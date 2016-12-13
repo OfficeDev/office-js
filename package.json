@@ -1,0 +1,23 @@
+{
+  "name": "@microsoft/office-js",
+  "description": "Office JavaScript API",
+  "version": "0.1.0-beta.3",
+  "keywords": [
+    "Office Add-ins",
+    "Office JavaScript API",
+    "Office"
+  ],
+  "dependencies": {
+    "node-fetch": "^1.6.3"
+  },
+  "author": {
+    "email": "onpm@microsoft.com",
+    "name": "Microsoft",
+    "url": "https://github.com/officedev"
+  },
+  "bugs": {
+    "url": "http://stackoverflow.com/questions/tagged/office-js"
+  },
+  "homepage": "https://dev.office.com/docs/add-ins/overview/office-add-ins",  
+  "license": "LICENSE"
+}
