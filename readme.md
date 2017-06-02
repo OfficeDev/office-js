@@ -1,50 +1,10 @@
-# Office Javascript API
+# Office JavaScript APIs
 
-Office Javascript API enables you to access content in Office documents.
+The JavaScript API for Office enables you to create web applications that interact with the object models in Office host applications. Your application will reference the office.js library, which is a script loader. The office.js library loads the object models that are applicable to the Office application that is running the add-in.
 
-## Usage
+The NPM package for Office.js is a copy of what gets published to the official "evergreen" Office.js CDN, at **<https://appsforoffice.microsoft.com/lib/1/hosted/office.js>**.  It NPM's beta packages also offer a channel for faster-cadence beta-testing (relative to the slower-cadence [official BETA endpoint](https://appsforoffice.microsoft.com/lib/beta/hosted/office.js)).
 
-### Use Office JavaScript API in Node.js Application
-#### Using TypeScript
-```typescript
-import * as Excel from '@microsoft/office-js/excel'
+For more information on Office Add-ins and the Office JavaScript APIs, see:
 
-var accessToken: string;
-// getAccessToken() method is is implemented by you and it returns OAUTH access token
-accessToken = getAccessToken();
-// Assume that there is a file 'book.xlsx' in the OneDrive root folder
-var workbookUrl = "https://graph.microsoft.com/v1.0/me/drive/root:/book.xlsx:/workbook";
-var session = new Excel.Session(workbookUrl, {Authorization: "Bearer " + accessToken});
-Excel.run(session, (context) => {
-    var r = context.workbook.worksheets.getItem('Sheet1').getRange("A1:B2");
-    r.values = [["Hello", "World"], [1234, "=B2 + 100"]];
-    r.load();
-    return context.sync()
-        .then(() => {
-            console.log(JSON.stringify(r.values));
-        });
-});
-
-```
-
-#### Using JavaScript
-```javascript
-import * as Excel from '@microsoft/office-js/excel'
-
-var accessToken;
-// getAccessToken() method is is implemented by you and it returns OAUTH access token
-accessToken = getAccessToken();
-// Assume that there is a file 'book.xlsx' in the OneDrive root folder
-var workbookUrl = "https://graph.microsoft.com/v1.0/me/drive/root:/book.xlsx:/workbook";
-var session = new Excel.Session(workbookUrl, {Authorization: "Bearer " + accessToken});
-Excel.run(session, function(context){
-    var r = context.workbook.worksheets.getItem('Sheet1').getRange("A1:B2");
-    r.values = [["Hello", "World"], [1234, "=B2 + 100"]];
-    r.load();
-    return context.sync()
-        .then(function() {
-            console.log(JSON.stringify(r.values));
-        });
-});
-
-```  
+- [Office Add-ins platform overview](https://dev.office.com/docs/add-ins/overview/office-add-ins)
+- [JavaScript API for Office reference](https://dev.office.com/reference/add-ins/javascript-api-for-office)
