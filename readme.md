@@ -53,12 +53,12 @@ Office.js versioning is described in detail in <https://dev.office.com/docs/add-
 
 The NPM package and the repo branches assume the following structure.
 
-| NPM tag                      | Description   | Corresponding CDN location | Repo branch
-| ---------------------------- |-------------- | -------------------------- |
-| Default (`latest`)           | The latest of the publicly-available APIs | <https://appsforoffice.microsoft.com/lib/**1**/hosted/office.js> | `master`
-| `beta` / `beta-prerelease`   | Forthcoming APIs, not necessarily ready for public consumption yet (and may still change...), but likely available on Insider Fast (and maybe Insider Slow) builds | <https://appsforoffice.microsoft.com/lib/**beta**/hosted/office.js> | `beta` / `beta-prerelease`
-| `alpha` / `alpha-prerelease` | Forthcoming APIs, not ready for public consumption yet (and *will* likely change...). *Might* be available on Insider Fast builds | N/A | `alpha` / `alpha-prerelease`
-| `private`                    | Any flavor of a release, but deployed for a very specific customer / need. Unlike the other tags, successive versions of this tag are not necessarily cumulative updates; it is possible to have a `1.1.2-private.1` that has the alpha JS, and then a `1.1.2-private.2` that only contains the publicly-available APIs (with some tweaks) | N/A | N/A
+| NPM tag                      | Description   | Corresponding CDN location | Repo branch |
+| ---------------------------- |-------------- | -------------------------- | ----------- |
+| Default (`latest`)           | The latest of the publicly-available APIs | <https://appsforoffice.microsoft.com/lib/**1**/hosted/office.js> | `master` |
+| `beta` / `beta-prerelease`   | Forthcoming APIs, not necessarily ready for public consumption yet (and may still change...), but likely available on Insider Fast (and maybe Insider Slow) builds | <https://appsforoffice.microsoft.com/lib/**beta**/hosted/office.js> | `beta` / `beta-prerelease` |
+| `alpha` / `alpha-prerelease` | Forthcoming APIs, not ready for public consumption yet (and *will* likely change...). *Might* be available on Insider Fast builds | N/A | `alpha` / `alpha-prerelease` |
+| `private`                    | Any flavor of a release, but deployed for a very specific customer / need. Unlike the other tags, successive versions of this tag are not necessarily cumulative updates; it is possible to have a `1.1.2-private.1` that has the alpha JS, and then a `1.1.2-private.2` that only contains the publicly-available APIs (with some tweaks) | N/A | N/A |
 
 
 
