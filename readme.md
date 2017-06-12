@@ -47,6 +47,21 @@ When you have a version number, can use it as follows with <https://unpkg.com>: 
     <src script="https://unpkg.com/@microsoft/office-js@1.1.2-alpha.0/dist/office.js"></script>
 
 
+## Production vs. Beta vs. Alpha versions
+
+Office.js versioning is described in detail in <https://dev.office.com/docs/add-ins/develop/office-js-versioning>.  Importantly, there is a large difference between what is in the JS files, versus what are the capabilities of a particular computer (i.e., older or slower-to-update versions of office). 
+
+The NPM package and the repo branches assume the following structure.
+
+| NPM tag                      | Description   | Corresponding CDN location | Repo branch
+| ---------------------------- |-------------- | -------------------------- |
+| Default (`latest`)           | The latest of the publicly-available APIs | <https://appsforoffice.microsoft.com/lib/**1**/hosted/office.js> | `master`
+| `beta` / `beta-prerelease`   | Forthcoming APIs, not necessarily ready for public consumption yet (and may still change...), but likely available on Insider Fast (and maybe Insider Slow) builds | <https://appsforoffice.microsoft.com/lib/**beta**/hosted/office.js> | `beta` / `beta-prerelease`
+| `alpha` / `alpha-prerelease` | Forthcoming APIs, not ready for public consumption yet (and *will* likely change...). *Might* be available on Insider Fast builds | N/A | `alpha` / `alpha-prerelease`
+| `private`                    | Any flavor of a release, but deployed for a very specific customer / need. Unlike the other tags, successive versions of this tag are not necessarily cumulative updates; it is possible to have a `1.1.2-private.1` that has the alpha JS, and then a `1.1.2-private.2` that only contains the publicly-available APIs (with some tweaks) | N/A | N/A
+
+
+
 ## Using an Alpha or Beta version with [Script Lab](https://aka.ms/script-lab)
 
 To use a version of the NPM package with [Script Lab](https://aka.ms/script-lab), substitute the CDN reference and the `@types/office-js` reference with the NPM package name and version.  [Note: Script Lab uses <https://unpkg.com> for resolving the package names, so it's very similar guidance as above]:
