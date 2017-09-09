@@ -2462,7 +2462,7 @@ declare namespace OfficeExtension {
 
 declare namespace OfficeCore {
     /**
-     * [Api set: Experiment 1.1 (PREVIEW)]
+     * [Api set: Experimentation 1.1 (PREVIEW)]
      */
     class FlightingService extends OfficeExtension.ClientObject {
         getFeature(featureName: string, type: string, defaultValue: number | boolean | string, possibleValues?: Array<number> | Array<string> | Array<boolean> | Array<ScopedValue>): OfficeCore.ABType;
@@ -2479,26 +2479,26 @@ declare namespace OfficeCore {
      *
      * Provides information about the scoped value.
      *
-     * [Api set: Experiment 1.1 (PREVIEW)]
+     * [Api set: Experimentation 1.1 (PREVIEW)]
      */
     interface ScopedValue {
         /**
          *
          * Gets the scope.
          *
-         * [Api set: Experiment 1.1 (PREVIEW)]
+         * [Api set: Experimentation 1.1 (PREVIEW)]
          */
         scope: string;
         /**
          *
          * Gets the value.
          *
-         * [Api set: Experiment 1.1 (PREVIEW)]
+         * [Api set: Experimentation 1.1 (PREVIEW)]
          */
         value: string | number | boolean;
     }
     /**
-     * [Api set: Experiment 1.1 (PREVIEW)]
+     * [Api set: Experimentation 1.1 (PREVIEW)]
      */
     class ABType extends OfficeExtension.ClientObject {
         readonly value: string | number | boolean;
@@ -2511,7 +2511,7 @@ declare namespace OfficeCore {
         };
     }
     /**
-     * [Api set: Experiment 1.1 (PREVIEW)]
+     * [Api set: Experimentation 1.1 (PREVIEW)]
      */
     namespace FeatureType {
         var boolean: string;
@@ -2527,7 +2527,7 @@ declare namespace OfficeCore {
 declare namespace OfficeCore {
     class RequestContext extends OfficeExtension.ClientRequestContext {
         constructor(url?: string | OfficeExtension.RequestUrlAndHeaderInfo | any);
-        readonly flightingService: FlightingService;
+        readonly flighting: FlightingService;
     }
 }
 
@@ -5582,7 +5582,7 @@ declare namespace Excel {
         getCount(): OfficeExtension.ClientResult<number>;
         /**
          *
-         * Retrieves a series based on its position in the collection
+         * Retrieves a series based on its position in the collection.
          *
          * [Api set: ExcelApi 1.1]
          *
@@ -7236,6 +7236,16 @@ declare namespace Excel {
         getCount(): OfficeExtension.ClientResult<number>;
         /**
          *
+         * Returns a conditional format for the given ID.
+         *
+         * [Api set: ExcelApi 1.6 (PREVIEW)]
+         *
+         * @param id The id of the conditional format.
+         * @returns Conditional Format object.
+         */
+        getItem(id: string): Excel.ConditionalFormat;
+        /**
+         *
          * Returns a conditional format at the given index.
          *
          * [Api set: ExcelApi 1.6 (PREVIEW)]
@@ -7376,10 +7386,18 @@ declare namespace Excel {
         readonly topBottomOrNullObject: Excel.TopBottomConditionalFormat;
         /**
          *
+         * The Priority of the Conditional Format within the current ConditionalFormatCollection.
+         *
+         * [Api set: ExcelApi 1.6 (PREVIEW)]
+         */
+        readonly id: string;
+        /**
+         *
          * The priority (or index) within the conditional format collection that this conditional format currently exists in. Changing this also
             changes other conditional formats' priorities, to allow for a contiguous priority order.
             Use a negative priority to begin from the back.
             Priorities greater than than bounds will get and set to the maximum (or minimum if negative) priority.
+            Also note that if you change the priority, you have to re-fetch a new copy of the object at that new priority location if you want to make further changes to it.
          *
          * [Api set: ExcelApi 1.6 (PREVIEW)]
          */
@@ -7444,6 +7462,7 @@ declare namespace Excel {
             "dataBarOrNullObject": DataBarConditionalFormat;
             "iconSet": IconSetConditionalFormat;
             "iconSetOrNullObject": IconSetConditionalFormat;
+            "id": string;
             "preset": PresetCriteriaConditionalFormat;
             "presetOrNullObject": PresetCriteriaConditionalFormat;
             "priority": number;
@@ -13914,6 +13933,7 @@ declare namespace Excel {
             changes other conditional formats' priorities, to allow for a contiguous priority order.
             Use a negative priority to begin from the back.
             Priorities greater than than bounds will get and set to the maximum (or minimum if negative) priority.
+            Also note that if you change the priority, you have to re-fetch a new copy of the object at that new priority location if you want to make further changes to it.
              *
              * [Api set: ExcelApi 1.6 (PREVIEW)]
              */
@@ -14303,84 +14323,84 @@ declare namespace Word {
          *
          * [Api set: WordApi 1.1]
          */
-        contentControls: Word.ContentControlCollection;
+        readonly contentControls: Word.ContentControlCollection;
         /**
          *
          * Gets the text format of the body. Use this to get and set font name, size, color and other properties. Read-only.
          *
          * [Api set: WordApi 1.1]
          */
-        font: Word.Font;
+        readonly font: Word.Font;
         /**
          *
          * Gets the collection of inlinePicture objects in the body. The collection does not include floating images. Read-only.
          *
          * [Api set: WordApi 1.1]
          */
-        inlinePictures: Word.InlinePictureCollection;
+        readonly inlinePictures: Word.InlinePictureCollection;
         /**
          *
          * Gets the collection of list objects in the body. Read-only.
          *
          * [Api set: WordApi 1.3]
          */
-        lists: Word.ListCollection;
+        readonly lists: Word.ListCollection;
         /**
          *
          * Gets the collection of paragraph objects in the body. Read-only.
          *
          * [Api set: WordApi 1.1]
          */
-        paragraphs: Word.ParagraphCollection;
+        readonly paragraphs: Word.ParagraphCollection;
         /**
          *
          * Gets the parent body of the body. For example, a table cell body's parent body could be a header. Throws if there isn't a parent body. Read-only.
          *
          * [Api set: WordApi 1.3]
          */
-        parentBody: Word.Body;
+        readonly parentBody: Word.Body;
         /**
          *
          * Gets the parent body of the body. For example, a table cell body's parent body could be a header. Returns a null object if there isn't a parent body. Read-only.
          *
          * [Api set: WordApi 1.3]
          */
-        parentBodyOrNullObject: Word.Body;
+        readonly parentBodyOrNullObject: Word.Body;
         /**
          *
          * Gets the content control that contains the body. Throws if there isn't a parent content control. Read-only.
          *
          * [Api set: WordApi 1.1]
          */
-        parentContentControl: Word.ContentControl;
+        readonly parentContentControl: Word.ContentControl;
         /**
          *
          * Gets the content control that contains the body. Returns a null object if there isn't a parent content control. Read-only.
          *
          * [Api set: WordApi 1.3]
          */
-        parentContentControlOrNullObject: Word.ContentControl;
+        readonly parentContentControlOrNullObject: Word.ContentControl;
         /**
          *
          * Gets the parent section of the body. Throws if there isn't a parent section. Read-only.
          *
          * [Api set: WordApi 1.3]
          */
-        parentSection: Word.Section;
+        readonly parentSection: Word.Section;
         /**
          *
          * Gets the parent section of the body. Returns a null object if there isn't a parent section. Read-only.
          *
          * [Api set: WordApi 1.3]
          */
-        parentSectionOrNullObject: Word.Section;
+        readonly parentSectionOrNullObject: Word.Section;
         /**
          *
          * Gets the collection of table objects in the body. Read-only.
          *
          * [Api set: WordApi 1.3]
          */
-        tables: Word.TableCollection;
+        readonly tables: Word.TableCollection;
         /**
          *
          * Gets or sets the style name for the body. Use this property for custom styles and localized style names. To use the built-in styles that are portable between locales, see the "styleBuiltIn" property.
@@ -14401,14 +14421,14 @@ declare namespace Word {
          *
          * [Api set: WordApi 1.1]
          */
-        text: string;
+        readonly text: string;
         /**
          *
          * Gets the type of the body. The type can be 'MainDoc', 'Section', 'Header', 'Footer', or 'TableCell'. Read-only.
          *
          * [Api set: WordApi 1.3]
          */
-        type: string;
+        readonly type: string;
         /** Sets multiple properties on the object at the same time, based on JSON input. */
         set(properties: Interfaces.BodyUpdateData, options?: {
             /**
@@ -14597,91 +14617,91 @@ declare namespace Word {
          *
          * [Api set: WordApi 1.1]
          */
-        contentControls: Word.ContentControlCollection;
+        readonly contentControls: Word.ContentControlCollection;
         /**
          *
          * Gets the text format of the content control. Use this to get and set font name, size, color, and other properties. Read-only.
          *
          * [Api set: WordApi 1.1]
          */
-        font: Word.Font;
+        readonly font: Word.Font;
         /**
          *
          * Gets the collection of inlinePicture objects in the content control. The collection does not include floating images. Read-only.
          *
          * [Api set: WordApi 1.1]
          */
-        inlinePictures: Word.InlinePictureCollection;
+        readonly inlinePictures: Word.InlinePictureCollection;
         /**
          *
          * Gets the collection of list objects in the content control. Read-only.
          *
          * [Api set: WordApi 1.3]
          */
-        lists: Word.ListCollection;
+        readonly lists: Word.ListCollection;
         /**
          *
          * Get the collection of paragraph objects in the content control. Read-only.
          *
          * [Api set: WordApi 1.1]
          */
-        paragraphs: Word.ParagraphCollection;
+        readonly paragraphs: Word.ParagraphCollection;
         /**
          *
          * Gets the parent body of the content control. Read-only.
          *
          * [Api set: WordApi 1.3]
          */
-        parentBody: Word.Body;
+        readonly parentBody: Word.Body;
         /**
          *
          * Gets the content control that contains the content control. Throws if there isn't a parent content control. Read-only.
          *
          * [Api set: WordApi 1.1]
          */
-        parentContentControl: Word.ContentControl;
+        readonly parentContentControl: Word.ContentControl;
         /**
          *
          * Gets the content control that contains the content control. Returns a null object if there isn't a parent content control. Read-only.
          *
          * [Api set: WordApi 1.3]
          */
-        parentContentControlOrNullObject: Word.ContentControl;
+        readonly parentContentControlOrNullObject: Word.ContentControl;
         /**
          *
          * Gets the table that contains the content control. Throws if it is not contained in a table. Read-only.
          *
          * [Api set: WordApi 1.3]
          */
-        parentTable: Word.Table;
+        readonly parentTable: Word.Table;
         /**
          *
          * Gets the table cell that contains the content control. Throws if it is not contained in a table cell. Read-only.
          *
          * [Api set: WordApi 1.3]
          */
-        parentTableCell: Word.TableCell;
+        readonly parentTableCell: Word.TableCell;
         /**
          *
          * Gets the table cell that contains the content control. Returns a null object if it is not contained in a table cell. Read-only.
          *
          * [Api set: WordApi 1.3]
          */
-        parentTableCellOrNullObject: Word.TableCell;
+        readonly parentTableCellOrNullObject: Word.TableCell;
         /**
          *
          * Gets the table that contains the content control. Returns a null object if it is not contained in a table. Read-only.
          *
          * [Api set: WordApi 1.3]
          */
-        parentTableOrNullObject: Word.Table;
+        readonly parentTableOrNullObject: Word.Table;
         /**
          *
          * Gets the collection of table objects in the content control. Read-only.
          *
          * [Api set: WordApi 1.3]
          */
-        tables: Word.TableCollection;
+        readonly tables: Word.TableCollection;
         /**
          *
          * Gets or sets the appearance of the content control. The value can be 'boundingBox', 'tags' or 'hidden'.
@@ -14716,7 +14736,7 @@ declare namespace Word {
          *
          * [Api set: WordApi 1.1]
          */
-        id: number;
+        readonly id: number;
         /**
          *
          * Gets or sets the placeholder text of the content control. Dimmed text will be displayed when the content control is empty.
@@ -14751,7 +14771,7 @@ declare namespace Word {
          *
          * [Api set: WordApi 1.3]
          */
-        subtype: string;
+        readonly subtype: string;
         /**
          *
          * Gets or sets a tag to identify a content control.
@@ -14765,7 +14785,7 @@ declare namespace Word {
          *
          * [Api set: WordApi 1.1]
          */
-        text: string;
+        readonly text: string;
         /**
          *
          * Gets or sets the title for a content control.
@@ -14779,7 +14799,7 @@ declare namespace Word {
          *
          * [Api set: WordApi 1.1]
          */
-        type: string;
+        readonly type: string;
         /** Sets multiple properties on the object at the same time, based on JSON input. */
         set(properties: Interfaces.ContentControlUpdateData, options?: {
             /**
@@ -14997,7 +15017,7 @@ declare namespace Word {
      */
     class ContentControlCollection extends OfficeExtension.ClientObject {
         /** Gets the loaded child items in this collection. */
-        items: Array<Word.ContentControl>;
+        readonly items: Array<Word.ContentControl>;
         /**
          *
          * Gets a content control by its identifier. Throws if there isn't a content control with the identifier in this collection.
@@ -15093,17 +15113,17 @@ declare namespace Word {
          *
          * [Api set: WordApi 1.3]
          */
-        key: string;
+        readonly key: string;
         /**
          *
-         * Gets the value type of the custom property. Read only.
+         * Gets the value type of the custom property. Possible values are: String, Number, Date, Boolean. Read only.
          *
          * [Api set: WordApi 1.3]
          */
-        type: string;
+        readonly type: string;
         /**
          *
-         * Gets or sets the value of the custom property.
+         * Gets or sets the value of the custom property. Note that even though Word Online and the docx file format allow these properties to be arbitrarily long, the desktop version of Word will truncate string values to 255 16-bit chars (possibly creating invalid unicode by breaking up a surrogate pair).
          *
          * [Api set: WordApi 1.3]
          */
@@ -15150,7 +15170,7 @@ declare namespace Word {
      */
     class CustomPropertyCollection extends OfficeExtension.ClientObject {
         /** Gets the loaded child items in this collection. */
-        items: Array<Word.CustomProperty>;
+        readonly items: Array<Word.CustomProperty>;
         /**
          *
          * Creates a new or sets an existing custom property.
@@ -15220,35 +15240,35 @@ declare namespace Word {
          *
          * [Api set: WordApi 1.1]
          */
-        body: Word.Body;
+        readonly body: Word.Body;
         /**
          *
          * Gets the collection of content control objects in the current document. This includes content controls in the body of the document, headers, footers, textboxes, etc.. Read-only.
          *
          * [Api set: WordApi 1.1]
          */
-        contentControls: Word.ContentControlCollection;
+        readonly contentControls: Word.ContentControlCollection;
         /**
          *
          * Gets the properties of the current document. Read-only.
          *
          * [Api set: WordApi 1.3]
          */
-        properties: Word.DocumentProperties;
+        readonly properties: Word.DocumentProperties;
         /**
          *
          * Gets the collection of section objects in the document. Read-only.
          *
          * [Api set: WordApi 1.1]
          */
-        sections: Word.SectionCollection;
+        readonly sections: Word.SectionCollection;
         /**
          *
          * Indicates whether the changes in the document have been saved. A value of true indicates that the document hasn't changed since it was saved. Read-only.
          *
          * [Api set: WordApi 1.1]
          */
-        saved: boolean;
+        readonly saved: boolean;
         /** Sets multiple properties on the object at the same time, based on JSON input. */
         set(properties: Interfaces.DocumentUpdateData, options?: {
             /**
@@ -15303,14 +15323,14 @@ declare namespace Word {
          *
          * [Api set: WordApi 1.3]
          */
-        customProperties: Word.CustomPropertyCollection;
+        readonly customProperties: Word.CustomPropertyCollection;
         /**
          *
          * Gets the application name of the document. Read only.
          *
          * [Api set: WordApi 1.3]
          */
-        applicationName: string;
+        readonly applicationName: string;
         /**
          *
          * Gets or sets the author of the document.
@@ -15345,7 +15365,7 @@ declare namespace Word {
          *
          * [Api set: WordApi 1.3]
          */
-        creationDate: Date;
+        readonly creationDate: Date;
         /**
          *
          * Gets or sets the format of the document.
@@ -15366,21 +15386,21 @@ declare namespace Word {
          *
          * [Api set: WordApi 1.3]
          */
-        lastAuthor: string;
+        readonly lastAuthor: string;
         /**
          *
          * Gets the last print date of the document. Read only.
          *
          * [Api set: WordApi 1.3]
          */
-        lastPrintDate: Date;
+        readonly lastPrintDate: Date;
         /**
          *
          * Gets the last save time of the document. Read only.
          *
          * [Api set: WordApi 1.3]
          */
-        lastSaveTime: Date;
+        readonly lastSaveTime: Date;
         /**
          *
          * Gets or sets the manager of the document.
@@ -15394,14 +15414,14 @@ declare namespace Word {
          *
          * [Api set: WordApi 1.3]
          */
-        revisionNumber: string;
+        readonly revisionNumber: string;
         /**
          *
          * Gets the security of the document. Read only.
          *
          * [Api set: WordApi 1.3]
          */
-        security: number;
+        readonly security: number;
         /**
          *
          * Gets or sets the subject of the document.
@@ -15415,7 +15435,7 @@ declare namespace Word {
          *
          * [Api set: WordApi 1.3]
          */
-        template: string;
+        readonly template: string;
         /**
          *
          * Gets or sets the title of the document.
@@ -15596,49 +15616,49 @@ declare namespace Word {
          *
          * [Api set: WordApi 1.2]
          */
-        paragraph: Word.Paragraph;
+        readonly paragraph: Word.Paragraph;
         /**
          *
          * Gets the content control that contains the inline image. Throws if there isn't a parent content control. Read-only.
          *
          * [Api set: WordApi 1.1]
          */
-        parentContentControl: Word.ContentControl;
+        readonly parentContentControl: Word.ContentControl;
         /**
          *
          * Gets the content control that contains the inline image. Returns a null object if there isn't a parent content control. Read-only.
          *
          * [Api set: WordApi 1.3]
          */
-        parentContentControlOrNullObject: Word.ContentControl;
+        readonly parentContentControlOrNullObject: Word.ContentControl;
         /**
          *
          * Gets the table that contains the inline image. Throws if it is not contained in a table. Read-only.
          *
          * [Api set: WordApi 1.3]
          */
-        parentTable: Word.Table;
+        readonly parentTable: Word.Table;
         /**
          *
          * Gets the table cell that contains the inline image. Throws if it is not contained in a table cell. Read-only.
          *
          * [Api set: WordApi 1.3]
          */
-        parentTableCell: Word.TableCell;
+        readonly parentTableCell: Word.TableCell;
         /**
          *
          * Gets the table cell that contains the inline image. Returns a null object if it is not contained in a table cell. Read-only.
          *
          * [Api set: WordApi 1.3]
          */
-        parentTableCellOrNullObject: Word.TableCell;
+        readonly parentTableCellOrNullObject: Word.TableCell;
         /**
          *
          * Gets the table that contains the inline image. Returns a null object if it is not contained in a table. Read-only.
          *
          * [Api set: WordApi 1.3]
          */
-        parentTableOrNullObject: Word.Table;
+        readonly parentTableOrNullObject: Word.Table;
         /**
          *
          * Gets or sets a string that represents the alternative text associated with the inline image
@@ -15842,7 +15862,7 @@ declare namespace Word {
      */
     class InlinePictureCollection extends OfficeExtension.ClientObject {
         /** Gets the loaded child items in this collection. */
-        items: Array<Word.InlinePicture>;
+        readonly items: Array<Word.InlinePicture>;
         /**
          *
          * Gets the first inline image in this collection. Throws if this collection is empty.
@@ -15884,28 +15904,28 @@ declare namespace Word {
          *
          * [Api set: WordApi 1.3]
          */
-        paragraphs: Word.ParagraphCollection;
+        readonly paragraphs: Word.ParagraphCollection;
         /**
          *
          * Gets the list's id.
          *
          * [Api set: WordApi 1.3]
          */
-        id: number;
+        readonly id: number;
         /**
          *
          * Checks whether each of the 9 levels exists in the list. A true value indicates the level exists, which means there is at least one list item at that level. Read-only.
          *
          * [Api set: WordApi 1.3]
          */
-        levelExistences: Array<boolean>;
+        readonly levelExistences: Array<boolean>;
         /**
          *
          * Gets all 9 level types in the list. Each type can be 'Bullet', 'Number' or 'Picture'. Read-only.
          *
          * [Api set: WordApi 1.3]
          */
-        levelTypes: Array<string>;
+        readonly levelTypes: Array<string>;
         /**
          *
          * Gets the paragraphs that occur at the specified level in the list.
@@ -16014,7 +16034,7 @@ declare namespace Word {
      */
     class ListCollection extends OfficeExtension.ClientObject {
         /** Gets the loaded child items in this collection. */
-        items: Array<Word.List>;
+        readonly items: Array<Word.List>;
         /**
          *
          * Gets a list by its identifier. Throws if there isn't a list with the identifier in this collection.
@@ -16090,14 +16110,14 @@ declare namespace Word {
          *
          * [Api set: WordApi 1.3]
          */
-        listString: string;
+        readonly listString: string;
         /**
          *
          * Gets the list item order number in relation to its siblings. Read-only.
          *
          * [Api set: WordApi 1.3]
          */
-        siblingIndex: number;
+        readonly siblingIndex: number;
         /** Sets multiple properties on the object at the same time, based on JSON input. */
         set(properties: Interfaces.ListItemUpdateData, options?: {
             /**
@@ -16165,98 +16185,98 @@ declare namespace Word {
          *
          * [Api set: WordApi 1.1]
          */
-        contentControls: Word.ContentControlCollection;
+        readonly contentControls: Word.ContentControlCollection;
         /**
          *
          * Gets the text format of the paragraph. Use this to get and set font name, size, color, and other properties. Read-only.
          *
          * [Api set: WordApi 1.1]
          */
-        font: Word.Font;
+        readonly font: Word.Font;
         /**
          *
          * Gets the collection of inlinePicture objects in the paragraph. The collection does not include floating images. Read-only.
          *
          * [Api set: WordApi 1.1]
          */
-        inlinePictures: Word.InlinePictureCollection;
+        readonly inlinePictures: Word.InlinePictureCollection;
         /**
          *
          * Gets the List to which this paragraph belongs. Throws if the paragraph is not in a list. Read-only.
          *
          * [Api set: WordApi 1.3]
          */
-        list: Word.List;
+        readonly list: Word.List;
         /**
          *
          * Gets the ListItem for the paragraph. Throws if the paragraph is not part of a list. Read-only.
          *
          * [Api set: WordApi 1.3]
          */
-        listItem: Word.ListItem;
+        readonly listItem: Word.ListItem;
         /**
          *
          * Gets the ListItem for the paragraph. Returns a null object if the paragraph is not part of a list. Read-only.
          *
          * [Api set: WordApi 1.3]
          */
-        listItemOrNullObject: Word.ListItem;
+        readonly listItemOrNullObject: Word.ListItem;
         /**
          *
          * Gets the List to which this paragraph belongs. Returns a null object if the paragraph is not in a list. Read-only.
          *
          * [Api set: WordApi 1.3]
          */
-        listOrNullObject: Word.List;
+        readonly listOrNullObject: Word.List;
         /**
          *
          * Gets the parent body of the paragraph. Read-only.
          *
          * [Api set: WordApi 1.3]
          */
-        parentBody: Word.Body;
+        readonly parentBody: Word.Body;
         /**
          *
          * Gets the content control that contains the paragraph. Throws if there isn't a parent content control. Read-only.
          *
          * [Api set: WordApi 1.1]
          */
-        parentContentControl: Word.ContentControl;
+        readonly parentContentControl: Word.ContentControl;
         /**
          *
          * Gets the content control that contains the paragraph. Returns a null object if there isn't a parent content control. Read-only.
          *
          * [Api set: WordApi 1.3]
          */
-        parentContentControlOrNullObject: Word.ContentControl;
+        readonly parentContentControlOrNullObject: Word.ContentControl;
         /**
          *
          * Gets the table that contains the paragraph. Throws if it is not contained in a table. Read-only.
          *
          * [Api set: WordApi 1.3]
          */
-        parentTable: Word.Table;
+        readonly parentTable: Word.Table;
         /**
          *
          * Gets the table cell that contains the paragraph. Throws if it is not contained in a table cell. Read-only.
          *
          * [Api set: WordApi 1.3]
          */
-        parentTableCell: Word.TableCell;
+        readonly parentTableCell: Word.TableCell;
         /**
          *
          * Gets the table cell that contains the paragraph. Returns a null object if it is not contained in a table cell. Read-only.
          *
          * [Api set: WordApi 1.3]
          */
-        parentTableCellOrNullObject: Word.TableCell;
+        readonly parentTableCellOrNullObject: Word.TableCell;
         /**
          *
          * Gets the table that contains the paragraph. Returns a null object if it is not contained in a table. Read-only.
          *
          * [Api set: WordApi 1.3]
          */
-        parentTableOrNullObject: Word.Table;
+        readonly parentTableOrNullObject: Word.Table;
         /**
          *
          * Gets or sets the alignment for a paragraph. The value can be 'left', 'centered', 'right', or 'justified'.
@@ -16277,14 +16297,14 @@ declare namespace Word {
          *
          * [Api set: WordApi 1.3]
          */
-        isLastParagraph: boolean;
+        readonly isLastParagraph: boolean;
         /**
          *
          * Checks whether the paragraph is a list item. Read-only.
          *
          * [Api set: WordApi 1.3]
          */
-        isListItem: boolean;
+        readonly isListItem: boolean;
         /**
          *
          * Gets or sets the left indent value, in points, for the paragraph.
@@ -16361,14 +16381,14 @@ declare namespace Word {
          *
          * [Api set: WordApi 1.3]
          */
-        tableNestingLevel: number;
+        readonly tableNestingLevel: number;
         /**
          *
          * Gets the text of the paragraph. Read-only.
          *
          * [Api set: WordApi 1.1]
          */
-        text: string;
+        readonly text: string;
         /** Sets multiple properties on the object at the same time, based on JSON input. */
         set(properties: Interfaces.ParagraphUpdateData, options?: {
             /**
@@ -16646,7 +16666,7 @@ declare namespace Word {
      */
     class ParagraphCollection extends OfficeExtension.ClientObject {
         /** Gets the loaded child items in this collection. */
-        items: Array<Word.Paragraph>;
+        readonly items: Array<Word.Paragraph>;
         /**
          *
          * Gets the first paragraph in this collection. Throws if the collection is empty.
@@ -16702,91 +16722,91 @@ declare namespace Word {
          *
          * [Api set: WordApi 1.1]
          */
-        contentControls: Word.ContentControlCollection;
+        readonly contentControls: Word.ContentControlCollection;
         /**
          *
          * Gets the text format of the range. Use this to get and set font name, size, color, and other properties. Read-only.
          *
          * [Api set: WordApi 1.1]
          */
-        font: Word.Font;
+        readonly font: Word.Font;
         /**
          *
          * Gets the collection of inline picture objects in the range. Read-only.
          *
          * [Api set: WordApi 1.2]
          */
-        inlinePictures: Word.InlinePictureCollection;
+        readonly inlinePictures: Word.InlinePictureCollection;
         /**
          *
          * Gets the collection of list objects in the range. Read-only.
          *
          * [Api set: WordApi 1.3]
          */
-        lists: Word.ListCollection;
+        readonly lists: Word.ListCollection;
         /**
          *
          * Gets the collection of paragraph objects in the range. Read-only.
          *
          * [Api set: WordApi 1.1]
          */
-        paragraphs: Word.ParagraphCollection;
+        readonly paragraphs: Word.ParagraphCollection;
         /**
          *
          * Gets the parent body of the range. Read-only.
          *
          * [Api set: WordApi 1.3]
          */
-        parentBody: Word.Body;
+        readonly parentBody: Word.Body;
         /**
          *
          * Gets the content control that contains the range. Throws if there isn't a parent content control. Read-only.
          *
          * [Api set: WordApi 1.1]
          */
-        parentContentControl: Word.ContentControl;
+        readonly parentContentControl: Word.ContentControl;
         /**
          *
          * Gets the content control that contains the range. Returns a null object if there isn't a parent content control. Read-only.
          *
          * [Api set: WordApi 1.3]
          */
-        parentContentControlOrNullObject: Word.ContentControl;
+        readonly parentContentControlOrNullObject: Word.ContentControl;
         /**
          *
          * Gets the table that contains the range. Throws if it is not contained in a table. Read-only.
          *
          * [Api set: WordApi 1.3]
          */
-        parentTable: Word.Table;
+        readonly parentTable: Word.Table;
         /**
          *
          * Gets the table cell that contains the range. Throws if it is not contained in a table cell. Read-only.
          *
          * [Api set: WordApi 1.3]
          */
-        parentTableCell: Word.TableCell;
+        readonly parentTableCell: Word.TableCell;
         /**
          *
          * Gets the table cell that contains the range. Returns a null object if it is not contained in a table cell. Read-only.
          *
          * [Api set: WordApi 1.3]
          */
-        parentTableCellOrNullObject: Word.TableCell;
+        readonly parentTableCellOrNullObject: Word.TableCell;
         /**
          *
          * Gets the table that contains the range. Returns a null object if it is not contained in a table. Read-only.
          *
          * [Api set: WordApi 1.3]
          */
-        parentTableOrNullObject: Word.Table;
+        readonly parentTableOrNullObject: Word.Table;
         /**
          *
          * Gets the collection of table objects in the range. Read-only.
          *
          * [Api set: WordApi 1.3]
          */
-        tables: Word.TableCollection;
+        readonly tables: Word.TableCollection;
         /**
          *
          * Gets the first hyperlink in the range, or sets a hyperlink on the range. All hyperlinks in the range are deleted when you set a new hyperlink on the range. Use a '#' to separate the address part from the optional location part.
@@ -16800,7 +16820,7 @@ declare namespace Word {
          *
          * [Api set: WordApi 1.3]
          */
-        isEmpty: boolean;
+        readonly isEmpty: boolean;
         /**
          *
          * Gets or sets the style name for the range. Use this property for custom styles and localized style names. To use the built-in styles that are portable between locales, see the "styleBuiltIn" property.
@@ -16821,7 +16841,7 @@ declare namespace Word {
          *
          * [Api set: WordApi 1.1]
          */
-        text: string;
+        readonly text: string;
         /** Sets multiple properties on the object at the same time, based on JSON input. */
         set(properties: Interfaces.RangeUpdateData, options?: {
             /**
@@ -17107,7 +17127,7 @@ declare namespace Word {
      */
     class RangeCollection extends OfficeExtension.ClientObject {
         /** Gets the loaded child items in this collection. */
-        items: Array<Word.Range>;
+        readonly items: Array<Word.Range>;
         /**
          *
          * Gets the first range in this collection. Throws if this collection is empty.
@@ -17233,7 +17253,7 @@ declare namespace Word {
          *
          * [Api set: WordApi 1.1]
          */
-        body: Word.Body;
+        readonly body: Word.Body;
         /** Sets multiple properties on the object at the same time, based on JSON input. */
         set(properties: Interfaces.SectionUpdateData, options?: {
             /**
@@ -17299,7 +17319,7 @@ declare namespace Word {
      */
     class SectionCollection extends OfficeExtension.ClientObject {
         /** Gets the loaded child items in this collection. */
-        items: Array<Word.Section>;
+        readonly items: Array<Word.Section>;
         /**
          *
          * Gets the first section in this collection. Throws if this collection is empty.
@@ -17341,70 +17361,70 @@ declare namespace Word {
          *
          * [Api set: WordApi 1.3]
          */
-        font: Word.Font;
+        readonly font: Word.Font;
         /**
          *
          * Gets the parent body of the table. Read-only.
          *
          * [Api set: WordApi 1.3]
          */
-        parentBody: Word.Body;
+        readonly parentBody: Word.Body;
         /**
          *
          * Gets the content control that contains the table. Throws if there isn't a parent content control. Read-only.
          *
          * [Api set: WordApi 1.3]
          */
-        parentContentControl: Word.ContentControl;
+        readonly parentContentControl: Word.ContentControl;
         /**
          *
          * Gets the content control that contains the table. Returns a null object if there isn't a parent content control. Read-only.
          *
          * [Api set: WordApi 1.3]
          */
-        parentContentControlOrNullObject: Word.ContentControl;
+        readonly parentContentControlOrNullObject: Word.ContentControl;
         /**
          *
          * Gets the table that contains this table. Throws if it is not contained in a table. Read-only.
          *
          * [Api set: WordApi 1.3]
          */
-        parentTable: Word.Table;
+        readonly parentTable: Word.Table;
         /**
          *
          * Gets the table cell that contains this table. Throws if it is not contained in a table cell. Read-only.
          *
          * [Api set: WordApi 1.3]
          */
-        parentTableCell: Word.TableCell;
+        readonly parentTableCell: Word.TableCell;
         /**
          *
          * Gets the table cell that contains this table. Returns a null object if it is not contained in a table cell. Read-only.
          *
          * [Api set: WordApi 1.3]
          */
-        parentTableCellOrNullObject: Word.TableCell;
+        readonly parentTableCellOrNullObject: Word.TableCell;
         /**
          *
          * Gets the table that contains this table. Returns a null object if it is not contained in a table. Read-only.
          *
          * [Api set: WordApi 1.3]
          */
-        parentTableOrNullObject: Word.Table;
+        readonly parentTableOrNullObject: Word.Table;
         /**
          *
          * Gets all of the table rows. Read-only.
          *
          * [Api set: WordApi 1.3]
          */
-        rows: Word.TableRowCollection;
+        readonly rows: Word.TableRowCollection;
         /**
          *
          * Gets the child tables nested one level deeper. Read-only.
          *
          * [Api set: WordApi 1.3]
          */
-        tables: Word.TableCollection;
+        readonly tables: Word.TableCollection;
         /**
          *
          * Gets or sets the alignment of the table against the page column. The value can be 'left', 'centered' or 'right'.
@@ -17432,21 +17452,21 @@ declare namespace Word {
          *
          * [Api set: WordApi 1.3]
          */
-        isUniform: boolean;
+        readonly isUniform: boolean;
         /**
          *
          * Gets the nesting level of the table. Top-level tables have level 1. Read-only.
          *
          * [Api set: WordApi 1.3]
          */
-        nestingLevel: number;
+        readonly nestingLevel: number;
         /**
          *
          * Gets the number of rows in the table. Read-only.
          *
          * [Api set: WordApi 1.3]
          */
-        rowCount: number;
+        readonly rowCount: number;
         /**
          *
          * Gets and sets the shading color.
@@ -17799,7 +17819,7 @@ declare namespace Word {
      */
     class TableCollection extends OfficeExtension.ClientObject {
         /** Gets the loaded child items in this collection. */
-        items: Array<Word.Table>;
+        readonly items: Array<Word.Table>;
         /**
          *
          * Gets the first table in this collection. Throws if this collection is empty.
@@ -17841,28 +17861,28 @@ declare namespace Word {
          *
          * [Api set: WordApi 1.3]
          */
-        cells: Word.TableCellCollection;
+        readonly cells: Word.TableCellCollection;
         /**
          *
          * Gets the font. Use this to get and set font name, size, color, and other properties. Read-only.
          *
          * [Api set: WordApi 1.3]
          */
-        font: Word.Font;
+        readonly font: Word.Font;
         /**
          *
          * Gets parent table. Read-only.
          *
          * [Api set: WordApi 1.3]
          */
-        parentTable: Word.Table;
+        readonly parentTable: Word.Table;
         /**
          *
          * Gets the number of cells in the row. Read-only.
          *
          * [Api set: WordApi 1.3]
          */
-        cellCount: number;
+        readonly cellCount: number;
         /**
          *
          * Gets and sets the horizontal alignment of every cell in the row. The value can be 'left', 'centered', 'right', or 'justified'.
@@ -17876,7 +17896,7 @@ declare namespace Word {
          *
          * [Api set: WordApi 1.3]
          */
-        isHeader: boolean;
+        readonly isHeader: boolean;
         /**
          *
          * Gets and sets the preferred height of the row in points.
@@ -17890,7 +17910,7 @@ declare namespace Word {
          *
          * [Api set: WordApi 1.3]
          */
-        rowIndex: number;
+        readonly rowIndex: number;
         /**
          *
          * Gets and sets the shading color.
@@ -18047,7 +18067,7 @@ declare namespace Word {
      */
     class TableRowCollection extends OfficeExtension.ClientObject {
         /** Gets the loaded child items in this collection. */
-        items: Array<Word.TableRow>;
+        readonly items: Array<Word.TableRow>;
         /**
          *
          * Gets the first row in this collection. Throws if this collection is empty.
@@ -18089,28 +18109,28 @@ declare namespace Word {
          *
          * [Api set: WordApi 1.3]
          */
-        body: Word.Body;
+        readonly body: Word.Body;
         /**
          *
          * Gets the parent row of the cell. Read-only.
          *
          * [Api set: WordApi 1.3]
          */
-        parentRow: Word.TableRow;
+        readonly parentRow: Word.TableRow;
         /**
          *
          * Gets the parent table of the cell. Read-only.
          *
          * [Api set: WordApi 1.3]
          */
-        parentTable: Word.Table;
+        readonly parentTable: Word.Table;
         /**
          *
          * Gets the index of the cell in its row. Read-only.
          *
          * [Api set: WordApi 1.3]
          */
-        cellIndex: number;
+        readonly cellIndex: number;
         /**
          *
          * Gets and sets the width of the cell's column in points. This is applicable to uniform tables.
@@ -18131,7 +18151,7 @@ declare namespace Word {
          *
          * [Api set: WordApi 1.3]
          */
-        rowIndex: number;
+        readonly rowIndex: number;
         /**
          *
          * Gets or sets the shading color of the cell. Color is specified in "#RRGGBB" format or by using the color name.
@@ -18159,7 +18179,7 @@ declare namespace Word {
          *
          * [Api set: WordApi 1.3]
          */
-        width: number;
+        readonly width: number;
         /** Sets multiple properties on the object at the same time, based on JSON input. */
         set(properties: Interfaces.TableCellUpdateData, options?: {
             /**
@@ -18279,7 +18299,7 @@ declare namespace Word {
      */
     class TableCellCollection extends OfficeExtension.ClientObject {
         /** Gets the loaded child items in this collection. */
-        items: Array<Word.TableCell>;
+        readonly items: Array<Word.TableCell>;
         /**
          *
          * Gets the first table cell in this collection. Throws if this collection is empty.
@@ -19015,7 +19035,7 @@ declare namespace Word {
         interface CustomPropertyUpdateData {
             /**
              *
-             * Gets or sets the value of the custom property.
+             * Gets or sets the value of the custom property. Note that even though Word Online and the docx file format allow these properties to be arbitrarily long, the desktop version of Word will truncate string values to 255 16-bit chars (possibly creating invalid unicode by breaking up a surrogate pair).
              *
              * [Api set: WordApi 1.3]
              */
@@ -19668,9 +19688,9 @@ declare module Word {
     /**
      * The RequestContext object facilitates requests to the Word application. Since the Office add-in and the Word application run in two different processes, the request context is required to get access to the Word object model from the add-in.
      */
-    class RequestContext extends OfficeExtension.ClientRequestContext {
+    class RequestContext extends OfficeCore.RequestContext {
         constructor(url?: string);
-        document: Document;
+        readonly document: Document;
     }
     /**
      * Executes a batch script that performs actions on the Word object model, using a new RequestContext. When the promise is resolved, any tracked objects that were automatically allocated during execution will be released.

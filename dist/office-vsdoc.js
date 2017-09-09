@@ -1,4 +1,4 @@
-/* Version: 16.0.8119.1000 */
+/* Version: 16.0.8503.1000 */
 /*
 	Copyright (c) Microsoft Corporation.  All rights reserved.
 */
@@ -2914,7 +2914,7 @@ Office._processContents(Office, Office._items);
 document.addEventListener("DOMContentLoaded", function () {
     Office.initialize();
 });
- 
+
 
 
 var __extends = this.__extends || function (d, b) {
@@ -2973,7 +2973,7 @@ var OfficeExtension;
 		};
 		ClientRequestContext.prototype.sync = function (passThroughValue) {
 			/// <summary>
-			/// Synchronizes the state between JavaScript proxy objects and the Office document, by executing instructions queued on the request context and retrieving properties of loaded Office objects for use in your code. This method returns a promise, which is resolved when the synchronization is complete.
+			/// Synchronizes the state between JavaScript proxy objects and the Office document, by executing instructions queued on the request context and retrieving properties of loaded Office objects for use in your code.ï¿½This method returns a promise, which is resolved when the synchronization is complete.
 			/// </summary>
 			/// <param name="passThroughValue" optional="true" />
 			return new OfficeExtension.Promise();
@@ -3159,7 +3159,6 @@ var OfficeExtension;
 			return new EventHandlerResult(null, null, handler);
 		};
 		EventHandlers.prototype.remove = function (handler) { };
-		EventHandlers.prototype.removeAll = function () { };
 		EventHandlers.prototype.__proto__ = null;
 		return EventHandlers;
 	}());
@@ -3175,157 +3174,67 @@ var OfficeExtension;
 })(OfficeExtension || (OfficeExtension = {__proto__: null}));
 
 OfficeExtension.__proto__ = null;
- 
 
-ï»¿
-var Excel;
-(function (Excel) {
-	var _V1Api = (function(_super) {
-		__extends(_V1Api, _super);
-		function _V1Api() {
-			/// <summary> [Api set: ExcelApi 1.3] </summary>
-			/// <field name="context" type="Excel.RequestContext">The request context associated with this object.</field>
-			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
-		}
 
-		_V1Api.prototype.load = function(option) {
+
+var OfficeCore;
+(function (OfficeCore) {
+	var RequestContext = (function (_super) {
+		__extends(RequestContext, _super);
+		function RequestContext() {
 			/// <summary>
-			/// Queues up a command to load the specified properties of the object. You must call "context.sync()" before reading the properties.
+			/// The RequestContext object facilitates requests to the OfficeCore application. Since the Office add-in and the OfficeCore application run in two different processes, the request context is required to get access to the OfficeCore object model from the add-in.
 			/// </summary>
-			/// <param name="option" type="string | string[] | OfficeExtension.LoadOption"/>
-			/// <returns type="Excel._V1Api"/>
+			_super.call(this, null);
 		}
-		_V1Api.prototype.bindingAddColumns = function(input) {
-			/// <returns type="OfficeExtension.ClientResult&lt;any&gt;"></returns>
-			var result = new OfficeExtension.ClientResult();
-			result.__proto__ = null;
-			result.value = {};
-			return result;
-		}
-		_V1Api.prototype.bindingAddFromNamedItem = function(input) {
-			/// <returns type="OfficeExtension.ClientResult&lt;any&gt;"></returns>
-			var result = new OfficeExtension.ClientResult();
-			result.__proto__ = null;
-			result.value = {};
-			return result;
-		}
-		_V1Api.prototype.bindingAddFromPrompt = function(input) {
-			/// <returns type="OfficeExtension.ClientResult&lt;any&gt;"></returns>
-			var result = new OfficeExtension.ClientResult();
-			result.__proto__ = null;
-			result.value = {};
-			return result;
-		}
-		_V1Api.prototype.bindingAddFromSelection = function(input) {
-			/// <returns type="OfficeExtension.ClientResult&lt;any&gt;"></returns>
-			var result = new OfficeExtension.ClientResult();
-			result.__proto__ = null;
-			result.value = {};
-			return result;
-		}
-		_V1Api.prototype.bindingAddRows = function(input) {
-			/// <returns type="OfficeExtension.ClientResult&lt;any&gt;"></returns>
-			var result = new OfficeExtension.ClientResult();
-			result.__proto__ = null;
-			result.value = {};
-			return result;
-		}
-		_V1Api.prototype.bindingClearFormats = function(input) {
-			/// <returns type="OfficeExtension.ClientResult&lt;any&gt;"></returns>
-			var result = new OfficeExtension.ClientResult();
-			result.__proto__ = null;
-			result.value = {};
-			return result;
-		}
-		_V1Api.prototype.bindingDeleteAllDataValues = function(input) {
-			/// <returns type="OfficeExtension.ClientResult&lt;any&gt;"></returns>
-			var result = new OfficeExtension.ClientResult();
-			result.__proto__ = null;
-			result.value = {};
-			return result;
-		}
-		_V1Api.prototype.bindingGetAll = function() {
-			/// <returns type="OfficeExtension.ClientResult&lt;any&gt;"></returns>
-			var result = new OfficeExtension.ClientResult();
-			result.__proto__ = null;
-			result.value = {};
-			return result;
-		}
-		_V1Api.prototype.bindingGetById = function(input) {
-			/// <returns type="OfficeExtension.ClientResult&lt;any&gt;"></returns>
-			var result = new OfficeExtension.ClientResult();
-			result.__proto__ = null;
-			result.value = {};
-			return result;
-		}
-		_V1Api.prototype.bindingGetData = function(input) {
-			/// <returns type="OfficeExtension.ClientResult&lt;any&gt;"></returns>
-			var result = new OfficeExtension.ClientResult();
-			result.__proto__ = null;
-			result.value = {};
-			return result;
-		}
-		_V1Api.prototype.bindingReleaseById = function(input) {
-			/// <returns type="OfficeExtension.ClientResult&lt;any&gt;"></returns>
-			var result = new OfficeExtension.ClientResult();
-			result.__proto__ = null;
-			result.value = {};
-			return result;
-		}
-		_V1Api.prototype.bindingSetData = function(input) {
-			/// <returns type="OfficeExtension.ClientResult&lt;any&gt;"></returns>
-			var result = new OfficeExtension.ClientResult();
-			result.__proto__ = null;
-			result.value = {};
-			return result;
-		}
-		_V1Api.prototype.bindingSetFormats = function(input) {
-			/// <returns type="OfficeExtension.ClientResult&lt;any&gt;"></returns>
-			var result = new OfficeExtension.ClientResult();
-			result.__proto__ = null;
-			result.value = {};
-			return result;
-		}
-		_V1Api.prototype.bindingSetTableOptions = function(input) {
-			/// <returns type="OfficeExtension.ClientResult&lt;any&gt;"></returns>
-			var result = new OfficeExtension.ClientResult();
-			result.__proto__ = null;
-			result.value = {};
-			return result;
-		}
-		_V1Api.prototype.getFilePropertiesAsync = function() {
-			/// <returns type="OfficeExtension.ClientResult&lt;any&gt;"></returns>
-			var result = new OfficeExtension.ClientResult();
-			result.__proto__ = null;
-			result.value = {};
-			return result;
-		}
-		_V1Api.prototype.getSelectedData = function(input) {
-			/// <returns type="OfficeExtension.ClientResult&lt;any&gt;"></returns>
-			var result = new OfficeExtension.ClientResult();
-			result.__proto__ = null;
-			result.value = {};
-			return result;
-		}
-		_V1Api.prototype.gotoById = function(input) {
-			/// <returns type="OfficeExtension.ClientResult&lt;any&gt;"></returns>
-			var result = new OfficeExtension.ClientResult();
-			result.__proto__ = null;
-			result.value = {};
-			return result;
-		}
-		_V1Api.prototype.setSelectedData = function(input) {
-			/// <returns type="OfficeExtension.ClientResult&lt;any&gt;"></returns>
-			var result = new OfficeExtension.ClientResult();
-			result.__proto__ = null;
-			result.value = {};
-			return result;
-		}
+		return RequestContext;
+	})(OfficeExtension.ClientRequestContext);
+	OfficeCore.RequestContext = RequestContext;
 
-		return _V1Api;
-	})(OfficeExtension.ClientObject);
-	Excel._V1Api = _V1Api;
-})(Excel || (Excel = {__proto__: null}));
+	OfficeCore.run = function (batch) {
+		/// <signature>
+		/// <summary>
+		/// Executes a batch script that performs actions on the OfficeCore object model, using a new RequestContext. When the promise is resolved, any tracked objects that were automatically allocated during execution will be released.
+		/// </summary>
+		/// <param name="batch" type="function(context) { ... }">
+		/// A function that takes in a RequestContext and returns a promise (typically, just the result of "context.sync()").
+		/// <br />
+		/// The context parameter facilitates requests to the OfficeCore application. Since the Office add-in and the OfficeCore application run in two different processes, the RequestContext is required to get access to the OfficeCore object model from the add-in.
+		/// </param>
+		/// </signature>
+		/// <signature>
+		/// <summary>
+		/// Executes a batch script that performs actions on the OfficeCore object model, using the RequestContext of a previously-created API object. When the promise is resolved, any tracked objects that were automatically allocated during execution will be released.
+		/// </summary>
+		/// <param name="object" type="OfficeExtension.ClientObject">
+		/// A previously-created API object. The batch will use the same RequestContext as the passed-in object, which means that any changes applied to the object will be picked up by "context.sync()".
+		/// </param>
+		/// <param name="batch" type="function(context) { ... }">
+		/// A function that takes in a RequestContext and returns a promise (typically, just the result of "context.sync()").
+		/// <br />
+		/// The context parameter facilitates requests to the OfficeCore application. Since the Office add-in and the OfficeCore application run in two different processes, the RequestContext is required to get access to the OfficeCore object model from the add-in.
+		/// </param>
+		/// </signature>
+		/// <signature>
+		/// <summary>
+		/// Executes a batch script that performs actions on the OfficeCore object model, using the RequestContext of a previously-created API object. When the promise is resolved, any tracked objects that were automatically allocated during execution will be released.
+		/// </summary>
+		/// <param name="objects" type="Array&lt;OfficeExtension.ClientObject&gt;">
+		/// An array of previously-created API objects. The array will be validated to make sure that all of the objects share the same context. The batch will use this shared RequestContext, which means that any changes applied to these objects will be picked up by "context.sync()".
+		/// </param>
+		/// <param name="batch" type="function(context) { ... }">
+		/// A function that takes in a RequestContext and returns a promise (typically, just the result of "context.sync()").
+		/// <br />
+		/// The context parameter facilitates requests to the OfficeCore application. Since the Office add-in and the OfficeCore application run in two different processes, the RequestContext is required to get access to the OfficeCore object model from the add-in.
+		/// </param>
+		/// </signature>
+		arguments[arguments.length - 1](new OfficeCore.RequestContext());
+		return new OfficeExtension.Promise();
+	}
+})(OfficeCore || (OfficeCore = {__proto__: null}));
+OfficeCore.__proto__ = null;
+
+
 
 var Excel;
 (function (Excel) {
@@ -3425,9 +3334,6 @@ var Excel;
 			remove: function (handler) {
 				/// <param name="handler" type="function(eventArgs: Excel.Interfaces.BindingDataChangedEventArgs)">Handler for the event.</param>
 				return;
-			},
-			removeAll: function () {
-				return;
 			}
 		};
 		Binding.prototype.onSelectionChanged = {
@@ -3441,9 +3347,6 @@ var Excel;
 			},
 			remove: function (handler) {
 				/// <param name="handler" type="function(eventArgs: Excel.Interfaces.BindingSelectionChangedEventArgs)">Handler for the event.</param>
-				return;
-			},
-			removeAll: function () {
 				return;
 			}
 		};
@@ -4676,7 +4579,7 @@ var Excel;
 		}
 		ChartSeriesCollection.prototype.getItemAt = function(index) {
 			/// <summary>
-			/// Retrieves a series based on its position in the collection [Api set: ExcelApi 1.1]
+			/// Retrieves a series based on its position in the collection. [Api set: ExcelApi 1.1]
 			/// </summary>
 			/// <param name="index" type="Number">Index value of the object to be retrieved. Zero-indexed.</param>
 			/// <returns type="Excel.ChartSeries"></returns>
@@ -5170,9 +5073,10 @@ var Excel;
 			/// <field name="dataBarOrNullObject" type="Excel.DataBarConditionalFormat">Returns the data bar properties if the current conditional format is a data bar. [Api set: ExcelApi 1.6 (PREVIEW)]</field>
 			/// <field name="iconSet" type="Excel.IconSetConditionalFormat">Returns the IconSet conditional format properties if the current conditional format is an IconSet type. [Api set: ExcelApi 1.6 (PREVIEW)]</field>
 			/// <field name="iconSetOrNullObject" type="Excel.IconSetConditionalFormat">Returns the IconSet conditional format properties if the current conditional format is an IconSet type. [Api set: ExcelApi 1.6 (PREVIEW)]</field>
+			/// <field name="id" type="String">The Priority of the Conditional Format within the current ConditionalFormatCollection. [Api set: ExcelApi 1.6 (PREVIEW)]</field>
 			/// <field name="preset" type="Excel.PresetCriteriaConditionalFormat">Returns the preset criteria conditional format such as above average/below average/unique values/contains blank/nonblank/error/noerror properties. [Api set: ExcelApi 1.6 (PREVIEW)]</field>
 			/// <field name="presetOrNullObject" type="Excel.PresetCriteriaConditionalFormat">Returns the preset criteria conditional format such as above average/below average/unique values/contains blank/nonblank/error/noerror properties. [Api set: ExcelApi 1.6 (PREVIEW)]</field>
-			/// <field name="priority" type="Number">The priority (or index) within the conditional format collection that this conditional format currently exists in. Changing this also               changes other conditional formats&apos; priorities, to allow for a contiguous priority order.              Use a negative priority to begin from the back.              Priorities greater than than bounds will get and set to the maximum (or minimum if negative) priority. [Api set: ExcelApi 1.6 (PREVIEW)]</field>
+			/// <field name="priority" type="Number">The priority (or index) within the conditional format collection that this conditional format currently exists in. Changing this also               changes other conditional formats&apos; priorities, to allow for a contiguous priority order.              Use a negative priority to begin from the back.              Priorities greater than than bounds will get and set to the maximum (or minimum if negative) priority.              Also note that if you change the priority, you have to re-fetch a new copy of the object at that new priority location if you want to make further changes to it. [Api set: ExcelApi 1.6 (PREVIEW)]</field>
 			/// <field name="stopIfTrue" type="Boolean">If the conditions of this conditional format are met, no lower-priority formats shall take effect on that cell.              Null on databars, icon sets, and colorscales as there&apos;s no concept of StopIfTrue for these [Api set: ExcelApi 1.6 (PREVIEW)]</field>
 			/// <field name="textComparison" type="Excel.TextConditionalFormat">Returns the specific text conditional format properties if the current conditional format is a text type.              For example to format cells matching the word &quot;Text&quot;. [Api set: ExcelApi 1.6 (PREVIEW)]</field>
 			/// <field name="textComparisonOrNullObject" type="Excel.TextConditionalFormat">Returns the specific text conditional format properties if the current conditional format is a text type.              For example to format cells matching the word &quot;Text&quot;. [Api set: ExcelApi 1.6 (PREVIEW)]</field>
@@ -5267,6 +5171,13 @@ var Excel;
 			result.__proto__ = null;
 			result.value = 0;
 			return result;
+		}
+		ConditionalFormatCollection.prototype.getItem = function(id) {
+			/// <summary>
+			/// Returns a conditional format for the given ID. [Api set: ExcelApi 1.6 (PREVIEW)]
+			/// </summary>
+			/// <param name="id" type="String">The id of the conditional format.</param>
+			/// <returns type="Excel.ConditionalFormat">Conditional Format object.</returns>
 		}
 		ConditionalFormatCollection.prototype.getItemAt = function(index) {
 			/// <summary>
@@ -9546,7 +9457,7 @@ var Excel;
 			/// <field name="comment" type="String">Represents the comment associated with this name. [Api set: ExcelApi 1.4]</field>
 			/// <field name="name" type="String">The name of the object. Read-only. [Api set: ExcelApi 1.1]</field>
 			/// <field name="scope" type="String">Indicates whether the name is scoped to the workbook or to a specific worksheet. Read-only. [Api set: ExcelApi 1.4]</field>
-			/// <field name="type" type="String">Indicates the type of the value returned by the name&apos;s formula. See Excel.NamedItemType for details. Read-only. [Api set: ExcelApi 1.1]</field>
+			/// <field name="type" type="String">Indicates the type of the value returned by the name&apos;s formula. See Excel.NamedItemType for details. Read-only. [Api set: ExcelApi 1.1 for String,Integer,Double,Boolean,Range,Error; 1.7 for Array]</field>
 			/// <field name="value" >Represents the value computed by the name&apos;s formula. For a named range, will return the range address. Read-only. [Api set: ExcelApi 1.1]</field>
 			/// <field name="visible" type="Boolean">Specifies whether the object is visible or not. [Api set: ExcelApi 1.1]</field>
 			/// <field name="worksheet" type="Excel.Worksheet">Returns the worksheet on which the named item is scoped to. Throws an error if the items is scoped to the workbook instead. [Api set: ExcelApi 1.4]</field>
@@ -9678,7 +9589,7 @@ var Excel;
 
 var Excel;
 (function (Excel) {
-	/// <summary> [Api set: ExcelApi 1.1] </summary>
+	/// <summary> [Api set: ExcelApi 1.1 for String,Integer,Double,Boolean,Range,Error; 1.7 for Array] </summary>
 	var NamedItemType = {
 		__proto__: null,
 		"string": "string",
@@ -9687,6 +9598,7 @@ var Excel;
 		"boolean": "boolean",
 		"range": "range",
 		"error": "error",
+		"array": "array",
 	}
 	Excel.NamedItemType = NamedItemType;
 })(Excel || (Excel = {__proto__: null}));
@@ -10619,9 +10531,6 @@ var Excel;
 			remove: function (handler) {
 				/// <param name="handler" type="function(eventArgs: Excel.Interfaces.SettingsChangedEventArgs)">Handler for the event.</param>
 				return;
-			},
-			removeAll: function () {
-				return;
 			}
 		};
 
@@ -11339,9 +11248,6 @@ var Excel;
 			},
 			remove: function (handler) {
 				/// <param name="handler" type="function(eventArgs: Excel.Interfaces.SelectionChangedEventArgs)">Handler for the event.</param>
-				return;
-			},
-			removeAll: function () {
 				return;
 			}
 		};
@@ -12241,7 +12147,7 @@ var Excel;
 				/// <field name="textComparisonOrNullObject" type="Excel.Interfaces.TextConditionalFormatUpdateData">Returns the specific text conditional format properties if the current conditional format is a text type.              For example to format cells matching the word &quot;Text&quot;. [Api set: ExcelApi 1.6 (PREVIEW)]</field>
 				/// <field name="topBottom" type="Excel.Interfaces.TopBottomConditionalFormatUpdateData">Returns the Top/Bottom conditional format properties if the current conditional format is an TopBottom type.              For example to format the top 10% or bottom 10 items. [Api set: ExcelApi 1.6 (PREVIEW)]</field>
 				/// <field name="topBottomOrNullObject" type="Excel.Interfaces.TopBottomConditionalFormatUpdateData">Returns the Top/Bottom conditional format properties if the current conditional format is an TopBottom type.              For example to format the top 10% or bottom 10 items. [Api set: ExcelApi 1.6 (PREVIEW)]</field>
-				/// <field name="priority" type="Number">The priority (or index) within the conditional format collection that this conditional format currently exists in. Changing this also               changes other conditional formats&apos; priorities, to allow for a contiguous priority order.              Use a negative priority to begin from the back.              Priorities greater than than bounds will get and set to the maximum (or minimum if negative) priority. [Api set: ExcelApi 1.6 (PREVIEW)]</field>;
+				/// <field name="priority" type="Number">The priority (or index) within the conditional format collection that this conditional format currently exists in. Changing this also               changes other conditional formats&apos; priorities, to allow for a contiguous priority order.              Use a negative priority to begin from the back.              Priorities greater than than bounds will get and set to the maximum (or minimum if negative) priority.              Also note that if you change the priority, you have to re-fetch a new copy of the object at that new priority location if you want to make further changes to it. [Api set: ExcelApi 1.6 (PREVIEW)]</field>;
 				/// <field name="stopIfTrue" type="Boolean">If the conditions of this conditional format are met, no lower-priority formats shall take effect on that cell.              Null on databars, icon sets, and colorscales as there&apos;s no concept of StopIfTrue for these [Api set: ExcelApi 1.6 (PREVIEW)]</field>;
 			}
 			return ConditionalFormatUpdateData;
@@ -12525,7 +12431,7 @@ var Excel;
 			/// <summary>
 			/// The RequestContext object facilitates requests to the Excel application. Since the Office add-in and the Excel application run in two different processes, the request context is required to get access to the Excel object model from the add-in.
 			/// </summary>
-			/// <field name="workbook" type="Excel.Workbook">Root object for interacting with the document</field>
+				/// <field name="workbook" type="Excel.Workbook">Root object for interacting with the document</field>
 			_super.call(this, null);
 		}
 		return RequestContext;
@@ -12575,7 +12481,7 @@ var Excel;
 })(Excel || (Excel = {__proto__: null}));
 Excel.__proto__ = null;
 
- 
+
 
 var Word;
 (function (Word) {
@@ -13231,8 +13137,8 @@ var Word;
 			/// <field name="context" type="Word.RequestContext">The request context associated with this object.</field>
 			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
 			/// <field name="key" type="String">Gets the key of the custom property. Read only. [Api set: WordApi 1.3]</field>
-			/// <field name="type" type="String">Gets the value type of the custom property. Read only. [Api set: WordApi 1.3]</field>
-			/// <field name="value" >Gets or sets the value of the custom property. [Api set: WordApi 1.3]</field>
+			/// <field name="type" type="String">Gets the value type of the custom property. Possible values are: String, Number, Date, Boolean. Read only. [Api set: WordApi 1.3]</field>
+			/// <field name="value" >Gets or sets the value of the custom property. Note that even though Word Online and the docx file format allow these properties to be arbitrarily long, the desktop version of Word will truncate string values to 255 16-bit chars (possibly creating invalid unicode by breaking up a surrogate pair). [Api set: WordApi 1.3]</field>
 		}
 
 		CustomProperty.prototype.load = function(option) {
@@ -16006,7 +15912,7 @@ var Word;
 		var CustomPropertyUpdateData = (function() {
 			function CustomPropertyUpdateData() {
 				/// <summary>An interface for updating data on the CustomProperty object, for use in "customProperty.set({ ... })".</summary>
-				/// <field name="value" >Gets or sets the value of the custom property. [Api set: WordApi 1.3]</field>;
+				/// <field name="value" >Gets or sets the value of the custom property. Note that even though Word Online and the docx file format allow these properties to be arbitrarily long, the desktop version of Word will truncate string values to 255 16-bit chars (possibly creating invalid unicode by breaking up a surrogate pair). [Api set: WordApi 1.3]</field>;
 			}
 			return CustomPropertyUpdateData;
 		})();

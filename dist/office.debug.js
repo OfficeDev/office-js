@@ -1,5 +1,5 @@
 /* Office JavaScript API library */
-/* Version: 16.0.8119.1000 */
+/* Version: 16.0.8516.3000 */
 /*
 	Copyright (c) Microsoft Corporation.  All rights reserved.
 */
@@ -371,6 +371,9 @@ var ScriptLoading;
                         self.flushTelemetryBuffer();
                     };
                     var onLoadCallback = function OSF_OUtil_loadScript$onLoadCallback() {
+                        if (OSF._OfficeAppFactory.getHostInfo().hostType == "onenote" && (typeof OSF.AppTelemetry !== 'undefined') && (typeof OSF.AppTelemetry.enableTelemetry !== 'undefined')) {
+                            OSF.AppTelemetry.enableTelemetry = false;
+                        }
                         logTelemetry(true);
                         loadedScriptEntry.isReady = true;
                         if (loadedScriptEntry.timer != null) {
@@ -458,7 +461,7 @@ var ScriptLoading;
     ScriptLoading.LoadScriptHelper = LoadScriptHelper;
 })(ScriptLoading || (ScriptLoading = {}));
 OSF.ConstantNames = {
-    FileVersion: "16.0.8119.1000",
+    FileVersion: "16.0.8516.3000",
     OfficeJS: "office.js",
     OfficeDebugJS: "office.debug.js",
     DefaultLocale: "en-us",
@@ -565,6 +568,12 @@ OSF._OfficeAppFactory = (function OSF__OfficeAppFactory() {
         }
         if (!hostInfoValue) {
             try {
+                window.external = window.external || {};
+                if (typeof agaveHost !== "undefined" && agaveHost.GetHostInfo) {
+                    window.external.GetHostInfo = function () {
+                        return agaveHost.GetHostInfo();
+                    };
+                }
                 var fallbackHostInfo = window.external.GetHostInfo();
                 if (fallbackHostInfo == "isDialog") {
                     _hostInfo.isO15 = true;
@@ -803,8 +812,11 @@ OSF._OfficeAppFactory = (function OSF__OfficeAppFactory() {
             throw 'Function window.prompt is not supported.';
             return null;
         };
-        window.history.replaceState = null;
-        window.history.pushState = null;
+        var isOutlookAndroid = _hostInfo.hostType == "outlook" && _hostInfo.hostPlatform == "android";
+        if (!isOutlookAndroid) {
+            window.history.replaceState = null;
+            window.history.pushState = null;
+        }
     };
     initialize();
     return {
