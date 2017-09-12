@@ -1,7 +1,7 @@
 /* Excel Mac-specific API library */
-/* Version: 16.0.8424.3000 */
+/* Version: 16.0.8514.3000 */
 
-/* Office.js Version: 16.0.8302.1000 */ 
+/* Office.js Version: 16.0.8511.1000 */ 
 /*
 	Copyright (c) Microsoft Corporation.  All rights reserved.
 */
@@ -837,6 +837,14 @@ OSF.OUtil=(function () {
 				}
 			}
 		},
+		removeClass: function OSF_OUtil$removeClass(elmt, val) {
+			if (OSF.OUtil.hasClass(elmt, val)) {
+				var className=elmt.getAttribute(_classN);
+				var reg=new RegExp('(\\s|^)'+val+'(\\s|$)');
+				className=className.replace(reg, '');
+				elmt.setAttribute(_classN, className);
+			}
+		},
 		hasClass: function OSF_OUtil$hasClass(elmt, clsName) {
 			var className=elmt.getAttribute(_classN);
 			return className && className.match(new RegExp('(\\s|^)'+clsName+'(\\s|$)'));
@@ -1031,7 +1039,9 @@ OSF.AgaveHostAction={
 	"EscExit": 15,
 	"F2Exit": 16,
 	"ExitNoFocusable": 17,
-	"ExitNoFocusableShift": 18
+	"ExitNoFocusableShift": 18,
+	"MouseEnter": 19,
+	"MouseLeave": 20
 };
 OSF.SharedConstants={
 	"NotificationConversationIdSuffix": '_ntf'
@@ -1167,6 +1177,7 @@ Microsoft.Office.WebExtension.Parameters={
 	HostType: "hostType",
 	ForceConsent: "forceConsent",
 	ForceAddAccount: "forceAddAccount",
+	AuthChallenge: "authChallenge",
 	Xml: "xml",
 	Namespace: "namespace",
 	Prefix: "prefix",
@@ -1314,6 +1325,7 @@ OSF.DDA.EventDispId={
 	dispidRichApiMessageEvent: 33,
 	dispidAppCommandInvokedEvent: 39,
 	dispidOlkItemSelectedChangedEvent: 46,
+	dispidOlkRecipientsChangedEvent: 47,
 	dispidTaskSelectionChangedEvent: 56,
 	dispidResourceSelectionChangedEvent: 57,
 	dispidViewSelectionChangedEvent: 58,
@@ -3089,6 +3101,7 @@ OSF.DDA.DispIdHost.Facade=function OSF_DDA_DispIdHost_Facade(getDelegateMethods,
 		"ContentControlAdded": did.dispidContentControlAddedEvent,
 		"RichApiMessage": did.dispidRichApiMessageEvent,
 		"ItemChanged": did.dispidOlkItemSelectedChangedEvent,
+		"RecipientsChanged": did.dispidOlkRecipientsChangedEvent,
 		"TaskSelectionChanged": did.dispidTaskSelectionChangedEvent,
 		"ResourceSelectionChanged": did.dispidResourceSelectionChangedEvent,
 		"ViewSelectionChanged": did.dispidViewSelectionChangedEvent,
@@ -3164,6 +3177,7 @@ OSF.DDA.DispIdHost.Facade=function OSF_DDA_DispIdHost_Facade(getDelegateMethods,
 				else {
 					hostCallArgs=callArgs;
 				}
+				var startTime=(new Date()).getTime();
 				delegate[OSF.DDA.DispIdHost.Delegates.ExecuteAsync]({
 					"dispId": dispId,
 					"hostCallArgs": hostCallArgs,
@@ -3184,6 +3198,9 @@ OSF.DDA.DispIdHost.Facade=function OSF_DDA_DispIdHost_Facade(getDelegateMethods,
 						}
 						var payload=asyncMethodCall.processResponse(status, responseArgs, caller, callArgs);
 						OSF.DDA.issueAsyncResult(callArgs, status, payload);
+						if (OSF.AppTelemetry) {
+							OSF.AppTelemetry.onMethodDone(dispId, hostCallArgs, Math.abs((new Date()).getTime() - startTime), status);
+						}
 					}
 				});
 			}
@@ -4051,7 +4068,6 @@ OSF.DDA.SafeArray.Delegate.executeAsync=function OSF_DDA_SafeArray_Delegate$Exec
 		if (args.onCalling) {
 			args.onCalling();
 		}
-		var startTime=(new Date()).getTime();
 		OSF.ClientHostController.execute(args.dispId, toArray(args.hostCallArgs), function OSF_DDA_SafeArrayFacade$Execute_OnResponse(hostResponseArgs, resultCode) {
 			var result=hostResponseArgs.toArray();
 			var status=result[OSF.DDA.SafeArray.Response.Status];
@@ -4097,9 +4113,6 @@ OSF.DDA.SafeArray.Delegate.executeAsync=function OSF_DDA_SafeArray_Delegate$Exec
 					payload=result[OSF.DDA.SafeArray.Response.Payload];
 				}
 				args.onComplete(status, payload);
-			}
-			if (OSF.AppTelemetry) {
-				OSF.AppTelemetry.onMethodDone(args.dispId, args.hostCallArgs, Math.abs((new Date()).getTime() - startTime), status);
 			}
 			return true;
 		});
@@ -5204,7 +5217,7 @@ var OSFAppTelemetry;
 		}
 		appInfo.message=context.get_hostCustomMessage();
 		appInfo.officeJSVersion=OSF.ConstantNames.FileVersion;
-		appInfo.hostJSVersion="16.0.8302.1000";
+		appInfo.hostJSVersion="16.0.8511.1000";
 		if (context._wacHostEnvironment) {
 			appInfo.wacHostEnvironment=context._wacHostEnvironment;
 		}
@@ -5704,6 +5717,14 @@ OSF.DDA.OMFactory.manufactureEventArgs=function OSF_DDA_OMFactory$manufactureEve
 				args=new OSF.DDA.OlkItemSelectedChangedEventArgs(eventProperties);
 				target.initialize(args["initialData"]);
 				target.setCurrentItemNumber(args["itemNumber"].itemNumber);
+			}
+			else {
+				throw OsfMsAjaxFactory.msAjaxError.argument(Microsoft.Office.WebExtension.Parameters.EventType, OSF.OUtil.formatString(Strings.OfficeOM.L_NotSupportedEventType, eventType));
+			}
+			break;
+		case Microsoft.Office.WebExtension.EventType.RecipientsChanged:
+			if (OSF._OfficeAppFactory.getHostInfo()["hostType"]=="outlook" || OSF._OfficeAppFactory.getHostInfo()["hostType"]=="outlookwebapp") {
+				args=new OSF.DDA.OlkRecipientsChangedEventArgs(eventProperties);
 			}
 			else {
 				throw OsfMsAjaxFactory.msAjaxError.argument(Microsoft.Office.WebExtension.Parameters.EventType, OSF.OUtil.formatString(Strings.OfficeOM.L_NotSupportedEventType, eventType));
@@ -7487,6 +7508,169 @@ OSF.DDA.SafeArray.Delegate.ParameterMap.define({
 		{ name: Microsoft.Office.WebExtension.Parameters.Data, value: OSF.DDA.SafeArray.Delegate.ParameterMap.self }
 	]
 });
+Microsoft.Office.WebExtension.FileType={
+	Text: "text",
+	Compressed: "compressed",
+	Pdf: "pdf"
+};
+OSF.OUtil.augmentList(OSF.DDA.PropertyDescriptors, {
+	FileProperties: "FileProperties",
+	FileSliceProperties: "FileSliceProperties"
+});
+OSF.DDA.FileProperties={
+	Handle: "FileHandle",
+	FileSize: "FileSize",
+	SliceSize: Microsoft.Office.WebExtension.Parameters.SliceSize
+};
+OSF.DDA.File=function OSF_DDA_File(handle, fileSize, sliceSize) {
+	OSF.OUtil.defineEnumerableProperties(this, {
+		"size": {
+			value: fileSize
+		},
+		"sliceCount": {
+			value: Math.ceil(fileSize / sliceSize)
+		}
+	});
+	var privateState={};
+	privateState[OSF.DDA.FileProperties.Handle]=handle;
+	privateState[OSF.DDA.FileProperties.SliceSize]=sliceSize;
+	var am=OSF.DDA.AsyncMethodNames;
+	OSF.DDA.DispIdHost.addAsyncMethods(this, [
+		am.GetDocumentCopyChunkAsync,
+		am.ReleaseDocumentCopyAsync
+	], privateState);
+};
+OSF.DDA.FileSliceOffset="fileSliceoffset";
+OSF.DDA.AsyncMethodNames.addNames({
+	GetDocumentCopyAsync: "getFileAsync",
+	GetDocumentCopyChunkAsync: "getSliceAsync",
+	ReleaseDocumentCopyAsync: "closeAsync"
+});
+OSF.DDA.AsyncMethodCalls.define({
+	method: OSF.DDA.AsyncMethodNames.GetDocumentCopyAsync,
+	requiredArguments: [
+		{
+			"name": Microsoft.Office.WebExtension.Parameters.FileType,
+			"enum": Microsoft.Office.WebExtension.FileType
+		}
+	],
+	supportedOptions: [
+		{
+			name: Microsoft.Office.WebExtension.Parameters.SliceSize,
+			value: {
+				"types": ["number"],
+				"defaultValue": 4 * 1024 * 1024
+			}
+		}
+	],
+	checkCallArgs: function (callArgs, caller, stateInfo) {
+		var sliceSize=callArgs[Microsoft.Office.WebExtension.Parameters.SliceSize];
+		if (sliceSize <=0 || sliceSize > (4 * 1024 * 1024)) {
+			throw OSF.DDA.ErrorCodeManager.errorCodes.ooeInvalidSliceSize;
+		}
+		return callArgs;
+	},
+	onSucceeded: function (fileDescriptor, caller, callArgs) {
+		return new OSF.DDA.File(fileDescriptor[OSF.DDA.FileProperties.Handle], fileDescriptor[OSF.DDA.FileProperties.FileSize], callArgs[Microsoft.Office.WebExtension.Parameters.SliceSize]);
+	}
+});
+OSF.DDA.AsyncMethodCalls.define({
+	method: OSF.DDA.AsyncMethodNames.GetDocumentCopyChunkAsync,
+	requiredArguments: [
+		{
+			"name": Microsoft.Office.WebExtension.Parameters.SliceIndex,
+			"types": ["number"]
+		}
+	],
+	privateStateCallbacks: [
+		{
+			name: OSF.DDA.FileProperties.Handle,
+			value: function (caller, stateInfo) { return stateInfo[OSF.DDA.FileProperties.Handle]; }
+		},
+		{
+			name: OSF.DDA.FileProperties.SliceSize,
+			value: function (caller, stateInfo) { return stateInfo[OSF.DDA.FileProperties.SliceSize]; }
+		}
+	],
+	checkCallArgs: function (callArgs, caller, stateInfo) {
+		var index=callArgs[Microsoft.Office.WebExtension.Parameters.SliceIndex];
+		if (index < 0 || index >=caller.sliceCount) {
+			throw OSF.DDA.ErrorCodeManager.errorCodes.ooeIndexOutOfRange;
+		}
+		callArgs[OSF.DDA.FileSliceOffset]=parseInt((index * stateInfo[OSF.DDA.FileProperties.SliceSize]).toString());
+		return callArgs;
+	},
+	onSucceeded: function (sliceDescriptor, caller, callArgs) {
+		var slice={};
+		OSF.OUtil.defineEnumerableProperties(slice, {
+			"data": {
+				value: OSF.OUtil.shallowCopy(sliceDescriptor[Microsoft.Office.WebExtension.Parameters.Data])
+			},
+			"index": {
+				value: callArgs[Microsoft.Office.WebExtension.Parameters.SliceIndex]
+			},
+			"size": {
+				value: sliceDescriptor[OSF.DDA.FileProperties.SliceSize]
+			}
+		});
+		return slice;
+	}
+});
+OSF.DDA.AsyncMethodCalls.define({
+	method: OSF.DDA.AsyncMethodNames.ReleaseDocumentCopyAsync,
+	privateStateCallbacks: [
+		{
+			name: OSF.DDA.FileProperties.Handle,
+			value: function (caller, stateInfo) { return stateInfo[OSF.DDA.FileProperties.Handle]; }
+		}
+	]
+});
+OSF.DDA.SafeArray.Delegate.ParameterMap.define({
+	type: OSF.DDA.PropertyDescriptors.FileProperties,
+	fromHost: [
+		{ name: OSF.DDA.FileProperties.Handle, value: 0 },
+		{ name: OSF.DDA.FileProperties.FileSize, value: 1 }
+	],
+	isComplexType: true
+});
+OSF.DDA.SafeArray.Delegate.ParameterMap.define({
+	type: OSF.DDA.PropertyDescriptors.FileSliceProperties,
+	fromHost: [
+		{ name: Microsoft.Office.WebExtension.Parameters.Data, value: 0 },
+		{ name: OSF.DDA.FileProperties.SliceSize, value: 1 }
+	],
+	isComplexType: true
+});
+OSF.DDA.SafeArray.Delegate.ParameterMap.define({
+	type: Microsoft.Office.WebExtension.Parameters.FileType,
+	toHost: [
+		{ name: Microsoft.Office.WebExtension.FileType.Text, value: 0 },
+		{ name: Microsoft.Office.WebExtension.FileType.Compressed, value: 5 },
+		{ name: Microsoft.Office.WebExtension.FileType.Pdf, value: 6 }
+	]
+});
+OSF.DDA.SafeArray.Delegate.ParameterMap.define({
+	type: OSF.DDA.MethodDispId.dispidGetDocumentCopyMethod,
+	toHost: [{ name: Microsoft.Office.WebExtension.Parameters.FileType, value: 0 }],
+	fromHost: [
+		{ name: OSF.DDA.PropertyDescriptors.FileProperties, value: OSF.DDA.SafeArray.Delegate.ParameterMap.self }
+	]
+});
+OSF.DDA.SafeArray.Delegate.ParameterMap.define({
+	type: OSF.DDA.MethodDispId.dispidGetDocumentCopyChunkMethod,
+	toHost: [
+		{ name: OSF.DDA.FileProperties.Handle, value: 0 },
+		{ name: OSF.DDA.FileSliceOffset, value: 1 },
+		{ name: OSF.DDA.FileProperties.SliceSize, value: 2 }
+	],
+	fromHost: [
+		{ name: OSF.DDA.PropertyDescriptors.FileSliceProperties, value: OSF.DDA.SafeArray.Delegate.ParameterMap.self }
+	]
+});
+OSF.DDA.SafeArray.Delegate.ParameterMap.define({
+	type: OSF.DDA.MethodDispId.dispidReleaseDocumentCopyMethod,
+	toHost: [{ name: OSF.DDA.FileProperties.Handle, value: 0 }]
+});
 OSF.DDA.FilePropertiesDescriptor={
 	Url: "Url"
 };
@@ -8298,10 +8482,56 @@ var OfficeExt;
 		AppCommand.registerDdaFacade=registerDdaFacade;
 	})(AppCommand=OfficeExt.AppCommand || (OfficeExt.AppCommand={}));
 })(OfficeExt || (OfficeExt={}));
+OSF.DDA.AsyncMethodNames.addNames({ GetAccessTokenAsync: "getAccessTokenAsync" });
+OSF.DDA.Auth=function OSF_DDA_Auth() {
+};
+OSF.DDA.AsyncMethodCalls.define({
+	method: OSF.DDA.AsyncMethodNames.GetAccessTokenAsync,
+	requiredArguments: [],
+	supportedOptions: [
+		{
+			name: Microsoft.Office.WebExtension.Parameters.ForceConsent,
+			value: {
+				"types": ["boolean"],
+				"defaultValue": false
+			}
+		},
+		{
+			name: Microsoft.Office.WebExtension.Parameters.ForceAddAccount,
+			value: {
+				"types": ["boolean"],
+				"defaultValue": false
+			}
+		},
+		{
+			name: Microsoft.Office.WebExtension.Parameters.AuthChallenge,
+			value: {
+				"types": ["string"],
+				"defaultValue": ""
+			}
+		}
+	],
+	onSucceeded: function (dataDescriptor, caller, callArgs) {
+		var data=dataDescriptor[Microsoft.Office.WebExtension.Parameters.Data];
+		return data;
+	}
+});
+OSF.DDA.SafeArray.Delegate.ParameterMap.define({
+	type: OSF.DDA.MethodDispId.dispidGetAccessTokenMethod,
+	toHost: [
+		{ name: Microsoft.Office.WebExtension.Parameters.ForceConsent, value: 0 },
+		{ name: Microsoft.Office.WebExtension.Parameters.ForceAddAccount, value: 1 },
+		{ name: Microsoft.Office.WebExtension.Parameters.AuthChallenge, value: 2 }
+	],
+	fromHost: [
+		{ name: Microsoft.Office.WebExtension.Parameters.Data, value: OSF.DDA.SafeArray.Delegate.ParameterMap.self }
+	]
+});
 OSF.DDA.ExcelDocument=function OSF_DDA_ExcelDocument(officeAppContext, settings) {
 	var bf=new OSF.DDA.BindingFacade(this);
 	OSF.DDA.DispIdHost.addAsyncMethods(bf, [OSF.DDA.AsyncMethodNames.AddFromPromptAsync]);
 	OSF.DDA.DispIdHost.addAsyncMethods(this, [OSF.DDA.AsyncMethodNames.GoToByIdAsync]);
+	OSF.DDA.DispIdHost.addAsyncMethods(this, [OSF.DDA.AsyncMethodNames.GetDocumentCopyAsync]);
 	OSF.DDA.DispIdHost.addAsyncMethods(this, [OSF.DDA.AsyncMethodNames.GetFilePropertiesAsync]);
 	OSF.DDA.ExcelDocument.uber.constructor.call(this, officeAppContext, bf, settings);
 	OSF.OUtil.finalizeProperties(this);
@@ -11960,6 +12190,8 @@ var __extends=(this && this.__extends) || function (d, b) {
 };
 var OfficeCore;
 (function (OfficeCore) {
+	var _hostName="OfficeCore";
+	var _defaultApiSetName="ExperimentApi";
 	var _createPropertyObjectPath=OfficeExtension.ObjectPathFactory.createPropertyObjectPath;
 	var _createMethodObjectPath=OfficeExtension.ObjectPathFactory.createMethodObjectPath;
 	var _createIndexerObjectPath=OfficeExtension.ObjectPathFactory.createIndexerObjectPath;
@@ -11972,6 +12204,7 @@ var OfficeCore;
 	var _isNullOrUndefined=OfficeExtension.Utility.isNullOrUndefined;
 	var _isUndefined=OfficeExtension.Utility.isUndefined;
 	var _throwIfNotLoaded=OfficeExtension.Utility.throwIfNotLoaded;
+	var _throwIfApiNotSupported=OfficeExtension.Utility.throwIfApiNotSupported;
 	var _load=OfficeExtension.Utility.load;
 	var _fixObjectPathIfNecessary=OfficeExtension.Utility.fixObjectPathIfNecessary;
 	var _addActionResultHandler=OfficeExtension.Utility._addActionResultHandler;
@@ -11989,6 +12222,12 @@ var OfficeCore;
 			enumerable: true,
 			configurable: true
 		});
+		FlightingService.prototype.getClientSessionId=function () {
+			var action=_createMethodAction(this.context, this, "GetClientSessionId", 0, []);
+			var ret=new OfficeExtension.ClientResult();
+			_addActionResultHandler(this, action, ret);
+			return ret;
+		};
 		FlightingService.prototype.getDeferredFlights=function () {
 			var action=_createMethodAction(this.context, this, "GetDeferredFlights", 0, []);
 			var ret=new OfficeExtension.ClientResult();

@@ -4,7 +4,6 @@
 	Copyright (c) Microsoft Corporation.  All rights reserved.
 */
 
-
 /*
 	Your use of this file is governed by the Microsoft Services Agreement http://go.microsoft.com/fwlink/?LinkId=266419.
 */
@@ -7353,7 +7352,7 @@ OSF.InitializationHelper.prototype.loadAppSpecificScriptAndCreateOM = function O
         addEventSupport: function()
         {
             if(this._item$p$0)
-                OSF.DDA.DispIdHost["addEventSupport"](this._item$p$0,new OSF.EventDispatch([Microsoft.Office.WebExtension.EventType["RecipientsChanged"]]))
+                OSF.DDA.DispIdHost["addEventSupport"](this._item$p$0,new OSF.EventDispatch([Microsoft.Office.WebExtension.EventType["RecipientsChanged"],Microsoft.Office.WebExtension.EventType["AppointmentTimeChanged"]]))
         },
         windowOpenOverrideHandler: function(url, targetName, features, replace)
         {
@@ -7914,9 +7913,24 @@ OSF.InitializationHelper.prototype.loadAppSpecificScriptAndCreateOM = function O
         _getRestUrl$p$0: function()
         {
             window["OSF"]["DDA"]["OutlookAppOm"]._throwOnPropertyAccessForRestrictedPermission$i(this._initialData$p$0._permissionLevel$p$0);
-            if(!this._initialData$p$0.get__restUrl$i$0() && this.isApiVersionSupported("1.5"))
+            if(this._shouldInferRestUrl$p$0())
                 return this._inferRestUrlFromEwsUrl$p$0();
             return this._initialData$p$0.get__restUrl$i$0()
+        },
+        _shouldInferRestUrl$p$0: function()
+        {
+            return window["OSF"]["DDA"]["OutlookAppOm"]._instance$p.get__appName$i$0() === 8 && !this._initialData$p$0.get__restUrl$i$0() && this.isApiVersionSupported("1.5") && this._isHostBuildNumberLessThan$p$0("16.0.8414.1000")
+        },
+        _isHostBuildNumberLessThan$p$0: function(buildNumber)
+        {
+            var hostVersion = this._initialData$p$0.get__hostVersion$i$0();
+            if(hostVersion)
+            {
+                var hostVersionParts = hostVersion.split(".");
+                var buildNumberParts = buildNumber.split(".");
+                return window["parseInt"](hostVersionParts[0]) < window["parseInt"](buildNumberParts[0]) || window["parseInt"](hostVersionParts[0]) === window["parseInt"](buildNumberParts[0]) && window["parseInt"](hostVersionParts[2]) < window["parseInt"](buildNumberParts[2])
+            }
+            return false
         },
         _inferRestUrlFromEwsUrl$p$0: function()
         {
@@ -10658,7 +10672,7 @@ OSF.InitializationHelper.prototype.loadAppSpecificScriptAndCreateOM = function O
         var callback = null;
         var asyncContext = null;
         if(argsLength === 1)
-            if(Function["isInstanceOfType"](args[0]))
+            if($h.CommonParameters._argIsFunction$p(args[0]))
                 callback = args[0];
             else if(Object["isInstanceOfType"](args[0]))
                 options = args[0];
@@ -10668,7 +10682,7 @@ OSF.InitializationHelper.prototype.loadAppSpecificScriptAndCreateOM = function O
         {
             if(!Object["isInstanceOfType"](args[0]))
                 throw Error.argument("options");
-            if(!Function["isInstanceOfType"](args[1]))
+            if(!$h.CommonParameters._argIsFunction$p(args[1]))
                 throw Error.argument("callback");
             options = args[0];
             callback = args[1]
@@ -10689,13 +10703,17 @@ OSF.InitializationHelper.prototype.loadAppSpecificScriptAndCreateOM = function O
         var userContext = null;
         if(!argsLength || argsLength > 2)
             return false;
-        if(!Function["isInstanceOfType"](args[0]))
+        if(!$h.CommonParameters._argIsFunction$p(args[0]))
             return false;
         callback = args[0];
         if(argsLength > 1)
             userContext = args[1];
         commonParameters["val"] = new $h.CommonParameters(null,callback,userContext);
         return true
+    };
+    $h.CommonParameters._argIsFunction$p = function(arg)
+    {
+        return typeof arg === "function"
     };
     $h.CommonParameters.prototype = {
         _options$p$0: null,

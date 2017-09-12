@@ -1,5 +1,5 @@
 /* PowerPoint specific API library */
-/* Version: 16.0.8410.1000 */
+/* Version: 16.0.8511.1000 */
 /*
 	Copyright (c) Microsoft Corporation.  All rights reserved.
 */
@@ -1168,6 +1168,7 @@ Microsoft.Office.WebExtension.Parameters = {
     HostType: "hostType",
     ForceConsent: "forceConsent",
     ForceAddAccount: "forceAddAccount",
+    AuthChallenge: "authChallenge",
     Xml: "xml",
     Namespace: "namespace",
     Prefix: "prefix",
@@ -5137,7 +5138,7 @@ var OSFAppTelemetry;
         }
         appInfo.message = context.get_hostCustomMessage();
         appInfo.officeJSVersion = OSF.ConstantNames.FileVersion;
-        appInfo.hostJSVersion = "16.0.8410.1000";
+        appInfo.hostJSVersion = "16.0.8511.1000";
         if (context._wacHostEnvironment) {
             appInfo.wacHostEnvironment = context._wacHostEnvironment;
         }
@@ -8164,6 +8165,13 @@ OSF.DDA.AsyncMethodCalls.define({
                 "types": ["boolean"],
                 "defaultValue": false
             }
+        },
+        {
+            name: Microsoft.Office.WebExtension.Parameters.AuthChallenge,
+            value: {
+                "types": ["string"],
+                "defaultValue": ""
+            }
         }
     ],
     onSucceeded: function (dataDescriptor, caller, callArgs) {
@@ -8175,7 +8183,8 @@ OSF.DDA.SafeArray.Delegate.ParameterMap.define({
     type: OSF.DDA.MethodDispId.dispidGetAccessTokenMethod,
     toHost: [
         { name: Microsoft.Office.WebExtension.Parameters.ForceConsent, value: 0 },
-        { name: Microsoft.Office.WebExtension.Parameters.ForceAddAccount, value: 1 }
+        { name: Microsoft.Office.WebExtension.Parameters.ForceAddAccount, value: 1 },
+        { name: Microsoft.Office.WebExtension.Parameters.AuthChallenge, value: 2 }
     ],
     fromHost: [
         { name: Microsoft.Office.WebExtension.Parameters.Data, value: OSF.DDA.SafeArray.Delegate.ParameterMap.self }

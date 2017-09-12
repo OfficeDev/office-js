@@ -1,12 +1,10 @@
 /* Outlook web application specific API library */
-/* Version: 16.0.8427.1000 */
+/* Version: 16.0.8529.1000 */
 /*
 	Copyright (c) Microsoft Corporation.  All rights reserved.
 */
-
-
 /*
-	Your use of this file is governed by the Microsoft Services Agreement http://go.microsoft.com/fwlink/?LinkId=266419.
+Your use of this file is governed by the Microsoft Services Agreement http://go.microsoft.com/fwlink/?LinkId=266419.
 */
 var __extends = this && this.__extends || function(d, b)
     {
@@ -1478,6 +1476,7 @@ OSF.DDA.EventDispId = {
     dispidAppCommandInvokedEvent: 39,
     dispidOlkItemSelectedChangedEvent: 46,
     dispidOlkRecipientsChangedEvent: 47,
+    dispidOlkAppointmentTimeChangedEvent: 48,
     dispidTaskSelectionChangedEvent: 56,
     dispidResourceSelectionChangedEvent: 57,
     dispidViewSelectionChangedEvent: 58,
@@ -1610,7 +1609,8 @@ OSF.DDA.ErrorCodeManager = function()
                 ooeSSOInvalidGrant: 13005,
                 ooeSSOClientError: 13006,
                 ooeSSOServerError: 13007,
-                ooeAddinIsAlreadyRequestingToken: 13008
+                ooeAddinIsAlreadyRequestingToken: 13008,
+                ooeSSOUserConsentNotSupportedByCurrentAddinCategory: 13009
             },
             initializeErrorMessages: function OSF_DDA_ErrorCodeManager$initializeErrorMessages(stringNS)
             {
@@ -1993,6 +1993,10 @@ OSF.DDA.ErrorCodeManager = function()
                 _errorMappings[OSF.DDA.ErrorCodeManager.errorCodes.ooeAddinIsAlreadyRequestingToken] = {
                     name: stringNS.L_AddinIsAlreadyRequestingToken,
                     message: stringNS.L_AddinIsAlreadyRequestingTokenMessage
+                };
+                _errorMappings[OSF.DDA.ErrorCodeManager.errorCodes.ooeSSOUserConsentNotSupportedByCurrentAddinCategory] = {
+                    name: stringNS.L_SSOUserConsentNotSupportedByCurrentAddinCategory,
+                    message: stringNS.L_SSOUserConsentNotSupportedByCurrentAddinCategoryMessage
                 }
             }
         }
@@ -3546,6 +3550,7 @@ OSF.DDA.DispIdHost.Facade = function OSF_DDA_DispIdHost_Facade(getDelegateMethod
             RichApiMessage: did.dispidRichApiMessageEvent,
             ItemChanged: did.dispidOlkItemSelectedChangedEvent,
             RecipientsChanged: did.dispidOlkRecipientsChangedEvent,
+            AppointmentTimeChanged: did.dispidOlkAppointmentTimeChangedEvent,
             TaskSelectionChanged: did.dispidTaskSelectionChangedEvent,
             ResourceSelectionChanged: did.dispidResourceSelectionChangedEvent,
             ViewSelectionChanged: did.dispidViewSelectionChangedEvent,
@@ -3992,17 +3997,17 @@ OSF.HostThemeButtonStyleKeys = {
     ButtonBackgroundColor: "buttonBackgroundColor"
 };
 OSF.OmexIframeNotificationUrlParameterKeys = {
-    AppName: "appName",
-    AppVersion: "appVersion",
-    AppUILocale: "appUILocale",
+    AppName: "client",
+    AppVersion: "cv",
+    AppUILocale: "ui",
     AppDomain: "appDomain",
-    StoreLocator: "storeLocator",
-    AssetId: "assetId",
+    StoreLocator: "rs",
+    AssetId: "assetid",
     NotificationType: "notificationType",
-    AppCorrelationId: "appCorrelationId"
+    AppCorrelationId: "corr"
 };
 OSF.OmexMessageKeys = {
-    MessageKey: "messageKey",
+    MessageType: "messageType",
     MessageValue: "messageValue"
 };
 var OfficeExt;
@@ -6786,7 +6791,7 @@ var OSFAppTelemetry;
             appInfo.appInstanceId = appInfo.appInstanceId.replace(/[{}]/g,"").toLowerCase();
         appInfo.message = context.get_hostCustomMessage();
         appInfo.officeJSVersion = OSF.ConstantNames.FileVersion;
-        appInfo.hostJSVersion = "16.0.8427.1000";
+        appInfo.hostJSVersion = "16.0.8529.1000";
         if(context._wacHostEnvironment)
             appInfo.wacHostEnvironment = context._wacHostEnvironment;
         if(context._isFromWacAutomation !== undefined && context._isFromWacAutomation !== null)
@@ -7319,6 +7324,12 @@ OSF.DDA.OMFactory.manufactureEventArgs = function OSF_DDA_OMFactory$manufactureE
         case Microsoft.Office.WebExtension.EventType.RecipientsChanged:
             if(OSF._OfficeAppFactory.getHostInfo()["hostType"] == "outlook" || OSF._OfficeAppFactory.getHostInfo()["hostType"] == "outlookwebapp")
                 args = new OSF.DDA.OlkRecipientsChangedEventArgs(eventProperties);
+            else
+                throw OsfMsAjaxFactory.msAjaxError.argument(Microsoft.Office.WebExtension.Parameters.EventType,OSF.OUtil.formatString(Strings.OfficeOM.L_NotSupportedEventType,eventType));
+            break;
+        case Microsoft.Office.WebExtension.EventType.AppointmentTimeChanged:
+            if(OSF._OfficeAppFactory.getHostInfo()["hostType"] == "outlook" || OSF._OfficeAppFactory.getHostInfo()["hostType"] == "outlookwebapp")
+                args = new OSF.DDA.OlkAppointmentTimeChangedEventArgs(eventProperties);
             else
                 throw OsfMsAjaxFactory.msAjaxError.argument(Microsoft.Office.WebExtension.Parameters.EventType,OSF.OUtil.formatString(Strings.OfficeOM.L_NotSupportedEventType,eventType));
             break;
@@ -8646,6 +8657,30 @@ OSF.DDA.OlkRecipientsChangedEventArgs = function OSF_DDA_OlkRecipientsChangedEve
         changedRecipientFields: {value: JSON.parse(changedRecipientFields)}
     })
 };
+OSF.OUtil.augmentList(Microsoft.Office.WebExtension.EventType,{AppointmentTimeChanged: "olkAppointmentTimeChanged"});
+OSF.OUtil.augmentList(OSF.DDA.EventDescriptors,{OlkAppointmentTimeChangedData: "OlkAppointmentTimeChangedData"});
+OSF.DDA.OlkAppointmentTimeChangedEventArgs = function OSF_DDA_OlkAppointmentTimeChangedEventArgs(eventData)
+{
+    var appointmentTimeString = eventData[OSF.DDA.EventDescriptors.OlkAppointmentTimeChangedData][0];
+    var start;
+    var end;
+    try
+    {
+        var appointmentTime = JSON.parse(appointmentTimeString);
+        start = new Date(appointmentTime.start).toISOString();
+        end = new Date(appointmentTime.end).toISOString()
+    }
+    catch(e)
+    {
+        start = null;
+        end = null
+    }
+    OSF.OUtil.defineEnumerableProperties(this,{
+        type: {value: Microsoft.Office.WebExtension.EventType.AppointmentTimeChanged},
+        start: {value: start},
+        end: {value: end}
+    })
+};
 OSF.DDA.WAC.Delegate.ParameterMap.define({
     type: OSF.DDA.EventDispId.dispidOlkItemSelectedChangedEvent,
     fromHost: [{
@@ -8658,6 +8693,14 @@ OSF.DDA.WAC.Delegate.ParameterMap.define({
     type: OSF.DDA.EventDispId.dispidOlkRecipientsChangedEvent,
     fromHost: [{
             name: OSF.DDA.EventDescriptors.OlkRecipientsData,
+            value: OSF.DDA.WAC.Delegate.ParameterMap.sourceData
+        }],
+    isComplexType: true
+});
+OSF.DDA.WAC.Delegate.ParameterMap.define({
+    type: OSF.DDA.EventDispId.dispidOlkAppointmentTimeChangedEvent,
+    fromHost: [{
+            name: OSF.DDA.EventDescriptors.OlkAppointmentTimeChangedData,
             value: OSF.DDA.WAC.Delegate.ParameterMap.sourceData
         }],
     isComplexType: true
@@ -8696,7 +8739,8 @@ OSF.OUtil.setNamespace("Marshaling",OSF.DDA);
 OSF.OUtil.setNamespace("SingleSignOn",OSF.DDA.Marshaling);
 OSF.DDA.Marshaling.SingleSignOn.GetAccessTokenKeys = {
     ForceConsent: "forceConsent",
-    ForceAddAccount: "forceAddAccount"
+    ForceAddAccount: "forceAddAccount",
+    AuthChallenge: "authChallenge"
 };
 OSF.DDA.Marshaling.SingleSignOn.AccessTokenResultKeys = {AccessToken: "accessToken"};
 OSF.DDA.WAC.Delegate.ParameterMap.define({
@@ -9156,7 +9200,7 @@ OSF.InitializationHelper.prototype.loadAppSpecificScriptAndCreateOM = function O
         addEventSupport: function()
         {
             if(this._item$p$0)
-                OSF.DDA.DispIdHost["addEventSupport"](this._item$p$0,new OSF.EventDispatch([Microsoft.Office.WebExtension.EventType["RecipientsChanged"]]))
+                OSF.DDA.DispIdHost["addEventSupport"](this._item$p$0,new OSF.EventDispatch([Microsoft.Office.WebExtension.EventType["RecipientsChanged"],Microsoft.Office.WebExtension.EventType["AppointmentTimeChanged"]]))
         },
         windowOpenOverrideHandler: function(url, targetName, features, replace)
         {
@@ -9717,9 +9761,24 @@ OSF.InitializationHelper.prototype.loadAppSpecificScriptAndCreateOM = function O
         _getRestUrl$p$0: function()
         {
             window["OSF"]["DDA"]["OutlookAppOm"]._throwOnPropertyAccessForRestrictedPermission$i(this._initialData$p$0._permissionLevel$p$0);
-            if(!this._initialData$p$0.get__restUrl$i$0() && this.isApiVersionSupported("1.5"))
+            if(this._shouldInferRestUrl$p$0())
                 return this._inferRestUrlFromEwsUrl$p$0();
             return this._initialData$p$0.get__restUrl$i$0()
+        },
+        _shouldInferRestUrl$p$0: function()
+        {
+            return window["OSF"]["DDA"]["OutlookAppOm"]._instance$p.get__appName$i$0() === 8 && !this._initialData$p$0.get__restUrl$i$0() && this.isApiVersionSupported("1.5") && this._isHostBuildNumberLessThan$p$0("16.0.8414.1000")
+        },
+        _isHostBuildNumberLessThan$p$0: function(buildNumber)
+        {
+            var hostVersion = this._initialData$p$0.get__hostVersion$i$0();
+            if(hostVersion)
+            {
+                var hostVersionParts = hostVersion.split(".");
+                var buildNumberParts = buildNumber.split(".");
+                return window["parseInt"](hostVersionParts[0]) < window["parseInt"](buildNumberParts[0]) || window["parseInt"](hostVersionParts[0]) === window["parseInt"](buildNumberParts[0]) && window["parseInt"](hostVersionParts[2]) < window["parseInt"](buildNumberParts[2])
+            }
+            return false
         },
         _inferRestUrlFromEwsUrl$p$0: function()
         {
@@ -12461,7 +12520,7 @@ OSF.InitializationHelper.prototype.loadAppSpecificScriptAndCreateOM = function O
         var callback = null;
         var asyncContext = null;
         if(argsLength === 1)
-            if(Function["isInstanceOfType"](args[0]))
+            if($h.CommonParameters._argIsFunction$p(args[0]))
                 callback = args[0];
             else if(Object["isInstanceOfType"](args[0]))
                 options = args[0];
@@ -12471,7 +12530,7 @@ OSF.InitializationHelper.prototype.loadAppSpecificScriptAndCreateOM = function O
         {
             if(!Object["isInstanceOfType"](args[0]))
                 throw Error.argument("options");
-            if(!Function["isInstanceOfType"](args[1]))
+            if(!$h.CommonParameters._argIsFunction$p(args[1]))
                 throw Error.argument("callback");
             options = args[0];
             callback = args[1]
@@ -12492,13 +12551,17 @@ OSF.InitializationHelper.prototype.loadAppSpecificScriptAndCreateOM = function O
         var userContext = null;
         if(!argsLength || argsLength > 2)
             return false;
-        if(!Function["isInstanceOfType"](args[0]))
+        if(!$h.CommonParameters._argIsFunction$p(args[0]))
             return false;
         callback = args[0];
         if(argsLength > 1)
             userContext = args[1];
         commonParameters["val"] = new $h.CommonParameters(null,callback,userContext);
         return true
+    };
+    $h.CommonParameters._argIsFunction$p = function(arg)
+    {
+        return typeof arg === "function"
     };
     $h.CommonParameters.prototype = {
         _options$p$0: null,

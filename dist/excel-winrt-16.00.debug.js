@@ -1,7 +1,7 @@
 /* Excel WinRT-specific API library */
-/* Version: 16.0.8424.3000 */
+/* Version: 16.0.8514.3000 */
 
-/* Office.js Version: 16.0.8302.1000 */ 
+/* Office.js Version: 16.0.8511.1000 */ 
 /*
 	Copyright (c) Microsoft Corporation.  All rights reserved.
 */
@@ -837,6 +837,14 @@ OSF.OUtil=(function () {
 				}
 			}
 		},
+		removeClass: function OSF_OUtil$removeClass(elmt, val) {
+			if (OSF.OUtil.hasClass(elmt, val)) {
+				var className=elmt.getAttribute(_classN);
+				var reg=new RegExp('(\\s|^)'+val+'(\\s|$)');
+				className=className.replace(reg, '');
+				elmt.setAttribute(_classN, className);
+			}
+		},
 		hasClass: function OSF_OUtil$hasClass(elmt, clsName) {
 			var className=elmt.getAttribute(_classN);
 			return className && className.match(new RegExp('(\\s|^)'+clsName+'(\\s|$)'));
@@ -1031,7 +1039,9 @@ OSF.AgaveHostAction={
 	"EscExit": 15,
 	"F2Exit": 16,
 	"ExitNoFocusable": 17,
-	"ExitNoFocusableShift": 18
+	"ExitNoFocusableShift": 18,
+	"MouseEnter": 19,
+	"MouseLeave": 20
 };
 OSF.SharedConstants={
 	"NotificationConversationIdSuffix": '_ntf'
@@ -1167,6 +1177,7 @@ Microsoft.Office.WebExtension.Parameters={
 	HostType: "hostType",
 	ForceConsent: "forceConsent",
 	ForceAddAccount: "forceAddAccount",
+	AuthChallenge: "authChallenge",
 	Xml: "xml",
 	Namespace: "namespace",
 	Prefix: "prefix",
@@ -1314,6 +1325,7 @@ OSF.DDA.EventDispId={
 	dispidRichApiMessageEvent: 33,
 	dispidAppCommandInvokedEvent: 39,
 	dispidOlkItemSelectedChangedEvent: 46,
+	dispidOlkRecipientsChangedEvent: 47,
 	dispidTaskSelectionChangedEvent: 56,
 	dispidResourceSelectionChangedEvent: 57,
 	dispidViewSelectionChangedEvent: 58,
@@ -3089,6 +3101,7 @@ OSF.DDA.DispIdHost.Facade=function OSF_DDA_DispIdHost_Facade(getDelegateMethods,
 		"ContentControlAdded": did.dispidContentControlAddedEvent,
 		"RichApiMessage": did.dispidRichApiMessageEvent,
 		"ItemChanged": did.dispidOlkItemSelectedChangedEvent,
+		"RecipientsChanged": did.dispidOlkRecipientsChangedEvent,
 		"TaskSelectionChanged": did.dispidTaskSelectionChangedEvent,
 		"ResourceSelectionChanged": did.dispidResourceSelectionChangedEvent,
 		"ViewSelectionChanged": did.dispidViewSelectionChangedEvent,
@@ -3164,6 +3177,7 @@ OSF.DDA.DispIdHost.Facade=function OSF_DDA_DispIdHost_Facade(getDelegateMethods,
 				else {
 					hostCallArgs=callArgs;
 				}
+				var startTime=(new Date()).getTime();
 				delegate[OSF.DDA.DispIdHost.Delegates.ExecuteAsync]({
 					"dispId": dispId,
 					"hostCallArgs": hostCallArgs,
@@ -3184,6 +3198,9 @@ OSF.DDA.DispIdHost.Facade=function OSF_DDA_DispIdHost_Facade(getDelegateMethods,
 						}
 						var payload=asyncMethodCall.processResponse(status, responseArgs, caller, callArgs);
 						OSF.DDA.issueAsyncResult(callArgs, status, payload);
+						if (OSF.AppTelemetry) {
+							OSF.AppTelemetry.onMethodDone(dispId, hostCallArgs, Math.abs((new Date()).getTime() - startTime), status);
+						}
 					}
 				});
 			}
@@ -4051,7 +4068,6 @@ OSF.DDA.SafeArray.Delegate.executeAsync=function OSF_DDA_SafeArray_Delegate$Exec
 		if (args.onCalling) {
 			args.onCalling();
 		}
-		var startTime=(new Date()).getTime();
 		OSF.ClientHostController.execute(args.dispId, toArray(args.hostCallArgs), function OSF_DDA_SafeArrayFacade$Execute_OnResponse(hostResponseArgs, resultCode) {
 			var result=hostResponseArgs.toArray();
 			var status=result[OSF.DDA.SafeArray.Response.Status];
@@ -4097,9 +4113,6 @@ OSF.DDA.SafeArray.Delegate.executeAsync=function OSF_DDA_SafeArray_Delegate$Exec
 					payload=result[OSF.DDA.SafeArray.Response.Payload];
 				}
 				args.onComplete(status, payload);
-			}
-			if (OSF.AppTelemetry) {
-				OSF.AppTelemetry.onMethodDone(args.dispId, args.hostCallArgs, Math.abs((new Date()).getTime() - startTime), status);
 			}
 			return true;
 		});
@@ -4797,15 +4810,33 @@ OSF.InitializationHelper.prototype.setAgaveHostCommunication=function OSF_Initia
 		};
 	};
 	windowOpen(window);
-	if (document.activeElement==null || document.activeElement==document.body) {
-		var allTabbableElements=getAllTabElements();
-		if (allTabbableElements.length) {
-			OSF.OUtil.focusToFirstTabbable(allTabbableElements, false);
+	var setDefaultFocus=function OSF_InitializationHelper$setDefaultFocus() {
+		try {
+			if (document.activeElement==null || document.activeElement==document.body) {
+				var allTabbableElements=getAllTabElements();
+				if (allTabbableElements && allTabbableElements.length > 0) {
+					OSF.OUtil.focusToFirstTabbable(allTabbableElements, false);
+				}
+			}
 		}
+		catch (err) {
+			OsfMsAjaxFactory.msAjaxDebug.trace("Setting Agave default focus failed. Exception:"+err);
+		}
+	};
+	if (document.body) {
+		setDefaultFocus();
+	}
+	else {
+		document.addEventListener('DOMContentLoaded', setDefaultFocus);
 	}
 	window.addEventListener("blur", function () {
-		if (document.activeElement) {
-			document.activeElement.blur();
+		try {
+			if (document.activeElement) {
+				document.activeElement.blur();
+			}
+		}
+		catch (err) {
+			OsfMsAjaxFactory.msAjaxDebug.trace("Clearing Agave focus failed. Exception:"+err);
 		}
 	});
 };
@@ -5479,7 +5510,7 @@ var OSFAppTelemetry;
 		}
 		appInfo.message=context.get_hostCustomMessage();
 		appInfo.officeJSVersion=OSF.ConstantNames.FileVersion;
-		appInfo.hostJSVersion="16.0.8302.1000";
+		appInfo.hostJSVersion="16.0.8511.1000";
 		if (context._wacHostEnvironment) {
 			appInfo.wacHostEnvironment=context._wacHostEnvironment;
 		}
@@ -6395,6 +6426,14 @@ OSF.DDA.OMFactory.manufactureEventArgs=function OSF_DDA_OMFactory$manufactureEve
 				args=new OSF.DDA.OlkItemSelectedChangedEventArgs(eventProperties);
 				target.initialize(args["initialData"]);
 				target.setCurrentItemNumber(args["itemNumber"].itemNumber);
+			}
+			else {
+				throw OsfMsAjaxFactory.msAjaxError.argument(Microsoft.Office.WebExtension.Parameters.EventType, OSF.OUtil.formatString(Strings.OfficeOM.L_NotSupportedEventType, eventType));
+			}
+			break;
+		case Microsoft.Office.WebExtension.EventType.RecipientsChanged:
+			if (OSF._OfficeAppFactory.getHostInfo()["hostType"]=="outlook" || OSF._OfficeAppFactory.getHostInfo()["hostType"]=="outlookwebapp") {
+				args=new OSF.DDA.OlkRecipientsChangedEventArgs(eventProperties);
 			}
 			else {
 				throw OsfMsAjaxFactory.msAjaxError.argument(Microsoft.Office.WebExtension.Parameters.EventType, OSF.OUtil.formatString(Strings.OfficeOM.L_NotSupportedEventType, eventType));
@@ -11625,6 +11664,8 @@ var __extends=(this && this.__extends) || function (d, b) {
 };
 var OfficeCore;
 (function (OfficeCore) {
+	var _hostName="OfficeCore";
+	var _defaultApiSetName="ExperimentApi";
 	var _createPropertyObjectPath=OfficeExtension.ObjectPathFactory.createPropertyObjectPath;
 	var _createMethodObjectPath=OfficeExtension.ObjectPathFactory.createMethodObjectPath;
 	var _createIndexerObjectPath=OfficeExtension.ObjectPathFactory.createIndexerObjectPath;
@@ -11637,6 +11678,7 @@ var OfficeCore;
 	var _isNullOrUndefined=OfficeExtension.Utility.isNullOrUndefined;
 	var _isUndefined=OfficeExtension.Utility.isUndefined;
 	var _throwIfNotLoaded=OfficeExtension.Utility.throwIfNotLoaded;
+	var _throwIfApiNotSupported=OfficeExtension.Utility.throwIfApiNotSupported;
 	var _load=OfficeExtension.Utility.load;
 	var _fixObjectPathIfNecessary=OfficeExtension.Utility.fixObjectPathIfNecessary;
 	var _addActionResultHandler=OfficeExtension.Utility._addActionResultHandler;
@@ -11654,6 +11696,12 @@ var OfficeCore;
 			enumerable: true,
 			configurable: true
 		});
+		FlightingService.prototype.getClientSessionId=function () {
+			var action=_createMethodAction(this.context, this, "GetClientSessionId", 0, []);
+			var ret=new OfficeExtension.ClientResult();
+			_addActionResultHandler(this, action, ret);
+			return ret;
+		};
 		FlightingService.prototype.getDeferredFlights=function () {
 			var action=_createMethodAction(this.context, this, "GetDeferredFlights", 0, []);
 			var ret=new OfficeExtension.ClientResult();
