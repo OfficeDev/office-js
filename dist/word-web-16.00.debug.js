@@ -1,7 +1,7 @@
 /* Word Web-specific API library */
-/* Version: 16.0.8424.3000 */
+/* Version: 16.0.8717.3000 */
 
-/* Office.js Version: 16.0.8302.1000 */ 
+/* Office.js Version: 16.0.8717.1000 */ 
 /*
 	Copyright (c) Microsoft Corporation.  All rights reserved.
 */
@@ -837,6 +837,14 @@ OSF.OUtil=(function () {
 				}
 			}
 		},
+		removeClass: function OSF_OUtil$removeClass(elmt, val) {
+			if (OSF.OUtil.hasClass(elmt, val)) {
+				var className=elmt.getAttribute(_classN);
+				var reg=new RegExp('(\\s|^)'+val+'(\\s|$)');
+				className=className.replace(reg, '');
+				elmt.setAttribute(_classN, className);
+			}
+		},
 		hasClass: function OSF_OUtil$hasClass(elmt, clsName) {
 			var className=elmt.getAttribute(_classN);
 			return className && className.match(new RegExp('(\\s|^)'+clsName+'(\\s|$)'));
@@ -1031,7 +1039,9 @@ OSF.AgaveHostAction={
 	"EscExit": 15,
 	"F2Exit": 16,
 	"ExitNoFocusable": 17,
-	"ExitNoFocusableShift": 18
+	"ExitNoFocusableShift": 18,
+	"MouseEnter": 19,
+	"MouseLeave": 20
 };
 OSF.SharedConstants={
 	"NotificationConversationIdSuffix": '_ntf'
@@ -1167,6 +1177,8 @@ Microsoft.Office.WebExtension.Parameters={
 	HostType: "hostType",
 	ForceConsent: "forceConsent",
 	ForceAddAccount: "forceAddAccount",
+	AuthChallenge: "authChallenge",
+	Reserved: "reserved",
 	Xml: "xml",
 	Namespace: "namespace",
 	Prefix: "prefix",
@@ -1256,6 +1268,7 @@ OSF.DDA.MethodDispId={
 	dispidAppCommandInvocationCompletedMethod: 94,
 	dispidCloseContainerMethod: 97,
 	dispidGetAccessTokenMethod: 98,
+	dispidOpenBrowserWindow: 102,
 	dispidGetSelectedTaskMethod: 110,
 	dispidGetSelectedResourceMethod: 111,
 	dispidGetTaskMethod: 112,
@@ -1314,6 +1327,8 @@ OSF.DDA.EventDispId={
 	dispidRichApiMessageEvent: 33,
 	dispidAppCommandInvokedEvent: 39,
 	dispidOlkItemSelectedChangedEvent: 46,
+	dispidOlkRecipientsChangedEvent: 47,
+	dispidOlkAppointmentTimeChangedEvent: 48,
 	dispidTaskSelectionChangedEvent: 56,
 	dispidResourceSelectionChangedEvent: 57,
 	dispidViewSelectionChangedEvent: 58,
@@ -1445,7 +1460,8 @@ OSF.DDA.ErrorCodeManager=(function () {
 			ooeSSOInvalidGrant: 13005,
 			ooeSSOClientError: 13006,
 			ooeSSOServerError: 13007,
-			ooeAddinIsAlreadyRequestingToken: 13008
+			ooeAddinIsAlreadyRequestingToken: 13008,
+			ooeSSOUserConsentNotSupportedByCurrentAddinCategory: 13009
 		},
 		initializeErrorMessages: function OSF_DDA_ErrorCodeManager$initializeErrorMessages(stringNS) {
 			_errorMappings[OSF.DDA.ErrorCodeManager.errorCodes.ooeCoercionTypeNotSupported]={ name: stringNS.L_InvalidCoercion, message: stringNS.L_CoercionTypeNotSupported };
@@ -1543,6 +1559,7 @@ OSF.DDA.ErrorCodeManager=(function () {
 			_errorMappings[OSF.DDA.ErrorCodeManager.errorCodes.ooeSSOClientError]={ name: stringNS.L_SSOClientError, message: stringNS.L_SSOClientErrorMessage };
 			_errorMappings[OSF.DDA.ErrorCodeManager.errorCodes.ooeSSOServerError]={ name: stringNS.L_SSOServerError, message: stringNS.L_SSOServerErrorMessage };
 			_errorMappings[OSF.DDA.ErrorCodeManager.errorCodes.ooeAddinIsAlreadyRequestingToken]={ name: stringNS.L_AddinIsAlreadyRequestingToken, message: stringNS.L_AddinIsAlreadyRequestingTokenMessage };
+			_errorMappings[OSF.DDA.ErrorCodeManager.errorCodes.ooeSSOUserConsentNotSupportedByCurrentAddinCategory]={ name: stringNS.L_SSOUserConsentNotSupportedByCurrentAddinCategory, message: stringNS.L_SSOUserConsentNotSupportedByCurrentAddinCategoryMessage };
 		}
 	};
 })();
@@ -3022,6 +3039,7 @@ OSF.DDA.DispIdHost.Facade=function OSF_DDA_DispIdHost_Facade(getDelegateMethods,
 		"ExecuteRichApiRequestAsync": did.dispidExecuteRichApiRequestMethod,
 		"AppCommandInvocationCompletedAsync": did.dispidAppCommandInvocationCompletedMethod,
 		"CloseContainerAsync": did.dispidCloseContainerMethod,
+		"OpenBrowserWindow": did.dispidOpenBrowserWindow,
 		"AddDataPartAsync": did.dispidAddDataPartMethod,
 		"GetDataPartByIdAsync": did.dispidGetDataPartByIdMethod,
 		"GetDataPartsByNameSpaceAsync": did.dispidGetDataPartsByNamespaceMethod,
@@ -3061,13 +3079,13 @@ OSF.DDA.DispIdHost.Facade=function OSF_DDA_DispIdHost_Facade(getDelegateMethods,
 	}
 	jsom=OSF.DDA.SyncMethodNames;
 	did=OSF.DDA.MethodDispId;
-	var asyncMethodMap={
+	var syncMethodMap={
 		"MessageParent": did.dispidMessageParentMethod,
 		"SendMessage": did.dispidSendMessageMethod
 	};
-	for (var method in asyncMethodMap) {
+	for (var method in syncMethodMap) {
 		if (jsom[method]) {
-			dispIdMap[jsom[method].id]=asyncMethodMap[method];
+			dispIdMap[jsom[method].id]=syncMethodMap[method];
 		}
 	}
 	jsom=Microsoft.Office.WebExtension.EventType;
@@ -3089,6 +3107,8 @@ OSF.DDA.DispIdHost.Facade=function OSF_DDA_DispIdHost_Facade(getDelegateMethods,
 		"ContentControlAdded": did.dispidContentControlAddedEvent,
 		"RichApiMessage": did.dispidRichApiMessageEvent,
 		"ItemChanged": did.dispidOlkItemSelectedChangedEvent,
+		"RecipientsChanged": did.dispidOlkRecipientsChangedEvent,
+		"AppointmentTimeChanged": did.dispidOlkAppointmentTimeChangedEvent,
 		"TaskSelectionChanged": did.dispidTaskSelectionChangedEvent,
 		"ResourceSelectionChanged": did.dispidResourceSelectionChangedEvent,
 		"ViewSelectionChanged": did.dispidViewSelectionChangedEvent,
@@ -3164,6 +3184,7 @@ OSF.DDA.DispIdHost.Facade=function OSF_DDA_DispIdHost_Facade(getDelegateMethods,
 				else {
 					hostCallArgs=callArgs;
 				}
+				var startTime=(new Date()).getTime();
 				delegate[OSF.DDA.DispIdHost.Delegates.ExecuteAsync]({
 					"dispId": dispId,
 					"hostCallArgs": hostCallArgs,
@@ -3184,6 +3205,9 @@ OSF.DDA.DispIdHost.Facade=function OSF_DDA_DispIdHost_Facade(getDelegateMethods,
 						}
 						var payload=asyncMethodCall.processResponse(status, responseArgs, caller, callArgs);
 						OSF.DDA.issueAsyncResult(callArgs, status, payload);
+						if (OSF.AppTelemetry) {
+							OSF.AppTelemetry.onMethodDone(dispId, hostCallArgs, Math.abs((new Date()).getTime() - startTime), status);
+						}
 					}
 				});
 			}
@@ -3482,6 +3506,37 @@ OSF.ShowWindowDialogParameterKeys={
 OSF.HostThemeButtonStyleKeys={
 	ButtonBorderColor: "buttonBorderColor",
 	ButtonBackgroundColor: "buttonBackgroundColor"
+};
+OSF.OmexPageParameterKeys={
+	AppName: "client",
+	AppVersion: "cv",
+	AppUILocale: "ui",
+	AppDomain: "appDomain",
+	StoreLocator: "rs",
+	AssetId: "assetid",
+	NotificationType: "notificationType",
+	AppCorrelationId: "corr",
+	AuthType: "authType"
+};
+OSF.AuthType={
+	Anonymous: 0,
+	MSA: 1,
+	OrgId: 2,
+	ADAL: 3
+};
+OSF.OmexMessageKeys={
+	MessageType: "messageType",
+	MessageValue: "messageValue"
+};
+OSF.OmexRemoveAddinMessageKeys={
+	RemoveAddinResultCode: "resultCode",
+	RemoveAddinResultValue: "resultValue"
+};
+OSF.OmexRemoveAddinResultCode={
+	Success: 0,
+	ClientError: 400,
+	ServerError: 500,
+	UnknownError: 600
 };
 var OfficeExt;
 (function (OfficeExt) {
@@ -4893,7 +4948,6 @@ OSF.DDA.WAC.Delegate.executeAsync=function OSF_DDA_WAC_Delegate$executeAsync(arg
 	if (args.onCalling) {
 		args.onCalling();
 	}
-	var startTime=(new Date()).getTime();
 	if (!OSF.getClientEndPoint()) {
 		return;
 	}
@@ -4918,9 +4972,6 @@ OSF.DDA.WAC.Delegate.executeAsync=function OSF_DDA_WAC_Delegate$executeAsync(arg
 		}
 		if (args.onComplete) {
 			args.onComplete(error, payload);
-		}
-		if (OSF.AppTelemetry) {
-			OSF.AppTelemetry.onMethodDone(args.dispId, args.hostCallArgs, Math.abs((new Date()).getTime() - startTime), error);
 		}
 	}, args.hostCallArgs);
 };
@@ -5850,7 +5901,7 @@ var OSFAriaLogger;
 		function AriaLogger() {
 		}
 		AriaLogger.prototype.getAriaCDNLocation=function () {
-			return (OSF._OfficeAppFactory.getLoadScriptHelper().getOfficeJsBasePath()+"/ariatelemetry/aria-web-telemetry-2.8.0.min.js");
+			return (OSF._OfficeAppFactory.getLoadScriptHelper().getOfficeJsBasePath()+"/ariatelemetry/aria-web-telemetry.js");
 		};
 		AriaLogger.getInstance=function () {
 			if (AriaLogger.AriaLoggerObj===undefined) {
@@ -5867,13 +5918,10 @@ var OSFAriaLogger;
 				try {
 					if (!this.ALogger) {
 						var OfficeExtensibilityTenantID="db334b301e7b474db5e0f02f07c51a47-a1b5bc36-1bbe-482f-a64a-c2d9cb606706-7439";
-						var configuration=new microsoft.applications.telemetry.LogConfiguration();
-						configuration.enableAutoUserSession=true;
-						microsoft.applications.telemetry.LogManager.initialize(OfficeExtensibilityTenantID, configuration);
-						this.ALogger=new microsoft.applications.telemetry.Logger();
+						this.ALogger=AWTLogManager.initialize(OfficeExtensibilityTenantID);
 					}
-					var eventProperties=new microsoft.applications.telemetry.EventProperties();
-					eventProperties.name="Office.Extensibility.OfficeJS."+tableName;
+					var eventProperties=new AWTEventProperties();
+					eventProperties.setName("Office.Extensibility.OfficeJS."+tableName);
 					for (var key in telemetryData) {
 						if (key.toLowerCase() !=="table") {
 							eventProperties.setProperty(key, telemetryData[key]);
@@ -5993,14 +6041,16 @@ var OSFAppTelemetry;
 			if (!OSF.Logger || !OSFAppTelemetry.enableTelemetry) {
 				return;
 			}
-			OSF.Logger.sendLog(OSF.Logger.TraceLevel.info, data.SerializeRow(), OSF.Logger.SendFlag.none);
-			OSFAriaLogger.AriaLogger.getInstance().logData(data);
+			try {
+				OSFAriaLogger.AriaLogger.getInstance().logData(data);
+			}
+			catch (e) {
+			}
 		};
 		AppLogger.prototype.LogRawData=function (log) {
 			if (!OSF.Logger || !OSFAppTelemetry.enableTelemetry) {
 				return;
 			}
-			OSF.Logger.sendLog(OSF.Logger.TraceLevel.info, log, OSF.Logger.SendFlag.none);
 			try {
 				OSFAriaLogger.AriaLogger.getInstance().logData(JSON.parse(log));
 			}
@@ -6040,7 +6090,7 @@ var OSFAppTelemetry;
 		}
 		appInfo.message=context.get_hostCustomMessage();
 		appInfo.officeJSVersion=OSF.ConstantNames.FileVersion;
-		appInfo.hostJSVersion="16.0.8302.1000";
+		appInfo.hostJSVersion="16.0.8717.1000";
 		if (context._wacHostEnvironment) {
 			appInfo.wacHostEnvironment=context._wacHostEnvironment;
 		}
@@ -6730,6 +6780,22 @@ OSF.DDA.OMFactory.manufactureEventArgs=function OSF_DDA_OMFactory$manufactureEve
 				args=new OSF.DDA.OlkItemSelectedChangedEventArgs(eventProperties);
 				target.initialize(args["initialData"]);
 				target.setCurrentItemNumber(args["itemNumber"].itemNumber);
+			}
+			else {
+				throw OsfMsAjaxFactory.msAjaxError.argument(Microsoft.Office.WebExtension.Parameters.EventType, OSF.OUtil.formatString(Strings.OfficeOM.L_NotSupportedEventType, eventType));
+			}
+			break;
+		case Microsoft.Office.WebExtension.EventType.RecipientsChanged:
+			if (OSF._OfficeAppFactory.getHostInfo()["hostType"]=="outlook" || OSF._OfficeAppFactory.getHostInfo()["hostType"]=="outlookwebapp") {
+				args=new OSF.DDA.OlkRecipientsChangedEventArgs(eventProperties);
+			}
+			else {
+				throw OsfMsAjaxFactory.msAjaxError.argument(Microsoft.Office.WebExtension.Parameters.EventType, OSF.OUtil.formatString(Strings.OfficeOM.L_NotSupportedEventType, eventType));
+			}
+			break;
+		case Microsoft.Office.WebExtension.EventType.AppointmentTimeChanged:
+			if (OSF._OfficeAppFactory.getHostInfo()["hostType"]=="outlook" || OSF._OfficeAppFactory.getHostInfo()["hostType"]=="outlookwebapp") {
+				args=new OSF.DDA.OlkAppointmentTimeChangedEventArgs(eventProperties);
 			}
 			else {
 				throw OsfMsAjaxFactory.msAjaxError.argument(Microsoft.Office.WebExtension.Parameters.EventType, OSF.OUtil.formatString(Strings.OfficeOM.L_NotSupportedEventType, eventType));
@@ -10078,7 +10144,14 @@ OSF.DDA.WAC.Delegate.openDialog=function OSF_DDA_WAC_Delegate$OpenDialog(args) {
 	var callback=OSF.DDA.WAC.Delegate._getOnAfterRegisterEvent(true, args);
 	function showDialogCallback(status) {
 		var payload={ "Error": status };
-		callback(Microsoft.Office.Common.InvokeResultCode.noError, payload);
+		try {
+			callback(Microsoft.Office.Common.InvokeResultCode.noError, payload);
+		}
+		catch (e) {
+			if (OSF.AppTelemetry) {
+				OSF.AppTelemetry.logAppException("Exception happens at showDialogCallback."+e);
+			}
+		}
 	}
 	if (OSF.DialogShownStatus.hasDialogShown) {
 		showDialogCallback(OSF.DDA.ErrorCodeManager.errorCodes.ooeDialogAlreadyOpened);
@@ -10133,7 +10206,14 @@ OSF.DDA.WAC.Delegate.closeDialog=function OSF_DDA_WAC_Delegate$CloseDialog(args)
 	var callback=OSF.DDA.WAC.Delegate._getOnAfterRegisterEvent(false, args);
 	function closeDialogCallback(status) {
 		var payload={ "Error": status };
-		callback(Microsoft.Office.Common.InvokeResultCode.noError, payload);
+		try {
+			callback(Microsoft.Office.Common.InvokeResultCode.noError, payload);
+		}
+		catch (e) {
+			if (OSF.AppTelemetry) {
+				OSF.AppTelemetry.logAppException("Exception happens at closeDialogCallback."+e);
+			}
+		}
 	}
 	if (!OSF.DialogShownStatus.hasDialogShown) {
 		closeDialogCallback(OSF.DDA.ErrorCodeManager.errorCodes.ooeWebDialogClosed);
@@ -10176,6 +10256,13 @@ OSF.DDA.AsyncMethodCalls.define({
 				"types": ["boolean"],
 				"defaultValue": false
 			}
+		},
+		{
+			name: Microsoft.Office.WebExtension.Parameters.AuthChallenge,
+			value: {
+				"types": ["string"],
+				"defaultValue": ""
+			}
 		}
 	],
 	onSucceeded: function (dataDescriptor, caller, callArgs) {
@@ -10187,16 +10274,21 @@ OSF.OUtil.setNamespace("Marshaling", OSF.DDA);
 OSF.OUtil.setNamespace("SingleSignOn", OSF.DDA.Marshaling);
 OSF.DDA.Marshaling.SingleSignOn.GetAccessTokenKeys={
 	ForceConsent: "forceConsent",
-	ForceAddAccount: "forceAddAccount"
+	ForceAddAccount: "forceAddAccount",
+	AuthChallenge: "authChallenge"
+};
+OSF.DDA.Marshaling.SingleSignOn.AccessTokenResultKeys={
+	AccessToken: "accessToken"
 };
 OSF.DDA.WAC.Delegate.ParameterMap.define({
 	type: OSF.DDA.MethodDispId.dispidGetAccessTokenMethod,
 	toHost: [
 		{ name: Microsoft.Office.WebExtension.Parameters.ForceConsent, value: OSF.DDA.Marshaling.SingleSignOn.GetAccessTokenKeys.ForceConsent },
-		{ name: Microsoft.Office.WebExtension.Parameters.ForceAddAccount, value: OSF.DDA.Marshaling.SingleSignOn.GetAccessTokenKeys.ForceAddAccount }
+		{ name: Microsoft.Office.WebExtension.Parameters.ForceAddAccount, value: OSF.DDA.Marshaling.SingleSignOn.GetAccessTokenKeys.ForceAddAccount },
+		{ name: Microsoft.Office.WebExtension.Parameters.AuthChallenge, value: OSF.DDA.Marshaling.SingleSignOn.GetAccessTokenKeys.AuthChallenge }
 	],
 	fromHost: [
-		{ name: Microsoft.Office.WebExtension.Parameters.Data, value: OSF.DDA.WAC.Delegate.ParameterMap.self }
+		{ name: Microsoft.Office.WebExtension.Parameters.Data, value: OSF.DDA.Marshaling.SingleSignOn.AccessTokenResultKeys.AccessToken }
 	]
 });
 var OSFWordWAC;
@@ -10284,9 +10376,10 @@ var __extends=(this && this.__extends) || function (d, b) {
 var OfficeExtension;
 (function (OfficeExtension) {
 	var Action=(function () {
-		function Action(actionInfo, isWriteOperation) {
+		function Action(actionInfo, isWriteOperation, isRestrictedResourceAccess) {
 			this.m_actionInfo=actionInfo;
 			this.m_isWriteOperation=isWriteOperation;
+			this.m_isRestrictedResourceAccess=isRestrictedResourceAccess;
 		}
 		Object.defineProperty(Action.prototype, "actionInfo", {
 			get: function () {
@@ -10298,6 +10391,13 @@ var OfficeExtension;
 		Object.defineProperty(Action.prototype, "isWriteOperation", {
 			get: function () {
 				return this.m_isWriteOperation;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(Action.prototype, "isRestrictedResourceAccess", {
+			get: function () {
+				return this.m_isRestrictedResourceAccess;
 			},
 			enumerable: true,
 			configurable: true
@@ -10334,13 +10434,13 @@ var OfficeExtension;
 			var args=[value];
 			var referencedArgumentObjectPaths=OfficeExtension.Utility.setMethodArguments(context, actionInfo.ArgumentInfo, args);
 			OfficeExtension.Utility.validateReferencedObjectPaths(referencedArgumentObjectPaths);
-			var ret=new OfficeExtension.Action(actionInfo, true);
+			var ret=new OfficeExtension.Action(actionInfo, true, false);
 			context._pendingRequest.addAction(ret);
 			context._pendingRequest.addReferencedObjectPath(parent._objectPath);
 			context._pendingRequest.addReferencedObjectPaths(referencedArgumentObjectPaths);
 			return ret;
 		};
-		ActionFactory.createMethodAction=function (context, parent, methodName, operationType, args) {
+		ActionFactory.createMethodAction=function (context, parent, methodName, operationType, args, isRestrictedResourceAccess) {
 			OfficeExtension.Utility.validateObjectPath(parent);
 			var actionInfo={
 				Id: context._nextId(),
@@ -10352,7 +10452,7 @@ var OfficeExtension;
 			var referencedArgumentObjectPaths=OfficeExtension.Utility.setMethodArguments(context, actionInfo.ArgumentInfo, args);
 			OfficeExtension.Utility.validateReferencedObjectPaths(referencedArgumentObjectPaths);
 			var isWriteOperation=operationType !=1;
-			var ret=new OfficeExtension.Action(actionInfo, isWriteOperation);
+			var ret=new OfficeExtension.Action(actionInfo, isWriteOperation, isRestrictedResourceAccess);
 			context._pendingRequest.addAction(ret);
 			context._pendingRequest.addReferencedObjectPath(parent._objectPath);
 			context._pendingRequest.addReferencedObjectPaths(referencedArgumentObjectPaths);
@@ -10367,7 +10467,7 @@ var OfficeExtension;
 				ObjectPathId: parent._objectPath.objectPathInfo.Id,
 			};
 			actionInfo.QueryInfo=queryOption;
-			var ret=new OfficeExtension.Action(actionInfo, false);
+			var ret=new OfficeExtension.Action(actionInfo, false, false);
 			context._pendingRequest.addAction(ret);
 			context._pendingRequest.addReferencedObjectPath(parent._objectPath);
 			return ret;
@@ -10381,7 +10481,7 @@ var OfficeExtension;
 				ObjectPathId: parent._objectPath.objectPathInfo.Id,
 				RecursiveQueryInfo: query
 			};
-			var ret=new OfficeExtension.Action(actionInfo, false);
+			var ret=new OfficeExtension.Action(actionInfo, false, false);
 			context._pendingRequest.addAction(ret);
 			context._pendingRequest.addReferencedObjectPath(parent._objectPath);
 			return ret;
@@ -10394,7 +10494,7 @@ var OfficeExtension;
 				Name: "",
 				ObjectPathId: obj._objectPath.objectPathInfo.Id
 			};
-			var ret=new OfficeExtension.Action(actionInfo, false);
+			var ret=new OfficeExtension.Action(actionInfo, false, false);
 			context._pendingRequest.addAction(ret);
 			context._pendingRequest.addReferencedObjectPath(obj._objectPath);
 			context._pendingRequest.addActionResultHandler(ret, new OfficeExtension.InstantiateActionResultHandler(obj));
@@ -10407,7 +10507,7 @@ var OfficeExtension;
 				Name: "Trace",
 				ObjectPathId: 0
 			};
-			var ret=new OfficeExtension.Action(actionInfo, false);
+			var ret=new OfficeExtension.Action(actionInfo, false, false);
 			context._pendingRequest.addAction(ret);
 			if (addTraceMessage) {
 				context._pendingRequest.addTrace(actionInfo.Id, message);
@@ -10635,6 +10735,9 @@ var OfficeExtension;
 			if (action.isWriteOperation) {
 				this.m_flags=this.m_flags | 1;
 			}
+			if (action.isRestrictedResourceAccess) {
+				this.m_flags=this.m_flags | 2;
+			}
 			this.m_actions.push(action);
 		};
 		Object.defineProperty(ClientRequest.prototype, "hasActions", {
@@ -10663,6 +10766,9 @@ var OfficeExtension;
 			while (objectPath) {
 				if (objectPath.isWriteOperation) {
 					this.m_flags=this.m_flags | 1;
+				}
+				if (objectPath.isRestrictedResourceAccess) {
+					this.m_flags=this.m_flags | 2;
 				}
 				this.m_referencedObjectPaths[objectPath.objectPathInfo.Id]=objectPath;
 				if (objectPath.objectPathInfo.ObjectPathType==3) {
@@ -11322,6 +11428,8 @@ var OfficeExtension;
 		Constants.embeddingPageOrigin="EmbeddingPageOrigin";
 		Constants.embeddingPageSessionInfo="EmbeddingPageSessionInfo";
 		Constants.eventMessageCategory=65536;
+		Constants.eventWorkbookId="Workbook";
+		Constants.eventSourceRemote="Remote";
 		return Constants;
 	}());
 	OfficeExtension.Constants=Constants;
@@ -11652,7 +11760,7 @@ var OfficeExtension;
 					debugInfo[key]=partialDebugInfo[key];
 				}
 				if (this.innerError) {
-					if (this.innerError instanceof OfficeExtension.Error) {
+					if (this.innerError instanceof OfficeExtension._Internal.Error) {
 						debugInfo.innerError=this.innerError.debugInfo;
 					}
 					else {
@@ -12038,6 +12146,9 @@ var OfficeExtension;
 						var funcs=this.m_eventRegistration.getHandlers(entry.messageType, entry.targetId);
 						if (funcs.length > 0) {
 							var arg=JSON.parse(entry.message);
+							if (entry.isRemoteOverride) {
+								arg.source=OfficeExtension.Constants.eventSourceRemote;
+							}
 							for (var i=0; i < funcs.length; i++) {
 								funcs[i](arg);
 							}
@@ -12071,7 +12182,7 @@ var OfficeExtension;
 		}
 		GenericEventHandlers.prototype.add=function (handler) {
 			var _this=this;
-			if (this.m_genericEventInfo.registerFunc) {
+			if ((this._handlers.length==0) && this.m_genericEventInfo.registerFunc) {
 				this.m_genericEventInfo.registerFunc();
 			}
 			if (!GenericEventRegistration.getGenericEventRegistration().isReady) {
@@ -12087,7 +12198,7 @@ var OfficeExtension;
 		};
 		GenericEventHandlers.prototype.remove=function (handler) {
 			var _this=this;
-			if (this.m_genericEventInfo.unregisterFunc) {
+			if ((this._handlers.length==1) && this.m_genericEventInfo.unregisterFunc) {
 				this.m_genericEventInfo.unregisterFunc();
 			}
 			OfficeExtension.ActionFactory.createTraceMarkerForCallback(this._context, function () {
@@ -12294,6 +12405,146 @@ var OfficeExtension;
 })(OfficeExtension || (OfficeExtension={}));
 var OfficeExtension;
 (function (OfficeExtension) {
+	var HostBridgeRequestExecutor=(function () {
+		function HostBridgeRequestExecutor(session) {
+			this.m_session=session;
+		}
+		HostBridgeRequestExecutor.prototype.executeAsync=function (customData, requestFlags, requestMessage) {
+			var httpRequestInfo={
+				url: OfficeExtension.Constants.processQuery,
+				method: "POST",
+				headers: requestMessage.Headers,
+				body: requestMessage.Body
+			};
+			var message={
+				id: HostBridgeSession.nextId(),
+				type: 1,
+				flags: requestFlags,
+				message: httpRequestInfo
+			};
+			OfficeExtension.Utility.log(JSON.stringify(message));
+			return this.m_session.sendMessageToHost(message)
+				.then(function (nativeBridgeResponse) {
+				OfficeExtension.Utility.log("Received response: "+JSON.stringify(nativeBridgeResponse));
+				var responseInfo=nativeBridgeResponse.message;
+				var response;
+				if (responseInfo.statusCode===200) {
+					response={ ErrorCode: null, ErrorMessage: null, Headers: responseInfo.headers, Body: responseInfo.body };
+				}
+				else {
+					OfficeExtension.Utility.log("Error Response:"+responseInfo.body);
+					var error=OfficeExtension.Utility._parseErrorResponse(responseInfo);
+					response={
+						ErrorCode: error.errorCode,
+						ErrorMessage: error.errorMessage,
+						Headers: responseInfo.headers,
+						Body: null
+					};
+				}
+				return response;
+			});
+		};
+		return HostBridgeRequestExecutor;
+	}());
+	var HostBridgeSession=(function (_super) {
+		__extends(HostBridgeSession, _super);
+		function HostBridgeSession(bridge) {
+			var _this=this;
+			_super.call(this);
+			this.m_promiseResolver={};
+			this.m_bridge=bridge;
+			this.m_bridge.onMessageFromHost=function (msg) {
+				_this.onMessageFromHost(msg);
+			};
+		}
+		HostBridgeSession.prototype._resolveRequestUrlAndHeaderInfo=function () {
+			return OfficeExtension.Utility._createPromiseFromResult(null);
+		};
+		HostBridgeSession.prototype._createRequestExecutorOrNull=function () {
+			OfficeExtension.Utility.log("NativeBridgeSession::CreateRequestExecutor");
+			return new HostBridgeRequestExecutor(this);
+		};
+		Object.defineProperty(HostBridgeSession.prototype, "eventRegistration", {
+			get: function () {
+				return OfficeExtension._Internal.officeJsEventRegistration;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		HostBridgeSession.init=function (bridge) {
+			if (bridge && typeof (bridge)==="object") {
+				var session=new HostBridgeSession(bridge);
+				OfficeExtension.ClientRequestContext._overrideSession=session;
+				OfficeExtension.HttpUtility.setCustomSendLocalDocumentRequestFunc(function (request) {
+					var bridgeMessage={
+						id: HostBridgeSession.nextId(),
+						type: 1,
+						flags: 0,
+						message: request
+					};
+					return session.sendMessageToHost(bridgeMessage)
+						.then(function (bridgeResponse) {
+						var responseInfo=bridgeResponse.message;
+						return responseInfo;
+					});
+				});
+			}
+		};
+		HostBridgeSession.prototype.sendMessageToHost=function (message) {
+			var _this=this;
+			this.m_bridge.sendMessageToHost(JSON.stringify(message));
+			var ret=new OfficeExtension._Internal.OfficePromise(function (resolve, reject) {
+				_this.m_promiseResolver[message.id]=resolve;
+			});
+			return ret;
+		};
+		HostBridgeSession.prototype.onMessageFromHost=function (messageText) {
+			if (messageText==="test") {
+				if (HostBridgeTest._testFunc) {
+					HostBridgeTest._testFunc();
+				}
+			}
+			else {
+				var message=JSON.parse(messageText);
+				if (typeof (message.id)==="number") {
+					var resolve=this.m_promiseResolver[message.id];
+					if (resolve) {
+						resolve(message);
+					}
+					delete this.m_promiseResolver[message.id];
+				}
+			}
+		};
+		HostBridgeSession.nextId=function () {
+			return HostBridgeSession.s_nextId++;
+		};
+		HostBridgeSession.s_nextId=1;
+		return HostBridgeSession;
+	}(OfficeExtension.SessionBase));
+	var HostBridge=(function () {
+		function HostBridge() {
+		}
+		HostBridge.init=function (bridge) {
+			HostBridgeSession.init(bridge);
+		};
+		return HostBridge;
+	}());
+	OfficeExtension.HostBridge=HostBridge;
+	if (typeof (_richApiNativeBridge)==="object" && _richApiNativeBridge) {
+		HostBridge.init(_richApiNativeBridge);
+	}
+	var HostBridgeTest=(function () {
+		function HostBridgeTest() {
+		}
+		HostBridgeTest.setTestFunc=function (func) {
+			HostBridgeTest._testFunc=func;
+		};
+		return HostBridgeTest;
+	}());
+	OfficeExtension.HostBridgeTest=HostBridgeTest;
+})(OfficeExtension || (OfficeExtension={}));
+var OfficeExtension;
+(function (OfficeExtension) {
 	var ObjectPath=(function () {
 		function ObjectPath(objectPathInfo, parentObjectPath, isCollection, isInvalidAfterRequest) {
 			this.m_objectPathInfo=objectPathInfo;
@@ -12316,6 +12567,16 @@ var OfficeExtension;
 			},
 			set: function (value) {
 				this.m_isWriteOperation=value;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(ObjectPath.prototype, "isRestrictedResourceAccess", {
+			get: function () {
+				return this.m_isRestrictedResourceAccess;
+			},
+			set: function (value) {
+				this.m_isRestrictedResourceAccess=value;
 			},
 			enumerable: true,
 			configurable: true
@@ -12463,18 +12724,22 @@ var OfficeExtension;
 			var objectPathInfo={ Id: context._nextId(), ObjectPathType: 1, Name: "" };
 			return new OfficeExtension.ObjectPath(objectPathInfo, null, false, false);
 		};
-		ObjectPathFactory.createNewObjectObjectPath=function (context, typeName, isCollection) {
+		ObjectPathFactory.createNewObjectObjectPath=function (context, typeName, isCollection, isRestrictedResourceAccess) {
 			var objectPathInfo={ Id: context._nextId(), ObjectPathType: 2, Name: typeName };
-			return new OfficeExtension.ObjectPath(objectPathInfo, null, isCollection, false);
+			var ret=new OfficeExtension.ObjectPath(objectPathInfo, null, isCollection, false);
+			ret.isRestrictedResourceAccess=isRestrictedResourceAccess;
+			return ret;
 		};
-		ObjectPathFactory.createPropertyObjectPath=function (context, parent, propertyName, isCollection, isInvalidAfterRequest) {
+		ObjectPathFactory.createPropertyObjectPath=function (context, parent, propertyName, isCollection, isInvalidAfterRequest, isRestrictedResourceAccess) {
 			var objectPathInfo={
 				Id: context._nextId(),
 				ObjectPathType: 4,
 				Name: propertyName,
 				ParentObjectPathId: parent._objectPath.objectPathInfo.Id,
 			};
-			return new OfficeExtension.ObjectPath(objectPathInfo, parent._objectPath, isCollection, isInvalidAfterRequest);
+			var ret=new OfficeExtension.ObjectPath(objectPathInfo, parent._objectPath, isCollection, isInvalidAfterRequest);
+			ret.isRestrictedResourceAccess=isRestrictedResourceAccess;
+			return ret;
 		};
 		ObjectPathFactory.createIndexerObjectPath=function (context, parent, args) {
 			var objectPathInfo={
@@ -12498,7 +12763,7 @@ var OfficeExtension;
 			objectPathInfo.ArgumentInfo.Arguments=args;
 			return new OfficeExtension.ObjectPath(objectPathInfo, parentObjectPath, false, false);
 		};
-		ObjectPathFactory.createMethodObjectPath=function (context, parent, methodName, operationType, args, isCollection, isInvalidAfterRequest, getByIdMethodName) {
+		ObjectPathFactory.createMethodObjectPath=function (context, parent, methodName, operationType, args, isCollection, isInvalidAfterRequest, getByIdMethodName, isRestrictedResourceAccess) {
 			var objectPathInfo={
 				Id: context._nextId(),
 				ObjectPathType: 3,
@@ -12511,6 +12776,7 @@ var OfficeExtension;
 			ret.argumentObjectPaths=argumentObjectPaths;
 			ret.isWriteOperation=(operationType !=1);
 			ret.getByIdMethodName=getByIdMethodName;
+			ret.isRestrictedResourceAccess=isRestrictedResourceAccess;
 			return ret;
 		};
 		ObjectPathFactory.createReferenceIdObjectPath=function (context, referenceId) {
@@ -12601,6 +12867,12 @@ var OfficeExtension;
 })(OfficeExtension || (OfficeExtension={}));
 var OfficeExtension;
 (function (OfficeExtension) {
+	var _Internal;
+	(function (_Internal) {
+		_Internal.OfficeRequire=function () {
+			return null;
+		}();
+	})(_Internal=OfficeExtension._Internal || (OfficeExtension._Internal={}));
 	var _Internal;
 	(function (_Internal) {
 		var PromiseImpl;
@@ -13254,6 +13526,8 @@ var OfficeExtension;
 		ResourceStrings.invalidOperationInCellEditMode="InvalidOperationInCellEditMode";
 		ResourceStrings.customFunctionDefintionMissing="CustomFunctionDefintionMissing";
 		ResourceStrings.customFunctionImplementationMissing="CustomFunctionImplementationMissing";
+		ResourceStrings.customFunctionNameContainsBadChars="CustomFunctionNameContainsBadChars";
+		ResourceStrings.customFunctionNameCannotSplit="CustomFunctionNameCannotSplit";
 		ResourceStrings.apiNotFoundDetails="ApiNotFoundDetails";
 		return ResourceStrings;
 	}());
@@ -13276,8 +13550,10 @@ var OfficeExtension;
 		ResourceStringValues.ValueNotLoaded="The value of the result object has not been loaded yet. Before reading the value property, call \"context.sync()\" on the associated request context.";
 		ResourceStringValues.InvalidOrTimedOutSessionMessage="Your Office Online session has expired or is invalid. To continue, refresh the page.";
 		ResourceStringValues.InvalidOperationInCellEditMode="Excel is in cell-editing mode. Please exit the edit mode by pressing ENTER or TAB or selecting another cell, and then try again.";
-		ResourceStringValues.CustomFunctionDefintionMissing="A property with this name that represents the function's definition must exist on Excel.CustomFunctions";
+		ResourceStringValues.CustomFunctionDefintionMissing="A property with this name that represents the function's definition must exist on Excel.CustomFunctions.";
 		ResourceStringValues.CustomFunctionImplementationMissing="The property with this name on Excel.CustomFunctions that represents the function's definition must contain a 'call' property that implements the function.";
+		ResourceStringValues.CustomFunctionNameContainsBadChars="The function name may only contain letters, digits, underscores, and periods.";
+		ResourceStringValues.CustomFunctionNameCannotSplit="The function name must contain a non-empty namespace and a non-empty short name.";
 		ResourceStringValues.ApiNotFoundDetails="The method or property {0} is part of the {1} requirement set, which is not available in your version of {2}.";
 		return ResourceStringValues;
 	}());
@@ -13822,7 +14098,10 @@ var OfficeExtension;
 		};
 		Utility._parseErrorResponse=function (responseInfo) {
 			var errorObj=null;
-			if (!Utility.isNullOrEmptyString(responseInfo.body)) {
+			if (Utility.isPlainJsonObject(responseInfo.body)) {
+				errorObj=responseInfo.body;
+			}
+			else if (!Utility.isNullOrEmptyString(responseInfo.body)) {
 				var errorResponseBody=Utility.trim(responseInfo.body);
 				try {
 					errorObj=JSON.parse(errorResponseBody);
@@ -13868,6 +14147,8 @@ var __extends=(this && this.__extends) || function (d, b) {
 };
 var OfficeCore;
 (function (OfficeCore) {
+	var _hostName="OfficeCore";
+	var _defaultApiSetName="ExperimentApi";
 	var _createPropertyObjectPath=OfficeExtension.ObjectPathFactory.createPropertyObjectPath;
 	var _createMethodObjectPath=OfficeExtension.ObjectPathFactory.createMethodObjectPath;
 	var _createIndexerObjectPath=OfficeExtension.ObjectPathFactory.createIndexerObjectPath;
@@ -13880,6 +14161,7 @@ var OfficeCore;
 	var _isNullOrUndefined=OfficeExtension.Utility.isNullOrUndefined;
 	var _isUndefined=OfficeExtension.Utility.isUndefined;
 	var _throwIfNotLoaded=OfficeExtension.Utility.throwIfNotLoaded;
+	var _throwIfApiNotSupported=OfficeExtension.Utility.throwIfApiNotSupported;
 	var _load=OfficeExtension.Utility.load;
 	var _fixObjectPathIfNecessary=OfficeExtension.Utility.fixObjectPathIfNecessary;
 	var _addActionResultHandler=OfficeExtension.Utility._addActionResultHandler;
@@ -13897,17 +14179,23 @@ var OfficeCore;
 			enumerable: true,
 			configurable: true
 		});
+		FlightingService.prototype.getClientSessionId=function () {
+			var action=_createMethodAction(this.context, this, "GetClientSessionId", 1, []);
+			var ret=new OfficeExtension.ClientResult();
+			_addActionResultHandler(this, action, ret);
+			return ret;
+		};
 		FlightingService.prototype.getDeferredFlights=function () {
-			var action=_createMethodAction(this.context, this, "GetDeferredFlights", 0, []);
+			var action=_createMethodAction(this.context, this, "GetDeferredFlights", 1, []);
 			var ret=new OfficeExtension.ClientResult();
 			_addActionResultHandler(this, action, ret);
 			return ret;
 		};
 		FlightingService.prototype.getFeature=function (featureName, type, defaultValue, possibleValues) {
-			return new OfficeCore.ABType(this.context, _createMethodObjectPath(this.context, this, "GetFeature", 0, [featureName, type, defaultValue, possibleValues], false, false, null));
+			return new OfficeCore.ABType(this.context, _createMethodObjectPath(this.context, this, "GetFeature", 1, [featureName, type, defaultValue, possibleValues], false, false, null));
 		};
 		FlightingService.prototype.getFeatureGate=function (featureName, scope) {
-			return new OfficeCore.ABType(this.context, _createMethodObjectPath(this.context, this, "GetFeatureGate", 0, [featureName, scope], false, false, null));
+			return new OfficeCore.ABType(this.context, _createMethodObjectPath(this.context, this, "GetFeatureGate", 1, [featureName, scope], false, false, null));
 		};
 		FlightingService.prototype.resetOverride=function (featureName) {
 			_createMethodAction(this.context, this, "ResetOverride", 0, [featureName]);
@@ -14056,6 +14344,38 @@ var Word;
 	var _addActionResultHandler=OfficeExtension.Utility._addActionResultHandler;
 	var _handleNavigationPropertyResults=OfficeExtension.Utility._handleNavigationPropertyResults;
 	var _adjustToDateTime=OfficeExtension.Utility.adjustToDateTime;
+	var Application=(function (_super) {
+		__extends(Application, _super);
+		function Application() {
+			_super.apply(this, arguments);
+		}
+		Object.defineProperty(Application.prototype, "_className", {
+			get: function () {
+				return "Application";
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Application.prototype.createDocument=function (base64File) {
+			return new Word.Document(this.context, _createMethodObjectPath(this.context, this, "CreateDocument", 1, [base64File], false, false, null));
+		};
+		Application.prototype._handleResult=function (value) {
+			_super.prototype._handleResult.call(this, value);
+			if (_isNullOrUndefined(value))
+				return;
+			var obj=value;
+			_fixObjectPathIfNecessary(this, obj);
+		};
+		Application.newObject=function (context) {
+			var ret=new Word.Application(context, _createNewObjectObjectPath(context, "Microsoft.WordServices.Application", false));
+			return ret;
+		};
+		Application.prototype.toJSON=function () {
+			return {};
+		};
+		return Application;
+	}(OfficeExtension.ClientObject));
+	Word.Application=Application;
 	var Body=(function (_super) {
 		__extends(Body, _super);
 		function Body() {
@@ -14833,6 +15153,84 @@ var Word;
 				this.m_id=value["Id"];
 			}
 		};
+		Object.defineProperty(ContentControl.prototype, "onDataChanged", {
+			get: function () {
+				var _this=this;
+				if (!this.m_dataChanged) {
+					this.m_dataChanged=new OfficeExtension.EventHandlers(this.context, this, "DataChanged", {
+						registerFunc: function (handlerCallback) {
+							_this.track();
+							return _this.context.eventRegistration.register(15, _this._ReferenceId, handlerCallback);
+						},
+						unregisterFunc: function (handlerCallback) {
+							return _this.context.eventRegistration.unregister(15, _this._ReferenceId, handlerCallback);
+						},
+						eventArgsTransformFunc: function (args) {
+							var evt={
+								type: 15,
+								object: _this
+							};
+							return OfficeExtension.Utility._createPromiseFromResult(evt);
+						}
+					});
+				}
+				return this.m_dataChanged;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(ContentControl.prototype, "onDeleted", {
+			get: function () {
+				var _this=this;
+				if (!this.m_deleted) {
+					this.m_deleted=new OfficeExtension.EventHandlers(this.context, this, "Deleted", {
+						registerFunc: function (handlerCallback) {
+							_this.track();
+							return _this.context.eventRegistration.register(13, _this._ReferenceId, handlerCallback);
+						},
+						unregisterFunc: function (handlerCallback) {
+							return _this.context.eventRegistration.unregister(13, _this._ReferenceId, handlerCallback);
+						},
+						eventArgsTransformFunc: function (args) {
+							var evt={
+								type: 13,
+								object: _this
+							};
+							return OfficeExtension.Utility._createPromiseFromResult(evt);
+						}
+					});
+				}
+				return this.m_deleted;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(ContentControl.prototype, "onSelectionChanged", {
+			get: function () {
+				var _this=this;
+				if (!this.m_selectionChanged) {
+					this.m_selectionChanged=new OfficeExtension.EventHandlers(this.context, this, "SelectionChanged", {
+						registerFunc: function (handlerCallback) {
+							_this.track();
+							return _this.context.eventRegistration.register(14, _this._ReferenceId, handlerCallback);
+						},
+						unregisterFunc: function (handlerCallback) {
+							return _this.context.eventRegistration.unregister(14, _this._ReferenceId, handlerCallback);
+						},
+						eventArgsTransformFunc: function (args) {
+							var evt={
+								type: 14,
+								object: _this
+							};
+							return OfficeExtension.Utility._createPromiseFromResult(evt);
+						}
+					});
+				}
+				return this.m_selectionChanged;
+			},
+			enumerable: true,
+			configurable: true
+		});
 		ContentControl.prototype.track=function () {
 			this.context.trackedObjects.add(this);
 			return this;
@@ -15185,6 +15583,333 @@ var Word;
 		return CustomPropertyCollection;
 	}(OfficeExtension.ClientObject));
 	Word.CustomPropertyCollection=CustomPropertyCollection;
+	var CustomXmlPart=(function (_super) {
+		__extends(CustomXmlPart, _super);
+		function CustomXmlPart() {
+			_super.apply(this, arguments);
+		}
+		Object.defineProperty(CustomXmlPart.prototype, "_className", {
+			get: function () {
+				return "CustomXmlPart";
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(CustomXmlPart.prototype, "id", {
+			get: function () {
+				_throwIfNotLoaded("id", this.m_id, "CustomXmlPart", this._isNull);
+				return this.m_id;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(CustomXmlPart.prototype, "namespaceUri", {
+			get: function () {
+				_throwIfNotLoaded("namespaceUri", this.m_namespaceUri, "CustomXmlPart", this._isNull);
+				return this.m_namespaceUri;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(CustomXmlPart.prototype, "_ReferenceId", {
+			get: function () {
+				_throwIfNotLoaded("_ReferenceId", this.m__ReferenceId, "CustomXmlPart", this._isNull);
+				return this.m__ReferenceId;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		CustomXmlPart.prototype.delete=function () {
+			_createMethodAction(this.context, this, "Delete", 0, []);
+		};
+		CustomXmlPart.prototype.deleteAttribute=function (xpath, namespaceMappings, name) {
+			_createMethodAction(this.context, this, "DeleteAttribute", 0, [xpath, namespaceMappings, name]);
+		};
+		CustomXmlPart.prototype.deleteElement=function (xpath, namespaceMappings) {
+			_createMethodAction(this.context, this, "DeleteElement", 0, [xpath, namespaceMappings]);
+		};
+		CustomXmlPart.prototype.getXml=function () {
+			var action=_createMethodAction(this.context, this, "GetXml", 1, []);
+			var ret=new OfficeExtension.ClientResult();
+			_addActionResultHandler(this, action, ret);
+			return ret;
+		};
+		CustomXmlPart.prototype.insertAttribute=function (xpath, namespaceMappings, name, value) {
+			_createMethodAction(this.context, this, "InsertAttribute", 0, [xpath, namespaceMappings, name, value]);
+		};
+		CustomXmlPart.prototype.insertElement=function (xpath, xml, namespaceMappings, index) {
+			_createMethodAction(this.context, this, "InsertElement", 0, [xpath, xml, namespaceMappings, index]);
+		};
+		CustomXmlPart.prototype.query=function (xpath, namespaceMappings) {
+			var action=_createMethodAction(this.context, this, "Query", 0, [xpath, namespaceMappings]);
+			var ret=new OfficeExtension.ClientResult();
+			_addActionResultHandler(this, action, ret);
+			return ret;
+		};
+		CustomXmlPart.prototype.setXml=function (xml) {
+			_createMethodAction(this.context, this, "SetXml", 0, [xml]);
+		};
+		CustomXmlPart.prototype.updateAttribute=function (xpath, namespaceMappings, name, value) {
+			_createMethodAction(this.context, this, "UpdateAttribute", 0, [xpath, namespaceMappings, name, value]);
+		};
+		CustomXmlPart.prototype.updateElement=function (xpath, xml, namespaceMappings) {
+			_createMethodAction(this.context, this, "UpdateElement", 0, [xpath, xml, namespaceMappings]);
+		};
+		CustomXmlPart.prototype._KeepReference=function () {
+			_createMethodAction(this.context, this, "_KeepReference", 1, []);
+		};
+		CustomXmlPart.prototype._handleResult=function (value) {
+			_super.prototype._handleResult.call(this, value);
+			if (_isNullOrUndefined(value))
+				return;
+			var obj=value;
+			_fixObjectPathIfNecessary(this, obj);
+			if (!_isUndefined(obj["Id"])) {
+				this.m_id=obj["Id"];
+			}
+			if (!_isUndefined(obj["NamespaceUri"])) {
+				this.m_namespaceUri=obj["NamespaceUri"];
+			}
+			if (!_isUndefined(obj["_ReferenceId"])) {
+				this.m__ReferenceId=obj["_ReferenceId"];
+			}
+		};
+		CustomXmlPart.prototype.load=function (option) {
+			_load(this, option);
+			return this;
+		};
+		CustomXmlPart.prototype._handleIdResult=function (value) {
+			_super.prototype._handleIdResult.call(this, value);
+			if (_isNullOrUndefined(value)) {
+				return;
+			}
+			if (!_isUndefined(value["_ReferenceId"])) {
+				this.m__ReferenceId=value["_ReferenceId"];
+			}
+			if (!_isUndefined(value["Id"])) {
+				this.m_id=value["Id"];
+			}
+		};
+		CustomXmlPart.prototype.track=function () {
+			this.context.trackedObjects.add(this);
+			return this;
+		};
+		CustomXmlPart.prototype.untrack=function () {
+			this.context.trackedObjects.remove(this);
+			return this;
+		};
+		CustomXmlPart.prototype.toJSON=function () {
+			return {
+				"id": this.m_id,
+				"namespaceUri": this.m_namespaceUri
+			};
+		};
+		return CustomXmlPart;
+	}(OfficeExtension.ClientObject));
+	Word.CustomXmlPart=CustomXmlPart;
+	var CustomXmlPartCollection=(function (_super) {
+		__extends(CustomXmlPartCollection, _super);
+		function CustomXmlPartCollection() {
+			_super.apply(this, arguments);
+		}
+		Object.defineProperty(CustomXmlPartCollection.prototype, "_className", {
+			get: function () {
+				return "CustomXmlPartCollection";
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(CustomXmlPartCollection.prototype, "items", {
+			get: function () {
+				_throwIfNotLoaded("items", this.m__items, "CustomXmlPartCollection", this._isNull);
+				return this.m__items;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(CustomXmlPartCollection.prototype, "_ReferenceId", {
+			get: function () {
+				_throwIfNotLoaded("_ReferenceId", this.m__ReferenceId, "CustomXmlPartCollection", this._isNull);
+				return this.m__ReferenceId;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		CustomXmlPartCollection.prototype.add=function (xml) {
+			return new Word.CustomXmlPart(this.context, _createMethodObjectPath(this.context, this, "Add", 0, [xml], false, true, null));
+		};
+		CustomXmlPartCollection.prototype.getByNamespace=function (namespaceUri) {
+			return new Word.CustomXmlPartScopedCollection(this.context, _createMethodObjectPath(this.context, this, "GetByNamespace", 1, [namespaceUri], true, false, null));
+		};
+		CustomXmlPartCollection.prototype.getCount=function () {
+			var action=_createMethodAction(this.context, this, "GetCount", 1, []);
+			var ret=new OfficeExtension.ClientResult();
+			_addActionResultHandler(this, action, ret);
+			return ret;
+		};
+		CustomXmlPartCollection.prototype.getItem=function (id) {
+			return new Word.CustomXmlPart(this.context, _createIndexerObjectPath(this.context, this, [id]));
+		};
+		CustomXmlPartCollection.prototype.getItemOrNullObject=function (id) {
+			return new Word.CustomXmlPart(this.context, _createMethodObjectPath(this.context, this, "GetItemOrNullObject", 1, [id], false, false, null));
+		};
+		CustomXmlPartCollection.prototype._KeepReference=function () {
+			_createMethodAction(this.context, this, "_KeepReference", 1, []);
+		};
+		CustomXmlPartCollection.prototype._handleResult=function (value) {
+			_super.prototype._handleResult.call(this, value);
+			if (_isNullOrUndefined(value))
+				return;
+			var obj=value;
+			_fixObjectPathIfNecessary(this, obj);
+			if (!_isUndefined(obj["_ReferenceId"])) {
+				this.m__ReferenceId=obj["_ReferenceId"];
+			}
+			if (!_isNullOrUndefined(obj[OfficeExtension.Constants.items])) {
+				this.m__items=[];
+				var _data=obj[OfficeExtension.Constants.items];
+				for (var i=0; i < _data.length; i++) {
+					var _item=new Word.CustomXmlPart(this.context, _createChildItemObjectPathUsingIndexerOrGetItemAt(true, this.context, this, _data[i], i));
+					_item._handleResult(_data[i]);
+					this.m__items.push(_item);
+				}
+			}
+		};
+		CustomXmlPartCollection.prototype.load=function (option) {
+			_load(this, option);
+			return this;
+		};
+		CustomXmlPartCollection.prototype._handleIdResult=function (value) {
+			_super.prototype._handleIdResult.call(this, value);
+			if (_isNullOrUndefined(value)) {
+				return;
+			}
+			if (!_isUndefined(value["_ReferenceId"])) {
+				this.m__ReferenceId=value["_ReferenceId"];
+			}
+		};
+		CustomXmlPartCollection.prototype.track=function () {
+			this.context.trackedObjects.add(this);
+			return this;
+		};
+		CustomXmlPartCollection.prototype.untrack=function () {
+			this.context.trackedObjects.remove(this);
+			return this;
+		};
+		CustomXmlPartCollection.prototype.toJSON=function () {
+			return {};
+		};
+		return CustomXmlPartCollection;
+	}(OfficeExtension.ClientObject));
+	Word.CustomXmlPartCollection=CustomXmlPartCollection;
+	var CustomXmlPartScopedCollection=(function (_super) {
+		__extends(CustomXmlPartScopedCollection, _super);
+		function CustomXmlPartScopedCollection() {
+			_super.apply(this, arguments);
+		}
+		Object.defineProperty(CustomXmlPartScopedCollection.prototype, "_className", {
+			get: function () {
+				return "CustomXmlPartScopedCollection";
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(CustomXmlPartScopedCollection.prototype, "items", {
+			get: function () {
+				_throwIfNotLoaded("items", this.m__items, "CustomXmlPartScopedCollection", this._isNull);
+				return this.m__items;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(CustomXmlPartScopedCollection.prototype, "namespaceUri", {
+			get: function () {
+				_throwIfNotLoaded("namespaceUri", this.m_namespaceUri, "CustomXmlPartScopedCollection", this._isNull);
+				return this.m_namespaceUri;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(CustomXmlPartScopedCollection.prototype, "_ReferenceId", {
+			get: function () {
+				_throwIfNotLoaded("_ReferenceId", this.m__ReferenceId, "CustomXmlPartScopedCollection", this._isNull);
+				return this.m__ReferenceId;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		CustomXmlPartScopedCollection.prototype.getCount=function () {
+			var action=_createMethodAction(this.context, this, "GetCount", 1, []);
+			var ret=new OfficeExtension.ClientResult();
+			_addActionResultHandler(this, action, ret);
+			return ret;
+		};
+		CustomXmlPartScopedCollection.prototype.getItem=function (id) {
+			return new Word.CustomXmlPart(this.context, _createIndexerObjectPath(this.context, this, [id]));
+		};
+		CustomXmlPartScopedCollection.prototype.getItemOrNullObject=function (id) {
+			return new Word.CustomXmlPart(this.context, _createMethodObjectPath(this.context, this, "GetItemOrNullObject", 1, [id], false, false, null));
+		};
+		CustomXmlPartScopedCollection.prototype.getOnlyItem=function () {
+			return new Word.CustomXmlPart(this.context, _createMethodObjectPath(this.context, this, "GetOnlyItem", 1, [], false, false, null));
+		};
+		CustomXmlPartScopedCollection.prototype.getOnlyItemOrNullObject=function () {
+			return new Word.CustomXmlPart(this.context, _createMethodObjectPath(this.context, this, "GetOnlyItemOrNullObject", 1, [], false, false, null));
+		};
+		CustomXmlPartScopedCollection.prototype._KeepReference=function () {
+			_createMethodAction(this.context, this, "_KeepReference", 1, []);
+		};
+		CustomXmlPartScopedCollection.prototype._handleResult=function (value) {
+			_super.prototype._handleResult.call(this, value);
+			if (_isNullOrUndefined(value))
+				return;
+			var obj=value;
+			_fixObjectPathIfNecessary(this, obj);
+			if (!_isUndefined(obj["NamespaceUri"])) {
+				this.m_namespaceUri=obj["NamespaceUri"];
+			}
+			if (!_isUndefined(obj["_ReferenceId"])) {
+				this.m__ReferenceId=obj["_ReferenceId"];
+			}
+			if (!_isNullOrUndefined(obj[OfficeExtension.Constants.items])) {
+				this.m__items=[];
+				var _data=obj[OfficeExtension.Constants.items];
+				for (var i=0; i < _data.length; i++) {
+					var _item=new Word.CustomXmlPart(this.context, _createChildItemObjectPathUsingIndexerOrGetItemAt(true, this.context, this, _data[i], i));
+					_item._handleResult(_data[i]);
+					this.m__items.push(_item);
+				}
+			}
+		};
+		CustomXmlPartScopedCollection.prototype.load=function (option) {
+			_load(this, option);
+			return this;
+		};
+		CustomXmlPartScopedCollection.prototype._handleIdResult=function (value) {
+			_super.prototype._handleIdResult.call(this, value);
+			if (_isNullOrUndefined(value)) {
+				return;
+			}
+			if (!_isUndefined(value["_ReferenceId"])) {
+				this.m__ReferenceId=value["_ReferenceId"];
+			}
+		};
+		CustomXmlPartScopedCollection.prototype.track=function () {
+			this.context.trackedObjects.add(this);
+			return this;
+		};
+		CustomXmlPartScopedCollection.prototype.untrack=function () {
+			this.context.trackedObjects.remove(this);
+			return this;
+		};
+		CustomXmlPartScopedCollection.prototype.toJSON=function () {
+			return {
+				"namespaceUri": this.m_namespaceUri
+			};
+		};
+		return CustomXmlPartScopedCollection;
+	}(OfficeExtension.ClientObject));
+	Word.CustomXmlPartScopedCollection=CustomXmlPartScopedCollection;
 	var Document=(function (_super) {
 		__extends(Document, _super);
 		function Document() {
@@ -15217,6 +15942,16 @@ var Word;
 			enumerable: true,
 			configurable: true
 		});
+		Object.defineProperty(Document.prototype, "customXmlParts", {
+			get: function () {
+				if (!this.m_customXmlParts) {
+					this.m_customXmlParts=new Word.CustomXmlPartCollection(this.context, _createPropertyObjectPath(this.context, this, "CustomXmlParts", true, false));
+				}
+				return this.m_customXmlParts;
+			},
+			enumerable: true,
+			configurable: true
+		});
 		Object.defineProperty(Document.prototype, "properties", {
 			get: function () {
 				if (!this.m_properties) {
@@ -15233,6 +15968,16 @@ var Word;
 					this.m_sections=new Word.SectionCollection(this.context, _createPropertyObjectPath(this.context, this, "Sections", true, false));
 				}
 				return this.m_sections;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(Document.prototype, "settings", {
+			get: function () {
+				if (!this.m_settings) {
+					this.m_settings=new Word.SettingCollection(this.context, _createPropertyObjectPath(this.context, this, "Settings", true, false));
+				}
+				return this.m_settings;
 			},
 			enumerable: true,
 			configurable: true
@@ -15256,13 +16001,29 @@ var Word;
 		Document.prototype.set=function (properties, options) {
 			this._recursivelySet(properties, options, [], ["body", "properties"], [
 				"contentControls",
+				"customXmlParts",
 				"sections",
+				"settings",
 				"contentControls",
-				"sections"
+				"customXmlParts",
+				"sections",
+				"settings"
 			]);
+		};
+		Document.prototype.deleteBookmark=function (name) {
+			_createMethodAction(this.context, this, "DeleteBookmark", 0, [name]);
+		};
+		Document.prototype.getBookmarkRange=function (name) {
+			return new Word.Range(this.context, _createMethodObjectPath(this.context, this, "GetBookmarkRange", 1, [name], false, false, null));
+		};
+		Document.prototype.getBookmarkRangeOrNullObject=function (name) {
+			return new Word.Range(this.context, _createMethodObjectPath(this.context, this, "GetBookmarkRangeOrNullObject", 1, [name], false, false, null));
 		};
 		Document.prototype.getSelection=function () {
 			return new Word.Range(this.context, _createMethodObjectPath(this.context, this, "GetSelection", 1, [], false, true, null));
+		};
+		Document.prototype.open=function () {
+			_createMethodAction(this.context, this, "Open", 1, []);
 		};
 		Document.prototype.save=function () {
 			_createMethodAction(this.context, this, "Save", 0, []);
@@ -15300,7 +16061,7 @@ var Word;
 			if (!_isUndefined(obj["_ReferenceId"])) {
 				this.m__ReferenceId=obj["_ReferenceId"];
 			}
-			_handleNavigationPropertyResults(this, obj, ["body", "Body", "contentControls", "ContentControls", "properties", "Properties", "sections", "Sections"]);
+			_handleNavigationPropertyResults(this, obj, ["body", "Body", "contentControls", "ContentControls", "customXmlParts", "CustomXmlParts", "properties", "Properties", "sections", "Sections", "settings", "Settings"]);
 		};
 		Document.prototype.load=function (option) {
 			_load(this, option);
@@ -15315,6 +16076,32 @@ var Word;
 				this.m__ReferenceId=value["_ReferenceId"];
 			}
 		};
+		Object.defineProperty(Document.prototype, "onContentControlAdded", {
+			get: function () {
+				var _this=this;
+				if (!this.m_contentControlAdded) {
+					this.m_contentControlAdded=new OfficeExtension.EventHandlers(this.context, this, "ContentControlAdded", {
+						registerFunc: function (handlerCallback) {
+							return _this.context.eventRegistration.register(16, _this.m__ReferenceId, handlerCallback);
+						},
+						unregisterFunc: function (handlerCallback) {
+							return _this.context.eventRegistration.unregister(16, _this.m__ReferenceId, handlerCallback);
+						},
+						eventArgsTransformFunc: function (args) {
+							var evt={
+								type: 16,
+								object: new Word.ContentControl(_this.context, OfficeExtension.ObjectPathFactory.createReferenceIdObjectPath(_this.context, args.object[0]))
+							};
+							evt.object.load();
+							return OfficeExtension.Utility._createPromiseFromResult(evt);
+						}
+					});
+				}
+				return this.m_contentControlAdded;
+			},
+			enumerable: true,
+			configurable: true
+		});
 		Document.prototype.track=function () {
 			this.context.trackedObjects.add(this);
 			return this;
@@ -16021,6 +16808,14 @@ var Word;
 			enumerable: true,
 			configurable: true
 		});
+		Object.defineProperty(InlinePicture.prototype, "imageFormat", {
+			get: function () {
+				_throwIfNotLoaded("imageFormat", this.m_imageFormat, "InlinePicture", this._isNull);
+				return this.m_imageFormat;
+			},
+			enumerable: true,
+			configurable: true
+		});
 		Object.defineProperty(InlinePicture.prototype, "lockAspectRatio", {
 			get: function () {
 				_throwIfNotLoaded("lockAspectRatio", this.m_lockAspectRatio, "InlinePicture", this._isNull);
@@ -16145,6 +16940,9 @@ var Word;
 			if (!_isUndefined(obj["Hyperlink"])) {
 				this.m_hyperlink=obj["Hyperlink"];
 			}
+			if (!_isUndefined(obj["ImageFormat"])) {
+				this.m_imageFormat=obj["ImageFormat"];
+			}
 			if (!_isUndefined(obj["LockAspectRatio"])) {
 				this.m_lockAspectRatio=obj["LockAspectRatio"];
 			}
@@ -16189,6 +16987,7 @@ var Word;
 				"altTextTitle": this.m_altTextTitle,
 				"height": this.m_height,
 				"hyperlink": this.m_hyperlink,
+				"imageFormat": this.m_imageFormat,
 				"lockAspectRatio": this.m_lockAspectRatio,
 				"width": this.m_width
 			};
@@ -16336,8 +17135,17 @@ var Word;
 			enumerable: true,
 			configurable: true
 		});
+		List.prototype.getLevelFont=function (level) {
+			return new Word.Font(this.context, _createMethodObjectPath(this.context, this, "GetLevelFont", 1, [level], false, false, null));
+		};
 		List.prototype.getLevelParagraphs=function (level) {
 			return new Word.ParagraphCollection(this.context, _createMethodObjectPath(this.context, this, "GetLevelParagraphs", 1, [level], true, false, null));
+		};
+		List.prototype.getLevelPicture=function (level) {
+			var action=_createMethodAction(this.context, this, "GetLevelPicture", 1, [level]);
+			var ret=new OfficeExtension.ClientResult();
+			_addActionResultHandler(this, action, ret);
+			return ret;
 		};
 		List.prototype.getLevelString=function (level) {
 			var action=_createMethodAction(this.context, this, "GetLevelString", 1, [level]);
@@ -16347,6 +17155,9 @@ var Word;
 		};
 		List.prototype.insertParagraph=function (paragraphText, insertLocation) {
 			return new Word.Paragraph(this.context, _createMethodObjectPath(this.context, this, "InsertParagraph", 0, [paragraphText, insertLocation], false, true, null));
+		};
+		List.prototype.resetLevelFont=function (level, resetFontName) {
+			_createMethodAction(this.context, this, "ResetLevelFont", 0, [level, resetFontName]);
 		};
 		List.prototype.setLevelAlignment=function (level, alignment) {
 			_createMethodAction(this.context, this, "SetLevelAlignment", 0, [level, alignment]);
@@ -16359,6 +17170,9 @@ var Word;
 		};
 		List.prototype.setLevelNumbering=function (level, listNumbering, formatString) {
 			_createMethodAction(this.context, this, "SetLevelNumbering", 0, [level, listNumbering, formatString]);
+		};
+		List.prototype.setLevelPicture=function (level, base64EncodedImage) {
+			_createMethodAction(this.context, this, "SetLevelPicture", 0, [level, base64EncodedImage]);
 		};
 		List.prototype.setLevelStartingNumber=function (level, startingNumber) {
 			_createMethodAction(this.context, this, "SetLevelStartingNumber", 0, [level, startingNumber]);
@@ -17540,6 +18354,12 @@ var Word;
 		Range.prototype.expandToOrNullObject=function (range) {
 			return new Word.Range(this.context, _createMethodObjectPath(this.context, this, "ExpandToOrNullObject", 0, [range], false, false, null));
 		};
+		Range.prototype.getBookmarks=function (includeHidden, includeAdjacent) {
+			var action=_createMethodAction(this.context, this, "GetBookmarks", 1, [includeHidden, includeAdjacent]);
+			var ret=new OfficeExtension.ClientResult();
+			_addActionResultHandler(this, action, ret);
+			return ret;
+		};
 		Range.prototype.getHtml=function () {
 			var action=_createMethodAction(this.context, this, "GetHtml", 1, []);
 			var ret=new OfficeExtension.ClientResult();
@@ -17566,6 +18386,9 @@ var Word;
 		};
 		Range.prototype.getTextRanges=function (endingMarks, trimSpacing) {
 			return new Word.RangeCollection(this.context, _createMethodObjectPath(this.context, this, "GetTextRanges", 1, [endingMarks, trimSpacing], true, false, null));
+		};
+		Range.prototype.insertBookmark=function (name) {
+			_createMethodAction(this.context, this, "InsertBookmark", 0, [name]);
 		};
 		Range.prototype.insertBreak=function (breakType, insertLocation) {
 			_createMethodAction(this.context, this, "InsertBreak", 0, [breakType, insertLocation]);
@@ -18114,6 +18937,255 @@ var Word;
 		return SectionCollection;
 	}(OfficeExtension.ClientObject));
 	Word.SectionCollection=SectionCollection;
+	var Setting=(function (_super) {
+		__extends(Setting, _super);
+		function Setting() {
+			_super.apply(this, arguments);
+		}
+		Object.defineProperty(Setting.prototype, "_className", {
+			get: function () {
+				return "Setting";
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Setting.replaceStringDateWithDate=function (value) {
+			var strValue=JSON.stringify(value);
+			value=JSON.parse(strValue, function dateReviver(k, v) {
+				var d;
+				if (typeof v==='string' && v && v.length > 6 && v.slice(0, 5)===Setting.DateJSONPrefix && v.slice(-1)===Setting.DateJSONSuffix) {
+					d=new Date(parseInt(v.slice(5, -1)));
+					if (d) {
+						return d;
+					}
+				}
+				return v;
+			});
+			return value;
+		};
+		Setting._replaceDateWithStringDate=function (value) {
+			var strValue=JSON.stringify(value, function dateReplacer(k, v) {
+				return (this[k] instanceof Date) ? (Setting.DateJSONPrefix+this[k].getTime()+Setting.DateJSONSuffix) : v;
+			});
+			value=JSON.parse(strValue);
+			return value;
+		};
+		Object.defineProperty(Setting.prototype, "key", {
+			get: function () {
+				_throwIfNotLoaded("key", this.m_key, "Setting", this._isNull);
+				return this.m_key;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(Setting.prototype, "value", {
+			get: function () {
+				function dateReviver(key, val) {
+					var re=/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2}(?:\.\d*)?)Z$/;
+					if (re.exec(val))
+						return new Date(val);
+					return val;
+				}
+				if (!this._isNull && typeof this.m_value==="string") {
+					var newValue=JSON.parse(this.m_value, dateReviver);
+					newValue=Setting.replaceStringDateWithDate(newValue);
+					return newValue;
+				}
+				_throwIfNotLoaded("value", this.m_value, "Setting", this._isNull);
+				return this.m_value;
+			},
+			set: function (value) {
+				var newValue=JSON.stringify(Setting._replaceDateWithStringDate(value));
+				if (newValue !==null) {
+					this.m_value=newValue;
+					_createSetPropertyAction(this.context, this, "Value", newValue);
+					return;
+				}
+				this.m_value=value;
+				_createSetPropertyAction(this.context, this, "Value", value);
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(Setting.prototype, "_Id", {
+			get: function () {
+				_throwIfNotLoaded("_Id", this.m__Id, "Setting", this._isNull);
+				return this.m__Id;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(Setting.prototype, "_ReferenceId", {
+			get: function () {
+				_throwIfNotLoaded("_ReferenceId", this.m__ReferenceId, "Setting", this._isNull);
+				return this.m__ReferenceId;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Setting.prototype.set=function (properties, options) {
+			this._recursivelySet(properties, options, ["value"], [], []);
+		};
+		Setting.prototype.delete=function () {
+			_createMethodAction(this.context, this, "Delete", 0, []);
+		};
+		Setting.prototype._KeepReference=function () {
+			_createMethodAction(this.context, this, "_KeepReference", 1, []);
+		};
+		Setting.prototype._handleResult=function (value) {
+			_super.prototype._handleResult.call(this, value);
+			if (_isNullOrUndefined(value))
+				return;
+			var obj=value;
+			_fixObjectPathIfNecessary(this, obj);
+			if (!_isUndefined(obj["Key"])) {
+				this.m_key=obj["Key"];
+			}
+			if (!_isUndefined(obj["Value"])) {
+				this.m_value=obj["Value"];
+				this.m_value=Setting.replaceStringDateWithDate(this.m_value);
+			}
+			if (!_isUndefined(obj["_Id"])) {
+				this.m__Id=obj["_Id"];
+			}
+			if (!_isUndefined(obj["_ReferenceId"])) {
+				this.m__ReferenceId=obj["_ReferenceId"];
+			}
+		};
+		Setting.prototype.load=function (option) {
+			_load(this, option);
+			return this;
+		};
+		Setting.prototype._handleIdResult=function (value) {
+			_super.prototype._handleIdResult.call(this, value);
+			if (_isNullOrUndefined(value)) {
+				return;
+			}
+			if (!_isUndefined(value["_ReferenceId"])) {
+				this.m__ReferenceId=value["_ReferenceId"];
+			}
+			if (!_isUndefined(value["_Id"])) {
+				this.m__Id=value["_Id"];
+			}
+		};
+		Setting.prototype.track=function () {
+			this.context.trackedObjects.add(this);
+			return this;
+		};
+		Setting.prototype.untrack=function () {
+			this.context.trackedObjects.remove(this);
+			return this;
+		};
+		Setting.prototype.toJSON=function () {
+			return {
+				"key": this.m_key,
+				"value": this.m_value
+			};
+		};
+		Setting.DateJSONPrefix="Date(";
+		Setting.DateJSONSuffix=")";
+		return Setting;
+	}(OfficeExtension.ClientObject));
+	Word.Setting=Setting;
+	var SettingCollection=(function (_super) {
+		__extends(SettingCollection, _super);
+		function SettingCollection() {
+			_super.apply(this, arguments);
+		}
+		Object.defineProperty(SettingCollection.prototype, "_className", {
+			get: function () {
+				return "SettingCollection";
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(SettingCollection.prototype, "items", {
+			get: function () {
+				_throwIfNotLoaded("items", this.m__items, "SettingCollection", this._isNull);
+				return this.m__items;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(SettingCollection.prototype, "_ReferenceId", {
+			get: function () {
+				_throwIfNotLoaded("_ReferenceId", this.m__ReferenceId, "SettingCollection", this._isNull);
+				return this.m__ReferenceId;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		SettingCollection.prototype.add=function (key, value) {
+			var newValue=JSON.stringify(Setting._replaceDateWithStringDate(value));
+			if (newValue !==null) {
+				return new Word.Setting(this.context, _createMethodObjectPath(this.context, this, "Add", 0, [key, newValue], false, false, null));
+			}
+			return new Word.Setting(this.context, _createMethodObjectPath(this.context, this, "Add", 0, [key, value], false, true, null));
+		};
+		SettingCollection.prototype.deleteAll=function () {
+			_createMethodAction(this.context, this, "DeleteAll", 0, []);
+		};
+		SettingCollection.prototype.getCount=function () {
+			var action=_createMethodAction(this.context, this, "GetCount", 1, []);
+			var ret=new OfficeExtension.ClientResult();
+			_addActionResultHandler(this, action, ret);
+			return ret;
+		};
+		SettingCollection.prototype.getItem=function (key) {
+			return new Word.Setting(this.context, _createIndexerObjectPath(this.context, this, [key]));
+		};
+		SettingCollection.prototype.getItemOrNullObject=function (key) {
+			return new Word.Setting(this.context, _createMethodObjectPath(this.context, this, "GetItemOrNullObject", 1, [key], false, false, null));
+		};
+		SettingCollection.prototype._KeepReference=function () {
+			_createMethodAction(this.context, this, "_KeepReference", 1, []);
+		};
+		SettingCollection.prototype._handleResult=function (value) {
+			_super.prototype._handleResult.call(this, value);
+			if (_isNullOrUndefined(value))
+				return;
+			var obj=value;
+			_fixObjectPathIfNecessary(this, obj);
+			if (!_isUndefined(obj["_ReferenceId"])) {
+				this.m__ReferenceId=obj["_ReferenceId"];
+			}
+			if (!_isNullOrUndefined(obj[OfficeExtension.Constants.items])) {
+				this.m__items=[];
+				var _data=obj[OfficeExtension.Constants.items];
+				for (var i=0; i < _data.length; i++) {
+					var _item=new Word.Setting(this.context, _createChildItemObjectPathUsingIndexerOrGetItemAt(true, this.context, this, _data[i], i));
+					_item._handleResult(_data[i]);
+					this.m__items.push(_item);
+				}
+			}
+		};
+		SettingCollection.prototype.load=function (option) {
+			_load(this, option);
+			return this;
+		};
+		SettingCollection.prototype._handleIdResult=function (value) {
+			_super.prototype._handleIdResult.call(this, value);
+			if (_isNullOrUndefined(value)) {
+				return;
+			}
+			if (!_isUndefined(value["_ReferenceId"])) {
+				this.m__ReferenceId=value["_ReferenceId"];
+			}
+		};
+		SettingCollection.prototype.track=function () {
+			this.context.trackedObjects.add(this);
+			return this;
+		};
+		SettingCollection.prototype.untrack=function () {
+			this.context.trackedObjects.remove(this);
+			return this;
+		};
+		SettingCollection.prototype.toJSON=function () {
+			return {};
+		};
+		return SettingCollection;
+	}(OfficeExtension.ClientObject));
+	Word.SettingCollection=SettingCollection;
 	var Table=(function (_super) {
 		__extends(Table, _super);
 		function Table() {
@@ -18525,6 +19597,9 @@ var Word;
 		Table.prototype.insertTable=function (rowCount, columnCount, insertLocation, values) {
 			return new Word.Table(this.context, _createMethodObjectPath(this.context, this, "InsertTable", 0, [rowCount, columnCount, insertLocation, values], false, true, null));
 		};
+		Table.prototype.mergeCells=function (topRow, firstCell, bottomRow, lastCell) {
+			return new Word.TableCell(this.context, _createMethodObjectPath(this.context, this, "MergeCells", 0, [topRow, firstCell, bottomRow, lastCell], false, true, null));
+		};
 		Table.prototype.search=function (searchText, searchOptions) {
 			searchOptions=_normalizeSearchOptions(this.context, searchOptions);
 			return new Word.RangeCollection(this.context, _createMethodObjectPath(this.context, this, "Search", 1, [searchText, searchOptions], true, false, null));
@@ -18909,8 +19984,14 @@ var Word;
 		TableRow.prototype.getNextOrNullObject=function () {
 			return new Word.TableRow(this.context, _createMethodObjectPath(this.context, this, "GetNextOrNullObject", 1, [], false, false, null));
 		};
+		TableRow.prototype.insertContentControl=function () {
+			return new Word.ContentControl(this.context, _createMethodObjectPath(this.context, this, "InsertContentControl", 0, [], false, false, null));
+		};
 		TableRow.prototype.insertRows=function (insertLocation, rowCount, values) {
 			return new Word.TableRowCollection(this.context, _createMethodObjectPath(this.context, this, "InsertRows", 1, [insertLocation, rowCount, values], true, false, null));
+		};
+		TableRow.prototype.merge=function () {
+			return new Word.TableCell(this.context, _createMethodObjectPath(this.context, this, "Merge", 0, [], false, false, null));
 		};
 		TableRow.prototype.search=function (searchText, searchOptions) {
 			searchOptions=_normalizeSearchOptions(this.context, searchOptions);
@@ -19268,6 +20349,9 @@ var Word;
 		};
 		TableCell.prototype.setCellPadding=function (cellPaddingLocation, cellPadding) {
 			_createMethodAction(this.context, this, "SetCellPadding", 0, [cellPaddingLocation, cellPadding]);
+		};
+		TableCell.prototype.split=function (rowCount, columnCount) {
+			_createMethodAction(this.context, this, "Split", 0, [rowCount, columnCount]);
 		};
 		TableCell.prototype._KeepReference=function () {
 			_createMethodAction(this.context, this, "_KeepReference", 1, []);
@@ -19950,6 +21034,16 @@ var Word;
 			enumerable: true,
 			configurable: true
 		});
+		Object.defineProperty(RequestContext.prototype, "application", {
+			get: function () {
+				if (this.m_application==null) {
+					this.m_application=new Word.Application(this, OfficeExtension.ObjectPathFactory.createNewObjectObjectPath(this, "Microsoft.WordServices.Application", false));
+				}
+				return this.m_application;
+			},
+			enumerable: true,
+			configurable: true
+		});
 		return RequestContext;
 	}(OfficeCore.RequestContext));
 	Word.RequestContext=RequestContext;
@@ -19959,6 +21053,15 @@ var Word;
 	Word.run=run;
 })(Word || (Word={}));
 
-OfficeExtension.Utility._doApiNotSupportedCheck=true;
+OSF.AdditionalPostContextSettingOverride=function() {
+	var original=Office.context.requirements.isSetSupported;
+	Office.context.requirements.isSetSupported=function(name, version) {
+		if (((name.toLowerCase()==='customxmlparts' || name.toLowerCase()==='dialogapi' || name.toLowerCase()==='identityapi') && version <=1.1)
+			|| (name.toLowerCase()==='wordapi' && version <=1.3)) {
+			return true;
+		}
+		return original(name, version);
+	};
+};
 
 

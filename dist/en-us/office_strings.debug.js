@@ -1,4 +1,4 @@
-/* Version: 16.0.8503.1000 */
+/* Version: 16.0.8626.1000 */
 
 if (window.Type && window.Type.registerNamespace) {
 Type.registerNamespace('Strings');} else {
@@ -41,6 +41,8 @@ Strings.OfficeOM.L_ConnectionFailureWithDetails='The request failed with status 
 Strings.OfficeOM.L_ConnectionFailureWithStatus='The request failed with status code of {0}.';
 Strings.OfficeOM.L_CustomFunctionDefinitionMissing='A property with this name that represents the function\'s definition must exist on Excel.CustomFunctions.';
 Strings.OfficeOM.L_CustomFunctionImplementationMissing='The property with this name on Excel.CustomFunctions that represents the function\'s definition must contain a \'call\' property that implements the function.';
+Strings.OfficeOM.L_CustomFunctionNameCannotSplit='The function name must contain a non-empty namespace and a non-empty short name.';
+Strings.OfficeOM.L_CustomFunctionNameContainsBadChars='The function name may only contain letters, digits, underscores, and periods.';
 Strings.OfficeOM.L_CustomXmlError='Custom XML Error.';
 Strings.OfficeOM.L_CustomXmlExceedQuotaMessage='XPath limits selection to 1024 items.';
 Strings.OfficeOM.L_CustomXmlExceedQuotaName='Selection Limit Reached';
@@ -157,6 +159,8 @@ Strings.OfficeOM.L_SSOClientError='Error occurred in the authentication request 
 Strings.OfficeOM.L_SSOClientErrorMessage='An unexpected error occurred in the client.';
 Strings.OfficeOM.L_SSOServerError='Error occurred in the authentication provider.';
 Strings.OfficeOM.L_SSOServerErrorMessage='An unexpected error occurred on the server.';
+Strings.OfficeOM.L_SSOUserConsentNotSupportedByCurrentAddinCategory='This add-in does not support user consent.';
+Strings.OfficeOM.L_SSOUserConsentNotSupportedByCurrentAddinCategoryMessage='The operation failed because this add-in does not support user consent in this category';
 Strings.OfficeOM.L_SaveSettingsError='Save Settings Error';
 Strings.OfficeOM.L_SelectionCannotBound='Cannot bind to the current selection.';
 Strings.OfficeOM.L_SelectionNotSupportCoercionType='The current selection is not compatible with the specified coercion type.';
