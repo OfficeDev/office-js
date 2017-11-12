@@ -73,7 +73,7 @@ For example, to use a `1.1.2-beta-next.0` version, use the following references:
     @microsoft/office-js@1.1.2-beta-next.0/dist/office.d.ts
 
 
-![Using the NPM package with Script Lab](.github/images/script-lab-substitute-ref.png)
+![Using the NPM package with Script Lab](.github/images/script-lab-substitute-refs.png)
 
 
 ## More info
