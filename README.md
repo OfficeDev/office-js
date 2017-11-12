@@ -5,6 +5,7 @@ The JavaScript API for Office enables you to create web applications that intera
 The NPM package for Office.js is a copy of what gets published to the official "evergreen" Office.js CDN, at **<https://appsforoffice.microsoft.com/lib/1/hosted/office.js>**.  The NPM also offers alpha and beta versions for faster-cadence beta-testing (relative to the slower-cadence [official BETA endpoint](https://appsforoffice.microsoft.com/lib/beta/hosted/office.js)).
 
 <br />
+
 ## Installing
 
 To install "office-js" locally via the NPM package, run
@@ -17,6 +18,7 @@ Once installed, the Office.js script reference can be used as
 
 
 <br />
+
 ## IntelliSense definitions
 
 TypeScript definitions for Office.js are available.
@@ -32,6 +34,7 @@ Visual Studio 2017+ can use these same TypeScript definitions, even for regular 
 
 
 <br />
+
 ## Accessing the NPM files via a CDN
 
 In addition to downloading the files locally, you can also use them via an external service like <https://unpkg.com>, which provides best-effort (no uptime guarantees) CDN hosting for npm packages.  This is especially useful for trying out alpha or beta builds.  To do so, simply change the script reference to:
@@ -50,7 +53,8 @@ When you have a version number, can use it as follows with <https://unpkg.com>: 
 
 
 <br />
-## Production vs. Beta vs. Alpha versions
+
+## Production vs. Beta vs. Private versions
 
 Office.js versioning is described in detail in <https://dev.office.com/docs/add-ins/develop/office-js-versioning>.  Importantly, there is a large difference between what is in the JS files, versus what are the capabilities of a particular computer (i.e., older or slower-to-update versions of office). 
 
@@ -66,6 +70,7 @@ The NPM package and the repo branches assume the following structure.
 
 
 <br />
+
 ## Using a Private or Beta version with [Script Lab](https://aka.ms/script-lab)
 
 To use a version of the NPM package with [Script Lab](https://aka.ms/script-lab), substitute the CDN reference and the `@types/office-js` reference with the NPM package name and version.  [Note: Script Lab uses <https://unpkg.com> for resolving the package names, so it's very similar guidance as above].
@@ -79,6 +84,7 @@ For example, to use a `1.1.2-beta-next.0` version, use the following references:
 ![Using the NPM package with Script Lab](.github/images/script-lab-substitute-refs.png)
 
 <br />
+
 ## More info
 
 For more information on Office Add-ins and the Office JavaScript APIs, see:
