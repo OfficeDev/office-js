@@ -6729,14 +6729,14 @@ OSF.InitializationHelper.prototype.loadAppSpecificScriptAndCreateOM=function OSF
 		if(!itemId)
 			throw Error.argumentNull("itemId");
 		window["OSF"]["DDA"]["OutlookAppOm"]._throwOnInvalidRestVersion$p(restVersion);
-		return itemId["replace"](new RegExp("[/]","g"),"-")["replace"](new RegExp("[+]","g"),"_")
+		return itemId["replace"]("/","-")["replace"]("+","_")
 	};
 	OSF.DDA.OutlookAppOm.prototype.convertToEwsId=function(itemId, restVersion)
 	{
 		if(!itemId)
 			throw Error.argumentNull("itemId");
 		window["OSF"]["DDA"]["OutlookAppOm"]._throwOnInvalidRestVersion$p(restVersion);
-		return itemId["replace"](new RegExp("[-]","g"),"/")["replace"](new RegExp("[_]","g"),"+")
+		return itemId["replace"]("-","/")["replace"]("_","+")
 	};
 	OSF.DDA.OutlookAppOm.prototype.getUserIdentityTokenAsync=function()
 	{
