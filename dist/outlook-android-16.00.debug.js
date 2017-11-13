@@ -9968,3 +9968,5 @@ OSF.InitializationHelper.prototype.loadAppSpecificScriptAndCreateOM = function O
     if (appContext.get_appName() == OSF.AppName.Outlook || appContext.get_appName() == OSF.AppName.OutlookWebApp)
         OSF.DDA.DispIdHost.addEventSupport(appContext.appOM, new OSF.EventDispatch([Microsoft.Office.WebExtension.EventType.ItemChanged]))
 }
+
+
