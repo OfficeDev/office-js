@@ -105,6 +105,7 @@ declare namespace Office {
         value: any;
     }
     export interface Context {
+        auth: Auth;
         contentLanguage: string;
         displayLanguage: string;
         license: string;
@@ -160,6 +161,15 @@ declare namespace Office {
          * @param messageObject Accepts a message from the dialog to deliver to the add-in.
          */
         messageParent(messageObject: any): void;
+        /**
+         * Closes the UI container where the JavaScript is executing. 
+         * The behavior of this method is specified by the following table.
+         * When called from	            Behavior
+         * A UI-less command button	    No effect. Any dialogs opened by displayDialogAsync will remain open.
+         * A taskpane	                The taskpane will close. Any dialogs opened by displayDialogAsync will also close. If the taskpane supports pinning and was pinned by the user, it will be un-pinned.
+         * A module extension	        No effect. 
+         */
+        closeContainer(): void;
     }
     export interface DialogOptions {
         /**
@@ -174,6 +184,32 @@ declare namespace Office {
          * Optional. Determines whether the dialog box should be displayed within an IFrame. This setting is only applicable in Office Online clients, and is ignored on other platforms.
          */
         displayInIframe?: boolean
+    }
+    export interface Auth {
+        /**
+        * Obtains an access token from AAD V 2.0 endpoint to grant the Office host application access to the add-in's web application.
+        * @param options Optional. Accepts an AuthOptions object to define sign-on behaviors.
+        * @param callback Optional. Accepts a callback method to handle the token acquisition attempt. If AsyncResult.status is "succeeded", then AsyncResult.value is the raw AAD v. 2.0-formatted access token.
+        */
+        getAccessTokenAsync(options?: AuthOptions, callback?: (result: AsyncResult) => void): void;		
+    }
+    export interface AuthOptions {
+        /**
+         * Optional. Causes Office to display the add-in consent experience. Useful if the add-in's Azure permissions have changed or if the user's consent has been revoked.
+         */
+        forceConsent?: boolean,
+        /**
+         * Optional. Prompts the user to add (or to switch if already added) his or her Office account.
+         */
+        forceAddAccount?: boolean,
+        /**
+         * Optional. Causes Office to prompt the user to provide the additional factor when the tenancy being targeted by Microsoft Graph requires multifactor authentication. The string value identifies the type of additional factor that is required. In most cases, you won't know at development time whether the user's tenant requires an additional factor or what the string should be. So this option would be used in a "second try" call of getAccessTokenAsync after Microsoft Graph has sent an error requesting the additional factor and containing the string that should be used with the authChallenge option.  
+         */
+        authChallenge?: string
+        /**
+         * Optional. A user-defined item of any type that is returned in the AsyncResult object without being altered.
+         */
+        asyncContext?: any
     }
     export interface OfficeTheme {
         bodyBackgroundColor: string;
@@ -288,6 +324,10 @@ declare namespace Office {
          * Triggers when a document level selection happens
          */
         DocumentSelectionChanged,
+        /**
+         * Triggers when the active item changes
+         */
+        ItemChanged,
         /**
          * Triggers when a customXmlPart node was deleted
          */
@@ -1762,9 +1802,15 @@ declare namespace Office {
         urls: Array<string>;
     }
     export interface Item {
+        /**
+        * You can cast item with `(Item as Office.[CAST_TYPE])` where CAST_TYPE is one of the following: ItemRead, ItemCompose, Message,
+        * MessageRead, MessageCompose, Appointment, AppointmentRead, AppointmentCompose
+        */
+        __BeSureToCastThisObject__: void;
         body: Body;
         itemType: Office.MailboxEnums.ItemType;
         notificationMessages: NotificationMessages;
+        dateTimeCreated: Date;
         /**
          * Asynchronously loads custom properties that are specific to the item and a app for Office
          * @param callback The optional callback method
@@ -1826,6 +1872,7 @@ declare namespace Office {
         setSelectedDataAsync(data: string, options?: AsyncContextOptions & CoercionTypeOptions, callback?: (result: AsyncResult) => void): void;
     }
     export interface ItemRead extends Item {
+        attachments: Array<AttachmentDetails>;
         itemClass: string;
         itemId: string;
         normalizedSubject: string;
@@ -1897,6 +1944,14 @@ declare namespace Office {
         ewsUrl: string;
         item: Item;
         userProfile: UserProfile;
+        /**
+         * Adds an event handler for a supported event
+         * @param eventType The event that should invoke the handler
+         * @param handler The function to handle the event
+         * @param options Any optional parameters or state data passed to the method
+         * @param callback The optional method to call when the handler is added
+         */
+        addHandlerAsync(eventType: Office.EventType, handler: (type: Office.EventType) => void, options?: any, callback?: (result: AsyncResult) => void): void;
         /**
          * Converts an item ID formatted for REST into EWS format.
          * @param itemId An item ID formatted for the Outlook REST APIs
@@ -2461,10 +2516,13 @@ declare namespace OfficeExtension {
 
 
 declare namespace OfficeCore {
+    var BeginFirstPartyOnlyIntelliSenseFlightingServiceClass: any;
     /**
      * [Api set: Experimentation 1.1 (PREVIEW)]
      */
     class FlightingService extends OfficeExtension.ClientObject {
+        getClientSessionId(): OfficeExtension.ClientResult<string>;
+        getDeferredFlights(): OfficeExtension.ClientResult<string>;
         getFeature(featureName: string, type: string, defaultValue: number | boolean | string, possibleValues?: Array<number> | Array<string> | Array<boolean> | Array<ScopedValue>): OfficeCore.ABType;
         getFeatureGate(featureName: string, scope?: string): OfficeCore.ABType;
         resetOverride(featureName: string): void;
@@ -2475,6 +2533,8 @@ declare namespace OfficeCore {
         static newObject(context: OfficeExtension.ClientRequestContext): OfficeCore.FlightingService;
         toJSON(): {};
     }
+    var EndFirstPartyOnlyIntelliSenseFlightingServiceClass: any;
+    var BeginFirstPartyOnlyIntelliSenseScopedValueClass: any;
     /**
      *
      * Provides information about the scoped value.
@@ -2497,6 +2557,8 @@ declare namespace OfficeCore {
          */
         value: string | number | boolean;
     }
+    var EndFirstPartyOnlyIntelliSenseScopedValueClass: any;
+    var BeginFirstPartyOnlyIntelliSenseABTypeClass: any;
     /**
      * [Api set: Experimentation 1.1 (PREVIEW)]
      */
@@ -2510,6 +2572,8 @@ declare namespace OfficeCore {
             "value": string | number | boolean;
         };
     }
+    var EndFirstPartyOnlyIntelliSenseABTypeClass: any;
+    var BeginFirstPartyOnlyIntelliSenseFeatureTypeClass: any;
     /**
      * [Api set: Experimentation 1.1 (PREVIEW)]
      */
@@ -2518,6 +2582,7 @@ declare namespace OfficeCore {
         var integer: string;
         var string: string;
     }
+    var EndFirstPartyOnlyIntelliSenseFeatureTypeClass: any;
     namespace ExperimentErrorCodes {
         var generalException: string;
     }
@@ -2527,7 +2592,9 @@ declare namespace OfficeCore {
 declare namespace OfficeCore {
     class RequestContext extends OfficeExtension.ClientRequestContext {
         constructor(url?: string | OfficeExtension.RequestUrlAndHeaderInfo | any);
+        static BeginFirstPartyOnlyIntelliSenseFlighting: any;
         readonly flighting: FlightingService;
+        static EndFirstPartyOnlyIntelliSenseFlighting: any;
     }
 }
 
@@ -3507,7 +3574,7 @@ declare namespace Excel {
          *
          * [Api set: ExcelApi 1.1]
          */
-        readonly text: Array<Array<any>>;
+        readonly text: Array<Array<string>>;
         /**
          *
          * Represents the type of data of each cell. Read-only.
@@ -3787,7 +3854,7 @@ declare namespace Excel {
             "rowCount": number;
             "rowHidden": boolean;
             "rowIndex": number;
-            "text": any[][];
+            "text": string[][];
             "values": any[][];
             "valueTypes": string[][];
         };
@@ -3877,7 +3944,7 @@ declare namespace Excel {
          *
          * [Api set: ExcelApi 1.3]
          */
-        readonly text: Array<Array<any>>;
+        readonly text: Array<Array<string>>;
         /**
          *
          * Represents the type of data of each cell. Read-only.
@@ -3921,7 +3988,7 @@ declare namespace Excel {
             "index": number;
             "numberFormat": any[][];
             "rowCount": number;
-            "text": any[][];
+            "text": string[][];
             "values": any[][];
             "valueTypes": string[][];
         };
@@ -3975,7 +4042,7 @@ declare namespace Excel {
          * @param key The Key of the new setting.
          * @param value The Value for the new setting.
          */
-        add(key: string, value: string | number | boolean | Array<any> | any): Excel.Setting;
+        add(key: string, value: string | number | boolean | Date | Array<any> | any): Excel.Setting;
         /**
          *
          * Gets the number of Settings in the collection.
@@ -4173,7 +4240,7 @@ declare namespace Excel {
          *
          * Indicates the type of the value returned by the name's formula. See Excel.NamedItemType for details. Read-only.
          *
-         * [Api set: ExcelApi 1.1]
+         * [Api set: ExcelApi 1.1 for String,Integer,Double,Boolean,Range,Error; 1.7 for Array]
          */
         readonly type: string;
         /**
@@ -8558,13 +8625,34 @@ declare namespace Excel {
         var fullRebuild: string;
     }
     /**
-     * [Api set: ExcelApi 1.1 for All/Formats/Contents, 1.7 for Hyperlinks.]
+     * [Api set: ExcelApi 1.1 for All/Formats/Contents, 1.7 for Hyperlinks & HyperlinksAndFormats.]
      */
     namespace ClearApplyTo {
         var all: string;
+        /**
+         *
+         * Clears all formatting for the range.
+         *
+         */
         var formats: string;
+        /**
+         *
+         * Clears the contents of the range.
+         *
+         */
         var contents: string;
+        /**
+         *
+         * Clears all hyperlinks, but leaves all content and formatting intact.
+         *
+         */
         var hyperlinks: string;
+        /**
+         *
+         * Removes hyperlinks and formatting for the cell but leaves content, conditional formats and data validation intact.
+         *
+         */
+        var removeHyperlinks: string;
     }
     /**
      * [Api set: ExcelApi 1.1]
@@ -9045,7 +9133,7 @@ declare namespace Excel {
         var workbook: string;
     }
     /**
-     * [Api set: ExcelApi 1.1]
+     * [Api set: ExcelApi 1.1 for String,Integer,Double,Boolean,Range,Error; 1.7 for Array]
      */
     namespace NamedItemType {
         var string: string;
@@ -9054,6 +9142,7 @@ declare namespace Excel {
         var boolean: string;
         var range: string;
         var error: string;
+        var array: string;
     }
     /**
      * [Api set: ExcelApi 1.1]

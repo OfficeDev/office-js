@@ -1,4 +1,4 @@
-/* Version: 16.0.8503.1000 */
+/* Version: 16.0.8616.1000 */
 /*
 	Copyright (c) Microsoft Corporation.  All rights reserved.
 */
@@ -4808,13 +4808,14 @@ var Excel;
 
 var Excel;
 (function (Excel) {
-	/// <summary> [Api set: ExcelApi 1.1 for All/Formats/Contents, 1.7 for Hyperlinks.] </summary>
+	/// <summary> [Api set: ExcelApi 1.1 for All/Formats/Contents, 1.7 for Hyperlinks & HyperlinksAndFormats.] </summary>
 	var ClearApplyTo = {
 		__proto__: null,
 		"all": "all",
 		"formats": "formats",
 		"contents": "contents",
 		"hyperlinks": "hyperlinks",
+		"removeHyperlinks": "removeHyperlinks",
 	}
 	Excel.ClearApplyTo = ClearApplyTo;
 })(Excel || (Excel = {__proto__: null}));

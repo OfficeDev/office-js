@@ -1,5 +1,5 @@
 /* Office JavaScript API library */
-/* Version: 16.0.8516.3000 */
+/* Version: 16.0.8616.1000 */
 /*
 	Copyright (c) Microsoft Corporation.  All rights reserved.
 */
@@ -60,6 +60,7 @@ OSF.HostSpecificFileVersionMap = {
 OSF.SupportedLocales = {
     "ar-sa": true,
     "bg-bg": true,
+    "bn-in": true,
     "ca-es": true,
     "cs-cz": true,
     "da-dk": true,
@@ -69,6 +70,7 @@ OSF.SupportedLocales = {
     "es-es": true,
     "et-ee": true,
     "eu-es": true,
+    "fa-ir": true,
     "fi-fi": true,
     "fr-fr": true,
     "gl-es": true,
@@ -86,6 +88,7 @@ OSF.SupportedLocales = {
     "ms-my": true,
     "nb-no": true,
     "nl-nl": true,
+    "nn-no": true,
     "pl-pl": true,
     "pt-br": true,
     "pt-pt": true,
@@ -101,6 +104,7 @@ OSF.SupportedLocales = {
     "th-th": true,
     "tr-tr": true,
     "uk-ua": true,
+    "ur-pk": true,
     "vi-vn": true,
     "zh-cn": true,
     "zh-tw": true
@@ -108,6 +112,7 @@ OSF.SupportedLocales = {
 OSF.AssociatedLocales = {
     ar: "ar-sa",
     bg: "bg-bg",
+    bn: "bn-in",
     ca: "ca-es",
     cs: "cs-cz",
     da: "da-dk",
@@ -117,6 +122,7 @@ OSF.AssociatedLocales = {
     es: "es-es",
     et: "et-ee",
     eu: "eu-es",
+    fa: "fa-ir",
     fi: "fi-fi",
     fr: "fr-fr",
     gl: "gl-es",
@@ -134,6 +140,7 @@ OSF.AssociatedLocales = {
     ms: "ms-my",
     nb: "nb-no",
     nl: "nl-nl",
+    nn: "nn-no",
     pl: "pl-pl",
     pt: "pt-br",
     ro: "ro-ro",
@@ -145,6 +152,7 @@ OSF.AssociatedLocales = {
     th: "th-th",
     tr: "tr-tr",
     uk: "uk-ua",
+    ur: "ur-pk",
     vi: "vi-vn",
     zh: "zh-cn"
 };
@@ -461,7 +469,7 @@ var ScriptLoading;
     ScriptLoading.LoadScriptHelper = LoadScriptHelper;
 })(ScriptLoading || (ScriptLoading = {}));
 OSF.ConstantNames = {
-    FileVersion: "16.0.8516.3000",
+    FileVersion: "16.0.8616.1000",
     OfficeJS: "office.js",
     OfficeDebugJS: "office.debug.js",
     DefaultLocale: "en-us",
