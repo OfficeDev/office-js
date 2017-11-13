@@ -12919,6 +12919,26 @@ var Excel;
 		data=window.OSF.DDA.DataCoercion.coerceData(data, callArgs[window.Microsoft.Office.WebExtension.Parameters.CoercionType]);
 		return data==undefined ? null : data;
 	}
+	function versionNumberIsEarlierThan(desiredMajor, desiredMinor) {
+		var hasOfficeVersion = typeof (window) !== "undefined" && window.Office && window.Office.context && window.Office.context.diagnostics || window.Office.context.diagnostics.version);
+		if (!hasOfficeVersion) {
+			return false;
+		}
+		var version = window.Office.context.diagnostics.version;
+		var versionExtractor = /^(\d+)\.\d+\.(\d+)\.\d+$/;
+		var result = versionExtractor.exec(version);
+		if (result) {
+			var major = Number.parseInt(result[1]);
+			var minor = Number.parseInt(result[2]);
+			if (major < desiredMajor) {
+				return true;
+			}
+			if (major == desiredMajor && minor < desiredMinor) {
+				return true;
+			}
+		}
+		return false;
+	}
 	var _hostName="Excel";
 	var _defaultApiSetName="ExcelApi";
 	var _createPropertyObjectPath=OfficeExtension.ObjectPathFactory.createPropertyObjectPath;
@@ -13998,6 +14018,10 @@ var Excel;
 			configurable: true
 		});
 		WorksheetProtection.prototype.protect=function (options, password) {
+			if (versionNumberIsEarlierThan(16, 8716)) {
+				_createMethodAction(this.context, this, "Protect", 0, [options], false);
+				return;
+			}
 			_createMethodAction(this.context, this, "Protect", 0, [options, password], false);
 		};
 		WorksheetProtection.prototype.unprotect=function (password) {
