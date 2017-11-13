@@ -22,7 +22,7 @@ var __extends=this&&this.__extends||function(n,t){function r(){this.constructor=
 ;
 (function() {
 	function versionNumberIsEarlierThan(desiredMajor, desiredMinor) {
-		var hasOfficeVersion = typeof (window) !== "undefined" && window.Office && window.Office.context && window.Office.context.diagnostics || window.Office.context.diagnostics.version);
+		var hasOfficeVersion = typeof (window) !== "undefined" && window.Office && window.Office.context && window.Office.context.diagnostics || window.Office.context.diagnostics.version;
 		if (!hasOfficeVersion) {
 			return false;
 		}
