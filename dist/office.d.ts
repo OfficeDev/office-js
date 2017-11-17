@@ -2516,73 +2516,6 @@ declare namespace OfficeExtension {
 
 
 declare namespace OfficeCore {
-    var BeginFirstPartyOnlyIntelliSenseFlightingServiceClass: any;
-    /**
-     * [Api set: Experimentation 1.1 (PREVIEW)]
-     */
-    class FlightingService extends OfficeExtension.ClientObject {
-        getClientSessionId(): OfficeExtension.ClientResult<string>;
-        getDeferredFlights(): OfficeExtension.ClientResult<string>;
-        getFeature(featureName: string, type: string, defaultValue: number | boolean | string, possibleValues?: Array<number> | Array<string> | Array<boolean> | Array<ScopedValue>): OfficeCore.ABType;
-        getFeatureGate(featureName: string, scope?: string): OfficeCore.ABType;
-        resetOverride(featureName: string): void;
-        setOverride(featureName: string, type: string, value: number | boolean | string): void;
-        /**
-         * Create a new instance of OfficeCore.FlightingService object
-         */
-        static newObject(context: OfficeExtension.ClientRequestContext): OfficeCore.FlightingService;
-        toJSON(): {};
-    }
-    var EndFirstPartyOnlyIntelliSenseFlightingServiceClass: any;
-    var BeginFirstPartyOnlyIntelliSenseScopedValueClass: any;
-    /**
-     *
-     * Provides information about the scoped value.
-     *
-     * [Api set: Experimentation 1.1 (PREVIEW)]
-     */
-    interface ScopedValue {
-        /**
-         *
-         * Gets the scope.
-         *
-         * [Api set: Experimentation 1.1 (PREVIEW)]
-         */
-        scope: string;
-        /**
-         *
-         * Gets the value.
-         *
-         * [Api set: Experimentation 1.1 (PREVIEW)]
-         */
-        value: string | number | boolean;
-    }
-    var EndFirstPartyOnlyIntelliSenseScopedValueClass: any;
-    var BeginFirstPartyOnlyIntelliSenseABTypeClass: any;
-    /**
-     * [Api set: Experimentation 1.1 (PREVIEW)]
-     */
-    class ABType extends OfficeExtension.ClientObject {
-        readonly value: string | number | boolean;
-        /**
-         * Queues up a command to load the specified properties of the object. You must call "context.sync()" before reading the properties.
-         */
-        load(option?: string | string[] | OfficeExtension.LoadOption): OfficeCore.ABType;
-        toJSON(): {
-            "value": string | number | boolean;
-        };
-    }
-    var EndFirstPartyOnlyIntelliSenseABTypeClass: any;
-    var BeginFirstPartyOnlyIntelliSenseFeatureTypeClass: any;
-    /**
-     * [Api set: Experimentation 1.1 (PREVIEW)]
-     */
-    namespace FeatureType {
-        var boolean: string;
-        var integer: string;
-        var string: string;
-    }
-    var EndFirstPartyOnlyIntelliSenseFeatureTypeClass: any;
     namespace ExperimentErrorCodes {
         var generalException: string;
     }
@@ -2592,9 +2525,6 @@ declare namespace OfficeCore {
 declare namespace OfficeCore {
     class RequestContext extends OfficeExtension.ClientRequestContext {
         constructor(url?: string | OfficeExtension.RequestUrlAndHeaderInfo | any);
-        static BeginFirstPartyOnlyIntelliSenseFlighting: any;
-        readonly flighting: FlightingService;
-        static EndFirstPartyOnlyIntelliSenseFlighting: any;
     }
 }
 
@@ -2923,42 +2853,42 @@ declare namespace Excel {
      *
      * Provides information about the worksheet that raised the DataChanged event.
      *
-     * [Api set: ExcelApi 1.8 (PREVIEW)]
+     * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
      */
     interface WorksheetDataChangedEvent {
         /**
          *
          * Gets the range address that represents the changed area of a specific worksheet.
          *
-         * [Api set: ExcelApi 1.8 (PREVIEW)]
+         * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         address: string;
         /**
          *
          * Gets the change type that represents how the DataChanged event is triggered. See Excel.DataChangeType for details.
          *
-         * [Api set: ExcelApi 1.8 (PREVIEW)]
+         * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         changeType: string;
         /**
          *
          * Gets the source of the event. See Excel.EventSource for details.
          *
-         * [Api set: ExcelApi 1.8 (PREVIEW)]
+         * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         source: string;
         /**
          *
          * Gets the type of the event. See Excel.EventType for details.
          *
-         * [Api set: ExcelApi 1.8 (PREVIEW)]
+         * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         type: string;
         /**
          *
          * Gets the id of the worksheet in which the data changed.
          *
-         * [Api set: ExcelApi 1.8 (PREVIEW)]
+         * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         worksheetId: string;
     }
@@ -2966,49 +2896,49 @@ declare namespace Excel {
      *
      * Provides information about the table that raised the DataChanged event.
      *
-     * [Api set: ExcelApi 1.8 (PREVIEW)]
+     * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
      */
     interface TableDataChangedEvent {
         /**
          *
          * Gets the address that represents the changed area of a table on a specific worksheet.
          *
-         * [Api set: ExcelApi 1.8 (PREVIEW)]
+         * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         address: string;
         /**
          *
          * Gets the change type that represents how the DataChanged event is triggered. See Excel.DataChangeType for details.
          *
-         * [Api set: ExcelApi 1.8 (PREVIEW)]
+         * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         changeType: string;
         /**
          *
          * Gets the source of the event. See Excel.EventSource for details.
          *
-         * [Api set: ExcelApi 1.8 (PREVIEW)]
+         * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         source: string;
         /**
          *
          * Gets the id of the table in which the data changed.
          *
-         * [Api set: ExcelApi 1.8 (PREVIEW)]
+         * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         tableId: string;
         /**
          *
          * Gets the type of the event. See Excel.EventType for details.
          *
-         * [Api set: ExcelApi 1.8 (PREVIEW)]
+         * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         type: string;
         /**
          *
          * Gets the id of the worksheet in which the data changed.
          *
-         * [Api set: ExcelApi 1.8 (PREVIEW)]
+         * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         worksheetId: string;
     }
@@ -3016,21 +2946,21 @@ declare namespace Excel {
      *
      * Provides information about the worksheet that raised the Activated event.
      *
-     * [Api set: ExcelApi 1.8 (PREVIEW)]
+     * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
      */
     interface WorksheetActivatedEvent {
         /**
          *
          * Gets the type of the event. See Excel.EventType for details.
          *
-         * [Api set: ExcelApi 1.8 (PREVIEW)]
+         * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         type: string;
         /**
          *
          * Gets the id of the worksheet that is activated.
          *
-         * [Api set: ExcelApi 1.8 (PREVIEW)]
+         * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         worksheetId: string;
     }
@@ -3038,21 +2968,21 @@ declare namespace Excel {
      *
      * Provides information about the worksheet that raised the Deactivated event.
      *
-     * [Api set: ExcelApi 1.8 (PREVIEW)]
+     * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
      */
     interface WorksheetDeactivatedEvent {
         /**
          *
          * Gets the type of the event. See Excel.EventType for details.
          *
-         * [Api set: ExcelApi 1.8 (PREVIEW)]
+         * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         type: string;
         /**
          *
          * Gets the id of the worksheet that is deactivated.
          *
-         * [Api set: ExcelApi 1.8 (PREVIEW)]
+         * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         worksheetId: string;
     }
@@ -3060,28 +2990,28 @@ declare namespace Excel {
      *
      * Provides information about the worksheet that raised the SelectionChanged event.
      *
-     * [Api set: ExcelApi 1.8 (PREVIEW)]
+     * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
      */
     interface WorksheetSelectionChangedEvent {
         /**
          *
          * Gets the range address that represents the selected area of a specific worksheet.
          *
-         * [Api set: ExcelApi 1.8 (PREVIEW)]
+         * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         address: string;
         /**
          *
          * Gets the type of the event. See Excel.EventType for details.
          *
-         * [Api set: ExcelApi 1.8 (PREVIEW)]
+         * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         type: string;
         /**
          *
          * Gets the id of the worksheet in which the selection changed.
          *
-         * [Api set: ExcelApi 1.8 (PREVIEW)]
+         * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         worksheetId: string;
     }
@@ -3089,35 +3019,35 @@ declare namespace Excel {
      *
      * Provides information about the table that raised the SelectionChanged event.
      *
-     * [Api set: ExcelApi 1.8 (PREVIEW)]
+     * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
      */
     interface TableSelectionChangedEvent {
         /**
          *
          * Gets the range address that represents the selected area of the table on a specific worksheet.
          *
-         * [Api set: ExcelApi 1.8 (PREVIEW)]
+         * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         address: string;
         /**
          *
          * Gets the id of the table in which the selection changed.
          *
-         * [Api set: ExcelApi 1.8 (PREVIEW)]
+         * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         tableId: string;
         /**
          *
          * Gets the type of the event. See Excel.EventType for details.
          *
-         * [Api set: ExcelApi 1.8 (PREVIEW)]
+         * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         type: string;
         /**
          *
          * Gets the id of the worksheet in which the selection changed.
          *
-         * [Api set: ExcelApi 1.8 (PREVIEW)]
+         * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         worksheetId: string;
     }
@@ -3125,28 +3055,28 @@ declare namespace Excel {
      *
      * Provides information about the worksheet that raised the Added event.
      *
-     * [Api set: ExcelApi 1.8 (PREVIEW)]
+     * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
      */
     interface WorksheetAddedEvent {
         /**
          *
          * Gets the source of the event. See Excel.EventSource for details.
          *
-         * [Api set: ExcelApi 1.8 (PREVIEW)]
+         * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         source: string;
         /**
          *
          * Gets the type of the event. See Excel.EventType for details.
          *
-         * [Api set: ExcelApi 1.8 (PREVIEW)]
+         * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         type: string;
         /**
          *
          * Gets the id of the worksheet that is added to the workbook.
          *
-         * [Api set: ExcelApi 1.8 (PREVIEW)]
+         * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         worksheetId: string;
     }
@@ -3177,7 +3107,7 @@ declare namespace Excel {
          *
          * Suspends calculation until the next "context.sync()" is called. Once set, it is the developer's responsibility to re-calc the workbook, to ensure that any dependencies are propagated.
          *
-         * [Api set: ExcelApi 1.6 (PREVIEW)]
+         * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         suspendApiCalculationUntilNextSync(): void;
         /**
@@ -3213,7 +3143,7 @@ declare namespace Excel {
          *
          * Represents the collection of custom functions defined in add-ins. Read-only.
          *
-         * [Api set: ExcelApi 1.7 (PREVIEW)]
+         * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         readonly customFunctions: Excel.CustomFunctionCollection;
         /**
@@ -3248,7 +3178,7 @@ declare namespace Excel {
          *
          * Gets the workbook properties.
          *
-         * [Api set: ExcelApi 1.7 (PREVIEW)]
+         * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         readonly properties: Excel.DocumentProperties;
         /**
@@ -3262,7 +3192,7 @@ declare namespace Excel {
          *
          * Represents a collection of styles associated with the workbook. Read-only.
          *
-         * [Api set: ExcelApi 1.7 (PREVIEW)]
+         * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         readonly styles: Excel.StyleCollection;
         /**
@@ -3284,14 +3214,14 @@ declare namespace Excel {
          *
          * Gets the workbook name.
          *
-         * [Api set: ExcelApi 1.7 (PREVIEW)]
+         * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         readonly name: string;
         /**
          *
          * Gets the currently active cell from the workbook.
          *
-         * [Api set: ExcelApi 1.7 (PREVIEW)]
+         * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         getActiveCell(): Excel.Range;
         /**
@@ -3334,7 +3264,7 @@ declare namespace Excel {
          *
          * Gets an object that can be used to manipulate frozen panes on the worksheet
          *
-         * [Api set: ExcelApi 1.7 (PREVIEW)]
+         * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         readonly freezePanes: Excel.WorksheetFreezePanes;
         /**
@@ -3348,7 +3278,7 @@ declare namespace Excel {
          *
          * Gets the PageLayout object of the worksheet. Read-only.
          *
-         * [Api set: ExcelApi 1.7 (PREVIEW)]
+         * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         readonly pageLayout: Excel.PageLayout;
         /**
@@ -3377,7 +3307,7 @@ declare namespace Excel {
          * Gets or sets the worksheet's gridlines flag.
             This flag determines whether gridlines are visible to the user.
          *
-         * [Api set: ExcelApi 1.7 (PREVIEW)]
+         * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         gridlines: boolean;
         /**
@@ -3385,7 +3315,7 @@ declare namespace Excel {
          * Gets or sets the worksheet's headings flag.
             This flag determines whether headings are visible to the user.
          *
-         * [Api set: ExcelApi 1.7 (PREVIEW)]
+         * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         headings: boolean;
         /**
@@ -3415,7 +3345,7 @@ declare namespace Excel {
             When retrieving the tab color, if the worksheet is invisible, the value will be null. If the worksheet is visible but the tab color is set to auto, an empty string will be returned. Otherwise, the property will be set to a color, in the form "#123456"
             When setting the color, use an empty-string to set an "auto" color, or a real color otherwise.
          *
-         * [Api set: ExcelApi 1.7 (PREVIEW)]
+         * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         tabColor: string;
         /**
@@ -3445,7 +3375,7 @@ declare namespace Excel {
          *
          * Calculates all cells on a worksheet.
          *
-         * [Api set: ExcelApi 1.6 (PREVIEW)]
+         * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         calculate(markAllDirty: boolean): void;
         /**
@@ -3514,7 +3444,7 @@ declare namespace Excel {
          *
          * Gets the range object beginning at a particular row index and column index, and spanning a certain number of rows and columns.
          *
-         * [Api set: ExcelApi 1.7 (PREVIEW)]
+         * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
          *
          * @param startRow Start row (zero-indexed).
          * @param startColumn Start column (zero-indexed).
@@ -3548,28 +3478,28 @@ declare namespace Excel {
          *
          * Occurs when the worksheet is activated.
          *
-         * [Api set: ExcelApi 1.8 (PREVIEW)]
+         * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         readonly onActivated: OfficeExtension.EventHandlers<Excel.WorksheetActivatedEvent>;
         /**
          *
          * Occurs when data changed on a specific worksheet.
          *
-         * [Api set: ExcelApi 1.8 (PREVIEW)]
+         * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         readonly onDataChanged: OfficeExtension.EventHandlers<Excel.WorksheetDataChangedEvent>;
         /**
          *
          * Occurs when the worksheet is deactivated.
          *
-         * [Api set: ExcelApi 1.8 (PREVIEW)]
+         * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         readonly onDeactivated: OfficeExtension.EventHandlers<Excel.WorksheetDeactivatedEvent>;
         /**
          *
          * Occurs when the selection changed on a specific worksheet.
          *
-         * [Api set: ExcelApi 1.8 (PREVIEW)]
+         * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         readonly onSelectionChanged: OfficeExtension.EventHandlers<Excel.WorksheetSelectionChangedEvent>;
         toJSON(): {
@@ -3657,21 +3587,21 @@ declare namespace Excel {
          *
          * Occurs when any worksheet in the workbook is activated.
          *
-         * [Api set: ExcelApi 1.8 (PREVIEW)]
+         * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         readonly onActivated: OfficeExtension.EventHandlers<Excel.WorksheetActivatedEvent>;
         /**
          *
          * Occurs when a new worksheet is added to the workbook.
          *
-         * [Api set: ExcelApi 1.8 (PREVIEW)]
+         * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         readonly onAdded: OfficeExtension.EventHandlers<Excel.WorksheetAddedEvent>;
         /**
          *
          * Occurs when any worksheet in the workbook is deactivated.
          *
-         * [Api set: ExcelApi 1.8 (PREVIEW)]
+         * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         readonly onDeactivated: OfficeExtension.EventHandlers<Excel.WorksheetDeactivatedEvent>;
         toJSON(): {};
@@ -3808,7 +3738,7 @@ declare namespace Excel {
         allowSort?: boolean;
     }
     /**
-     * [Api set: ExcelApi 1.7 (PREVIEW)]
+     * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
      */
     class WorksheetFreezePanes extends OfficeExtension.ClientObject {
         /**
@@ -3816,7 +3746,7 @@ declare namespace Excel {
          * Sets the frozen cells in the active worksheet view.
             The range provided corresponds to cells that will be frozen in the top- and left-most pane.
          *
-         * [Api set: ExcelApi 1.7 (PREVIEW)]
+         * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
          *
          * @param frozenRange A range that represents the cells to be frozen, or null to remove all frozen panes.
          */
@@ -3825,7 +3755,7 @@ declare namespace Excel {
          *
          * Freeze the first column(s) of the worksheet in place.
          *
-         * [Api set: ExcelApi 1.7 (PREVIEW)]
+         * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
          *
          * @param count Optional number of columns to freeze, or zero to unfreeze all columns
          */
@@ -3834,7 +3764,7 @@ declare namespace Excel {
          *
          * Freeze the top row(s) of the worksheet in place.
          *
-         * [Api set: ExcelApi 1.7 (PREVIEW)]
+         * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
          *
          * @param count Optional number of rows to freeze, or zero to unfreeze all rows
          */
@@ -3844,7 +3774,7 @@ declare namespace Excel {
          * Gets a range that describes the frozen cells in the active worksheet view.
             The frozen range is corresponds to cells that are frozen in the top- and left-most pane.
          *
-         * [Api set: ExcelApi 1.7 (PREVIEW)]
+         * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         getLocation(): Excel.Range;
         /**
@@ -3853,14 +3783,14 @@ declare namespace Excel {
             The frozen range is corresponds to cells that are frozen in the top- and left-most pane.
             If there is no frozen pane, returns a null object.
          *
-         * [Api set: ExcelApi 1.7 (PREVIEW)]
+         * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         getLocationOrNullObject(): Excel.Range;
         /**
          *
          * Removes all frozen panes in the worksheet.
          *
-         * [Api set: ExcelApi 1.7 (PREVIEW)]
+         * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         unfreeze(): void;
         toJSON(): {};
@@ -3876,7 +3806,7 @@ declare namespace Excel {
          *
          * Collection of ConditionalFormats that intersect the range. Read-only.
          *
-         * [Api set: ExcelApi 1.6 (PREVIEW)]
+         * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         readonly conditionalFormats: Excel.ConditionalFormatCollection;
         /**
@@ -3974,7 +3904,7 @@ declare namespace Excel {
          *
          * Represents the hyperlink set for the current range.
          *
-         * [Api set: ExcelApi 1.7 (PREVIEW)]
+         * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         hyperlink: Excel.RangeHyperlink;
         /**
@@ -3988,7 +3918,7 @@ declare namespace Excel {
          *
          * Represents Excel's number format code for the given cell as a string in the language of the user.
          *
-         * [Api set: ExcelApi 1.7 (PREVIEW)]
+         * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         numberFormatLocal: Array<Array<any>>;
         /**
@@ -4018,7 +3948,7 @@ declare namespace Excel {
             If the styles of the cells are inconsistent, null will be returned.
             For custom styles, the style name will be returned. For built-in styles, a string representing a value in the BuiltInStyle enum will be returned.
          *
-         * [Api set: ExcelApi 1.7 (PREVIEW)]
+         * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         style: string;
         /**
@@ -4046,14 +3976,14 @@ declare namespace Excel {
          *
          * Represents if the current range is an entire column.
          *
-         * [Api set: ExcelApi 1.7 (PREVIEW)]
+         * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         readonly isEntireColumn: boolean;
         /**
          *
          * Represents if the current range is an entire row.
          *
-         * [Api set: ExcelApi 1.7 (PREVIEW)]
+         * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         readonly isEntireRow: boolean;
         /** Sets multiple properties on the object at the same time, based on JSON input. */
@@ -4069,7 +3999,7 @@ declare namespace Excel {
          *
          * Calculates a range of cells on a worksheet.
          *
-         * [Api set: ExcelApi 1.6 (PREVIEW)]
+         * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         calculate(): void;
         /**
@@ -4094,7 +4024,7 @@ declare namespace Excel {
          *
          * Gets a Range object with the same top-left cell as the current Range object, but with the specified numbers of rows and columns.
          *
-         * [Api set: ExcelApi 1.7 (PREVIEW)]
+         * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
          *
          * @param numRows The number of rows of the new range size.
          * @param numColumns The number of columns of the new range size.
@@ -4164,7 +4094,7 @@ declare namespace Excel {
          *
          * Renders the range as a base64-encoded image.
          *
-         * [Api set: ExcelApi 1.7 (PREVIEW)]
+         * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         getImage(): OfficeExtension.ClientResult<string>;
         /**
@@ -4257,7 +4187,7 @@ declare namespace Excel {
          *
          * Returns a Range object that represents the surrounding region for the top-left cell in this range. A surrounding region is a range bounded by any combination of blank rows and blank columns relative to this range.
          *
-         * [Api set: ExcelApi 1.7 (PREVIEW)]
+         * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         getSurroundingRegion(): Excel.Range;
         /**
@@ -4314,7 +4244,7 @@ declare namespace Excel {
          *
          * Displays the card for an active cell if it has rich value content.
          *
-         * [Api set: ExcelApi 1.8 (PREVIEW)]
+         * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         showCard(): void;
         /**
@@ -4375,35 +4305,35 @@ declare namespace Excel {
      *
      * Represents the necessary strings to get/set a hyperlink (XHL) object.
      *
-     * [Api set: ExcelApi 1.7 (PREVIEW)]
+     * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
      */
     interface RangeHyperlink {
         /**
          *
          * Represents the url target for the hyperlink.
          *
-         * [Api set: ExcelApi 1.7 (PREVIEW)]
+         * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         address?: string;
         /**
          *
          * Represents the document reference target for the hyperlink.
          *
-         * [Api set: ExcelApi 1.7 (PREVIEW)]
+         * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         documentReference?: string;
         /**
          *
          * Represents the string displayed when hovering over the hyperlink.
          *
-         * [Api set: ExcelApi 1.7 (PREVIEW)]
+         * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         screenTip?: string;
         /**
          *
          * Represents the string that is displayed in the top left most cell in the range.
          *
-         * [Api set: ExcelApi 1.7 (PREVIEW)]
+         * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         textToDisplay?: string;
     }
@@ -4744,7 +4674,7 @@ declare namespace Excel {
          *
          * Returns an object containing values and types of the named item.
          *
-         * [Api set: ExcelApi 1.7 (PREVIEW)]
+         * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         readonly arrayValues: Excel.NamedItemArrayValues;
         /**
@@ -4772,7 +4702,7 @@ declare namespace Excel {
          *
          * Gets or sets the formula of the named item.  Formula always starts with a '=' sign.
          *
-         * [Api set: ExcelApi 1.7 (PREVIEW)]
+         * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         formula: any;
         /**
@@ -4858,21 +4788,21 @@ declare namespace Excel {
      *
      * Represents an object containing values and types of a named item.
      *
-     * [Api set: ExcelApi 1.7 (PREVIEW)]
+     * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
      */
     class NamedItemArrayValues extends OfficeExtension.ClientObject {
         /**
          *
          * Represents the types for each item in the named item array
          *
-         * [Api set: ExcelApi 1.7 (PREVIEW)]
+         * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         readonly types: Array<Array<string>>;
         /**
          *
          * Represents the values of each item in the named item array.
          *
-         * [Api set: ExcelApi 1.7 (PREVIEW)]
+         * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         readonly values: Array<Array<any>>;
         /**
@@ -5114,7 +5044,7 @@ declare namespace Excel {
          *
          * Occurs when data changed on any table in a workbook, or a worksheet.
          *
-         * [Api set: ExcelApi 1.8 (PREVIEW)]
+         * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         readonly onDataChanged: OfficeExtension.EventHandlers<Excel.TableDataChangedEvent>;
         toJSON(): {
@@ -5299,14 +5229,14 @@ declare namespace Excel {
          *
          * Occurs when data changed on a specific table.
          *
-         * [Api set: ExcelApi 1.8 (PREVIEW)]
+         * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         readonly onDataChanged: OfficeExtension.EventHandlers<Excel.TableDataChangedEvent>;
         /**
          *
          * Occurs when the selection changed on a specific table.
          *
-         * [Api set: ExcelApi 1.8 (PREVIEW)]
+         * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         readonly onSelectionChanged: OfficeExtension.EventHandlers<Excel.TableSelectionChangedEvent>;
         toJSON(): {
@@ -5673,7 +5603,7 @@ declare namespace Excel {
             The text orientation should be an integer either from -90 to 90, or 180 for vertically-oriented text.
             If the orientation within a range are not uniform, then null will be returned.
          *
-         * [Api set: ExcelApi 1.7 (PREVIEW)]
+         * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         textOrientation: number;
         /**
@@ -5683,7 +5613,7 @@ declare namespace Excel {
             Returns Null if the range contains more than one row and the rows aren't all the same height.
             Returns False otherwise.
          *
-         * [Api set: ExcelApi 1.7 (PREVIEW)]
+         * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         useStandardHeight: boolean;
         /**
@@ -5693,7 +5623,7 @@ declare namespace Excel {
             Returns Null if the range contains more than one column and the columns aren't all the same height.
             Returns False otherwise.
          *
-         * [Api set: ExcelApi 1.7 (PREVIEW)]
+         * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         useStandardWidth: boolean;
         /**
@@ -6133,7 +6063,7 @@ declare namespace Excel {
          *
          * The unique id of chart. Read-only.
          *
-         * [Api set: ExcelApi 1.8 (PREVIEW)]
+         * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         readonly id: string;
         /**
@@ -6154,7 +6084,7 @@ declare namespace Excel {
          *
          * Returns or sets whether to display all field buttons on a PivotChart. Read/write
          *
-         * [Api set: ExcelApi 1.8 (PREVIEW)]
+         * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         showAllFieldButtons: boolean;
         /**
@@ -6297,7 +6227,7 @@ declare namespace Excel {
          *
          * Add a new series to the collection.
          *
-         * [Api set: ExcelApi 1.8 (PREVIEW)]
+         * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
          *
          * @param name Name of the series.
          * @param index Index value of the series to be added. Zero-indexed.
@@ -6352,56 +6282,56 @@ declare namespace Excel {
          *
          * Represents a collection of trendlines in the series. Read-only.
          *
-         * [Api set: ExcelApi 1.8 (PREVIEW)]
+         * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         readonly trendlines: Excel.ChartTrendlineCollection;
         /**
          *
          * Represents the chart type of a series. See Excel.ChartType for details.
          *
-         * [Api set: ExcelApi 1.8 (PREVIEW)]
+         * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         chartType: string;
         /**
          *
          * Boolean value representing if the series is filtered or not. Not applicable for surface charts.
          *
-         * [Api set: ExcelApi 1.8 (PREVIEW)]
+         * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         filtered: boolean;
         /**
          *
          * Boolean value representing if the series has data labels or not.
          *
-         * [Api set: ExcelApi 1.8 (PREVIEW)]
+         * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         hasDataLabels: boolean;
         /**
          *
          * Represents markers background color of a chart series.
          *
-         * [Api set: ExcelApi 1.8 (PREVIEW)]
+         * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         markerBackgroundColor: string;
         /**
          *
          * Represents markers foreground color of a chart series.
          *
-         * [Api set: ExcelApi 1.8 (PREVIEW)]
+         * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         markerForegroundColor: string;
         /**
          *
          * Represents marker size of a chart series.
          *
-         * [Api set: ExcelApi 1.8 (PREVIEW)]
+         * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         markerSize: number;
         /**
          *
          * Represents marker style of a chart series. See Excel.ChartMarkerStyle for details.
          *
-         * [Api set: ExcelApi 1.8 (PREVIEW)]
+         * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         markerStyle: string;
         /**
@@ -6415,21 +6345,21 @@ declare namespace Excel {
          *
          * Represents the plot order of a chart series within the chart group.
          *
-         * [Api set: ExcelApi 1.8 (PREVIEW)]
+         * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         plotOrder: number;
         /**
          *
          * Boolean value representing if the series has shadow or not.
          *
-         * [Api set: ExcelApi 1.8 (PREVIEW)]
+         * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         showShadow: boolean;
         /**
          *
          * Boolean value representing if the series is smooth or not. Only for line and scatter charts.
          *
-         * [Api set: ExcelApi 1.8 (PREVIEW)]
+         * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         smooth: boolean;
         /** Sets multiple properties on the object at the same time, based on JSON input. */
@@ -6445,14 +6375,14 @@ declare namespace Excel {
          *
          * Deletes the chart series.
          *
-         * [Api set: ExcelApi 1.8 (PREVIEW)]
+         * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         delete(): void;
         /**
          *
          * Set bubble sizes for a chart series. Only works for bubble charts.
          *
-         * [Api set: ExcelApi 1.8 (PREVIEW)]
+         * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
          *
          * @param sourceData The Range object corresponding to the source data.
          */
@@ -6461,7 +6391,7 @@ declare namespace Excel {
          *
          * Set values for a chart series. For scatter chart, it means Y axis values.
          *
-         * [Api set: ExcelApi 1.8 (PREVIEW)]
+         * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
          *
          * @param sourceData The Range object corresponding to the source data.
          */
@@ -6470,7 +6400,7 @@ declare namespace Excel {
          *
          * Set values of X axis for a chart series. Only works for scatter charts.
          *
-         * [Api set: ExcelApi 1.8 (PREVIEW)]
+         * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
          *
          * @param sourceData The Range object corresponding to the source data.
          */
@@ -6584,7 +6514,7 @@ declare namespace Excel {
          *
          * Returns the data label of a chart point. Read-only.
          *
-         * [Api set: ExcelApi 1.8 (PREVIEW)]
+         * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         readonly dataLabel: Excel.ChartDataLabel;
         /**
@@ -6673,7 +6603,7 @@ declare namespace Excel {
          *
          * Returns the specific axis identified by type and group.
          *
-         * [Api set: ExcelApi 1.8 (PREVIEW)]
+         * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
          *
          * @param type Specifies the axis type. See Excel.ChartAxis for details.
          * @param group Specifies the axis group. See Excel.ChartAxis for details.
@@ -6728,77 +6658,77 @@ declare namespace Excel {
          *
          * Represents the group for the specified axis.
          *
-         * [Api set: ExcelApi 1.8 (PREVIEW)]
+         * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         readonly axisGroup: string;
         /**
          *
          * Returns or sets the base unit for the specified category axis.
          *
-         * [Api set: ExcelApi 1.8 (PREVIEW)]
+         * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         baseTimeUnit: string;
         /**
          *
          * Returns or sets the category axis type.
          *
-         * [Api set: ExcelApi 1.8 (PREVIEW)]
+         * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         categoryType: string;
         /**
          *
          * Represents the specified axis where the other axis crosses.
          *
-         * [Api set: ExcelApi 1.8 (PREVIEW)]
+         * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         crosses: string;
         /**
          *
          * Represents the specified axis where the other axis crosses at. Read Only. Set to this property should use SetCrossesAt(double) method.
          *
-         * [Api set: ExcelApi 1.8 (PREVIEW)]
+         * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         readonly crossesAt: number;
         /**
          *
          * Represents the custom axis display unit value. Read Only. To set this property, please use the SetCustomDisplayUnit(double) method.
          *
-         * [Api set: ExcelApi 1.8 (PREVIEW)]
+         * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         readonly customDisplayUnit: number;
         /**
          *
          * Represents the axis display unit.
          *
-         * [Api set: ExcelApi 1.8 (PREVIEW)]
+         * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         displayUnit: string;
         /**
          *
          * Represents the height, in points, of the chart axis. Null if the axis's not visible.
          *
-         * [Api set: ExcelApi 1.8 (PREVIEW)]
+         * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         readonly height: number;
         /**
          *
          * Represents the distance, in points, from the left edge of the axis to the left of chart area. Null if the axis's not visible.
          *
-         * [Api set: ExcelApi 1.8 (PREVIEW)]
+         * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         readonly left: number;
         /**
          *
          * Represents the base of the logarithm when using logarithmic scales.
          *
-         * [Api set: ExcelApi 1.8 (PREVIEW)]
+         * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         logBase: number;
         /**
          *
          * Returns or sets the major unit scale value for the category axis when the CategoryType property is set to TimeScale.
          *
-         * [Api set: ExcelApi 1.8 (PREVIEW)]
+         * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         majorTimeUnitScale: string;
         /**
@@ -6826,7 +6756,7 @@ declare namespace Excel {
          *
          * Returns or sets the minor unit scale value for the category axis when the CategoryType property is set to TimeScale.
          *
-         * [Api set: ExcelApi 1.8 (PREVIEW)]
+         * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         minorTimeUnitScale: string;
         /**
@@ -6840,49 +6770,49 @@ declare namespace Excel {
          *
          * Represents whether Microsoft Excel plots data points from last to first.
          *
-         * [Api set: ExcelApi 1.8 (PREVIEW)]
+         * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         reversePlotOrder: boolean;
         /**
          *
          * Represents the value axis scale type.
          *
-         * [Api set: ExcelApi 1.8 (PREVIEW)]
+         * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         scaleType: string;
         /**
          *
          * Represents whether the axis display unit label is visible.
          *
-         * [Api set: ExcelApi 1.8 (PREVIEW)]
+         * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         showDisplayUnitLabel: boolean;
         /**
          *
          * Represents the distance, in points, from the top edge of the axis to the top of chart area. Null if the axis's not visible.
          *
-         * [Api set: ExcelApi 1.8 (PREVIEW)]
+         * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         readonly top: number;
         /**
          *
          * Represents the axis type. Read-only.
          *
-         * [Api set: ExcelApi 1.8 (PREVIEW)]
+         * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         readonly type: string;
         /**
          *
          * A boolean value represents the visibility of the axis.
          *
-         * [Api set: ExcelApi 1.8 (PREVIEW)]
+         * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         visible: boolean;
         /**
          *
          * Represents the width, in points, of the chart axis. Null if the axis's not visible.
          *
-         * [Api set: ExcelApi 1.8 (PREVIEW)]
+         * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         readonly width: number;
         /** Sets multiple properties on the object at the same time, based on JSON input. */
@@ -6898,21 +6828,21 @@ declare namespace Excel {
          *
          * Sets all the category names for the specified axis.
          *
-         * [Api set: ExcelApi 1.8 (PREVIEW)]
+         * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         setCategoryNames(sourceData: Array<string> | Excel.Range): void;
         /**
          *
          * Set the specified axis where the other axis crosses at.
          *
-         * [Api set: ExcelApi 1.8 (PREVIEW)]
+         * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         setCrossesAt(value: number): void;
         /**
          *
          * Sets the axis display unit to a custom value.
          *
-         * [Api set: ExcelApi 1.8 (PREVIEW)]
+         * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         setCustomDisplayUnit(value: number): void;
         /**
@@ -7165,14 +7095,14 @@ declare namespace Excel {
      *
      * Represents the data label of a chart point.
      *
-     * [Api set: ExcelApi 1.8 (PREVIEW)]
+     * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
      */
     class ChartDataLabel extends OfficeExtension.ClientObject {
         /**
          *
          * DataLabelPosition value that represents the position of the data label. See Excel.ChartDataLabelPosition for details.
          *
-         * [Api set: ExcelApi 1.8 (PREVIEW)]
+         * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         position: string;
         /** Sets multiple properties on the object at the same time, based on JSON input. */
@@ -7319,21 +7249,21 @@ declare namespace Excel {
          *
          * Represents a collection of legendEntries in the legend. Read-only.
          *
-         * [Api set: ExcelApi 1.8 (PREVIEW)]
+         * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         readonly legendEntries: Excel.ChartLegendEntryCollection;
         /**
          *
          * Represents the height of the legend on the chart.
          *
-         * [Api set: ExcelApi 1.8 (PREVIEW)]
+         * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         height: number;
         /**
          *
          * Represents the left of a chart legend.
          *
-         * [Api set: ExcelApi 1.8 (PREVIEW)]
+         * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         left: number;
         /**
@@ -7354,14 +7284,14 @@ declare namespace Excel {
          *
          * Represents if the legend has shadow on the chart.
          *
-         * [Api set: ExcelApi 1.8 (PREVIEW)]
+         * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         showShadow: boolean;
         /**
          *
          * Represents the top of a chart legend.
          *
-         * [Api set: ExcelApi 1.8 (PREVIEW)]
+         * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         top: number;
         /**
@@ -7375,7 +7305,7 @@ declare namespace Excel {
          *
          * Represents the width of the legend on the chart.
          *
-         * [Api set: ExcelApi 1.8 (PREVIEW)]
+         * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         width: number;
         /** Sets multiple properties on the object at the same time, based on JSON input. */
@@ -7407,14 +7337,14 @@ declare namespace Excel {
      *
      * Represents the legendEntry in legendEntryCollection.
      *
-     * [Api set: ExcelApi 1.8 (PREVIEW)]
+     * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
      */
     class ChartLegendEntry extends OfficeExtension.ClientObject {
         /**
          *
          * Represents the visible of a chart legend entry.
          *
-         * [Api set: ExcelApi 1.8 (PREVIEW)]
+         * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         visible: boolean;
         /** Sets multiple properties on the object at the same time, based on JSON input. */
@@ -7438,7 +7368,7 @@ declare namespace Excel {
      *
      * Represents a collection of legendEntries.
      *
-     * [Api set: ExcelApi 1.8 (PREVIEW)]
+     * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
      */
     class ChartLegendEntryCollection extends OfficeExtension.ClientObject {
         /** Gets the loaded child items in this collection. */
@@ -7447,14 +7377,14 @@ declare namespace Excel {
          *
          * Returns the number of legendEntry in the collection.
          *
-         * [Api set: ExcelApi 1.8 (PREVIEW)]
+         * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         getCount(): OfficeExtension.ClientResult<number>;
         /**
          *
          * Returns a legendEntry at the given index.
          *
-         * [Api set: ExcelApi 1.8 (PREVIEW)]
+         * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
          *
          * @param index Index of the legendEntry to be retrieved.
          */
@@ -7522,21 +7452,21 @@ declare namespace Excel {
          *
          * Returns the height, in points, of the chart title. Read-only. Null if chart title's not visible.
          *
-         * [Api set: ExcelApi 1.8 (PREVIEW)]
+         * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         readonly height: number;
         /**
          *
          * Represents the horizontal alignment for chart title.
          *
-         * [Api set: ExcelApi 1.8 (PREVIEW)]
+         * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         horizontalAlignment: string;
         /**
          *
          * Represents the distance, in points, from the left edge of chart title to the left edge of chart area. Null if chart title's not visible.
          *
-         * [Api set: ExcelApi 1.8 (PREVIEW)]
+         * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         left: number;
         /**
@@ -7550,14 +7480,14 @@ declare namespace Excel {
          *
          * Represents the position of chart title. See Excel.ChartTitlePosition for details.
          *
-         * [Api set: ExcelApi 1.8 (PREVIEW)]
+         * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         position: string;
         /**
          *
          * Represents a boolean value that determines if the chart title has a shadow.
          *
-         * [Api set: ExcelApi 1.8 (PREVIEW)]
+         * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         showShadow: boolean;
         /**
@@ -7571,21 +7501,21 @@ declare namespace Excel {
          *
          * Represents the text orientation of chart title. The value should be an integer either from -90 to 90, or 180 for vertically-oriented text.
          *
-         * [Api set: ExcelApi 1.8 (PREVIEW)]
+         * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         textOrientation: number;
         /**
          *
          * Represents the distance, in points, from the top edge of chart title to the top of chart area. Null if chart title's not visible.
          *
-         * [Api set: ExcelApi 1.8 (PREVIEW)]
+         * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         top: number;
         /**
          *
          * Represents the vertical alignment of chart title. See Excel.ChartTextVerticalAlignment for details.
          *
-         * [Api set: ExcelApi 1.8 (PREVIEW)]
+         * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         verticalAlignment: string;
         /**
@@ -7599,7 +7529,7 @@ declare namespace Excel {
          *
          * Returns the width, in points, of the chart title. Read-only. Null if chart title's not visible.
          *
-         * [Api set: ExcelApi 1.8 (PREVIEW)]
+         * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         readonly width: number;
         /** Sets multiple properties on the object at the same time, based on JSON input. */
@@ -7615,7 +7545,7 @@ declare namespace Excel {
          *
          * Get the substring of a chart title. Line break '\n' also counts one charater.
          *
-         * [Api set: ExcelApi 1.8 (PREVIEW)]
+         * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
          *
          * @param start Start position of substring to be retrieved. Position start with 0.
          * @param length Length of substring to be retrieved.
@@ -7625,7 +7555,7 @@ declare namespace Excel {
          *
          * Sets a string value that represents the formula of chart title using A1-style notation.
          *
-         * [Api set: ExcelApi 1.8 (PREVIEW)]
+         * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
          *
          * @param formula a string that present the formula to set
          */
@@ -7654,14 +7584,14 @@ declare namespace Excel {
      *
      * Represents the substring in chart related objects that contains text, like ChartTitle object, ChartAxisTitle object, etc.
      *
-     * [Api set: ExcelApi 1.8 (PREVIEW)]
+     * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
      */
     class ChartFormatString extends OfficeExtension.ClientObject {
         /**
          *
          * Represents the font attributes, such as font name, font size, color, etc. of chart characters object. Read-only.
          *
-         * [Api set: ExcelApi 1.8 (PREVIEW)]
+         * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         readonly font: Excel.ChartFont;
         /**
@@ -7851,63 +7781,63 @@ declare namespace Excel {
      *
      * This object represents the attributes for a chart trendline object.
      *
-     * [Api set: ExcelApi 1.8 (PREVIEW)]
+     * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
      */
     class ChartTrendline extends OfficeExtension.ClientObject {
         /**
          *
          * Represents the formatting of a chart trendline. Read-only.
          *
-         * [Api set: ExcelApi 1.8 (PREVIEW)]
+         * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         readonly format: Excel.ChartTrendlineFormat;
         /**
          *
          * Represents the number of periods that the trendline extends backward.
          *
-         * [Api set: ExcelApi 1.8 (PREVIEW)]
+         * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         backward: number;
         /**
          *
          * True if the equation for the trendline is displayed on the chart.
          *
-         * [Api set: ExcelApi 1.8 (PREVIEW)]
+         * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         displayEquation: boolean;
         /**
          *
          * True if the R-squared for the trendline is displayed on the chart.
          *
-         * [Api set: ExcelApi 1.8 (PREVIEW)]
+         * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         displayRSquared: boolean;
         /**
          *
          * Represents the number of periods that the trendline extends forward.
          *
-         * [Api set: ExcelApi 1.8 (PREVIEW)]
+         * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         forward: number;
         /**
          *
          * Represents the period of a chart trendline, only for trendline with MovingAverage type.
          *
-         * [Api set: ExcelApi 1.8 (PREVIEW)]
+         * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         movingAveragePeriod: number;
         /**
          *
          * Represents the order of a chart trendline, only for trendline with Polynomial type.
          *
-         * [Api set: ExcelApi 1.8 (PREVIEW)]
+         * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         polynomialOrder: number;
         /**
          *
          * Represents the type of a chart trendline.
          *
-         * [Api set: ExcelApi 1.8 (PREVIEW)]
+         * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         type: string;
         /** Sets multiple properties on the object at the same time, based on JSON input. */
@@ -7923,7 +7853,7 @@ declare namespace Excel {
          *
          * Delete the trendline object.
          *
-         * [Api set: ExcelApi 1.8 (PREVIEW)]
+         * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         delete(): void;
         /**
@@ -7945,7 +7875,7 @@ declare namespace Excel {
      *
      * Represents a collection of Chart Trendlines.
      *
-     * [Api set: ExcelApi 1.8 (PREVIEW)]
+     * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
      */
     class ChartTrendlineCollection extends OfficeExtension.ClientObject {
         /** Gets the loaded child items in this collection. */
@@ -7954,7 +7884,7 @@ declare namespace Excel {
          *
          * Adds a new trendline to trendline collection.
          *
-         * [Api set: ExcelApi 1.8 (PREVIEW)]
+         * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
          *
          * @param type Specifies the trendline type. The default value is "Linear". See Excel.ChartTrendline for details.
          */
@@ -7963,14 +7893,14 @@ declare namespace Excel {
          *
          * Returns the number of trendlines in the collection.
          *
-         * [Api set: ExcelApi 1.8 (PREVIEW)]
+         * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         getCount(): OfficeExtension.ClientResult<number>;
         /**
          *
          * Get trendline object by index, which is the insertion order in items array.
          *
-         * [Api set: ExcelApi 1.8 (PREVIEW)]
+         * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
          *
          * @param index Represents the insertion order in items array.
          */
@@ -7985,14 +7915,14 @@ declare namespace Excel {
      *
      * Represents the format properties for chart trendline.
      *
-     * [Api set: ExcelApi 1.8 (PREVIEW)]
+     * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
      */
     class ChartTrendlineFormat extends OfficeExtension.ClientObject {
         /**
          *
          * Represents chart line formatting. Read-only.
          *
-         * [Api set: ExcelApi 1.8 (PREVIEW)]
+         * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         readonly line: Excel.ChartLineFormat;
         /** Sets multiple properties on the object at the same time, based on JSON input. */
@@ -8629,7 +8559,7 @@ declare namespace Excel {
          *
          * True if the PivotTable report shows grand totals for columns.
          *
-         * [Api set: ExcelApi 1.7 (PREVIEW)]
+         * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         columnGrandTotals: boolean;
         /**
@@ -8650,7 +8580,7 @@ declare namespace Excel {
          *
          * True if the PivotTable report shows grand totals for rows.
          *
-         * [Api set: ExcelApi 1.7 (PREVIEW)]
+         * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         rowGrandTotals: boolean;
         allowMultipleFilters: boolean;
@@ -8722,7 +8652,7 @@ declare namespace Excel {
          *
          * This method is used for simultaneously setting layout options for all existing PivotFields.
          *
-         * [Api set: ExcelApi 1.7 (PREVIEW)]
+         * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
          *
          * @param RowLayout Required LayoutRowType. See Excel.LayoutRowType for details.
          */
@@ -8731,7 +8661,7 @@ declare namespace Excel {
          *
          * This method changes the subtotal location for all existing PivotFields. Changing the subtotal location has an immediate visual effect only for fields in outline form, but it will be set for fields in tabular form as well.
          *
-         * [Api set: ExcelApi 1.7 (PREVIEW)]
+         * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
          *
          * @param Location Required SubtotalLocationType. See Excel.SubtotalLocationType for details.
          */
@@ -8818,91 +8748,91 @@ declare namespace Excel {
      *
      * Represents workbook properties.
      *
-     * [Api set: ExcelApi 1.7 (PREVIEW)]
+     * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
      */
     class DocumentProperties extends OfficeExtension.ClientObject {
         /**
          *
          * Gets the collection of custom properties of the workbook. Read only.
          *
-         * [Api set: ExcelApi 1.7 (PREVIEW)]
+         * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         readonly custom: Excel.CustomPropertyCollection;
         /**
          *
          * Gets or sets the author of the workbook.
          *
-         * [Api set: ExcelApi 1.7 (PREVIEW)]
+         * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         author: string;
         /**
          *
          * Gets or sets the category of the workbook.
          *
-         * [Api set: ExcelApi 1.7 (PREVIEW)]
+         * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         category: string;
         /**
          *
          * Gets or sets the comments of the workbook.
          *
-         * [Api set: ExcelApi 1.7 (PREVIEW)]
+         * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         comments: string;
         /**
          *
          * Gets or sets the company of the workbook.
          *
-         * [Api set: ExcelApi 1.7 (PREVIEW)]
+         * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         company: string;
         /**
          *
          * Gets the creation date of the workbook. Read only.
          *
-         * [Api set: ExcelApi 1.7 (PREVIEW)]
+         * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         readonly creationDate: Date;
         /**
          *
          * Gets or sets the keywords of the workbook.
          *
-         * [Api set: ExcelApi 1.7 (PREVIEW)]
+         * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         keywords: string;
         /**
          *
          * Gets the last author of the workbook. Read only.
          *
-         * [Api set: ExcelApi 1.7 (PREVIEW)]
+         * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         readonly lastAuthor: string;
         /**
          *
          * Gets or sets the manager of the workbook.
          *
-         * [Api set: ExcelApi 1.7 (PREVIEW)]
+         * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         manager: string;
         /**
          *
          * Gets the revision number of the workbook. Read only.
          *
-         * [Api set: ExcelApi 1.7 (PREVIEW)]
+         * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         readonly revisionNumber: string;
         /**
          *
          * Gets or sets the subject of the workbook.
          *
-         * [Api set: ExcelApi 1.7 (PREVIEW)]
+         * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         subject: string;
         /**
          *
          * Gets or sets the title of the workbook.
          *
-         * [Api set: ExcelApi 1.7 (PREVIEW)]
+         * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         title: string;
         /** Sets multiple properties on the object at the same time, based on JSON input. */
@@ -8936,28 +8866,28 @@ declare namespace Excel {
      *
      * Represents a custom property.
      *
-     * [Api set: ExcelApi 1.7 (PREVIEW)]
+     * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
      */
     class CustomProperty extends OfficeExtension.ClientObject {
         /**
          *
          * Gets the key of the custom property. Read only.
          *
-         * [Api set: ExcelApi 1.7 (PREVIEW)]
+         * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         readonly key: string;
         /**
          *
          * Gets the value type of the custom property. Read only.
          *
-         * [Api set: ExcelApi 1.7 (PREVIEW)]
+         * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         readonly type: string;
         /**
          *
          * Gets or sets the value of the custom property.
          *
-         * [Api set: ExcelApi 1.7 (PREVIEW)]
+         * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         value: any;
         /** Sets multiple properties on the object at the same time, based on JSON input. */
@@ -8973,7 +8903,7 @@ declare namespace Excel {
          *
          * Deletes the custom property.
          *
-         * [Api set: ExcelApi 1.7 (PREVIEW)]
+         * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         delete(): void;
         /**
@@ -8990,7 +8920,7 @@ declare namespace Excel {
      *
      * Contains the collection of customProperty objects.
      *
-     * [Api set: ExcelApi 1.7 (PREVIEW)]
+     * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
      */
     class CustomPropertyCollection extends OfficeExtension.ClientObject {
         /** Gets the loaded child items in this collection. */
@@ -8999,7 +8929,7 @@ declare namespace Excel {
          *
          * Creates a new or sets an existing custom property.
          *
-         * [Api set: ExcelApi 1.7 (PREVIEW)]
+         * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
          *
          * @param key Required. The custom property's key, which is case-insensitive.
          * @param value Required. The custom property's value.
@@ -9009,21 +8939,21 @@ declare namespace Excel {
          *
          * Deletes all custom properties in this collection.
          *
-         * [Api set: ExcelApi 1.7 (PREVIEW)]
+         * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         deleteAll(): void;
         /**
          *
          * Gets the count of custom properties.
          *
-         * [Api set: ExcelApi 1.7 (PREVIEW)]
+         * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         getCount(): OfficeExtension.ClientResult<number>;
         /**
          *
          * Gets a custom property object by its key, which is case-insensitive. Throws if the custom property does not exist.
          *
-         * [Api set: ExcelApi 1.7 (PREVIEW)]
+         * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
          *
          * @param key The key that identifies the custom property object.
          */
@@ -9032,7 +8962,7 @@ declare namespace Excel {
          *
          * Gets a custom property object by its key, which is case-insensitive. Returns a null object if the custom property does not exist.
          *
-         * [Api set: ExcelApi 1.7 (PREVIEW)]
+         * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
          *
          * @param key Required. The key that identifies the custom property object.
          */
@@ -9047,7 +8977,7 @@ declare namespace Excel {
      *
      * Represents a collection of all the conditional formats that are overlap the range.
      *
-     * [Api set: ExcelApi 1.6 (PREVIEW)]
+     * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
      */
     class ConditionalFormatCollection extends OfficeExtension.ClientObject {
         /** Gets the loaded child items in this collection. */
@@ -9056,7 +8986,7 @@ declare namespace Excel {
          *
          * Adds a new conditional format to the collection at the first/top priority.
          *
-         * [Api set: ExcelApi 1.6 (PREVIEW)]
+         * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
          *
          * @param type The type of conditional format being added. See Excel.ConditionalFormatType for details.
          */
@@ -9065,21 +8995,21 @@ declare namespace Excel {
          *
          * Clears all conditional formats active on the current specified range.
          *
-         * [Api set: ExcelApi 1.6 (PREVIEW)]
+         * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         clearAll(): void;
         /**
          *
          * Returns the number of conditional formats in the workbook. Read-only.
          *
-         * [Api set: ExcelApi 1.6 (PREVIEW)]
+         * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         getCount(): OfficeExtension.ClientResult<number>;
         /**
          *
          * Returns a conditional format for the given ID.
          *
-         * [Api set: ExcelApi 1.6 (PREVIEW)]
+         * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
          *
          * @param id The id of the conditional format.
          * @returns Conditional Format object.
@@ -9089,7 +9019,7 @@ declare namespace Excel {
          *
          * Returns a conditional format at the given index.
          *
-         * [Api set: ExcelApi 1.6 (PREVIEW)]
+         * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
          *
          * @param index Index of the conditional formats to be retrieved.
          */
@@ -9104,7 +9034,7 @@ declare namespace Excel {
      *
      * An object encapsulating a conditional format's range, format, rule, and other properties.
      *
-     * [Api set: ExcelApi 1.6 (PREVIEW)]
+     * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
      */
     class ConditionalFormat extends OfficeExtension.ClientObject {
         /**
@@ -9112,7 +9042,7 @@ declare namespace Excel {
          * Returns the cell value conditional format properties if the current conditional format is a CellValue type.
             For example to format all cells between 5 and 10.
          *
-         * [Api set: ExcelApi 1.6 (PREVIEW)]
+         * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         readonly cellValue: Excel.CellValueConditionalFormat;
         /**
@@ -9120,77 +9050,77 @@ declare namespace Excel {
          * Returns the cell value conditional format properties if the current conditional format is a CellValue type.
             For example to format all cells between 5 and 10.
          *
-         * [Api set: ExcelApi 1.6 (PREVIEW)]
+         * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         readonly cellValueOrNullObject: Excel.CellValueConditionalFormat;
         /**
          *
          * Returns the ColorScale conditional format properties if the current conditional format is an ColorScale type.
          *
-         * [Api set: ExcelApi 1.6 (PREVIEW)]
+         * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         readonly colorScale: Excel.ColorScaleConditionalFormat;
         /**
          *
          * Returns the ColorScale conditional format properties if the current conditional format is an ColorScale type.
          *
-         * [Api set: ExcelApi 1.6 (PREVIEW)]
+         * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         readonly colorScaleOrNullObject: Excel.ColorScaleConditionalFormat;
         /**
          *
          * Returns the custom conditional format properties if the current conditional format is a custom type.
          *
-         * [Api set: ExcelApi 1.6 (PREVIEW)]
+         * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         readonly custom: Excel.CustomConditionalFormat;
         /**
          *
          * Returns the custom conditional format properties if the current conditional format is a custom type.
          *
-         * [Api set: ExcelApi 1.6 (PREVIEW)]
+         * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         readonly customOrNullObject: Excel.CustomConditionalFormat;
         /**
          *
          * Returns the data bar properties if the current conditional format is a data bar.
          *
-         * [Api set: ExcelApi 1.6 (PREVIEW)]
+         * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         readonly dataBar: Excel.DataBarConditionalFormat;
         /**
          *
          * Returns the data bar properties if the current conditional format is a data bar.
          *
-         * [Api set: ExcelApi 1.6 (PREVIEW)]
+         * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         readonly dataBarOrNullObject: Excel.DataBarConditionalFormat;
         /**
          *
          * Returns the IconSet conditional format properties if the current conditional format is an IconSet type.
          *
-         * [Api set: ExcelApi 1.6 (PREVIEW)]
+         * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         readonly iconSet: Excel.IconSetConditionalFormat;
         /**
          *
          * Returns the IconSet conditional format properties if the current conditional format is an IconSet type.
          *
-         * [Api set: ExcelApi 1.6 (PREVIEW)]
+         * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         readonly iconSetOrNullObject: Excel.IconSetConditionalFormat;
         /**
          *
          * Returns the preset criteria conditional format such as above average/below average/unique values/contains blank/nonblank/error/noerror properties.
          *
-         * [Api set: ExcelApi 1.6 (PREVIEW)]
+         * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         readonly preset: Excel.PresetCriteriaConditionalFormat;
         /**
          *
          * Returns the preset criteria conditional format such as above average/below average/unique values/contains blank/nonblank/error/noerror properties.
          *
-         * [Api set: ExcelApi 1.6 (PREVIEW)]
+         * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         readonly presetOrNullObject: Excel.PresetCriteriaConditionalFormat;
         /**
@@ -9198,7 +9128,7 @@ declare namespace Excel {
          * Returns the specific text conditional format properties if the current conditional format is a text type.
             For example to format cells matching the word "Text".
          *
-         * [Api set: ExcelApi 1.6 (PREVIEW)]
+         * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         readonly textComparison: Excel.TextConditionalFormat;
         /**
@@ -9206,7 +9136,7 @@ declare namespace Excel {
          * Returns the specific text conditional format properties if the current conditional format is a text type.
             For example to format cells matching the word "Text".
          *
-         * [Api set: ExcelApi 1.6 (PREVIEW)]
+         * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         readonly textComparisonOrNullObject: Excel.TextConditionalFormat;
         /**
@@ -9214,7 +9144,7 @@ declare namespace Excel {
          * Returns the Top/Bottom conditional format properties if the current conditional format is an TopBottom type.
             For example to format the top 10% or bottom 10 items.
          *
-         * [Api set: ExcelApi 1.6 (PREVIEW)]
+         * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         readonly topBottom: Excel.TopBottomConditionalFormat;
         /**
@@ -9222,14 +9152,14 @@ declare namespace Excel {
          * Returns the Top/Bottom conditional format properties if the current conditional format is an TopBottom type.
             For example to format the top 10% or bottom 10 items.
          *
-         * [Api set: ExcelApi 1.6 (PREVIEW)]
+         * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         readonly topBottomOrNullObject: Excel.TopBottomConditionalFormat;
         /**
          *
          * The Priority of the Conditional Format within the current ConditionalFormatCollection.
          *
-         * [Api set: ExcelApi 1.6 (PREVIEW)]
+         * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         readonly id: string;
         /**
@@ -9240,7 +9170,7 @@ declare namespace Excel {
             Priorities greater than than bounds will get and set to the maximum (or minimum if negative) priority.
             Also note that if you change the priority, you have to re-fetch a new copy of the object at that new priority location if you want to make further changes to it.
          *
-         * [Api set: ExcelApi 1.6 (PREVIEW)]
+         * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         priority: number;
         /**
@@ -9248,14 +9178,14 @@ declare namespace Excel {
          * If the conditions of this conditional format are met, no lower-priority formats shall take effect on that cell.
             Null on databars, icon sets, and colorscales as there's no concept of StopIfTrue for these
          *
-         * [Api set: ExcelApi 1.6 (PREVIEW)]
+         * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         stopIfTrue: boolean;
         /**
          *
          * A type of conditional format. Only one can be set at a time. Read-Only.
          *
-         * [Api set: ExcelApi 1.6 (PREVIEW)]
+         * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         readonly type: string;
         /** Sets multiple properties on the object at the same time, based on JSON input. */
@@ -9271,21 +9201,21 @@ declare namespace Excel {
          *
          * Deletes this conditional format.
          *
-         * [Api set: ExcelApi 1.6 (PREVIEW)]
+         * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         delete(): void;
         /**
          *
          * Returns the range the conditonal format is applied to or a null object if the range is discontiguous. Read-only.
          *
-         * [Api set: ExcelApi 1.6 (PREVIEW)]
+         * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         getRange(): Excel.Range;
         /**
          *
          * Returns the range the conditonal format is applied to or a null object if the range is discontiguous. Read-only.
          *
-         * [Api set: ExcelApi 1.6 (PREVIEW)]
+         * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         getRangeOrNullObject(): Excel.Range;
         /**
@@ -9319,21 +9249,21 @@ declare namespace Excel {
      *
      * Represents an Excel Conditional Data Bar Type.
      *
-     * [Api set: ExcelApi 1.6 (PREVIEW)]
+     * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
      */
     class DataBarConditionalFormat extends OfficeExtension.ClientObject {
         /**
          *
          * Representation of all values to the left of the axis in an Excel data bar.
          *
-         * [Api set: ExcelApi 1.6 (PREVIEW)]
+         * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         readonly negativeFormat: Excel.ConditionalDataBarNegativeFormat;
         /**
          *
          * Representation of all values to the right of the axis in an Excel data bar.
          *
-         * [Api set: ExcelApi 1.6 (PREVIEW)]
+         * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         readonly positiveFormat: Excel.ConditionalDataBarPositiveFormat;
         /**
@@ -9341,42 +9271,42 @@ declare namespace Excel {
          * HTML color code representing the color of the Axis line, of the form #RRGGBB (e.g. "FFA500") or as a named HTML color (e.g. "orange").
             "" (empty string) if no axis is present or set.
          *
-         * [Api set: ExcelApi 1.6 (PREVIEW)]
+         * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         axisColor: string;
         /**
          *
          * Representation of how the axis is determined for an Excel data bar.
          *
-         * [Api set: ExcelApi 1.6 (PREVIEW)]
+         * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         axisFormat: string;
         /**
          *
          * Represents the direction that the data bar graphic should be based on.
          *
-         * [Api set: ExcelApi 1.6 (PREVIEW)]
+         * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         barDirection: string;
         /**
          *
          * The rule for what consistutes the lower bound (and how to calculate it, if applicable) for a data bar.
          *
-         * [Api set: ExcelApi 1.6 (PREVIEW)]
+         * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         lowerBoundRule: Excel.ConditionalDataBarRule;
         /**
          *
          * If true, hides the values from the cells where the data bar is applied.
          *
-         * [Api set: ExcelApi 1.6 (PREVIEW)]
+         * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         showDataBarOnly: boolean;
         /**
          *
          * The rule for what constitutes the upper bound (and how to calculate it, if applicable) for a data bar.
          *
-         * [Api set: ExcelApi 1.6 (PREVIEW)]
+         * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         upperBoundRule: Excel.ConditionalDataBarRule;
         /** Sets multiple properties on the object at the same time, based on JSON input. */
@@ -9407,7 +9337,7 @@ declare namespace Excel {
      *
      * Represents a conditional format DataBar Format for the positive side of the data bar.
      *
-     * [Api set: ExcelApi 1.6 (PREVIEW)]
+     * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
      */
     class ConditionalDataBarPositiveFormat extends OfficeExtension.ClientObject {
         /**
@@ -9415,21 +9345,21 @@ declare namespace Excel {
          * HTML color code representing the color of the border line, of the form #RRGGBB (e.g. "FFA500") or as a named HTML color (e.g. "orange").
             "" (empty string) if no border is present or set.
          *
-         * [Api set: ExcelApi 1.6 (PREVIEW)]
+         * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         borderColor: string;
         /**
          *
          * HTML color code representing the fill color, of the form #RRGGBB (e.g. "FFA500") or as a named HTML color (e.g. "orange").
          *
-         * [Api set: ExcelApi 1.6 (PREVIEW)]
+         * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         fillColor: string;
         /**
          *
          * Boolean representation of whether or not the DataBar has a gradient.
          *
-         * [Api set: ExcelApi 1.6 (PREVIEW)]
+         * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         gradientFill: boolean;
         /** Sets multiple properties on the object at the same time, based on JSON input. */
@@ -9455,7 +9385,7 @@ declare namespace Excel {
      *
      * Represents a conditional format DataBar Format for the negative side of the data bar.
      *
-     * [Api set: ExcelApi 1.6 (PREVIEW)]
+     * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
      */
     class ConditionalDataBarNegativeFormat extends OfficeExtension.ClientObject {
         /**
@@ -9463,28 +9393,28 @@ declare namespace Excel {
          * HTML color code representing the color of the border line, of the form #RRGGBB (e.g. "FFA500") or as a named HTML color (e.g. "orange").
             "Empty String" if no border is present or set.
          *
-         * [Api set: ExcelApi 1.6 (PREVIEW)]
+         * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         borderColor: string;
         /**
          *
          * HTML color code representing the fill color, of the form #RRGGBB (e.g. "FFA500") or as a named HTML color (e.g. "orange").
          *
-         * [Api set: ExcelApi 1.6 (PREVIEW)]
+         * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         fillColor: string;
         /**
          *
          * Boolean representation of whether or not the negative DataBar has the same border color as the positive DataBar.
          *
-         * [Api set: ExcelApi 1.6 (PREVIEW)]
+         * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         matchPositiveBorderColor: boolean;
         /**
          *
          * Boolean representation of whether or not the negative DataBar has the same fill color as the positive DataBar.
          *
-         * [Api set: ExcelApi 1.6 (PREVIEW)]
+         * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         matchPositiveFillColor: boolean;
         /** Sets multiple properties on the object at the same time, based on JSON input. */
@@ -9511,21 +9441,21 @@ declare namespace Excel {
      *
      * Represents a rule-type for a Data Bar.
      *
-     * [Api set: ExcelApi 1.6 (PREVIEW)]
+     * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
      */
     interface ConditionalDataBarRule {
         /**
          *
          * The formula, if required, to evaluate the databar rule on.
          *
-         * [Api set: ExcelApi 1.6 (PREVIEW)]
+         * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         formula?: string;
         /**
          *
          * The type of rule for the databar.
          *
-         * [Api set: ExcelApi 1.6 (PREVIEW)]
+         * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         type: string;
     }
@@ -9533,21 +9463,21 @@ declare namespace Excel {
      *
      * Represents a custom conditional format type.
      *
-     * [Api set: ExcelApi 1.6 (PREVIEW)]
+     * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
      */
     class CustomConditionalFormat extends OfficeExtension.ClientObject {
         /**
          *
          * Returns a format object, encapsulating the conditional formats font, fill, borders, and other properties. Read-only.
          *
-         * [Api set: ExcelApi 1.6 (PREVIEW)]
+         * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         readonly format: Excel.ConditionalRangeFormat;
         /**
          *
          * Represents the Rule object on this conditional format.
          *
-         * [Api set: ExcelApi 1.6 (PREVIEW)]
+         * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         readonly rule: Excel.ConditionalFormatRule;
         /** Sets multiple properties on the object at the same time, based on JSON input. */
@@ -9572,28 +9502,28 @@ declare namespace Excel {
      *
      * Represents a rule, for all traditional rule/format pairings.
      *
-     * [Api set: ExcelApi 1.6 (PREVIEW)]
+     * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
      */
     class ConditionalFormatRule extends OfficeExtension.ClientObject {
         /**
          *
          * The formula, if required, to evaluate the conditional format rule on.
          *
-         * [Api set: ExcelApi 1.6 (PREVIEW)]
+         * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         formula: string;
         /**
          *
          * The formula, if required, to evaluate the conditional format rule on in the user's language.
          *
-         * [Api set: ExcelApi 1.6 (PREVIEW)]
+         * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         formulaLocal: string;
         /**
          *
          * The formula, if required, to evaluate the conditional format rule on in R1C1-style notation.
          *
-         * [Api set: ExcelApi 1.6 (PREVIEW)]
+         * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         formulaR1C1: string;
         /** Sets multiple properties on the object at the same time, based on JSON input. */
@@ -9619,35 +9549,35 @@ declare namespace Excel {
      *
      * Represents an IconSet criteria for conditional formatting.
      *
-     * [Api set: ExcelApi 1.6 (PREVIEW)]
+     * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
      */
     class IconSetConditionalFormat extends OfficeExtension.ClientObject {
         /**
          *
          * An array of Criteria and IconSets for the rules and potential custom icons for conditional icons. Note that for the first criterion only the custom icon can be modified, while type, formula and operator will be ignored when set.
          *
-         * [Api set: ExcelApi 1.6 (PREVIEW)]
+         * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         criteria: Array<Excel.ConditionalIconCriterion>;
         /**
          *
          * If true, reverses the icon orders for the IconSet. Note that this cannot be set if custom icons are used.
          *
-         * [Api set: ExcelApi 1.6 (PREVIEW)]
+         * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         reverseIconOrder: boolean;
         /**
          *
          * If true, hides the values and only shows icons.
          *
-         * [Api set: ExcelApi 1.6 (PREVIEW)]
+         * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         showIconOnly: boolean;
         /**
          *
          * If set, displays the IconSet option for the conditional format.
          *
-         * [Api set: ExcelApi 1.6 (PREVIEW)]
+         * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         style: string;
         /** Sets multiple properties on the object at the same time, based on JSON input. */
@@ -9674,35 +9604,35 @@ declare namespace Excel {
      *
      * Represents an Icon Criterion which contains a type, value, an Operator, and an optional custom icon, if not using an iconset.
      *
-     * [Api set: ExcelApi 1.6 (PREVIEW)]
+     * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
      */
     interface ConditionalIconCriterion {
         /**
          *
          * The custom icon for the current criterion if different from the default IconSet, else null will be returned.
          *
-         * [Api set: ExcelApi 1.6 (PREVIEW)]
+         * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         customIcon?: Excel.Icon;
         /**
          *
          * A number or a formula depending on the type.
          *
-         * [Api set: ExcelApi 1.6 (PREVIEW)]
+         * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         formula: string;
         /**
          *
          * GreaterThan or GreaterThanOrEqual for each of the rule type for the Icon conditional format.
          *
-         * [Api set: ExcelApi 1.6 (PREVIEW)]
+         * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         operator: string;
         /**
          *
          * What the icon conditional formula should be based on.
          *
-         * [Api set: ExcelApi 1.6 (PREVIEW)]
+         * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         type: string;
     }
@@ -9710,21 +9640,21 @@ declare namespace Excel {
      *
      * Represents an IconSet criteria for conditional formatting.
      *
-     * [Api set: ExcelApi 1.6 (PREVIEW)]
+     * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
      */
     class ColorScaleConditionalFormat extends OfficeExtension.ClientObject {
         /**
          *
          * The criteria of the color scale. Midpoint is optional when using a two point color scale.
          *
-         * [Api set: ExcelApi 1.6 (PREVIEW)]
+         * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         criteria: Excel.ConditionalColorScaleCriteria;
         /**
          *
          * If true the color scale will have three points (minimum, midpoint, maximum), otherwise it will have two (minimum, maximum).
          *
-         * [Api set: ExcelApi 1.6 (PREVIEW)]
+         * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         readonly threeColorScale: boolean;
         /** Sets multiple properties on the object at the same time, based on JSON input. */
@@ -9749,28 +9679,28 @@ declare namespace Excel {
      *
      * Represents the criteria of the color scale.
      *
-     * [Api set: ExcelApi 1.6 (PREVIEW)]
+     * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
      */
     interface ConditionalColorScaleCriteria {
         /**
          *
          * The maximum point Color Scale Criterion.
          *
-         * [Api set: ExcelApi 1.6 (PREVIEW)]
+         * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         maximum: Excel.ConditionalColorScaleCriterion;
         /**
          *
          * The midpoint Color Scale Criterion if the color scale is a 3-color scale.
          *
-         * [Api set: ExcelApi 1.6 (PREVIEW)]
+         * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         midpoint?: Excel.ConditionalColorScaleCriterion;
         /**
          *
          * The minimum point Color Scale Criterion.
          *
-         * [Api set: ExcelApi 1.6 (PREVIEW)]
+         * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         minimum: Excel.ConditionalColorScaleCriterion;
     }
@@ -9778,28 +9708,28 @@ declare namespace Excel {
      *
      * Represents a Color Scale Criterion which contains a type, value and a color.
      *
-     * [Api set: ExcelApi 1.6 (PREVIEW)]
+     * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
      */
     interface ConditionalColorScaleCriterion {
         /**
          *
          * HTML color code representation of the color scale color. E.g. #FF0000 represents Red.
          *
-         * [Api set: ExcelApi 1.6 (PREVIEW)]
+         * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         color?: string;
         /**
          *
          * A number, a formula, or null (if Type is LowestValue).
          *
-         * [Api set: ExcelApi 1.6 (PREVIEW)]
+         * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         formula?: string;
         /**
          *
          * What the icon conditional formula should be based on.
          *
-         * [Api set: ExcelApi 1.6 (PREVIEW)]
+         * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         type: string;
     }
@@ -9807,21 +9737,21 @@ declare namespace Excel {
      *
      * Represents a Top/Bottom conditional format.
      *
-     * [Api set: ExcelApi 1.6 (PREVIEW)]
+     * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
      */
     class TopBottomConditionalFormat extends OfficeExtension.ClientObject {
         /**
          *
          * Returns a format object, encapsulating the conditional formats font, fill, borders, and other properties. Read-only.
          *
-         * [Api set: ExcelApi 1.6 (PREVIEW)]
+         * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         readonly format: Excel.ConditionalRangeFormat;
         /**
          *
          * The criteria of the Top/Bottom conditional format.
          *
-         * [Api set: ExcelApi 1.6 (PREVIEW)]
+         * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         rule: Excel.ConditionalTopBottomRule;
         /** Sets multiple properties on the object at the same time, based on JSON input. */
@@ -9846,21 +9776,21 @@ declare namespace Excel {
      *
      * Represents the rule of the top/bottom conditional format.
      *
-     * [Api set: ExcelApi 1.6 (PREVIEW)]
+     * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
      */
     interface ConditionalTopBottomRule {
         /**
          *
          * The rank between 1 and 1000 for numeric ranks or 1 and 100 for percent ranks.
          *
-         * [Api set: ExcelApi 1.6 (PREVIEW)]
+         * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         rank: number;
         /**
          *
          * Format values based on the top or bottom rank.
          *
-         * [Api set: ExcelApi 1.6 (PREVIEW)]
+         * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         type: string;
     }
@@ -9868,21 +9798,21 @@ declare namespace Excel {
      *
      * Represents the the preset criteria conditional format such as above average/below average/unique values/contains blank/nonblank/error/noerror.
      *
-     * [Api set: ExcelApi 1.6 (PREVIEW)]
+     * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
      */
     class PresetCriteriaConditionalFormat extends OfficeExtension.ClientObject {
         /**
          *
          * Returns a format object, encapsulating the conditional formats font, fill, borders, and other properties. Read-only.
          *
-         * [Api set: ExcelApi 1.6 (PREVIEW)]
+         * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         readonly format: Excel.ConditionalRangeFormat;
         /**
          *
          * The rule of the conditional format.
          *
-         * [Api set: ExcelApi 1.6 (PREVIEW)]
+         * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         rule: Excel.ConditionalPresetCriteriaRule;
         /** Sets multiple properties on the object at the same time, based on JSON input. */
@@ -9907,14 +9837,14 @@ declare namespace Excel {
      *
      * Represents the Preset Criteria Conditional Format Rule
      *
-     * [Api set: ExcelApi 1.6 (PREVIEW)]
+     * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
      */
     interface ConditionalPresetCriteriaRule {
         /**
          *
          * The criterion of the conditional format.
          *
-         * [Api set: ExcelApi 1.6 (PREVIEW)]
+         * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         criterion: string;
     }
@@ -9922,21 +9852,21 @@ declare namespace Excel {
      *
      * Represents a specific text conditional format.
      *
-     * [Api set: ExcelApi 1.6 (PREVIEW)]
+     * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
      */
     class TextConditionalFormat extends OfficeExtension.ClientObject {
         /**
          *
          * Returns a format object, encapsulating the conditional formats font, fill, borders, and other properties. Read-only.
          *
-         * [Api set: ExcelApi 1.6 (PREVIEW)]
+         * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         readonly format: Excel.ConditionalRangeFormat;
         /**
          *
          * The rule of the conditional format.
          *
-         * [Api set: ExcelApi 1.6 (PREVIEW)]
+         * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         rule: Excel.ConditionalTextComparisonRule;
         /** Sets multiple properties on the object at the same time, based on JSON input. */
@@ -9961,21 +9891,21 @@ declare namespace Excel {
      *
      * Represents a Cell Value Conditional Format Rule
      *
-     * [Api set: ExcelApi 1.6 (PREVIEW)]
+     * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
      */
     interface ConditionalTextComparisonRule {
         /**
          *
          * The operator of the text conditional format.
          *
-         * [Api set: ExcelApi 1.6 (PREVIEW)]
+         * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         operator: string;
         /**
          *
          * The Text value of conditional format.
          *
-         * [Api set: ExcelApi 1.6 (PREVIEW)]
+         * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         text: string;
     }
@@ -9983,21 +9913,21 @@ declare namespace Excel {
      *
      * Represents a cell value conditional format.
      *
-     * [Api set: ExcelApi 1.6 (PREVIEW)]
+     * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
      */
     class CellValueConditionalFormat extends OfficeExtension.ClientObject {
         /**
          *
          * Returns a format object, encapsulating the conditional formats font, fill, borders, and other properties. Read-only.
          *
-         * [Api set: ExcelApi 1.6 (PREVIEW)]
+         * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         readonly format: Excel.ConditionalRangeFormat;
         /**
          *
          * Represents the Rule object on this conditional format.
          *
-         * [Api set: ExcelApi 1.6 (PREVIEW)]
+         * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         rule: Excel.ConditionalCellValueRule;
         /** Sets multiple properties on the object at the same time, based on JSON input. */
@@ -10022,28 +9952,28 @@ declare namespace Excel {
      *
      * Represents a Cell Value Conditional Format Rule
      *
-     * [Api set: ExcelApi 1.6 (PREVIEW)]
+     * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
      */
     interface ConditionalCellValueRule {
         /**
          *
          * The formula, if required, to evaluate the conditional format rule on.
          *
-         * [Api set: ExcelApi 1.6 (PREVIEW)]
+         * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         formula1: string;
         /**
          *
          * The formula, if required, to evaluate the conditional format rule on.
          *
-         * [Api set: ExcelApi 1.6 (PREVIEW)]
+         * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         formula2?: string;
         /**
          *
          * The operator of the text conditional format.
          *
-         * [Api set: ExcelApi 1.6 (PREVIEW)]
+         * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         operator: string;
     }
@@ -10051,35 +9981,35 @@ declare namespace Excel {
      *
      * A format object encapsulating the conditional formats range's font, fill, borders, and other properties.
      *
-     * [Api set: ExcelApi 1.6 (PREVIEW)]
+     * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
      */
     class ConditionalRangeFormat extends OfficeExtension.ClientObject {
         /**
          *
          * Collection of border objects that apply to the overall conditional format range. Read-only.
          *
-         * [Api set: ExcelApi 1.6 (PREVIEW)]
+         * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         readonly borders: Excel.ConditionalRangeBorderCollection;
         /**
          *
          * Returns the fill object defined on the overall conditional format range. Read-only.
          *
-         * [Api set: ExcelApi 1.6 (PREVIEW)]
+         * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         readonly fill: Excel.ConditionalRangeFill;
         /**
          *
          * Returns the font object defined on the overall conditional format range. Read-only.
          *
-         * [Api set: ExcelApi 1.6 (PREVIEW)]
+         * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         readonly font: Excel.ConditionalRangeFont;
         /**
          *
          * Represents Excel's number format code for the given range. Cleared if null is passed in.
          *
-         * [Api set: ExcelApi 1.6 (PREVIEW)]
+         * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         numberFormat: any;
         /** Sets multiple properties on the object at the same time, based on JSON input. */
@@ -10103,42 +10033,42 @@ declare namespace Excel {
      *
      * This object represents the font attributes (font style,, color, etc.) for an object.
      *
-     * [Api set: ExcelApi 1.6 (PREVIEW)]
+     * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
      */
     class ConditionalRangeFont extends OfficeExtension.ClientObject {
         /**
          *
          * Represents the bold status of font.
          *
-         * [Api set: ExcelApi 1.6 (PREVIEW)]
+         * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         bold: boolean;
         /**
          *
          * HTML color code representation of the text color. E.g. #FF0000 represents Red.
          *
-         * [Api set: ExcelApi 1.6 (PREVIEW)]
+         * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         color: string;
         /**
          *
          * Represents the italic status of the font.
          *
-         * [Api set: ExcelApi 1.6 (PREVIEW)]
+         * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         italic: boolean;
         /**
          *
          * Represents the strikethrough status of the font.
          *
-         * [Api set: ExcelApi 1.6 (PREVIEW)]
+         * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         strikethrough: boolean;
         /**
          *
          * Type of underline applied to the font. See Excel.ConditionalRangeFontUnderlineStyle for details.
          *
-         * [Api set: ExcelApi 1.6 (PREVIEW)]
+         * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         underline: string;
         /** Sets multiple properties on the object at the same time, based on JSON input. */
@@ -10154,7 +10084,7 @@ declare namespace Excel {
          *
          * Resets the font formats.
          *
-         * [Api set: ExcelApi 1.6 (PREVIEW)]
+         * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         clear(): void;
         /**
@@ -10173,14 +10103,14 @@ declare namespace Excel {
      *
      * Represents the background of a conditional range object.
      *
-     * [Api set: ExcelApi 1.6 (PREVIEW)]
+     * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
      */
     class ConditionalRangeFill extends OfficeExtension.ClientObject {
         /**
          *
          * HTML color code representing the color of the fill, of the form #RRGGBB (e.g. "FFA500") or as a named HTML color (e.g. "orange").
          *
-         * [Api set: ExcelApi 1.6 (PREVIEW)]
+         * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         color: string;
         /** Sets multiple properties on the object at the same time, based on JSON input. */
@@ -10196,7 +10126,7 @@ declare namespace Excel {
          *
          * Resets the fill.
          *
-         * [Api set: ExcelApi 1.6 (PREVIEW)]
+         * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         clear(): void;
         /**
@@ -10211,28 +10141,28 @@ declare namespace Excel {
      *
      * Represents the border of an object.
      *
-     * [Api set: ExcelApi 1.6 (PREVIEW)]
+     * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
      */
     class ConditionalRangeBorder extends OfficeExtension.ClientObject {
         /**
          *
          * HTML color code representing the color of the border line, of the form #RRGGBB (e.g. "FFA500") or as a named HTML color (e.g. "orange").
          *
-         * [Api set: ExcelApi 1.6 (PREVIEW)]
+         * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         color: string;
         /**
          *
          * Constant value that indicates the specific side of the border. See Excel.ConditionalRangeBorderIndex for details. Read-only.
          *
-         * [Api set: ExcelApi 1.6 (PREVIEW)]
+         * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         readonly sideIndex: string;
         /**
          *
          * One of the constants of line style specifying the line style for the border. See Excel.BorderLineStyle for details.
          *
-         * [Api set: ExcelApi 1.6 (PREVIEW)]
+         * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         style: string;
         /** Sets multiple properties on the object at the same time, based on JSON input. */
@@ -10258,35 +10188,35 @@ declare namespace Excel {
      *
      * Represents the border objects that make up range border.
      *
-     * [Api set: ExcelApi 1.6 (PREVIEW)]
+     * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
      */
     class ConditionalRangeBorderCollection extends OfficeExtension.ClientObject {
         /**
          *
          * Gets the top border
          *
-         * [Api set: ExcelApi 1.6 (PREVIEW)]
+         * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         readonly bottom: Excel.ConditionalRangeBorder;
         /**
          *
          * Gets the top border
          *
-         * [Api set: ExcelApi 1.6 (PREVIEW)]
+         * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         readonly left: Excel.ConditionalRangeBorder;
         /**
          *
          * Gets the top border
          *
-         * [Api set: ExcelApi 1.6 (PREVIEW)]
+         * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         readonly right: Excel.ConditionalRangeBorder;
         /**
          *
          * Gets the top border
          *
-         * [Api set: ExcelApi 1.6 (PREVIEW)]
+         * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         readonly top: Excel.ConditionalRangeBorder;
         /** Gets the loaded child items in this collection. */
@@ -10295,14 +10225,14 @@ declare namespace Excel {
          *
          * Number of border objects in the collection. Read-only.
          *
-         * [Api set: ExcelApi 1.6 (PREVIEW)]
+         * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         readonly count: number;
         /**
          *
          * Gets a border object using its name
          *
-         * [Api set: ExcelApi 1.6 (PREVIEW)]
+         * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
          *
          * @param index Index value of the border object to be retrieved. See Excel.ConditionalRangeBorderIndex for details.
          */
@@ -10311,7 +10241,7 @@ declare namespace Excel {
          *
          * Gets a border object using its index
          *
-         * [Api set: ExcelApi 1.6 (PREVIEW)]
+         * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
          *
          * @param index Index value of the object to be retrieved. Zero-indexed.
          */
@@ -10354,70 +10284,70 @@ declare namespace Excel {
      *
      * Custom function declaration.
      *
-     * [Api set: ExcelApi 1.7 (PREVIEW)]
+     * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
      */
     class CustomFunction extends OfficeExtension.ClientObject {
         /**
          *
          * Useful description of the function.
          *
-         * [Api set: ExcelApi 1.7 (PREVIEW)]
+         * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         readonly description: string;
         /**
          *
          * The ID of the function. Read-only.
          *
-         * [Api set: ExcelApi 1.7 (PREVIEW)]
+         * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         readonly id: string;
         /**
          *
          * The name of the function.
          *
-         * [Api set: ExcelApi 1.7 (PREVIEW)]
+         * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         readonly name: string;
         /**
          *
          * Parameters of the function.
          *
-         * [Api set: ExcelApi 1.7 (PREVIEW)]
+         * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         readonly parameters: Array<Excel.CustomFunctionParameter>;
         /**
          *
          * The dimensionality of result values.
          *
-         * [Api set: ExcelApi 1.7 (PREVIEW)]
+         * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         readonly resultDimensionality: string;
         /**
          *
          * The type of result values.
          *
-         * [Api set: ExcelApi 1.7 (PREVIEW)]
+         * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         readonly resultType: string;
         /**
          *
          * Represents whether the function supports returning results multiple times.
          *
-         * [Api set: ExcelApi 1.7 (PREVIEW)]
+         * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         readonly streaming: boolean;
         /**
          *
          * The type of the function.
          *
-         * [Api set: ExcelApi 1.7 (PREVIEW)]
+         * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         readonly type: string;
         /**
          *
          * Deletes this function from Excel.
          *
-         * [Api set: ExcelApi 1.7 (PREVIEW)]
+         * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         delete(): void;
         /**
@@ -10449,21 +10379,21 @@ declare namespace Excel {
      *
      * Collection of custom functions.
      *
-     * [Api set: ExcelApi 1.7 (PREVIEW)]
+     * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
      */
     class CustomFunctionCollection extends OfficeExtension.ClientObject {
         /**
          *
          * Deletes and re-adds all custom functions to the workbook based on the definitions in Excel.Script.CustomFunctions.
          *
-         * [Api set: ExcelApi 1.7 (PREVIEW)]
+         * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         addAll(): void;
         /**
          *
          * Adds a new custom function to the workbook based on its definition in Excel.Script.CustomFunctions.
          *
-         * [Api set: ExcelApi 1.7 (PREVIEW)]
+         * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
          *
          * @param name The name of the function for the user.
          */
@@ -10474,21 +10404,21 @@ declare namespace Excel {
          *
          * Deletes all custom functions added by this add-in.
          *
-         * [Api set: ExcelApi 1.7 (PREVIEW)]
+         * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         deleteAll(): void;
         /**
          *
          * Gets the number of functions in the collection.
          *
-         * [Api set: ExcelApi 1.7 (PREVIEW)]
+         * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         getCount(): OfficeExtension.ClientResult<number>;
         /**
          *
          * Gets a function based on its name.
          *
-         * [Api set: ExcelApi 1.7 (PREVIEW)]
+         * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
          *
          * @param name The name of the function to be retrieved.
          */
@@ -10498,7 +10428,7 @@ declare namespace Excel {
          * Gets a function based on its name.
             If a function with the given name does not exist, the return object's isNull property will be true.
          *
-         * [Api set: ExcelApi 1.7 (PREVIEW)]
+         * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
          *
          * @param name The name of the function to be retrieved.
          */
@@ -10507,7 +10437,7 @@ declare namespace Excel {
          *
          * Imports a new custom function to the workbook from web service metadata.
          *
-         * [Api set: ExcelApi 1.7 (PREVIEW)]
+         * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
          *
          * @param metadataFormat The format of the metadata.
          * @param metadataUrl The URL from where the metadata could be downloaded.
@@ -10528,35 +10458,35 @@ declare namespace Excel {
      *
      * Custom function parameter declaration.
      *
-     * [Api set: ExcelApi 1.7 (PREVIEW)]
+     * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
      */
     interface CustomFunctionParameter {
         /**
          *
          * Useful description of the parameter.
          *
-         * [Api set: ExcelApi 1.7 (PREVIEW)]
+         * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         description: string;
         /**
          *
          * The name of the parameter.
          *
-         * [Api set: ExcelApi 1.7 (PREVIEW)]
+         * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         name: string;
         /**
          *
          * The dimensionality of parameter value.
          *
-         * [Api set: ExcelApi 1.7 (PREVIEW)]
+         * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         valueDimensionality: string;
         /**
          *
          * The type of parameter value.
          *
-         * [Api set: ExcelApi 1.7 (PREVIEW)]
+         * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         valueType: string;
     }
@@ -10564,28 +10494,28 @@ declare namespace Excel {
      *
      * Custom function invocation message declaration. Sent by the server to the client.
      *
-     * [Api set: ExcelApi 1.7 (PREVIEW)]
+     * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
      */
     interface CustomFunctionInvocationMessage {
         /**
          *
          * Function name.
          *
-         * [Api set: ExcelApi 1.7 (PREVIEW)]
+         * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         functionName: string;
         /**
          *
          * Invocation ID that the client should attach to the result value.
          *
-         * [Api set: ExcelApi 1.7 (PREVIEW)]
+         * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         invocationId: number;
         /**
          *
          * Parameter values.
          *
-         * [Api set: ExcelApi 1.7 (PREVIEW)]
+         * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         parameterValues: Array<any>;
     }
@@ -10593,168 +10523,168 @@ declare namespace Excel {
      *
      * An object encapsulating a style's format and other properties.
      *
-     * [Api set: ExcelApi 1.7 (PREVIEW)]
+     * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
      */
     class Style extends OfficeExtension.ClientObject {
         /**
          *
          * A Border collection of four Border objects that represent the style of the four borders.
          *
-         * [Api set: ExcelApi 1.7 (PREVIEW)]
+         * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         readonly borders: Excel.RangeBorderCollection;
         /**
          *
          * The Fill of the style.
          *
-         * [Api set: ExcelApi 1.7 (PREVIEW)]
+         * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         readonly fill: Excel.RangeFill;
         /**
          *
          * A Font object that represents the font of the style.
          *
-         * [Api set: ExcelApi 1.7 (PREVIEW)]
+         * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         readonly font: Excel.RangeFont;
         /**
          *
          * Indicates if text is automatically indented when the text alignment in a cell is set to equal distribution.
          *
-         * [Api set: ExcelApi 1.7 (PREVIEW)]
+         * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         addIndent: boolean;
         /**
          *
          * Indicates if the style is a built-in style.
          *
-         * [Api set: ExcelApi 1.7 (PREVIEW)]
+         * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         readonly builtIn: boolean;
         /**
          *
          * Indicates if the formula will be hidden when the worksheet is protected.
          *
-         * [Api set: ExcelApi 1.7 (PREVIEW)]
+         * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         formulaHidden: boolean;
         /**
          *
          * Represents the horizontal alignment for the style. See Excel.HorizontalAlignment for details.
          *
-         * [Api set: ExcelApi 1.7 (PREVIEW)]
+         * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         horizontalAlignment: string;
         /**
          *
          * Indicates if the style includes the AddIndent, HorizontalAlignment, VerticalAlignment, WrapText, IndentLevel, and Orientation properties.
          *
-         * [Api set: ExcelApi 1.7 (PREVIEW)]
+         * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         includeAlignment: boolean;
         /**
          *
          * Indicates if the style includes the Color, ColorIndex, LineStyle, and Weight border properties.
          *
-         * [Api set: ExcelApi 1.7 (PREVIEW)]
+         * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         includeBorder: boolean;
         /**
          *
          * Indicates if the style includes the Background, Bold, Color, ColorIndex, FontStyle, Italic, Name, Size, Strikethrough, Subscript, Superscript, and Underline font properties.
          *
-         * [Api set: ExcelApi 1.7 (PREVIEW)]
+         * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         includeFont: boolean;
         /**
          *
          * Indicates if the style includes the NumberFormat property.
          *
-         * [Api set: ExcelApi 1.7 (PREVIEW)]
+         * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         includeNumber: boolean;
         /**
          *
          * Indicates if the style includes the Color, ColorIndex, InvertIfNegative, Pattern, PatternColor, and PatternColorIndex interior properties.
          *
-         * [Api set: ExcelApi 1.7 (PREVIEW)]
+         * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         includePatterns: boolean;
         /**
          *
          * Indicates if the style includes the FormulaHidden and Locked protection properties.
          *
-         * [Api set: ExcelApi 1.7 (PREVIEW)]
+         * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         includeProtection: boolean;
         /**
          *
          * An integer from 0 to 15 that indicates the indent level for the style.
          *
-         * [Api set: ExcelApi 1.7 (PREVIEW)]
+         * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         indentLevel: number;
         /**
          *
          * Indicates if the object is locked when the worksheet is protected.
          *
-         * [Api set: ExcelApi 1.7 (PREVIEW)]
+         * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         locked: boolean;
         /**
          *
          * The name of the style.
          *
-         * [Api set: ExcelApi 1.7 (PREVIEW)]
+         * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         readonly name: string;
         /**
          *
          * The format code of the number format for the style.
          *
-         * [Api set: ExcelApi 1.7 (PREVIEW)]
+         * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         numberFormat: string;
         /**
          *
          * The localized format code of the number format for the style.
          *
-         * [Api set: ExcelApi 1.7 (PREVIEW)]
+         * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         numberFormatLocal: string;
         /**
          *
          * The text orientation for the style.
          *
-         * [Api set: ExcelApi 1.7 (PREVIEW)]
+         * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         orientation: number;
         /**
          *
          * The reading order for the style.
          *
-         * [Api set: ExcelApi 1.7 (PREVIEW)]
+         * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         readingOrder: string;
         /**
          *
          * Indicates if text automatically shrinks to fit in the available column width.
          *
-         * [Api set: ExcelApi 1.7 (PREVIEW)]
+         * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         shrinkToFit: boolean;
         /**
          *
          * Represents the vertical alignment for the style. See Excel.VerticalAlignment for details.
          *
-         * [Api set: ExcelApi 1.7 (PREVIEW)]
+         * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         verticalAlignment: string;
         /**
          *
          * Indicates if Microsoft Excel wraps the text in the object.
          *
-         * [Api set: ExcelApi 1.7 (PREVIEW)]
+         * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         wrapText: boolean;
         /** Sets multiple properties on the object at the same time, based on JSON input. */
@@ -10770,7 +10700,7 @@ declare namespace Excel {
          *
          * Deletes this style.
          *
-         * [Api set: ExcelApi 1.7 (PREVIEW)]
+         * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         delete(): void;
         /**
@@ -10804,7 +10734,7 @@ declare namespace Excel {
      *
      * Represents a collection of all the styles.
      *
-     * [Api set: ExcelApi 1.7 (PREVIEW)]
+     * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
      */
     class StyleCollection extends OfficeExtension.ClientObject {
         /** Gets the loaded child items in this collection. */
@@ -10813,7 +10743,7 @@ declare namespace Excel {
          *
          * Adds a new style to the collection.
          *
-         * [Api set: ExcelApi 1.7 (PREVIEW)]
+         * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
          *
          * @param name Name of the style to be added.
          */
@@ -10822,7 +10752,7 @@ declare namespace Excel {
          *
          * Gets a style by name.
          *
-         * [Api set: ExcelApi 1.7 (PREVIEW)]
+         * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
          *
          * @param name Name of the style to be retrieved.
          */
@@ -10834,35 +10764,35 @@ declare namespace Excel {
         toJSON(): {};
     }
     /**
-     * [Api set: ExcelApi 1.7 (PREVIEW)]
+     * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
      */
     class PageLayout extends OfficeExtension.ClientObject {
         /**
          *
          * Gets or sets the black and white print option.
          *
-         * [Api set: ExcelApi 1.7 (PREVIEW)]
+         * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         blackAndWhite: boolean;
         /**
          *
          * Gets or sets the orientation of the page.
          *
-         * [Api set: ExcelApi 1.7 (PREVIEW)]
+         * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         orientation: string;
         /**
          *
          * Gets or sets the paper size of the page.
          *
-         * [Api set: ExcelApi 1.7 (PREVIEW)]
+         * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         paperSize: string;
         /**
          *
          * Gets or sets the print errors option.
          *
-         * [Api set: ExcelApi 1.7 (PREVIEW)]
+         * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         printErrors: string;
         /** Sets multiple properties on the object at the same time, based on JSON input. */
@@ -10886,7 +10816,7 @@ declare namespace Excel {
         };
     }
     /**
-     * [Api set: ExcelApi 1.8 (PREVIEW)]
+     * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
      */
     namespace AxisType {
         var invalid: string;
@@ -10910,21 +10840,21 @@ declare namespace Excel {
         var series: string;
     }
     /**
-     * [Api set: ExcelApi 1.8 (PREVIEW)]
+     * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
      */
     namespace AxisGroup {
         var primary: string;
         var secondary: string;
     }
     /**
-     * [Api set: ExcelApi 1.8 (PREVIEW)]
+     * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
      */
     namespace AxisScaleType {
         var linear: string;
         var logarithmic: string;
     }
     /**
-     * [Api set: ExcelApi 1.8 (PREVIEW)]
+     * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
      */
     namespace AxisCrosses {
         var automatic: string;
@@ -11037,7 +10967,7 @@ declare namespace Excel {
         var removeHyperlinks: string;
     }
     /**
-     * [Api set: ExcelApi 1.8 (PREVIEW)]
+     * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
      */
     namespace ChartAxisDisplayUnit {
         /**
@@ -11111,7 +11041,7 @@ declare namespace Excel {
      *
      * Specifies the unit of time for chart axes and data series.
      *
-     * [Api set: ExcelApi 1.8 (PREVIEW)]
+     * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
      */
     namespace ChartAxisTimeUnit {
         var days: string;
@@ -11122,7 +11052,7 @@ declare namespace Excel {
      *
      * Specifies the type of the category axis.
      *
-     * [Api set: ExcelApi 1.8 (PREVIEW)]
+     * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
      */
     namespace ChartAxisCategoryType {
         /**
@@ -11165,7 +11095,7 @@ declare namespace Excel {
      *
      * Represents the position of chart title.
      *
-     * [Api set: ExcelApi 1.8 (PREVIEW)]
+     * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
      */
     namespace ChartTitlePosition {
         var automatic: string;
@@ -11187,7 +11117,7 @@ declare namespace Excel {
         var custom: string;
     }
     /**
-     * [Api set: ExcelApi 1.8 (PREVIEW)]
+     * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
      */
     namespace ChartMarkerStyle {
         var invalid: string;
@@ -11224,7 +11154,7 @@ declare namespace Excel {
      *
      * Represents the horizontal alignment for the specified object.
      *
-     * [Api set: ExcelApi 1.8 (PREVIEW)]
+     * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
      */
     namespace ChartTextHorizontalAlignment {
         var center: string;
@@ -11237,7 +11167,7 @@ declare namespace Excel {
      *
      * Represents the vertical alignment for the specified object.
      *
-     * [Api set: ExcelApi 1.8 (PREVIEW)]
+     * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
      */
     namespace ChartTextVerticalAlignment {
         var center: string;
@@ -11336,7 +11266,7 @@ declare namespace Excel {
      *
      * Represents the format options for a Data Bar Axis.
      *
-     * [Api set: ExcelApi 1.6 (PREVIEW)]
+     * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
      */
     namespace ConditionalDataBarAxisFormat {
         var automatic: string;
@@ -11347,7 +11277,7 @@ declare namespace Excel {
      *
      * Represents the Data Bar direction within a cell.
      *
-     * [Api set: ExcelApi 1.6 (PREVIEW)]
+     * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
      */
     namespace ConditionalDataBarDirection {
         var context: string;
@@ -11358,14 +11288,14 @@ declare namespace Excel {
      *
      * Represents the direction for a selection.
      *
-     * [Api set: ExcelApi 1.6 (PREVIEW)]
+     * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
      */
     namespace ConditionalFormatDirection {
         var top: string;
         var bottom: string;
     }
     /**
-     * [Api set: ExcelApi 1.6 (PREVIEW)]
+     * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
      */
     namespace ConditionalFormatType {
         var custom: string;
@@ -11381,7 +11311,7 @@ declare namespace Excel {
      *
      * Represents the types of conditional format values.
      *
-     * [Api set: ExcelApi 1.6 (PREVIEW)]
+     * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
      */
     namespace ConditionalFormatRuleType {
         var invalid: string;
@@ -11397,7 +11327,7 @@ declare namespace Excel {
      *
      * Represents the types of conditional format values.
      *
-     * [Api set: ExcelApi 1.6 (PREVIEW)]
+     * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
      */
     namespace ConditionalFormatIconRuleType {
         var invalid: string;
@@ -11410,7 +11340,7 @@ declare namespace Excel {
      *
      * Represents the types of conditional format values.
      *
-     * [Api set: ExcelApi 1.6 (PREVIEW)]
+     * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
      */
     namespace ConditionalFormatColorCriterionType {
         var invalid: string;
@@ -11425,7 +11355,7 @@ declare namespace Excel {
      *
      * Represents the criteria for the above/below average conditional format type.
      *
-     * [Api set: ExcelApi 1.6 (PREVIEW)]
+     * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
      */
     namespace ConditionalTopBottomCriterionType {
         var invalid: string;
@@ -11438,7 +11368,7 @@ declare namespace Excel {
      *
      * Represents the criteria for the Preset Criteria conditional format type.
      *
-     * [Api set: ExcelApi 1.6 (PREVIEW)]
+     * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
      */
     namespace ConditionalFormatPresetCriterion {
         var invalid: string;
@@ -11473,7 +11403,7 @@ declare namespace Excel {
      *
      * Represents the operator of the text conditional format type.
      *
-     * [Api set: ExcelApi 1.6 (PREVIEW)]
+     * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
      */
     namespace ConditionalTextOperator {
         var invalid: string;
@@ -11486,7 +11416,7 @@ declare namespace Excel {
      *
      * Represents the operator of the text conditional format type.
      *
-     * [Api set: ExcelApi 1.6 (PREVIEW)]
+     * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
      */
     namespace ConditionalCellValueOperator {
         var invalid: string;
@@ -11503,7 +11433,7 @@ declare namespace Excel {
      *
      * Represents the operator for each icon criteria.
      *
-     * [Api set: ExcelApi 1.6 (PREVIEW)]
+     * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
      */
     namespace ConditionalIconCriterionOperator {
         var invalid: string;
@@ -11511,7 +11441,7 @@ declare namespace Excel {
         var greaterThanOrEqual: string;
     }
     /**
-     * [Api set: ExcelApi 1.6 (PREVIEW)]
+     * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
      */
     namespace ConditionalRangeBorderIndex {
         var edgeTop: string;
@@ -11520,7 +11450,7 @@ declare namespace Excel {
         var edgeRight: string;
     }
     /**
-     * [Api set: ExcelApi 1.6 (PREVIEW)]
+     * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
      */
     namespace ConditionalRangeBorderLineStyle {
         var none: string;
@@ -11531,7 +11461,7 @@ declare namespace Excel {
         var dot: string;
     }
     /**
-     * [Api set: ExcelApi 1.6 (PREVIEW)]
+     * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
      */
     namespace ConditionalRangeFontUnderlineStyle {
         var none: string;
@@ -11539,7 +11469,7 @@ declare namespace Excel {
         var double: string;
     }
     /**
-     * [Api set: ExcelApi 1.7 (PREVIEW)]
+     * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
      */
     namespace CustomFunctionType {
         var invalid: string;
@@ -11547,14 +11477,14 @@ declare namespace Excel {
         var webService: string;
     }
     /**
-     * [Api set: ExcelApi 1.7 (PREVIEW)]
+     * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
      */
     namespace CustomFunctionMetadataFormat {
         var invalid: string;
         var openApi: string;
     }
     /**
-     * [Api set: ExcelApi 1.7 (PREVIEW)]
+     * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
      */
     namespace CustomFunctionValueType {
         var invalid: string;
@@ -11564,7 +11494,7 @@ declare namespace Excel {
         var isodate: string;
     }
     /**
-     * [Api set: ExcelApi 1.7 (PREVIEW)]
+     * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
      */
     namespace CustomFunctionDimensionality {
         var invalid: string;
@@ -11795,7 +11725,7 @@ declare namespace Excel {
         var distributed: string;
     }
     /**
-     * [Api set: ExcelApi 1.8 (PREVIEW)]
+     * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
      */
     const enum MessageCategory {
         none = 0,
@@ -11803,7 +11733,7 @@ declare namespace Excel {
         event = 65536,
     }
     /**
-     * [Api set: ExcelApi 1.8 (PREVIEW)]
+     * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
      */
     const enum MessageType {
         none = 0,
@@ -11819,7 +11749,7 @@ declare namespace Excel {
         tableDataChangedEvent = 101,
     }
     /**
-     * [Api set: ExcelApi 1.7 (PREVIEW)]
+     * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
      */
     namespace DocumentPropertyType {
         var number: string;
@@ -11829,7 +11759,7 @@ declare namespace Excel {
         var float: string;
     }
     /**
-     * [Api set: ExcelApi 1.8 (PREVIEW) for Local, Remote]
+     * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW) for Local, Remote]
      */
     namespace EventSource {
         /**
@@ -11846,7 +11776,7 @@ declare namespace Excel {
         var remote: string;
     }
     /**
-     * [Api set: ExcelApi 1.8 (PREVIEW) for Others, RangeEdited, RowInserted, RowDeleted, ColumnInserted, ColumnDeleted, CellInserted, CellDeleted]
+     * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW) for Others, RangeEdited, RowInserted, RowDeleted, ColumnInserted, ColumnDeleted, CellInserted, CellDeleted]
      */
     namespace DataChangeType {
         /**
@@ -11899,7 +11829,7 @@ declare namespace Excel {
         var cellDeleted: string;
     }
     /**
-     * [Api set: ExcelApi 1.8 (PREVIEW) for WorksheetDataChanged, WorksheetSelectionChanged, WorksheetAdded, WorksheetActivated, WorksheetDeactivated, TableDataChanged, TableSelectionChanged]
+     * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW) for WorksheetDataChanged, WorksheetSelectionChanged, WorksheetAdded, WorksheetActivated, WorksheetDeactivated, TableDataChanged, TableSelectionChanged]
      */
     namespace EventType {
         /**
@@ -11952,7 +11882,7 @@ declare namespace Excel {
         var worksheetDeleted: string;
     }
     /**
-     * [Api set: ExcelApi 1.7 (PREVIEW)]
+     * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
      */
     namespace DocumentPropertyItem {
         var title: string;
@@ -11973,7 +11903,7 @@ declare namespace Excel {
         var company: string;
     }
     /**
-     * [Api set: ExcelApi 1.8 (PREVIEW)]
+     * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
      */
     namespace TrendlineType {
         var linear: string;
@@ -11984,14 +11914,14 @@ declare namespace Excel {
         var power: string;
     }
     /**
-     * [Api set: ExcelApi 1.7 (PREVIEW)]
+     * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
      */
     namespace SubtotalLocationType {
         var atTop: string;
         var atBottom: string;
     }
     /**
-     * [Api set: ExcelApi 1.7 (PREVIEW)]
+     * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
      */
     namespace LayoutRowType {
         var compactRow: string;
@@ -11999,14 +11929,14 @@ declare namespace Excel {
         var outlineRow: string;
     }
     /**
-     * [Api set: ExcelApi 1.7 (PREVIEW)]
+     * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
      */
     namespace PageOrientation {
         var portrait: string;
         var landscape: string;
     }
     /**
-     * [Api set: ExcelApi 1.7 (PREVIEW)]
+     * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
      */
     namespace PaperType {
         var letter: string;
@@ -12052,7 +11982,7 @@ declare namespace Excel {
         var fanfoldLegalGerman: string;
     }
     /**
-     * [Api set: ExcelApi 1.7 (PREVIEW)]
+     * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
      */
     namespace ReadingOrder {
         var context: string;
@@ -12060,7 +11990,7 @@ declare namespace Excel {
         var rightToLeft: string;
     }
     /**
-     * [Api set: ExcelApi 1.7 (PREVIEW)]
+     * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
      */
     namespace BuiltInStyle {
         var normal: string;
@@ -12117,7 +12047,7 @@ declare namespace Excel {
         var explanatoryText: string;
     }
     /**
-     * [Api set: ExcelApi 1.7 (PREVIEW)]
+     * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
      */
     namespace PrintErrorType {
         var errorsDisplayed: string;
@@ -16232,7 +16162,7 @@ declare namespace Excel {
              * Gets or sets the worksheet's gridlines flag.
             This flag determines whether gridlines are visible to the user.
              *
-             * [Api set: ExcelApi 1.7 (PREVIEW)]
+             * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
              */
             gridlines?: boolean;
             /**
@@ -16240,7 +16170,7 @@ declare namespace Excel {
              * Gets or sets the worksheet's headings flag.
             This flag determines whether headings are visible to the user.
              *
-             * [Api set: ExcelApi 1.7 (PREVIEW)]
+             * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
              */
             headings?: boolean;
             /**
@@ -16263,7 +16193,7 @@ declare namespace Excel {
             When retrieving the tab color, if the worksheet is invisible, the value will be null. If the worksheet is visible but the tab color is set to auto, an empty string will be returned. Otherwise, the property will be set to a color, in the form "#123456"
             When setting the color, use an empty-string to set an "auto" color, or a real color otherwise.
              *
-             * [Api set: ExcelApi 1.7 (PREVIEW)]
+             * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
              */
             tabColor?: string;
             /**
@@ -16315,7 +16245,7 @@ declare namespace Excel {
              *
              * Represents the hyperlink set for the current range.
              *
-             * [Api set: ExcelApi 1.7 (PREVIEW)]
+             * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
              */
             hyperlink?: Excel.RangeHyperlink;
             /**
@@ -16329,7 +16259,7 @@ declare namespace Excel {
              *
              * Represents Excel's number format code for the given cell as a string in the language of the user.
              *
-             * [Api set: ExcelApi 1.7 (PREVIEW)]
+             * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
              */
             numberFormatLocal?: Array<Array<any>>;
             /**
@@ -16345,7 +16275,7 @@ declare namespace Excel {
             If the styles of the cells are inconsistent, null will be returned.
             For custom styles, the style name will be returned. For built-in styles, a string representing a value in the BuiltInStyle enum will be returned.
              *
-             * [Api set: ExcelApi 1.7 (PREVIEW)]
+             * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
              */
             style?: string;
             /**
@@ -16417,7 +16347,7 @@ declare namespace Excel {
              *
              * Gets or sets the formula of the named item.  Formula always starts with a '=' sign.
              *
-             * [Api set: ExcelApi 1.7 (PREVIEW)]
+             * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
              */
             formula?: any;
             /**
@@ -16571,7 +16501,7 @@ declare namespace Excel {
             The text orientation should be an integer either from -90 to 90, or 180 for vertically-oriented text.
             If the orientation within a range are not uniform, then null will be returned.
              *
-             * [Api set: ExcelApi 1.7 (PREVIEW)]
+             * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
              */
             textOrientation?: number;
             /**
@@ -16581,7 +16511,7 @@ declare namespace Excel {
             Returns Null if the range contains more than one row and the rows aren't all the same height.
             Returns False otherwise.
              *
-             * [Api set: ExcelApi 1.7 (PREVIEW)]
+             * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
              */
             useStandardHeight?: boolean;
             /**
@@ -16591,7 +16521,7 @@ declare namespace Excel {
             Returns Null if the range contains more than one column and the columns aren't all the same height.
             Returns False otherwise.
              *
-             * [Api set: ExcelApi 1.7 (PREVIEW)]
+             * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
              */
             useStandardWidth?: boolean;
             /**
@@ -16767,7 +16697,7 @@ declare namespace Excel {
              *
              * Returns or sets whether to display all field buttons on a PivotChart. Read/write
              *
-             * [Api set: ExcelApi 1.8 (PREVIEW)]
+             * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
              */
             showAllFieldButtons?: boolean;
             /**
@@ -16808,49 +16738,49 @@ declare namespace Excel {
              *
              * Represents the chart type of a series. See Excel.ChartType for details.
              *
-             * [Api set: ExcelApi 1.8 (PREVIEW)]
+             * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
              */
             chartType?: string;
             /**
              *
              * Boolean value representing if the series is filtered or not. Not applicable for surface charts.
              *
-             * [Api set: ExcelApi 1.8 (PREVIEW)]
+             * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
              */
             filtered?: boolean;
             /**
              *
              * Boolean value representing if the series has data labels or not.
              *
-             * [Api set: ExcelApi 1.8 (PREVIEW)]
+             * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
              */
             hasDataLabels?: boolean;
             /**
              *
              * Represents markers background color of a chart series.
              *
-             * [Api set: ExcelApi 1.8 (PREVIEW)]
+             * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
              */
             markerBackgroundColor?: string;
             /**
              *
              * Represents markers foreground color of a chart series.
              *
-             * [Api set: ExcelApi 1.8 (PREVIEW)]
+             * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
              */
             markerForegroundColor?: string;
             /**
              *
              * Represents marker size of a chart series.
              *
-             * [Api set: ExcelApi 1.8 (PREVIEW)]
+             * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
              */
             markerSize?: number;
             /**
              *
              * Represents marker style of a chart series. See Excel.ChartMarkerStyle for details.
              *
-             * [Api set: ExcelApi 1.8 (PREVIEW)]
+             * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
              */
             markerStyle?: string;
             /**
@@ -16864,21 +16794,21 @@ declare namespace Excel {
              *
              * Represents the plot order of a chart series within the chart group.
              *
-             * [Api set: ExcelApi 1.8 (PREVIEW)]
+             * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
              */
             plotOrder?: number;
             /**
              *
              * Boolean value representing if the series has shadow or not.
              *
-             * [Api set: ExcelApi 1.8 (PREVIEW)]
+             * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
              */
             showShadow?: boolean;
             /**
              *
              * Boolean value representing if the series is smooth or not. Only for line and scatter charts.
              *
-             * [Api set: ExcelApi 1.8 (PREVIEW)]
+             * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
              */
             smooth?: boolean;
         }
@@ -16950,42 +16880,42 @@ declare namespace Excel {
              *
              * Returns or sets the base unit for the specified category axis.
              *
-             * [Api set: ExcelApi 1.8 (PREVIEW)]
+             * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
              */
             baseTimeUnit?: string;
             /**
              *
              * Returns or sets the category axis type.
              *
-             * [Api set: ExcelApi 1.8 (PREVIEW)]
+             * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
              */
             categoryType?: string;
             /**
              *
              * Represents the specified axis where the other axis crosses.
              *
-             * [Api set: ExcelApi 1.8 (PREVIEW)]
+             * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
              */
             crosses?: string;
             /**
              *
              * Represents the axis display unit.
              *
-             * [Api set: ExcelApi 1.8 (PREVIEW)]
+             * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
              */
             displayUnit?: string;
             /**
              *
              * Represents the base of the logarithm when using logarithmic scales.
              *
-             * [Api set: ExcelApi 1.8 (PREVIEW)]
+             * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
              */
             logBase?: number;
             /**
              *
              * Returns or sets the major unit scale value for the category axis when the CategoryType property is set to TimeScale.
              *
-             * [Api set: ExcelApi 1.8 (PREVIEW)]
+             * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
              */
             majorTimeUnitScale?: string;
             /**
@@ -17013,7 +16943,7 @@ declare namespace Excel {
              *
              * Returns or sets the minor unit scale value for the category axis when the CategoryType property is set to TimeScale.
              *
-             * [Api set: ExcelApi 1.8 (PREVIEW)]
+             * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
              */
             minorTimeUnitScale?: string;
             /**
@@ -17027,28 +16957,28 @@ declare namespace Excel {
              *
              * Represents whether Microsoft Excel plots data points from last to first.
              *
-             * [Api set: ExcelApi 1.8 (PREVIEW)]
+             * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
              */
             reversePlotOrder?: boolean;
             /**
              *
              * Represents the value axis scale type.
              *
-             * [Api set: ExcelApi 1.8 (PREVIEW)]
+             * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
              */
             scaleType?: string;
             /**
              *
              * Represents whether the axis display unit label is visible.
              *
-             * [Api set: ExcelApi 1.8 (PREVIEW)]
+             * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
              */
             showDisplayUnitLabel?: boolean;
             /**
              *
              * A boolean value represents the visibility of the axis.
              *
-             * [Api set: ExcelApi 1.8 (PREVIEW)]
+             * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
              */
             visible?: boolean;
         }
@@ -17175,7 +17105,7 @@ declare namespace Excel {
              *
              * DataLabelPosition value that represents the position of the data label. See Excel.ChartDataLabelPosition for details.
              *
-             * [Api set: ExcelApi 1.8 (PREVIEW)]
+             * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
              */
             position?: string;
         }
@@ -17229,14 +17159,14 @@ declare namespace Excel {
              *
              * Represents the height of the legend on the chart.
              *
-             * [Api set: ExcelApi 1.8 (PREVIEW)]
+             * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
              */
             height?: number;
             /**
              *
              * Represents the left of a chart legend.
              *
-             * [Api set: ExcelApi 1.8 (PREVIEW)]
+             * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
              */
             left?: number;
             /**
@@ -17257,14 +17187,14 @@ declare namespace Excel {
              *
              * Represents if the legend has shadow on the chart.
              *
-             * [Api set: ExcelApi 1.8 (PREVIEW)]
+             * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
              */
             showShadow?: boolean;
             /**
              *
              * Represents the top of a chart legend.
              *
-             * [Api set: ExcelApi 1.8 (PREVIEW)]
+             * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
              */
             top?: number;
             /**
@@ -17278,7 +17208,7 @@ declare namespace Excel {
              *
              * Represents the width of the legend on the chart.
              *
-             * [Api set: ExcelApi 1.8 (PREVIEW)]
+             * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
              */
             width?: number;
         }
@@ -17288,7 +17218,7 @@ declare namespace Excel {
              *
              * Represents the visible of a chart legend entry.
              *
-             * [Api set: ExcelApi 1.8 (PREVIEW)]
+             * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
              */
             visible?: boolean;
         }
@@ -17315,14 +17245,14 @@ declare namespace Excel {
              *
              * Represents the horizontal alignment for chart title.
              *
-             * [Api set: ExcelApi 1.8 (PREVIEW)]
+             * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
              */
             horizontalAlignment?: string;
             /**
              *
              * Represents the distance, in points, from the left edge of chart title to the left edge of chart area. Null if chart title's not visible.
              *
-             * [Api set: ExcelApi 1.8 (PREVIEW)]
+             * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
              */
             left?: number;
             /**
@@ -17336,14 +17266,14 @@ declare namespace Excel {
              *
              * Represents the position of chart title. See Excel.ChartTitlePosition for details.
              *
-             * [Api set: ExcelApi 1.8 (PREVIEW)]
+             * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
              */
             position?: string;
             /**
              *
              * Represents a boolean value that determines if the chart title has a shadow.
              *
-             * [Api set: ExcelApi 1.8 (PREVIEW)]
+             * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
              */
             showShadow?: boolean;
             /**
@@ -17357,21 +17287,21 @@ declare namespace Excel {
              *
              * Represents the text orientation of chart title. The value should be an integer either from -90 to 90, or 180 for vertically-oriented text.
              *
-             * [Api set: ExcelApi 1.8 (PREVIEW)]
+             * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
              */
             textOrientation?: number;
             /**
              *
              * Represents the distance, in points, from the top edge of chart title to the top of chart area. Null if chart title's not visible.
              *
-             * [Api set: ExcelApi 1.8 (PREVIEW)]
+             * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
              */
             top?: number;
             /**
              *
              * Represents the vertical alignment of chart title. See Excel.ChartTextVerticalAlignment for details.
              *
-             * [Api set: ExcelApi 1.8 (PREVIEW)]
+             * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
              */
             verticalAlignment?: string;
             /**
@@ -17453,56 +17383,56 @@ declare namespace Excel {
             *
             * Represents the formatting of a chart trendline.
             *
-            * [Api set: ExcelApi 1.8 (PREVIEW)]
+            * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
             */
             format?: Excel.Interfaces.ChartTrendlineFormatUpdateData;
             /**
              *
              * Represents the number of periods that the trendline extends backward.
              *
-             * [Api set: ExcelApi 1.8 (PREVIEW)]
+             * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
              */
             backward?: number;
             /**
              *
              * True if the equation for the trendline is displayed on the chart.
              *
-             * [Api set: ExcelApi 1.8 (PREVIEW)]
+             * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
              */
             displayEquation?: boolean;
             /**
              *
              * True if the R-squared for the trendline is displayed on the chart.
              *
-             * [Api set: ExcelApi 1.8 (PREVIEW)]
+             * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
              */
             displayRSquared?: boolean;
             /**
              *
              * Represents the number of periods that the trendline extends forward.
              *
-             * [Api set: ExcelApi 1.8 (PREVIEW)]
+             * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
              */
             forward?: number;
             /**
              *
              * Represents the period of a chart trendline, only for trendline with MovingAverage type.
              *
-             * [Api set: ExcelApi 1.8 (PREVIEW)]
+             * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
              */
             movingAveragePeriod?: number;
             /**
              *
              * Represents the order of a chart trendline, only for trendline with Polynomial type.
              *
-             * [Api set: ExcelApi 1.8 (PREVIEW)]
+             * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
              */
             polynomialOrder?: number;
             /**
              *
              * Represents the type of a chart trendline.
              *
-             * [Api set: ExcelApi 1.8 (PREVIEW)]
+             * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
              */
             type?: string;
         }
@@ -17512,7 +17442,7 @@ declare namespace Excel {
             *
             * Represents chart line formatting.
             *
-            * [Api set: ExcelApi 1.8 (PREVIEW)]
+            * [Api set: ExcelApi 1.8 (PREVIEW) (PREVIEW) (PREVIEW)]
             */
             line?: Excel.Interfaces.ChartLineFormatUpdateData;
         }
@@ -17522,7 +17452,7 @@ declare namespace Excel {
              *
              * True if the PivotTable report shows grand totals for columns.
              *
-             * [Api set: ExcelApi 1.7 (PREVIEW)]
+             * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
              */
             columnGrandTotals?: boolean;
             /**
@@ -17536,7 +17466,7 @@ declare namespace Excel {
              *
              * True if the PivotTable report shows grand totals for rows.
              *
-             * [Api set: ExcelApi 1.7 (PREVIEW)]
+             * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
              */
             rowGrandTotals?: boolean;
             allowMultipleFilters?: boolean;
@@ -17591,56 +17521,56 @@ declare namespace Excel {
              *
              * Gets or sets the author of the workbook.
              *
-             * [Api set: ExcelApi 1.7 (PREVIEW)]
+             * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
              */
             author?: string;
             /**
              *
              * Gets or sets the category of the workbook.
              *
-             * [Api set: ExcelApi 1.7 (PREVIEW)]
+             * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
              */
             category?: string;
             /**
              *
              * Gets or sets the comments of the workbook.
              *
-             * [Api set: ExcelApi 1.7 (PREVIEW)]
+             * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
              */
             comments?: string;
             /**
              *
              * Gets or sets the company of the workbook.
              *
-             * [Api set: ExcelApi 1.7 (PREVIEW)]
+             * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
              */
             company?: string;
             /**
              *
              * Gets or sets the keywords of the workbook.
              *
-             * [Api set: ExcelApi 1.7 (PREVIEW)]
+             * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
              */
             keywords?: string;
             /**
              *
              * Gets or sets the manager of the workbook.
              *
-             * [Api set: ExcelApi 1.7 (PREVIEW)]
+             * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
              */
             manager?: string;
             /**
              *
              * Gets or sets the subject of the workbook.
              *
-             * [Api set: ExcelApi 1.7 (PREVIEW)]
+             * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
              */
             subject?: string;
             /**
              *
              * Gets or sets the title of the workbook.
              *
-             * [Api set: ExcelApi 1.7 (PREVIEW)]
+             * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
              */
             title?: string;
         }
@@ -17650,7 +17580,7 @@ declare namespace Excel {
              *
              * Gets or sets the value of the custom property.
              *
-             * [Api set: ExcelApi 1.7 (PREVIEW)]
+             * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
              */
             value?: any;
         }
@@ -17661,7 +17591,7 @@ declare namespace Excel {
             * Returns the cell value conditional format properties if the current conditional format is a CellValue type.
             For example to format all cells between 5 and 10.
             *
-            * [Api set: ExcelApi 1.6 (PREVIEW)]
+            * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
             */
             cellValue?: Excel.Interfaces.CellValueConditionalFormatUpdateData;
             /**
@@ -17669,77 +17599,77 @@ declare namespace Excel {
             * Returns the cell value conditional format properties if the current conditional format is a CellValue type.
             For example to format all cells between 5 and 10.
             *
-            * [Api set: ExcelApi 1.6 (PREVIEW)]
+            * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
             */
             cellValueOrNullObject?: Excel.Interfaces.CellValueConditionalFormatUpdateData;
             /**
             *
             * Returns the ColorScale conditional format properties if the current conditional format is an ColorScale type.
             *
-            * [Api set: ExcelApi 1.6 (PREVIEW)]
+            * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
             */
             colorScale?: Excel.Interfaces.ColorScaleConditionalFormatUpdateData;
             /**
             *
             * Returns the ColorScale conditional format properties if the current conditional format is an ColorScale type.
             *
-            * [Api set: ExcelApi 1.6 (PREVIEW)]
+            * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
             */
             colorScaleOrNullObject?: Excel.Interfaces.ColorScaleConditionalFormatUpdateData;
             /**
             *
             * Returns the custom conditional format properties if the current conditional format is a custom type.
             *
-            * [Api set: ExcelApi 1.6 (PREVIEW)]
+            * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
             */
             custom?: Excel.Interfaces.CustomConditionalFormatUpdateData;
             /**
             *
             * Returns the custom conditional format properties if the current conditional format is a custom type.
             *
-            * [Api set: ExcelApi 1.6 (PREVIEW)]
+            * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
             */
             customOrNullObject?: Excel.Interfaces.CustomConditionalFormatUpdateData;
             /**
             *
             * Returns the data bar properties if the current conditional format is a data bar.
             *
-            * [Api set: ExcelApi 1.6 (PREVIEW)]
+            * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
             */
             dataBar?: Excel.Interfaces.DataBarConditionalFormatUpdateData;
             /**
             *
             * Returns the data bar properties if the current conditional format is a data bar.
             *
-            * [Api set: ExcelApi 1.6 (PREVIEW)]
+            * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
             */
             dataBarOrNullObject?: Excel.Interfaces.DataBarConditionalFormatUpdateData;
             /**
             *
             * Returns the IconSet conditional format properties if the current conditional format is an IconSet type.
             *
-            * [Api set: ExcelApi 1.6 (PREVIEW)]
+            * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
             */
             iconSet?: Excel.Interfaces.IconSetConditionalFormatUpdateData;
             /**
             *
             * Returns the IconSet conditional format properties if the current conditional format is an IconSet type.
             *
-            * [Api set: ExcelApi 1.6 (PREVIEW)]
+            * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
             */
             iconSetOrNullObject?: Excel.Interfaces.IconSetConditionalFormatUpdateData;
             /**
             *
             * Returns the preset criteria conditional format such as above average/below average/unique values/contains blank/nonblank/error/noerror properties.
             *
-            * [Api set: ExcelApi 1.6 (PREVIEW)]
+            * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
             */
             preset?: Excel.Interfaces.PresetCriteriaConditionalFormatUpdateData;
             /**
             *
             * Returns the preset criteria conditional format such as above average/below average/unique values/contains blank/nonblank/error/noerror properties.
             *
-            * [Api set: ExcelApi 1.6 (PREVIEW)]
+            * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
             */
             presetOrNullObject?: Excel.Interfaces.PresetCriteriaConditionalFormatUpdateData;
             /**
@@ -17747,7 +17677,7 @@ declare namespace Excel {
             * Returns the specific text conditional format properties if the current conditional format is a text type.
             For example to format cells matching the word "Text".
             *
-            * [Api set: ExcelApi 1.6 (PREVIEW)]
+            * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
             */
             textComparison?: Excel.Interfaces.TextConditionalFormatUpdateData;
             /**
@@ -17755,7 +17685,7 @@ declare namespace Excel {
             * Returns the specific text conditional format properties if the current conditional format is a text type.
             For example to format cells matching the word "Text".
             *
-            * [Api set: ExcelApi 1.6 (PREVIEW)]
+            * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
             */
             textComparisonOrNullObject?: Excel.Interfaces.TextConditionalFormatUpdateData;
             /**
@@ -17763,7 +17693,7 @@ declare namespace Excel {
             * Returns the Top/Bottom conditional format properties if the current conditional format is an TopBottom type.
             For example to format the top 10% or bottom 10 items.
             *
-            * [Api set: ExcelApi 1.6 (PREVIEW)]
+            * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
             */
             topBottom?: Excel.Interfaces.TopBottomConditionalFormatUpdateData;
             /**
@@ -17771,7 +17701,7 @@ declare namespace Excel {
             * Returns the Top/Bottom conditional format properties if the current conditional format is an TopBottom type.
             For example to format the top 10% or bottom 10 items.
             *
-            * [Api set: ExcelApi 1.6 (PREVIEW)]
+            * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
             */
             topBottomOrNullObject?: Excel.Interfaces.TopBottomConditionalFormatUpdateData;
             /**
@@ -17782,7 +17712,7 @@ declare namespace Excel {
             Priorities greater than than bounds will get and set to the maximum (or minimum if negative) priority.
             Also note that if you change the priority, you have to re-fetch a new copy of the object at that new priority location if you want to make further changes to it.
              *
-             * [Api set: ExcelApi 1.6 (PREVIEW)]
+             * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
              */
             priority?: number;
             /**
@@ -17790,7 +17720,7 @@ declare namespace Excel {
              * If the conditions of this conditional format are met, no lower-priority formats shall take effect on that cell.
             Null on databars, icon sets, and colorscales as there's no concept of StopIfTrue for these
              *
-             * [Api set: ExcelApi 1.6 (PREVIEW)]
+             * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
              */
             stopIfTrue?: boolean;
         }
@@ -17800,14 +17730,14 @@ declare namespace Excel {
             *
             * Representation of all values to the left of the axis in an Excel data bar.
             *
-            * [Api set: ExcelApi 1.6 (PREVIEW)]
+            * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
             */
             negativeFormat?: Excel.Interfaces.ConditionalDataBarNegativeFormatUpdateData;
             /**
             *
             * Representation of all values to the right of the axis in an Excel data bar.
             *
-            * [Api set: ExcelApi 1.6 (PREVIEW)]
+            * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
             */
             positiveFormat?: Excel.Interfaces.ConditionalDataBarPositiveFormatUpdateData;
             /**
@@ -17815,42 +17745,42 @@ declare namespace Excel {
              * HTML color code representing the color of the Axis line, of the form #RRGGBB (e.g. "FFA500") or as a named HTML color (e.g. "orange").
             "" (empty string) if no axis is present or set.
              *
-             * [Api set: ExcelApi 1.6 (PREVIEW)]
+             * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
              */
             axisColor?: string;
             /**
              *
              * Representation of how the axis is determined for an Excel data bar.
              *
-             * [Api set: ExcelApi 1.6 (PREVIEW)]
+             * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
              */
             axisFormat?: string;
             /**
              *
              * Represents the direction that the data bar graphic should be based on.
              *
-             * [Api set: ExcelApi 1.6 (PREVIEW)]
+             * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
              */
             barDirection?: string;
             /**
              *
              * The rule for what consistutes the lower bound (and how to calculate it, if applicable) for a data bar.
              *
-             * [Api set: ExcelApi 1.6 (PREVIEW)]
+             * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
              */
             lowerBoundRule?: Excel.ConditionalDataBarRule;
             /**
              *
              * If true, hides the values from the cells where the data bar is applied.
              *
-             * [Api set: ExcelApi 1.6 (PREVIEW)]
+             * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
              */
             showDataBarOnly?: boolean;
             /**
              *
              * The rule for what constitutes the upper bound (and how to calculate it, if applicable) for a data bar.
              *
-             * [Api set: ExcelApi 1.6 (PREVIEW)]
+             * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
              */
             upperBoundRule?: Excel.ConditionalDataBarRule;
         }
@@ -17861,21 +17791,21 @@ declare namespace Excel {
              * HTML color code representing the color of the border line, of the form #RRGGBB (e.g. "FFA500") or as a named HTML color (e.g. "orange").
             "" (empty string) if no border is present or set.
              *
-             * [Api set: ExcelApi 1.6 (PREVIEW)]
+             * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
              */
             borderColor?: string;
             /**
              *
              * HTML color code representing the fill color, of the form #RRGGBB (e.g. "FFA500") or as a named HTML color (e.g. "orange").
              *
-             * [Api set: ExcelApi 1.6 (PREVIEW)]
+             * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
              */
             fillColor?: string;
             /**
              *
              * Boolean representation of whether or not the DataBar has a gradient.
              *
-             * [Api set: ExcelApi 1.6 (PREVIEW)]
+             * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
              */
             gradientFill?: boolean;
         }
@@ -17886,28 +17816,28 @@ declare namespace Excel {
              * HTML color code representing the color of the border line, of the form #RRGGBB (e.g. "FFA500") or as a named HTML color (e.g. "orange").
             "Empty String" if no border is present or set.
              *
-             * [Api set: ExcelApi 1.6 (PREVIEW)]
+             * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
              */
             borderColor?: string;
             /**
              *
              * HTML color code representing the fill color, of the form #RRGGBB (e.g. "FFA500") or as a named HTML color (e.g. "orange").
              *
-             * [Api set: ExcelApi 1.6 (PREVIEW)]
+             * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
              */
             fillColor?: string;
             /**
              *
              * Boolean representation of whether or not the negative DataBar has the same border color as the positive DataBar.
              *
-             * [Api set: ExcelApi 1.6 (PREVIEW)]
+             * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
              */
             matchPositiveBorderColor?: boolean;
             /**
              *
              * Boolean representation of whether or not the negative DataBar has the same fill color as the positive DataBar.
              *
-             * [Api set: ExcelApi 1.6 (PREVIEW)]
+             * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
              */
             matchPositiveFillColor?: boolean;
         }
@@ -17917,14 +17847,14 @@ declare namespace Excel {
             *
             * Returns a format object, encapsulating the conditional formats font, fill, borders, and other properties.
             *
-            * [Api set: ExcelApi 1.6 (PREVIEW)]
+            * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
             */
             format?: Excel.Interfaces.ConditionalRangeFormatUpdateData;
             /**
             *
             * Represents the Rule object on this conditional format.
             *
-            * [Api set: ExcelApi 1.6 (PREVIEW)]
+            * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
             */
             rule?: Excel.Interfaces.ConditionalFormatRuleUpdateData;
         }
@@ -17934,21 +17864,21 @@ declare namespace Excel {
              *
              * The formula, if required, to evaluate the conditional format rule on.
              *
-             * [Api set: ExcelApi 1.6 (PREVIEW)]
+             * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
              */
             formula?: string;
             /**
              *
              * The formula, if required, to evaluate the conditional format rule on in the user's language.
              *
-             * [Api set: ExcelApi 1.6 (PREVIEW)]
+             * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
              */
             formulaLocal?: string;
             /**
              *
              * The formula, if required, to evaluate the conditional format rule on in R1C1-style notation.
              *
-             * [Api set: ExcelApi 1.6 (PREVIEW)]
+             * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
              */
             formulaR1C1?: string;
         }
@@ -17958,28 +17888,28 @@ declare namespace Excel {
              *
              * An array of Criteria and IconSets for the rules and potential custom icons for conditional icons. Note that for the first criterion only the custom icon can be modified, while type, formula and operator will be ignored when set.
              *
-             * [Api set: ExcelApi 1.6 (PREVIEW)]
+             * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
              */
             criteria?: Array<Excel.ConditionalIconCriterion>;
             /**
              *
              * If true, reverses the icon orders for the IconSet. Note that this cannot be set if custom icons are used.
              *
-             * [Api set: ExcelApi 1.6 (PREVIEW)]
+             * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
              */
             reverseIconOrder?: boolean;
             /**
              *
              * If true, hides the values and only shows icons.
              *
-             * [Api set: ExcelApi 1.6 (PREVIEW)]
+             * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
              */
             showIconOnly?: boolean;
             /**
              *
              * If set, displays the IconSet option for the conditional format.
              *
-             * [Api set: ExcelApi 1.6 (PREVIEW)]
+             * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
              */
             style?: string;
         }
@@ -17989,7 +17919,7 @@ declare namespace Excel {
              *
              * The criteria of the color scale. Midpoint is optional when using a two point color scale.
              *
-             * [Api set: ExcelApi 1.6 (PREVIEW)]
+             * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
              */
             criteria?: Excel.ConditionalColorScaleCriteria;
         }
@@ -17999,14 +17929,14 @@ declare namespace Excel {
             *
             * Returns a format object, encapsulating the conditional formats font, fill, borders, and other properties.
             *
-            * [Api set: ExcelApi 1.6 (PREVIEW)]
+            * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
             */
             format?: Excel.Interfaces.ConditionalRangeFormatUpdateData;
             /**
              *
              * The criteria of the Top/Bottom conditional format.
              *
-             * [Api set: ExcelApi 1.6 (PREVIEW)]
+             * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
              */
             rule?: Excel.ConditionalTopBottomRule;
         }
@@ -18016,14 +17946,14 @@ declare namespace Excel {
             *
             * Returns a format object, encapsulating the conditional formats font, fill, borders, and other properties.
             *
-            * [Api set: ExcelApi 1.6 (PREVIEW)]
+            * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
             */
             format?: Excel.Interfaces.ConditionalRangeFormatUpdateData;
             /**
              *
              * The rule of the conditional format.
              *
-             * [Api set: ExcelApi 1.6 (PREVIEW)]
+             * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
              */
             rule?: Excel.ConditionalPresetCriteriaRule;
         }
@@ -18033,14 +17963,14 @@ declare namespace Excel {
             *
             * Returns a format object, encapsulating the conditional formats font, fill, borders, and other properties.
             *
-            * [Api set: ExcelApi 1.6 (PREVIEW)]
+            * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
             */
             format?: Excel.Interfaces.ConditionalRangeFormatUpdateData;
             /**
              *
              * The rule of the conditional format.
              *
-             * [Api set: ExcelApi 1.6 (PREVIEW)]
+             * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
              */
             rule?: Excel.ConditionalTextComparisonRule;
         }
@@ -18050,14 +17980,14 @@ declare namespace Excel {
             *
             * Returns a format object, encapsulating the conditional formats font, fill, borders, and other properties.
             *
-            * [Api set: ExcelApi 1.6 (PREVIEW)]
+            * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
             */
             format?: Excel.Interfaces.ConditionalRangeFormatUpdateData;
             /**
              *
              * Represents the Rule object on this conditional format.
              *
-             * [Api set: ExcelApi 1.6 (PREVIEW)]
+             * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
              */
             rule?: Excel.ConditionalCellValueRule;
         }
@@ -18067,7 +17997,7 @@ declare namespace Excel {
              *
              * Represents Excel's number format code for the given range. Cleared if null is passed in.
              *
-             * [Api set: ExcelApi 1.6 (PREVIEW)]
+             * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
              */
             numberFormat?: any;
         }
@@ -18077,35 +18007,35 @@ declare namespace Excel {
              *
              * Represents the bold status of font.
              *
-             * [Api set: ExcelApi 1.6 (PREVIEW)]
+             * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
              */
             bold?: boolean;
             /**
              *
              * HTML color code representation of the text color. E.g. #FF0000 represents Red.
              *
-             * [Api set: ExcelApi 1.6 (PREVIEW)]
+             * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
              */
             color?: string;
             /**
              *
              * Represents the italic status of the font.
              *
-             * [Api set: ExcelApi 1.6 (PREVIEW)]
+             * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
              */
             italic?: boolean;
             /**
              *
              * Represents the strikethrough status of the font.
              *
-             * [Api set: ExcelApi 1.6 (PREVIEW)]
+             * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
              */
             strikethrough?: boolean;
             /**
              *
              * Type of underline applied to the font. See Excel.ConditionalRangeFontUnderlineStyle for details.
              *
-             * [Api set: ExcelApi 1.6 (PREVIEW)]
+             * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
              */
             underline?: string;
         }
@@ -18115,7 +18045,7 @@ declare namespace Excel {
              *
              * HTML color code representing the color of the fill, of the form #RRGGBB (e.g. "FFA500") or as a named HTML color (e.g. "orange").
              *
-             * [Api set: ExcelApi 1.6 (PREVIEW)]
+             * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
              */
             color?: string;
         }
@@ -18125,14 +18055,14 @@ declare namespace Excel {
              *
              * HTML color code representing the color of the border line, of the form #RRGGBB (e.g. "FFA500") or as a named HTML color (e.g. "orange").
              *
-             * [Api set: ExcelApi 1.6 (PREVIEW)]
+             * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
              */
             color?: string;
             /**
              *
              * One of the constants of line style specifying the line style for the border. See Excel.BorderLineStyle for details.
              *
-             * [Api set: ExcelApi 1.6 (PREVIEW)]
+             * [Api set: ExcelApi 1.6 (PREVIEW) (PREVIEW) (PREVIEW)]
              */
             style?: string;
         }
@@ -18142,126 +18072,126 @@ declare namespace Excel {
              *
              * Indicates if text is automatically indented when the text alignment in a cell is set to equal distribution.
              *
-             * [Api set: ExcelApi 1.7 (PREVIEW)]
+             * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
              */
             addIndent?: boolean;
             /**
              *
              * Indicates if the formula will be hidden when the worksheet is protected.
              *
-             * [Api set: ExcelApi 1.7 (PREVIEW)]
+             * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
              */
             formulaHidden?: boolean;
             /**
              *
              * Represents the horizontal alignment for the style. See Excel.HorizontalAlignment for details.
              *
-             * [Api set: ExcelApi 1.7 (PREVIEW)]
+             * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
              */
             horizontalAlignment?: string;
             /**
              *
              * Indicates if the style includes the AddIndent, HorizontalAlignment, VerticalAlignment, WrapText, IndentLevel, and Orientation properties.
              *
-             * [Api set: ExcelApi 1.7 (PREVIEW)]
+             * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
              */
             includeAlignment?: boolean;
             /**
              *
              * Indicates if the style includes the Color, ColorIndex, LineStyle, and Weight border properties.
              *
-             * [Api set: ExcelApi 1.7 (PREVIEW)]
+             * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
              */
             includeBorder?: boolean;
             /**
              *
              * Indicates if the style includes the Background, Bold, Color, ColorIndex, FontStyle, Italic, Name, Size, Strikethrough, Subscript, Superscript, and Underline font properties.
              *
-             * [Api set: ExcelApi 1.7 (PREVIEW)]
+             * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
              */
             includeFont?: boolean;
             /**
              *
              * Indicates if the style includes the NumberFormat property.
              *
-             * [Api set: ExcelApi 1.7 (PREVIEW)]
+             * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
              */
             includeNumber?: boolean;
             /**
              *
              * Indicates if the style includes the Color, ColorIndex, InvertIfNegative, Pattern, PatternColor, and PatternColorIndex interior properties.
              *
-             * [Api set: ExcelApi 1.7 (PREVIEW)]
+             * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
              */
             includePatterns?: boolean;
             /**
              *
              * Indicates if the style includes the FormulaHidden and Locked protection properties.
              *
-             * [Api set: ExcelApi 1.7 (PREVIEW)]
+             * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
              */
             includeProtection?: boolean;
             /**
              *
              * An integer from 0 to 15 that indicates the indent level for the style.
              *
-             * [Api set: ExcelApi 1.7 (PREVIEW)]
+             * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
              */
             indentLevel?: number;
             /**
              *
              * Indicates if the object is locked when the worksheet is protected.
              *
-             * [Api set: ExcelApi 1.7 (PREVIEW)]
+             * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
              */
             locked?: boolean;
             /**
              *
              * The format code of the number format for the style.
              *
-             * [Api set: ExcelApi 1.7 (PREVIEW)]
+             * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
              */
             numberFormat?: string;
             /**
              *
              * The localized format code of the number format for the style.
              *
-             * [Api set: ExcelApi 1.7 (PREVIEW)]
+             * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
              */
             numberFormatLocal?: string;
             /**
              *
              * The text orientation for the style.
              *
-             * [Api set: ExcelApi 1.7 (PREVIEW)]
+             * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
              */
             orientation?: number;
             /**
              *
              * The reading order for the style.
              *
-             * [Api set: ExcelApi 1.7 (PREVIEW)]
+             * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
              */
             readingOrder?: string;
             /**
              *
              * Indicates if text automatically shrinks to fit in the available column width.
              *
-             * [Api set: ExcelApi 1.7 (PREVIEW)]
+             * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
              */
             shrinkToFit?: boolean;
             /**
              *
              * Represents the vertical alignment for the style. See Excel.VerticalAlignment for details.
              *
-             * [Api set: ExcelApi 1.7 (PREVIEW)]
+             * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
              */
             verticalAlignment?: string;
             /**
              *
              * Indicates if Microsoft Excel wraps the text in the object.
              *
-             * [Api set: ExcelApi 1.7 (PREVIEW)]
+             * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
              */
             wrapText?: boolean;
         }
@@ -18271,28 +18201,28 @@ declare namespace Excel {
              *
              * Gets or sets the black and white print option.
              *
-             * [Api set: ExcelApi 1.7 (PREVIEW)]
+             * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
              */
             blackAndWhite?: boolean;
             /**
              *
              * Gets or sets the orientation of the page.
              *
-             * [Api set: ExcelApi 1.7 (PREVIEW)]
+             * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
              */
             orientation?: string;
             /**
              *
              * Gets or sets the paper size of the page.
              *
-             * [Api set: ExcelApi 1.7 (PREVIEW)]
+             * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
              */
             paperSize?: string;
             /**
              *
              * Gets or sets the print errors option.
              *
-             * [Api set: ExcelApi 1.7 (PREVIEW)]
+             * [Api set: ExcelApi 1.7 (PREVIEW) (PREVIEW) (PREVIEW)]
              */
             printErrors?: string;
         }
@@ -18345,14 +18275,14 @@ declare namespace Word {
      *
      * The Application object.
      *
-     * [Api set: WordApi 1.4 (PREVIEW)]
+     * [Api set: WordApi 1.4 (PREVIEW) (PREVIEW) (PREVIEW)]
      */
     class Application extends OfficeExtension.ClientObject {
         /**
          *
          * Creates a new document by using a base64 encoded .docx file.
          *
-         * [Api set: WordApi 1.4 (PREVIEW)]
+         * [Api set: WordApi 1.4 (PREVIEW) (PREVIEW) (PREVIEW)]
          *
          * @param base64File Optional. The base64 encoded .docx file. The default value is null.
          */
@@ -19040,21 +18970,21 @@ declare namespace Word {
          *
          * Occurs when data within the content control is changed. To get the new text, load this content control in the handler. To get the old text, do not load it.
          *
-         * [Api set: WordApi 1.4 (PREVIEW)]
+         * [Api set: WordApi 1.4 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         readonly onDataChanged: OfficeExtension.EventHandlers<Word.ObjectEventArgs>;
         /**
          *
          * Occurs when the content control is deleted. Do not load this content control in the handler, otherwise you won't be able to get its original properties.
          *
-         * [Api set: WordApi 1.4 (PREVIEW)]
+         * [Api set: WordApi 1.4 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         readonly onDeleted: OfficeExtension.EventHandlers<Word.ObjectEventArgs>;
         /**
          *
          * Occurs when selection within the content control is changed.
          *
-         * [Api set: WordApi 1.4 (PREVIEW)]
+         * [Api set: WordApi 1.4 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         readonly onSelectionChanged: OfficeExtension.EventHandlers<Word.ObjectEventArgs>;
         /**
@@ -19305,35 +19235,35 @@ declare namespace Word {
      *
      * Represents a custom XML part.
      *
-     * [Api set: WordApi 1.4 (PREVIEW)]
+     * [Api set: WordApi 1.4 (PREVIEW) (PREVIEW) (PREVIEW)]
      */
     class CustomXmlPart extends OfficeExtension.ClientObject {
         /**
          *
          * Gets the ID of the custom XML part. Read only.
          *
-         * [Api set: WordApi 1.4 (PREVIEW)]
+         * [Api set: WordApi 1.4 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         readonly id: string;
         /**
          *
          * Gets the namespace URI of the custom XML part. Read only.
          *
-         * [Api set: WordApi 1.4 (PREVIEW)]
+         * [Api set: WordApi 1.4 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         readonly namespaceUri: string;
         /**
          *
          * Deletes the custom XML part.
          *
-         * [Api set: WordApi 1.4 (PREVIEW)]
+         * [Api set: WordApi 1.4 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         delete(): void;
         /**
          *
          * Deletes an attribute with the given name from the element identified by xpath.
          *
-         * [Api set: WordApi 1.4 (PREVIEW)]
+         * [Api set: WordApi 1.4 (PREVIEW) (PREVIEW) (PREVIEW)]
          *
          * @param xpath Required. Absolute path to the single element in XPath notation.
          * @param namespaceMappings Required. An object whose properties represent namespace aliases and the values are the actual namespace URIs.
@@ -19344,7 +19274,7 @@ declare namespace Word {
          *
          * Deletes the element identified by xpath.
          *
-         * [Api set: WordApi 1.4 (PREVIEW)]
+         * [Api set: WordApi 1.4 (PREVIEW) (PREVIEW) (PREVIEW)]
          *
          * @param xpath Required. Absolute path to the single element in XPath notation.
          * @param namespaceMappings Required. An object whose properties represent namespace aliases and the values are the actual namespace URIs.
@@ -19354,14 +19284,14 @@ declare namespace Word {
          *
          * Gets the full XML content of the custom XML part.
          *
-         * [Api set: WordApi 1.4 (PREVIEW)]
+         * [Api set: WordApi 1.4 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         getXml(): OfficeExtension.ClientResult<string>;
         /**
          *
          * Inserts an attribute with the given name and value to the element identified by xpath.
          *
-         * [Api set: WordApi 1.4 (PREVIEW)]
+         * [Api set: WordApi 1.4 (PREVIEW) (PREVIEW) (PREVIEW)]
          *
          * @param xpath Required. Absolute path to the single element in XPath notation.
          * @param namespaceMappings Required. An object whose properties represent namespace aliases and the values are the actual namespace URIs.
@@ -19373,7 +19303,7 @@ declare namespace Word {
          *
          * Inserts the given XML under the parent element identified by xpath at child position index.
          *
-         * [Api set: WordApi 1.4 (PREVIEW)]
+         * [Api set: WordApi 1.4 (PREVIEW) (PREVIEW) (PREVIEW)]
          *
          * @param xpath Required. Absolute path to the single parent element in XPath notation.
          * @param xml Required. XML content to be inserted.
@@ -19385,7 +19315,7 @@ declare namespace Word {
          *
          * Queries the XML content of the custom XML part.
          *
-         * [Api set: WordApi 1.4 (PREVIEW)]
+         * [Api set: WordApi 1.4 (PREVIEW) (PREVIEW) (PREVIEW)]
          *
          * @param xpath Required. An XPath query.
          * @param namespaceMappings Required. An object whose properties represent namespace aliases and the values are the actual namespace URIs.
@@ -19396,7 +19326,7 @@ declare namespace Word {
          *
          * Sets the full XML content of the custom XML part.
          *
-         * [Api set: WordApi 1.4 (PREVIEW)]
+         * [Api set: WordApi 1.4 (PREVIEW) (PREVIEW) (PREVIEW)]
          *
          * @param xml Required. XML content to be set.
          */
@@ -19405,7 +19335,7 @@ declare namespace Word {
          *
          * Updates the value of an attribute with the given name of the element identified by xpath.
          *
-         * [Api set: WordApi 1.4 (PREVIEW)]
+         * [Api set: WordApi 1.4 (PREVIEW) (PREVIEW) (PREVIEW)]
          *
          * @param xpath Required. Absolute path to the single element in XPath notation.
          * @param namespaceMappings Required. An object whose properties represent namespace aliases and the values are the actual namespace URIs.
@@ -19417,7 +19347,7 @@ declare namespace Word {
          *
          * Updates the XML of the element identified by xpath.
          *
-         * [Api set: WordApi 1.4 (PREVIEW)]
+         * [Api set: WordApi 1.4 (PREVIEW) (PREVIEW) (PREVIEW)]
          *
          * @param xpath Required. Absolute path to the single element in XPath notation.
          * @param xml Required. New XML content to be stored.
@@ -19445,7 +19375,7 @@ declare namespace Word {
      *
      * Contains the collection of [customXmlPart](customXmlPart.md) objects.
      *
-     * [Api set: WordApi 1.4 (PREVIEW)]
+     * [Api set: WordApi 1.4 (PREVIEW) (PREVIEW) (PREVIEW)]
      */
     class CustomXmlPartCollection extends OfficeExtension.ClientObject {
         /** Gets the loaded child items in this collection. */
@@ -19454,7 +19384,7 @@ declare namespace Word {
          *
          * Adds a new custom XML part to the document.
          *
-         * [Api set: WordApi 1.4 (PREVIEW)]
+         * [Api set: WordApi 1.4 (PREVIEW) (PREVIEW) (PREVIEW)]
          *
          * @param xml Required. XML content. Must be a valid XML fragment.
          */
@@ -19463,7 +19393,7 @@ declare namespace Word {
          *
          * Gets a new scoped collection of custom XML parts whose namespaces match the given namespace.
          *
-         * [Api set: WordApi 1.4 (PREVIEW)]
+         * [Api set: WordApi 1.4 (PREVIEW) (PREVIEW) (PREVIEW)]
          *
          * @param namespaceUri Required. The namespace URI.
          */
@@ -19472,14 +19402,14 @@ declare namespace Word {
          *
          * Gets the number of items in the collection.
          *
-         * [Api set: WordApi 1.4 (PREVIEW)]
+         * [Api set: WordApi 1.4 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         getCount(): OfficeExtension.ClientResult<number>;
         /**
          *
          * Gets a custom XML part based on its ID. Read only.
          *
-         * [Api set: WordApi 1.4 (PREVIEW)]
+         * [Api set: WordApi 1.4 (PREVIEW) (PREVIEW) (PREVIEW)]
          *
          * @param id ID or index of the custom XML part to be retrieved.
          */
@@ -19488,7 +19418,7 @@ declare namespace Word {
          *
          * Gets a custom XML part based on its ID. Returns a null object if the CustomXmlPart does not exist.
          *
-         * [Api set: WordApi 1.4 (PREVIEW)]
+         * [Api set: WordApi 1.4 (PREVIEW) (PREVIEW) (PREVIEW)]
          *
          * @param id Required. ID of the object to be retrieved.
          */
@@ -19511,7 +19441,7 @@ declare namespace Word {
      *
      * Contains the collection of [customXmlPart](customXmlPart.md) objects with a specific namespace.
      *
-     * [Api set: WordApi 1.4 (PREVIEW)]
+     * [Api set: WordApi 1.4 (PREVIEW) (PREVIEW) (PREVIEW)]
      */
     class CustomXmlPartScopedCollection extends OfficeExtension.ClientObject {
         /** Gets the loaded child items in this collection. */
@@ -19520,21 +19450,21 @@ declare namespace Word {
          *
          * Gets the namespace URI of this custom XML part collection .
          *
-         * [Api set: WordApi 1.4 (PREVIEW)]
+         * [Api set: WordApi 1.4 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         readonly namespaceUri: string;
         /**
          *
          * Gets the number of items in the collection.
          *
-         * [Api set: WordApi 1.4 (PREVIEW)]
+         * [Api set: WordApi 1.4 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         getCount(): OfficeExtension.ClientResult<number>;
         /**
          *
          * Gets a custom XML part based on its ID. Read only.
          *
-         * [Api set: WordApi 1.4 (PREVIEW)]
+         * [Api set: WordApi 1.4 (PREVIEW) (PREVIEW) (PREVIEW)]
          *
          * @param id ID of the custom XML part to be retrieved.
          */
@@ -19543,7 +19473,7 @@ declare namespace Word {
          *
          * Gets a custom XML part based on its ID. Returns a null object if the CustomXmlPart does not exist in the collection.
          *
-         * [Api set: WordApi 1.4 (PREVIEW)]
+         * [Api set: WordApi 1.4 (PREVIEW) (PREVIEW) (PREVIEW)]
          *
          * @param id Required. ID of the object to be retrieved.
          */
@@ -19552,14 +19482,14 @@ declare namespace Word {
          *
          * If the collection contains exactly one item, this method returns it. Otherwise, this method produces an error.
          *
-         * [Api set: WordApi 1.4 (PREVIEW)]
+         * [Api set: WordApi 1.4 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         getOnlyItem(): Word.CustomXmlPart;
         /**
          *
          * If the collection contains exactly one item, this method returns it. Otherwise, this method returns a null object.
          *
-         * [Api set: WordApi 1.4 (PREVIEW)]
+         * [Api set: WordApi 1.4 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         getOnlyItemOrNullObject(): Word.CustomXmlPart;
         /**
@@ -19603,7 +19533,7 @@ declare namespace Word {
          *
          * Gets the custom XML parts in the current document. Read-only.
          *
-         * [Api set: WordApi 1.4 (PREVIEW)]
+         * [Api set: WordApi 1.4 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         readonly customXmlParts: Word.CustomXmlPartCollection;
         /**
@@ -19624,7 +19554,7 @@ declare namespace Word {
          *
          * Gets the add-in's settings in the current document. Read-only.
          *
-         * [Api set: WordApi 1.4 (PREVIEW)]
+         * [Api set: WordApi 1.4 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         readonly settings: Word.SettingCollection;
         /**
@@ -19647,7 +19577,7 @@ declare namespace Word {
          *
          * Deletes a bookmark, if exists, from the document.
          *
-         * [Api set: WordApi 1.4 (PREVIEW)]
+         * [Api set: WordApi 1.4 (PREVIEW) (PREVIEW) (PREVIEW)]
          *
          * @param name Required. The bookmark name, which is case-insensitive.
          */
@@ -19656,7 +19586,7 @@ declare namespace Word {
          *
          * Gets a bookmark's range. Throws if the bookmark does not exist.
          *
-         * [Api set: WordApi 1.4 (PREVIEW)]
+         * [Api set: WordApi 1.4 (PREVIEW) (PREVIEW) (PREVIEW)]
          *
          * @param name Required. The bookmark name, which is case-insensitive.
          */
@@ -19665,7 +19595,7 @@ declare namespace Word {
          *
          * Gets a bookmark's range. Returns a null object if the bookmark does not exist.
          *
-         * [Api set: WordApi 1.4 (PREVIEW)]
+         * [Api set: WordApi 1.4 (PREVIEW) (PREVIEW) (PREVIEW)]
          *
          * @param name Required. The bookmark name, which is case-insensitive.
          */
@@ -19681,7 +19611,7 @@ declare namespace Word {
          *
          * Open the document.
          *
-         * [Api set: WordApi 1.4 (PREVIEW)]
+         * [Api set: WordApi 1.4 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         open(): void;
         /**
@@ -19699,7 +19629,7 @@ declare namespace Word {
          *
          * Occurs when a content control is added. Run context.sync() in the handler to get the new content control's properties.
          *
-         * [Api set: WordApi 1.4 (PREVIEW)]
+         * [Api set: WordApi 1.4 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         readonly onContentControlAdded: OfficeExtension.EventHandlers<Word.ObjectEventArgs>;
         /**
@@ -20097,7 +20027,7 @@ declare namespace Word {
          *
          * Gets the format of the inline image. Read-only.
          *
-         * [Api set: WordApi 1.4 (PREVIEW)]
+         * [Api set: WordApi 1.4 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         readonly imageFormat: string;
         /**
@@ -20344,7 +20274,7 @@ declare namespace Word {
          *
          * Gets the font of the bullet, number or picture at the specified level in the list.
          *
-         * [Api set: WordApi 1.4 (PREVIEW)]
+         * [Api set: WordApi 1.4 (PREVIEW) (PREVIEW) (PREVIEW)]
          *
          * @param level Required. The level in the list.
          */
@@ -20362,7 +20292,7 @@ declare namespace Word {
          *
          * Gets the base64 encoded string representation of the picture at the specified level in the list.
          *
-         * [Api set: WordApi 1.4 (PREVIEW)]
+         * [Api set: WordApi 1.4 (PREVIEW) (PREVIEW) (PREVIEW)]
          *
          * @param level Required. The level in the list.
          */
@@ -20390,7 +20320,7 @@ declare namespace Word {
          *
          * Resets the font of the bullet, number or picture at the specified level in the list.
          *
-         * [Api set: WordApi 1.4 (PREVIEW)]
+         * [Api set: WordApi 1.4 (PREVIEW) (PREVIEW) (PREVIEW)]
          *
          * @param level Required. The level in the list.
          * @param resetFontName Optional. Indicates whether to reset the font name. Default is false that indicates the font name is kept unchanged.
@@ -20444,7 +20374,7 @@ declare namespace Word {
          *
          * Sets the picture at the specified level in the list.
          *
-         * [Api set: WordApi 1.4 (PREVIEW)]
+         * [Api set: WordApi 1.4 (PREVIEW) (PREVIEW) (PREVIEW)]
          *
          * @param level Required. The level in the list.
          * @param base64EncodedImage Optional. The base64 encoded image to be set. If not given, the default picture is set.
@@ -21348,7 +21278,7 @@ declare namespace Word {
          *
          * Gets the names all bookmarks in or overlapping the range. A bookmark is hidden if its name starts with the underscore character.
          *
-         * [Api set: WordApi 1.4 (PREVIEW)]
+         * [Api set: WordApi 1.4 (PREVIEW) (PREVIEW) (PREVIEW)]
          *
          * @param includeHidden Optional. Indicates whether to include hidden bookmarks. Default is false which indicates that the hidden bookmarks are excluded.
          * @param includeAdjacent Optional. Indicates whether to include bookmarks that are adjacent to the range. Default is false which indicates that the adjacent bookmarks are excluded.
@@ -21418,7 +21348,7 @@ declare namespace Word {
          *
          * Inserts a bookmark on the range. If a bookmark of the same name exists somewhere, it is deleted first.
          *
-         * [Api set: WordApi 1.4 (PREVIEW)]
+         * [Api set: WordApi 1.4 (PREVIEW) (PREVIEW) (PREVIEW)]
          *
          * @param name Required. The bookmark name, which is case-insensitive. If the name starts with an underscore character, the bookmark is an hidden one.
          */
@@ -21823,7 +21753,7 @@ declare namespace Word {
      *
      * Represents a setting of the add-in.
      *
-     * [Api set: WordApi 1.4 (PREVIEW)]
+     * [Api set: WordApi 1.4 (PREVIEW) (PREVIEW) (PREVIEW)]
      */
     class Setting extends OfficeExtension.ClientObject {
         private static DateJSONPrefix;
@@ -21834,14 +21764,14 @@ declare namespace Word {
          *
          * Gets the key of the setting. Read only.
          *
-         * [Api set: WordApi 1.4 (PREVIEW)]
+         * [Api set: WordApi 1.4 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         readonly key: string;
         /**
          *
          * Gets or sets the value of the setting.
          *
-         * [Api set: WordApi 1.4 (PREVIEW)]
+         * [Api set: WordApi 1.4 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         value: any;
         /** Sets multiple properties on the object at the same time, based on JSON input. */
@@ -21857,7 +21787,7 @@ declare namespace Word {
          *
          * Deletes the setting.
          *
-         * [Api set: WordApi 1.4 (PREVIEW)]
+         * [Api set: WordApi 1.4 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         delete(): void;
         /**
@@ -21881,7 +21811,7 @@ declare namespace Word {
      *
      * Contains the collection of [setting](setting.md) objects.
      *
-     * [Api set: WordApi 1.4 (PREVIEW)]
+     * [Api set: WordApi 1.4 (PREVIEW) (PREVIEW) (PREVIEW)]
      */
     class SettingCollection extends OfficeExtension.ClientObject {
         /** Gets the loaded child items in this collection. */
@@ -21890,7 +21820,7 @@ declare namespace Word {
          *
          * Creates a new setting or sets an existing setting.
          *
-         * [Api set: WordApi 1.4 (PREVIEW)]
+         * [Api set: WordApi 1.4 (PREVIEW) (PREVIEW) (PREVIEW)]
          *
          * @param key Required. The setting's key, which is case-sensitive.
          * @param value Required. The setting's value.
@@ -21900,21 +21830,21 @@ declare namespace Word {
          *
          * Deletes all settings in this add-in.
          *
-         * [Api set: WordApi 1.4 (PREVIEW)]
+         * [Api set: WordApi 1.4 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         deleteAll(): void;
         /**
          *
          * Gets the count of settings.
          *
-         * [Api set: WordApi 1.4 (PREVIEW)]
+         * [Api set: WordApi 1.4 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         getCount(): OfficeExtension.ClientResult<number>;
         /**
          *
          * Gets a setting object by its key, which is case-sensitive. Throws if the setting does not exist.
          *
-         * [Api set: WordApi 1.4 (PREVIEW)]
+         * [Api set: WordApi 1.4 (PREVIEW) (PREVIEW) (PREVIEW)]
          *
          * @param key The key that identifies the setting object.
          */
@@ -21923,7 +21853,7 @@ declare namespace Word {
          *
          * Gets a setting object by its key, which is case-sensitive. Returns a null object if the setting does not exist.
          *
-         * [Api set: WordApi 1.4 (PREVIEW)]
+         * [Api set: WordApi 1.4 (PREVIEW) (PREVIEW) (PREVIEW)]
          *
          * @param key Required. The key that identifies the setting object.
          */
@@ -22339,7 +22269,7 @@ declare namespace Word {
          *
          * Merges the cells bounded inclusively by a first and last cell.
          *
-         * [Api set: WordApi 1.4 (PREVIEW)]
+         * [Api set: WordApi 1.4 (PREVIEW) (PREVIEW) (PREVIEW)]
          *
          * @param topRow Required. The row of the first cell
          * @param firstCell Required. The index of the first cell in its row
@@ -22597,7 +22527,7 @@ declare namespace Word {
          *
          * Inserts a content control on the row.
          *
-         * [Api set: WordApi 1.4 (PREVIEW)]
+         * [Api set: WordApi 1.4 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         insertContentControl(): Word.ContentControl;
         /**
@@ -22615,7 +22545,7 @@ declare namespace Word {
          *
          * Merges the row into one cell.
          *
-         * [Api set: WordApi 1.4 (PREVIEW)]
+         * [Api set: WordApi 1.4 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         merge(): Word.TableCell;
         /**
@@ -22891,7 +22821,7 @@ declare namespace Word {
          *
          * Splits the cell into the specified number of rows and columns.
          *
-         * [Api set: WordApi 1.4 (PREVIEW)]
+         * [Api set: WordApi 1.4 (PREVIEW) (PREVIEW) (PREVIEW)]
          *
          * @param rowCount Required. The number of rows to split into. Must be a divisor of the number of underlying rows.
          * @param columnCount Required. The number of columns to split into.
@@ -23017,21 +22947,21 @@ declare namespace Word {
      *
      * Provides information about the content control that raised an event.
      *
-     * [Api set: WordApi 1.4 (PREVIEW)]
+     * [Api set: WordApi 1.4 (PREVIEW) (PREVIEW) (PREVIEW)]
      */
     interface ObjectEventArgs {
         /**
          *
          * The object that raised the event. Load this object to get its properties.
          *
-         * [Api set: WordApi 1.4 (PREVIEW)]
+         * [Api set: WordApi 1.4 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         object: any;
         /**
          *
          * The event type.
          *
-         * [Api set: WordApi 1.4 (PREVIEW)]
+         * [Api set: WordApi 1.4 (PREVIEW) (PREVIEW) (PREVIEW)]
          */
         type: number;
     }
@@ -24118,7 +24048,7 @@ declare namespace Word {
              *
              * Gets or sets the value of the setting.
              *
-             * [Api set: WordApi 1.4 (PREVIEW)]
+             * [Api set: WordApi 1.4 (PREVIEW) (PREVIEW) (PREVIEW)]
              */
             value?: any;
         }
