@@ -17,4 +17,5 @@ before_script:
 - npm run tsc
 
 script:
+- npm run build.deploy.script
 - npm run deploy
