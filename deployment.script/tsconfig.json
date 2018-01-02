@@ -1,0 +1,18 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "target": "es6",
+    "sourceMap": true,
+    "typeRoots": [
+      "../node_modules/**"
+    ],
+    "strict": true,
+    "baseUrl": "./",
+    "paths": {
+      "*": [
+        "../node_modules/*"
+      ]
+    },
+    "noUnusedLocals": true
+  }
+}
