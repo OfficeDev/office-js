@@ -14,8 +14,7 @@ install:
 - npm install
 
 before_script:
-- npm run tsc
+- npm run build.deploy.script
 
 script:
-- npm run build.deploy.script
 - npm run deploy
