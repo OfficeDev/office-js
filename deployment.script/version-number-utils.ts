@@ -1,7 +1,17 @@
 import { isString, isNil, isArray } from "lodash";
 import * as semver from 'semver';
+import * as handlebars from 'handlebars';
+import * as moment from "moment";
 
-import { fetchAndThrowOnError, runNpmCommand } from "./util";
+import { fetchAndThrowOnError, runNpmCommand, stripSpaces } from "./util";
+
+export interface IDeploymentYamlFileContext {
+    version: string,
+    travisBuildNumber: string,
+    travisBuildId: string,
+    tag: string
+}
+
 
 export async function getPackageVersonStringFromRepo(
     branch: "release"
@@ -45,4 +55,47 @@ export async function getNextPrivateVersionNumber() {
     }));
 
     return privateNumStart + "-private." + (largestNumber + 1);
+}
+
+export function writeDeploymentYamlFile(partialContext: IDeploymentYamlFileContext) {
+    console.log(generateDeploymentYamlText(partialContext));
+}
+
+
+function generateDeploymentYamlText(partialContext: IDeploymentYamlFileContext): string {
+    const context = {
+        ...partialContext,
+        deployedAt: moment().utc().format('YYYY-MM-DD HH:mm a') + ' UTC',
+        isOfficialBuild: partialContext.tag !== "private"
+    };
+
+    const template = stripSpaces(`
+        version: {{{version}}}
+        deployedAt: {{{deployedAt}}}
+
+        travisCI:
+            buildNumber: {{{travisBuildNumber}}}
+            buildId: {{{travisBuildId}}}
+            log: https://travis-ci.org/OfficeDev/script-lab/builds/{{{travisBuildId}}}
+
+        unpkgUrls: |-
+        {{#if isOfficialBuild}}
+            builds using this same tag ("{{{tag}}}"):
+                https://unpkg.com/@microsoft/office-js@{{{tag}}}/office.js
+        {{/if}}
+            this specific build number:
+                https://unpkg.com/@microsoft/office-js@{{{version}}}/office.js
+
+        scriptLabReferences: |-
+        {{#if isOfficialBuild}}
+            builds using this same tag ("{{{tag}}}"):
+                @microsoft/office-js@{{{tag}}}/office.js
+                @microsoft/office-js@{{{tag}}}/office.d.ts
+        {{/if}}
+            this specific build number:
+                @microsoft/office-js@{{{version}}}/office.js
+                @microsoft/office-js@{{{version}}}/office.d.ts
+    `);
+
+    return handlebars.compile(template)(context);
 }

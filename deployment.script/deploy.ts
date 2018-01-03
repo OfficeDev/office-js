@@ -11,6 +11,8 @@ declare var process: {
     exit: (status: number) => void;
 };
 
+const TRAVIS_AUTO_COMMIT_TEXT = "[TravisCI AUTO-COMMIT]";
+
 const REQUIRED_ADDITIONAL_FIELDS: Array<keyof IEnvironmentVariables> =
     [];
 //['GH_ACCOUNT', 'GH_REPO', 'GH_TOKEN'];
@@ -47,6 +49,9 @@ const OFFICIAL_BRANCHES = ["release", "release-next", "beta", "beta-next"];
             banner('UNKNOWN BRANCH, SKIPPING DEPLOYMENT', message, chalk.yellow.bold);
         }
 
+        banner('SUCCESS, DEPLOYMENT COMPLETE!', null, chalk.green.bold);
+        process.exit(0);
+
     } catch (error) {
         banner('AN ERROR OCCURRED', error.message || error, chalk.bold.red);
         console.error(error);
@@ -80,6 +85,13 @@ function precheckOrExit(): void {
         process.exit(0);
     }
 
+    if (process.env.TRAVIS_COMMIT_MESSAGE && process.env.TRAVIS_COMMIT_MESSAGE.startsWith(TRAVIS_AUTO_COMMIT_TEXT)) {
+        banner('Deployment skipped',
+            `Skipping builds for commit messages labeled as "${TRAVIS_AUTO_COMMIT_TEXT}"`,
+            chalk.yellow.bold);
+        process.exit(0);
+    }
+
     // Careful! Need this check because otherwise, a pull request against master would immediately trigger a deployment.
     if (process.env.TRAVIS_PULL_REQUEST !== 'false') {
         banner('Deployment skipped', 'Skipping deploy for pull requests.', chalk.yellow.bold);
@@ -94,8 +106,15 @@ function precheckOrExit(): void {
 }
 
 async function deployPrivateBuild(): Promise<void> {
-    let privateVersion = await VersionUtils.getNextPrivateVersionNumber();
-    console.log("Will be deploying build number " + privateVersion);
+    let version = await VersionUtils.getNextPrivateVersionNumber();
+    console.log("Will be deploying build number " + version);
+
+    VersionUtils.writeDeploymentYamlFile({
+        tag: "private",
+        travisBuildId: process.env.TRAVIS_BUILD_ID,
+        travisBuildNumber: process.env.TRAVIS_BUILD_NUMBER,
+        version
+    });
 }
 
 async function deployOfficialBranchBuild(): Promise<void> {
