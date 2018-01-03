@@ -2,15 +2,9 @@ import { isString, isNil, isArray } from "lodash";
 import * as semver from 'semver';
 import * as handlebars from 'handlebars';
 import * as moment from "moment";
+import * as fs from "fs-extra";
 
 import { fetchAndThrowOnError, runNpmCommand, stripSpaces } from "./util";
-
-export interface IDeploymentYamlFileContext {
-    version: string,
-    travisBuildNumber: string,
-    travisBuildId: string,
-    tag: string
-}
 
 
 export async function getPackageVersonStringFromRepo(
@@ -57,12 +51,29 @@ export async function getNextPrivateVersionNumber() {
     return privateNumStart + "-private." + (largestNumber + 1);
 }
 
-export function writeDeploymentYamlFile(partialContext: IDeploymentYamlFileContext) {
-    console.log(generateDeploymentYamlText(partialContext));
+export function updatePackageJson(version: string): void {
+    const packageJsonPath = "package.json";
+    const packageJsonContentsArray = fs.readFileSync(packageJsonPath).toString().split("\n");
+    const versionRegex = /(^\s+"version": ")(.*)(",\s+$)/;
+    let versionEntryIndex = packageJsonContentsArray.findIndex(line => versionRegex.test(line));
+    if (versionEntryIndex <= 0) {
+        throw new Error("Could not find a line with the package version number, this can't be correct");
+    }
+    const regexResult = versionRegex.exec(packageJsonContentsArray[versionEntryIndex])!;
+    const substitutedVersion = regexResult[1] + version + regexResult[3];
+    packageJsonContentsArray[versionEntryIndex] = substitutedVersion;
+    fs.writeFileSync(packageJsonPath, packageJsonContentsArray.join("\n"));
 }
 
-
-function generateDeploymentYamlText(partialContext: IDeploymentYamlFileContext): string {
+export function generateDeploymentYamlText(partialContext: {
+    version: string,
+    travisBuildNumber: string,
+    travisBuildId: string,
+    tag: string,
+    branchName: string,
+    commitHash: string,
+    commitMessage: string
+}): string {
     const context = {
         ...partialContext,
         deployedAt: moment().utc().format('YYYY-MM-DD HH:mm a') + ' UTC',
@@ -77,6 +88,11 @@ function generateDeploymentYamlText(partialContext: IDeploymentYamlFileContext):
             buildNumber: {{{travisBuildNumber}}}
             buildId: {{{travisBuildId}}}
             log: https://travis-ci.org/OfficeDev/script-lab/builds/{{{travisBuildId}}}
+
+        history:
+            privateBranchName: {{{branchName}}}
+            basedOnDistFolderFromCommitHash: {{{commitHash}}}
+            commitMessage: {{{commitMessage}}}
 
         unpkgUrls: |-
         {{#if isOfficialBuild}}

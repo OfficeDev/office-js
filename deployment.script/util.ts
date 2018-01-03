@@ -1,5 +1,6 @@
 import * as chalk from 'chalk';
-import * as shell from "shelljs";
+import * as shell from 'shelljs';
+import { forIn } from 'lodash';
 require('isomorphic-fetch');
 
 
@@ -45,14 +46,39 @@ export async function fetchAndThrowOnError(url: string, format: 'text' | 'json')
     }
 }
 
-export function shellExecOrFail(command: string) {
-    console.log(">> " + command);
-    let result = shell.exec(command);
-    if (result.code !== 0) {
-        console.error(`An error occurred while executing \`${command}\``);
-        console.error(result.stderr);
-        process.exit(1);
+/**
+ * Execute a shall command.
+ * @param originalSanitizedCommand - The command to execute. Note that if it contains something secret, put it in triple <<<NAME>>> syntax, as the command itself will get echo-ed.
+ * @param secretSubstitutions - key-value pairs to substitute into the command when executing.  Having any secret substitutions will automatically make the command run silently.
+ */
+export function execCommand(originalSanitizedCommand: string, secretSubstitutions: { [key: string]: string } = {}) {
+    console.log(">> " + originalSanitizedCommand);
+
+    let hadSecrets = false;
+    let command = originalSanitizedCommand;
+    forIn(secretSubstitutions, (value, key) => {
+        hadSecrets = true;
+        command = replaceAll(command, '<<<' + key + '>>>', value);
+    });
+
+    if (hadSecrets) {
+        console.log(chalk.yellow('Command contained secret substitution values; running the `shell.exec` silently'));
     }
+
+    let result: any = shell.exec(command, hadSecrets ? { silent: true } : null!);
+    if (result.code !== 0) {
+        const message = `An error occurred while executing "${originalSanitizedCommand}"`;
+        console.error(message);
+        if (!hadSecrets) {
+            console.error(result.stderr);
+        }
+
+        throw new Error(message);
+    }
+}
+
+function replaceAll(source: string, search: string, replacement: string) {
+    return source.split(search).join(replacement);
 }
 
 export async function runNpmCommand<T>(command: string, ...args: any[]): Promise<T> {

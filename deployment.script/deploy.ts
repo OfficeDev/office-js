@@ -2,8 +2,10 @@
 
 import { isString } from "lodash";
 import * as chalk from 'chalk';
+import * as shell from 'shelljs';
+import * as fs from "fs-extra";
 
-import { banner, stripSpaces } from "./util";
+import { banner, stripSpaces, execCommand } from "./util";
 import * as VersionUtils from "./version-number-utils";
 
 declare var process: {
@@ -11,19 +13,29 @@ declare var process: {
     exit: (status: number) => void;
 };
 
-const TRAVIS_AUTO_COMMIT_TEXT = "[TravisCI AUTO-COMMIT]";
+const TRAVIS_AUTO_COMMIT_TEXT = "[TRAVIS CI AUTO-COMMIT]";
+const TOKENIZED_GITHUB_PUSH_URL = `https://<<<token>>>@github.com/OfficeDev/office-js.git`;
+const REPO_LOCAL_FOLDER = "office-js"; // Just a local folder name relative to current path.
+const DEPLOYMENT_YAML_FILENAME = "NPM.DEPLOYMENT.INFO.yaml";
 
-const REQUIRED_ADDITIONAL_FIELDS: Array<keyof IEnvironmentVariables> =
-    [];
-//['GH_ACCOUNT', 'GH_REPO', 'GH_TOKEN'];
+const REQUIRED_ADDITIONAL_FIELDS: Array<keyof IEnvironmentVariables> = ['GH_TOKEN'];
 
 interface IEnvironmentVariables {
     TRAVIS: string,
     TRAVIS_BRANCH: string,
     TRAVIS_PULL_REQUEST: string,
+    TRAVIS_COMMIT: string,
     TRAVIS_COMMIT_MESSAGE: string,
     TRAVIS_BUILD_ID: string,
     TRAVIS_BUILD_NUMBER: string,
+
+    /**
+     * GitHub token generated using https://github.com/settings/tokens,
+     *     bearing permissions for "repo:status", "repo_deployment", and "public_repo".
+     * This is a personal access token, so the commits always happen on behalf
+     *     of the person who created the token.
+     * The token is then entered as a hidden value in https://travis-ci.org/OfficeDev/office-js/settings */
+    GH_TOKEN: string
 }
 
 const OFFICIAL_BRANCHES = ["release", "release-next", "beta", "beta-next"];
@@ -106,14 +118,28 @@ function precheckOrExit(): void {
 }
 
 async function deployPrivateBuild(): Promise<void> {
-    let version = await VersionUtils.getNextPrivateVersionNumber();
-    console.log("Will be deploying build number " + version);
+    const version = await VersionUtils.getNextPrivateVersionNumber();
+    console.log("Will be deploying as office.js NPM version " + version);
 
-    VersionUtils.writeDeploymentYamlFile({
-        tag: "private",
-        travisBuildId: process.env.TRAVIS_BUILD_ID,
-        travisBuildNumber: process.env.TRAVIS_BUILD_NUMBER,
-        version
+    await cloneRepo({
+        version,
+        afterCloneBeforePush: async () => {
+            const deploymentFileContents = VersionUtils.generateDeploymentYamlText({
+                tag: "private",
+                travisBuildId: process.env.TRAVIS_BUILD_ID,
+                travisBuildNumber: process.env.TRAVIS_BUILD_NUMBER,
+                branchName: process.env.TRAVIS_BRANCH,
+                commitHash: process.env.TRAVIS_COMMIT,
+                commitMessage: process.env.TRAVIS_COMMIT_MESSAGE,
+                version
+            });
+            fs.writeFileSync(DEPLOYMENT_YAML_FILENAME, deploymentFileContents);
+            execCommand(`git add ${DEPLOYMENT_YAML_FILENAME}`);
+
+            VersionUtils.updatePackageJson(version);
+
+            execCommand(`git commit --allow-empty -m "${TRAVIS_AUTO_COMMIT_TEXT}\n${process.env.TRAVIS_COMMIT_MESSAGE}"`);
+        }
     });
 }
 
@@ -122,4 +148,33 @@ async function deployOfficialBranchBuild(): Promise<void> {
         Sorry, the auto-deployment of official branches isn't supported yet.
     `);
     banner('NOT YET IMPLEMENTED, SKIPPING DEPLOYMENT', message, chalk.yellow.bold);
+}
+
+async function cloneRepo(options: {
+    version: string;
+    afterCloneBeforePush: () => Promise<any>,
+}) {
+    fs.removeSync(REPO_LOCAL_FOLDER);
+
+    execCommand(`git clone ${TOKENIZED_GITHUB_PUSH_URL} ${REPO_LOCAL_FOLDER}`, {
+        token: process.env.GH_TOKEN
+    });
+
+    shell.pushd(REPO_LOCAL_FOLDER);
+
+
+    execCommand(`git checkout ${process.env.TRAVIS_BRANCH}`);
+    execCommand('git config --add user.name "Travis CI"');
+    execCommand('git config --add user.email "travis.ci@microsoft.com"');
+
+    await options.afterCloneBeforePush();
+
+    execCommand(`git push`);
+
+    const gitTagName = "v" + options.version;
+    execCommand(`git tag -a ${gitTagName} -m "${TRAVIS_AUTO_COMMIT_TEXT}\n${process.env.TRAVIS_COMMIT_MESSAGE}"`);
+    execCommand(`git push origin ${gitTagName}`);
+
+
+    shell.popd();
 }
