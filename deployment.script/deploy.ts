@@ -3,7 +3,8 @@
 import { isString } from "lodash";
 import * as chalk from 'chalk';
 
-import { banner } from "./util";
+import { banner, stripSpaces } from "./util";
+import * as VersionUtils from "./version-number-utils";
 
 declare var process: {
     env: IEnvironmentVariables
@@ -12,7 +13,7 @@ declare var process: {
 
 const REQUIRED_ADDITIONAL_FIELDS: Array<keyof IEnvironmentVariables> =
     [];
-    //['GH_ACCOUNT', 'GH_REPO', 'GH_TOKEN'];
+//['GH_ACCOUNT', 'GH_REPO', 'GH_TOKEN'];
 
 interface IEnvironmentVariables {
     TRAVIS: string,
@@ -23,19 +24,34 @@ interface IEnvironmentVariables {
     TRAVIS_BUILD_NUMBER: string,
 }
 
+const OFFICIAL_BRANCHES = ["release", "release-next", "beta", "beta-next"];
+
+
 (async () => {
     try {
         printBuildStartInfo();
 
-        if (!precheck()) {
-            return;
+        precheckOrExit();
+
+        if (process.env.TRAVIS_BRANCH.startsWith("__private")) {
+            await deployPrivateBuild();
+        } else if (OFFICIAL_BRANCHES.indexOf(process.env.TRAVIS_BRANCH) >= 0) {
+            await deployOfficialBranchBuild();
+        } else {
+            const message = stripSpaces(`
+                Branch "${process.env.TRAVIS_BRANCH}" neither starts with "__private",
+                    nor matches any of the following: [${
+                OFFICIAL_BRANCHES.map(item => `"${item}"`).join(", ")
+                }].
+            `);
+            banner('UNKNOWN BRANCH, SKIPPING DEPLOYMENT', message, chalk.yellow.bold);
         }
 
-        await deploy();
+    } catch (error) {
+        banner('AN ERROR OCCURRED', error.message || error, chalk.bold.red);
+        console.error(error);
 
-        process.exit(0);
-    } catch (e) {
-        console.error(e);
+        banner('DEPLOYMENT DID NOT GET TRIGGERED', null, chalk.bold.red);
         process.exit(1);
     }
 })();
@@ -57,17 +73,17 @@ function printBuildStartInfo() {
     banner('TravisCI build started', fieldsString, chalk.green.bold);
 }
 
-function precheck(): boolean {
+function precheckOrExit(): void {
     /* Check if the code is running inside of travis.ci. If not abort immediately. */
     if (!process.env.TRAVIS) {
         banner('Deployment skipped', 'Not running inside of Travis.', chalk.yellow.bold);
-        return false;
+        process.exit(0);
     }
 
     // Careful! Need this check because otherwise, a pull request against master would immediately trigger a deployment.
     if (process.env.TRAVIS_PULL_REQUEST !== 'false') {
         banner('Deployment skipped', 'Skipping deploy for pull requests.', chalk.yellow.bold);
-        return false;
+        process.exit(0);
     }
 
     REQUIRED_ADDITIONAL_FIELDS.forEach(key => {
@@ -75,10 +91,16 @@ function precheck(): boolean {
             throw new Error(`"${key}" is a required global variables.`);
         }
     });
-
-    return true;
 }
 
-function deploy(): void {
+async function deployPrivateBuild(): Promise<void> {
+    let privateVersion = await VersionUtils.getNextPrivateVersionNumber();
+    console.log("Will be deploying build number " + privateVersion);
+}
 
+async function deployOfficialBranchBuild(): Promise<void> {
+    const message = stripSpaces(`
+        Sorry, the auto-deployment of official branches isn't supported yet.
+    `);
+    banner('NOT YET IMPLEMENTED, SKIPPING DEPLOYMENT', message, chalk.yellow.bold);
 }
