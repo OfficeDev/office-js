@@ -1,7 +1,26 @@
-#############################################################################
-############## Please keep this file IN SYNC with .npmignore ################
-##### (near-identical copy, but with a few additional files at the top) #####
-#############################################################################
+# Addition files to ignore from the NPM package:
+.vscode
+deployment.script
+.travis.yml
+
+# Until we publish sources, no point to have tslint.json and yarn.lock
+#   (which today are only used for the deployment.script folder, which is excluded)
+tslint.json
+yarn.lock
+
+# Don't include the .github folder either; the only useful thing it contains
+# is an image used in the README file, but that's not worth it.
+.github
+
+
+
+
+##################################################################
+####### The rest of this file is IDENTICAL to .gitignore #########
+################ Please keep BOTH OF THEM IN SYNC ################
+##################################################################
+
+
 
 
 node_modules/**
