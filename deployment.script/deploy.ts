@@ -40,13 +40,6 @@ interface IEnvironmentVariables {
     /** A token for publishing to NPM.  It can be generated using "npm token create"
      * Note that you'll need NPM version 5.5.1+ to run this command.
      * https://docs.npmjs.com/getting-started/working_with_tokens
-     *
-     * In practice, the token is never used here in the deploy.ts script.
-     * Instead, it's used by the ".travis.yml" file, where it does:
-     *     before_install:
-     *        - echo "//registry.npmjs.org/:_authToken=\${NPM_TOKEN}" > .npmrc
-     * It is mention here simply for completeness/documentation sake, since the
-     * other token is also mentioned here.
     */
     NPM_TOKEN: string
 }
@@ -57,7 +50,6 @@ interface IDeploymentParams {
     npmPublishTag: string;
     version: string;
     afterCloneBeforeCommit?: () => Promise<any>;
-    doNpmPublish: () => void;
 }
 
 (async () => {
@@ -105,7 +97,10 @@ function printBuildStartInfo() {
         "TRAVIS_BUILD_NUMBER",
         "TRAVIS_COMMIT_MESSAGE",
         "TRAVIS_PULL_REQUEST",
-        "TRAVIS_BUILD_DIR"
+
+        // "TRAVIS_BUILD_DIR":  Intentionally *NOT* outputting it,
+        // since it serves no use to see, but causes issues if you copy-paste
+        // the output of these Travis parameters from the log into "launch.json"
     ];
 
     const fieldsString = fieldsToPrint
@@ -181,16 +176,20 @@ async function doDeployment(params: IDeploymentParams): Promise<string> {
 
     VersionUtils.updatePackageJson(version);
 
-    execCommand(`git commit --allow-empty -m "${TRAVIS_AUTO_COMMIT_TEXT}\n${process.env.TRAVIS_COMMIT_MESSAGE}"`);
+    execCommand(`git commit --allow-empty -m "${TRAVIS_AUTO_COMMIT_TEXT} ${process.env.TRAVIS_COMMIT_MESSAGE}"`);
     execCommand(`git push`);
 
-    params.doNpmPublish();
+
+    // Now that the repo is updated, publish to NPM:
+
+    fs.writeFileSync(".npmrc", `//registry.npmjs.org/:_authToken=${process.env.NPM_TOKEN}`);
+    execCommand(`npm publish --tag ${npmPublishTag}`);
 
 
     // If NPM succeeded, tag it and also add an NPM release:
     console.log(`Also tag the branch, and make a GitHub release: https://github.com/OfficeDev/office-js/releases/tag/${gitTagName}`);
 
-    execCommand(`git tag -a ${gitTagName} -m "${TRAVIS_AUTO_COMMIT_TEXT}\n${process.env.TRAVIS_COMMIT_MESSAGE}"`);
+    execCommand(`git tag -a ${gitTagName} -m "${TRAVIS_AUTO_COMMIT_TEXT} ${process.env.TRAVIS_COMMIT_MESSAGE}"`);
     execCommand(`git push origin ${gitTagName}`);
 
     const releaseNotesWithNbsp = deploymentFileContents.split("\n").map(line => {
@@ -235,13 +234,11 @@ async function doDeployment(params: IDeploymentParams): Promise<string> {
 
 async function getPrivateBranchDeploymentParams(): Promise<IDeploymentParams> {
     const version = await VersionUtils.getNextPrivateVersionNumber();
+    const npmPublishTag = "private";
 
     return {
         version,
-        npmPublishTag: "private",
-        doNpmPublish: () => {
-            execCommand(`npm publish --tag beta`);
-        }
+        npmPublishTag
     };
 }
 
@@ -254,7 +251,6 @@ async function getOfficialBranchDeploymentParams(): Promise<IDeploymentParams> {
 
     return {
         version: "unknown",
-        npmPublishTag: "unknown",
-        doNpmPublish: () => { }
+        npmPublishTag: "unknown"
     };
 }

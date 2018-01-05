@@ -23,7 +23,7 @@ yarn.lock
 
 
 
-
+.npmrc
 node_modules/**
 typings/**
 deployment.script/*.js
