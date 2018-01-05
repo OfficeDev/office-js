@@ -115,7 +115,7 @@ export function generateDeploymentYamlText(partialContext: {
         travisCI:
             buildNumber: {{{travisBuildNumber}}}
             buildId: {{{travisBuildId}}}
-            log: https://travis-ci.org/OfficeDev/script-lab/builds/{{{travisBuildId}}}
+            log: https://travis-ci.org/OfficeDev/office-js/builds/{{{travisBuildId}}}
     `);
 
     return handlebars.compile(template)(context);
