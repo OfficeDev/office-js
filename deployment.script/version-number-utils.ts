@@ -54,7 +54,7 @@ export async function getNextPrivateVersionNumber() {
 export function updatePackageJson(version: string): void {
     const packageJsonPath = "package.json";
     const packageJsonContentsArray = fs.readFileSync(packageJsonPath).toString().split("\n");
-    const versionRegex = /(^\s+"version": ")(.*)(",\s+$)/;
+    const versionRegex = /^(\s+"version": ")(.*)(",\s*)$/;
     let versionEntryIndex = packageJsonContentsArray.findIndex(line => versionRegex.test(line));
     if (versionEntryIndex <= 0) {
         const errorMessage = "Could not find a line with the package version number, this can't be correct.";
