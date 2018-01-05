@@ -1,7 +1,7 @@
 import { isString, isNil, isArray } from "lodash";
-import * as semver from 'semver';
-import * as handlebars from 'handlebars';
-import * as moment from "moment";
+import * as semver from "semver";
+import * as handlebars from "handlebars";
+import * as moment from "moment-timezone";
 import * as fs from "fs-extra";
 
 import { fetchAndThrowOnError, runNpmCommand, stripSpaces } from "./util";
@@ -69,25 +69,20 @@ export function generateDeploymentYamlText(partialContext: {
     version: string,
     travisBuildNumber: string,
     travisBuildId: string,
-    tag: string,
+    npmPublishTag: string,
     branchName: string,
     commitHash: string,
     commitMessage: string
 }): string {
     const context = {
         ...partialContext,
-        deployedAt: moment().utc().format('YYYY-MM-DD HH:mm a') + ' UTC',
-        isOfficialBuild: partialContext.tag !== "private"
+        deployedAt: `${moment().utc().format('YYYY-MM-DD h:mm a')} UTC  (${moment().tz("America/Los_Angeles").format('YYYY-MM-DD h:mm a')} Pacific Time)`,
+        isOfficialBuild: partialContext.npmPublishTag !== "private"
     };
 
     const template = stripSpaces(`
         version: {{{version}}}
         deployedAt: {{{deployedAt}}}
-
-        travisCI:
-            buildNumber: {{{travisBuildNumber}}}
-            buildId: {{{travisBuildId}}}
-            log: https://travis-ci.org/OfficeDev/script-lab/builds/{{{travisBuildId}}}
 
         history:
             privateBranchName: {{{branchName}}}
@@ -97,20 +92,27 @@ export function generateDeploymentYamlText(partialContext: {
         unpkgUrls: |-
         {{#if isOfficialBuild}}
             builds using this same tag ("{{{tag}}}"):
-                https://unpkg.com/@microsoft/office-js@{{{tag}}}/office.js
+                https://unpkg.com/@microsoft/office-js@{{{tag}}}/dist/office.js
+                https://unpkg.com/@microsoft/office-js@{{{tag}}}/dist/office.debug.js  (unminified)
         {{/if}}
             this specific build number:
-                https://unpkg.com/@microsoft/office-js@{{{version}}}/office.js
+                https://unpkg.com/@microsoft/office-js@{{{version}}}/dist/office.js
+                https://unpkg.com/@microsoft/office-js@{{{version}}}/dist/office.debug.js  (unminified)
 
         scriptLabReferences: |-
         {{#if isOfficialBuild}}
             builds using this same tag ("{{{tag}}}"):
-                @microsoft/office-js@{{{tag}}}/office.js
-                @microsoft/office-js@{{{tag}}}/office.d.ts
+                @microsoft/office-js@{{{tag}}}/dist/office.js
+                @microsoft/office-js@{{{tag}}}/dist/office.d.ts
         {{/if}}
             this specific build number:
-                @microsoft/office-js@{{{version}}}/office.js
-                @microsoft/office-js@{{{version}}}/office.d.ts
+                @microsoft/office-js@{{{version}}}/dist/office.js
+                @microsoft/office-js@{{{version}}}/dist/office.d.ts
+
+        travisCI:
+            buildNumber: {{{travisBuildNumber}}}
+            buildId: {{{travisBuildId}}}
+            log: https://travis-ci.org/OfficeDev/script-lab/builds/{{{travisBuildId}}}
     `);
 
     return handlebars.compile(template)(context);

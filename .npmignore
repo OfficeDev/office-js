@@ -2,6 +2,7 @@
 .vscode
 deployment.script
 .travis.yml
+gulpfile.js
 
 # Until we publish sources, no point to have tslint.json and yarn.lock
 #   (which today are only used for the deployment.script folder, which is excluded)

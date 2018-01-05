@@ -15,7 +15,6 @@ declare var process: {
 
 const TRAVIS_AUTO_COMMIT_TEXT = "[TRAVIS CI AUTO-COMMIT]";
 const TOKENIZED_GITHUB_PUSH_URL = `https://<<<token>>>@github.com/OfficeDev/office-js.git`;
-const REPO_LOCAL_FOLDER = "office-js"; // Just a local folder name relative to current path.
 const DEPLOYMENT_YAML_FILENAME = "NPM.DEPLOYMENT.INFO.yaml";
 
 const REQUIRED_ADDITIONAL_FIELDS: Array<keyof IEnvironmentVariables> = ['GH_TOKEN'];
@@ -28,6 +27,7 @@ interface IEnvironmentVariables {
     TRAVIS_COMMIT_MESSAGE: string,
     TRAVIS_BUILD_ID: string,
     TRAVIS_BUILD_NUMBER: string,
+    TRAVIS_BUILD_DIR: string,
 
     /**
      * GitHub token generated using https://github.com/settings/tokens,
@@ -35,11 +35,30 @@ interface IEnvironmentVariables {
      * This is a personal access token, so the commits always happen on behalf
      *     of the person who created the token.
      * The token is then entered as a hidden value in https://travis-ci.org/OfficeDev/office-js/settings */
-    GH_TOKEN: string
+    GH_TOKEN: string,
+
+    /** A token for publishing to NPM.  It can be generated using "npm token create"
+     * Note that you'll need NPM version 5.5.1+ to run this command.
+     * https://docs.npmjs.com/getting-started/working_with_tokens
+     *
+     * In practice, the token is never used here in the deploy.ts script.
+     * Instead, it's used by the ".travis.yml" file, where it does:
+     *     before_install:
+     *        - echo "//registry.npmjs.org/:_authToken=\${NPM_TOKEN}" > .npmrc
+     * It is mention here simply for completeness/documentation sake, since the
+     * other token is also mentioned here.
+    */
+    NPM_TOKEN: string
 }
 
 const OFFICIAL_BRANCHES = ["release", "release-next", "beta", "beta-next"];
 
+interface IDeploymentParams {
+    npmPublishTag: string;
+    version: string;
+    afterCloneBeforeCommit?: () => Promise<any>;
+    doNpmPublish: () => void;
+}
 
 (async () => {
     try {
@@ -47,10 +66,11 @@ const OFFICIAL_BRANCHES = ["release", "release-next", "beta", "beta-next"];
 
         precheckOrExit();
 
+        let deploymentParams: IDeploymentParams;
         if (process.env.TRAVIS_BRANCH.startsWith("__private")) {
-            await deployPrivateBuild();
+            deploymentParams = await getPrivateBranchDeploymentParams();
         } else if (OFFICIAL_BRANCHES.indexOf(process.env.TRAVIS_BRANCH) >= 0) {
-            await deployOfficialBranchBuild();
+            deploymentParams = await getOfficialBranchDeploymentParams();
         } else {
             const message = stripSpaces(`
                 Branch "${process.env.TRAVIS_BRANCH}" neither starts with "__private",
@@ -59,9 +79,13 @@ const OFFICIAL_BRANCHES = ["release", "release-next", "beta", "beta-next"];
                 }].
             `);
             banner('UNKNOWN BRANCH, SKIPPING DEPLOYMENT', message, chalk.yellow.bold);
+            process.exit(0);
+            return;
         }
 
-        banner('SUCCESS, DEPLOYMENT COMPLETE!', null, chalk.green.bold);
+        let deploymentResultOutput = await doDeployment(deploymentParams);
+
+        banner('SUCCESS, DEPLOYMENT COMPLETE!', deploymentResultOutput, chalk.green.bold);
         process.exit(0);
 
     } catch (error) {
@@ -80,12 +104,13 @@ function printBuildStartInfo() {
         "TRAVIS_BUILD_ID",
         "TRAVIS_BUILD_NUMBER",
         "TRAVIS_COMMIT_MESSAGE",
-        "TRAVIS_PULL_REQUEST"
+        "TRAVIS_PULL_REQUEST",
+        "TRAVIS_BUILD_DIR"
     ];
 
     const fieldsString = fieldsToPrint
-        .map(item => item + ": " + process.env[item])
-        .join("\n");
+        .map(item => `${item}: "${process.env[item]}"`)
+        .join(",\n");
 
     banner('TravisCI build started', fieldsString, chalk.green.bold);
 }
@@ -117,64 +142,119 @@ function precheckOrExit(): void {
     });
 }
 
-async function deployPrivateBuild(): Promise<void> {
-    const version = await VersionUtils.getNextPrivateVersionNumber();
-    console.log("Will be deploying as office.js NPM version " + version);
+async function doDeployment(params: IDeploymentParams): Promise<string> {
+    const { version, npmPublishTag } = params;
+    const gitTagName = "v" + params.version;
 
-    await cloneRepo({
+    banner("This deployment's target NPM version", "Target package version: " + version, chalk.magenta.bold);
+
+    const deploymentFileContents = VersionUtils.generateDeploymentYamlText({
+        npmPublishTag,
         version,
-        afterCloneBeforePush: async () => {
-            const deploymentFileContents = VersionUtils.generateDeploymentYamlText({
-                tag: "private",
-                travisBuildId: process.env.TRAVIS_BUILD_ID,
-                travisBuildNumber: process.env.TRAVIS_BUILD_NUMBER,
-                branchName: process.env.TRAVIS_BRANCH,
-                commitHash: process.env.TRAVIS_COMMIT,
-                commitMessage: process.env.TRAVIS_COMMIT_MESSAGE,
-                version
-            });
-            fs.writeFileSync(DEPLOYMENT_YAML_FILENAME, deploymentFileContents);
-            execCommand(`git add ${DEPLOYMENT_YAML_FILENAME}`);
-
-            VersionUtils.updatePackageJson(version);
-
-            execCommand(`git commit --allow-empty -m "${TRAVIS_AUTO_COMMIT_TEXT}\n${process.env.TRAVIS_COMMIT_MESSAGE}"`);
-        }
+        travisBuildId: process.env.TRAVIS_BUILD_ID,
+        travisBuildNumber: process.env.TRAVIS_BUILD_NUMBER,
+        branchName: process.env.TRAVIS_BRANCH,
+        commitHash: process.env.TRAVIS_COMMIT,
+        commitMessage: process.env.TRAVIS_COMMIT_MESSAGE,
     });
-}
 
-async function deployOfficialBranchBuild(): Promise<void> {
-    const message = stripSpaces(`
-        Sorry, the auto-deployment of official branches isn't supported yet.
-    `);
-    banner('NOT YET IMPLEMENTED, SKIPPING DEPLOYMENT', message, chalk.yellow.bold);
-}
+    const repoLocalFolderPath = process.env.TRAVIS_BUILD_DIR + "/" + "office-js/";
+    fs.removeSync(repoLocalFolderPath);
 
-async function cloneRepo(options: {
-    version: string;
-    afterCloneBeforePush: () => Promise<any>,
-}) {
-    fs.removeSync(REPO_LOCAL_FOLDER);
-
-    execCommand(`git clone ${TOKENIZED_GITHUB_PUSH_URL} ${REPO_LOCAL_FOLDER}`, {
+    execCommand(`git clone ${TOKENIZED_GITHUB_PUSH_URL} ${repoLocalFolderPath}`, {
         token: process.env.GH_TOKEN
     });
 
-    shell.pushd(REPO_LOCAL_FOLDER);
+    shell.pushd(repoLocalFolderPath);
 
 
     execCommand(`git checkout ${process.env.TRAVIS_BRANCH}`);
     execCommand('git config --add user.name "Travis CI"');
     execCommand('git config --add user.email "travis.ci@microsoft.com"');
 
-    await options.afterCloneBeforePush();
+    if (params.afterCloneBeforeCommit) {
+        await params.afterCloneBeforeCommit();
+    }
 
+    fs.writeFileSync(DEPLOYMENT_YAML_FILENAME, deploymentFileContents);
+    execCommand(`git add ${DEPLOYMENT_YAML_FILENAME}`);
+
+    VersionUtils.updatePackageJson(version);
+
+    execCommand(`git commit --allow-empty -m "${TRAVIS_AUTO_COMMIT_TEXT}\n${process.env.TRAVIS_COMMIT_MESSAGE}"`);
     execCommand(`git push`);
 
-    const gitTagName = "v" + options.version;
+    params.doNpmPublish();
+
+
+    // If NPM succeeded, tag it and also add an NPM release:
+    console.log(`Also tag the branch, and make a GitHub release: https://github.com/OfficeDev/office-js/releases/tag/${gitTagName}`);
+
     execCommand(`git tag -a ${gitTagName} -m "${TRAVIS_AUTO_COMMIT_TEXT}\n${process.env.TRAVIS_COMMIT_MESSAGE}"`);
     execCommand(`git push origin ${gitTagName}`);
 
+    const releaseNotesWithNbsp = deploymentFileContents.split("\n").map(line => {
+        let regex = /^(\s*)(.+?)(\|\-)?$/;
+        // Match 0 or more starting spaces, followed by a non-greedy (lazy) anything, followed by optionally a "|-" at the end.
+        let result = regex.exec(line);
+        if (!result) {
+            return line;
+        }
+        return (result[1].length > 0 ? ("&nbsp;".repeat(result[1].length - 1) + " ") : "") + result[2];
+    }).join("\n");
+
+    // Documentation: https://developer.github.com/v3/repos/releases/#create-a-release
+    const response = await fetch("https://api.github.com/repos/OfficeDev/office-js/releases", {
+        method: "POST",
+        headers: new Headers({
+            "Authorization": `token ${process.env.GH_TOKEN}`
+        }),
+        body: JSON.stringify({
+            "tag_name": gitTagName,
+            "name": params.version,
+            "body": releaseNotesWithNbsp,
+            "prerelease": true,
+            "draft": false
+        })
+    });
+
+    if (response.status !== 201) {
+        throw new Error(`Failed to create GitHub release; ${response.status}: ${response.statusText}`);
+    }
+
 
     shell.popd();
+
+    let removeLocalFolderAtCompletion = true;
+    if (removeLocalFolderAtCompletion) {
+        fs.removeSync(repoLocalFolderPath);
+    }
+
+    return releaseNotesWithNbsp.replace(/&nbsp;/g, " ");
+}
+
+async function getPrivateBranchDeploymentParams(): Promise<IDeploymentParams> {
+    const version = await VersionUtils.getNextPrivateVersionNumber();
+
+    return {
+        version,
+        npmPublishTag: "private",
+        doNpmPublish: () => {
+            execCommand(`npm publish --tag beta`);
+        }
+    };
+}
+
+async function getOfficialBranchDeploymentParams(): Promise<IDeploymentParams> {
+    const message = stripSpaces(`
+        Sorry, the auto-deployment of official branches isn't supported yet.
+    `);
+    banner('NOT YET IMPLEMENTED, SKIPPING DEPLOYMENT', message, chalk.yellow.bold);
+    process.exit(0);
+
+    return {
+        version: "unknown",
+        npmPublishTag: "unknown",
+        doNpmPublish: () => { }
+    };
 }

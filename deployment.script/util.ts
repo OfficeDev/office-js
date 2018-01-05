@@ -47,12 +47,13 @@ export async function fetchAndThrowOnError(url: string, format: 'text' | 'json')
 }
 
 /**
- * Execute a shall command.
+ * Execute a shell command.
  * @param originalSanitizedCommand - The command to execute. Note that if it contains something secret, put it in triple <<<NAME>>> syntax, as the command itself will get echo-ed.
  * @param secretSubstitutions - key-value pairs to substitute into the command when executing.  Having any secret substitutions will automatically make the command run silently.
  */
 export function execCommand(originalSanitizedCommand: string, secretSubstitutions: { [key: string]: string } = {}) {
-    console.log(">> " + originalSanitizedCommand);
+    console.log("\n");
+    console.log(chalk.cyan.bold(">> " + originalSanitizedCommand));
 
     let hadSecrets = false;
     let command = originalSanitizedCommand;

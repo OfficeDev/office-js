@@ -13,6 +13,9 @@ node_js:
 install:
 - npm install
 
+before_install:
+  - echo "//registry.npmjs.org/:_authToken=\${NPM_TOKEN}" > .npmrc
+
 before_script:
 - npm run build.deploy.script
 
