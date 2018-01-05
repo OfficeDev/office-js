@@ -57,7 +57,10 @@ export function updatePackageJson(version: string): void {
     const versionRegex = /(^\s+"version": ")(.*)(",\s+$)/;
     let versionEntryIndex = packageJsonContentsArray.findIndex(line => versionRegex.test(line));
     if (versionEntryIndex <= 0) {
-        throw new Error("Could not find a line with the package version number, this can't be correct");
+        const errorMessage = "Could not find a line with the package version number, this can't be correct.";
+        console.error(errorMessage);
+        console.warn(packageJsonContentsArray.join("\n"));
+        throw new Error(errorMessage);
     }
     const regexResult = versionRegex.exec(packageJsonContentsArray[versionEntryIndex])!;
     const substitutedVersion = regexResult[1] + version + regexResult[3];

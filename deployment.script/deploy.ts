@@ -109,7 +109,7 @@ function printBuildStartInfo() {
     ];
 
     const fieldsString = fieldsToPrint
-        .map(item => `${item}: "${process.env[item]}"`)
+        .map(item => `"${item}": "${process.env[item]}"`)
         .join(",\n");
 
     banner('TravisCI build started', fieldsString, chalk.green.bold);
@@ -211,7 +211,7 @@ async function doDeployment(params: IDeploymentParams): Promise<string> {
         }),
         body: JSON.stringify({
             "tag_name": gitTagName,
-            "name": params.version,
+            "name": gitTagName,
             "body": releaseNotesWithNbsp,
             "prerelease": true,
             "draft": false
