@@ -7,24 +7,38 @@ import * as fs from "fs-extra";
 import { fetchAndThrowOnError, runNpmCommand, stripSpaces } from "./util";
 
 
-export async function getPackageVersonStringFromRepo(
-    branch: "release"
-): Promise<string> {
-    const url = `https://raw.githubusercontent.com/OfficeDev/office-js/${branch}/package.json`;
-    const version = (await fetchAndThrowOnError<{ version: string }>(url, "json")).version;
-    if (isNil(version) || !isString(version) || version.length <= 0) {
+export async function getReleasePackageVersonStringFromRepo(): Promise<string> {
+    const url = `https://raw.githubusercontent.com/OfficeDev/office-js/release/package.json`;
+    const versionString = (await fetchAndThrowOnError<{ version: string }>(url, "json")).version;
+
+    if (isNil(versionString) || !isString(versionString) || versionString.length <= 0) {
         throw new Error(`Missing or invalid package version number at URL "${url}"`);
     }
 
-    return version;
-}
-
-export async function getNextPrivateVersionNumber() {
-    const releaseVersionString = await getPackageVersonStringFromRepo("release");
-    if (!semver.valid(releaseVersionString)) {
+    if (!semver.valid(versionString)) {
         throw new Error("Invalid release build number, should never happen");
     }
 
+    return versionString;
+}
+
+export async function getNextReleaseVersionNumber() {
+    let currentReleaseVersionString = await getReleasePackageVersonStringFromRepo();
+    // For release, increment it not by one patch version, but by TWO.
+    // That way, the release-next/beta/beta-next/private versions don't get mixed up with the main one
+    // (e.g., in a dropdown or alphabetical list.)
+
+    const oneUp = semver.inc(currentReleaseVersionString, "patch")!;
+    const twoUp = semver.inc(oneUp, "patch")!;
+    return twoUp;
+}
+
+export async function getNextVersionNumberForNonReleaseTag(npmTag: string) {
+    const releaseVersionString = await getReleasePackageVersonStringFromRepo();
+    return getNextSuffixedVersion(semver.inc(releaseVersionString, "patch")!, npmTag);
+}
+
+async function getNextSuffixedVersion(mainVersionNumberString: string, tagName: string) {
     const versionsResult = await runNpmCommand<any>("view", "@microsoft/office-js", "versions", "--json");
     if (Object.keys(versionsResult).length !== 1) {
         throw new Error("Unexpected result for versions");
@@ -35,20 +49,22 @@ export async function getNextPrivateVersionNumber() {
         throw new Error("Unexpected result for versions");
     }
 
-    const privateNumStart = semver.inc(releaseVersionString, "patch")!;
     const matchingVersions = versionsArray
-        .filter(item => item.startsWith(privateNumStart + "-private."));
+        .filter(item => item.startsWith(mainVersionNumberString + "-" + tagName));
 
     if (matchingVersions.length === 0) {
-        return privateNumStart + "-private.0";
+        return `${mainVersionNumberString}-${tagName}.0`;
     }
 
+    const suffixRegex = new RegExp(`(.*-${tagName}\\.)(\\d+)`);
+    // Note: don't need to escape tagName, since it's going to be devoid of any special characters
+    // (just letters and a dash, e.g., for "release-next"), and a dash is OK (at least in this context)
     const largestNumber = Math.max(...matchingVersions.map(item => {
-        let suffix = /(.*-private\.)(\d+)/.exec(item)![2];
+        let suffix = suffixRegex.exec(item)![2];
         return Number.parseInt(suffix);
     }));
 
-    return privateNumStart + "-private." + (largestNumber + 1);
+    return `${mainVersionNumberString}-${tagName}.${largestNumber + 1}`;
 }
 
 export function updatePackageJson(version: string): void {
@@ -94,9 +110,9 @@ export function generateDeploymentYamlText(partialContext: {
 
         unpkgUrls: |-
         {{#if isOfficialBuild}}
-            builds using this same tag ("{{{tag}}}"):
-                https://unpkg.com/@microsoft/office-js@{{{tag}}}/dist/office.js
-                https://unpkg.com/@microsoft/office-js@{{{tag}}}/dist/office.debug.js  (unminified)
+            builds using this same tag ("{{{npmPublishTag}}}"):
+                https://unpkg.com/@microsoft/office-js@{{{npmPublishTag}}}/dist/office.js
+                https://unpkg.com/@microsoft/office-js@{{{npmPublishTag}}}/dist/office.debug.js  (unminified)
         {{/if}}
             this specific build number:
                 https://unpkg.com/@microsoft/office-js@{{{version}}}/dist/office.js
@@ -104,18 +120,15 @@ export function generateDeploymentYamlText(partialContext: {
 
         scriptLabReferences: |-
         {{#if isOfficialBuild}}
-            builds using this same tag ("{{{tag}}}"):
-                @microsoft/office-js@{{{tag}}}/dist/office.js
-                @microsoft/office-js@{{{tag}}}/dist/office.d.ts
+            builds using this same tag ("{{{npmPublishTag}}}"):
+                @microsoft/office-js@{{{npmPublishTag}}}/dist/office.js
+                @microsoft/office-js@{{{npmPublishTag}}}/dist/office.d.ts
         {{/if}}
             this specific build number:
                 @microsoft/office-js@{{{version}}}/dist/office.js
                 @microsoft/office-js@{{{version}}}/dist/office.d.ts
 
-        travisCI:
-            buildNumber: {{{travisBuildNumber}}}
-            buildId: {{{travisBuildId}}}
-            log: https://travis-ci.org/OfficeDev/office-js/builds/{{{travisBuildId}}}
+        buildLog: https://travis-ci.org/OfficeDev/office-js/builds/{{{travisBuildId}}}
     `);
 
     return handlebars.compile(template)(context);

@@ -13,6 +13,7 @@ declare var process: {
     exit: (status: number) => void;
 };
 
+const TRAVIS_QUEUE_BRANCH_PREFIX = "travis-queue__";
 const TRAVIS_AUTO_COMMIT_TEXT = "[TRAVIS CI AUTO-COMMIT]";
 const TOKENIZED_GITHUB_PUSH_URL = `https://<<<token>>>@github.com/OfficeDev/office-js.git`;
 const DEPLOYMENT_YAML_FILENAME = "NPM.DEPLOYMENT.INFO.yaml";
@@ -49,7 +50,10 @@ const OFFICIAL_BRANCHES = ["release", "release-next", "beta", "beta-next"];
 interface IDeploymentParams {
     npmPublishTag: string;
     version: string;
-    afterCloneBeforeCommit?: () => Promise<any>;
+
+    /** A script to run after cloning. Note that the current working directory at that point
+     * is still the original one from the start of the script */
+    afterCloneBeforeCommit?: (repoLocalFolderPath: string) => Promise<any>;
 }
 
 (async () => {
@@ -59,13 +63,25 @@ interface IDeploymentParams {
         precheckOrExit();
 
         let deploymentParams: IDeploymentParams;
+
         if (process.env.TRAVIS_BRANCH.startsWith("__private")) {
             deploymentParams = await getPrivateBranchDeploymentParams();
+
+        } else if (process.env.TRAVIS_BRANCH.startsWith(TRAVIS_QUEUE_BRANCH_PREFIX)) {
+            deploymentParams = await getTravisQueueBranchDeploymentParams();
+
         } else if (OFFICIAL_BRANCHES.indexOf(process.env.TRAVIS_BRANCH) >= 0) {
-            deploymentParams = await getOfficialBranchDeploymentParams();
+            const message = stripSpaces(`
+                Deployment to one of the official branches must happen through a
+                "${TRAVIS_QUEUE_BRANCH_PREFIX}"-prefixed branch.
+            `);
+            banner('SKIPPING DEPLOYMENT', message, chalk.yellow.bold);
+            process.exit(0);
+            return;
+
         } else {
             const message = stripSpaces(`
-                Branch "${process.env.TRAVIS_BRANCH}" neither starts with "__private",
+                Branch "${process.env.TRAVIS_BRANCH}" neither starts with "__private" or "__travis-queue",
                     nor matches any of the following: [${
                 OFFICIAL_BRANCHES.map(item => `"${item}"`).join(", ")
                 }].
@@ -169,9 +185,15 @@ async function doDeployment(params: IDeploymentParams): Promise<string> {
     execCommand('git config --add user.name "Travis CI"');
     execCommand('git config --add user.email "travis.ci@microsoft.com"');
 
+    shell.popd();
+
+
     if (params.afterCloneBeforeCommit) {
-        await params.afterCloneBeforeCommit();
+        await params.afterCloneBeforeCommit(repoLocalFolderPath);
     }
+
+
+    shell.pushd(repoLocalFolderPath);
 
     fs.writeFileSync(DEPLOYMENT_YAML_FILENAME, deploymentFileContents);
     execCommand(`git add ${DEPLOYMENT_YAML_FILENAME}`);
@@ -189,6 +211,11 @@ async function doDeployment(params: IDeploymentParams): Promise<string> {
 
     fs.writeFileSync(".npmrc", `//registry.npmjs.org/:_authToken=${process.env.NPM_TOKEN}`);
     execCommand(`npm publish --tag ${npmPublishTag}`);
+
+    // For us, the "release" tag is same as "latest" -- so for release, publish without a tag (implicit latest) too:
+    if (npmPublishTag === "release") {
+        execCommand(`npm publish`);
+    }
 
 
     // If NPM succeeded, tag it and also add an NPM release:
@@ -238,8 +265,8 @@ async function doDeployment(params: IDeploymentParams): Promise<string> {
 }
 
 async function getPrivateBranchDeploymentParams(): Promise<IDeploymentParams> {
-    const version = await VersionUtils.getNextPrivateVersionNumber();
     const npmPublishTag = "private";
+    const version = await VersionUtils.getNextVersionNumberForNonReleaseTag(npmPublishTag);
 
     return {
         version,
@@ -247,15 +274,51 @@ async function getPrivateBranchDeploymentParams(): Promise<IDeploymentParams> {
     };
 }
 
-async function getOfficialBranchDeploymentParams(): Promise<IDeploymentParams> {
-    const message = stripSpaces(`
-        Sorry, the auto-deployment of official branches isn't supported yet.
-    `);
-    banner('NOT YET IMPLEMENTED, SKIPPING DEPLOYMENT', message, chalk.yellow.bold);
-    process.exit(0);
+async function getTravisQueueBranchDeploymentParams(): Promise<IDeploymentParams> {
+    const targetBranchName = process.env.TRAVIS_BRANCH.substr(TRAVIS_QUEUE_BRANCH_PREFIX.length);
+    if (OFFICIAL_BRANCHES.indexOf(targetBranchName) < 0) {
+        throw new Error(`The branch "${process.env.TRAVIS_BRANCH}" starts with the "${TRAVIS_QUEUE_BRANCH_PREFIX}" prefix, ` +
+            `but does not seem to match one of the official repo branches (${OFFICIAL_BRANCHES.map(item => `"${item}"`).join(", ")})`);
+    }
+
+    banner("Kicking off deployment to an official branch", `Target deployment branch: ${targetBranchName}`);
+
+    const version = (targetBranchName === "release")
+        ? await VersionUtils.getNextReleaseVersionNumber()
+        : await VersionUtils.getNextVersionNumberForNonReleaseTag(targetBranchName);
+
+    // Note that for official branches, the NPM tag and github tag are the same thing
+    //     (unlike for private branches, where the tag is always "private", but the branch is "__private-xyz")
+    const npmPublishTag = targetBranchName;
 
     return {
-        version: "unknown",
-        npmPublishTag: "unknown"
+        version,
+        npmPublishTag,
+
+        afterCloneBeforeCommit: async (repoLocalFolderPath: string) => {
+            console.log(`Delete all files except ".git" and the "dist" folder`);
+            fs.readdirSync(repoLocalFolderPath)
+                .filter(filename => [".git", "dist"].indexOf(filename) < 0)
+                .forEach(filename => fs.removeSync(repoLocalFolderPath + '/' + filename));
+
+            const repoCopyFolderPath = process.env.TRAVIS_BUILD_DIR + "/" + "office-js-repo-copy-release-branch/";
+            execCommand(`git clone ${TOKENIZED_GITHUB_PUSH_URL} ${repoCopyFolderPath}`, {
+                token: process.env.GH_TOKEN
+            });
+
+            console.log(`Now, from a different clone of the "release" branch, copy all files except ".git" and the "dist" folder`);
+            fs.readdirSync(repoCopyFolderPath)
+                .filter(filename => [".git", "dist"].indexOf(filename) < 0)
+                .forEach(filename => fs.copySync(
+                    repoCopyFolderPath + '/' + filename,
+                    repoLocalFolderPath + '/' + filename,
+                    {
+                        preserveTimestamps: true
+                    }
+                ));
+
+            fs.removeSync(repoCopyFolderPath);
+        }
+
     };
 }
