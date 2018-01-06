@@ -121,6 +121,8 @@ function precheckOrExit(): void {
         banner('Deployment skipped',
             `Skipping builds for commit messages labeled as "${TRAVIS_AUTO_COMMIT_TEXT}"`,
             chalk.yellow.bold);
+        // NOTE: in practice, such builds should also be skipped because they'll have the text "skip ci" in them.
+        // But this serves as a double-guarantee.
         process.exit(0);
     }
 
@@ -176,7 +178,10 @@ async function doDeployment(params: IDeploymentParams): Promise<string> {
 
     VersionUtils.updatePackageJson(version);
 
-    execCommand(`git commit --allow-empty -m "${TRAVIS_AUTO_COMMIT_TEXT} ${process.env.TRAVIS_COMMIT_MESSAGE}"`);
+    const commitMessage = `${TRAVIS_AUTO_COMMIT_TEXT} ${process.env.TRAVIS_COMMIT_MESSAGE} [skip ci]`;
+    // Note: "skip CI" will skip travis running on the build.  https://docs.travis-ci.com/user/customizing-the-build/#Skipping-a-build
+
+    execCommand(`git commit --allow-empty -m "${commitMessage}"`);
     execCommand(`git push`);
 
 
@@ -189,7 +194,7 @@ async function doDeployment(params: IDeploymentParams): Promise<string> {
     // If NPM succeeded, tag it and also add an NPM release:
     console.log(`Also tag the branch, and make a GitHub release: https://github.com/OfficeDev/office-js/releases/tag/${gitTagName}`);
 
-    execCommand(`git tag -a ${gitTagName} -m "${TRAVIS_AUTO_COMMIT_TEXT} ${process.env.TRAVIS_COMMIT_MESSAGE}"`);
+    execCommand(`git tag -a ${gitTagName} -m "${commitMessage}"`);
     execCommand(`git push origin ${gitTagName}`);
 
     const releaseNotesWithNbsp = deploymentFileContents.split("\n").map(line => {
