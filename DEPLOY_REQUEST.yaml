@@ -1,0 +1,33 @@
+###########################################################
+## IMPORTANT: this file (and this particular branch)
+##     acts as the "command" infrastructure to trigger
+##     a deployment to one of the official branches.
+###########################################################
+
+
+# First, specify the TARGET BRANCH for your change. Guidelines:
+# If you are pushing a copy of ____
+#    * RELEASE files that are already on the public CDN
+#         ==> choose "release"
+#    * RELEASE files that are on EDOG but *NOT* the public CDN yet
+#         ==> choose "release-next"
+#    * BETA files that are already on the public CDN
+#         ==> choose "beta"
+#    * BETA files that are on EDOG but *NOT* the public CDN yet
+#         ==> choose "beta-next"
+
+targetBranch:
+
+
+
+# Now specify the URL to the commits listing FOR THE BRANCH YOU WANT TO COPY THE FILES FROM.
+#    The branch must a "__private-..."-prefixed branch
+
+from:
+
+
+
+# Would you like to automatically delete the private branch on completion?
+#    (Generally yes -- there is nothing left to do with the branch, it's only in the way)
+
+deletePrivateBranchOnSuccessfulDeployment: true
