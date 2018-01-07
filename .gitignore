@@ -1,7 +1,9 @@
-#############################################################################
-############## Please keep this file IN SYNC with .npmignore ################
-##### (near-identical copy, but with a few additional files at the top) #####
-#############################################################################
+#########################################################################################
+#### Please keep this file in sync with the ".gitignore" file in
+####     the "deployment-queue" branch.
+#### Also, please keep it in sync with the .npmignore file in this branch 
+####     (contains a near-identical copy, but with a few additional files at the top)
+#########################################################################################
 
 
 .npmrc
