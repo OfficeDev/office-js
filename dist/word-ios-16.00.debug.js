@@ -1,7 +1,7 @@
 /* Word iOS-specific API library */
-/* Version: 16.0.8717.3000 */
+/* Version: 16.0.8825.3000 */
 
-/* Office.js Version: 16.0.8717.1000 */ 
+/* Office.js Version: 16.0.8825.1000 */ 
 /*
 	Copyright (c) Microsoft Corporation.  All rights reserved.
 */
@@ -256,6 +256,54 @@ OSF.OUtil=(function () {
 			if (parent && name && parent[name]) {
 				delete parent[name];
 			}
+		},
+		serializeSettings: function OSF_OUtil$serializeSettings(settingsCollection) {
+			var ret={};
+			for (var key in settingsCollection) {
+				var value=settingsCollection[key];
+				try {
+					if (JSON) {
+						value=JSON.stringify(value, function dateReplacer(k, v) {
+							return OSF.OUtil.isDate(this[k]) ? OSF.DDA.SettingsManager.DateJSONPrefix+this[k].getTime()+OSF.DDA.SettingsManager.DataJSONSuffix : v;
+						});
+					}
+					else {
+						value=Sys.Serialization.JavaScriptSerializer.serialize(value);
+					}
+					ret[key]=value;
+				}
+				catch (ex) {
+				}
+			}
+			return ret;
+		},
+		deserializeSettings: function OSF_OUtil$deserializeSettings(serializedSettings) {
+			var ret={};
+			serializedSettings=serializedSettings || {};
+			for (var key in serializedSettings) {
+				var value=serializedSettings[key];
+				try {
+					if (JSON) {
+						value=JSON.parse(value, function dateReviver(k, v) {
+							var d;
+							if (typeof v==='string' && v && v.length > 6 && v.slice(0, 5)===OSF.DDA.SettingsManager.DateJSONPrefix && v.slice(-1)===OSF.DDA.SettingsManager.DataJSONSuffix) {
+								d=new Date(parseInt(v.slice(5, -1)));
+								if (d) {
+									return d;
+								}
+							}
+							return v;
+						});
+					}
+					else {
+						value=Sys.Serialization.JavaScriptSerializer.deserialize(value, true);
+					}
+					ret[key]=value;
+				}
+				catch (ex) {
+				}
+			}
+			return ret;
 		},
 		loadScript: function OSF_OUtil$loadScript(url, callback, timeoutInMs) {
 			if (url && callback) {
@@ -981,6 +1029,12 @@ OSF.OUtil.Guid=(function () {
 })();
 window.OSF=OSF;
 OSF.OUtil.setNamespace("OSF", window);
+OSF.MessageIDs={
+	"FetchBundleUrl": 0,
+	"LoadReactBundle": 1,
+	"LoadBundleSuccess": 2,
+	"LoadBundleError": 3
+};
 OSF.AppName={
 	Unsupported: 0,
 	Excel: 1,
@@ -1211,6 +1265,7 @@ Microsoft.Office.WebExtension.Parameters={
 	DisplayInIframe: "displayInIframe",
 	MessageContent: "messageContent",
 	HideTitle: "hideTitle",
+	UseDeviceIndependentPixels: "useDeviceIndependentPixels",
 	AppCommandInvocationCompletedData: "appCommandInvocationCompletedData"
 };
 OSF.OUtil.setNamespace("DDA", OSF);
@@ -1461,7 +1516,8 @@ OSF.DDA.ErrorCodeManager=(function () {
 			ooeSSOClientError: 13006,
 			ooeSSOServerError: 13007,
 			ooeAddinIsAlreadyRequestingToken: 13008,
-			ooeSSOUserConsentNotSupportedByCurrentAddinCategory: 13009
+			ooeSSOUserConsentNotSupportedByCurrentAddinCategory: 13009,
+			ooeSSOConnectionLost: 13010
 		},
 		initializeErrorMessages: function OSF_DDA_ErrorCodeManager$initializeErrorMessages(stringNS) {
 			_errorMappings[OSF.DDA.ErrorCodeManager.errorCodes.ooeCoercionTypeNotSupported]={ name: stringNS.L_InvalidCoercion, message: stringNS.L_CoercionTypeNotSupported };
@@ -1560,6 +1616,7 @@ OSF.DDA.ErrorCodeManager=(function () {
 			_errorMappings[OSF.DDA.ErrorCodeManager.errorCodes.ooeSSOServerError]={ name: stringNS.L_SSOServerError, message: stringNS.L_SSOServerErrorMessage };
 			_errorMappings[OSF.DDA.ErrorCodeManager.errorCodes.ooeAddinIsAlreadyRequestingToken]={ name: stringNS.L_AddinIsAlreadyRequestingToken, message: stringNS.L_AddinIsAlreadyRequestingTokenMessage };
 			_errorMappings[OSF.DDA.ErrorCodeManager.errorCodes.ooeSSOUserConsentNotSupportedByCurrentAddinCategory]={ name: stringNS.L_SSOUserConsentNotSupportedByCurrentAddinCategory, message: stringNS.L_SSOUserConsentNotSupportedByCurrentAddinCategoryMessage };
+			_errorMappings[OSF.DDA.ErrorCodeManager.errorCodes.ooeSSOConnectionLost]={ name: stringNS.L_SSOConnectionLostError, message: stringNS.L_SSOConnectionLostErrorMessage };
 		}
 	};
 })();
@@ -4529,6 +4586,7 @@ var OSFWebkit;
 		MethodId[MethodId["UnregisterEvent"]=3]="UnregisterEvent";
 		MethodId[MethodId["WriteSettings"]=4]="WriteSettings";
 		MethodId[MethodId["GetContext"]=5]="GetContext";
+		MethodId[MethodId["SendMessage"]=6]="SendMessage";
 	})(OSFWebkit.MethodId || (OSFWebkit.MethodId={}));
 	var MethodId=OSFWebkit.MethodId;
 	var WebkitHostController=(function () {
@@ -4671,6 +4729,11 @@ var OSFWebkit;
 			}
 		};
 		WebkitHostController.prototype.sendMessage=function (params) {
+			var message=params[Microsoft.Office.WebExtension.Parameters.MessageContent];
+			if (!isNaN(parseFloat(message)) && isFinite(message)) {
+				message=message.toString();
+			}
+			this.hostScriptProxy.invokeMethod(OSF.Webkit.MessageHandlerName, OSF.Webkit.MethodId.SendMessage, message, null);
 		};
 		return WebkitHostController;
 	})();
@@ -5452,7 +5515,7 @@ var OSFAppTelemetry;
 		}
 		appInfo.message=context.get_hostCustomMessage();
 		appInfo.officeJSVersion=OSF.ConstantNames.FileVersion;
-		appInfo.hostJSVersion="16.0.8717.1000";
+		appInfo.hostJSVersion="16.0.8825.1000";
 		if (context._wacHostEnvironment) {
 			appInfo.wacHostEnvironment=context._wacHostEnvironment;
 		}
@@ -6069,17 +6132,19 @@ OSF.DDA.OMFactory.manufactureEventArgs=function OSF_DDA_OMFactory$manufactureEve
 			args=new OSF.DDA.DialogParentEventArgs(eventProperties);
 			break;
 		case Microsoft.Office.WebExtension.EventType.ItemChanged:
-			if (OSF._OfficeAppFactory.getHostInfo()["hostType"]=="outlook" || OSF._OfficeAppFactory.getHostInfo()["hostType"]=="outlookwebapp") {
+			if (OSF._OfficeAppFactory.getHostInfo()["hostType"]=="outlook") {
 				args=new OSF.DDA.OlkItemSelectedChangedEventArgs(eventProperties);
 				target.initialize(args["initialData"]);
-				target.setCurrentItemNumber(args["itemNumber"].itemNumber);
+				if (OSF._OfficeAppFactory.getHostInfo()["hostPlatform"]=="win32") {
+					target.setCurrentItemNumber(args["itemNumber"].itemNumber);
+				}
 			}
 			else {
 				throw OsfMsAjaxFactory.msAjaxError.argument(Microsoft.Office.WebExtension.Parameters.EventType, OSF.OUtil.formatString(Strings.OfficeOM.L_NotSupportedEventType, eventType));
 			}
 			break;
 		case Microsoft.Office.WebExtension.EventType.RecipientsChanged:
-			if (OSF._OfficeAppFactory.getHostInfo()["hostType"]=="outlook" || OSF._OfficeAppFactory.getHostInfo()["hostType"]=="outlookwebapp") {
+			if (OSF._OfficeAppFactory.getHostInfo()["hostType"]=="outlook") {
 				args=new OSF.DDA.OlkRecipientsChangedEventArgs(eventProperties);
 			}
 			else {
@@ -6087,7 +6152,7 @@ OSF.DDA.OMFactory.manufactureEventArgs=function OSF_DDA_OMFactory$manufactureEve
 			}
 			break;
 		case Microsoft.Office.WebExtension.EventType.AppointmentTimeChanged:
-			if (OSF._OfficeAppFactory.getHostInfo()["hostType"]=="outlook" || OSF._OfficeAppFactory.getHostInfo()["hostType"]=="outlookwebapp") {
+			if (OSF._OfficeAppFactory.getHostInfo()["hostType"]=="outlook") {
 				args=new OSF.DDA.OlkAppointmentTimeChangedEventArgs(eventProperties);
 			}
 			else {
@@ -6275,6 +6340,13 @@ OSF.DDA.AsyncMethodCalls.define({
 				"types": ["boolean"],
 				"defaultValue": false
 			}
+		},
+		{
+			name: Microsoft.Office.WebExtension.Parameters.UseDeviceIndependentPixels,
+			value: {
+				"types": ["boolean"],
+				"defaultValue": false
+			}
 		}
 	],
 	privateStateCallbacks: [],
@@ -6312,13 +6384,13 @@ OSF.DDA.AsyncMethodCalls.define({
 		if (callArgs[Microsoft.Office.WebExtension.Parameters.Width] <=0) {
 			callArgs[Microsoft.Office.WebExtension.Parameters.Width]=1;
 		}
-		if (callArgs[Microsoft.Office.WebExtension.Parameters.Width] > 100) {
+		if (!callArgs[Microsoft.Office.WebExtension.Parameters.UseDeviceIndependentPixels] && callArgs[Microsoft.Office.WebExtension.Parameters.Width] > 100) {
 			callArgs[Microsoft.Office.WebExtension.Parameters.Width]=99;
 		}
 		if (callArgs[Microsoft.Office.WebExtension.Parameters.Height] <=0) {
 			callArgs[Microsoft.Office.WebExtension.Parameters.Height]=1;
 		}
-		if (callArgs[Microsoft.Office.WebExtension.Parameters.Height] > 100) {
+		if (!callArgs[Microsoft.Office.WebExtension.Parameters.UseDeviceIndependentPixels] && callArgs[Microsoft.Office.WebExtension.Parameters.Height] > 100) {
 			callArgs[Microsoft.Office.WebExtension.Parameters.Height]=99;
 		}
 		if (!callArgs[Microsoft.Office.WebExtension.Parameters.RequireHTTPs]) {
@@ -6703,52 +6775,10 @@ OSF.DDA.SettingsManager={
 	DateJSONPrefix: "Date(",
 	DataJSONSuffix: ")",
 	serializeSettings: function OSF_DDA_SettingsManager$serializeSettings(settingsCollection) {
-		var ret={};
-		for (var key in settingsCollection) {
-			var value=settingsCollection[key];
-			try {
-				if (JSON) {
-					value=JSON.stringify(value, function dateReplacer(k, v) {
-						return OSF.OUtil.isDate(this[k]) ? OSF.DDA.SettingsManager.DateJSONPrefix+this[k].getTime()+OSF.DDA.SettingsManager.DataJSONSuffix : v;
-					});
-				}
-				else {
-					value=Sys.Serialization.JavaScriptSerializer.serialize(value);
-				}
-				ret[key]=value;
-			}
-			catch (ex) {
-			}
-		}
-		return ret;
+		return OSF.OUtil.serializeSettings(settingsCollection);
 	},
 	deserializeSettings: function OSF_DDA_SettingsManager$deserializeSettings(serializedSettings) {
-		var ret={};
-		serializedSettings=serializedSettings || {};
-		for (var key in serializedSettings) {
-			var value=serializedSettings[key];
-			try {
-				if (JSON) {
-					value=JSON.parse(value, function dateReviver(k, v) {
-						var d;
-						if (typeof v==='string' && v && v.length > 6 && v.slice(0, 5)===OSF.DDA.SettingsManager.DateJSONPrefix && v.slice(-1)===OSF.DDA.SettingsManager.DataJSONSuffix) {
-							d=new Date(parseInt(v.slice(5, -1)));
-							if (d) {
-								return d;
-							}
-						}
-						return v;
-					});
-				}
-				else {
-					value=Sys.Serialization.JavaScriptSerializer.deserialize(value, true);
-				}
-				ret[key]=value;
-			}
-			catch (ex) {
-			}
-		}
-		return ret;
+		return OSF.OUtil.deserializeSettings(serializedSettings);
 	}
 };
 OSF.DDA.Settings=function OSF_DDA_Settings(settings) {
@@ -8722,10 +8752,14 @@ var OfficeExtension;
 			var args=[value];
 			var referencedArgumentObjectPaths=OfficeExtension.Utility.setMethodArguments(context, actionInfo.ArgumentInfo, args);
 			OfficeExtension.Utility.validateReferencedObjectPaths(referencedArgumentObjectPaths);
+			context._pendingRequest.ensureInstantiateObjectPath(parent._objectPath);
+			context._pendingRequest.ensureInstantiateObjectPaths(referencedArgumentObjectPaths);
 			var ret=new OfficeExtension.Action(actionInfo, true, false);
 			context._pendingRequest.addAction(ret);
 			context._pendingRequest.addReferencedObjectPath(parent._objectPath);
 			context._pendingRequest.addReferencedObjectPaths(referencedArgumentObjectPaths);
+			ret.referencedObjectPath=parent._objectPath;
+			ret.referencedArgumentObjectPaths=referencedArgumentObjectPaths;
 			return ret;
 		};
 		ActionFactory.createMethodAction=function (context, parent, methodName, operationType, args, isRestrictedResourceAccess) {
@@ -8739,15 +8773,20 @@ var OfficeExtension;
 			};
 			var referencedArgumentObjectPaths=OfficeExtension.Utility.setMethodArguments(context, actionInfo.ArgumentInfo, args);
 			OfficeExtension.Utility.validateReferencedObjectPaths(referencedArgumentObjectPaths);
+			context._pendingRequest.ensureInstantiateObjectPath(parent._objectPath);
+			context._pendingRequest.ensureInstantiateObjectPaths(referencedArgumentObjectPaths);
 			var isWriteOperation=operationType !=1;
 			var ret=new OfficeExtension.Action(actionInfo, isWriteOperation, isRestrictedResourceAccess);
 			context._pendingRequest.addAction(ret);
 			context._pendingRequest.addReferencedObjectPath(parent._objectPath);
 			context._pendingRequest.addReferencedObjectPaths(referencedArgumentObjectPaths);
+			ret.referencedObjectPath=parent._objectPath;
+			ret.referencedArgumentObjectPaths=referencedArgumentObjectPaths;
 			return ret;
 		};
 		ActionFactory.createQueryAction=function (context, parent, queryOption) {
 			OfficeExtension.Utility.validateObjectPath(parent);
+			context._pendingRequest.ensureInstantiateObjectPath(parent._objectPath);
 			var actionInfo={
 				Id: context._nextId(),
 				ActionType: 2,
@@ -8758,10 +8797,12 @@ var OfficeExtension;
 			var ret=new OfficeExtension.Action(actionInfo, false, false);
 			context._pendingRequest.addAction(ret);
 			context._pendingRequest.addReferencedObjectPath(parent._objectPath);
+			ret.referencedObjectPath=parent._objectPath;
 			return ret;
 		};
 		ActionFactory.createRecursiveQueryAction=function (context, parent, query) {
 			OfficeExtension.Utility.validateObjectPath(parent);
+			context._pendingRequest.ensureInstantiateObjectPath(parent._objectPath);
 			var actionInfo={
 				Id: context._nextId(),
 				ActionType: 6,
@@ -8772,10 +8813,45 @@ var OfficeExtension;
 			var ret=new OfficeExtension.Action(actionInfo, false, false);
 			context._pendingRequest.addAction(ret);
 			context._pendingRequest.addReferencedObjectPath(parent._objectPath);
+			ret.referencedObjectPath=parent._objectPath;
+			return ret;
+		};
+		ActionFactory.createQueryAsJsonAction=function (context, parent, queryOption) {
+			OfficeExtension.Utility.validateObjectPath(parent);
+			context._pendingRequest.ensureInstantiateObjectPath(parent._objectPath);
+			var actionInfo={
+				Id: context._nextId(),
+				ActionType: 7,
+				Name: "",
+				ObjectPathId: parent._objectPath.objectPathInfo.Id,
+			};
+			actionInfo.QueryInfo=queryOption;
+			var ret=new OfficeExtension.Action(actionInfo, false, false);
+			context._pendingRequest.addAction(ret);
+			context._pendingRequest.addReferencedObjectPath(parent._objectPath);
+			ret.referencedObjectPath=parent._objectPath;
+			return ret;
+		};
+		ActionFactory.createEnsureUnchangedAction=function (context, parent, objectState) {
+			OfficeExtension.Utility.validateObjectPath(parent);
+			context._pendingRequest.ensureInstantiateObjectPath(parent._objectPath);
+			var actionInfo={
+				Id: context._nextId(),
+				ActionType: 8,
+				Name: "",
+				ObjectPathId: parent._objectPath.objectPathInfo.Id,
+				ObjectState: objectState
+			};
+			var ret=new OfficeExtension.Action(actionInfo, false, false);
+			context._pendingRequest.addAction(ret);
+			context._pendingRequest.addReferencedObjectPath(parent._objectPath);
+			ret.referencedObjectPath=parent._objectPath;
 			return ret;
 		};
 		ActionFactory.createInstantiateAction=function (context, obj) {
 			OfficeExtension.Utility.validateObjectPath(obj);
+			context._pendingRequest.ensureInstantiateObjectPath(obj._objectPath.parentObjectPath);
+			context._pendingRequest.ensureInstantiateObjectPaths(obj._objectPath.argumentObjectPaths);
 			var actionInfo={
 				Id: context._nextId(),
 				ActionType: 1,
@@ -8786,6 +8862,7 @@ var OfficeExtension;
 			context._pendingRequest.addAction(ret);
 			context._pendingRequest.addReferencedObjectPath(obj._objectPath);
 			context._pendingRequest.addActionResultHandler(ret, new OfficeExtension.InstantiateActionResultHandler(obj));
+			ret.referencedObjectPath=obj._objectPath;
 			return ret;
 		};
 		ActionFactory.createTraceAction=function (context, message, addTraceMessage) {
@@ -8883,6 +8960,7 @@ var OfficeExtension;
 		};
 		ClientObject.prototype._recursivelySet=function (input, options, scalarWriteablePropertyNames, objectPropertyNames, notAllowedToBeSetPropertyNames) {
 			var isClientObject=(input instanceof ClientObject);
+			var originalInput=input;
 			if (isClientObject) {
 				if (Object.getPrototypeOf(this)===Object.getPrototypeOf(input)) {
 					input=JSON.parse(JSON.stringify(input));
@@ -8899,30 +8977,37 @@ var OfficeExtension;
 				for (var i=0; i < scalarWriteablePropertyNames.length; i++) {
 					prop=scalarWriteablePropertyNames[i];
 					if (input.hasOwnProperty(prop)) {
-						this[prop]=input[prop];
+						if (typeof input[prop] !=="undefined") {
+							this[prop]=input[prop];
+						}
 					}
 				}
 				for (var i=0; i < objectPropertyNames.length; i++) {
 					prop=objectPropertyNames[i];
 					if (input.hasOwnProperty(prop)) {
-						this[prop].set(input[prop], options);
-					}
-				}
-				for (var i=0; i < notAllowedToBeSetPropertyNames.length; i++) {
-					prop=notAllowedToBeSetPropertyNames[i];
-					if (input.hasOwnProperty(prop)) {
-						throw new OfficeExtension._Internal.RuntimeError({
-							code: OfficeExtension.ErrorCodes.invalidArgument,
-							message: OfficeExtension.Utility._getResourceString(OfficeExtension.ResourceStrings.cannotApplyPropertyThroughSetMethod, prop),
-							debugInfo: {
-								errorLocation: prop
-							}
-						});
+						if (typeof input[prop] !=="undefined") {
+							var dataToPassToSet=isClientObject ? originalInput[prop] : input[prop];
+							this[prop].set(dataToPassToSet, options);
+						}
 					}
 				}
 				var throwOnReadOnly=!isClientObject;
 				if (options && !OfficeExtension.Utility.isNullOrUndefined(throwOnReadOnly)) {
 					throwOnReadOnly=options.throwOnReadOnly;
+				}
+				for (var i=0; i < notAllowedToBeSetPropertyNames.length; i++) {
+					prop=notAllowedToBeSetPropertyNames[i];
+					if (input.hasOwnProperty(prop)) {
+						if (typeof input[prop] !=="undefined" && throwOnReadOnly) {
+							throw new OfficeExtension._Internal.RuntimeError({
+								code: OfficeExtension.ErrorCodes.invalidArgument,
+								message: OfficeExtension.Utility._getResourceString(OfficeExtension.ResourceStrings.cannotApplyPropertyThroughSetMethod, prop),
+								debugInfo: {
+									errorLocation: prop
+								}
+							});
+						}
+					}
 				}
 				for (prop in input) {
 					if (scalarWriteablePropertyNames.indexOf(prop) < 0 && objectPropertyNames.indexOf(prop) < 0) {
@@ -8971,6 +9056,7 @@ var OfficeExtension;
 			this.m_actions=[];
 			this.m_actionResultHandler={};
 			this.m_referencedObjectPaths={};
+			this.m_instantiatedObjectPaths={};
 			this.m_flags=0;
 			this.m_traceInfos={};
 			this.m_pendingProcessEventHandlers=[];
@@ -9027,6 +9113,9 @@ var OfficeExtension;
 				this.m_flags=this.m_flags | 2;
 			}
 			this.m_actions.push(action);
+			if (action.actionInfo.ActionType==1) {
+				this.m_instantiatedObjectPaths[action.actionInfo.ObjectPathId]=action;
+			}
 		};
 		Object.defineProperty(ClientRequest.prototype, "hasActions", {
 			get: function () {
@@ -9035,8 +9124,38 @@ var OfficeExtension;
 			enumerable: true,
 			configurable: true
 		});
+		ClientRequest.prototype._getLastAction=function () {
+			return this.m_actions[this.m_actions.length - 1];
+		};
 		ClientRequest.prototype.addTrace=function (actionId, message) {
 			this.m_traceInfos[actionId]=message;
+		};
+		ClientRequest.prototype.ensureInstantiateObjectPath=function (objectPath) {
+			if (objectPath) {
+				if (this.m_instantiatedObjectPaths[objectPath.objectPathInfo.Id]) {
+					return;
+				}
+				this.ensureInstantiateObjectPath(objectPath.parentObjectPath);
+				this.ensureInstantiateObjectPaths(objectPath.argumentObjectPaths);
+				if (!this.m_instantiatedObjectPaths[objectPath.objectPathInfo.Id]) {
+					var actionInfo={
+						Id: this.m_context._nextId(),
+						ActionType: 1,
+						Name: "",
+						ObjectPathId: objectPath.objectPathInfo.Id
+					};
+					var instantiateAction=new OfficeExtension.Action(actionInfo, false, false);
+					instantiateAction.referencedObjectPath=objectPath;
+					this.addAction(instantiateAction);
+				}
+			}
+		};
+		ClientRequest.prototype.ensureInstantiateObjectPaths=function (objectPaths) {
+			if (objectPaths) {
+				for (var i=0; i < objectPaths.length; i++) {
+					this.ensureInstantiateObjectPath(objectPaths[i]);
+				}
+			}
 		};
 		ClientRequest.prototype.addReferencedObjectPath=function (objectPath) {
 			if (this.m_referencedObjectPaths[objectPath.objectPathInfo.Id]) {
@@ -9076,6 +9195,9 @@ var OfficeExtension;
 			this.m_actionResultHandler[action.actionInfo.Id]=resultHandler;
 		};
 		ClientRequest.prototype.buildRequestMessageBody=function () {
+			if (OfficeExtension._internalConfig.enableEarlyDispose) {
+				ClientRequest._calculateLastUsedObjectPathIds(this.m_actions);
+			}
 			var objectPaths={};
 			for (var i in this.m_referencedObjectPaths) {
 				objectPaths[i]=this.m_referencedObjectPaths[i].objectPathInfo;
@@ -9136,12 +9258,85 @@ var OfficeExtension;
 			enumerable: true,
 			configurable: true
 		});
+		Object.defineProperty(ClientRequest.prototype, "_actions", {
+			get: function () {
+				return this.m_actions;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(ClientRequest.prototype, "_objectPaths", {
+			get: function () {
+				return this.m_referencedObjectPaths;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		ClientRequest._updateLastUsedActionIdOfObjectPathId=function (lastUsedActionIdOfObjectPathId, objectPath, actionId) {
+			while (objectPath) {
+				if (lastUsedActionIdOfObjectPathId[objectPath.objectPathInfo.Id]) {
+					return;
+				}
+				lastUsedActionIdOfObjectPathId[objectPath.objectPathInfo.Id]=actionId;
+				var argumentObjectPaths=objectPath.argumentObjectPaths;
+				if (argumentObjectPaths) {
+					var argumentObjectPathsLength=argumentObjectPaths.length;
+					for (var i=0; i < argumentObjectPathsLength; i++) {
+						ClientRequest._updateLastUsedActionIdOfObjectPathId(lastUsedActionIdOfObjectPathId, argumentObjectPaths[i], actionId);
+					}
+				}
+				objectPath=objectPath.parentObjectPath;
+			}
+		};
+		ClientRequest._calculateLastUsedObjectPathIds=function (actions) {
+			var lastUsedActionIdOfObjectPathId={};
+			var actionsLength=actions.length;
+			for (var index=actionsLength - 1; index >=0; --index) {
+				var action=actions[index];
+				var actionId=action.actionInfo.Id;
+				if (action.referencedObjectPath) {
+					ClientRequest._updateLastUsedActionIdOfObjectPathId(lastUsedActionIdOfObjectPathId, action.referencedObjectPath, actionId);
+				}
+				var referencedObjectPaths=action.referencedArgumentObjectPaths;
+				if (referencedObjectPaths) {
+					var referencedObjectPathsLength=referencedObjectPaths.length;
+					for (var refIndex=0; refIndex < referencedObjectPathsLength; refIndex++) {
+						ClientRequest._updateLastUsedActionIdOfObjectPathId(lastUsedActionIdOfObjectPathId, referencedObjectPaths[refIndex], actionId);
+					}
+				}
+			}
+			var lastUsedObjectPathIdsOfAction={};
+			for (var key in lastUsedActionIdOfObjectPathId) {
+				var actionId=lastUsedActionIdOfObjectPathId[key];
+				var objectPathIds=lastUsedObjectPathIdsOfAction[actionId];
+				if (!objectPathIds) {
+					objectPathIds=[];
+					lastUsedObjectPathIdsOfAction[actionId]=objectPathIds;
+				}
+				objectPathIds.push(parseInt(key));
+			}
+			for (var index=0; index < actionsLength; index++) {
+				var action=actions[index];
+				var lastUsedObjectPathIds=lastUsedObjectPathIdsOfAction[action.actionInfo.Id];
+				if (lastUsedObjectPathIds && lastUsedObjectPathIds.length > 0) {
+					action.actionInfo.L=lastUsedObjectPathIds;
+				}
+				else if (action.actionInfo.L) {
+					delete action.actionInfo.L;
+				}
+			}
+		};
 		return ClientRequest;
 	}());
 	OfficeExtension.ClientRequest=ClientRequest;
 })(OfficeExtension || (OfficeExtension={}));
 var OfficeExtension;
 (function (OfficeExtension) {
+	OfficeExtension._internalConfig={
+		showDisposeInfoInDebugInfo: false,
+		enableEarlyDispose: true,
+		alwaysPolyfillClientObjectRetrieveMethod: false
+	};
 	var SessionBase=(function () {
 		function SessionBase() {
 		}
@@ -9235,6 +9430,15 @@ var OfficeExtension;
 			enumerable: true,
 			configurable: true
 		});
+		Object.defineProperty(ClientRequestContext.prototype, "debugInfo", {
+			get: function () {
+				var prettyPrinter=new OfficeExtension.RequestPrettyPrinter(this._rootObjectPropertyName, this._pendingRequest._objectPaths, this._pendingRequest._actions, OfficeExtension._internalConfig.showDisposeInfoInDebugInfo);
+				var statements=prettyPrinter.process();
+				return { pendingStatements: statements };
+			},
+			enumerable: true,
+			configurable: true
+		});
 		Object.defineProperty(ClientRequestContext.prototype, "trackedObjects", {
 			get: function () {
 				if (!this.m_trackedObjects) {
@@ -9254,11 +9458,76 @@ var OfficeExtension;
 		});
 		ClientRequestContext.prototype.load=function (clientObj, option) {
 			OfficeExtension.Utility.validateContext(this, clientObj);
-			var queryOption=ClientRequestContext.parseQueryOption(option);
+			var queryOption=ClientRequestContext._parseQueryOption(option);
 			var action=OfficeExtension.ActionFactory.createQueryAction(this, clientObj, queryOption);
 			this._pendingRequest.addActionResultHandler(action, clientObj);
 		};
-		ClientRequestContext.parseQueryOption=function (option) {
+		ClientRequestContext.isLoadOption=function (loadOption) {
+			if (!OfficeExtension.Utility.isUndefined(loadOption.select) && (typeof (loadOption.select)==="string" || Array.isArray(loadOption.select)))
+				return true;
+			if (!OfficeExtension.Utility.isUndefined(loadOption.expand) && (typeof (loadOption.expand)==="string" || Array.isArray(loadOption.expand)))
+				return true;
+			if (!OfficeExtension.Utility.isUndefined(loadOption.top) && typeof (loadOption.top)==="number")
+				return true;
+			if (!OfficeExtension.Utility.isUndefined(loadOption.skip) && typeof (loadOption.skip)==="number")
+				return true;
+			for (var i in loadOption) {
+				return false;
+			}
+			return true;
+		};
+		ClientRequestContext.parseStrictLoadOption=function (option) {
+			var ret={ Select: [] };
+			ClientRequestContext.parseStrictLoadOptionHelper(ret, "", "option", option);
+			return ret;
+		};
+		ClientRequestContext.combineQueryPath=function (pathPrefix, key, separator) {
+			if (pathPrefix.length===0) {
+				return key;
+			}
+			else {
+				return pathPrefix+separator+key;
+			}
+		};
+		ClientRequestContext.parseStrictLoadOptionHelper=function (queryInfo, pathPrefix, argPrefix, option) {
+			for (var key in option) {
+				var value=option[key];
+				if (key==="$all") {
+					if (typeof (value) !=="boolean") {
+						throw OfficeExtension._Internal.RuntimeError._createInvalidArgError(ClientRequestContext.combineQueryPath(argPrefix, key, "."));
+					}
+					if (value) {
+						queryInfo.Select.push(ClientRequestContext.combineQueryPath(pathPrefix, "*", "/"));
+					}
+				}
+				else if (key==="$top") {
+					if (typeof (value) !=="number" || pathPrefix.length > 0) {
+						throw OfficeExtension._Internal.RuntimeError._createInvalidArgError(ClientRequestContext.combineQueryPath(argPrefix, key, "."));
+					}
+					queryInfo.Top=value;
+				}
+				else if (key==="$skip") {
+					if (typeof (value) !=="number" || pathPrefix.length > 0) {
+						throw OfficeExtension._Internal.RuntimeError._createInvalidArgError(ClientRequestContext.combineQueryPath(argPrefix, key, "."));
+					}
+					queryInfo.Skip=value;
+				}
+				else {
+					if (typeof (value)==="boolean") {
+						if (value) {
+							queryInfo.Select.push(ClientRequestContext.combineQueryPath(pathPrefix, key, "/"));
+						}
+					}
+					else if (typeof (value)==="object") {
+						ClientRequestContext.parseStrictLoadOptionHelper(queryInfo, ClientRequestContext.combineQueryPath(pathPrefix, key, "/"), ClientRequestContext.combineQueryPath(argPrefix, key, "."), value);
+					}
+					else {
+						throw OfficeExtension._Internal.RuntimeError._createInvalidArgError(ClientRequestContext.combineQueryPath(argPrefix, key, "."));
+					}
+				}
+			}
+		};
+		ClientRequestContext._parseQueryOption=function (option) {
 			var queryOption={};
 			if (typeof (option)=="string") {
 				var select=option;
@@ -9267,41 +9536,46 @@ var OfficeExtension;
 			else if (Array.isArray(option)) {
 				queryOption.Select=option;
 			}
-			else if (typeof (option)=="object") {
+			else if (typeof (option)==="object") {
 				var loadOption=option;
-				if (typeof (loadOption.select)=="string") {
-					queryOption.Select=OfficeExtension.Utility._parseSelectExpand(loadOption.select);
+				if (ClientRequestContext.isLoadOption(loadOption)) {
+					if (typeof (loadOption.select)=="string") {
+						queryOption.Select=OfficeExtension.Utility._parseSelectExpand(loadOption.select);
+					}
+					else if (Array.isArray(loadOption.select)) {
+						queryOption.Select=loadOption.select;
+					}
+					else if (!OfficeExtension.Utility.isNullOrUndefined(loadOption.select)) {
+						throw OfficeExtension._Internal.RuntimeError._createInvalidArgError("option.select");
+					}
+					if (typeof (loadOption.expand)=="string") {
+						queryOption.Expand=OfficeExtension.Utility._parseSelectExpand(loadOption.expand);
+					}
+					else if (Array.isArray(loadOption.expand)) {
+						queryOption.Expand=loadOption.expand;
+					}
+					else if (!OfficeExtension.Utility.isNullOrUndefined(loadOption.expand)) {
+						throw OfficeExtension._Internal.RuntimeError._createInvalidArgError("option.expand");
+					}
+					if (typeof (loadOption.top)==="number") {
+						queryOption.Top=loadOption.top;
+					}
+					else if (!OfficeExtension.Utility.isNullOrUndefined(loadOption.top)) {
+						throw OfficeExtension._Internal.RuntimeError._createInvalidArgError("option.top");
+					}
+					if (typeof (loadOption.skip)==="number") {
+						queryOption.Skip=loadOption.skip;
+					}
+					else if (!OfficeExtension.Utility.isNullOrUndefined(loadOption.skip)) {
+						throw OfficeExtension._Internal.RuntimeError._createInvalidArgError("option.skip");
+					}
 				}
-				else if (Array.isArray(loadOption.select)) {
-					queryOption.Select=loadOption.select;
-				}
-				else if (!OfficeExtension.Utility.isNullOrUndefined(loadOption.select)) {
-					OfficeExtension.Utility.throwError(OfficeExtension.ResourceStrings.invalidArgument, "option.select");
-				}
-				if (typeof (loadOption.expand)=="string") {
-					queryOption.Expand=OfficeExtension.Utility._parseSelectExpand(loadOption.expand);
-				}
-				else if (Array.isArray(loadOption.expand)) {
-					queryOption.Expand=loadOption.expand;
-				}
-				else if (!OfficeExtension.Utility.isNullOrUndefined(loadOption.expand)) {
-					OfficeExtension.Utility.throwError(OfficeExtension.ResourceStrings.invalidArgument, "option.expand");
-				}
-				if (typeof (loadOption.top)=="number") {
-					queryOption.Top=loadOption.top;
-				}
-				else if (!OfficeExtension.Utility.isNullOrUndefined(loadOption.top)) {
-					OfficeExtension.Utility.throwError(OfficeExtension.ResourceStrings.invalidArgument, "option.top");
-				}
-				if (typeof (loadOption.skip)=="number") {
-					queryOption.Skip=loadOption.skip;
-				}
-				else if (!OfficeExtension.Utility.isNullOrUndefined(loadOption.skip)) {
-					OfficeExtension.Utility.throwError(OfficeExtension.ResourceStrings.invalidArgument, "option.skip");
+				else {
+					queryOption=ClientRequestContext.parseStrictLoadOption(option);
 				}
 			}
 			else if (!OfficeExtension.Utility.isNullOrUndefined(option)) {
-				OfficeExtension.Utility.throwError(OfficeExtension.ResourceStrings.invalidArgument, "option");
+				throw OfficeExtension._Internal.RuntimeError._createInvalidArgError("option");
 			}
 			return queryOption;
 		};
@@ -9311,7 +9585,7 @@ var OfficeExtension;
 			}
 			var quries={};
 			for (var key in options) {
-				quries[key]=ClientRequestContext.parseQueryOption(options[key]);
+				quries[key]=ClientRequestContext._parseQueryOption(options[key]);
 			}
 			var action=OfficeExtension.ActionFactory.createRecursiveQueryAction(this, clientObj, { Queries: quries, MaxDepth: maxDepth });
 			this._pendingRequest.addActionResultHandler(action, clientObj);
@@ -9381,8 +9655,10 @@ var OfficeExtension;
 			req.invalidatePendingInvalidObjectPaths();
 			var errorFromResponse=null;
 			var errorFromProcessEventHandlers=null;
+			this._lastSyncStart=performance.now();
 			return requestExecutor.executeAsync(this._customData, requestFlags, requestExecutorRequestMessage)
 				.then(function (response) {
+				_this._lastSyncEnd=performance.now();
 				errorFromResponse=_this.processRequestExecutorResponseMessage(req, response);
 				return _this.processPendingEventHandlers(req)
 					.catch(function (ex) {
@@ -9429,7 +9705,13 @@ var OfficeExtension;
 				req._setResponseTraceIds(response.Body.TraceIds);
 			}
 			var traceMessages=req._responseTraceMessages;
+			var errorStatementInfo=null;
 			if (response.Body) {
+				if (response.Body.Error &&
+					response.Body.Error.ActionIndex >=0) {
+					var prettyPrinter=new OfficeExtension.RequestPrettyPrinter(this._rootObjectPropertyName, req._objectPaths, req._actions);
+					errorStatementInfo=prettyPrinter.processForDebugStatementInfo(response.Body.Error.ActionIndex);
+				}
 				var actionResults=null;
 				if (response.Body.Results) {
 					actionResults=response.Body.Results;
@@ -9455,13 +9737,18 @@ var OfficeExtension;
 				});
 			}
 			else if (response.Body && response.Body.Error) {
+				var debugInfo={
+					errorLocation: response.Body.Error.Location
+				};
+				if (errorStatementInfo) {
+					debugInfo.statement=errorStatementInfo.statement;
+					debugInfo.surroundingStatements=errorStatementInfo.surroundingStatements;
+				}
 				return new OfficeExtension._Internal.RuntimeError({
 					code: response.Body.Error.Code,
 					message: response.Body.Error.Message,
 					traceMessages: traceMessages,
-					debugInfo: {
-						errorLocation: response.Body.Error.Location
-					}
+					debugInfo: debugInfo
 				});
 			}
 			return null;
@@ -9526,8 +9813,14 @@ var OfficeExtension;
 				batch=receivedRunArgs[argOffset+0];
 			}
 			else if (receivedRunArgs.length==argOffset+2) {
-				if (receivedRunArgs[argOffset+0] instanceof OfficeExtension.ClientObject) {
+				if (OfficeExtension.Utility.isNullOrUndefined(receivedRunArgs[argOffset+0])) {
+					ctxRetriever=ctxInitializer;
+				}
+				else if (receivedRunArgs[argOffset+0] instanceof OfficeExtension.ClientObject) {
 					ctxRetriever=function () { return receivedRunArgs[argOffset+0].context; };
+				}
+				else if (receivedRunArgs[argOffset+0] instanceof ClientRequestContext) {
+					ctxRetriever=function () { return receivedRunArgs[argOffset+0]; };
 				}
 				else if (Array.isArray(receivedRunArgs[argOffset+0])) {
 					var array=receivedRunArgs[argOffset+0];
@@ -9694,6 +9987,79 @@ var OfficeExtension;
 		return ClientResult;
 	}());
 	OfficeExtension.ClientResult=ClientResult;
+	var RetrieveResult=(function () {
+		function RetrieveResult(m_proxy, m_shouldPolyfill) {
+			this.m_proxy=m_proxy;
+			this.m_shouldPolyfill=m_shouldPolyfill;
+		}
+		Object.defineProperty(RetrieveResult.prototype, "proxy", {
+			get: function () {
+				return this.m_proxy;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(RetrieveResult.prototype, "data", {
+			get: function () {
+				if (!this.m_isLoaded) {
+					throw new OfficeExtension._Internal.RuntimeError({
+						code: OfficeExtension.ErrorCodes.valueNotLoaded,
+						message: OfficeExtension.Utility._getResourceString(OfficeExtension.ResourceStrings.valueNotLoaded),
+						debugInfo: {
+							errorLocation: "retrieveResult.data"
+						}
+					});
+				}
+				return this.m_data;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		RetrieveResult.prototype._handleResult=function (value) {
+			this.m_isLoaded=true;
+			if (typeof (value)==="object" && value && value._IsNull) {
+				this.m_data=null;
+				return;
+			}
+			if (this.m_shouldPolyfill) {
+				this.m_data=this.changePropertyNameToCamelLowerCase(value);
+			}
+			else {
+				this.m_data=value;
+			}
+		};
+		RetrieveResult.prototype.changePropertyNameToCamelLowerCase=function (value) {
+			var charCodeUnderscore=95;
+			if (Array.isArray(value)) {
+				var ret=[];
+				for (var i=0; i < value.length; i++) {
+					ret.push(this.changePropertyNameToCamelLowerCase(value[i]));
+				}
+				return ret;
+			}
+			else if (typeof (value)==="object" && value !==null) {
+				var ret={};
+				for (var key in value) {
+					var propValue=value[key];
+					if (key==="_Items") {
+						ret={};
+						ret["items"]=this.changePropertyNameToCamelLowerCase(propValue);
+						break;
+					}
+					else if (key.charCodeAt(0) !==charCodeUnderscore) {
+						var propName=OfficeExtension.Utility._toCamelLowerCase(key);
+						ret[propName]=this.changePropertyNameToCamelLowerCase(propValue);
+					}
+				}
+				return ret;
+			}
+			else {
+				return value;
+			}
+		};
+		return RetrieveResult;
+	}());
+	OfficeExtension.RetrieveResult=RetrieveResult;
 })(OfficeExtension || (OfficeExtension={}));
 var OfficeExtension;
 (function (OfficeExtension) {
@@ -10048,7 +10414,7 @@ var OfficeExtension;
 					debugInfo[key]=partialDebugInfo[key];
 				}
 				if (this.innerError) {
-					if (this.innerError instanceof OfficeExtension._Internal.Error) {
+					if (this.innerError instanceof OfficeExtension._Internal.RuntimeError) {
 						debugInfo.innerError=this.innerError.debugInfo;
 					}
 					else {
@@ -10240,6 +10606,13 @@ var OfficeExtension;
 			this.m_allHandlers=handlers;
 			this.m_handler=handler;
 		}
+		Object.defineProperty(EventHandlerResult.prototype, "context", {
+			get: function () {
+				return this.m_context;
+			},
+			enumerable: true,
+			configurable: true
+		});
 		EventHandlerResult.prototype.remove=function () {
 			if (this.m_allHandlers && this.m_handler) {
 				this.m_allHandlers.remove(this.m_handler);
@@ -10955,6 +11328,7 @@ var OfficeExtension;
 				this.m_objectPathInfo.ObjectPathType=6;
 				this.m_objectPathInfo.Name=referenceId;
 				this.m_objectPathInfo.ArgumentInfo={};
+				delete this.m_objectPathInfo.ParentObjectPathId;
 				this.m_parentObjectPath=null;
 				this.m_argumentObjectPaths=null;
 				return;
@@ -11792,6 +12166,305 @@ var OfficeExtension;
 })(OfficeExtension || (OfficeExtension={}));
 var OfficeExtension;
 (function (OfficeExtension) {
+	var RequestPrettyPrinter=(function () {
+		function RequestPrettyPrinter(globalObjName, referencedObjectPaths, actions, showDispose) {
+			if (!globalObjName) {
+				globalObjName="root";
+			}
+			this.m_globalObjName=globalObjName;
+			this.m_referencedObjectPaths=referencedObjectPaths;
+			this.m_actions=actions;
+			this.m_statements=[];
+			this.m_variableNameForObjectPathMap={};
+			this.m_variableNameToObjectPathMap={};
+			this.m_declaredObjectPathMap={};
+			this.m_showDispose=showDispose;
+		}
+		RequestPrettyPrinter.prototype.process=function () {
+			if (this.m_showDispose) {
+				OfficeExtension.ClientRequest._calculateLastUsedObjectPathIds(this.m_actions);
+			}
+			for (var i=0; i < this.m_actions.length; i++) {
+				this.processOneAction(this.m_actions[i]);
+			}
+			return this.m_statements;
+		};
+		RequestPrettyPrinter.prototype.processForDebugStatementInfo=function (actionIndex) {
+			if (this.m_showDispose) {
+				OfficeExtension.ClientRequest._calculateLastUsedObjectPathIds(this.m_actions);
+			}
+			var surroundingCount=5;
+			this.m_statements=[];
+			var oneStatement="";
+			var statementIndex=-1;
+			for (var i=0; i < this.m_actions.length; i++) {
+				this.processOneAction(this.m_actions[i]);
+				if (actionIndex==i) {
+					statementIndex=this.m_statements.length - 1;
+				}
+				if (statementIndex >=0 && this.m_statements.length > statementIndex+surroundingCount+1) {
+					break;
+				}
+			}
+			if (statementIndex < 0) {
+				return null;
+			}
+			var startIndex=statementIndex - surroundingCount;
+			if (startIndex < 0) {
+				startIndex=0;
+			}
+			var endIndex=statementIndex+1+surroundingCount;
+			if (endIndex > this.m_statements.length) {
+				endIndex=this.m_statements.length;
+			}
+			var surroundingStatements=[];
+			if (startIndex !=0) {
+				surroundingStatements.push("...");
+			}
+			for (var i_1=startIndex; i_1 < statementIndex; i_1++) {
+				surroundingStatements.push(this.m_statements[i_1]);
+			}
+			surroundingStatements.push("// >>>>>");
+			surroundingStatements.push(this.m_statements[statementIndex]);
+			surroundingStatements.push("// <<<<<");
+			for (var i_2=statementIndex+1; i_2 < endIndex; i_2++) {
+				surroundingStatements.push(this.m_statements[i_2]);
+			}
+			if (endIndex < this.m_statements.length) {
+				surroundingStatements.push("...");
+			}
+			return {
+				statement: this.m_statements[statementIndex],
+				surroundingStatements: surroundingStatements
+			};
+		};
+		RequestPrettyPrinter.prototype.processOneAction=function (action) {
+			var actionInfo=action.actionInfo;
+			switch (actionInfo.ActionType) {
+				case 1:
+					this.processInstantiateAction(action);
+					break;
+				case 3:
+					this.processMethodAction(action);
+					break;
+				case 2:
+					this.processQueryAction(action);
+					break;
+				case 7:
+					this.processQueryAsJsonAction(action);
+					break;
+				case 6:
+					this.processRecursiveQueryAction(action);
+					break;
+				case 4:
+					this.processSetPropertyAction(action);
+					break;
+				case 5:
+					this.processTraceAction(action);
+					break;
+				case 8:
+					this.processEnsureUnchangedAction(action);
+					break;
+			}
+		};
+		RequestPrettyPrinter.prototype.processInstantiateAction=function (action) {
+			var objId=action.actionInfo.ObjectPathId;
+			var objPath=this.m_referencedObjectPaths[objId];
+			var varName=this.getObjVarName(objId);
+			if (!this.m_declaredObjectPathMap[objId]) {
+				var statement="var "+varName+"="+this.buildObjectPathExpressionWithParent(objPath)+";";
+				statement=this.appendDisposeCommentIfRelevant(statement, action);
+				this.m_statements.push(statement);
+				this.m_declaredObjectPathMap[objId]=varName;
+			}
+			else {
+				var statement="// Instantiate {"+varName+"}";
+				statement=this.appendDisposeCommentIfRelevant(statement, action);
+				this.m_statements.push(statement);
+			}
+		};
+		RequestPrettyPrinter.prototype.processMethodAction=function (action) {
+			var methodName=action.actionInfo.Name;
+			if (methodName==="_KeepReference") {
+				methodName="track";
+			}
+			var statement=this.getObjVarName(action.actionInfo.ObjectPathId)+"."+OfficeExtension.Utility._toCamelLowerCase(methodName)+"("+this.buildArgumentsExpression(action.actionInfo.ArgumentInfo)+");";
+			statement=this.appendDisposeCommentIfRelevant(statement, action);
+			this.m_statements.push(statement);
+		};
+		RequestPrettyPrinter.prototype.processQueryAction=function (action) {
+			var queryExp=this.buildQueryExpression(action);
+			var statement=this.getObjVarName(action.actionInfo.ObjectPathId)+".load("+queryExp+");";
+			statement=this.appendDisposeCommentIfRelevant(statement, action);
+			this.m_statements.push(statement);
+		};
+		RequestPrettyPrinter.prototype.processQueryAsJsonAction=function (action) {
+			var queryExp=this.buildQueryExpression(action);
+			var statement=this.getObjVarName(action.actionInfo.ObjectPathId)+".loadJson("+queryExp+");";
+			statement=this.appendDisposeCommentIfRelevant(statement, action);
+			this.m_statements.push(statement);
+		};
+		RequestPrettyPrinter.prototype.processRecursiveQueryAction=function (action) {
+			var queryExp="";
+			if (action.actionInfo.RecursiveQueryInfo) {
+				queryExp=JSON.stringify(action.actionInfo.RecursiveQueryInfo);
+			}
+			var statement=this.getObjVarName(action.actionInfo.ObjectPathId)+".loadRecursive("+queryExp+");";
+			statement=this.appendDisposeCommentIfRelevant(statement, action);
+			this.m_statements.push(statement);
+		};
+		RequestPrettyPrinter.prototype.processSetPropertyAction=function (action) {
+			var statement=this.getObjVarName(action.actionInfo.ObjectPathId)+"."+OfficeExtension.Utility._toCamelLowerCase(action.actionInfo.Name)+"="+this.buildArgumentsExpression(action.actionInfo.ArgumentInfo)+";";
+			statement=this.appendDisposeCommentIfRelevant(statement, action);
+			this.m_statements.push(statement);
+		};
+		RequestPrettyPrinter.prototype.processTraceAction=function (action) {
+			var statement="context.trace();";
+			statement=this.appendDisposeCommentIfRelevant(statement, action);
+			this.m_statements.push(statement);
+		};
+		RequestPrettyPrinter.prototype.processEnsureUnchangedAction=function (action) {
+			var statement=this.getObjVarName(action.actionInfo.ObjectPathId)+".ensureUnchanged("+JSON.stringify(action.actionInfo.ObjectState)+");";
+			statement=this.appendDisposeCommentIfRelevant(statement, action);
+			this.m_statements.push(statement);
+		};
+		RequestPrettyPrinter.prototype.appendDisposeCommentIfRelevant=function (statement, action) {
+			var _this=this;
+			if (this.m_showDispose) {
+				var lastUsedObjectPathIds=action.actionInfo.L;
+				if (lastUsedObjectPathIds && lastUsedObjectPathIds.length > 0) {
+					var objectNamesToDispose=lastUsedObjectPathIds.map(function (item) { return _this.getObjVarName(item); }).join(", ");
+					return statement+" // And then dispose {"+objectNamesToDispose+"}";
+				}
+			}
+			return statement;
+		};
+		RequestPrettyPrinter.prototype.buildQueryExpression=function (action) {
+			if (action.actionInfo.QueryInfo) {
+				var option={};
+				option.select=action.actionInfo.QueryInfo.Select;
+				option.expand=action.actionInfo.QueryInfo.Expand;
+				option.skip=action.actionInfo.QueryInfo.Skip;
+				option.top=action.actionInfo.QueryInfo.Top;
+				if (typeof (option.top)==="undefined" && typeof (option.skip)==="undefined" && typeof (option.expand)==="undefined") {
+					if (typeof (option.select)==="undefined") {
+						return "";
+					}
+					else {
+						return JSON.stringify(option.select);
+					}
+				}
+				else {
+					return JSON.stringify(option);
+				}
+			}
+			return "";
+		};
+		RequestPrettyPrinter.prototype.buildObjectPathExpressionWithParent=function (objPath) {
+			var hasParent=objPath.objectPathInfo.ObjectPathType==5 ||
+				objPath.objectPathInfo.ObjectPathType==3 ||
+				objPath.objectPathInfo.ObjectPathType==4;
+			if (hasParent && objPath.objectPathInfo.ParentObjectPathId) {
+				return this.getObjVarName(objPath.objectPathInfo.ParentObjectPathId)+"."+this.buildObjectPathExpression(objPath);
+			}
+			return this.buildObjectPathExpression(objPath);
+		};
+		RequestPrettyPrinter.prototype.buildObjectPathExpression=function (objPath) {
+			switch (objPath.objectPathInfo.ObjectPathType) {
+				case 1:
+					return "context."+this.m_globalObjName;
+				case 5:
+					return "getItem("+this.buildArgumentsExpression(objPath.objectPathInfo.ArgumentInfo)+")";
+				case 3:
+					return OfficeExtension.Utility._toCamelLowerCase(objPath.objectPathInfo.Name)+"("+this.buildArgumentsExpression(objPath.objectPathInfo.ArgumentInfo)+")";
+				case 2:
+					return objPath.objectPathInfo.Name+".newObject()";
+				case 7:
+					return "null";
+				case 4:
+					return OfficeExtension.Utility._toCamelLowerCase(objPath.objectPathInfo.Name);
+				case 6:
+					return "context."+this.m_globalObjName+"._getObjectByReferenceId("+JSON.stringify(objPath.objectPathInfo.Name)+")";
+			}
+		};
+		RequestPrettyPrinter.prototype.buildArgumentsExpression=function (args) {
+			var ret="";
+			if (!args.Arguments) {
+				return ret;
+			}
+			for (var i=0; i < args.Arguments.length; i++) {
+				if (i > 0) {
+					ret=ret+", ";
+				}
+				ret=ret+this.buildArgumentLiteral(args.Arguments[i], args.ReferencedObjectPathIds ? args.ReferencedObjectPathIds[i] : null);
+			}
+			if (ret==="undefined") {
+				ret="";
+			}
+			return ret;
+		};
+		RequestPrettyPrinter.prototype.buildArgumentLiteral=function (value, objectPathId) {
+			if (typeof value=="number" && value===objectPathId) {
+				return this.getObjVarName(objectPathId);
+			}
+			else {
+				return JSON.stringify(value);
+			}
+		};
+		RequestPrettyPrinter.prototype.getObjVarNameBase=function (objectPathId) {
+			var ret="v";
+			var objPath=this.m_referencedObjectPaths[objectPathId];
+			switch (objPath.objectPathInfo.ObjectPathType) {
+				case 1:
+					ret=this.m_globalObjName;
+					break;
+				case 4:
+					ret=OfficeExtension.Utility._toCamelLowerCase(objPath.objectPathInfo.Name);
+					break;
+				case 3:
+					var methodName=objPath.objectPathInfo.Name;
+					if (methodName.length > 3 && methodName.substr(0, 3)==="Get") {
+						methodName=methodName.substr(3);
+					}
+					ret=OfficeExtension.Utility._toCamelLowerCase(methodName);
+					break;
+				case 5:
+					var parentName=this.getObjVarNameBase(objPath.objectPathInfo.ParentObjectPathId);
+					if (parentName.charAt(parentName.length - 1)==="s") {
+						ret=parentName.substr(0, parentName.length - 1);
+					}
+					else {
+						ret=parentName+"Item";
+					}
+					break;
+			}
+			return ret;
+		};
+		RequestPrettyPrinter.prototype.getObjVarName=function (objectPathId) {
+			if (this.m_variableNameForObjectPathMap[objectPathId]) {
+				return this.m_variableNameForObjectPathMap[objectPathId];
+			}
+			var ret=this.getObjVarNameBase(objectPathId);
+			if (!this.m_variableNameToObjectPathMap[ret]) {
+				this.m_variableNameForObjectPathMap[objectPathId]=ret;
+				this.m_variableNameToObjectPathMap[ret]=objectPathId;
+				return ret;
+			}
+			var i=1;
+			while (this.m_variableNameToObjectPathMap[ret+i.toString()]) {
+				i++;
+			}
+			ret=ret+i.toString();
+			this.m_variableNameForObjectPathMap[objectPathId]=ret;
+			this.m_variableNameToObjectPathMap[ret]=objectPathId;
+			return ret;
+		};
+		return RequestPrettyPrinter;
+	}());
+	OfficeExtension.RequestPrettyPrinter=RequestPrettyPrinter;
+})(OfficeExtension || (OfficeExtension={}));
+var OfficeExtension;
+(function (OfficeExtension) {
 	var ResourceStrings=(function () {
 		function ResourceStrings() {
 		}
@@ -11816,6 +12489,8 @@ var OfficeExtension;
 		ResourceStrings.customFunctionImplementationMissing="CustomFunctionImplementationMissing";
 		ResourceStrings.customFunctionNameContainsBadChars="CustomFunctionNameContainsBadChars";
 		ResourceStrings.customFunctionNameCannotSplit="CustomFunctionNameCannotSplit";
+		ResourceStrings.customFunctionUnexpectedNumberOfEntriesInResultBatch="CustomFunctionUnexpectedNumberOfEntriesInResultBatch";
+		ResourceStrings.customFunctionCancellationHandlerMissing="CustomFunctionCancellationHandlerMissing";
 		ResourceStrings.apiNotFoundDetails="ApiNotFoundDetails";
 		return ResourceStrings;
 	}());
@@ -11842,6 +12517,8 @@ var OfficeExtension;
 		ResourceStringValues.CustomFunctionImplementationMissing="The property with this name on Excel.CustomFunctions that represents the function's definition must contain a 'call' property that implements the function.";
 		ResourceStringValues.CustomFunctionNameContainsBadChars="The function name may only contain letters, digits, underscores, and periods.";
 		ResourceStringValues.CustomFunctionNameCannotSplit="The function name must contain a non-empty namespace and a non-empty short name.";
+		ResourceStringValues.CustomFunctionUnexpectedNumberOfEntriesInResultBatch="The batching function returned a number of results that doesn't match the number of parameter value sets that were passed into it.";
+		ResourceStringValues.CustomFunctionCancellationHandlerMissing="The cancellation handler onCanceled is missing in the function. The handler must be present as the function is defined as cancelable.";
 		ResourceStringValues.ApiNotFoundDetails="The method or property {0} is part of the {1} requirement set, which is not available in your version of {2}.";
 		return ResourceStringValues;
 	}());
@@ -12136,6 +12813,34 @@ var OfficeExtension;
 		};
 		Utility.load=function (clientObj, option) {
 			clientObj.context.load(clientObj, option);
+			return clientObj;
+		};
+		Utility.loadAndSync=function (clientObj, option) {
+			clientObj.context.load(clientObj, option);
+			return clientObj.context.sync().then(function () { return clientObj; });
+		};
+		Utility.retrieve=function (clientObj, option) {
+			var shouldPolyfill=OfficeExtension._internalConfig.alwaysPolyfillClientObjectRetrieveMethod;
+			if (!shouldPolyfill) {
+				if (typeof (window) !=="undefined" && window.Office && window.Office.context && window.Office.context.requirements) {
+					shouldPolyfill=!window.Office.context.requirements.isSetSupported("RichApiRuntime", "1.1");
+				}
+			}
+			var result=new OfficeExtension.RetrieveResult(clientObj, shouldPolyfill);
+			var queryOption=OfficeExtension.ClientRequestContext._parseQueryOption(option);
+			var action;
+			if (shouldPolyfill) {
+				action=OfficeExtension.ActionFactory.createQueryAction(clientObj.context, clientObj, queryOption);
+			}
+			else {
+				action=OfficeExtension.ActionFactory.createQueryAsJsonAction(clientObj.context, clientObj, queryOption);
+			}
+			clientObj.context._pendingRequest.addActionResultHandler(action, result);
+			return result;
+		};
+		Utility.retrieveAndSync=function (clientObj, option) {
+			var result=Utility.retrieve(clientObj, option);
+			return clientObj.context.sync().then(function () { return result; });
 		};
 		Utility._parseSelectExpand=function (select) {
 			var args=[];
@@ -12156,11 +12861,32 @@ var OfficeExtension;
 					return '*';
 				}
 				var itemsSlashLength=6;
-				if (propertyNameLower.substr(0, itemsSlashLength)==="items/") {
+				var isItemsSlashOrItemsDot=propertyNameLower.substr(0, itemsSlashLength)==="items/" ||
+					propertyNameLower.substr(0, itemsSlashLength)==="items.";
+				if (isItemsSlashOrItemsDot) {
 					propertyName=propertyName.substr(itemsSlashLength);
 				}
-				return propertyName.replace(new RegExp("\/items\/", "gi"), "/");
+				return propertyName.replace(new RegExp("[\/\.]items[\/\.]", "gi"), "/");
 			}
+		};
+		Utility.toJson=function (clientObj, scalarProperties, navigationProperties, collectionItemsIfAny) {
+			var result={};
+			for (var prop in scalarProperties) {
+				var value=scalarProperties[prop];
+				if (typeof value !=="undefined") {
+					result[prop]=value;
+				}
+			}
+			for (var prop in navigationProperties) {
+				var value=navigationProperties[prop];
+				if (typeof value !=="undefined") {
+					result[prop]=value.toJSON();
+				}
+			}
+			if (collectionItemsIfAny) {
+				result["items"]=collectionItemsIfAny.map(function (item) { return item.toJSON(); });
+			}
+			return result;
 		};
 		Utility.throwError=function (resourceId, arg, errorLocation) {
 			throw new OfficeExtension._Internal.RuntimeError({
@@ -12419,6 +13145,21 @@ var OfficeExtension;
 				}
 			}
 		};
+		Utility._toCamelLowerCase=function (name) {
+			if (Utility.isNullOrEmptyString(name)) {
+				return name;
+			}
+			var index=0;
+			while (index < name.length && name.charCodeAt(index) >=65 && name.charCodeAt(index) <=90) {
+				index++;
+			}
+			if (index < name.length) {
+				return name.substr(0, index).toLowerCase()+name.substr(index);
+			}
+			else {
+				return name.toLowerCase();
+			}
+		};
 		Utility._logEnabled=false;
 		Utility._synchronousCleanup=false;
 		Utility._doApiNotSupportedCheck=false;
@@ -12568,6 +13309,23 @@ var OfficeCore;
 		function RequestContext(url) {
 			_super.call(this, url);
 		}
+		Object.defineProperty(RequestContext.prototype, "flighting", {
+			get: function () {
+				return this.flightingService;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(RequestContext.prototype, "telemetry", {
+			get: function () {
+				if (!this.m_telemetry) {
+					this.m_telemetry=OfficeCore.TelemetryService.newObject(this);
+				}
+				return this.m_telemetry;
+			},
+			enumerable: true,
+			configurable: true
+		});
 		Object.defineProperty(RequestContext.prototype, "flightingService", {
 			get: function () {
 				if (!this.m_flightingService) {
@@ -12578,23 +13336,81 @@ var OfficeCore;
 			enumerable: true,
 			configurable: true
 		});
-		Object.defineProperty(RequestContext.prototype, "flighting", {
-			get: function () {
-				return this.flightingService;
-			},
-			enumerable: true,
-			configurable: true
-		});
 		return RequestContext;
 	}(OfficeExtension.ClientRequestContext));
 	OfficeCore.RequestContext=RequestContext;
 })(OfficeCore || (OfficeCore={}));
+var OfficeCore;
+(function (OfficeCore) {
+	var _hostName="OfficeCore";
+	var _defaultApiSetName="TelemetryApi";
+	var _createPropertyObjectPath=OfficeExtension.ObjectPathFactory.createPropertyObjectPath;
+	var _createMethodObjectPath=OfficeExtension.ObjectPathFactory.createMethodObjectPath;
+	var _createIndexerObjectPath=OfficeExtension.ObjectPathFactory.createIndexerObjectPath;
+	var _createNewObjectObjectPath=OfficeExtension.ObjectPathFactory.createNewObjectObjectPath;
+	var _createChildItemObjectPathUsingIndexer=OfficeExtension.ObjectPathFactory.createChildItemObjectPathUsingIndexer;
+	var _createChildItemObjectPathUsingGetItemAt=OfficeExtension.ObjectPathFactory.createChildItemObjectPathUsingGetItemAt;
+	var _createChildItemObjectPathUsingIndexerOrGetItemAt=OfficeExtension.ObjectPathFactory.createChildItemObjectPathUsingIndexerOrGetItemAt;
+	var _createMethodAction=OfficeExtension.ActionFactory.createMethodAction;
+	var _createSetPropertyAction=OfficeExtension.ActionFactory.createSetPropertyAction;
+	var _isNullOrUndefined=OfficeExtension.Utility.isNullOrUndefined;
+	var _isUndefined=OfficeExtension.Utility.isUndefined;
+	var _throwIfNotLoaded=OfficeExtension.Utility.throwIfNotLoaded;
+	var _throwIfApiNotSupported=OfficeExtension.Utility.throwIfApiNotSupported;
+	var _load=OfficeExtension.Utility.load;
+	var _fixObjectPathIfNecessary=OfficeExtension.Utility.fixObjectPathIfNecessary;
+	var _addActionResultHandler=OfficeExtension.Utility._addActionResultHandler;
+	var _handleNavigationPropertyResults=OfficeExtension.Utility._handleNavigationPropertyResults;
+	var _adjustToDateTime=OfficeExtension.Utility.adjustToDateTime;
+	var _typeTelemetryService="TelemetryService";
+	var TelemetryService=(function (_super) {
+		__extends(TelemetryService, _super);
+		function TelemetryService() {
+			_super.apply(this, arguments);
+		}
+		Object.defineProperty(TelemetryService.prototype, "_className", {
+			get: function () {
+				return "TelemetryService";
+			},
+			enumerable: true,
+			configurable: true
+		});
+		TelemetryService.prototype.sendTelemetryEvent=function (telemetryProperties, eventName, eventContract, eventFlags, value) {
+			_createMethodAction(this.context, this, "SendTelemetryEvent", 1, [telemetryProperties, eventName, eventContract, eventFlags, value], false);
+		};
+		TelemetryService.prototype._handleResult=function (value) {
+			_super.prototype._handleResult.call(this, value);
+			if (_isNullOrUndefined(value))
+				return;
+			var obj=value;
+			_fixObjectPathIfNecessary(this, obj);
+		};
+		TelemetryService.newObject=function (context) {
+			var ret=new OfficeCore.TelemetryService(context, _createNewObjectObjectPath(context, "Microsoft.Telemetry.TelemetryService", false, false));
+			return ret;
+		};
+		TelemetryService.prototype.toJSON=function () {
+			return {};
+		};
+		return TelemetryService;
+	}(OfficeExtension.ClientObject));
+	OfficeCore.TelemetryService=TelemetryService;
+	var TelemetryErrorCodes;
+	(function (TelemetryErrorCodes) {
+		TelemetryErrorCodes.generalException="GeneralException";
+	})(TelemetryErrorCodes=OfficeCore.TelemetryErrorCodes || (OfficeCore.TelemetryErrorCodes={}));
+})(OfficeCore || (OfficeCore={}));
 
-var __extends=(this && this.__extends) || function (d, b) {
-	for (var p in b) if (b.hasOwnProperty(p)) d[p]=b[p];
-	function __() { this.constructor=d; }
-	d.prototype=b===null ? Object.create(b) : (__.prototype=b.prototype, new __());
-};
+var __extends=(this && this.__extends) || (function () {
+	var extendStatics=Object.setPrototypeOf ||
+		({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__=b; }) ||
+		function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p]=b[p]; };
+	return function (d, b) {
+		extendStatics(d, b);
+		function __() { this.constructor=d; }
+		d.prototype=b===null ? Object.create(b) : (__.prototype=b.prototype, new __());
+	};
+})();
 var Word;
 (function (Word) {
 	function _normalizeSearchOptions(context, searchOptions) {
@@ -12615,6 +13431,8 @@ var Word;
 		}
 		return newSearchOptions;
 	}
+	var _hostName="Word";
+	var _defaultApiSetName="WordApi";
 	var _createPropertyObjectPath=OfficeExtension.ObjectPathFactory.createPropertyObjectPath;
 	var _createMethodObjectPath=OfficeExtension.ObjectPathFactory.createMethodObjectPath;
 	var _createIndexerObjectPath=OfficeExtension.ObjectPathFactory.createIndexerObjectPath;
@@ -12623,19 +13441,26 @@ var Word;
 	var _createChildItemObjectPathUsingGetItemAt=OfficeExtension.ObjectPathFactory.createChildItemObjectPathUsingGetItemAt;
 	var _createChildItemObjectPathUsingIndexerOrGetItemAt=OfficeExtension.ObjectPathFactory.createChildItemObjectPathUsingIndexerOrGetItemAt;
 	var _createMethodAction=OfficeExtension.ActionFactory.createMethodAction;
+	var _createEnsureUnchangedAction=OfficeExtension.ActionFactory.createEnsureUnchangedAction;
 	var _createSetPropertyAction=OfficeExtension.ActionFactory.createSetPropertyAction;
 	var _isNullOrUndefined=OfficeExtension.Utility.isNullOrUndefined;
 	var _isUndefined=OfficeExtension.Utility.isUndefined;
 	var _throwIfNotLoaded=OfficeExtension.Utility.throwIfNotLoaded;
+	var _throwIfApiNotSupported=OfficeExtension.Utility.throwIfApiNotSupported;
 	var _load=OfficeExtension.Utility.load;
+	var _loadAndSync=OfficeExtension.Utility.loadAndSync;
+	var _retrieve=OfficeExtension.Utility.retrieve;
+	var _retrieveAndSync=OfficeExtension.Utility.retrieveAndSync;
+	var _toJson=OfficeExtension.Utility.toJson;
 	var _fixObjectPathIfNecessary=OfficeExtension.Utility.fixObjectPathIfNecessary;
 	var _addActionResultHandler=OfficeExtension.Utility._addActionResultHandler;
 	var _handleNavigationPropertyResults=OfficeExtension.Utility._handleNavigationPropertyResults;
 	var _adjustToDateTime=OfficeExtension.Utility.adjustToDateTime;
+	var _typeApplication="Application";
 	var Application=(function (_super) {
 		__extends(Application, _super);
 		function Application() {
-			_super.apply(this, arguments);
+			return _super !==null && _super.apply(this, arguments) || this;
 		}
 		Object.defineProperty(Application.prototype, "_className", {
 			get: function () {
@@ -12645,7 +13470,7 @@ var Word;
 			configurable: true
 		});
 		Application.prototype.createDocument=function (base64File) {
-			return new Word.Document(this.context, _createMethodObjectPath(this.context, this, "CreateDocument", 1, [base64File], false, false, null));
+			return new Word.DocumentCreated(this.context, _createMethodObjectPath(this.context, this, "CreateDocument", 1, [base64File], false, false, null, false));
 		};
 		Application.prototype._handleResult=function (value) {
 			_super.prototype._handleResult.call(this, value);
@@ -12655,19 +13480,20 @@ var Word;
 			_fixObjectPathIfNecessary(this, obj);
 		};
 		Application.newObject=function (context) {
-			var ret=new Word.Application(context, _createNewObjectObjectPath(context, "Microsoft.WordServices.Application", false));
+			var ret=new Word.Application(context, _createNewObjectObjectPath(context, "Microsoft.WordServices.Application", false, false));
 			return ret;
 		};
 		Application.prototype.toJSON=function () {
-			return {};
+			return _toJson(this, {}, {});
 		};
 		return Application;
 	}(OfficeExtension.ClientObject));
 	Word.Application=Application;
+	var _typeBody="Body";
 	var Body=(function (_super) {
 		__extends(Body, _super);
 		function Body() {
-			_super.apply(this, arguments);
+			return _super !==null && _super.apply(this, arguments) || this;
 		}
 		Object.defineProperty(Body.prototype, "_className", {
 			get: function () {
@@ -12678,131 +13504,138 @@ var Word;
 		});
 		Object.defineProperty(Body.prototype, "contentControls", {
 			get: function () {
-				if (!this.m_contentControls) {
-					this.m_contentControls=new Word.ContentControlCollection(this.context, _createPropertyObjectPath(this.context, this, "ContentControls", true, false));
+				if (!this._C) {
+					this._C=new Word.ContentControlCollection(this.context, _createPropertyObjectPath(this.context, this, "ContentControls", true, false, false));
 				}
-				return this.m_contentControls;
+				return this._C;
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(Body.prototype, "font", {
 			get: function () {
-				if (!this.m_font) {
-					this.m_font=new Word.Font(this.context, _createPropertyObjectPath(this.context, this, "Font", false, false));
+				if (!this._F) {
+					this._F=new Word.Font(this.context, _createPropertyObjectPath(this.context, this, "Font", false, false, false));
 				}
-				return this.m_font;
+				return this._F;
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(Body.prototype, "inlinePictures", {
 			get: function () {
-				if (!this.m_inlinePictures) {
-					this.m_inlinePictures=new Word.InlinePictureCollection(this.context, _createPropertyObjectPath(this.context, this, "InlinePictures", true, false));
+				if (!this._I) {
+					this._I=new Word.InlinePictureCollection(this.context, _createPropertyObjectPath(this.context, this, "InlinePictures", true, false, false));
 				}
-				return this.m_inlinePictures;
+				return this._I;
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(Body.prototype, "lists", {
 			get: function () {
-				if (!this.m_lists) {
-					this.m_lists=new Word.ListCollection(this.context, _createPropertyObjectPath(this.context, this, "Lists", true, false));
+				_throwIfApiNotSupported("Body.lists", _defaultApiSetName, "1.3", _hostName);
+				if (!this._L) {
+					this._L=new Word.ListCollection(this.context, _createPropertyObjectPath(this.context, this, "Lists", true, false, false));
 				}
-				return this.m_lists;
+				return this._L;
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(Body.prototype, "paragraphs", {
 			get: function () {
-				if (!this.m_paragraphs) {
-					this.m_paragraphs=new Word.ParagraphCollection(this.context, _createPropertyObjectPath(this.context, this, "Paragraphs", true, false));
+				if (!this._P) {
+					this._P=new Word.ParagraphCollection(this.context, _createPropertyObjectPath(this.context, this, "Paragraphs", true, false, false));
 				}
-				return this.m_paragraphs;
+				return this._P;
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(Body.prototype, "parentBody", {
 			get: function () {
-				if (!this.m_parentBody) {
-					this.m_parentBody=new Word.Body(this.context, _createPropertyObjectPath(this.context, this, "ParentBody", false, false));
+				_throwIfApiNotSupported("Body.parentBody", _defaultApiSetName, "1.3", _hostName);
+				if (!this._Pa) {
+					this._Pa=new Word.Body(this.context, _createPropertyObjectPath(this.context, this, "ParentBody", false, false, false));
 				}
-				return this.m_parentBody;
+				return this._Pa;
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(Body.prototype, "parentBodyOrNullObject", {
 			get: function () {
-				if (!this.m_parentBodyOrNullObject) {
-					this.m_parentBodyOrNullObject=new Word.Body(this.context, _createPropertyObjectPath(this.context, this, "ParentBodyOrNullObject", false, false));
+				_throwIfApiNotSupported("Body.parentBodyOrNullObject", _defaultApiSetName, "1.3", _hostName);
+				if (!this._Par) {
+					this._Par=new Word.Body(this.context, _createPropertyObjectPath(this.context, this, "ParentBodyOrNullObject", false, false, false));
 				}
-				return this.m_parentBodyOrNullObject;
+				return this._Par;
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(Body.prototype, "parentContentControl", {
 			get: function () {
-				if (!this.m_parentContentControl) {
-					this.m_parentContentControl=new Word.ContentControl(this.context, _createPropertyObjectPath(this.context, this, "ParentContentControl", false, false));
+				if (!this._Pare) {
+					this._Pare=new Word.ContentControl(this.context, _createPropertyObjectPath(this.context, this, "ParentContentControl", false, false, false));
 				}
-				return this.m_parentContentControl;
+				return this._Pare;
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(Body.prototype, "parentContentControlOrNullObject", {
 			get: function () {
-				if (!this.m_parentContentControlOrNullObject) {
-					this.m_parentContentControlOrNullObject=new Word.ContentControl(this.context, _createPropertyObjectPath(this.context, this, "ParentContentControlOrNullObject", false, false));
+				_throwIfApiNotSupported("Body.parentContentControlOrNullObject", _defaultApiSetName, "1.3", _hostName);
+				if (!this._Paren) {
+					this._Paren=new Word.ContentControl(this.context, _createPropertyObjectPath(this.context, this, "ParentContentControlOrNullObject", false, false, false));
 				}
-				return this.m_parentContentControlOrNullObject;
+				return this._Paren;
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(Body.prototype, "parentSection", {
 			get: function () {
-				if (!this.m_parentSection) {
-					this.m_parentSection=new Word.Section(this.context, _createPropertyObjectPath(this.context, this, "ParentSection", false, false));
+				_throwIfApiNotSupported("Body.parentSection", _defaultApiSetName, "1.3", _hostName);
+				if (!this._Parent) {
+					this._Parent=new Word.Section(this.context, _createPropertyObjectPath(this.context, this, "ParentSection", false, false, false));
 				}
-				return this.m_parentSection;
+				return this._Parent;
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(Body.prototype, "parentSectionOrNullObject", {
 			get: function () {
-				if (!this.m_parentSectionOrNullObject) {
-					this.m_parentSectionOrNullObject=new Word.Section(this.context, _createPropertyObjectPath(this.context, this, "ParentSectionOrNullObject", false, false));
+				_throwIfApiNotSupported("Body.parentSectionOrNullObject", _defaultApiSetName, "1.3", _hostName);
+				if (!this._ParentS) {
+					this._ParentS=new Word.Section(this.context, _createPropertyObjectPath(this.context, this, "ParentSectionOrNullObject", false, false, false));
 				}
-				return this.m_parentSectionOrNullObject;
+				return this._ParentS;
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(Body.prototype, "tables", {
 			get: function () {
-				if (!this.m_tables) {
-					this.m_tables=new Word.TableCollection(this.context, _createPropertyObjectPath(this.context, this, "Tables", true, false));
+				_throwIfApiNotSupported("Body.tables", _defaultApiSetName, "1.3", _hostName);
+				if (!this._T) {
+					this._T=new Word.TableCollection(this.context, _createPropertyObjectPath(this.context, this, "Tables", true, false, false));
 				}
-				return this.m_tables;
+				return this._T;
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(Body.prototype, "style", {
 			get: function () {
-				_throwIfNotLoaded("style", this.m_style, "Body", this._isNull);
-				return this.m_style;
+				_throwIfNotLoaded("style", this._S, _typeBody, this._isNull);
+				return this._S;
 			},
 			set: function (value) {
-				this.m_style=value;
+				this._S=value;
 				_createSetPropertyAction(this.context, this, "Style", value);
 			},
 			enumerable: true,
@@ -12810,11 +13643,12 @@ var Word;
 		});
 		Object.defineProperty(Body.prototype, "styleBuiltIn", {
 			get: function () {
-				_throwIfNotLoaded("styleBuiltIn", this.m_styleBuiltIn, "Body", this._isNull);
-				return this.m_styleBuiltIn;
+				_throwIfNotLoaded("styleBuiltIn", this._St, _typeBody, this._isNull);
+				_throwIfApiNotSupported("Body.styleBuiltIn", _defaultApiSetName, "1.3", _hostName);
+				return this._St;
 			},
 			set: function (value) {
-				this.m_styleBuiltIn=value;
+				this._St=value;
 				_createSetPropertyAction(this.context, this, "StyleBuiltIn", value);
 			},
 			enumerable: true,
@@ -12822,24 +13656,25 @@ var Word;
 		});
 		Object.defineProperty(Body.prototype, "text", {
 			get: function () {
-				_throwIfNotLoaded("text", this.m_text, "Body", this._isNull);
-				return this.m_text;
+				_throwIfNotLoaded("text", this._Te, _typeBody, this._isNull);
+				return this._Te;
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(Body.prototype, "type", {
 			get: function () {
-				_throwIfNotLoaded("type", this.m_type, "Body", this._isNull);
-				return this.m_type;
+				_throwIfNotLoaded("type", this._Ty, _typeBody, this._isNull);
+				_throwIfApiNotSupported("Body.type", _defaultApiSetName, "1.3", _hostName);
+				return this._Ty;
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(Body.prototype, "_ReferenceId", {
 			get: function () {
-				_throwIfNotLoaded("_ReferenceId", this.m__ReferenceId, "Body", this._isNull);
-				return this.m__ReferenceId;
+				_throwIfNotLoaded("_ReferenceId", this.__R, _typeBody, this._isNull);
+				return this.__R;
 			},
 			enumerable: true,
 			configurable: true
@@ -12856,74 +13691,66 @@ var Word;
 				"parentContentControlOrNullObject",
 				"parentSection",
 				"parentSectionOrNullObject",
-				"tables",
-				"contentControls",
-				"inlinePictures",
-				"lists",
-				"paragraphs",
-				"parentBody",
-				"parentBodyOrNullObject",
-				"parentContentControl",
-				"parentContentControlOrNullObject",
-				"parentSection",
-				"parentSectionOrNullObject",
 				"tables"
 			]);
 		};
 		Body.prototype.clear=function () {
-			_createMethodAction(this.context, this, "Clear", 0, []);
+			_createMethodAction(this.context, this, "Clear", 0, [], false);
 		};
 		Body.prototype.getHtml=function () {
-			var action=_createMethodAction(this.context, this, "GetHtml", 1, []);
+			var action=_createMethodAction(this.context, this, "GetHtml", 1, [], false);
 			var ret=new OfficeExtension.ClientResult();
 			_addActionResultHandler(this, action, ret);
 			return ret;
 		};
 		Body.prototype.getOoxml=function () {
-			var action=_createMethodAction(this.context, this, "GetOoxml", 1, []);
+			var action=_createMethodAction(this.context, this, "GetOoxml", 1, [], false);
 			var ret=new OfficeExtension.ClientResult();
 			_addActionResultHandler(this, action, ret);
 			return ret;
 		};
 		Body.prototype.getRange=function (rangeLocation) {
-			return new Word.Range(this.context, _createMethodObjectPath(this.context, this, "GetRange", 1, [rangeLocation], false, false, null));
+			_throwIfApiNotSupported("Body.getRange", _defaultApiSetName, "1.3", _hostName);
+			return new Word.Range(this.context, _createMethodObjectPath(this.context, this, "GetRange", 1, [rangeLocation], false, false, null, false));
 		};
 		Body.prototype.insertBreak=function (breakType, insertLocation) {
-			_createMethodAction(this.context, this, "InsertBreak", 0, [breakType, insertLocation]);
+			_createMethodAction(this.context, this, "InsertBreak", 0, [breakType, insertLocation], false);
 		};
 		Body.prototype.insertContentControl=function () {
-			return new Word.ContentControl(this.context, _createMethodObjectPath(this.context, this, "InsertContentControl", 0, [], false, true, null));
+			return new Word.ContentControl(this.context, _createMethodObjectPath(this.context, this, "InsertContentControl", 0, [], false, true, null, false));
 		};
 		Body.prototype.insertFileFromBase64=function (base64File, insertLocation) {
-			return new Word.Range(this.context, _createMethodObjectPath(this.context, this, "InsertFileFromBase64", 0, [base64File, insertLocation], false, true, null));
+			return new Word.Range(this.context, _createMethodObjectPath(this.context, this, "InsertFileFromBase64", 0, [base64File, insertLocation], false, true, null, false));
 		};
 		Body.prototype.insertHtml=function (html, insertLocation) {
-			return new Word.Range(this.context, _createMethodObjectPath(this.context, this, "InsertHtml", 0, [html, insertLocation], false, true, null));
+			return new Word.Range(this.context, _createMethodObjectPath(this.context, this, "InsertHtml", 0, [html, insertLocation], false, true, null, false));
 		};
 		Body.prototype.insertInlinePictureFromBase64=function (base64EncodedImage, insertLocation) {
-			return new Word.InlinePicture(this.context, _createMethodObjectPath(this.context, this, "InsertInlinePictureFromBase64", 0, [base64EncodedImage, insertLocation], false, true, null));
+			_throwIfApiNotSupported("Body.insertInlinePictureFromBase64", _defaultApiSetName, "1.2", _hostName);
+			return new Word.InlinePicture(this.context, _createMethodObjectPath(this.context, this, "InsertInlinePictureFromBase64", 0, [base64EncodedImage, insertLocation], false, true, null, false));
 		};
 		Body.prototype.insertOoxml=function (ooxml, insertLocation) {
-			return new Word.Range(this.context, _createMethodObjectPath(this.context, this, "InsertOoxml", 0, [ooxml, insertLocation], false, true, null));
+			return new Word.Range(this.context, _createMethodObjectPath(this.context, this, "InsertOoxml", 0, [ooxml, insertLocation], false, true, null, false));
 		};
 		Body.prototype.insertParagraph=function (paragraphText, insertLocation) {
-			return new Word.Paragraph(this.context, _createMethodObjectPath(this.context, this, "InsertParagraph", 0, [paragraphText, insertLocation], false, true, null));
+			return new Word.Paragraph(this.context, _createMethodObjectPath(this.context, this, "InsertParagraph", 0, [paragraphText, insertLocation], false, true, null, false));
 		};
 		Body.prototype.insertTable=function (rowCount, columnCount, insertLocation, values) {
-			return new Word.Table(this.context, _createMethodObjectPath(this.context, this, "InsertTable", 0, [rowCount, columnCount, insertLocation, values], false, true, null));
+			_throwIfApiNotSupported("Body.insertTable", _defaultApiSetName, "1.3", _hostName);
+			return new Word.Table(this.context, _createMethodObjectPath(this.context, this, "InsertTable", 0, [rowCount, columnCount, insertLocation, values], false, true, null, false));
 		};
 		Body.prototype.insertText=function (text, insertLocation) {
-			return new Word.Range(this.context, _createMethodObjectPath(this.context, this, "InsertText", 0, [text, insertLocation], false, true, null));
+			return new Word.Range(this.context, _createMethodObjectPath(this.context, this, "InsertText", 0, [text, insertLocation], false, true, null, false));
 		};
 		Body.prototype.search=function (searchText, searchOptions) {
 			searchOptions=_normalizeSearchOptions(this.context, searchOptions);
-			return new Word.RangeCollection(this.context, _createMethodObjectPath(this.context, this, "Search", 1, [searchText, searchOptions], true, false, null));
+			return new Word.RangeCollection(this.context, _createMethodObjectPath(this.context, this, "Search", 1, [searchText, searchOptions], true, false, null, false));
 		};
 		Body.prototype.select=function (selectionMode) {
-			_createMethodAction(this.context, this, "Select", 1, [selectionMode]);
+			_createMethodAction(this.context, this, "Select", 1, [selectionMode], false);
 		};
 		Body.prototype._KeepReference=function () {
-			_createMethodAction(this.context, this, "_KeepReference", 1, []);
+			_createMethodAction(this.context, this, "_KeepReference", 1, [], false);
 		};
 		Body.prototype._handleResult=function (value) {
 			_super.prototype._handleResult.call(this, value);
@@ -12932,25 +13759,33 @@ var Word;
 			var obj=value;
 			_fixObjectPathIfNecessary(this, obj);
 			if (!_isUndefined(obj["Style"])) {
-				this.m_style=obj["Style"];
+				this._S=obj["Style"];
 			}
 			if (!_isUndefined(obj["StyleBuiltIn"])) {
-				this.m_styleBuiltIn=obj["StyleBuiltIn"];
+				this._St=obj["StyleBuiltIn"];
 			}
 			if (!_isUndefined(obj["Text"])) {
-				this.m_text=obj["Text"];
+				this._Te=obj["Text"];
 			}
 			if (!_isUndefined(obj["Type"])) {
-				this.m_type=obj["Type"];
+				this._Ty=obj["Type"];
 			}
 			if (!_isUndefined(obj["_ReferenceId"])) {
-				this.m__ReferenceId=obj["_ReferenceId"];
+				this.__R=obj["_ReferenceId"];
 			}
 			_handleNavigationPropertyResults(this, obj, ["contentControls", "ContentControls", "font", "Font", "inlinePictures", "InlinePictures", "lists", "Lists", "paragraphs", "Paragraphs", "parentBody", "ParentBody", "parentBodyOrNullObject", "ParentBodyOrNullObject", "parentContentControl", "ParentContentControl", "parentContentControlOrNullObject", "ParentContentControlOrNullObject", "parentSection", "ParentSection", "parentSectionOrNullObject", "ParentSectionOrNullObject", "tables", "Tables"]);
 		};
 		Body.prototype.load=function (option) {
-			_load(this, option);
-			return this;
+			return _load(this, option);
+		};
+		Body.prototype.loadAndSync=function (option) {
+			return _loadAndSync(this, option);
+		};
+		Body.prototype.retrieve=function (option) {
+			return _retrieve(this, option);
+		};
+		Body.prototype.retrieveAndSync=function (option) {
+			return _retrieveAndSync(this, option);
 		};
 		Body.prototype._handleIdResult=function (value) {
 			_super.prototype._handleIdResult.call(this, value);
@@ -12958,7 +13793,7 @@ var Word;
 				return;
 			}
 			if (!_isUndefined(value["_ReferenceId"])) {
-				this.m__ReferenceId=value["_ReferenceId"];
+				this.__R=value["_ReferenceId"];
 			}
 		};
 		Body.prototype.track=function () {
@@ -12970,21 +13805,32 @@ var Word;
 			return this;
 		};
 		Body.prototype.toJSON=function () {
-			return {
-				"font": this.m_font,
-				"style": this.m_style,
-				"styleBuiltIn": this.m_styleBuiltIn,
-				"text": this.m_text,
-				"type": this.m_type
-			};
+			return _toJson(this, {
+				"style": this._S,
+				"styleBuiltIn": this._St,
+				"text": this._Te,
+				"type": this._Ty,
+			}, {
+				"contentControls": this._C,
+				"font": this._F,
+				"inlinePictures": this._I,
+				"lists": this._L,
+				"paragraphs": this._P,
+				"tables": this._T,
+			});
+		};
+		Body.prototype.ensureUnchanged=function (data) {
+			_createEnsureUnchangedAction(this.context, this, data);
+			return;
 		};
 		return Body;
 	}(OfficeExtension.ClientObject));
 	Word.Body=Body;
+	var _typeContentControl="ContentControl";
 	var ContentControl=(function (_super) {
 		__extends(ContentControl, _super);
 		function ContentControl() {
-			_super.apply(this, arguments);
+			return _super !==null && _super.apply(this, arguments) || this;
 		}
 		Object.defineProperty(ContentControl.prototype, "_className", {
 			get: function () {
@@ -12995,141 +13841,149 @@ var Word;
 		});
 		Object.defineProperty(ContentControl.prototype, "contentControls", {
 			get: function () {
-				if (!this.m_contentControls) {
-					this.m_contentControls=new Word.ContentControlCollection(this.context, _createPropertyObjectPath(this.context, this, "ContentControls", true, false));
+				if (!this._Con) {
+					this._Con=new Word.ContentControlCollection(this.context, _createPropertyObjectPath(this.context, this, "ContentControls", true, false, false));
 				}
-				return this.m_contentControls;
+				return this._Con;
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(ContentControl.prototype, "font", {
 			get: function () {
-				if (!this.m_font) {
-					this.m_font=new Word.Font(this.context, _createPropertyObjectPath(this.context, this, "Font", false, false));
+				if (!this._F) {
+					this._F=new Word.Font(this.context, _createPropertyObjectPath(this.context, this, "Font", false, false, false));
 				}
-				return this.m_font;
+				return this._F;
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(ContentControl.prototype, "inlinePictures", {
 			get: function () {
-				if (!this.m_inlinePictures) {
-					this.m_inlinePictures=new Word.InlinePictureCollection(this.context, _createPropertyObjectPath(this.context, this, "InlinePictures", true, false));
+				if (!this._In) {
+					this._In=new Word.InlinePictureCollection(this.context, _createPropertyObjectPath(this.context, this, "InlinePictures", true, false, false));
 				}
-				return this.m_inlinePictures;
+				return this._In;
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(ContentControl.prototype, "lists", {
 			get: function () {
-				if (!this.m_lists) {
-					this.m_lists=new Word.ListCollection(this.context, _createPropertyObjectPath(this.context, this, "Lists", true, false));
+				_throwIfApiNotSupported("ContentControl.lists", _defaultApiSetName, "1.3", _hostName);
+				if (!this._L) {
+					this._L=new Word.ListCollection(this.context, _createPropertyObjectPath(this.context, this, "Lists", true, false, false));
 				}
-				return this.m_lists;
+				return this._L;
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(ContentControl.prototype, "paragraphs", {
 			get: function () {
-				if (!this.m_paragraphs) {
-					this.m_paragraphs=new Word.ParagraphCollection(this.context, _createPropertyObjectPath(this.context, this, "Paragraphs", true, false));
+				if (!this._P) {
+					this._P=new Word.ParagraphCollection(this.context, _createPropertyObjectPath(this.context, this, "Paragraphs", true, false, false));
 				}
-				return this.m_paragraphs;
+				return this._P;
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(ContentControl.prototype, "parentBody", {
 			get: function () {
-				if (!this.m_parentBody) {
-					this.m_parentBody=new Word.Body(this.context, _createPropertyObjectPath(this.context, this, "ParentBody", false, false));
+				_throwIfApiNotSupported("ContentControl.parentBody", _defaultApiSetName, "1.3", _hostName);
+				if (!this._Pa) {
+					this._Pa=new Word.Body(this.context, _createPropertyObjectPath(this.context, this, "ParentBody", false, false, false));
 				}
-				return this.m_parentBody;
+				return this._Pa;
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(ContentControl.prototype, "parentContentControl", {
 			get: function () {
-				if (!this.m_parentContentControl) {
-					this.m_parentContentControl=new Word.ContentControl(this.context, _createPropertyObjectPath(this.context, this, "ParentContentControl", false, false));
+				if (!this._Par) {
+					this._Par=new Word.ContentControl(this.context, _createPropertyObjectPath(this.context, this, "ParentContentControl", false, false, false));
 				}
-				return this.m_parentContentControl;
+				return this._Par;
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(ContentControl.prototype, "parentContentControlOrNullObject", {
 			get: function () {
-				if (!this.m_parentContentControlOrNullObject) {
-					this.m_parentContentControlOrNullObject=new Word.ContentControl(this.context, _createPropertyObjectPath(this.context, this, "ParentContentControlOrNullObject", false, false));
+				_throwIfApiNotSupported("ContentControl.parentContentControlOrNullObject", _defaultApiSetName, "1.3", _hostName);
+				if (!this._Pare) {
+					this._Pare=new Word.ContentControl(this.context, _createPropertyObjectPath(this.context, this, "ParentContentControlOrNullObject", false, false, false));
 				}
-				return this.m_parentContentControlOrNullObject;
+				return this._Pare;
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(ContentControl.prototype, "parentTable", {
 			get: function () {
-				if (!this.m_parentTable) {
-					this.m_parentTable=new Word.Table(this.context, _createPropertyObjectPath(this.context, this, "ParentTable", false, false));
+				_throwIfApiNotSupported("ContentControl.parentTable", _defaultApiSetName, "1.3", _hostName);
+				if (!this._Paren) {
+					this._Paren=new Word.Table(this.context, _createPropertyObjectPath(this.context, this, "ParentTable", false, false, false));
 				}
-				return this.m_parentTable;
+				return this._Paren;
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(ContentControl.prototype, "parentTableCell", {
 			get: function () {
-				if (!this.m_parentTableCell) {
-					this.m_parentTableCell=new Word.TableCell(this.context, _createPropertyObjectPath(this.context, this, "ParentTableCell", false, false));
+				_throwIfApiNotSupported("ContentControl.parentTableCell", _defaultApiSetName, "1.3", _hostName);
+				if (!this._Parent) {
+					this._Parent=new Word.TableCell(this.context, _createPropertyObjectPath(this.context, this, "ParentTableCell", false, false, false));
 				}
-				return this.m_parentTableCell;
+				return this._Parent;
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(ContentControl.prototype, "parentTableCellOrNullObject", {
 			get: function () {
-				if (!this.m_parentTableCellOrNullObject) {
-					this.m_parentTableCellOrNullObject=new Word.TableCell(this.context, _createPropertyObjectPath(this.context, this, "ParentTableCellOrNullObject", false, false));
+				_throwIfApiNotSupported("ContentControl.parentTableCellOrNullObject", _defaultApiSetName, "1.3", _hostName);
+				if (!this._ParentT) {
+					this._ParentT=new Word.TableCell(this.context, _createPropertyObjectPath(this.context, this, "ParentTableCellOrNullObject", false, false, false));
 				}
-				return this.m_parentTableCellOrNullObject;
+				return this._ParentT;
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(ContentControl.prototype, "parentTableOrNullObject", {
 			get: function () {
-				if (!this.m_parentTableOrNullObject) {
-					this.m_parentTableOrNullObject=new Word.Table(this.context, _createPropertyObjectPath(this.context, this, "ParentTableOrNullObject", false, false));
+				_throwIfApiNotSupported("ContentControl.parentTableOrNullObject", _defaultApiSetName, "1.3", _hostName);
+				if (!this._ParentTa) {
+					this._ParentTa=new Word.Table(this.context, _createPropertyObjectPath(this.context, this, "ParentTableOrNullObject", false, false, false));
 				}
-				return this.m_parentTableOrNullObject;
+				return this._ParentTa;
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(ContentControl.prototype, "tables", {
 			get: function () {
-				if (!this.m_tables) {
-					this.m_tables=new Word.TableCollection(this.context, _createPropertyObjectPath(this.context, this, "Tables", true, false));
+				_throwIfApiNotSupported("ContentControl.tables", _defaultApiSetName, "1.3", _hostName);
+				if (!this._T) {
+					this._T=new Word.TableCollection(this.context, _createPropertyObjectPath(this.context, this, "Tables", true, false, false));
 				}
-				return this.m_tables;
+				return this._T;
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(ContentControl.prototype, "appearance", {
 			get: function () {
-				_throwIfNotLoaded("appearance", this.m_appearance, "ContentControl", this._isNull);
-				return this.m_appearance;
+				_throwIfNotLoaded("appearance", this._A, _typeContentControl, this._isNull);
+				return this._A;
 			},
 			set: function (value) {
-				this.m_appearance=value;
+				this._A=value;
 				_createSetPropertyAction(this.context, this, "Appearance", value);
 			},
 			enumerable: true,
@@ -13137,11 +13991,11 @@ var Word;
 		});
 		Object.defineProperty(ContentControl.prototype, "cannotDelete", {
 			get: function () {
-				_throwIfNotLoaded("cannotDelete", this.m_cannotDelete, "ContentControl", this._isNull);
-				return this.m_cannotDelete;
+				_throwIfNotLoaded("cannotDelete", this._C, _typeContentControl, this._isNull);
+				return this._C;
 			},
 			set: function (value) {
-				this.m_cannotDelete=value;
+				this._C=value;
 				_createSetPropertyAction(this.context, this, "CannotDelete", value);
 			},
 			enumerable: true,
@@ -13149,11 +14003,11 @@ var Word;
 		});
 		Object.defineProperty(ContentControl.prototype, "cannotEdit", {
 			get: function () {
-				_throwIfNotLoaded("cannotEdit", this.m_cannotEdit, "ContentControl", this._isNull);
-				return this.m_cannotEdit;
+				_throwIfNotLoaded("cannotEdit", this._Ca, _typeContentControl, this._isNull);
+				return this._Ca;
 			},
 			set: function (value) {
-				this.m_cannotEdit=value;
+				this._Ca=value;
 				_createSetPropertyAction(this.context, this, "CannotEdit", value);
 			},
 			enumerable: true,
@@ -13161,11 +14015,11 @@ var Word;
 		});
 		Object.defineProperty(ContentControl.prototype, "color", {
 			get: function () {
-				_throwIfNotLoaded("color", this.m_color, "ContentControl", this._isNull);
-				return this.m_color;
+				_throwIfNotLoaded("color", this._Co, _typeContentControl, this._isNull);
+				return this._Co;
 			},
 			set: function (value) {
-				this.m_color=value;
+				this._Co=value;
 				_createSetPropertyAction(this.context, this, "Color", value);
 			},
 			enumerable: true,
@@ -13173,19 +14027,19 @@ var Word;
 		});
 		Object.defineProperty(ContentControl.prototype, "id", {
 			get: function () {
-				_throwIfNotLoaded("id", this.m_id, "ContentControl", this._isNull);
-				return this.m_id;
+				_throwIfNotLoaded("id", this._I, _typeContentControl, this._isNull);
+				return this._I;
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(ContentControl.prototype, "placeholderText", {
 			get: function () {
-				_throwIfNotLoaded("placeholderText", this.m_placeholderText, "ContentControl", this._isNull);
-				return this.m_placeholderText;
+				_throwIfNotLoaded("placeholderText", this._Pl, _typeContentControl, this._isNull);
+				return this._Pl;
 			},
 			set: function (value) {
-				this.m_placeholderText=value;
+				this._Pl=value;
 				_createSetPropertyAction(this.context, this, "PlaceholderText", value);
 			},
 			enumerable: true,
@@ -13193,11 +14047,11 @@ var Word;
 		});
 		Object.defineProperty(ContentControl.prototype, "removeWhenEdited", {
 			get: function () {
-				_throwIfNotLoaded("removeWhenEdited", this.m_removeWhenEdited, "ContentControl", this._isNull);
-				return this.m_removeWhenEdited;
+				_throwIfNotLoaded("removeWhenEdited", this._R, _typeContentControl, this._isNull);
+				return this._R;
 			},
 			set: function (value) {
-				this.m_removeWhenEdited=value;
+				this._R=value;
 				_createSetPropertyAction(this.context, this, "RemoveWhenEdited", value);
 			},
 			enumerable: true,
@@ -13205,11 +14059,11 @@ var Word;
 		});
 		Object.defineProperty(ContentControl.prototype, "style", {
 			get: function () {
-				_throwIfNotLoaded("style", this.m_style, "ContentControl", this._isNull);
-				return this.m_style;
+				_throwIfNotLoaded("style", this._S, _typeContentControl, this._isNull);
+				return this._S;
 			},
 			set: function (value) {
-				this.m_style=value;
+				this._S=value;
 				_createSetPropertyAction(this.context, this, "Style", value);
 			},
 			enumerable: true,
@@ -13217,11 +14071,12 @@ var Word;
 		});
 		Object.defineProperty(ContentControl.prototype, "styleBuiltIn", {
 			get: function () {
-				_throwIfNotLoaded("styleBuiltIn", this.m_styleBuiltIn, "ContentControl", this._isNull);
-				return this.m_styleBuiltIn;
+				_throwIfNotLoaded("styleBuiltIn", this._St, _typeContentControl, this._isNull);
+				_throwIfApiNotSupported("ContentControl.styleBuiltIn", _defaultApiSetName, "1.3", _hostName);
+				return this._St;
 			},
 			set: function (value) {
-				this.m_styleBuiltIn=value;
+				this._St=value;
 				_createSetPropertyAction(this.context, this, "StyleBuiltIn", value);
 			},
 			enumerable: true,
@@ -13229,19 +14084,20 @@ var Word;
 		});
 		Object.defineProperty(ContentControl.prototype, "subtype", {
 			get: function () {
-				_throwIfNotLoaded("subtype", this.m_subtype, "ContentControl", this._isNull);
-				return this.m_subtype;
+				_throwIfNotLoaded("subtype", this._Su, _typeContentControl, this._isNull);
+				_throwIfApiNotSupported("ContentControl.subtype", _defaultApiSetName, "1.3", _hostName);
+				return this._Su;
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(ContentControl.prototype, "tag", {
 			get: function () {
-				_throwIfNotLoaded("tag", this.m_tag, "ContentControl", this._isNull);
-				return this.m_tag;
+				_throwIfNotLoaded("tag", this._Ta, _typeContentControl, this._isNull);
+				return this._Ta;
 			},
 			set: function (value) {
-				this.m_tag=value;
+				this._Ta=value;
 				_createSetPropertyAction(this.context, this, "Tag", value);
 			},
 			enumerable: true,
@@ -13249,19 +14105,19 @@ var Word;
 		});
 		Object.defineProperty(ContentControl.prototype, "text", {
 			get: function () {
-				_throwIfNotLoaded("text", this.m_text, "ContentControl", this._isNull);
-				return this.m_text;
+				_throwIfNotLoaded("text", this._Te, _typeContentControl, this._isNull);
+				return this._Te;
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(ContentControl.prototype, "title", {
 			get: function () {
-				_throwIfNotLoaded("title", this.m_title, "ContentControl", this._isNull);
-				return this.m_title;
+				_throwIfNotLoaded("title", this._Ti, _typeContentControl, this._isNull);
+				return this._Ti;
 			},
 			set: function (value) {
-				this.m_title=value;
+				this._Ti=value;
 				_createSetPropertyAction(this.context, this, "Title", value);
 			},
 			enumerable: true,
@@ -13269,16 +14125,16 @@ var Word;
 		});
 		Object.defineProperty(ContentControl.prototype, "type", {
 			get: function () {
-				_throwIfNotLoaded("type", this.m_type, "ContentControl", this._isNull);
-				return this.m_type;
+				_throwIfNotLoaded("type", this._Ty, _typeContentControl, this._isNull);
+				return this._Ty;
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(ContentControl.prototype, "_ReferenceId", {
 			get: function () {
-				_throwIfNotLoaded("_ReferenceId", this.m__ReferenceId, "ContentControl", this._isNull);
-				return this.m__ReferenceId;
+				_throwIfNotLoaded("_ReferenceId", this.__R, _typeContentControl, this._isNull);
+				return this.__R;
 			},
 			enumerable: true,
 			configurable: true
@@ -13296,81 +14152,74 @@ var Word;
 				"parentTableCell",
 				"parentTableCellOrNullObject",
 				"parentTableOrNullObject",
-				"tables",
-				"contentControls",
-				"inlinePictures",
-				"lists",
-				"paragraphs",
-				"parentBody",
-				"parentContentControl",
-				"parentContentControlOrNullObject",
-				"parentTable",
-				"parentTableCell",
-				"parentTableCellOrNullObject",
-				"parentTableOrNullObject",
 				"tables"
 			]);
 		};
 		ContentControl.prototype.clear=function () {
-			_createMethodAction(this.context, this, "Clear", 0, []);
+			_createMethodAction(this.context, this, "Clear", 0, [], false);
 		};
 		ContentControl.prototype.delete=function (keepContent) {
-			_createMethodAction(this.context, this, "Delete", 0, [keepContent]);
+			_createMethodAction(this.context, this, "Delete", 0, [keepContent], false);
 		};
 		ContentControl.prototype.getHtml=function () {
-			var action=_createMethodAction(this.context, this, "GetHtml", 1, []);
+			var action=_createMethodAction(this.context, this, "GetHtml", 1, [], false);
 			var ret=new OfficeExtension.ClientResult();
 			_addActionResultHandler(this, action, ret);
 			return ret;
 		};
 		ContentControl.prototype.getOoxml=function () {
-			var action=_createMethodAction(this.context, this, "GetOoxml", 1, []);
+			var action=_createMethodAction(this.context, this, "GetOoxml", 1, [], false);
 			var ret=new OfficeExtension.ClientResult();
 			_addActionResultHandler(this, action, ret);
 			return ret;
 		};
 		ContentControl.prototype.getRange=function (rangeLocation) {
-			return new Word.Range(this.context, _createMethodObjectPath(this.context, this, "GetRange", 1, [rangeLocation], false, false, null));
+			_throwIfApiNotSupported("ContentControl.getRange", _defaultApiSetName, "1.3", _hostName);
+			return new Word.Range(this.context, _createMethodObjectPath(this.context, this, "GetRange", 1, [rangeLocation], false, false, null, false));
 		};
 		ContentControl.prototype.getTextRanges=function (endingMarks, trimSpacing) {
-			return new Word.RangeCollection(this.context, _createMethodObjectPath(this.context, this, "GetTextRanges", 1, [endingMarks, trimSpacing], true, false, null));
+			_throwIfApiNotSupported("ContentControl.getTextRanges", _defaultApiSetName, "1.3", _hostName);
+			return new Word.RangeCollection(this.context, _createMethodObjectPath(this.context, this, "GetTextRanges", 1, [endingMarks, trimSpacing], true, false, null, false));
 		};
 		ContentControl.prototype.insertBreak=function (breakType, insertLocation) {
-			_createMethodAction(this.context, this, "InsertBreak", 0, [breakType, insertLocation]);
+			_createMethodAction(this.context, this, "InsertBreak", 0, [breakType, insertLocation], false);
 		};
 		ContentControl.prototype.insertFileFromBase64=function (base64File, insertLocation) {
-			return new Word.Range(this.context, _createMethodObjectPath(this.context, this, "InsertFileFromBase64", 0, [base64File, insertLocation], false, true, null));
+			return new Word.Range(this.context, _createMethodObjectPath(this.context, this, "InsertFileFromBase64", 0, [base64File, insertLocation], false, true, null, false));
 		};
 		ContentControl.prototype.insertHtml=function (html, insertLocation) {
-			return new Word.Range(this.context, _createMethodObjectPath(this.context, this, "InsertHtml", 0, [html, insertLocation], false, true, null));
+			return new Word.Range(this.context, _createMethodObjectPath(this.context, this, "InsertHtml", 0, [html, insertLocation], false, true, null, false));
 		};
 		ContentControl.prototype.insertInlinePictureFromBase64=function (base64EncodedImage, insertLocation) {
-			return new Word.InlinePicture(this.context, _createMethodObjectPath(this.context, this, "InsertInlinePictureFromBase64", 0, [base64EncodedImage, insertLocation], false, true, null));
+			_throwIfApiNotSupported("ContentControl.insertInlinePictureFromBase64", _defaultApiSetName, "1.2", _hostName);
+			return new Word.InlinePicture(this.context, _createMethodObjectPath(this.context, this, "InsertInlinePictureFromBase64", 0, [base64EncodedImage, insertLocation], false, true, null, false));
 		};
 		ContentControl.prototype.insertOoxml=function (ooxml, insertLocation) {
-			return new Word.Range(this.context, _createMethodObjectPath(this.context, this, "InsertOoxml", 0, [ooxml, insertLocation], false, true, null));
+			return new Word.Range(this.context, _createMethodObjectPath(this.context, this, "InsertOoxml", 0, [ooxml, insertLocation], false, true, null, false));
 		};
 		ContentControl.prototype.insertParagraph=function (paragraphText, insertLocation) {
-			return new Word.Paragraph(this.context, _createMethodObjectPath(this.context, this, "InsertParagraph", 0, [paragraphText, insertLocation], false, true, null));
+			return new Word.Paragraph(this.context, _createMethodObjectPath(this.context, this, "InsertParagraph", 0, [paragraphText, insertLocation], false, true, null, false));
 		};
 		ContentControl.prototype.insertTable=function (rowCount, columnCount, insertLocation, values) {
-			return new Word.Table(this.context, _createMethodObjectPath(this.context, this, "InsertTable", 0, [rowCount, columnCount, insertLocation, values], false, true, null));
+			_throwIfApiNotSupported("ContentControl.insertTable", _defaultApiSetName, "1.3", _hostName);
+			return new Word.Table(this.context, _createMethodObjectPath(this.context, this, "InsertTable", 0, [rowCount, columnCount, insertLocation, values], false, true, null, false));
 		};
 		ContentControl.prototype.insertText=function (text, insertLocation) {
-			return new Word.Range(this.context, _createMethodObjectPath(this.context, this, "InsertText", 0, [text, insertLocation], false, true, null));
+			return new Word.Range(this.context, _createMethodObjectPath(this.context, this, "InsertText", 0, [text, insertLocation], false, true, null, false));
 		};
 		ContentControl.prototype.search=function (searchText, searchOptions) {
 			searchOptions=_normalizeSearchOptions(this.context, searchOptions);
-			return new Word.RangeCollection(this.context, _createMethodObjectPath(this.context, this, "Search", 1, [searchText, searchOptions], true, false, null));
+			return new Word.RangeCollection(this.context, _createMethodObjectPath(this.context, this, "Search", 1, [searchText, searchOptions], true, false, null, false));
 		};
 		ContentControl.prototype.select=function (selectionMode) {
-			_createMethodAction(this.context, this, "Select", 1, [selectionMode]);
+			_createMethodAction(this.context, this, "Select", 1, [selectionMode], false);
 		};
 		ContentControl.prototype.split=function (delimiters, multiParagraphs, trimDelimiters, trimSpacing) {
-			return new Word.RangeCollection(this.context, _createMethodObjectPath(this.context, this, "Split", 1, [delimiters, multiParagraphs, trimDelimiters, trimSpacing], true, false, null));
+			_throwIfApiNotSupported("ContentControl.split", _defaultApiSetName, "1.3", _hostName);
+			return new Word.RangeCollection(this.context, _createMethodObjectPath(this.context, this, "Split", 1, [delimiters, multiParagraphs, trimDelimiters, trimSpacing], true, false, null, false));
 		};
 		ContentControl.prototype._KeepReference=function () {
-			_createMethodAction(this.context, this, "_KeepReference", 1, []);
+			_createMethodAction(this.context, this, "_KeepReference", 1, [], false);
 		};
 		ContentControl.prototype._handleResult=function (value) {
 			_super.prototype._handleResult.call(this, value);
@@ -13379,55 +14228,63 @@ var Word;
 			var obj=value;
 			_fixObjectPathIfNecessary(this, obj);
 			if (!_isUndefined(obj["Appearance"])) {
-				this.m_appearance=obj["Appearance"];
+				this._A=obj["Appearance"];
 			}
 			if (!_isUndefined(obj["CannotDelete"])) {
-				this.m_cannotDelete=obj["CannotDelete"];
+				this._C=obj["CannotDelete"];
 			}
 			if (!_isUndefined(obj["CannotEdit"])) {
-				this.m_cannotEdit=obj["CannotEdit"];
+				this._Ca=obj["CannotEdit"];
 			}
 			if (!_isUndefined(obj["Color"])) {
-				this.m_color=obj["Color"];
+				this._Co=obj["Color"];
 			}
 			if (!_isUndefined(obj["Id"])) {
-				this.m_id=obj["Id"];
+				this._I=obj["Id"];
 			}
 			if (!_isUndefined(obj["PlaceholderText"])) {
-				this.m_placeholderText=obj["PlaceholderText"];
+				this._Pl=obj["PlaceholderText"];
 			}
 			if (!_isUndefined(obj["RemoveWhenEdited"])) {
-				this.m_removeWhenEdited=obj["RemoveWhenEdited"];
+				this._R=obj["RemoveWhenEdited"];
 			}
 			if (!_isUndefined(obj["Style"])) {
-				this.m_style=obj["Style"];
+				this._S=obj["Style"];
 			}
 			if (!_isUndefined(obj["StyleBuiltIn"])) {
-				this.m_styleBuiltIn=obj["StyleBuiltIn"];
+				this._St=obj["StyleBuiltIn"];
 			}
 			if (!_isUndefined(obj["Subtype"])) {
-				this.m_subtype=obj["Subtype"];
+				this._Su=obj["Subtype"];
 			}
 			if (!_isUndefined(obj["Tag"])) {
-				this.m_tag=obj["Tag"];
+				this._Ta=obj["Tag"];
 			}
 			if (!_isUndefined(obj["Text"])) {
-				this.m_text=obj["Text"];
+				this._Te=obj["Text"];
 			}
 			if (!_isUndefined(obj["Title"])) {
-				this.m_title=obj["Title"];
+				this._Ti=obj["Title"];
 			}
 			if (!_isUndefined(obj["Type"])) {
-				this.m_type=obj["Type"];
+				this._Ty=obj["Type"];
 			}
 			if (!_isUndefined(obj["_ReferenceId"])) {
-				this.m__ReferenceId=obj["_ReferenceId"];
+				this.__R=obj["_ReferenceId"];
 			}
 			_handleNavigationPropertyResults(this, obj, ["contentControls", "ContentControls", "font", "Font", "inlinePictures", "InlinePictures", "lists", "Lists", "paragraphs", "Paragraphs", "parentBody", "ParentBody", "parentContentControl", "ParentContentControl", "parentContentControlOrNullObject", "ParentContentControlOrNullObject", "parentTable", "ParentTable", "parentTableCell", "ParentTableCell", "parentTableCellOrNullObject", "ParentTableCellOrNullObject", "parentTableOrNullObject", "ParentTableOrNullObject", "tables", "Tables"]);
 		};
 		ContentControl.prototype.load=function (option) {
-			_load(this, option);
-			return this;
+			return _load(this, option);
+		};
+		ContentControl.prototype.loadAndSync=function (option) {
+			return _loadAndSync(this, option);
+		};
+		ContentControl.prototype.retrieve=function (option) {
+			return _retrieve(this, option);
+		};
+		ContentControl.prototype.retrieveAndSync=function (option) {
+			return _retrieveAndSync(this, option);
 		};
 		ContentControl.prototype._handleIdResult=function (value) {
 			_super.prototype._handleIdResult.call(this, value);
@@ -13435,15 +14292,16 @@ var Word;
 				return;
 			}
 			if (!_isUndefined(value["_ReferenceId"])) {
-				this.m__ReferenceId=value["_ReferenceId"];
+				this.__R=value["_ReferenceId"];
 			}
 			if (!_isUndefined(value["Id"])) {
-				this.m_id=value["Id"];
+				this._I=value["Id"];
 			}
 		};
 		Object.defineProperty(ContentControl.prototype, "onDataChanged", {
 			get: function () {
 				var _this=this;
+				_throwIfApiNotSupported("ContentControl.onDataChanged", _defaultApiSetName, "1.4", _hostName);
 				if (!this.m_dataChanged) {
 					this.m_dataChanged=new OfficeExtension.EventHandlers(this.context, this, "DataChanged", {
 						registerFunc: function (handlerCallback) {
@@ -13470,6 +14328,7 @@ var Word;
 		Object.defineProperty(ContentControl.prototype, "onDeleted", {
 			get: function () {
 				var _this=this;
+				_throwIfApiNotSupported("ContentControl.onDeleted", _defaultApiSetName, "1.4", _hostName);
 				if (!this.m_deleted) {
 					this.m_deleted=new OfficeExtension.EventHandlers(this.context, this, "Deleted", {
 						registerFunc: function (handlerCallback) {
@@ -13496,6 +14355,7 @@ var Word;
 		Object.defineProperty(ContentControl.prototype, "onSelectionChanged", {
 			get: function () {
 				var _this=this;
+				_throwIfApiNotSupported("ContentControl.onSelectionChanged", _defaultApiSetName, "1.4", _hostName);
 				if (!this.m_selectionChanged) {
 					this.m_selectionChanged=new OfficeExtension.EventHandlers(this.context, this, "SelectionChanged", {
 						registerFunc: function (handlerCallback) {
@@ -13528,31 +14388,42 @@ var Word;
 			return this;
 		};
 		ContentControl.prototype.toJSON=function () {
-			return {
-				"appearance": this.m_appearance,
-				"cannotDelete": this.m_cannotDelete,
-				"cannotEdit": this.m_cannotEdit,
-				"color": this.m_color,
-				"font": this.m_font,
-				"id": this.m_id,
-				"placeholderText": this.m_placeholderText,
-				"removeWhenEdited": this.m_removeWhenEdited,
-				"style": this.m_style,
-				"styleBuiltIn": this.m_styleBuiltIn,
-				"subtype": this.m_subtype,
-				"tag": this.m_tag,
-				"text": this.m_text,
-				"title": this.m_title,
-				"type": this.m_type
-			};
+			return _toJson(this, {
+				"appearance": this._A,
+				"cannotDelete": this._C,
+				"cannotEdit": this._Ca,
+				"color": this._Co,
+				"id": this._I,
+				"placeholderText": this._Pl,
+				"removeWhenEdited": this._R,
+				"style": this._S,
+				"styleBuiltIn": this._St,
+				"subtype": this._Su,
+				"tag": this._Ta,
+				"text": this._Te,
+				"title": this._Ti,
+				"type": this._Ty,
+			}, {
+				"contentControls": this._Con,
+				"font": this._F,
+				"inlinePictures": this._In,
+				"lists": this._L,
+				"paragraphs": this._P,
+				"tables": this._T,
+			});
+		};
+		ContentControl.prototype.ensureUnchanged=function (data) {
+			_createEnsureUnchangedAction(this.context, this, data);
+			return;
 		};
 		return ContentControl;
 	}(OfficeExtension.ClientObject));
 	Word.ContentControl=ContentControl;
+	var _typeContentControlCollection="ContentControlCollection";
 	var ContentControlCollection=(function (_super) {
 		__extends(ContentControlCollection, _super);
 		function ContentControlCollection() {
-			_super.apply(this, arguments);
+			return _super !==null && _super.apply(this, arguments) || this;
 		}
 		Object.defineProperty(ContentControlCollection.prototype, "_className", {
 			get: function () {
@@ -13563,7 +14434,7 @@ var Word;
 		});
 		Object.defineProperty(ContentControlCollection.prototype, "items", {
 			get: function () {
-				_throwIfNotLoaded("items", this.m__items, "ContentControlCollection", this._isNull);
+				_throwIfNotLoaded("items", this.m__items, _typeContentControlCollection, this._isNull);
 				return this.m__items;
 			},
 			enumerable: true,
@@ -13571,38 +14442,42 @@ var Word;
 		});
 		Object.defineProperty(ContentControlCollection.prototype, "_ReferenceId", {
 			get: function () {
-				_throwIfNotLoaded("_ReferenceId", this.m__ReferenceId, "ContentControlCollection", this._isNull);
-				return this.m__ReferenceId;
+				_throwIfNotLoaded("_ReferenceId", this.__R, _typeContentControlCollection, this._isNull);
+				return this.__R;
 			},
 			enumerable: true,
 			configurable: true
 		});
 		ContentControlCollection.prototype.getById=function (id) {
-			return new Word.ContentControl(this.context, _createMethodObjectPath(this.context, this, "GetById", 1, [id], false, false, null));
+			return new Word.ContentControl(this.context, _createMethodObjectPath(this.context, this, "GetById", 1, [id], false, false, null, false));
 		};
 		ContentControlCollection.prototype.getByIdOrNullObject=function (id) {
-			return new Word.ContentControl(this.context, _createMethodObjectPath(this.context, this, "GetByIdOrNullObject", 1, [id], false, false, null));
+			_throwIfApiNotSupported("ContentControlCollection.getByIdOrNullObject", _defaultApiSetName, "1.3", _hostName);
+			return new Word.ContentControl(this.context, _createMethodObjectPath(this.context, this, "GetByIdOrNullObject", 1, [id], false, false, null, false));
 		};
 		ContentControlCollection.prototype.getByTag=function (tag) {
-			return new Word.ContentControlCollection(this.context, _createMethodObjectPath(this.context, this, "GetByTag", 1, [tag], true, false, null));
+			return new Word.ContentControlCollection(this.context, _createMethodObjectPath(this.context, this, "GetByTag", 1, [tag], true, false, null, false));
 		};
 		ContentControlCollection.prototype.getByTitle=function (title) {
-			return new Word.ContentControlCollection(this.context, _createMethodObjectPath(this.context, this, "GetByTitle", 1, [title], true, false, null));
+			return new Word.ContentControlCollection(this.context, _createMethodObjectPath(this.context, this, "GetByTitle", 1, [title], true, false, null, false));
 		};
 		ContentControlCollection.prototype.getByTypes=function (types) {
-			return new Word.ContentControlCollection(this.context, _createMethodObjectPath(this.context, this, "GetByTypes", 1, [types], true, false, null));
+			_throwIfApiNotSupported("ContentControlCollection.getByTypes", _defaultApiSetName, "1.3", _hostName);
+			return new Word.ContentControlCollection(this.context, _createMethodObjectPath(this.context, this, "GetByTypes", 1, [types], true, false, null, false));
 		};
 		ContentControlCollection.prototype.getFirst=function () {
-			return new Word.ContentControl(this.context, _createMethodObjectPath(this.context, this, "GetFirst", 1, [], false, false, null));
+			_throwIfApiNotSupported("ContentControlCollection.getFirst", _defaultApiSetName, "1.3", _hostName);
+			return new Word.ContentControl(this.context, _createMethodObjectPath(this.context, this, "GetFirst", 1, [], false, false, null, false));
 		};
 		ContentControlCollection.prototype.getFirstOrNullObject=function () {
-			return new Word.ContentControl(this.context, _createMethodObjectPath(this.context, this, "GetFirstOrNullObject", 1, [], false, false, null));
+			_throwIfApiNotSupported("ContentControlCollection.getFirstOrNullObject", _defaultApiSetName, "1.3", _hostName);
+			return new Word.ContentControl(this.context, _createMethodObjectPath(this.context, this, "GetFirstOrNullObject", 1, [], false, false, null, false));
 		};
 		ContentControlCollection.prototype.getItem=function (index) {
 			return new Word.ContentControl(this.context, _createIndexerObjectPath(this.context, this, [index]));
 		};
 		ContentControlCollection.prototype._KeepReference=function () {
-			_createMethodAction(this.context, this, "_KeepReference", 1, []);
+			_createMethodAction(this.context, this, "_KeepReference", 1, [], false);
 		};
 		ContentControlCollection.prototype._handleResult=function (value) {
 			_super.prototype._handleResult.call(this, value);
@@ -13611,7 +14486,7 @@ var Word;
 			var obj=value;
 			_fixObjectPathIfNecessary(this, obj);
 			if (!_isUndefined(obj["_ReferenceId"])) {
-				this.m__ReferenceId=obj["_ReferenceId"];
+				this.__R=obj["_ReferenceId"];
 			}
 			if (!_isNullOrUndefined(obj[OfficeExtension.Constants.items])) {
 				this.m__items=[];
@@ -13624,8 +14499,16 @@ var Word;
 			}
 		};
 		ContentControlCollection.prototype.load=function (option) {
-			_load(this, option);
-			return this;
+			return _load(this, option);
+		};
+		ContentControlCollection.prototype.loadAndSync=function (option) {
+			return _loadAndSync(this, option);
+		};
+		ContentControlCollection.prototype.retrieve=function (option) {
+			return _retrieve(this, option);
+		};
+		ContentControlCollection.prototype.retrieveAndSync=function (option) {
+			return _retrieveAndSync(this, option);
 		};
 		ContentControlCollection.prototype._handleIdResult=function (value) {
 			_super.prototype._handleIdResult.call(this, value);
@@ -13633,7 +14516,7 @@ var Word;
 				return;
 			}
 			if (!_isUndefined(value["_ReferenceId"])) {
-				this.m__ReferenceId=value["_ReferenceId"];
+				this.__R=value["_ReferenceId"];
 			}
 		};
 		ContentControlCollection.prototype.track=function () {
@@ -13645,15 +14528,16 @@ var Word;
 			return this;
 		};
 		ContentControlCollection.prototype.toJSON=function () {
-			return {};
+			return _toJson(this, {}, {}, this.m__items);
 		};
 		return ContentControlCollection;
 	}(OfficeExtension.ClientObject));
 	Word.ContentControlCollection=ContentControlCollection;
+	var _typeCustomProperty="CustomProperty";
 	var CustomProperty=(function (_super) {
 		__extends(CustomProperty, _super);
 		function CustomProperty() {
-			_super.apply(this, arguments);
+			return _super !==null && _super.apply(this, arguments) || this;
 		}
 		Object.defineProperty(CustomProperty.prototype, "_className", {
 			get: function () {
@@ -13664,15 +14548,15 @@ var Word;
 		});
 		Object.defineProperty(CustomProperty.prototype, "key", {
 			get: function () {
-				_throwIfNotLoaded("key", this.m_key, "CustomProperty", this._isNull);
-				return this.m_key;
+				_throwIfNotLoaded("key", this._K, _typeCustomProperty, this._isNull);
+				return this._K;
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(CustomProperty.prototype, "type", {
 			get: function () {
-				_throwIfNotLoaded("type", this.m_type, "CustomProperty", this._isNull);
+				_throwIfNotLoaded("type", this.m_type, _typeCustomProperty, this._isNull);
 				return this.m_type;
 			},
 			enumerable: true,
@@ -13685,7 +14569,7 @@ var Word;
 					_throwIfNotLoaded("value", this.m_value, "CustomProperty", this._isNull);
 					return new Date(this.m_value);
 				}
-				_throwIfNotLoaded("value", this.m_value, "CustomProperty", this._isNull);
+				_throwIfNotLoaded("value", this.m_value, _typeCustomProperty, this._isNull);
 				return this.m_value;
 			},
 			set: function (value) {
@@ -13697,16 +14581,16 @@ var Word;
 		});
 		Object.defineProperty(CustomProperty.prototype, "_Id", {
 			get: function () {
-				_throwIfNotLoaded("_Id", this.m__Id, "CustomProperty", this._isNull);
-				return this.m__Id;
+				_throwIfNotLoaded("_Id", this.__I, _typeCustomProperty, this._isNull);
+				return this.__I;
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(CustomProperty.prototype, "_ReferenceId", {
 			get: function () {
-				_throwIfNotLoaded("_ReferenceId", this.m__ReferenceId, "CustomProperty", this._isNull);
-				return this.m__ReferenceId;
+				_throwIfNotLoaded("_ReferenceId", this.__R, _typeCustomProperty, this._isNull);
+				return this.__R;
 			},
 			enumerable: true,
 			configurable: true
@@ -13715,10 +14599,10 @@ var Word;
 			this._recursivelySet(properties, options, ["value"], [], []);
 		};
 		CustomProperty.prototype.delete=function () {
-			_createMethodAction(this.context, this, "Delete", 0, []);
+			_createMethodAction(this.context, this, "Delete", 0, [], false);
 		};
 		CustomProperty.prototype._KeepReference=function () {
-			_createMethodAction(this.context, this, "_KeepReference", 1, []);
+			_createMethodAction(this.context, this, "_KeepReference", 1, [], false);
 		};
 		CustomProperty.prototype._handleResult=function (value) {
 			_super.prototype._handleResult.call(this, value);
@@ -13727,7 +14611,7 @@ var Word;
 			var obj=value;
 			_fixObjectPathIfNecessary(this, obj);
 			if (!_isUndefined(obj["Key"])) {
-				this.m_key=obj["Key"];
+				this._K=obj["Key"];
 			}
 			if (!_isUndefined(obj["Type"])) {
 				this.m_type=obj["Type"];
@@ -13736,15 +14620,23 @@ var Word;
 				this.m_value=obj["Value"];
 			}
 			if (!_isUndefined(obj["_Id"])) {
-				this.m__Id=obj["_Id"];
+				this.__I=obj["_Id"];
 			}
 			if (!_isUndefined(obj["_ReferenceId"])) {
-				this.m__ReferenceId=obj["_ReferenceId"];
+				this.__R=obj["_ReferenceId"];
 			}
 		};
 		CustomProperty.prototype.load=function (option) {
-			_load(this, option);
-			return this;
+			return _load(this, option);
+		};
+		CustomProperty.prototype.loadAndSync=function (option) {
+			return _loadAndSync(this, option);
+		};
+		CustomProperty.prototype.retrieve=function (option) {
+			return _retrieve(this, option);
+		};
+		CustomProperty.prototype.retrieveAndSync=function (option) {
+			return _retrieveAndSync(this, option);
 		};
 		CustomProperty.prototype._handleIdResult=function (value) {
 			_super.prototype._handleIdResult.call(this, value);
@@ -13752,10 +14644,10 @@ var Word;
 				return;
 			}
 			if (!_isUndefined(value["_ReferenceId"])) {
-				this.m__ReferenceId=value["_ReferenceId"];
+				this.__R=value["_ReferenceId"];
 			}
 			if (!_isUndefined(value["_Id"])) {
-				this.m__Id=value["_Id"];
+				this.__I=value["_Id"];
 			}
 		};
 		CustomProperty.prototype.track=function () {
@@ -13767,19 +14659,24 @@ var Word;
 			return this;
 		};
 		CustomProperty.prototype.toJSON=function () {
-			return {
-				"key": this.m_key,
+			return _toJson(this, {
+				"key": this._K,
 				"type": this.m_type,
-				"value": this.m_value
-			};
+				"value": this.m_value,
+			}, {});
+		};
+		CustomProperty.prototype.ensureUnchanged=function (data) {
+			_createEnsureUnchangedAction(this.context, this, data);
+			return;
 		};
 		return CustomProperty;
 	}(OfficeExtension.ClientObject));
 	Word.CustomProperty=CustomProperty;
+	var _typeCustomPropertyCollection="CustomPropertyCollection";
 	var CustomPropertyCollection=(function (_super) {
 		__extends(CustomPropertyCollection, _super);
 		function CustomPropertyCollection() {
-			_super.apply(this, arguments);
+			return _super !==null && _super.apply(this, arguments) || this;
 		}
 		Object.defineProperty(CustomPropertyCollection.prototype, "_className", {
 			get: function () {
@@ -13790,7 +14687,7 @@ var Word;
 		});
 		Object.defineProperty(CustomPropertyCollection.prototype, "items", {
 			get: function () {
-				_throwIfNotLoaded("items", this.m__items, "CustomPropertyCollection", this._isNull);
+				_throwIfNotLoaded("items", this.m__items, _typeCustomPropertyCollection, this._isNull);
 				return this.m__items;
 			},
 			enumerable: true,
@@ -13798,20 +14695,20 @@ var Word;
 		});
 		Object.defineProperty(CustomPropertyCollection.prototype, "_ReferenceId", {
 			get: function () {
-				_throwIfNotLoaded("_ReferenceId", this.m__ReferenceId, "CustomPropertyCollection", this._isNull);
-				return this.m__ReferenceId;
+				_throwIfNotLoaded("_ReferenceId", this.__R, _typeCustomPropertyCollection, this._isNull);
+				return this.__R;
 			},
 			enumerable: true,
 			configurable: true
 		});
 		CustomPropertyCollection.prototype.add=function (key, value) {
-			return new Word.CustomProperty(this.context, _createMethodObjectPath(this.context, this, "Add", 0, [key, value], false, true, null));
+			return new Word.CustomProperty(this.context, _createMethodObjectPath(this.context, this, "Add", 0, [key, value], false, true, null, false));
 		};
 		CustomPropertyCollection.prototype.deleteAll=function () {
-			_createMethodAction(this.context, this, "DeleteAll", 0, []);
+			_createMethodAction(this.context, this, "DeleteAll", 0, [], false);
 		};
 		CustomPropertyCollection.prototype.getCount=function () {
-			var action=_createMethodAction(this.context, this, "GetCount", 1, []);
+			var action=_createMethodAction(this.context, this, "GetCount", 1, [], false);
 			var ret=new OfficeExtension.ClientResult();
 			_addActionResultHandler(this, action, ret);
 			return ret;
@@ -13820,10 +14717,10 @@ var Word;
 			return new Word.CustomProperty(this.context, _createIndexerObjectPath(this.context, this, [key]));
 		};
 		CustomPropertyCollection.prototype.getItemOrNullObject=function (key) {
-			return new Word.CustomProperty(this.context, _createMethodObjectPath(this.context, this, "GetItemOrNullObject", 1, [key], false, false, null));
+			return new Word.CustomProperty(this.context, _createMethodObjectPath(this.context, this, "GetItemOrNullObject", 1, [key], false, false, null, false));
 		};
 		CustomPropertyCollection.prototype._KeepReference=function () {
-			_createMethodAction(this.context, this, "_KeepReference", 1, []);
+			_createMethodAction(this.context, this, "_KeepReference", 1, [], false);
 		};
 		CustomPropertyCollection.prototype._handleResult=function (value) {
 			_super.prototype._handleResult.call(this, value);
@@ -13832,7 +14729,7 @@ var Word;
 			var obj=value;
 			_fixObjectPathIfNecessary(this, obj);
 			if (!_isUndefined(obj["_ReferenceId"])) {
-				this.m__ReferenceId=obj["_ReferenceId"];
+				this.__R=obj["_ReferenceId"];
 			}
 			if (!_isNullOrUndefined(obj[OfficeExtension.Constants.items])) {
 				this.m__items=[];
@@ -13845,8 +14742,16 @@ var Word;
 			}
 		};
 		CustomPropertyCollection.prototype.load=function (option) {
-			_load(this, option);
-			return this;
+			return _load(this, option);
+		};
+		CustomPropertyCollection.prototype.loadAndSync=function (option) {
+			return _loadAndSync(this, option);
+		};
+		CustomPropertyCollection.prototype.retrieve=function (option) {
+			return _retrieve(this, option);
+		};
+		CustomPropertyCollection.prototype.retrieveAndSync=function (option) {
+			return _retrieveAndSync(this, option);
 		};
 		CustomPropertyCollection.prototype._handleIdResult=function (value) {
 			_super.prototype._handleIdResult.call(this, value);
@@ -13854,7 +14759,7 @@ var Word;
 				return;
 			}
 			if (!_isUndefined(value["_ReferenceId"])) {
-				this.m__ReferenceId=value["_ReferenceId"];
+				this.__R=value["_ReferenceId"];
 			}
 		};
 		CustomPropertyCollection.prototype.track=function () {
@@ -13866,15 +14771,16 @@ var Word;
 			return this;
 		};
 		CustomPropertyCollection.prototype.toJSON=function () {
-			return {};
+			return _toJson(this, {}, {}, this.m__items);
 		};
 		return CustomPropertyCollection;
 	}(OfficeExtension.ClientObject));
 	Word.CustomPropertyCollection=CustomPropertyCollection;
+	var _typeCustomXmlPart="CustomXmlPart";
 	var CustomXmlPart=(function (_super) {
 		__extends(CustomXmlPart, _super);
 		function CustomXmlPart() {
-			_super.apply(this, arguments);
+			return _super !==null && _super.apply(this, arguments) || this;
 		}
 		Object.defineProperty(CustomXmlPart.prototype, "_className", {
 			get: function () {
@@ -13885,66 +14791,66 @@ var Word;
 		});
 		Object.defineProperty(CustomXmlPart.prototype, "id", {
 			get: function () {
-				_throwIfNotLoaded("id", this.m_id, "CustomXmlPart", this._isNull);
-				return this.m_id;
+				_throwIfNotLoaded("id", this._I, _typeCustomXmlPart, this._isNull);
+				return this._I;
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(CustomXmlPart.prototype, "namespaceUri", {
 			get: function () {
-				_throwIfNotLoaded("namespaceUri", this.m_namespaceUri, "CustomXmlPart", this._isNull);
-				return this.m_namespaceUri;
+				_throwIfNotLoaded("namespaceUri", this._N, _typeCustomXmlPart, this._isNull);
+				return this._N;
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(CustomXmlPart.prototype, "_ReferenceId", {
 			get: function () {
-				_throwIfNotLoaded("_ReferenceId", this.m__ReferenceId, "CustomXmlPart", this._isNull);
-				return this.m__ReferenceId;
+				_throwIfNotLoaded("_ReferenceId", this.__R, _typeCustomXmlPart, this._isNull);
+				return this.__R;
 			},
 			enumerable: true,
 			configurable: true
 		});
 		CustomXmlPart.prototype.delete=function () {
-			_createMethodAction(this.context, this, "Delete", 0, []);
+			_createMethodAction(this.context, this, "Delete", 0, [], false);
 		};
 		CustomXmlPart.prototype.deleteAttribute=function (xpath, namespaceMappings, name) {
-			_createMethodAction(this.context, this, "DeleteAttribute", 0, [xpath, namespaceMappings, name]);
+			_createMethodAction(this.context, this, "DeleteAttribute", 0, [xpath, namespaceMappings, name], false);
 		};
 		CustomXmlPart.prototype.deleteElement=function (xpath, namespaceMappings) {
-			_createMethodAction(this.context, this, "DeleteElement", 0, [xpath, namespaceMappings]);
+			_createMethodAction(this.context, this, "DeleteElement", 0, [xpath, namespaceMappings], false);
 		};
 		CustomXmlPart.prototype.getXml=function () {
-			var action=_createMethodAction(this.context, this, "GetXml", 1, []);
+			var action=_createMethodAction(this.context, this, "GetXml", 1, [], false);
 			var ret=new OfficeExtension.ClientResult();
 			_addActionResultHandler(this, action, ret);
 			return ret;
 		};
 		CustomXmlPart.prototype.insertAttribute=function (xpath, namespaceMappings, name, value) {
-			_createMethodAction(this.context, this, "InsertAttribute", 0, [xpath, namespaceMappings, name, value]);
+			_createMethodAction(this.context, this, "InsertAttribute", 0, [xpath, namespaceMappings, name, value], false);
 		};
 		CustomXmlPart.prototype.insertElement=function (xpath, xml, namespaceMappings, index) {
-			_createMethodAction(this.context, this, "InsertElement", 0, [xpath, xml, namespaceMappings, index]);
+			_createMethodAction(this.context, this, "InsertElement", 0, [xpath, xml, namespaceMappings, index], false);
 		};
 		CustomXmlPart.prototype.query=function (xpath, namespaceMappings) {
-			var action=_createMethodAction(this.context, this, "Query", 0, [xpath, namespaceMappings]);
+			var action=_createMethodAction(this.context, this, "Query", 0, [xpath, namespaceMappings], false);
 			var ret=new OfficeExtension.ClientResult();
 			_addActionResultHandler(this, action, ret);
 			return ret;
 		};
 		CustomXmlPart.prototype.setXml=function (xml) {
-			_createMethodAction(this.context, this, "SetXml", 0, [xml]);
+			_createMethodAction(this.context, this, "SetXml", 0, [xml], false);
 		};
 		CustomXmlPart.prototype.updateAttribute=function (xpath, namespaceMappings, name, value) {
-			_createMethodAction(this.context, this, "UpdateAttribute", 0, [xpath, namespaceMappings, name, value]);
+			_createMethodAction(this.context, this, "UpdateAttribute", 0, [xpath, namespaceMappings, name, value], false);
 		};
 		CustomXmlPart.prototype.updateElement=function (xpath, xml, namespaceMappings) {
-			_createMethodAction(this.context, this, "UpdateElement", 0, [xpath, xml, namespaceMappings]);
+			_createMethodAction(this.context, this, "UpdateElement", 0, [xpath, xml, namespaceMappings], false);
 		};
 		CustomXmlPart.prototype._KeepReference=function () {
-			_createMethodAction(this.context, this, "_KeepReference", 1, []);
+			_createMethodAction(this.context, this, "_KeepReference", 1, [], false);
 		};
 		CustomXmlPart.prototype._handleResult=function (value) {
 			_super.prototype._handleResult.call(this, value);
@@ -13953,18 +14859,26 @@ var Word;
 			var obj=value;
 			_fixObjectPathIfNecessary(this, obj);
 			if (!_isUndefined(obj["Id"])) {
-				this.m_id=obj["Id"];
+				this._I=obj["Id"];
 			}
 			if (!_isUndefined(obj["NamespaceUri"])) {
-				this.m_namespaceUri=obj["NamespaceUri"];
+				this._N=obj["NamespaceUri"];
 			}
 			if (!_isUndefined(obj["_ReferenceId"])) {
-				this.m__ReferenceId=obj["_ReferenceId"];
+				this.__R=obj["_ReferenceId"];
 			}
 		};
 		CustomXmlPart.prototype.load=function (option) {
-			_load(this, option);
-			return this;
+			return _load(this, option);
+		};
+		CustomXmlPart.prototype.loadAndSync=function (option) {
+			return _loadAndSync(this, option);
+		};
+		CustomXmlPart.prototype.retrieve=function (option) {
+			return _retrieve(this, option);
+		};
+		CustomXmlPart.prototype.retrieveAndSync=function (option) {
+			return _retrieveAndSync(this, option);
 		};
 		CustomXmlPart.prototype._handleIdResult=function (value) {
 			_super.prototype._handleIdResult.call(this, value);
@@ -13972,10 +14886,10 @@ var Word;
 				return;
 			}
 			if (!_isUndefined(value["_ReferenceId"])) {
-				this.m__ReferenceId=value["_ReferenceId"];
+				this.__R=value["_ReferenceId"];
 			}
 			if (!_isUndefined(value["Id"])) {
-				this.m_id=value["Id"];
+				this._I=value["Id"];
 			}
 		};
 		CustomXmlPart.prototype.track=function () {
@@ -13987,18 +14901,23 @@ var Word;
 			return this;
 		};
 		CustomXmlPart.prototype.toJSON=function () {
-			return {
-				"id": this.m_id,
-				"namespaceUri": this.m_namespaceUri
-			};
+			return _toJson(this, {
+				"id": this._I,
+				"namespaceUri": this._N,
+			}, {});
+		};
+		CustomXmlPart.prototype.ensureUnchanged=function (data) {
+			_createEnsureUnchangedAction(this.context, this, data);
+			return;
 		};
 		return CustomXmlPart;
 	}(OfficeExtension.ClientObject));
 	Word.CustomXmlPart=CustomXmlPart;
+	var _typeCustomXmlPartCollection="CustomXmlPartCollection";
 	var CustomXmlPartCollection=(function (_super) {
 		__extends(CustomXmlPartCollection, _super);
 		function CustomXmlPartCollection() {
-			_super.apply(this, arguments);
+			return _super !==null && _super.apply(this, arguments) || this;
 		}
 		Object.defineProperty(CustomXmlPartCollection.prototype, "_className", {
 			get: function () {
@@ -14009,7 +14928,7 @@ var Word;
 		});
 		Object.defineProperty(CustomXmlPartCollection.prototype, "items", {
 			get: function () {
-				_throwIfNotLoaded("items", this.m__items, "CustomXmlPartCollection", this._isNull);
+				_throwIfNotLoaded("items", this.m__items, _typeCustomXmlPartCollection, this._isNull);
 				return this.m__items;
 			},
 			enumerable: true,
@@ -14017,20 +14936,20 @@ var Word;
 		});
 		Object.defineProperty(CustomXmlPartCollection.prototype, "_ReferenceId", {
 			get: function () {
-				_throwIfNotLoaded("_ReferenceId", this.m__ReferenceId, "CustomXmlPartCollection", this._isNull);
-				return this.m__ReferenceId;
+				_throwIfNotLoaded("_ReferenceId", this.__R, _typeCustomXmlPartCollection, this._isNull);
+				return this.__R;
 			},
 			enumerable: true,
 			configurable: true
 		});
 		CustomXmlPartCollection.prototype.add=function (xml) {
-			return new Word.CustomXmlPart(this.context, _createMethodObjectPath(this.context, this, "Add", 0, [xml], false, true, null));
+			return new Word.CustomXmlPart(this.context, _createMethodObjectPath(this.context, this, "Add", 0, [xml], false, true, null, false));
 		};
 		CustomXmlPartCollection.prototype.getByNamespace=function (namespaceUri) {
-			return new Word.CustomXmlPartScopedCollection(this.context, _createMethodObjectPath(this.context, this, "GetByNamespace", 1, [namespaceUri], true, false, null));
+			return new Word.CustomXmlPartScopedCollection(this.context, _createMethodObjectPath(this.context, this, "GetByNamespace", 1, [namespaceUri], true, false, null, false));
 		};
 		CustomXmlPartCollection.prototype.getCount=function () {
-			var action=_createMethodAction(this.context, this, "GetCount", 1, []);
+			var action=_createMethodAction(this.context, this, "GetCount", 1, [], false);
 			var ret=new OfficeExtension.ClientResult();
 			_addActionResultHandler(this, action, ret);
 			return ret;
@@ -14039,10 +14958,10 @@ var Word;
 			return new Word.CustomXmlPart(this.context, _createIndexerObjectPath(this.context, this, [id]));
 		};
 		CustomXmlPartCollection.prototype.getItemOrNullObject=function (id) {
-			return new Word.CustomXmlPart(this.context, _createMethodObjectPath(this.context, this, "GetItemOrNullObject", 1, [id], false, false, null));
+			return new Word.CustomXmlPart(this.context, _createMethodObjectPath(this.context, this, "GetItemOrNullObject", 1, [id], false, false, null, false));
 		};
 		CustomXmlPartCollection.prototype._KeepReference=function () {
-			_createMethodAction(this.context, this, "_KeepReference", 1, []);
+			_createMethodAction(this.context, this, "_KeepReference", 1, [], false);
 		};
 		CustomXmlPartCollection.prototype._handleResult=function (value) {
 			_super.prototype._handleResult.call(this, value);
@@ -14051,7 +14970,7 @@ var Word;
 			var obj=value;
 			_fixObjectPathIfNecessary(this, obj);
 			if (!_isUndefined(obj["_ReferenceId"])) {
-				this.m__ReferenceId=obj["_ReferenceId"];
+				this.__R=obj["_ReferenceId"];
 			}
 			if (!_isNullOrUndefined(obj[OfficeExtension.Constants.items])) {
 				this.m__items=[];
@@ -14064,8 +14983,16 @@ var Word;
 			}
 		};
 		CustomXmlPartCollection.prototype.load=function (option) {
-			_load(this, option);
-			return this;
+			return _load(this, option);
+		};
+		CustomXmlPartCollection.prototype.loadAndSync=function (option) {
+			return _loadAndSync(this, option);
+		};
+		CustomXmlPartCollection.prototype.retrieve=function (option) {
+			return _retrieve(this, option);
+		};
+		CustomXmlPartCollection.prototype.retrieveAndSync=function (option) {
+			return _retrieveAndSync(this, option);
 		};
 		CustomXmlPartCollection.prototype._handleIdResult=function (value) {
 			_super.prototype._handleIdResult.call(this, value);
@@ -14073,7 +15000,7 @@ var Word;
 				return;
 			}
 			if (!_isUndefined(value["_ReferenceId"])) {
-				this.m__ReferenceId=value["_ReferenceId"];
+				this.__R=value["_ReferenceId"];
 			}
 		};
 		CustomXmlPartCollection.prototype.track=function () {
@@ -14085,15 +15012,16 @@ var Word;
 			return this;
 		};
 		CustomXmlPartCollection.prototype.toJSON=function () {
-			return {};
+			return _toJson(this, {}, {}, this.m__items);
 		};
 		return CustomXmlPartCollection;
 	}(OfficeExtension.ClientObject));
 	Word.CustomXmlPartCollection=CustomXmlPartCollection;
+	var _typeCustomXmlPartScopedCollection="CustomXmlPartScopedCollection";
 	var CustomXmlPartScopedCollection=(function (_super) {
 		__extends(CustomXmlPartScopedCollection, _super);
 		function CustomXmlPartScopedCollection() {
-			_super.apply(this, arguments);
+			return _super !==null && _super.apply(this, arguments) || this;
 		}
 		Object.defineProperty(CustomXmlPartScopedCollection.prototype, "_className", {
 			get: function () {
@@ -14104,30 +15032,22 @@ var Word;
 		});
 		Object.defineProperty(CustomXmlPartScopedCollection.prototype, "items", {
 			get: function () {
-				_throwIfNotLoaded("items", this.m__items, "CustomXmlPartScopedCollection", this._isNull);
+				_throwIfNotLoaded("items", this.m__items, _typeCustomXmlPartScopedCollection, this._isNull);
 				return this.m__items;
-			},
-			enumerable: true,
-			configurable: true
-		});
-		Object.defineProperty(CustomXmlPartScopedCollection.prototype, "namespaceUri", {
-			get: function () {
-				_throwIfNotLoaded("namespaceUri", this.m_namespaceUri, "CustomXmlPartScopedCollection", this._isNull);
-				return this.m_namespaceUri;
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(CustomXmlPartScopedCollection.prototype, "_ReferenceId", {
 			get: function () {
-				_throwIfNotLoaded("_ReferenceId", this.m__ReferenceId, "CustomXmlPartScopedCollection", this._isNull);
-				return this.m__ReferenceId;
+				_throwIfNotLoaded("_ReferenceId", this.__R, _typeCustomXmlPartScopedCollection, this._isNull);
+				return this.__R;
 			},
 			enumerable: true,
 			configurable: true
 		});
 		CustomXmlPartScopedCollection.prototype.getCount=function () {
-			var action=_createMethodAction(this.context, this, "GetCount", 1, []);
+			var action=_createMethodAction(this.context, this, "GetCount", 1, [], false);
 			var ret=new OfficeExtension.ClientResult();
 			_addActionResultHandler(this, action, ret);
 			return ret;
@@ -14136,16 +15056,16 @@ var Word;
 			return new Word.CustomXmlPart(this.context, _createIndexerObjectPath(this.context, this, [id]));
 		};
 		CustomXmlPartScopedCollection.prototype.getItemOrNullObject=function (id) {
-			return new Word.CustomXmlPart(this.context, _createMethodObjectPath(this.context, this, "GetItemOrNullObject", 1, [id], false, false, null));
+			return new Word.CustomXmlPart(this.context, _createMethodObjectPath(this.context, this, "GetItemOrNullObject", 1, [id], false, false, null, false));
 		};
 		CustomXmlPartScopedCollection.prototype.getOnlyItem=function () {
-			return new Word.CustomXmlPart(this.context, _createMethodObjectPath(this.context, this, "GetOnlyItem", 1, [], false, false, null));
+			return new Word.CustomXmlPart(this.context, _createMethodObjectPath(this.context, this, "GetOnlyItem", 1, [], false, false, null, false));
 		};
 		CustomXmlPartScopedCollection.prototype.getOnlyItemOrNullObject=function () {
-			return new Word.CustomXmlPart(this.context, _createMethodObjectPath(this.context, this, "GetOnlyItemOrNullObject", 1, [], false, false, null));
+			return new Word.CustomXmlPart(this.context, _createMethodObjectPath(this.context, this, "GetOnlyItemOrNullObject", 1, [], false, false, null, false));
 		};
 		CustomXmlPartScopedCollection.prototype._KeepReference=function () {
-			_createMethodAction(this.context, this, "_KeepReference", 1, []);
+			_createMethodAction(this.context, this, "_KeepReference", 1, [], false);
 		};
 		CustomXmlPartScopedCollection.prototype._handleResult=function (value) {
 			_super.prototype._handleResult.call(this, value);
@@ -14153,11 +15073,8 @@ var Word;
 				return;
 			var obj=value;
 			_fixObjectPathIfNecessary(this, obj);
-			if (!_isUndefined(obj["NamespaceUri"])) {
-				this.m_namespaceUri=obj["NamespaceUri"];
-			}
 			if (!_isUndefined(obj["_ReferenceId"])) {
-				this.m__ReferenceId=obj["_ReferenceId"];
+				this.__R=obj["_ReferenceId"];
 			}
 			if (!_isNullOrUndefined(obj[OfficeExtension.Constants.items])) {
 				this.m__items=[];
@@ -14170,8 +15087,16 @@ var Word;
 			}
 		};
 		CustomXmlPartScopedCollection.prototype.load=function (option) {
-			_load(this, option);
-			return this;
+			return _load(this, option);
+		};
+		CustomXmlPartScopedCollection.prototype.loadAndSync=function (option) {
+			return _loadAndSync(this, option);
+		};
+		CustomXmlPartScopedCollection.prototype.retrieve=function (option) {
+			return _retrieve(this, option);
+		};
+		CustomXmlPartScopedCollection.prototype.retrieveAndSync=function (option) {
+			return _retrieveAndSync(this, option);
 		};
 		CustomXmlPartScopedCollection.prototype._handleIdResult=function (value) {
 			_super.prototype._handleIdResult.call(this, value);
@@ -14179,7 +15104,7 @@ var Word;
 				return;
 			}
 			if (!_isUndefined(value["_ReferenceId"])) {
-				this.m__ReferenceId=value["_ReferenceId"];
+				this.__R=value["_ReferenceId"];
 			}
 		};
 		CustomXmlPartScopedCollection.prototype.track=function () {
@@ -14191,17 +15116,16 @@ var Word;
 			return this;
 		};
 		CustomXmlPartScopedCollection.prototype.toJSON=function () {
-			return {
-				"namespaceUri": this.m_namespaceUri
-			};
+			return _toJson(this, {}, {}, this.m__items);
 		};
 		return CustomXmlPartScopedCollection;
 	}(OfficeExtension.ClientObject));
 	Word.CustomXmlPartScopedCollection=CustomXmlPartScopedCollection;
+	var _typeDocument="Document";
 	var Document=(function (_super) {
 		__extends(Document, _super);
 		function Document() {
-			_super.apply(this, arguments);
+			return _super !==null && _super.apply(this, arguments) || this;
 		}
 		Object.defineProperty(Document.prototype, "_className", {
 			get: function () {
@@ -14212,75 +15136,78 @@ var Word;
 		});
 		Object.defineProperty(Document.prototype, "body", {
 			get: function () {
-				if (!this.m_body) {
-					this.m_body=new Word.Body(this.context, _createPropertyObjectPath(this.context, this, "Body", false, false));
+				if (!this._B) {
+					this._B=new Word.Body(this.context, _createPropertyObjectPath(this.context, this, "Body", false, false, false));
 				}
-				return this.m_body;
+				return this._B;
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(Document.prototype, "contentControls", {
 			get: function () {
-				if (!this.m_contentControls) {
-					this.m_contentControls=new Word.ContentControlCollection(this.context, _createPropertyObjectPath(this.context, this, "ContentControls", true, false));
+				if (!this._C) {
+					this._C=new Word.ContentControlCollection(this.context, _createPropertyObjectPath(this.context, this, "ContentControls", true, false, false));
 				}
-				return this.m_contentControls;
+				return this._C;
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(Document.prototype, "customXmlParts", {
 			get: function () {
-				if (!this.m_customXmlParts) {
-					this.m_customXmlParts=new Word.CustomXmlPartCollection(this.context, _createPropertyObjectPath(this.context, this, "CustomXmlParts", true, false));
+				_throwIfApiNotSupported("Document.customXmlParts", _defaultApiSetName, "1.4", _hostName);
+				if (!this._Cu) {
+					this._Cu=new Word.CustomXmlPartCollection(this.context, _createPropertyObjectPath(this.context, this, "CustomXmlParts", true, false, false));
 				}
-				return this.m_customXmlParts;
+				return this._Cu;
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(Document.prototype, "properties", {
 			get: function () {
-				if (!this.m_properties) {
-					this.m_properties=new Word.DocumentProperties(this.context, _createPropertyObjectPath(this.context, this, "Properties", false, false));
+				_throwIfApiNotSupported("Document.properties", _defaultApiSetName, "1.3", _hostName);
+				if (!this._P) {
+					this._P=new Word.DocumentProperties(this.context, _createPropertyObjectPath(this.context, this, "Properties", false, false, false));
 				}
-				return this.m_properties;
+				return this._P;
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(Document.prototype, "sections", {
 			get: function () {
-				if (!this.m_sections) {
-					this.m_sections=new Word.SectionCollection(this.context, _createPropertyObjectPath(this.context, this, "Sections", true, false));
+				if (!this._Se) {
+					this._Se=new Word.SectionCollection(this.context, _createPropertyObjectPath(this.context, this, "Sections", true, false, false));
 				}
-				return this.m_sections;
+				return this._Se;
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(Document.prototype, "settings", {
 			get: function () {
-				if (!this.m_settings) {
-					this.m_settings=new Word.SettingCollection(this.context, _createPropertyObjectPath(this.context, this, "Settings", true, false));
+				_throwIfApiNotSupported("Document.settings", _defaultApiSetName, "1.4", _hostName);
+				if (!this._Set) {
+					this._Set=new Word.SettingCollection(this.context, _createPropertyObjectPath(this.context, this, "Settings", true, false, false));
 				}
-				return this.m_settings;
+				return this._Set;
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(Document.prototype, "saved", {
 			get: function () {
-				_throwIfNotLoaded("saved", this.m_saved, "Document", this._isNull);
-				return this.m_saved;
+				_throwIfNotLoaded("saved", this._S, _typeDocument, this._isNull);
+				return this._S;
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(Document.prototype, "_ReferenceId", {
 			get: function () {
-				_throwIfNotLoaded("_ReferenceId", this.m__ReferenceId, "Document", this._isNull);
+				_throwIfNotLoaded("_ReferenceId", this.m__ReferenceId, _typeDocument, this._isNull);
 				return this.m__ReferenceId;
 			},
 			enumerable: true,
@@ -14291,51 +15218,51 @@ var Word;
 				"contentControls",
 				"customXmlParts",
 				"sections",
-				"settings",
-				"contentControls",
-				"customXmlParts",
-				"sections",
 				"settings"
 			]);
 		};
 		Document.prototype.deleteBookmark=function (name) {
-			_createMethodAction(this.context, this, "DeleteBookmark", 0, [name]);
+			_throwIfApiNotSupported("Document.deleteBookmark", _defaultApiSetName, "1.4", _hostName);
+			_createMethodAction(this.context, this, "DeleteBookmark", 0, [name], false);
 		};
 		Document.prototype.getBookmarkRange=function (name) {
-			return new Word.Range(this.context, _createMethodObjectPath(this.context, this, "GetBookmarkRange", 1, [name], false, false, null));
+			_throwIfApiNotSupported("Document.getBookmarkRange", _defaultApiSetName, "1.4", _hostName);
+			return new Word.Range(this.context, _createMethodObjectPath(this.context, this, "GetBookmarkRange", 1, [name], false, false, null, false));
 		};
 		Document.prototype.getBookmarkRangeOrNullObject=function (name) {
-			return new Word.Range(this.context, _createMethodObjectPath(this.context, this, "GetBookmarkRangeOrNullObject", 1, [name], false, false, null));
+			_throwIfApiNotSupported("Document.getBookmarkRangeOrNullObject", _defaultApiSetName, "1.4", _hostName);
+			return new Word.Range(this.context, _createMethodObjectPath(this.context, this, "GetBookmarkRangeOrNullObject", 1, [name], false, false, null, false));
 		};
 		Document.prototype.getSelection=function () {
-			return new Word.Range(this.context, _createMethodObjectPath(this.context, this, "GetSelection", 1, [], false, true, null));
+			return new Word.Range(this.context, _createMethodObjectPath(this.context, this, "GetSelection", 1, [], false, true, null, false));
 		};
 		Document.prototype.open=function () {
-			_createMethodAction(this.context, this, "Open", 1, []);
+			_throwIfApiNotSupported("Document.open", _defaultApiSetName, "1.3", _hostName);
+			_createMethodAction(this.context, this, "Open", 1, [], false);
 		};
 		Document.prototype.save=function () {
-			_createMethodAction(this.context, this, "Save", 0, []);
+			_createMethodAction(this.context, this, "Save", 0, [], false);
 		};
 		Document.prototype._GetObjectByReferenceId=function (referenceId) {
-			var action=_createMethodAction(this.context, this, "_GetObjectByReferenceId", 1, [referenceId]);
+			var action=_createMethodAction(this.context, this, "_GetObjectByReferenceId", 1, [referenceId], false);
 			var ret=new OfficeExtension.ClientResult();
 			_addActionResultHandler(this, action, ret);
 			return ret;
 		};
 		Document.prototype._GetObjectTypeNameByReferenceId=function (referenceId) {
-			var action=_createMethodAction(this.context, this, "_GetObjectTypeNameByReferenceId", 1, [referenceId]);
+			var action=_createMethodAction(this.context, this, "_GetObjectTypeNameByReferenceId", 1, [referenceId], false);
 			var ret=new OfficeExtension.ClientResult();
 			_addActionResultHandler(this, action, ret);
 			return ret;
 		};
 		Document.prototype._KeepReference=function () {
-			_createMethodAction(this.context, this, "_KeepReference", 1, []);
+			_createMethodAction(this.context, this, "_KeepReference", 1, [], false);
 		};
 		Document.prototype._RemoveAllReferences=function () {
-			_createMethodAction(this.context, this, "_RemoveAllReferences", 1, []);
+			_createMethodAction(this.context, this, "_RemoveAllReferences", 1, [], false);
 		};
 		Document.prototype._RemoveReference=function (referenceId) {
-			_createMethodAction(this.context, this, "_RemoveReference", 1, [referenceId]);
+			_createMethodAction(this.context, this, "_RemoveReference", 1, [referenceId], false);
 		};
 		Document.prototype._handleResult=function (value) {
 			_super.prototype._handleResult.call(this, value);
@@ -14344,7 +15271,7 @@ var Word;
 			var obj=value;
 			_fixObjectPathIfNecessary(this, obj);
 			if (!_isUndefined(obj["Saved"])) {
-				this.m_saved=obj["Saved"];
+				this._S=obj["Saved"];
 			}
 			if (!_isUndefined(obj["_ReferenceId"])) {
 				this.m__ReferenceId=obj["_ReferenceId"];
@@ -14352,8 +15279,16 @@ var Word;
 			_handleNavigationPropertyResults(this, obj, ["body", "Body", "contentControls", "ContentControls", "customXmlParts", "CustomXmlParts", "properties", "Properties", "sections", "Sections", "settings", "Settings"]);
 		};
 		Document.prototype.load=function (option) {
-			_load(this, option);
-			return this;
+			return _load(this, option);
+		};
+		Document.prototype.loadAndSync=function (option) {
+			return _loadAndSync(this, option);
+		};
+		Document.prototype.retrieve=function (option) {
+			return _retrieve(this, option);
+		};
+		Document.prototype.retrieveAndSync=function (option) {
+			return _retrieveAndSync(this, option);
 		};
 		Document.prototype._handleIdResult=function (value) {
 			_super.prototype._handleIdResult.call(this, value);
@@ -14367,6 +15302,7 @@ var Word;
 		Object.defineProperty(Document.prototype, "onContentControlAdded", {
 			get: function () {
 				var _this=this;
+				_throwIfApiNotSupported("Document.onContentControlAdded", _defaultApiSetName, "1.4", _hostName);
 				if (!this.m_contentControlAdded) {
 					this.m_contentControlAdded=new OfficeExtension.EventHandlers(this.context, this, "ContentControlAdded", {
 						registerFunc: function (handlerCallback) {
@@ -14399,19 +15335,217 @@ var Word;
 			return this;
 		};
 		Document.prototype.toJSON=function () {
-			return {
-				"body": this.m_body,
-				"properties": this.m_properties,
-				"saved": this.m_saved
-			};
+			return _toJson(this, {
+				"saved": this._S,
+			}, {
+				"body": this._B,
+				"contentControls": this._C,
+				"customXmlParts": this._Cu,
+				"properties": this._P,
+				"sections": this._Se,
+				"settings": this._Set,
+			});
+		};
+		Document.prototype.ensureUnchanged=function (data) {
+			_createEnsureUnchangedAction(this.context, this, data);
+			return;
 		};
 		return Document;
 	}(OfficeExtension.ClientObject));
 	Word.Document=Document;
+	var _typeDocumentCreated="DocumentCreated";
+	var DocumentCreated=(function (_super) {
+		__extends(DocumentCreated, _super);
+		function DocumentCreated() {
+			return _super !==null && _super.apply(this, arguments) || this;
+		}
+		Object.defineProperty(DocumentCreated.prototype, "_className", {
+			get: function () {
+				return "DocumentCreated";
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(DocumentCreated.prototype, "body", {
+			get: function () {
+				_throwIfApiNotSupported("DocumentCreated.body", "WordApiHiddenDocument", "1.3", _hostName);
+				if (!this._B) {
+					this._B=new Word.Body(this.context, _createPropertyObjectPath(this.context, this, "Body", false, false, false));
+				}
+				return this._B;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(DocumentCreated.prototype, "contentControls", {
+			get: function () {
+				_throwIfApiNotSupported("DocumentCreated.contentControls", "WordApiHiddenDocument", "1.3", _hostName);
+				if (!this._C) {
+					this._C=new Word.ContentControlCollection(this.context, _createPropertyObjectPath(this.context, this, "ContentControls", true, false, false));
+				}
+				return this._C;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(DocumentCreated.prototype, "customXmlParts", {
+			get: function () {
+				_throwIfApiNotSupported("DocumentCreated.customXmlParts", "WordApiHiddenDocument", "1.4", _hostName);
+				if (!this._Cu) {
+					this._Cu=new Word.CustomXmlPartCollection(this.context, _createPropertyObjectPath(this.context, this, "CustomXmlParts", true, false, false));
+				}
+				return this._Cu;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(DocumentCreated.prototype, "properties", {
+			get: function () {
+				_throwIfApiNotSupported("DocumentCreated.properties", "WordApiHiddenDocument", "1.3", _hostName);
+				if (!this._P) {
+					this._P=new Word.DocumentProperties(this.context, _createPropertyObjectPath(this.context, this, "Properties", false, false, false));
+				}
+				return this._P;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(DocumentCreated.prototype, "sections", {
+			get: function () {
+				_throwIfApiNotSupported("DocumentCreated.sections", "WordApiHiddenDocument", "1.3", _hostName);
+				if (!this._Se) {
+					this._Se=new Word.SectionCollection(this.context, _createPropertyObjectPath(this.context, this, "Sections", true, false, false));
+				}
+				return this._Se;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(DocumentCreated.prototype, "settings", {
+			get: function () {
+				_throwIfApiNotSupported("DocumentCreated.settings", "WordApiHiddenDocument", "1.4", _hostName);
+				if (!this._Set) {
+					this._Set=new Word.SettingCollection(this.context, _createPropertyObjectPath(this.context, this, "Settings", true, false, false));
+				}
+				return this._Set;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(DocumentCreated.prototype, "saved", {
+			get: function () {
+				_throwIfNotLoaded("saved", this._S, _typeDocumentCreated, this._isNull);
+				_throwIfApiNotSupported("DocumentCreated.saved", "WordApiHiddenDocument", "1.3", _hostName);
+				return this._S;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(DocumentCreated.prototype, "_ReferenceId", {
+			get: function () {
+				_throwIfNotLoaded("_ReferenceId", this.m__ReferenceId, _typeDocumentCreated, this._isNull);
+				return this.m__ReferenceId;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		DocumentCreated.prototype.set=function (properties, options) {
+			this._recursivelySet(properties, options, [], ["body", "properties"], [
+				"contentControls",
+				"customXmlParts",
+				"sections",
+				"settings"
+			]);
+		};
+		DocumentCreated.prototype.deleteBookmark=function (name) {
+			_throwIfApiNotSupported("DocumentCreated.deleteBookmark", "WordApiHiddenDocument", "1.4", _hostName);
+			_createMethodAction(this.context, this, "DeleteBookmark", 0, [name], false);
+		};
+		DocumentCreated.prototype.getBookmarkRange=function (name) {
+			_throwIfApiNotSupported("DocumentCreated.getBookmarkRange", "WordApiHiddenDocument", "1.4", _hostName);
+			return new Word.Range(this.context, _createMethodObjectPath(this.context, this, "GetBookmarkRange", 1, [name], false, false, null, false));
+		};
+		DocumentCreated.prototype.getBookmarkRangeOrNullObject=function (name) {
+			_throwIfApiNotSupported("DocumentCreated.getBookmarkRangeOrNullObject", "WordApiHiddenDocument", "1.4", _hostName);
+			return new Word.Range(this.context, _createMethodObjectPath(this.context, this, "GetBookmarkRangeOrNullObject", 1, [name], false, false, null, false));
+		};
+		DocumentCreated.prototype.open=function () {
+			_createMethodAction(this.context, this, "Open", 1, [], false);
+		};
+		DocumentCreated.prototype.save=function () {
+			_throwIfApiNotSupported("DocumentCreated.save", "WordApiHiddenDocument", "1.3", _hostName);
+			_createMethodAction(this.context, this, "Save", 0, [], false);
+		};
+		DocumentCreated.prototype._KeepReference=function () {
+			_createMethodAction(this.context, this, "_KeepReference", 1, [], false);
+		};
+		DocumentCreated.prototype._handleResult=function (value) {
+			_super.prototype._handleResult.call(this, value);
+			if (_isNullOrUndefined(value))
+				return;
+			var obj=value;
+			_fixObjectPathIfNecessary(this, obj);
+			if (!_isUndefined(obj["Saved"])) {
+				this._S=obj["Saved"];
+			}
+			if (!_isUndefined(obj["_ReferenceId"])) {
+				this.m__ReferenceId=obj["_ReferenceId"];
+			}
+			_handleNavigationPropertyResults(this, obj, ["body", "Body", "contentControls", "ContentControls", "customXmlParts", "CustomXmlParts", "properties", "Properties", "sections", "Sections", "settings", "Settings"]);
+		};
+		DocumentCreated.prototype.load=function (option) {
+			return _load(this, option);
+		};
+		DocumentCreated.prototype.loadAndSync=function (option) {
+			return _loadAndSync(this, option);
+		};
+		DocumentCreated.prototype.retrieve=function (option) {
+			return _retrieve(this, option);
+		};
+		DocumentCreated.prototype.retrieveAndSync=function (option) {
+			return _retrieveAndSync(this, option);
+		};
+		DocumentCreated.prototype._handleIdResult=function (value) {
+			_super.prototype._handleIdResult.call(this, value);
+			if (_isNullOrUndefined(value)) {
+				return;
+			}
+			if (!_isUndefined(value["_ReferenceId"])) {
+				this.m__ReferenceId=value["_ReferenceId"];
+			}
+		};
+		DocumentCreated.prototype.track=function () {
+			this.context.trackedObjects.add(this);
+			return this;
+		};
+		DocumentCreated.prototype.untrack=function () {
+			this.context.trackedObjects.remove(this);
+			return this;
+		};
+		DocumentCreated.prototype.toJSON=function () {
+			return _toJson(this, {
+				"saved": this._S,
+			}, {
+				"body": this._B,
+				"contentControls": this._C,
+				"customXmlParts": this._Cu,
+				"properties": this._P,
+				"sections": this._Se,
+				"settings": this._Set,
+			});
+		};
+		DocumentCreated.prototype.ensureUnchanged=function (data) {
+			_createEnsureUnchangedAction(this.context, this, data);
+			return;
+		};
+		return DocumentCreated;
+	}(OfficeExtension.ClientObject));
+	Word.DocumentCreated=DocumentCreated;
+	var _typeDocumentProperties="DocumentProperties";
 	var DocumentProperties=(function (_super) {
 		__extends(DocumentProperties, _super);
 		function DocumentProperties() {
-			_super.apply(this, arguments);
+			return _super !==null && _super.apply(this, arguments) || this;
 		}
 		Object.defineProperty(DocumentProperties.prototype, "_className", {
 			get: function () {
@@ -14422,29 +15556,29 @@ var Word;
 		});
 		Object.defineProperty(DocumentProperties.prototype, "customProperties", {
 			get: function () {
-				if (!this.m_customProperties) {
-					this.m_customProperties=new Word.CustomPropertyCollection(this.context, _createPropertyObjectPath(this.context, this, "CustomProperties", true, false));
+				if (!this._Cu) {
+					this._Cu=new Word.CustomPropertyCollection(this.context, _createPropertyObjectPath(this.context, this, "CustomProperties", true, false, false));
 				}
-				return this.m_customProperties;
+				return this._Cu;
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(DocumentProperties.prototype, "applicationName", {
 			get: function () {
-				_throwIfNotLoaded("applicationName", this.m_applicationName, "DocumentProperties", this._isNull);
-				return this.m_applicationName;
+				_throwIfNotLoaded("applicationName", this._A, _typeDocumentProperties, this._isNull);
+				return this._A;
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(DocumentProperties.prototype, "author", {
 			get: function () {
-				_throwIfNotLoaded("author", this.m_author, "DocumentProperties", this._isNull);
-				return this.m_author;
+				_throwIfNotLoaded("author", this._Au, _typeDocumentProperties, this._isNull);
+				return this._Au;
 			},
 			set: function (value) {
-				this.m_author=value;
+				this._Au=value;
 				_createSetPropertyAction(this.context, this, "Author", value);
 			},
 			enumerable: true,
@@ -14452,11 +15586,11 @@ var Word;
 		});
 		Object.defineProperty(DocumentProperties.prototype, "category", {
 			get: function () {
-				_throwIfNotLoaded("category", this.m_category, "DocumentProperties", this._isNull);
-				return this.m_category;
+				_throwIfNotLoaded("category", this._C, _typeDocumentProperties, this._isNull);
+				return this._C;
 			},
 			set: function (value) {
-				this.m_category=value;
+				this._C=value;
 				_createSetPropertyAction(this.context, this, "Category", value);
 			},
 			enumerable: true,
@@ -14464,11 +15598,11 @@ var Word;
 		});
 		Object.defineProperty(DocumentProperties.prototype, "comments", {
 			get: function () {
-				_throwIfNotLoaded("comments", this.m_comments, "DocumentProperties", this._isNull);
-				return this.m_comments;
+				_throwIfNotLoaded("comments", this._Co, _typeDocumentProperties, this._isNull);
+				return this._Co;
 			},
 			set: function (value) {
-				this.m_comments=value;
+				this._Co=value;
 				_createSetPropertyAction(this.context, this, "Comments", value);
 			},
 			enumerable: true,
@@ -14476,11 +15610,11 @@ var Word;
 		});
 		Object.defineProperty(DocumentProperties.prototype, "company", {
 			get: function () {
-				_throwIfNotLoaded("company", this.m_company, "DocumentProperties", this._isNull);
-				return this.m_company;
+				_throwIfNotLoaded("company", this._Com, _typeDocumentProperties, this._isNull);
+				return this._Com;
 			},
 			set: function (value) {
-				this.m_company=value;
+				this._Com=value;
 				_createSetPropertyAction(this.context, this, "Company", value);
 			},
 			enumerable: true,
@@ -14488,19 +15622,19 @@ var Word;
 		});
 		Object.defineProperty(DocumentProperties.prototype, "creationDate", {
 			get: function () {
-				_throwIfNotLoaded("creationDate", this.m_creationDate, "DocumentProperties", this._isNull);
-				return this.m_creationDate;
+				_throwIfNotLoaded("creationDate", this._Cr, _typeDocumentProperties, this._isNull);
+				return this._Cr;
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(DocumentProperties.prototype, "format", {
 			get: function () {
-				_throwIfNotLoaded("format", this.m_format, "DocumentProperties", this._isNull);
-				return this.m_format;
+				_throwIfNotLoaded("format", this._F, _typeDocumentProperties, this._isNull);
+				return this._F;
 			},
 			set: function (value) {
-				this.m_format=value;
+				this._F=value;
 				_createSetPropertyAction(this.context, this, "Format", value);
 			},
 			enumerable: true,
@@ -14508,11 +15642,11 @@ var Word;
 		});
 		Object.defineProperty(DocumentProperties.prototype, "keywords", {
 			get: function () {
-				_throwIfNotLoaded("keywords", this.m_keywords, "DocumentProperties", this._isNull);
-				return this.m_keywords;
+				_throwIfNotLoaded("keywords", this._K, _typeDocumentProperties, this._isNull);
+				return this._K;
 			},
 			set: function (value) {
-				this.m_keywords=value;
+				this._K=value;
 				_createSetPropertyAction(this.context, this, "Keywords", value);
 			},
 			enumerable: true,
@@ -14520,35 +15654,35 @@ var Word;
 		});
 		Object.defineProperty(DocumentProperties.prototype, "lastAuthor", {
 			get: function () {
-				_throwIfNotLoaded("lastAuthor", this.m_lastAuthor, "DocumentProperties", this._isNull);
-				return this.m_lastAuthor;
+				_throwIfNotLoaded("lastAuthor", this._L, _typeDocumentProperties, this._isNull);
+				return this._L;
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(DocumentProperties.prototype, "lastPrintDate", {
 			get: function () {
-				_throwIfNotLoaded("lastPrintDate", this.m_lastPrintDate, "DocumentProperties", this._isNull);
-				return this.m_lastPrintDate;
+				_throwIfNotLoaded("lastPrintDate", this._La, _typeDocumentProperties, this._isNull);
+				return this._La;
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(DocumentProperties.prototype, "lastSaveTime", {
 			get: function () {
-				_throwIfNotLoaded("lastSaveTime", this.m_lastSaveTime, "DocumentProperties", this._isNull);
-				return this.m_lastSaveTime;
+				_throwIfNotLoaded("lastSaveTime", this._Las, _typeDocumentProperties, this._isNull);
+				return this._Las;
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(DocumentProperties.prototype, "manager", {
 			get: function () {
-				_throwIfNotLoaded("manager", this.m_manager, "DocumentProperties", this._isNull);
-				return this.m_manager;
+				_throwIfNotLoaded("manager", this._M, _typeDocumentProperties, this._isNull);
+				return this._M;
 			},
 			set: function (value) {
-				this.m_manager=value;
+				this._M=value;
 				_createSetPropertyAction(this.context, this, "Manager", value);
 			},
 			enumerable: true,
@@ -14556,27 +15690,27 @@ var Word;
 		});
 		Object.defineProperty(DocumentProperties.prototype, "revisionNumber", {
 			get: function () {
-				_throwIfNotLoaded("revisionNumber", this.m_revisionNumber, "DocumentProperties", this._isNull);
-				return this.m_revisionNumber;
+				_throwIfNotLoaded("revisionNumber", this._R, _typeDocumentProperties, this._isNull);
+				return this._R;
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(DocumentProperties.prototype, "security", {
 			get: function () {
-				_throwIfNotLoaded("security", this.m_security, "DocumentProperties", this._isNull);
-				return this.m_security;
+				_throwIfNotLoaded("security", this._S, _typeDocumentProperties, this._isNull);
+				return this._S;
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(DocumentProperties.prototype, "subject", {
 			get: function () {
-				_throwIfNotLoaded("subject", this.m_subject, "DocumentProperties", this._isNull);
-				return this.m_subject;
+				_throwIfNotLoaded("subject", this._Su, _typeDocumentProperties, this._isNull);
+				return this._Su;
 			},
 			set: function (value) {
-				this.m_subject=value;
+				this._Su=value;
 				_createSetPropertyAction(this.context, this, "Subject", value);
 			},
 			enumerable: true,
@@ -14584,19 +15718,19 @@ var Word;
 		});
 		Object.defineProperty(DocumentProperties.prototype, "template", {
 			get: function () {
-				_throwIfNotLoaded("template", this.m_template, "DocumentProperties", this._isNull);
-				return this.m_template;
+				_throwIfNotLoaded("template", this._T, _typeDocumentProperties, this._isNull);
+				return this._T;
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(DocumentProperties.prototype, "title", {
 			get: function () {
-				_throwIfNotLoaded("title", this.m_title, "DocumentProperties", this._isNull);
-				return this.m_title;
+				_throwIfNotLoaded("title", this._Ti, _typeDocumentProperties, this._isNull);
+				return this._Ti;
 			},
 			set: function (value) {
-				this.m_title=value;
+				this._Ti=value;
 				_createSetPropertyAction(this.context, this, "Title", value);
 			},
 			enumerable: true,
@@ -14604,20 +15738,19 @@ var Word;
 		});
 		Object.defineProperty(DocumentProperties.prototype, "_ReferenceId", {
 			get: function () {
-				_throwIfNotLoaded("_ReferenceId", this.m__ReferenceId, "DocumentProperties", this._isNull);
-				return this.m__ReferenceId;
+				_throwIfNotLoaded("_ReferenceId", this.__R, _typeDocumentProperties, this._isNull);
+				return this.__R;
 			},
 			enumerable: true,
 			configurable: true
 		});
 		DocumentProperties.prototype.set=function (properties, options) {
 			this._recursivelySet(properties, options, ["title", "subject", "author", "keywords", "comments", "category", "format", "manager", "company"], [], [
-				"customProperties",
 				"customProperties"
 			]);
 		};
 		DocumentProperties.prototype._KeepReference=function () {
-			_createMethodAction(this.context, this, "_KeepReference", 1, []);
+			_createMethodAction(this.context, this, "_KeepReference", 1, [], false);
 		};
 		DocumentProperties.prototype._handleResult=function (value) {
 			_super.prototype._handleResult.call(this, value);
@@ -14626,64 +15759,72 @@ var Word;
 			var obj=value;
 			_fixObjectPathIfNecessary(this, obj);
 			if (!_isUndefined(obj["ApplicationName"])) {
-				this.m_applicationName=obj["ApplicationName"];
+				this._A=obj["ApplicationName"];
 			}
 			if (!_isUndefined(obj["Author"])) {
-				this.m_author=obj["Author"];
+				this._Au=obj["Author"];
 			}
 			if (!_isUndefined(obj["Category"])) {
-				this.m_category=obj["Category"];
+				this._C=obj["Category"];
 			}
 			if (!_isUndefined(obj["Comments"])) {
-				this.m_comments=obj["Comments"];
+				this._Co=obj["Comments"];
 			}
 			if (!_isUndefined(obj["Company"])) {
-				this.m_company=obj["Company"];
+				this._Com=obj["Company"];
 			}
 			if (!_isUndefined(obj["CreationDate"])) {
-				this.m_creationDate=_adjustToDateTime(obj["CreationDate"]);
+				this._Cr=_adjustToDateTime(obj["CreationDate"]);
 			}
 			if (!_isUndefined(obj["Format"])) {
-				this.m_format=obj["Format"];
+				this._F=obj["Format"];
 			}
 			if (!_isUndefined(obj["Keywords"])) {
-				this.m_keywords=obj["Keywords"];
+				this._K=obj["Keywords"];
 			}
 			if (!_isUndefined(obj["LastAuthor"])) {
-				this.m_lastAuthor=obj["LastAuthor"];
+				this._L=obj["LastAuthor"];
 			}
 			if (!_isUndefined(obj["LastPrintDate"])) {
-				this.m_lastPrintDate=_adjustToDateTime(obj["LastPrintDate"]);
+				this._La=_adjustToDateTime(obj["LastPrintDate"]);
 			}
 			if (!_isUndefined(obj["LastSaveTime"])) {
-				this.m_lastSaveTime=_adjustToDateTime(obj["LastSaveTime"]);
+				this._Las=_adjustToDateTime(obj["LastSaveTime"]);
 			}
 			if (!_isUndefined(obj["Manager"])) {
-				this.m_manager=obj["Manager"];
+				this._M=obj["Manager"];
 			}
 			if (!_isUndefined(obj["RevisionNumber"])) {
-				this.m_revisionNumber=obj["RevisionNumber"];
+				this._R=obj["RevisionNumber"];
 			}
 			if (!_isUndefined(obj["Security"])) {
-				this.m_security=obj["Security"];
+				this._S=obj["Security"];
 			}
 			if (!_isUndefined(obj["Subject"])) {
-				this.m_subject=obj["Subject"];
+				this._Su=obj["Subject"];
 			}
 			if (!_isUndefined(obj["Template"])) {
-				this.m_template=obj["Template"];
+				this._T=obj["Template"];
 			}
 			if (!_isUndefined(obj["Title"])) {
-				this.m_title=obj["Title"];
+				this._Ti=obj["Title"];
 			}
 			if (!_isUndefined(obj["_ReferenceId"])) {
-				this.m__ReferenceId=obj["_ReferenceId"];
+				this.__R=obj["_ReferenceId"];
 			}
 			_handleNavigationPropertyResults(this, obj, ["customProperties", "CustomProperties"]);
 		};
 		DocumentProperties.prototype.load=function (option) {
-			_load(this, option);
-			return this;
+			return _load(this, option);
+		};
+		DocumentProperties.prototype.loadAndSync=function (option) {
+			return _loadAndSync(this, option);
+		};
+		DocumentProperties.prototype.retrieve=function (option) {
+			return _retrieve(this, option);
+		};
+		DocumentProperties.prototype.retrieveAndSync=function (option) {
+			return _retrieveAndSync(this, option);
 		};
 		DocumentProperties.prototype._handleIdResult=function (value) {
 			_super.prototype._handleIdResult.call(this, value);
@@ -14691,7 +15832,7 @@ var Word;
 				return;
 			}
 			if (!_isUndefined(value["_ReferenceId"])) {
-				this.m__ReferenceId=value["_ReferenceId"];
+				this.__R=value["_ReferenceId"];
 			}
 		};
 		DocumentProperties.prototype.track=function () {
@@ -14703,33 +15844,40 @@ var Word;
 			return this;
 		};
 		DocumentProperties.prototype.toJSON=function () {
-			return {
-				"applicationName": this.m_applicationName,
-				"author": this.m_author,
-				"category": this.m_category,
-				"comments": this.m_comments,
-				"company": this.m_company,
-				"creationDate": this.m_creationDate,
-				"format": this.m_format,
-				"keywords": this.m_keywords,
-				"lastAuthor": this.m_lastAuthor,
-				"lastPrintDate": this.m_lastPrintDate,
-				"lastSaveTime": this.m_lastSaveTime,
-				"manager": this.m_manager,
-				"revisionNumber": this.m_revisionNumber,
-				"security": this.m_security,
-				"subject": this.m_subject,
-				"template": this.m_template,
-				"title": this.m_title
-			};
+			return _toJson(this, {
+				"applicationName": this._A,
+				"author": this._Au,
+				"category": this._C,
+				"comments": this._Co,
+				"company": this._Com,
+				"creationDate": this._Cr,
+				"format": this._F,
+				"keywords": this._K,
+				"lastAuthor": this._L,
+				"lastPrintDate": this._La,
+				"lastSaveTime": this._Las,
+				"manager": this._M,
+				"revisionNumber": this._R,
+				"security": this._S,
+				"subject": this._Su,
+				"template": this._T,
+				"title": this._Ti,
+			}, {
+				"customProperties": this._Cu,
+			});
+		};
+		DocumentProperties.prototype.ensureUnchanged=function (data) {
+			_createEnsureUnchangedAction(this.context, this, data);
+			return;
 		};
 		return DocumentProperties;
 	}(OfficeExtension.ClientObject));
 	Word.DocumentProperties=DocumentProperties;
+	var _typeFont="Font";
 	var Font=(function (_super) {
 		__extends(Font, _super);
 		function Font() {
-			_super.apply(this, arguments);
+			return _super !==null && _super.apply(this, arguments) || this;
 		}
 		Object.defineProperty(Font.prototype, "_className", {
 			get: function () {
@@ -14740,11 +15888,11 @@ var Word;
 		});
 		Object.defineProperty(Font.prototype, "bold", {
 			get: function () {
-				_throwIfNotLoaded("bold", this.m_bold, "Font", this._isNull);
-				return this.m_bold;
+				_throwIfNotLoaded("bold", this._B, _typeFont, this._isNull);
+				return this._B;
 			},
 			set: function (value) {
-				this.m_bold=value;
+				this._B=value;
 				_createSetPropertyAction(this.context, this, "Bold", value);
 			},
 			enumerable: true,
@@ -14752,11 +15900,11 @@ var Word;
 		});
 		Object.defineProperty(Font.prototype, "color", {
 			get: function () {
-				_throwIfNotLoaded("color", this.m_color, "Font", this._isNull);
-				return this.m_color;
+				_throwIfNotLoaded("color", this._C, _typeFont, this._isNull);
+				return this._C;
 			},
 			set: function (value) {
-				this.m_color=value;
+				this._C=value;
 				_createSetPropertyAction(this.context, this, "Color", value);
 			},
 			enumerable: true,
@@ -14764,11 +15912,11 @@ var Word;
 		});
 		Object.defineProperty(Font.prototype, "doubleStrikeThrough", {
 			get: function () {
-				_throwIfNotLoaded("doubleStrikeThrough", this.m_doubleStrikeThrough, "Font", this._isNull);
-				return this.m_doubleStrikeThrough;
+				_throwIfNotLoaded("doubleStrikeThrough", this._D, _typeFont, this._isNull);
+				return this._D;
 			},
 			set: function (value) {
-				this.m_doubleStrikeThrough=value;
+				this._D=value;
 				_createSetPropertyAction(this.context, this, "DoubleStrikeThrough", value);
 			},
 			enumerable: true,
@@ -14776,11 +15924,11 @@ var Word;
 		});
 		Object.defineProperty(Font.prototype, "highlightColor", {
 			get: function () {
-				_throwIfNotLoaded("highlightColor", this.m_highlightColor, "Font", this._isNull);
-				return this.m_highlightColor;
+				_throwIfNotLoaded("highlightColor", this._H, _typeFont, this._isNull);
+				return this._H;
 			},
 			set: function (value) {
-				this.m_highlightColor=value;
+				this._H=value;
 				_createSetPropertyAction(this.context, this, "HighlightColor", value);
 			},
 			enumerable: true,
@@ -14788,11 +15936,11 @@ var Word;
 		});
 		Object.defineProperty(Font.prototype, "italic", {
 			get: function () {
-				_throwIfNotLoaded("italic", this.m_italic, "Font", this._isNull);
-				return this.m_italic;
+				_throwIfNotLoaded("italic", this._I, _typeFont, this._isNull);
+				return this._I;
 			},
 			set: function (value) {
-				this.m_italic=value;
+				this._I=value;
 				_createSetPropertyAction(this.context, this, "Italic", value);
 			},
 			enumerable: true,
@@ -14800,11 +15948,11 @@ var Word;
 		});
 		Object.defineProperty(Font.prototype, "name", {
 			get: function () {
-				_throwIfNotLoaded("name", this.m_name, "Font", this._isNull);
-				return this.m_name;
+				_throwIfNotLoaded("name", this._N, _typeFont, this._isNull);
+				return this._N;
 			},
 			set: function (value) {
-				this.m_name=value;
+				this._N=value;
 				_createSetPropertyAction(this.context, this, "Name", value);
 			},
 			enumerable: true,
@@ -14812,11 +15960,11 @@ var Word;
 		});
 		Object.defineProperty(Font.prototype, "size", {
 			get: function () {
-				_throwIfNotLoaded("size", this.m_size, "Font", this._isNull);
-				return this.m_size;
+				_throwIfNotLoaded("size", this._S, _typeFont, this._isNull);
+				return this._S;
 			},
 			set: function (value) {
-				this.m_size=value;
+				this._S=value;
 				_createSetPropertyAction(this.context, this, "Size", value);
 			},
 			enumerable: true,
@@ -14824,11 +15972,11 @@ var Word;
 		});
 		Object.defineProperty(Font.prototype, "strikeThrough", {
 			get: function () {
-				_throwIfNotLoaded("strikeThrough", this.m_strikeThrough, "Font", this._isNull);
-				return this.m_strikeThrough;
+				_throwIfNotLoaded("strikeThrough", this._St, _typeFont, this._isNull);
+				return this._St;
 			},
 			set: function (value) {
-				this.m_strikeThrough=value;
+				this._St=value;
 				_createSetPropertyAction(this.context, this, "StrikeThrough", value);
 			},
 			enumerable: true,
@@ -14836,11 +15984,11 @@ var Word;
 		});
 		Object.defineProperty(Font.prototype, "subscript", {
 			get: function () {
-				_throwIfNotLoaded("subscript", this.m_subscript, "Font", this._isNull);
-				return this.m_subscript;
+				_throwIfNotLoaded("subscript", this._Su, _typeFont, this._isNull);
+				return this._Su;
 			},
 			set: function (value) {
-				this.m_subscript=value;
+				this._Su=value;
 				_createSetPropertyAction(this.context, this, "Subscript", value);
 			},
 			enumerable: true,
@@ -14848,11 +15996,11 @@ var Word;
 		});
 		Object.defineProperty(Font.prototype, "superscript", {
 			get: function () {
-				_throwIfNotLoaded("superscript", this.m_superscript, "Font", this._isNull);
-				return this.m_superscript;
+				_throwIfNotLoaded("superscript", this._Sup, _typeFont, this._isNull);
+				return this._Sup;
 			},
 			set: function (value) {
-				this.m_superscript=value;
+				this._Sup=value;
 				_createSetPropertyAction(this.context, this, "Superscript", value);
 			},
 			enumerable: true,
@@ -14860,11 +16008,11 @@ var Word;
 		});
 		Object.defineProperty(Font.prototype, "underline", {
 			get: function () {
-				_throwIfNotLoaded("underline", this.m_underline, "Font", this._isNull);
-				return this.m_underline;
+				_throwIfNotLoaded("underline", this._U, _typeFont, this._isNull);
+				return this._U;
 			},
 			set: function (value) {
-				this.m_underline=value;
+				this._U=value;
 				_createSetPropertyAction(this.context, this, "Underline", value);
 			},
 			enumerable: true,
@@ -14872,8 +16020,8 @@ var Word;
 		});
 		Object.defineProperty(Font.prototype, "_ReferenceId", {
 			get: function () {
-				_throwIfNotLoaded("_ReferenceId", this.m__ReferenceId, "Font", this._isNull);
-				return this.m__ReferenceId;
+				_throwIfNotLoaded("_ReferenceId", this.__R, _typeFont, this._isNull);
+				return this.__R;
 			},
 			enumerable: true,
 			configurable: true
@@ -14882,7 +16030,7 @@ var Word;
 			this._recursivelySet(properties, options, ["name", "size", "bold", "italic", "color", "underline", "subscript", "superscript", "strikeThrough", "doubleStrikeThrough", "highlightColor"], [], []);
 		};
 		Font.prototype._KeepReference=function () {
-			_createMethodAction(this.context, this, "_KeepReference", 1, []);
+			_createMethodAction(this.context, this, "_KeepReference", 1, [], false);
 		};
 		Font.prototype._handleResult=function (value) {
 			_super.prototype._handleResult.call(this, value);
@@ -14891,45 +16039,53 @@ var Word;
 			var obj=value;
 			_fixObjectPathIfNecessary(this, obj);
 			if (!_isUndefined(obj["Bold"])) {
-				this.m_bold=obj["Bold"];
+				this._B=obj["Bold"];
 			}
 			if (!_isUndefined(obj["Color"])) {
-				this.m_color=obj["Color"];
+				this._C=obj["Color"];
 			}
 			if (!_isUndefined(obj["DoubleStrikeThrough"])) {
-				this.m_doubleStrikeThrough=obj["DoubleStrikeThrough"];
+				this._D=obj["DoubleStrikeThrough"];
 			}
 			if (!_isUndefined(obj["HighlightColor"])) {
-				this.m_highlightColor=obj["HighlightColor"];
+				this._H=obj["HighlightColor"];
 			}
 			if (!_isUndefined(obj["Italic"])) {
-				this.m_italic=obj["Italic"];
+				this._I=obj["Italic"];
 			}
 			if (!_isUndefined(obj["Name"])) {
-				this.m_name=obj["Name"];
+				this._N=obj["Name"];
 			}
 			if (!_isUndefined(obj["Size"])) {
-				this.m_size=obj["Size"];
+				this._S=obj["Size"];
 			}
 			if (!_isUndefined(obj["StrikeThrough"])) {
-				this.m_strikeThrough=obj["StrikeThrough"];
+				this._St=obj["StrikeThrough"];
 			}
 			if (!_isUndefined(obj["Subscript"])) {
-				this.m_subscript=obj["Subscript"];
+				this._Su=obj["Subscript"];
 			}
 			if (!_isUndefined(obj["Superscript"])) {
-				this.m_superscript=obj["Superscript"];
+				this._Sup=obj["Superscript"];
 			}
 			if (!_isUndefined(obj["Underline"])) {
-				this.m_underline=obj["Underline"];
+				this._U=obj["Underline"];
 			}
 			if (!_isUndefined(obj["_ReferenceId"])) {
-				this.m__ReferenceId=obj["_ReferenceId"];
+				this.__R=obj["_ReferenceId"];
 			}
 		};
 		Font.prototype.load=function (option) {
-			_load(this, option);
-			return this;
+			return _load(this, option);
+		};
+		Font.prototype.loadAndSync=function (option) {
+			return _loadAndSync(this, option);
+		};
+		Font.prototype.retrieve=function (option) {
+			return _retrieve(this, option);
+		};
+		Font.prototype.retrieveAndSync=function (option) {
+			return _retrieveAndSync(this, option);
 		};
 		Font.prototype._handleIdResult=function (value) {
 			_super.prototype._handleIdResult.call(this, value);
@@ -14937,7 +16093,7 @@ var Word;
 				return;
 			}
 			if (!_isUndefined(value["_ReferenceId"])) {
-				this.m__ReferenceId=value["_ReferenceId"];
+				this.__R=value["_ReferenceId"];
 			}
 		};
 		Font.prototype.track=function () {
@@ -14949,27 +16105,32 @@ var Word;
 			return this;
 		};
 		Font.prototype.toJSON=function () {
-			return {
-				"bold": this.m_bold,
-				"color": this.m_color,
-				"doubleStrikeThrough": this.m_doubleStrikeThrough,
-				"highlightColor": this.m_highlightColor,
-				"italic": this.m_italic,
-				"name": this.m_name,
-				"size": this.m_size,
-				"strikeThrough": this.m_strikeThrough,
-				"subscript": this.m_subscript,
-				"superscript": this.m_superscript,
-				"underline": this.m_underline
-			};
+			return _toJson(this, {
+				"bold": this._B,
+				"color": this._C,
+				"doubleStrikeThrough": this._D,
+				"highlightColor": this._H,
+				"italic": this._I,
+				"name": this._N,
+				"size": this._S,
+				"strikeThrough": this._St,
+				"subscript": this._Su,
+				"superscript": this._Sup,
+				"underline": this._U,
+			}, {});
+		};
+		Font.prototype.ensureUnchanged=function (data) {
+			_createEnsureUnchangedAction(this.context, this, data);
+			return;
 		};
 		return Font;
 	}(OfficeExtension.ClientObject));
 	Word.Font=Font;
+	var _typeInlinePicture="InlinePicture";
 	var InlinePicture=(function (_super) {
 		__extends(InlinePicture, _super);
 		function InlinePicture() {
-			_super.apply(this, arguments);
+			return _super !==null && _super.apply(this, arguments) || this;
 		}
 		Object.defineProperty(InlinePicture.prototype, "_className", {
 			get: function () {
@@ -14980,81 +16141,87 @@ var Word;
 		});
 		Object.defineProperty(InlinePicture.prototype, "paragraph", {
 			get: function () {
-				if (!this.m_paragraph) {
-					this.m_paragraph=new Word.Paragraph(this.context, _createPropertyObjectPath(this.context, this, "Paragraph", false, false));
+				_throwIfApiNotSupported("InlinePicture.paragraph", _defaultApiSetName, "1.2", _hostName);
+				if (!this._P) {
+					this._P=new Word.Paragraph(this.context, _createPropertyObjectPath(this.context, this, "Paragraph", false, false, false));
 				}
-				return this.m_paragraph;
+				return this._P;
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(InlinePicture.prototype, "parentContentControl", {
 			get: function () {
-				if (!this.m_parentContentControl) {
-					this.m_parentContentControl=new Word.ContentControl(this.context, _createPropertyObjectPath(this.context, this, "ParentContentControl", false, false));
+				if (!this._Pa) {
+					this._Pa=new Word.ContentControl(this.context, _createPropertyObjectPath(this.context, this, "ParentContentControl", false, false, false));
 				}
-				return this.m_parentContentControl;
+				return this._Pa;
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(InlinePicture.prototype, "parentContentControlOrNullObject", {
 			get: function () {
-				if (!this.m_parentContentControlOrNullObject) {
-					this.m_parentContentControlOrNullObject=new Word.ContentControl(this.context, _createPropertyObjectPath(this.context, this, "ParentContentControlOrNullObject", false, false));
+				_throwIfApiNotSupported("InlinePicture.parentContentControlOrNullObject", _defaultApiSetName, "1.3", _hostName);
+				if (!this._Par) {
+					this._Par=new Word.ContentControl(this.context, _createPropertyObjectPath(this.context, this, "ParentContentControlOrNullObject", false, false, false));
 				}
-				return this.m_parentContentControlOrNullObject;
+				return this._Par;
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(InlinePicture.prototype, "parentTable", {
 			get: function () {
-				if (!this.m_parentTable) {
-					this.m_parentTable=new Word.Table(this.context, _createPropertyObjectPath(this.context, this, "ParentTable", false, false));
+				_throwIfApiNotSupported("InlinePicture.parentTable", _defaultApiSetName, "1.3", _hostName);
+				if (!this._Pare) {
+					this._Pare=new Word.Table(this.context, _createPropertyObjectPath(this.context, this, "ParentTable", false, false, false));
 				}
-				return this.m_parentTable;
+				return this._Pare;
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(InlinePicture.prototype, "parentTableCell", {
 			get: function () {
-				if (!this.m_parentTableCell) {
-					this.m_parentTableCell=new Word.TableCell(this.context, _createPropertyObjectPath(this.context, this, "ParentTableCell", false, false));
+				_throwIfApiNotSupported("InlinePicture.parentTableCell", _defaultApiSetName, "1.3", _hostName);
+				if (!this._Paren) {
+					this._Paren=new Word.TableCell(this.context, _createPropertyObjectPath(this.context, this, "ParentTableCell", false, false, false));
 				}
-				return this.m_parentTableCell;
+				return this._Paren;
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(InlinePicture.prototype, "parentTableCellOrNullObject", {
 			get: function () {
-				if (!this.m_parentTableCellOrNullObject) {
-					this.m_parentTableCellOrNullObject=new Word.TableCell(this.context, _createPropertyObjectPath(this.context, this, "ParentTableCellOrNullObject", false, false));
+				_throwIfApiNotSupported("InlinePicture.parentTableCellOrNullObject", _defaultApiSetName, "1.3", _hostName);
+				if (!this._Parent) {
+					this._Parent=new Word.TableCell(this.context, _createPropertyObjectPath(this.context, this, "ParentTableCellOrNullObject", false, false, false));
 				}
-				return this.m_parentTableCellOrNullObject;
+				return this._Parent;
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(InlinePicture.prototype, "parentTableOrNullObject", {
 			get: function () {
-				if (!this.m_parentTableOrNullObject) {
-					this.m_parentTableOrNullObject=new Word.Table(this.context, _createPropertyObjectPath(this.context, this, "ParentTableOrNullObject", false, false));
+				_throwIfApiNotSupported("InlinePicture.parentTableOrNullObject", _defaultApiSetName, "1.3", _hostName);
+				if (!this._ParentT) {
+					this._ParentT=new Word.Table(this.context, _createPropertyObjectPath(this.context, this, "ParentTableOrNullObject", false, false, false));
 				}
-				return this.m_parentTableOrNullObject;
+				return this._ParentT;
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(InlinePicture.prototype, "altTextDescription", {
 			get: function () {
-				_throwIfNotLoaded("altTextDescription", this.m_altTextDescription, "InlinePicture", this._isNull);
-				return this.m_altTextDescription;
+				_throwIfNotLoaded("altTextDescription", this._A, _typeInlinePicture, this._isNull);
+				return this._A;
 			},
 			set: function (value) {
-				this.m_altTextDescription=value;
+				this._A=value;
 				_createSetPropertyAction(this.context, this, "AltTextDescription", value);
 			},
 			enumerable: true,
@@ -15062,11 +16229,11 @@ var Word;
 		});
 		Object.defineProperty(InlinePicture.prototype, "altTextTitle", {
 			get: function () {
-				_throwIfNotLoaded("altTextTitle", this.m_altTextTitle, "InlinePicture", this._isNull);
-				return this.m_altTextTitle;
+				_throwIfNotLoaded("altTextTitle", this._Al, _typeInlinePicture, this._isNull);
+				return this._Al;
 			},
 			set: function (value) {
-				this.m_altTextTitle=value;
+				this._Al=value;
 				_createSetPropertyAction(this.context, this, "AltTextTitle", value);
 			},
 			enumerable: true,
@@ -15074,11 +16241,11 @@ var Word;
 		});
 		Object.defineProperty(InlinePicture.prototype, "height", {
 			get: function () {
-				_throwIfNotLoaded("height", this.m_height, "InlinePicture", this._isNull);
-				return this.m_height;
+				_throwIfNotLoaded("height", this._H, _typeInlinePicture, this._isNull);
+				return this._H;
 			},
 			set: function (value) {
-				this.m_height=value;
+				this._H=value;
 				_createSetPropertyAction(this.context, this, "Height", value);
 			},
 			enumerable: true,
@@ -15086,11 +16253,11 @@ var Word;
 		});
 		Object.defineProperty(InlinePicture.prototype, "hyperlink", {
 			get: function () {
-				_throwIfNotLoaded("hyperlink", this.m_hyperlink, "InlinePicture", this._isNull);
-				return this.m_hyperlink;
+				_throwIfNotLoaded("hyperlink", this._Hy, _typeInlinePicture, this._isNull);
+				return this._Hy;
 			},
 			set: function (value) {
-				this.m_hyperlink=value;
+				this._Hy=value;
 				_createSetPropertyAction(this.context, this, "Hyperlink", value);
 			},
 			enumerable: true,
@@ -15098,19 +16265,20 @@ var Word;
 		});
 		Object.defineProperty(InlinePicture.prototype, "imageFormat", {
 			get: function () {
-				_throwIfNotLoaded("imageFormat", this.m_imageFormat, "InlinePicture", this._isNull);
-				return this.m_imageFormat;
+				_throwIfNotLoaded("imageFormat", this._I, _typeInlinePicture, this._isNull);
+				_throwIfApiNotSupported("InlinePicture.imageFormat", _defaultApiSetName, "1.4", _hostName);
+				return this._I;
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(InlinePicture.prototype, "lockAspectRatio", {
 			get: function () {
-				_throwIfNotLoaded("lockAspectRatio", this.m_lockAspectRatio, "InlinePicture", this._isNull);
-				return this.m_lockAspectRatio;
+				_throwIfNotLoaded("lockAspectRatio", this._L, _typeInlinePicture, this._isNull);
+				return this._L;
 			},
 			set: function (value) {
-				this.m_lockAspectRatio=value;
+				this._L=value;
 				_createSetPropertyAction(this.context, this, "LockAspectRatio", value);
 			},
 			enumerable: true,
@@ -15118,11 +16286,11 @@ var Word;
 		});
 		Object.defineProperty(InlinePicture.prototype, "width", {
 			get: function () {
-				_throwIfNotLoaded("width", this.m_width, "InlinePicture", this._isNull);
-				return this.m_width;
+				_throwIfNotLoaded("width", this._W, _typeInlinePicture, this._isNull);
+				return this._W;
 			},
 			set: function (value) {
-				this.m_width=value;
+				this._W=value;
 				_createSetPropertyAction(this.context, this, "Width", value);
 			},
 			enumerable: true,
@@ -15130,16 +16298,16 @@ var Word;
 		});
 		Object.defineProperty(InlinePicture.prototype, "_Id", {
 			get: function () {
-				_throwIfNotLoaded("_Id", this.m__Id, "InlinePicture", this._isNull);
-				return this.m__Id;
+				_throwIfNotLoaded("_Id", this.__I, _typeInlinePicture, this._isNull);
+				return this.__I;
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(InlinePicture.prototype, "_ReferenceId", {
 			get: function () {
-				_throwIfNotLoaded("_ReferenceId", this.m__ReferenceId, "InlinePicture", this._isNull);
-				return this.m__ReferenceId;
+				_throwIfNotLoaded("_ReferenceId", this.__R, _typeInlinePicture, this._isNull);
+				return this.__R;
 			},
 			enumerable: true,
 			configurable: true
@@ -15152,63 +16320,68 @@ var Word;
 				"parentTable",
 				"parentTableCell",
 				"parentTableCellOrNullObject",
-				"parentTableOrNullObject",
-				"paragraph",
-				"parentContentControl",
-				"parentContentControlOrNullObject",
-				"parentTable",
-				"parentTableCell",
-				"parentTableCellOrNullObject",
 				"parentTableOrNullObject"
 			]);
 		};
 		InlinePicture.prototype.delete=function () {
-			_createMethodAction(this.context, this, "Delete", 0, []);
+			_throwIfApiNotSupported("InlinePicture.delete", _defaultApiSetName, "1.2", _hostName);
+			_createMethodAction(this.context, this, "Delete", 0, [], false);
 		};
 		InlinePicture.prototype.getBase64ImageSrc=function () {
-			var action=_createMethodAction(this.context, this, "GetBase64ImageSrc", 1, []);
+			var action=_createMethodAction(this.context, this, "GetBase64ImageSrc", 1, [], false);
 			var ret=new OfficeExtension.ClientResult();
 			_addActionResultHandler(this, action, ret);
 			return ret;
 		};
 		InlinePicture.prototype.getNext=function () {
-			return new Word.InlinePicture(this.context, _createMethodObjectPath(this.context, this, "GetNext", 1, [], false, false, null));
+			_throwIfApiNotSupported("InlinePicture.getNext", _defaultApiSetName, "1.3", _hostName);
+			return new Word.InlinePicture(this.context, _createMethodObjectPath(this.context, this, "GetNext", 1, [], false, false, null, false));
 		};
 		InlinePicture.prototype.getNextOrNullObject=function () {
-			return new Word.InlinePicture(this.context, _createMethodObjectPath(this.context, this, "GetNextOrNullObject", 1, [], false, false, null));
+			_throwIfApiNotSupported("InlinePicture.getNextOrNullObject", _defaultApiSetName, "1.3", _hostName);
+			return new Word.InlinePicture(this.context, _createMethodObjectPath(this.context, this, "GetNextOrNullObject", 1, [], false, false, null, false));
 		};
 		InlinePicture.prototype.getRange=function (rangeLocation) {
-			return new Word.Range(this.context, _createMethodObjectPath(this.context, this, "GetRange", 1, [rangeLocation], false, false, null));
+			_throwIfApiNotSupported("InlinePicture.getRange", _defaultApiSetName, "1.3", _hostName);
+			return new Word.Range(this.context, _createMethodObjectPath(this.context, this, "GetRange", 1, [rangeLocation], false, false, null, false));
 		};
 		InlinePicture.prototype.insertBreak=function (breakType, insertLocation) {
-			_createMethodAction(this.context, this, "InsertBreak", 0, [breakType, insertLocation]);
+			_throwIfApiNotSupported("InlinePicture.insertBreak", _defaultApiSetName, "1.2", _hostName);
+			_createMethodAction(this.context, this, "InsertBreak", 0, [breakType, insertLocation], false);
 		};
 		InlinePicture.prototype.insertContentControl=function () {
-			return new Word.ContentControl(this.context, _createMethodObjectPath(this.context, this, "InsertContentControl", 0, [], false, true, null));
+			return new Word.ContentControl(this.context, _createMethodObjectPath(this.context, this, "InsertContentControl", 0, [], false, true, null, false));
 		};
 		InlinePicture.prototype.insertFileFromBase64=function (base64File, insertLocation) {
-			return new Word.Range(this.context, _createMethodObjectPath(this.context, this, "InsertFileFromBase64", 0, [base64File, insertLocation], false, true, null));
+			_throwIfApiNotSupported("InlinePicture.insertFileFromBase64", _defaultApiSetName, "1.2", _hostName);
+			return new Word.Range(this.context, _createMethodObjectPath(this.context, this, "InsertFileFromBase64", 0, [base64File, insertLocation], false, true, null, false));
 		};
 		InlinePicture.prototype.insertHtml=function (html, insertLocation) {
-			return new Word.Range(this.context, _createMethodObjectPath(this.context, this, "InsertHtml", 0, [html, insertLocation], false, true, null));
+			_throwIfApiNotSupported("InlinePicture.insertHtml", _defaultApiSetName, "1.2", _hostName);
+			return new Word.Range(this.context, _createMethodObjectPath(this.context, this, "InsertHtml", 0, [html, insertLocation], false, true, null, false));
 		};
 		InlinePicture.prototype.insertInlinePictureFromBase64=function (base64EncodedImage, insertLocation) {
-			return new Word.InlinePicture(this.context, _createMethodObjectPath(this.context, this, "InsertInlinePictureFromBase64", 0, [base64EncodedImage, insertLocation], false, true, null));
+			_throwIfApiNotSupported("InlinePicture.insertInlinePictureFromBase64", _defaultApiSetName, "1.2", _hostName);
+			return new Word.InlinePicture(this.context, _createMethodObjectPath(this.context, this, "InsertInlinePictureFromBase64", 0, [base64EncodedImage, insertLocation], false, true, null, false));
 		};
 		InlinePicture.prototype.insertOoxml=function (ooxml, insertLocation) {
-			return new Word.Range(this.context, _createMethodObjectPath(this.context, this, "InsertOoxml", 0, [ooxml, insertLocation], false, true, null));
+			_throwIfApiNotSupported("InlinePicture.insertOoxml", _defaultApiSetName, "1.2", _hostName);
+			return new Word.Range(this.context, _createMethodObjectPath(this.context, this, "InsertOoxml", 0, [ooxml, insertLocation], false, true, null, false));
 		};
 		InlinePicture.prototype.insertParagraph=function (paragraphText, insertLocation) {
-			return new Word.Paragraph(this.context, _createMethodObjectPath(this.context, this, "InsertParagraph", 0, [paragraphText, insertLocation], false, true, null));
+			_throwIfApiNotSupported("InlinePicture.insertParagraph", _defaultApiSetName, "1.2", _hostName);
+			return new Word.Paragraph(this.context, _createMethodObjectPath(this.context, this, "InsertParagraph", 0, [paragraphText, insertLocation], false, true, null, false));
 		};
 		InlinePicture.prototype.insertText=function (text, insertLocation) {
-			return new Word.Range(this.context, _createMethodObjectPath(this.context, this, "InsertText", 0, [text, insertLocation], false, true, null));
+			_throwIfApiNotSupported("InlinePicture.insertText", _defaultApiSetName, "1.2", _hostName);
+			return new Word.Range(this.context, _createMethodObjectPath(this.context, this, "InsertText", 0, [text, insertLocation], false, true, null, false));
 		};
 		InlinePicture.prototype.select=function (selectionMode) {
-			_createMethodAction(this.context, this, "Select", 1, [selectionMode]);
+			_throwIfApiNotSupported("InlinePicture.select", _defaultApiSetName, "1.2", _hostName);
+			_createMethodAction(this.context, this, "Select", 1, [selectionMode], false);
 		};
 		InlinePicture.prototype._KeepReference=function () {
-			_createMethodAction(this.context, this, "_KeepReference", 1, []);
+			_createMethodAction(this.context, this, "_KeepReference", 1, [], false);
 		};
 		InlinePicture.prototype._handleResult=function (value) {
 			_super.prototype._handleResult.call(this, value);
@@ -15217,37 +16390,45 @@ var Word;
 			var obj=value;
 			_fixObjectPathIfNecessary(this, obj);
 			if (!_isUndefined(obj["AltTextDescription"])) {
-				this.m_altTextDescription=obj["AltTextDescription"];
+				this._A=obj["AltTextDescription"];
 			}
 			if (!_isUndefined(obj["AltTextTitle"])) {
-				this.m_altTextTitle=obj["AltTextTitle"];
+				this._Al=obj["AltTextTitle"];
 			}
 			if (!_isUndefined(obj["Height"])) {
-				this.m_height=obj["Height"];
+				this._H=obj["Height"];
 			}
 			if (!_isUndefined(obj["Hyperlink"])) {
-				this.m_hyperlink=obj["Hyperlink"];
+				this._Hy=obj["Hyperlink"];
 			}
 			if (!_isUndefined(obj["ImageFormat"])) {
-				this.m_imageFormat=obj["ImageFormat"];
+				this._I=obj["ImageFormat"];
 			}
 			if (!_isUndefined(obj["LockAspectRatio"])) {
-				this.m_lockAspectRatio=obj["LockAspectRatio"];
+				this._L=obj["LockAspectRatio"];
 			}
 			if (!_isUndefined(obj["Width"])) {
-				this.m_width=obj["Width"];
+				this._W=obj["Width"];
 			}
 			if (!_isUndefined(obj["_Id"])) {
-				this.m__Id=obj["_Id"];
+				this.__I=obj["_Id"];
 			}
 			if (!_isUndefined(obj["_ReferenceId"])) {
-				this.m__ReferenceId=obj["_ReferenceId"];
+				this.__R=obj["_ReferenceId"];
 			}
 			_handleNavigationPropertyResults(this, obj, ["paragraph", "Paragraph", "parentContentControl", "ParentContentControl", "parentContentControlOrNullObject", "ParentContentControlOrNullObject", "parentTable", "ParentTable", "parentTableCell", "ParentTableCell", "parentTableCellOrNullObject", "ParentTableCellOrNullObject", "parentTableOrNullObject", "ParentTableOrNullObject"]);
 		};
 		InlinePicture.prototype.load=function (option) {
-			_load(this, option);
-			return this;
+			return _load(this, option);
+		};
+		InlinePicture.prototype.loadAndSync=function (option) {
+			return _loadAndSync(this, option);
+		};
+		InlinePicture.prototype.retrieve=function (option) {
+			return _retrieve(this, option);
+		};
+		InlinePicture.prototype.retrieveAndSync=function (option) {
+			return _retrieveAndSync(this, option);
 		};
 		InlinePicture.prototype._handleIdResult=function (value) {
 			_super.prototype._handleIdResult.call(this, value);
@@ -15255,10 +16436,10 @@ var Word;
 				return;
 			}
 			if (!_isUndefined(value["_ReferenceId"])) {
-				this.m__ReferenceId=value["_ReferenceId"];
+				this.__R=value["_ReferenceId"];
 			}
 			if (!_isUndefined(value["_Id"])) {
-				this.m__Id=value["_Id"];
+				this.__I=value["_Id"];
 			}
 		};
 		InlinePicture.prototype.track=function () {
@@ -15270,23 +16451,28 @@ var Word;
 			return this;
 		};
 		InlinePicture.prototype.toJSON=function () {
-			return {
-				"altTextDescription": this.m_altTextDescription,
-				"altTextTitle": this.m_altTextTitle,
-				"height": this.m_height,
-				"hyperlink": this.m_hyperlink,
-				"imageFormat": this.m_imageFormat,
-				"lockAspectRatio": this.m_lockAspectRatio,
-				"width": this.m_width
-			};
+			return _toJson(this, {
+				"altTextDescription": this._A,
+				"altTextTitle": this._Al,
+				"height": this._H,
+				"hyperlink": this._Hy,
+				"imageFormat": this._I,
+				"lockAspectRatio": this._L,
+				"width": this._W,
+			}, {});
+		};
+		InlinePicture.prototype.ensureUnchanged=function (data) {
+			_createEnsureUnchangedAction(this.context, this, data);
+			return;
 		};
 		return InlinePicture;
 	}(OfficeExtension.ClientObject));
 	Word.InlinePicture=InlinePicture;
+	var _typeInlinePictureCollection="InlinePictureCollection";
 	var InlinePictureCollection=(function (_super) {
 		__extends(InlinePictureCollection, _super);
 		function InlinePictureCollection() {
-			_super.apply(this, arguments);
+			return _super !==null && _super.apply(this, arguments) || this;
 		}
 		Object.defineProperty(InlinePictureCollection.prototype, "_className", {
 			get: function () {
@@ -15297,7 +16483,7 @@ var Word;
 		});
 		Object.defineProperty(InlinePictureCollection.prototype, "items", {
 			get: function () {
-				_throwIfNotLoaded("items", this.m__items, "InlinePictureCollection", this._isNull);
+				_throwIfNotLoaded("items", this.m__items, _typeInlinePictureCollection, this._isNull);
 				return this.m__items;
 			},
 			enumerable: true,
@@ -15305,23 +16491,25 @@ var Word;
 		});
 		Object.defineProperty(InlinePictureCollection.prototype, "_ReferenceId", {
 			get: function () {
-				_throwIfNotLoaded("_ReferenceId", this.m__ReferenceId, "InlinePictureCollection", this._isNull);
-				return this.m__ReferenceId;
+				_throwIfNotLoaded("_ReferenceId", this.__R, _typeInlinePictureCollection, this._isNull);
+				return this.__R;
 			},
 			enumerable: true,
 			configurable: true
 		});
 		InlinePictureCollection.prototype.getFirst=function () {
-			return new Word.InlinePicture(this.context, _createMethodObjectPath(this.context, this, "GetFirst", 1, [], false, false, null));
+			_throwIfApiNotSupported("InlinePictureCollection.getFirst", _defaultApiSetName, "1.3", _hostName);
+			return new Word.InlinePicture(this.context, _createMethodObjectPath(this.context, this, "GetFirst", 1, [], false, false, null, false));
 		};
 		InlinePictureCollection.prototype.getFirstOrNullObject=function () {
-			return new Word.InlinePicture(this.context, _createMethodObjectPath(this.context, this, "GetFirstOrNullObject", 1, [], false, false, null));
+			_throwIfApiNotSupported("InlinePictureCollection.getFirstOrNullObject", _defaultApiSetName, "1.3", _hostName);
+			return new Word.InlinePicture(this.context, _createMethodObjectPath(this.context, this, "GetFirstOrNullObject", 1, [], false, false, null, false));
 		};
 		InlinePictureCollection.prototype._GetItem=function (index) {
 			return new Word.InlinePicture(this.context, _createIndexerObjectPath(this.context, this, [index]));
 		};
 		InlinePictureCollection.prototype._KeepReference=function () {
-			_createMethodAction(this.context, this, "_KeepReference", 1, []);
+			_createMethodAction(this.context, this, "_KeepReference", 1, [], false);
 		};
 		InlinePictureCollection.prototype._handleResult=function (value) {
 			_super.prototype._handleResult.call(this, value);
@@ -15330,7 +16518,7 @@ var Word;
 			var obj=value;
 			_fixObjectPathIfNecessary(this, obj);
 			if (!_isUndefined(obj["_ReferenceId"])) {
-				this.m__ReferenceId=obj["_ReferenceId"];
+				this.__R=obj["_ReferenceId"];
 			}
 			if (!_isNullOrUndefined(obj[OfficeExtension.Constants.items])) {
 				this.m__items=[];
@@ -15343,8 +16531,16 @@ var Word;
 			}
 		};
 		InlinePictureCollection.prototype.load=function (option) {
-			_load(this, option);
-			return this;
+			return _load(this, option);
+		};
+		InlinePictureCollection.prototype.loadAndSync=function (option) {
+			return _loadAndSync(this, option);
+		};
+		InlinePictureCollection.prototype.retrieve=function (option) {
+			return _retrieve(this, option);
+		};
+		InlinePictureCollection.prototype.retrieveAndSync=function (option) {
+			return _retrieveAndSync(this, option);
 		};
 		InlinePictureCollection.prototype._handleIdResult=function (value) {
 			_super.prototype._handleIdResult.call(this, value);
@@ -15352,7 +16548,7 @@ var Word;
 				return;
 			}
 			if (!_isUndefined(value["_ReferenceId"])) {
-				this.m__ReferenceId=value["_ReferenceId"];
+				this.__R=value["_ReferenceId"];
 			}
 		};
 		InlinePictureCollection.prototype.track=function () {
@@ -15364,15 +16560,16 @@ var Word;
 			return this;
 		};
 		InlinePictureCollection.prototype.toJSON=function () {
-			return {};
+			return _toJson(this, {}, {}, this.m__items);
 		};
 		return InlinePictureCollection;
 	}(OfficeExtension.ClientObject));
 	Word.InlinePictureCollection=InlinePictureCollection;
+	var _typeList="List";
 	var List=(function (_super) {
 		__extends(List, _super);
 		function List() {
-			_super.apply(this, arguments);
+			return _super !==null && _super.apply(this, arguments) || this;
 		}
 		Object.defineProperty(List.prototype, "_className", {
 			get: function () {
@@ -15383,90 +16580,94 @@ var Word;
 		});
 		Object.defineProperty(List.prototype, "paragraphs", {
 			get: function () {
-				if (!this.m_paragraphs) {
-					this.m_paragraphs=new Word.ParagraphCollection(this.context, _createPropertyObjectPath(this.context, this, "Paragraphs", true, false));
+				if (!this._P) {
+					this._P=new Word.ParagraphCollection(this.context, _createPropertyObjectPath(this.context, this, "Paragraphs", true, false, false));
 				}
-				return this.m_paragraphs;
+				return this._P;
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(List.prototype, "id", {
 			get: function () {
-				_throwIfNotLoaded("id", this.m_id, "List", this._isNull);
-				return this.m_id;
+				_throwIfNotLoaded("id", this._I, _typeList, this._isNull);
+				return this._I;
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(List.prototype, "levelExistences", {
 			get: function () {
-				_throwIfNotLoaded("levelExistences", this.m_levelExistences, "List", this._isNull);
-				return this.m_levelExistences;
+				_throwIfNotLoaded("levelExistences", this._L, _typeList, this._isNull);
+				return this._L;
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(List.prototype, "levelTypes", {
 			get: function () {
-				_throwIfNotLoaded("levelTypes", this.m_levelTypes, "List", this._isNull);
-				return this.m_levelTypes;
+				_throwIfNotLoaded("levelTypes", this._Le, _typeList, this._isNull);
+				return this._Le;
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(List.prototype, "_ReferenceId", {
 			get: function () {
-				_throwIfNotLoaded("_ReferenceId", this.m__ReferenceId, "List", this._isNull);
-				return this.m__ReferenceId;
+				_throwIfNotLoaded("_ReferenceId", this.__R, _typeList, this._isNull);
+				return this.__R;
 			},
 			enumerable: true,
 			configurable: true
 		});
 		List.prototype.getLevelFont=function (level) {
-			return new Word.Font(this.context, _createMethodObjectPath(this.context, this, "GetLevelFont", 1, [level], false, false, null));
+			_throwIfApiNotSupported("List.getLevelFont", _defaultApiSetName, "1.4", _hostName);
+			return new Word.Font(this.context, _createMethodObjectPath(this.context, this, "GetLevelFont", 1, [level], false, false, null, false));
 		};
 		List.prototype.getLevelParagraphs=function (level) {
-			return new Word.ParagraphCollection(this.context, _createMethodObjectPath(this.context, this, "GetLevelParagraphs", 1, [level], true, false, null));
+			return new Word.ParagraphCollection(this.context, _createMethodObjectPath(this.context, this, "GetLevelParagraphs", 1, [level], true, false, null, false));
 		};
 		List.prototype.getLevelPicture=function (level) {
-			var action=_createMethodAction(this.context, this, "GetLevelPicture", 1, [level]);
+			_throwIfApiNotSupported("List.getLevelPicture", _defaultApiSetName, "1.4", _hostName);
+			var action=_createMethodAction(this.context, this, "GetLevelPicture", 1, [level], false);
 			var ret=new OfficeExtension.ClientResult();
 			_addActionResultHandler(this, action, ret);
 			return ret;
 		};
 		List.prototype.getLevelString=function (level) {
-			var action=_createMethodAction(this.context, this, "GetLevelString", 1, [level]);
+			var action=_createMethodAction(this.context, this, "GetLevelString", 1, [level], false);
 			var ret=new OfficeExtension.ClientResult();
 			_addActionResultHandler(this, action, ret);
 			return ret;
 		};
 		List.prototype.insertParagraph=function (paragraphText, insertLocation) {
-			return new Word.Paragraph(this.context, _createMethodObjectPath(this.context, this, "InsertParagraph", 0, [paragraphText, insertLocation], false, true, null));
+			return new Word.Paragraph(this.context, _createMethodObjectPath(this.context, this, "InsertParagraph", 0, [paragraphText, insertLocation], false, true, null, false));
 		};
 		List.prototype.resetLevelFont=function (level, resetFontName) {
-			_createMethodAction(this.context, this, "ResetLevelFont", 0, [level, resetFontName]);
+			_throwIfApiNotSupported("List.resetLevelFont", _defaultApiSetName, "1.4", _hostName);
+			_createMethodAction(this.context, this, "ResetLevelFont", 0, [level, resetFontName], false);
 		};
 		List.prototype.setLevelAlignment=function (level, alignment) {
-			_createMethodAction(this.context, this, "SetLevelAlignment", 0, [level, alignment]);
+			_createMethodAction(this.context, this, "SetLevelAlignment", 0, [level, alignment], false);
 		};
 		List.prototype.setLevelBullet=function (level, listBullet, charCode, fontName) {
-			_createMethodAction(this.context, this, "SetLevelBullet", 0, [level, listBullet, charCode, fontName]);
+			_createMethodAction(this.context, this, "SetLevelBullet", 0, [level, listBullet, charCode, fontName], false);
 		};
 		List.prototype.setLevelIndents=function (level, textIndent, bulletNumberPictureIndent) {
-			_createMethodAction(this.context, this, "SetLevelIndents", 0, [level, textIndent, bulletNumberPictureIndent]);
+			_createMethodAction(this.context, this, "SetLevelIndents", 0, [level, textIndent, bulletNumberPictureIndent], false);
 		};
 		List.prototype.setLevelNumbering=function (level, listNumbering, formatString) {
-			_createMethodAction(this.context, this, "SetLevelNumbering", 0, [level, listNumbering, formatString]);
+			_createMethodAction(this.context, this, "SetLevelNumbering", 0, [level, listNumbering, formatString], false);
 		};
 		List.prototype.setLevelPicture=function (level, base64EncodedImage) {
-			_createMethodAction(this.context, this, "SetLevelPicture", 0, [level, base64EncodedImage]);
+			_throwIfApiNotSupported("List.setLevelPicture", _defaultApiSetName, "1.4", _hostName);
+			_createMethodAction(this.context, this, "SetLevelPicture", 0, [level, base64EncodedImage], false);
 		};
 		List.prototype.setLevelStartingNumber=function (level, startingNumber) {
-			_createMethodAction(this.context, this, "SetLevelStartingNumber", 0, [level, startingNumber]);
+			_createMethodAction(this.context, this, "SetLevelStartingNumber", 0, [level, startingNumber], false);
 		};
 		List.prototype._KeepReference=function () {
-			_createMethodAction(this.context, this, "_KeepReference", 1, []);
+			_createMethodAction(this.context, this, "_KeepReference", 1, [], false);
 		};
 		List.prototype._handleResult=function (value) {
 			_super.prototype._handleResult.call(this, value);
@@ -15475,22 +16676,30 @@ var Word;
 			var obj=value;
 			_fixObjectPathIfNecessary(this, obj);
 			if (!_isUndefined(obj["Id"])) {
-				this.m_id=obj["Id"];
+				this._I=obj["Id"];
 			}
 			if (!_isUndefined(obj["LevelExistences"])) {
-				this.m_levelExistences=obj["LevelExistences"];
+				this._L=obj["LevelExistences"];
 			}
 			if (!_isUndefined(obj["LevelTypes"])) {
-				this.m_levelTypes=obj["LevelTypes"];
+				this._Le=obj["LevelTypes"];
 			}
 			if (!_isUndefined(obj["_ReferenceId"])) {
-				this.m__ReferenceId=obj["_ReferenceId"];
+				this.__R=obj["_ReferenceId"];
 			}
 			_handleNavigationPropertyResults(this, obj, ["paragraphs", "Paragraphs"]);
 		};
 		List.prototype.load=function (option) {
-			_load(this, option);
-			return this;
+			return _load(this, option);
+		};
+		List.prototype.loadAndSync=function (option) {
+			return _loadAndSync(this, option);
+		};
+		List.prototype.retrieve=function (option) {
+			return _retrieve(this, option);
+		};
+		List.prototype.retrieveAndSync=function (option) {
+			return _retrieveAndSync(this, option);
 		};
 		List.prototype._handleIdResult=function (value) {
 			_super.prototype._handleIdResult.call(this, value);
@@ -15498,10 +16707,10 @@ var Word;
 				return;
 			}
 			if (!_isUndefined(value["_ReferenceId"])) {
-				this.m__ReferenceId=value["_ReferenceId"];
+				this.__R=value["_ReferenceId"];
 			}
 			if (!_isUndefined(value["Id"])) {
-				this.m_id=value["Id"];
+				this._I=value["Id"];
 			}
 		};
 		List.prototype.track=function () {
@@ -15513,19 +16722,26 @@ var Word;
 			return this;
 		};
 		List.prototype.toJSON=function () {
-			return {
-				"id": this.m_id,
-				"levelExistences": this.m_levelExistences,
-				"levelTypes": this.m_levelTypes
-			};
+			return _toJson(this, {
+				"id": this._I,
+				"levelExistences": this._L,
+				"levelTypes": this._Le,
+			}, {
+				"paragraphs": this._P,
+			});
+		};
+		List.prototype.ensureUnchanged=function (data) {
+			_createEnsureUnchangedAction(this.context, this, data);
+			return;
 		};
 		return List;
 	}(OfficeExtension.ClientObject));
 	Word.List=List;
+	var _typeListCollection="ListCollection";
 	var ListCollection=(function (_super) {
 		__extends(ListCollection, _super);
 		function ListCollection() {
-			_super.apply(this, arguments);
+			return _super !==null && _super.apply(this, arguments) || this;
 		}
 		Object.defineProperty(ListCollection.prototype, "_className", {
 			get: function () {
@@ -15536,7 +16752,7 @@ var Word;
 		});
 		Object.defineProperty(ListCollection.prototype, "items", {
 			get: function () {
-				_throwIfNotLoaded("items", this.m__items, "ListCollection", this._isNull);
+				_throwIfNotLoaded("items", this.m__items, _typeListCollection, this._isNull);
 				return this.m__items;
 			},
 			enumerable: true,
@@ -15544,29 +16760,29 @@ var Word;
 		});
 		Object.defineProperty(ListCollection.prototype, "_ReferenceId", {
 			get: function () {
-				_throwIfNotLoaded("_ReferenceId", this.m__ReferenceId, "ListCollection", this._isNull);
-				return this.m__ReferenceId;
+				_throwIfNotLoaded("_ReferenceId", this.__R, _typeListCollection, this._isNull);
+				return this.__R;
 			},
 			enumerable: true,
 			configurable: true
 		});
 		ListCollection.prototype.getById=function (id) {
-			return new Word.List(this.context, _createMethodObjectPath(this.context, this, "GetById", 1, [id], false, false, null));
+			return new Word.List(this.context, _createMethodObjectPath(this.context, this, "GetById", 1, [id], false, false, null, false));
 		};
 		ListCollection.prototype.getByIdOrNullObject=function (id) {
-			return new Word.List(this.context, _createMethodObjectPath(this.context, this, "GetByIdOrNullObject", 1, [id], false, false, null));
+			return new Word.List(this.context, _createMethodObjectPath(this.context, this, "GetByIdOrNullObject", 1, [id], false, false, null, false));
 		};
 		ListCollection.prototype.getFirst=function () {
-			return new Word.List(this.context, _createMethodObjectPath(this.context, this, "GetFirst", 1, [], false, false, null));
+			return new Word.List(this.context, _createMethodObjectPath(this.context, this, "GetFirst", 1, [], false, false, null, false));
 		};
 		ListCollection.prototype.getFirstOrNullObject=function () {
-			return new Word.List(this.context, _createMethodObjectPath(this.context, this, "GetFirstOrNullObject", 1, [], false, false, null));
+			return new Word.List(this.context, _createMethodObjectPath(this.context, this, "GetFirstOrNullObject", 1, [], false, false, null, false));
 		};
 		ListCollection.prototype.getItem=function (index) {
 			return new Word.List(this.context, _createIndexerObjectPath(this.context, this, [index]));
 		};
 		ListCollection.prototype._KeepReference=function () {
-			_createMethodAction(this.context, this, "_KeepReference", 1, []);
+			_createMethodAction(this.context, this, "_KeepReference", 1, [], false);
 		};
 		ListCollection.prototype._handleResult=function (value) {
 			_super.prototype._handleResult.call(this, value);
@@ -15575,7 +16791,7 @@ var Word;
 			var obj=value;
 			_fixObjectPathIfNecessary(this, obj);
 			if (!_isUndefined(obj["_ReferenceId"])) {
-				this.m__ReferenceId=obj["_ReferenceId"];
+				this.__R=obj["_ReferenceId"];
 			}
 			if (!_isNullOrUndefined(obj[OfficeExtension.Constants.items])) {
 				this.m__items=[];
@@ -15588,8 +16804,16 @@ var Word;
 			}
 		};
 		ListCollection.prototype.load=function (option) {
-			_load(this, option);
-			return this;
+			return _load(this, option);
+		};
+		ListCollection.prototype.loadAndSync=function (option) {
+			return _loadAndSync(this, option);
+		};
+		ListCollection.prototype.retrieve=function (option) {
+			return _retrieve(this, option);
+		};
+		ListCollection.prototype.retrieveAndSync=function (option) {
+			return _retrieveAndSync(this, option);
 		};
 		ListCollection.prototype._handleIdResult=function (value) {
 			_super.prototype._handleIdResult.call(this, value);
@@ -15597,7 +16821,7 @@ var Word;
 				return;
 			}
 			if (!_isUndefined(value["_ReferenceId"])) {
-				this.m__ReferenceId=value["_ReferenceId"];
+				this.__R=value["_ReferenceId"];
 			}
 		};
 		ListCollection.prototype.track=function () {
@@ -15609,15 +16833,16 @@ var Word;
 			return this;
 		};
 		ListCollection.prototype.toJSON=function () {
-			return {};
+			return _toJson(this, {}, {}, this.m__items);
 		};
 		return ListCollection;
 	}(OfficeExtension.ClientObject));
 	Word.ListCollection=ListCollection;
+	var _typeListItem="ListItem";
 	var ListItem=(function (_super) {
 		__extends(ListItem, _super);
 		function ListItem() {
-			_super.apply(this, arguments);
+			return _super !==null && _super.apply(this, arguments) || this;
 		}
 		Object.defineProperty(ListItem.prototype, "_className", {
 			get: function () {
@@ -15628,11 +16853,11 @@ var Word;
 		});
 		Object.defineProperty(ListItem.prototype, "level", {
 			get: function () {
-				_throwIfNotLoaded("level", this.m_level, "ListItem", this._isNull);
-				return this.m_level;
+				_throwIfNotLoaded("level", this._L, _typeListItem, this._isNull);
+				return this._L;
 			},
 			set: function (value) {
-				this.m_level=value;
+				this._L=value;
 				_createSetPropertyAction(this.context, this, "Level", value);
 			},
 			enumerable: true,
@@ -15640,24 +16865,24 @@ var Word;
 		});
 		Object.defineProperty(ListItem.prototype, "listString", {
 			get: function () {
-				_throwIfNotLoaded("listString", this.m_listString, "ListItem", this._isNull);
-				return this.m_listString;
+				_throwIfNotLoaded("listString", this._Li, _typeListItem, this._isNull);
+				return this._Li;
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(ListItem.prototype, "siblingIndex", {
 			get: function () {
-				_throwIfNotLoaded("siblingIndex", this.m_siblingIndex, "ListItem", this._isNull);
-				return this.m_siblingIndex;
+				_throwIfNotLoaded("siblingIndex", this._S, _typeListItem, this._isNull);
+				return this._S;
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(ListItem.prototype, "_ReferenceId", {
 			get: function () {
-				_throwIfNotLoaded("_ReferenceId", this.m__ReferenceId, "ListItem", this._isNull);
-				return this.m__ReferenceId;
+				_throwIfNotLoaded("_ReferenceId", this.__R, _typeListItem, this._isNull);
+				return this.__R;
 			},
 			enumerable: true,
 			configurable: true
@@ -15666,16 +16891,16 @@ var Word;
 			this._recursivelySet(properties, options, ["level"], [], []);
 		};
 		ListItem.prototype.getAncestor=function (parentOnly) {
-			return new Word.Paragraph(this.context, _createMethodObjectPath(this.context, this, "GetAncestor", 1, [parentOnly], false, false, null));
+			return new Word.Paragraph(this.context, _createMethodObjectPath(this.context, this, "GetAncestor", 1, [parentOnly], false, false, null, false));
 		};
 		ListItem.prototype.getAncestorOrNullObject=function (parentOnly) {
-			return new Word.Paragraph(this.context, _createMethodObjectPath(this.context, this, "GetAncestorOrNullObject", 1, [parentOnly], false, false, null));
+			return new Word.Paragraph(this.context, _createMethodObjectPath(this.context, this, "GetAncestorOrNullObject", 1, [parentOnly], false, false, null, false));
 		};
 		ListItem.prototype.getDescendants=function (directChildrenOnly) {
-			return new Word.ParagraphCollection(this.context, _createMethodObjectPath(this.context, this, "GetDescendants", 1, [directChildrenOnly], true, false, null));
+			return new Word.ParagraphCollection(this.context, _createMethodObjectPath(this.context, this, "GetDescendants", 1, [directChildrenOnly], true, false, null, false));
 		};
 		ListItem.prototype._KeepReference=function () {
-			_createMethodAction(this.context, this, "_KeepReference", 1, []);
+			_createMethodAction(this.context, this, "_KeepReference", 1, [], false);
 		};
 		ListItem.prototype._handleResult=function (value) {
 			_super.prototype._handleResult.call(this, value);
@@ -15684,21 +16909,29 @@ var Word;
 			var obj=value;
 			_fixObjectPathIfNecessary(this, obj);
 			if (!_isUndefined(obj["Level"])) {
-				this.m_level=obj["Level"];
+				this._L=obj["Level"];
 			}
 			if (!_isUndefined(obj["ListString"])) {
-				this.m_listString=obj["ListString"];
+				this._Li=obj["ListString"];
 			}
 			if (!_isUndefined(obj["SiblingIndex"])) {
-				this.m_siblingIndex=obj["SiblingIndex"];
+				this._S=obj["SiblingIndex"];
 			}
 			if (!_isUndefined(obj["_ReferenceId"])) {
-				this.m__ReferenceId=obj["_ReferenceId"];
+				this.__R=obj["_ReferenceId"];
 			}
 		};
 		ListItem.prototype.load=function (option) {
-			_load(this, option);
-			return this;
+			return _load(this, option);
+		};
+		ListItem.prototype.loadAndSync=function (option) {
+			return _loadAndSync(this, option);
+		};
+		ListItem.prototype.retrieve=function (option) {
+			return _retrieve(this, option);
+		};
+		ListItem.prototype.retrieveAndSync=function (option) {
+			return _retrieveAndSync(this, option);
 		};
 		ListItem.prototype._handleIdResult=function (value) {
 			_super.prototype._handleIdResult.call(this, value);
@@ -15706,7 +16939,7 @@ var Word;
 				return;
 			}
 			if (!_isUndefined(value["_ReferenceId"])) {
-				this.m__ReferenceId=value["_ReferenceId"];
+				this.__R=value["_ReferenceId"];
 			}
 		};
 		ListItem.prototype.track=function () {
@@ -15718,19 +16951,24 @@ var Word;
 			return this;
 		};
 		ListItem.prototype.toJSON=function () {
-			return {
-				"level": this.m_level,
-				"listString": this.m_listString,
-				"siblingIndex": this.m_siblingIndex
-			};
+			return _toJson(this, {
+				"level": this._L,
+				"listString": this._Li,
+				"siblingIndex": this._S,
+			}, {});
+		};
+		ListItem.prototype.ensureUnchanged=function (data) {
+			_createEnsureUnchangedAction(this.context, this, data);
+			return;
 		};
 		return ListItem;
 	}(OfficeExtension.ClientObject));
 	Word.ListItem=ListItem;
+	var _typeParagraph="Paragraph";
 	var Paragraph=(function (_super) {
 		__extends(Paragraph, _super);
 		function Paragraph() {
-			_super.apply(this, arguments);
+			return _super !==null && _super.apply(this, arguments) || this;
 		}
 		Object.defineProperty(Paragraph.prototype, "_className", {
 			get: function () {
@@ -15741,151 +16979,161 @@ var Word;
 		});
 		Object.defineProperty(Paragraph.prototype, "contentControls", {
 			get: function () {
-				if (!this.m_contentControls) {
-					this.m_contentControls=new Word.ContentControlCollection(this.context, _createPropertyObjectPath(this.context, this, "ContentControls", true, false));
+				if (!this._C) {
+					this._C=new Word.ContentControlCollection(this.context, _createPropertyObjectPath(this.context, this, "ContentControls", true, false, false));
 				}
-				return this.m_contentControls;
+				return this._C;
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(Paragraph.prototype, "font", {
 			get: function () {
-				if (!this.m_font) {
-					this.m_font=new Word.Font(this.context, _createPropertyObjectPath(this.context, this, "Font", false, false));
+				if (!this._Fo) {
+					this._Fo=new Word.Font(this.context, _createPropertyObjectPath(this.context, this, "Font", false, false, false));
 				}
-				return this.m_font;
+				return this._Fo;
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(Paragraph.prototype, "inlinePictures", {
 			get: function () {
-				if (!this.m_inlinePictures) {
-					this.m_inlinePictures=new Word.InlinePictureCollection(this.context, _createPropertyObjectPath(this.context, this, "InlinePictures", true, false));
+				if (!this._I) {
+					this._I=new Word.InlinePictureCollection(this.context, _createPropertyObjectPath(this.context, this, "InlinePictures", true, false, false));
 				}
-				return this.m_inlinePictures;
+				return this._I;
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(Paragraph.prototype, "list", {
 			get: function () {
-				if (!this.m_list) {
-					this.m_list=new Word.List(this.context, _createPropertyObjectPath(this.context, this, "List", false, false));
+				_throwIfApiNotSupported("Paragraph.list", _defaultApiSetName, "1.3", _hostName);
+				if (!this._Lis) {
+					this._Lis=new Word.List(this.context, _createPropertyObjectPath(this.context, this, "List", false, false, false));
 				}
-				return this.m_list;
+				return this._Lis;
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(Paragraph.prototype, "listItem", {
 			get: function () {
-				if (!this.m_listItem) {
-					this.m_listItem=new Word.ListItem(this.context, _createPropertyObjectPath(this.context, this, "ListItem", false, false));
+				_throwIfApiNotSupported("Paragraph.listItem", _defaultApiSetName, "1.3", _hostName);
+				if (!this._List) {
+					this._List=new Word.ListItem(this.context, _createPropertyObjectPath(this.context, this, "ListItem", false, false, false));
 				}
-				return this.m_listItem;
+				return this._List;
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(Paragraph.prototype, "listItemOrNullObject", {
 			get: function () {
-				if (!this.m_listItemOrNullObject) {
-					this.m_listItemOrNullObject=new Word.ListItem(this.context, _createPropertyObjectPath(this.context, this, "ListItemOrNullObject", false, false));
+				_throwIfApiNotSupported("Paragraph.listItemOrNullObject", _defaultApiSetName, "1.3", _hostName);
+				if (!this._ListI) {
+					this._ListI=new Word.ListItem(this.context, _createPropertyObjectPath(this.context, this, "ListItemOrNullObject", false, false, false));
 				}
-				return this.m_listItemOrNullObject;
+				return this._ListI;
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(Paragraph.prototype, "listOrNullObject", {
 			get: function () {
-				if (!this.m_listOrNullObject) {
-					this.m_listOrNullObject=new Word.List(this.context, _createPropertyObjectPath(this.context, this, "ListOrNullObject", false, false));
+				_throwIfApiNotSupported("Paragraph.listOrNullObject", _defaultApiSetName, "1.3", _hostName);
+				if (!this._ListO) {
+					this._ListO=new Word.List(this.context, _createPropertyObjectPath(this.context, this, "ListOrNullObject", false, false, false));
 				}
-				return this.m_listOrNullObject;
+				return this._ListO;
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(Paragraph.prototype, "parentBody", {
 			get: function () {
-				if (!this.m_parentBody) {
-					this.m_parentBody=new Word.Body(this.context, _createPropertyObjectPath(this.context, this, "ParentBody", false, false));
+				_throwIfApiNotSupported("Paragraph.parentBody", _defaultApiSetName, "1.3", _hostName);
+				if (!this._P) {
+					this._P=new Word.Body(this.context, _createPropertyObjectPath(this.context, this, "ParentBody", false, false, false));
 				}
-				return this.m_parentBody;
+				return this._P;
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(Paragraph.prototype, "parentContentControl", {
 			get: function () {
-				if (!this.m_parentContentControl) {
-					this.m_parentContentControl=new Word.ContentControl(this.context, _createPropertyObjectPath(this.context, this, "ParentContentControl", false, false));
+				if (!this._Pa) {
+					this._Pa=new Word.ContentControl(this.context, _createPropertyObjectPath(this.context, this, "ParentContentControl", false, false, false));
 				}
-				return this.m_parentContentControl;
+				return this._Pa;
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(Paragraph.prototype, "parentContentControlOrNullObject", {
 			get: function () {
-				if (!this.m_parentContentControlOrNullObject) {
-					this.m_parentContentControlOrNullObject=new Word.ContentControl(this.context, _createPropertyObjectPath(this.context, this, "ParentContentControlOrNullObject", false, false));
+				_throwIfApiNotSupported("Paragraph.parentContentControlOrNullObject", _defaultApiSetName, "1.3", _hostName);
+				if (!this._Par) {
+					this._Par=new Word.ContentControl(this.context, _createPropertyObjectPath(this.context, this, "ParentContentControlOrNullObject", false, false, false));
 				}
-				return this.m_parentContentControlOrNullObject;
+				return this._Par;
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(Paragraph.prototype, "parentTable", {
 			get: function () {
-				if (!this.m_parentTable) {
-					this.m_parentTable=new Word.Table(this.context, _createPropertyObjectPath(this.context, this, "ParentTable", false, false));
+				_throwIfApiNotSupported("Paragraph.parentTable", _defaultApiSetName, "1.3", _hostName);
+				if (!this._Pare) {
+					this._Pare=new Word.Table(this.context, _createPropertyObjectPath(this.context, this, "ParentTable", false, false, false));
 				}
-				return this.m_parentTable;
+				return this._Pare;
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(Paragraph.prototype, "parentTableCell", {
 			get: function () {
-				if (!this.m_parentTableCell) {
-					this.m_parentTableCell=new Word.TableCell(this.context, _createPropertyObjectPath(this.context, this, "ParentTableCell", false, false));
+				_throwIfApiNotSupported("Paragraph.parentTableCell", _defaultApiSetName, "1.3", _hostName);
+				if (!this._Paren) {
+					this._Paren=new Word.TableCell(this.context, _createPropertyObjectPath(this.context, this, "ParentTableCell", false, false, false));
 				}
-				return this.m_parentTableCell;
+				return this._Paren;
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(Paragraph.prototype, "parentTableCellOrNullObject", {
 			get: function () {
-				if (!this.m_parentTableCellOrNullObject) {
-					this.m_parentTableCellOrNullObject=new Word.TableCell(this.context, _createPropertyObjectPath(this.context, this, "ParentTableCellOrNullObject", false, false));
+				_throwIfApiNotSupported("Paragraph.parentTableCellOrNullObject", _defaultApiSetName, "1.3", _hostName);
+				if (!this._Parent) {
+					this._Parent=new Word.TableCell(this.context, _createPropertyObjectPath(this.context, this, "ParentTableCellOrNullObject", false, false, false));
 				}
-				return this.m_parentTableCellOrNullObject;
+				return this._Parent;
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(Paragraph.prototype, "parentTableOrNullObject", {
 			get: function () {
-				if (!this.m_parentTableOrNullObject) {
-					this.m_parentTableOrNullObject=new Word.Table(this.context, _createPropertyObjectPath(this.context, this, "ParentTableOrNullObject", false, false));
+				_throwIfApiNotSupported("Paragraph.parentTableOrNullObject", _defaultApiSetName, "1.3", _hostName);
+				if (!this._ParentT) {
+					this._ParentT=new Word.Table(this.context, _createPropertyObjectPath(this.context, this, "ParentTableOrNullObject", false, false, false));
 				}
-				return this.m_parentTableOrNullObject;
+				return this._ParentT;
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(Paragraph.prototype, "alignment", {
 			get: function () {
-				_throwIfNotLoaded("alignment", this.m_alignment, "Paragraph", this._isNull);
-				return this.m_alignment;
+				_throwIfNotLoaded("alignment", this._A, _typeParagraph, this._isNull);
+				return this._A;
 			},
 			set: function (value) {
-				this.m_alignment=value;
+				this._A=value;
 				_createSetPropertyAction(this.context, this, "Alignment", value);
 			},
 			enumerable: true,
@@ -15893,11 +17141,11 @@ var Word;
 		});
 		Object.defineProperty(Paragraph.prototype, "firstLineIndent", {
 			get: function () {
-				_throwIfNotLoaded("firstLineIndent", this.m_firstLineIndent, "Paragraph", this._isNull);
-				return this.m_firstLineIndent;
+				_throwIfNotLoaded("firstLineIndent", this._F, _typeParagraph, this._isNull);
+				return this._F;
 			},
 			set: function (value) {
-				this.m_firstLineIndent=value;
+				this._F=value;
 				_createSetPropertyAction(this.context, this, "FirstLineIndent", value);
 			},
 			enumerable: true,
@@ -15905,27 +17153,29 @@ var Word;
 		});
 		Object.defineProperty(Paragraph.prototype, "isLastParagraph", {
 			get: function () {
-				_throwIfNotLoaded("isLastParagraph", this.m_isLastParagraph, "Paragraph", this._isNull);
-				return this.m_isLastParagraph;
+				_throwIfNotLoaded("isLastParagraph", this._Is, _typeParagraph, this._isNull);
+				_throwIfApiNotSupported("Paragraph.isLastParagraph", _defaultApiSetName, "1.3", _hostName);
+				return this._Is;
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(Paragraph.prototype, "isListItem", {
 			get: function () {
-				_throwIfNotLoaded("isListItem", this.m_isListItem, "Paragraph", this._isNull);
-				return this.m_isListItem;
+				_throwIfNotLoaded("isListItem", this._IsL, _typeParagraph, this._isNull);
+				_throwIfApiNotSupported("Paragraph.isListItem", _defaultApiSetName, "1.3", _hostName);
+				return this._IsL;
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(Paragraph.prototype, "leftIndent", {
 			get: function () {
-				_throwIfNotLoaded("leftIndent", this.m_leftIndent, "Paragraph", this._isNull);
-				return this.m_leftIndent;
+				_throwIfNotLoaded("leftIndent", this._L, _typeParagraph, this._isNull);
+				return this._L;
 			},
 			set: function (value) {
-				this.m_leftIndent=value;
+				this._L=value;
 				_createSetPropertyAction(this.context, this, "LeftIndent", value);
 			},
 			enumerable: true,
@@ -15933,11 +17183,11 @@ var Word;
 		});
 		Object.defineProperty(Paragraph.prototype, "lineSpacing", {
 			get: function () {
-				_throwIfNotLoaded("lineSpacing", this.m_lineSpacing, "Paragraph", this._isNull);
-				return this.m_lineSpacing;
+				_throwIfNotLoaded("lineSpacing", this._Li, _typeParagraph, this._isNull);
+				return this._Li;
 			},
 			set: function (value) {
-				this.m_lineSpacing=value;
+				this._Li=value;
 				_createSetPropertyAction(this.context, this, "LineSpacing", value);
 			},
 			enumerable: true,
@@ -15945,11 +17195,11 @@ var Word;
 		});
 		Object.defineProperty(Paragraph.prototype, "lineUnitAfter", {
 			get: function () {
-				_throwIfNotLoaded("lineUnitAfter", this.m_lineUnitAfter, "Paragraph", this._isNull);
-				return this.m_lineUnitAfter;
+				_throwIfNotLoaded("lineUnitAfter", this._Lin, _typeParagraph, this._isNull);
+				return this._Lin;
 			},
 			set: function (value) {
-				this.m_lineUnitAfter=value;
+				this._Lin=value;
 				_createSetPropertyAction(this.context, this, "LineUnitAfter", value);
 			},
 			enumerable: true,
@@ -15957,11 +17207,11 @@ var Word;
 		});
 		Object.defineProperty(Paragraph.prototype, "lineUnitBefore", {
 			get: function () {
-				_throwIfNotLoaded("lineUnitBefore", this.m_lineUnitBefore, "Paragraph", this._isNull);
-				return this.m_lineUnitBefore;
+				_throwIfNotLoaded("lineUnitBefore", this._Line, _typeParagraph, this._isNull);
+				return this._Line;
 			},
 			set: function (value) {
-				this.m_lineUnitBefore=value;
+				this._Line=value;
 				_createSetPropertyAction(this.context, this, "LineUnitBefore", value);
 			},
 			enumerable: true,
@@ -15969,11 +17219,11 @@ var Word;
 		});
 		Object.defineProperty(Paragraph.prototype, "outlineLevel", {
 			get: function () {
-				_throwIfNotLoaded("outlineLevel", this.m_outlineLevel, "Paragraph", this._isNull);
-				return this.m_outlineLevel;
+				_throwIfNotLoaded("outlineLevel", this._O, _typeParagraph, this._isNull);
+				return this._O;
 			},
 			set: function (value) {
-				this.m_outlineLevel=value;
+				this._O=value;
 				_createSetPropertyAction(this.context, this, "OutlineLevel", value);
 			},
 			enumerable: true,
@@ -15981,11 +17231,11 @@ var Word;
 		});
 		Object.defineProperty(Paragraph.prototype, "rightIndent", {
 			get: function () {
-				_throwIfNotLoaded("rightIndent", this.m_rightIndent, "Paragraph", this._isNull);
-				return this.m_rightIndent;
+				_throwIfNotLoaded("rightIndent", this._R, _typeParagraph, this._isNull);
+				return this._R;
 			},
 			set: function (value) {
-				this.m_rightIndent=value;
+				this._R=value;
 				_createSetPropertyAction(this.context, this, "RightIndent", value);
 			},
 			enumerable: true,
@@ -15993,11 +17243,11 @@ var Word;
 		});
 		Object.defineProperty(Paragraph.prototype, "spaceAfter", {
 			get: function () {
-				_throwIfNotLoaded("spaceAfter", this.m_spaceAfter, "Paragraph", this._isNull);
-				return this.m_spaceAfter;
+				_throwIfNotLoaded("spaceAfter", this._S, _typeParagraph, this._isNull);
+				return this._S;
 			},
 			set: function (value) {
-				this.m_spaceAfter=value;
+				this._S=value;
 				_createSetPropertyAction(this.context, this, "SpaceAfter", value);
 			},
 			enumerable: true,
@@ -16005,11 +17255,11 @@ var Word;
 		});
 		Object.defineProperty(Paragraph.prototype, "spaceBefore", {
 			get: function () {
-				_throwIfNotLoaded("spaceBefore", this.m_spaceBefore, "Paragraph", this._isNull);
-				return this.m_spaceBefore;
+				_throwIfNotLoaded("spaceBefore", this._Sp, _typeParagraph, this._isNull);
+				return this._Sp;
 			},
 			set: function (value) {
-				this.m_spaceBefore=value;
+				this._Sp=value;
 				_createSetPropertyAction(this.context, this, "SpaceBefore", value);
 			},
 			enumerable: true,
@@ -16017,11 +17267,11 @@ var Word;
 		});
 		Object.defineProperty(Paragraph.prototype, "style", {
 			get: function () {
-				_throwIfNotLoaded("style", this.m_style, "Paragraph", this._isNull);
-				return this.m_style;
+				_throwIfNotLoaded("style", this._St, _typeParagraph, this._isNull);
+				return this._St;
 			},
 			set: function (value) {
-				this.m_style=value;
+				this._St=value;
 				_createSetPropertyAction(this.context, this, "Style", value);
 			},
 			enumerable: true,
@@ -16029,11 +17279,12 @@ var Word;
 		});
 		Object.defineProperty(Paragraph.prototype, "styleBuiltIn", {
 			get: function () {
-				_throwIfNotLoaded("styleBuiltIn", this.m_styleBuiltIn, "Paragraph", this._isNull);
-				return this.m_styleBuiltIn;
+				_throwIfNotLoaded("styleBuiltIn", this._Sty, _typeParagraph, this._isNull);
+				_throwIfApiNotSupported("Paragraph.styleBuiltIn", _defaultApiSetName, "1.3", _hostName);
+				return this._Sty;
 			},
 			set: function (value) {
-				this.m_styleBuiltIn=value;
+				this._Sty=value;
 				_createSetPropertyAction(this.context, this, "StyleBuiltIn", value);
 			},
 			enumerable: true,
@@ -16041,32 +17292,33 @@ var Word;
 		});
 		Object.defineProperty(Paragraph.prototype, "tableNestingLevel", {
 			get: function () {
-				_throwIfNotLoaded("tableNestingLevel", this.m_tableNestingLevel, "Paragraph", this._isNull);
-				return this.m_tableNestingLevel;
+				_throwIfNotLoaded("tableNestingLevel", this._T, _typeParagraph, this._isNull);
+				_throwIfApiNotSupported("Paragraph.tableNestingLevel", _defaultApiSetName, "1.3", _hostName);
+				return this._T;
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(Paragraph.prototype, "text", {
 			get: function () {
-				_throwIfNotLoaded("text", this.m_text, "Paragraph", this._isNull);
-				return this.m_text;
+				_throwIfNotLoaded("text", this._Te, _typeParagraph, this._isNull);
+				return this._Te;
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(Paragraph.prototype, "_Id", {
 			get: function () {
-				_throwIfNotLoaded("_Id", this.m__Id, "Paragraph", this._isNull);
-				return this.m__Id;
+				_throwIfNotLoaded("_Id", this.__I, _typeParagraph, this._isNull);
+				return this.__I;
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(Paragraph.prototype, "_ReferenceId", {
 			get: function () {
-				_throwIfNotLoaded("_ReferenceId", this.m__ReferenceId, "Paragraph", this._isNull);
-				return this.m__ReferenceId;
+				_throwIfNotLoaded("_ReferenceId", this.__R, _typeParagraph, this._isNull);
+				return this.__R;
 			},
 			enumerable: true,
 			configurable: true
@@ -16083,104 +17335,104 @@ var Word;
 				"parentTable",
 				"parentTableCell",
 				"parentTableCellOrNullObject",
-				"parentTableOrNullObject",
-				"contentControls",
-				"inlinePictures",
-				"list",
-				"listOrNullObject",
-				"parentBody",
-				"parentContentControl",
-				"parentContentControlOrNullObject",
-				"parentTable",
-				"parentTableCell",
-				"parentTableCellOrNullObject",
 				"parentTableOrNullObject"
 			]);
 		};
 		Paragraph.prototype.attachToList=function (listId, level) {
-			return new Word.List(this.context, _createMethodObjectPath(this.context, this, "AttachToList", 0, [listId, level], false, false, null));
+			_throwIfApiNotSupported("Paragraph.attachToList", _defaultApiSetName, "1.3", _hostName);
+			return new Word.List(this.context, _createMethodObjectPath(this.context, this, "AttachToList", 0, [listId, level], false, false, null, false));
 		};
 		Paragraph.prototype.clear=function () {
-			_createMethodAction(this.context, this, "Clear", 0, []);
+			_createMethodAction(this.context, this, "Clear", 0, [], false);
 		};
 		Paragraph.prototype.delete=function () {
-			_createMethodAction(this.context, this, "Delete", 0, []);
+			_createMethodAction(this.context, this, "Delete", 0, [], false);
 		};
 		Paragraph.prototype.detachFromList=function () {
-			_createMethodAction(this.context, this, "DetachFromList", 0, []);
+			_throwIfApiNotSupported("Paragraph.detachFromList", _defaultApiSetName, "1.3", _hostName);
+			_createMethodAction(this.context, this, "DetachFromList", 0, [], false);
 		};
 		Paragraph.prototype.getHtml=function () {
-			var action=_createMethodAction(this.context, this, "GetHtml", 1, []);
+			var action=_createMethodAction(this.context, this, "GetHtml", 1, [], false);
 			var ret=new OfficeExtension.ClientResult();
 			_addActionResultHandler(this, action, ret);
 			return ret;
 		};
 		Paragraph.prototype.getNext=function () {
-			return new Word.Paragraph(this.context, _createMethodObjectPath(this.context, this, "GetNext", 1, [], false, false, null));
+			_throwIfApiNotSupported("Paragraph.getNext", _defaultApiSetName, "1.3", _hostName);
+			return new Word.Paragraph(this.context, _createMethodObjectPath(this.context, this, "GetNext", 1, [], false, false, null, false));
 		};
 		Paragraph.prototype.getNextOrNullObject=function () {
-			return new Word.Paragraph(this.context, _createMethodObjectPath(this.context, this, "GetNextOrNullObject", 1, [], false, false, null));
+			_throwIfApiNotSupported("Paragraph.getNextOrNullObject", _defaultApiSetName, "1.3", _hostName);
+			return new Word.Paragraph(this.context, _createMethodObjectPath(this.context, this, "GetNextOrNullObject", 1, [], false, false, null, false));
 		};
 		Paragraph.prototype.getOoxml=function () {
-			var action=_createMethodAction(this.context, this, "GetOoxml", 1, []);
+			var action=_createMethodAction(this.context, this, "GetOoxml", 1, [], false);
 			var ret=new OfficeExtension.ClientResult();
 			_addActionResultHandler(this, action, ret);
 			return ret;
 		};
 		Paragraph.prototype.getPrevious=function () {
-			return new Word.Paragraph(this.context, _createMethodObjectPath(this.context, this, "GetPrevious", 1, [], false, false, null));
+			_throwIfApiNotSupported("Paragraph.getPrevious", _defaultApiSetName, "1.3", _hostName);
+			return new Word.Paragraph(this.context, _createMethodObjectPath(this.context, this, "GetPrevious", 1, [], false, false, null, false));
 		};
 		Paragraph.prototype.getPreviousOrNullObject=function () {
-			return new Word.Paragraph(this.context, _createMethodObjectPath(this.context, this, "GetPreviousOrNullObject", 1, [], false, false, null));
+			_throwIfApiNotSupported("Paragraph.getPreviousOrNullObject", _defaultApiSetName, "1.3", _hostName);
+			return new Word.Paragraph(this.context, _createMethodObjectPath(this.context, this, "GetPreviousOrNullObject", 1, [], false, false, null, false));
 		};
 		Paragraph.prototype.getRange=function (rangeLocation) {
-			return new Word.Range(this.context, _createMethodObjectPath(this.context, this, "GetRange", 1, [rangeLocation], false, false, null));
+			_throwIfApiNotSupported("Paragraph.getRange", _defaultApiSetName, "1.3", _hostName);
+			return new Word.Range(this.context, _createMethodObjectPath(this.context, this, "GetRange", 1, [rangeLocation], false, false, null, false));
 		};
 		Paragraph.prototype.getTextRanges=function (endingMarks, trimSpacing) {
-			return new Word.RangeCollection(this.context, _createMethodObjectPath(this.context, this, "GetTextRanges", 1, [endingMarks, trimSpacing], true, false, null));
+			_throwIfApiNotSupported("Paragraph.getTextRanges", _defaultApiSetName, "1.3", _hostName);
+			return new Word.RangeCollection(this.context, _createMethodObjectPath(this.context, this, "GetTextRanges", 1, [endingMarks, trimSpacing], true, false, null, false));
 		};
 		Paragraph.prototype.insertBreak=function (breakType, insertLocation) {
-			_createMethodAction(this.context, this, "InsertBreak", 0, [breakType, insertLocation]);
+			_createMethodAction(this.context, this, "InsertBreak", 0, [breakType, insertLocation], false);
 		};
 		Paragraph.prototype.insertContentControl=function () {
-			return new Word.ContentControl(this.context, _createMethodObjectPath(this.context, this, "InsertContentControl", 0, [], false, true, null));
+			return new Word.ContentControl(this.context, _createMethodObjectPath(this.context, this, "InsertContentControl", 0, [], false, true, null, false));
 		};
 		Paragraph.prototype.insertFileFromBase64=function (base64File, insertLocation) {
-			return new Word.Range(this.context, _createMethodObjectPath(this.context, this, "InsertFileFromBase64", 0, [base64File, insertLocation], false, true, null));
+			return new Word.Range(this.context, _createMethodObjectPath(this.context, this, "InsertFileFromBase64", 0, [base64File, insertLocation], false, true, null, false));
 		};
 		Paragraph.prototype.insertHtml=function (html, insertLocation) {
-			return new Word.Range(this.context, _createMethodObjectPath(this.context, this, "InsertHtml", 0, [html, insertLocation], false, true, null));
+			return new Word.Range(this.context, _createMethodObjectPath(this.context, this, "InsertHtml", 0, [html, insertLocation], false, true, null, false));
 		};
 		Paragraph.prototype.insertInlinePictureFromBase64=function (base64EncodedImage, insertLocation) {
-			return new Word.InlinePicture(this.context, _createMethodObjectPath(this.context, this, "InsertInlinePictureFromBase64", 0, [base64EncodedImage, insertLocation], false, true, null));
+			return new Word.InlinePicture(this.context, _createMethodObjectPath(this.context, this, "InsertInlinePictureFromBase64", 0, [base64EncodedImage, insertLocation], false, true, null, false));
 		};
 		Paragraph.prototype.insertOoxml=function (ooxml, insertLocation) {
-			return new Word.Range(this.context, _createMethodObjectPath(this.context, this, "InsertOoxml", 0, [ooxml, insertLocation], false, true, null));
+			return new Word.Range(this.context, _createMethodObjectPath(this.context, this, "InsertOoxml", 0, [ooxml, insertLocation], false, true, null, false));
 		};
 		Paragraph.prototype.insertParagraph=function (paragraphText, insertLocation) {
-			return new Word.Paragraph(this.context, _createMethodObjectPath(this.context, this, "InsertParagraph", 0, [paragraphText, insertLocation], false, true, null));
+			return new Word.Paragraph(this.context, _createMethodObjectPath(this.context, this, "InsertParagraph", 0, [paragraphText, insertLocation], false, true, null, false));
 		};
 		Paragraph.prototype.insertTable=function (rowCount, columnCount, insertLocation, values) {
-			return new Word.Table(this.context, _createMethodObjectPath(this.context, this, "InsertTable", 0, [rowCount, columnCount, insertLocation, values], false, true, null));
+			_throwIfApiNotSupported("Paragraph.insertTable", _defaultApiSetName, "1.3", _hostName);
+			return new Word.Table(this.context, _createMethodObjectPath(this.context, this, "InsertTable", 0, [rowCount, columnCount, insertLocation, values], false, true, null, false));
 		};
 		Paragraph.prototype.insertText=function (text, insertLocation) {
-			return new Word.Range(this.context, _createMethodObjectPath(this.context, this, "InsertText", 0, [text, insertLocation], false, true, null));
+			return new Word.Range(this.context, _createMethodObjectPath(this.context, this, "InsertText", 0, [text, insertLocation], false, true, null, false));
 		};
 		Paragraph.prototype.search=function (searchText, searchOptions) {
 			searchOptions=_normalizeSearchOptions(this.context, searchOptions);
-			return new Word.RangeCollection(this.context, _createMethodObjectPath(this.context, this, "Search", 1, [searchText, searchOptions], true, false, null));
+			return new Word.RangeCollection(this.context, _createMethodObjectPath(this.context, this, "Search", 1, [searchText, searchOptions], true, false, null, false));
 		};
 		Paragraph.prototype.select=function (selectionMode) {
-			_createMethodAction(this.context, this, "Select", 1, [selectionMode]);
+			_createMethodAction(this.context, this, "Select", 1, [selectionMode], false);
 		};
 		Paragraph.prototype.split=function (delimiters, trimDelimiters, trimSpacing) {
-			return new Word.RangeCollection(this.context, _createMethodObjectPath(this.context, this, "Split", 1, [delimiters, trimDelimiters, trimSpacing], true, false, null));
+			_throwIfApiNotSupported("Paragraph.split", _defaultApiSetName, "1.3", _hostName);
+			return new Word.RangeCollection(this.context, _createMethodObjectPath(this.context, this, "Split", 1, [delimiters, trimDelimiters, trimSpacing], true, false, null, false));
 		};
 		Paragraph.prototype.startNewList=function () {
-			return new Word.List(this.context, _createMethodObjectPath(this.context, this, "StartNewList", 0, [], false, false, null));
+			_throwIfApiNotSupported("Paragraph.startNewList", _defaultApiSetName, "1.3", _hostName);
+			return new Word.List(this.context, _createMethodObjectPath(this.context, this, "StartNewList", 0, [], false, false, null, false));
 		};
 		Paragraph.prototype._KeepReference=function () {
-			_createMethodAction(this.context, this, "_KeepReference", 1, []);
+			_createMethodAction(this.context, this, "_KeepReference", 1, [], false);
 		};
 		Paragraph.prototype._handleResult=function (value) {
 			_super.prototype._handleResult.call(this, value);
@@ -16189,64 +17441,72 @@ var Word;
 			var obj=value;
 			_fixObjectPathIfNecessary(this, obj);
 			if (!_isUndefined(obj["Alignment"])) {
-				this.m_alignment=obj["Alignment"];
+				this._A=obj["Alignment"];
 			}
 			if (!_isUndefined(obj["FirstLineIndent"])) {
-				this.m_firstLineIndent=obj["FirstLineIndent"];
+				this._F=obj["FirstLineIndent"];
 			}
 			if (!_isUndefined(obj["IsLastParagraph"])) {
-				this.m_isLastParagraph=obj["IsLastParagraph"];
+				this._Is=obj["IsLastParagraph"];
 			}
 			if (!_isUndefined(obj["IsListItem"])) {
-				this.m_isListItem=obj["IsListItem"];
+				this._IsL=obj["IsListItem"];
 			}
 			if (!_isUndefined(obj["LeftIndent"])) {
-				this.m_leftIndent=obj["LeftIndent"];
+				this._L=obj["LeftIndent"];
 			}
 			if (!_isUndefined(obj["LineSpacing"])) {
-				this.m_lineSpacing=obj["LineSpacing"];
+				this._Li=obj["LineSpacing"];
 			}
 			if (!_isUndefined(obj["LineUnitAfter"])) {
-				this.m_lineUnitAfter=obj["LineUnitAfter"];
+				this._Lin=obj["LineUnitAfter"];
 			}
 			if (!_isUndefined(obj["LineUnitBefore"])) {
-				this.m_lineUnitBefore=obj["LineUnitBefore"];
+				this._Line=obj["LineUnitBefore"];
 			}
 			if (!_isUndefined(obj["OutlineLevel"])) {
-				this.m_outlineLevel=obj["OutlineLevel"];
+				this._O=obj["OutlineLevel"];
 			}
 			if (!_isUndefined(obj["RightIndent"])) {
-				this.m_rightIndent=obj["RightIndent"];
+				this._R=obj["RightIndent"];
 			}
 			if (!_isUndefined(obj["SpaceAfter"])) {
-				this.m_spaceAfter=obj["SpaceAfter"];
+				this._S=obj["SpaceAfter"];
 			}
 			if (!_isUndefined(obj["SpaceBefore"])) {
-				this.m_spaceBefore=obj["SpaceBefore"];
+				this._Sp=obj["SpaceBefore"];
 			}
 			if (!_isUndefined(obj["Style"])) {
-				this.m_style=obj["Style"];
+				this._St=obj["Style"];
 			}
 			if (!_isUndefined(obj["StyleBuiltIn"])) {
-				this.m_styleBuiltIn=obj["StyleBuiltIn"];
+				this._Sty=obj["StyleBuiltIn"];
 			}
 			if (!_isUndefined(obj["TableNestingLevel"])) {
-				this.m_tableNestingLevel=obj["TableNestingLevel"];
+				this._T=obj["TableNestingLevel"];
 			}
 			if (!_isUndefined(obj["Text"])) {
-				this.m_text=obj["Text"];
+				this._Te=obj["Text"];
 			}
 			if (!_isUndefined(obj["_Id"])) {
-				this.m__Id=obj["_Id"];
+				this.__I=obj["_Id"];
 			}
 			if (!_isUndefined(obj["_ReferenceId"])) {
-				this.m__ReferenceId=obj["_ReferenceId"];
+				this.__R=obj["_ReferenceId"];
 			}
 			_handleNavigationPropertyResults(this, obj, ["contentControls", "ContentControls", "font", "Font", "inlinePictures", "InlinePictures", "list", "List", "listItem", "ListItem", "listItemOrNullObject", "ListItemOrNullObject", "listOrNullObject", "ListOrNullObject", "parentBody", "ParentBody", "parentContentControl", "ParentContentControl", "parentContentControlOrNullObject", "ParentContentControlOrNullObject", "parentTable", "ParentTable", "parentTableCell", "ParentTableCell", "parentTableCellOrNullObject", "ParentTableCellOrNullObject", "parentTableOrNullObject", "ParentTableOrNullObject"]);
 		};
 		Paragraph.prototype.load=function (option) {
-			_load(this, option);
-			return this;
+			return _load(this, option);
+		};
+		Paragraph.prototype.loadAndSync=function (option) {
+			return _loadAndSync(this, option);
+		};
+		Paragraph.prototype.retrieve=function (option) {
+			return _retrieve(this, option);
+		};
+		Paragraph.prototype.retrieveAndSync=function (option) {
+			return _retrieveAndSync(this, option);
 		};
 		Paragraph.prototype._handleIdResult=function (value) {
 			_super.prototype._handleIdResult.call(this, value);
@@ -16254,10 +17514,10 @@ var Word;
 				return;
 			}
 			if (!_isUndefined(value["_ReferenceId"])) {
-				this.m__ReferenceId=value["_ReferenceId"];
+				this.__R=value["_ReferenceId"];
 			}
 			if (!_isUndefined(value["_Id"])) {
-				this.m__Id=value["_Id"];
+				this.__I=value["_Id"];
 			}
 		};
 		Paragraph.prototype.track=function () {
@@ -16269,35 +17529,42 @@ var Word;
 			return this;
 		};
 		Paragraph.prototype.toJSON=function () {
-			return {
-				"alignment": this.m_alignment,
-				"firstLineIndent": this.m_firstLineIndent,
-				"font": this.m_font,
-				"isLastParagraph": this.m_isLastParagraph,
-				"isListItem": this.m_isListItem,
-				"leftIndent": this.m_leftIndent,
-				"lineSpacing": this.m_lineSpacing,
-				"lineUnitAfter": this.m_lineUnitAfter,
-				"lineUnitBefore": this.m_lineUnitBefore,
-				"listItem": this.m_listItem,
-				"listItemOrNullObject": this.m_listItemOrNullObject,
-				"outlineLevel": this.m_outlineLevel,
-				"rightIndent": this.m_rightIndent,
-				"spaceAfter": this.m_spaceAfter,
-				"spaceBefore": this.m_spaceBefore,
-				"style": this.m_style,
-				"styleBuiltIn": this.m_styleBuiltIn,
-				"tableNestingLevel": this.m_tableNestingLevel,
-				"text": this.m_text
-			};
+			return _toJson(this, {
+				"alignment": this._A,
+				"firstLineIndent": this._F,
+				"isLastParagraph": this._Is,
+				"isListItem": this._IsL,
+				"leftIndent": this._L,
+				"lineSpacing": this._Li,
+				"lineUnitAfter": this._Lin,
+				"lineUnitBefore": this._Line,
+				"outlineLevel": this._O,
+				"rightIndent": this._R,
+				"spaceAfter": this._S,
+				"spaceBefore": this._Sp,
+				"style": this._St,
+				"styleBuiltIn": this._Sty,
+				"tableNestingLevel": this._T,
+				"text": this._Te,
+			}, {
+				"font": this._Fo,
+				"inlinePictures": this._I,
+				"listItem": this._List,
+				"listItemOrNullObject": this._ListI,
+			});
+		};
+		Paragraph.prototype.ensureUnchanged=function (data) {
+			_createEnsureUnchangedAction(this.context, this, data);
+			return;
 		};
 		return Paragraph;
 	}(OfficeExtension.ClientObject));
 	Word.Paragraph=Paragraph;
+	var _typeParagraphCollection="ParagraphCollection";
 	var ParagraphCollection=(function (_super) {
 		__extends(ParagraphCollection, _super);
 		function ParagraphCollection() {
-			_super.apply(this, arguments);
+			return _super !==null && _super.apply(this, arguments) || this;
 		}
 		Object.defineProperty(ParagraphCollection.prototype, "_className", {
 			get: function () {
@@ -16308,7 +17575,7 @@ var Word;
 		});
 		Object.defineProperty(ParagraphCollection.prototype, "items", {
 			get: function () {
-				_throwIfNotLoaded("items", this.m__items, "ParagraphCollection", this._isNull);
+				_throwIfNotLoaded("items", this.m__items, _typeParagraphCollection, this._isNull);
 				return this.m__items;
 			},
 			enumerable: true,
@@ -16316,29 +17583,33 @@ var Word;
 		});
 		Object.defineProperty(ParagraphCollection.prototype, "_ReferenceId", {
 			get: function () {
-				_throwIfNotLoaded("_ReferenceId", this.m__ReferenceId, "ParagraphCollection", this._isNull);
-				return this.m__ReferenceId;
+				_throwIfNotLoaded("_ReferenceId", this.__R, _typeParagraphCollection, this._isNull);
+				return this.__R;
 			},
 			enumerable: true,
 			configurable: true
 		});
 		ParagraphCollection.prototype.getFirst=function () {
-			return new Word.Paragraph(this.context, _createMethodObjectPath(this.context, this, "GetFirst", 1, [], false, false, null));
+			_throwIfApiNotSupported("ParagraphCollection.getFirst", _defaultApiSetName, "1.3", _hostName);
+			return new Word.Paragraph(this.context, _createMethodObjectPath(this.context, this, "GetFirst", 1, [], false, false, null, false));
 		};
 		ParagraphCollection.prototype.getFirstOrNullObject=function () {
-			return new Word.Paragraph(this.context, _createMethodObjectPath(this.context, this, "GetFirstOrNullObject", 1, [], false, false, null));
+			_throwIfApiNotSupported("ParagraphCollection.getFirstOrNullObject", _defaultApiSetName, "1.3", _hostName);
+			return new Word.Paragraph(this.context, _createMethodObjectPath(this.context, this, "GetFirstOrNullObject", 1, [], false, false, null, false));
 		};
 		ParagraphCollection.prototype.getLast=function () {
-			return new Word.Paragraph(this.context, _createMethodObjectPath(this.context, this, "GetLast", 1, [], false, false, null));
+			_throwIfApiNotSupported("ParagraphCollection.getLast", _defaultApiSetName, "1.3", _hostName);
+			return new Word.Paragraph(this.context, _createMethodObjectPath(this.context, this, "GetLast", 1, [], false, false, null, false));
 		};
 		ParagraphCollection.prototype.getLastOrNullObject=function () {
-			return new Word.Paragraph(this.context, _createMethodObjectPath(this.context, this, "GetLastOrNullObject", 1, [], false, false, null));
+			_throwIfApiNotSupported("ParagraphCollection.getLastOrNullObject", _defaultApiSetName, "1.3", _hostName);
+			return new Word.Paragraph(this.context, _createMethodObjectPath(this.context, this, "GetLastOrNullObject", 1, [], false, false, null, false));
 		};
 		ParagraphCollection.prototype._GetItem=function (index) {
 			return new Word.Paragraph(this.context, _createIndexerObjectPath(this.context, this, [index]));
 		};
 		ParagraphCollection.prototype._KeepReference=function () {
-			_createMethodAction(this.context, this, "_KeepReference", 1, []);
+			_createMethodAction(this.context, this, "_KeepReference", 1, [], false);
 		};
 		ParagraphCollection.prototype._handleResult=function (value) {
 			_super.prototype._handleResult.call(this, value);
@@ -16347,7 +17618,7 @@ var Word;
 			var obj=value;
 			_fixObjectPathIfNecessary(this, obj);
 			if (!_isUndefined(obj["_ReferenceId"])) {
-				this.m__ReferenceId=obj["_ReferenceId"];
+				this.__R=obj["_ReferenceId"];
 			}
 			if (!_isNullOrUndefined(obj[OfficeExtension.Constants.items])) {
 				this.m__items=[];
@@ -16360,8 +17631,16 @@ var Word;
 			}
 		};
 		ParagraphCollection.prototype.load=function (option) {
-			_load(this, option);
-			return this;
+			return _load(this, option);
+		};
+		ParagraphCollection.prototype.loadAndSync=function (option) {
+			return _loadAndSync(this, option);
+		};
+		ParagraphCollection.prototype.retrieve=function (option) {
+			return _retrieve(this, option);
+		};
+		ParagraphCollection.prototype.retrieveAndSync=function (option) {
+			return _retrieveAndSync(this, option);
 		};
 		ParagraphCollection.prototype._handleIdResult=function (value) {
 			_super.prototype._handleIdResult.call(this, value);
@@ -16369,7 +17648,7 @@ var Word;
 				return;
 			}
 			if (!_isUndefined(value["_ReferenceId"])) {
-				this.m__ReferenceId=value["_ReferenceId"];
+				this.__R=value["_ReferenceId"];
 			}
 		};
 		ParagraphCollection.prototype.track=function () {
@@ -16381,15 +17660,16 @@ var Word;
 			return this;
 		};
 		ParagraphCollection.prototype.toJSON=function () {
-			return {};
+			return _toJson(this, {}, {}, this.m__items);
 		};
 		return ParagraphCollection;
 	}(OfficeExtension.ClientObject));
 	Word.ParagraphCollection=ParagraphCollection;
+	var _typeRange="Range";
 	var Range=(function (_super) {
 		__extends(Range, _super);
 		function Range() {
-			_super.apply(this, arguments);
+			return _super !==null && _super.apply(this, arguments) || this;
 		}
 		Object.defineProperty(Range.prototype, "_className", {
 			get: function () {
@@ -16400,141 +17680,151 @@ var Word;
 		});
 		Object.defineProperty(Range.prototype, "contentControls", {
 			get: function () {
-				if (!this.m_contentControls) {
-					this.m_contentControls=new Word.ContentControlCollection(this.context, _createPropertyObjectPath(this.context, this, "ContentControls", true, false));
+				if (!this._C) {
+					this._C=new Word.ContentControlCollection(this.context, _createPropertyObjectPath(this.context, this, "ContentControls", true, false, false));
 				}
-				return this.m_contentControls;
+				return this._C;
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(Range.prototype, "font", {
 			get: function () {
-				if (!this.m_font) {
-					this.m_font=new Word.Font(this.context, _createPropertyObjectPath(this.context, this, "Font", false, false));
+				if (!this._F) {
+					this._F=new Word.Font(this.context, _createPropertyObjectPath(this.context, this, "Font", false, false, false));
 				}
-				return this.m_font;
+				return this._F;
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(Range.prototype, "inlinePictures", {
 			get: function () {
-				if (!this.m_inlinePictures) {
-					this.m_inlinePictures=new Word.InlinePictureCollection(this.context, _createPropertyObjectPath(this.context, this, "InlinePictures", true, false));
+				_throwIfApiNotSupported("Range.inlinePictures", _defaultApiSetName, "1.2", _hostName);
+				if (!this._I) {
+					this._I=new Word.InlinePictureCollection(this.context, _createPropertyObjectPath(this.context, this, "InlinePictures", true, false, false));
 				}
-				return this.m_inlinePictures;
+				return this._I;
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(Range.prototype, "lists", {
 			get: function () {
-				if (!this.m_lists) {
-					this.m_lists=new Word.ListCollection(this.context, _createPropertyObjectPath(this.context, this, "Lists", true, false));
+				_throwIfApiNotSupported("Range.lists", _defaultApiSetName, "1.3", _hostName);
+				if (!this._L) {
+					this._L=new Word.ListCollection(this.context, _createPropertyObjectPath(this.context, this, "Lists", true, false, false));
 				}
-				return this.m_lists;
+				return this._L;
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(Range.prototype, "paragraphs", {
 			get: function () {
-				if (!this.m_paragraphs) {
-					this.m_paragraphs=new Word.ParagraphCollection(this.context, _createPropertyObjectPath(this.context, this, "Paragraphs", true, false));
+				if (!this._P) {
+					this._P=new Word.ParagraphCollection(this.context, _createPropertyObjectPath(this.context, this, "Paragraphs", true, false, false));
 				}
-				return this.m_paragraphs;
+				return this._P;
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(Range.prototype, "parentBody", {
 			get: function () {
-				if (!this.m_parentBody) {
-					this.m_parentBody=new Word.Body(this.context, _createPropertyObjectPath(this.context, this, "ParentBody", false, false));
+				_throwIfApiNotSupported("Range.parentBody", _defaultApiSetName, "1.3", _hostName);
+				if (!this._Pa) {
+					this._Pa=new Word.Body(this.context, _createPropertyObjectPath(this.context, this, "ParentBody", false, false, false));
 				}
-				return this.m_parentBody;
+				return this._Pa;
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(Range.prototype, "parentContentControl", {
 			get: function () {
-				if (!this.m_parentContentControl) {
-					this.m_parentContentControl=new Word.ContentControl(this.context, _createPropertyObjectPath(this.context, this, "ParentContentControl", false, false));
+				if (!this._Par) {
+					this._Par=new Word.ContentControl(this.context, _createPropertyObjectPath(this.context, this, "ParentContentControl", false, false, false));
 				}
-				return this.m_parentContentControl;
+				return this._Par;
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(Range.prototype, "parentContentControlOrNullObject", {
 			get: function () {
-				if (!this.m_parentContentControlOrNullObject) {
-					this.m_parentContentControlOrNullObject=new Word.ContentControl(this.context, _createPropertyObjectPath(this.context, this, "ParentContentControlOrNullObject", false, false));
+				_throwIfApiNotSupported("Range.parentContentControlOrNullObject", _defaultApiSetName, "1.3", _hostName);
+				if (!this._Pare) {
+					this._Pare=new Word.ContentControl(this.context, _createPropertyObjectPath(this.context, this, "ParentContentControlOrNullObject", false, false, false));
 				}
-				return this.m_parentContentControlOrNullObject;
+				return this._Pare;
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(Range.prototype, "parentTable", {
 			get: function () {
-				if (!this.m_parentTable) {
-					this.m_parentTable=new Word.Table(this.context, _createPropertyObjectPath(this.context, this, "ParentTable", false, false));
+				_throwIfApiNotSupported("Range.parentTable", _defaultApiSetName, "1.3", _hostName);
+				if (!this._Paren) {
+					this._Paren=new Word.Table(this.context, _createPropertyObjectPath(this.context, this, "ParentTable", false, false, false));
 				}
-				return this.m_parentTable;
+				return this._Paren;
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(Range.prototype, "parentTableCell", {
 			get: function () {
-				if (!this.m_parentTableCell) {
-					this.m_parentTableCell=new Word.TableCell(this.context, _createPropertyObjectPath(this.context, this, "ParentTableCell", false, false));
+				_throwIfApiNotSupported("Range.parentTableCell", _defaultApiSetName, "1.3", _hostName);
+				if (!this._Parent) {
+					this._Parent=new Word.TableCell(this.context, _createPropertyObjectPath(this.context, this, "ParentTableCell", false, false, false));
 				}
-				return this.m_parentTableCell;
+				return this._Parent;
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(Range.prototype, "parentTableCellOrNullObject", {
 			get: function () {
-				if (!this.m_parentTableCellOrNullObject) {
-					this.m_parentTableCellOrNullObject=new Word.TableCell(this.context, _createPropertyObjectPath(this.context, this, "ParentTableCellOrNullObject", false, false));
+				_throwIfApiNotSupported("Range.parentTableCellOrNullObject", _defaultApiSetName, "1.3", _hostName);
+				if (!this._ParentT) {
+					this._ParentT=new Word.TableCell(this.context, _createPropertyObjectPath(this.context, this, "ParentTableCellOrNullObject", false, false, false));
 				}
-				return this.m_parentTableCellOrNullObject;
+				return this._ParentT;
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(Range.prototype, "parentTableOrNullObject", {
 			get: function () {
-				if (!this.m_parentTableOrNullObject) {
-					this.m_parentTableOrNullObject=new Word.Table(this.context, _createPropertyObjectPath(this.context, this, "ParentTableOrNullObject", false, false));
+				_throwIfApiNotSupported("Range.parentTableOrNullObject", _defaultApiSetName, "1.3", _hostName);
+				if (!this._ParentTa) {
+					this._ParentTa=new Word.Table(this.context, _createPropertyObjectPath(this.context, this, "ParentTableOrNullObject", false, false, false));
 				}
-				return this.m_parentTableOrNullObject;
+				return this._ParentTa;
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(Range.prototype, "tables", {
 			get: function () {
-				if (!this.m_tables) {
-					this.m_tables=new Word.TableCollection(this.context, _createPropertyObjectPath(this.context, this, "Tables", true, false));
+				_throwIfApiNotSupported("Range.tables", _defaultApiSetName, "1.3", _hostName);
+				if (!this._T) {
+					this._T=new Word.TableCollection(this.context, _createPropertyObjectPath(this.context, this, "Tables", true, false, false));
 				}
-				return this.m_tables;
+				return this._T;
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(Range.prototype, "hyperlink", {
 			get: function () {
-				_throwIfNotLoaded("hyperlink", this.m_hyperlink, "Range", this._isNull);
-				return this.m_hyperlink;
+				_throwIfNotLoaded("hyperlink", this._H, _typeRange, this._isNull);
+				_throwIfApiNotSupported("Range.hyperlink", _defaultApiSetName, "1.3", _hostName);
+				return this._H;
 			},
 			set: function (value) {
-				this.m_hyperlink=value;
+				this._H=value;
 				_createSetPropertyAction(this.context, this, "Hyperlink", value);
 			},
 			enumerable: true,
@@ -16542,19 +17832,20 @@ var Word;
 		});
 		Object.defineProperty(Range.prototype, "isEmpty", {
 			get: function () {
-				_throwIfNotLoaded("isEmpty", this.m_isEmpty, "Range", this._isNull);
-				return this.m_isEmpty;
+				_throwIfNotLoaded("isEmpty", this._Is, _typeRange, this._isNull);
+				_throwIfApiNotSupported("Range.isEmpty", _defaultApiSetName, "1.3", _hostName);
+				return this._Is;
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(Range.prototype, "style", {
 			get: function () {
-				_throwIfNotLoaded("style", this.m_style, "Range", this._isNull);
-				return this.m_style;
+				_throwIfNotLoaded("style", this._S, _typeRange, this._isNull);
+				return this._S;
 			},
 			set: function (value) {
-				this.m_style=value;
+				this._S=value;
 				_createSetPropertyAction(this.context, this, "Style", value);
 			},
 			enumerable: true,
@@ -16562,11 +17853,12 @@ var Word;
 		});
 		Object.defineProperty(Range.prototype, "styleBuiltIn", {
 			get: function () {
-				_throwIfNotLoaded("styleBuiltIn", this.m_styleBuiltIn, "Range", this._isNull);
-				return this.m_styleBuiltIn;
+				_throwIfNotLoaded("styleBuiltIn", this._St, _typeRange, this._isNull);
+				_throwIfApiNotSupported("Range.styleBuiltIn", _defaultApiSetName, "1.3", _hostName);
+				return this._St;
 			},
 			set: function (value) {
-				this.m_styleBuiltIn=value;
+				this._St=value;
 				_createSetPropertyAction(this.context, this, "StyleBuiltIn", value);
 			},
 			enumerable: true,
@@ -16574,24 +17866,24 @@ var Word;
 		});
 		Object.defineProperty(Range.prototype, "text", {
 			get: function () {
-				_throwIfNotLoaded("text", this.m_text, "Range", this._isNull);
-				return this.m_text;
+				_throwIfNotLoaded("text", this._Te, _typeRange, this._isNull);
+				return this._Te;
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(Range.prototype, "_Id", {
 			get: function () {
-				_throwIfNotLoaded("_Id", this.m__Id, "Range", this._isNull);
-				return this.m__Id;
+				_throwIfNotLoaded("_Id", this.__I, _typeRange, this._isNull);
+				return this.__I;
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(Range.prototype, "_ReferenceId", {
 			get: function () {
-				_throwIfNotLoaded("_ReferenceId", this.m__ReferenceId, "Range", this._isNull);
-				return this.m__ReferenceId;
+				_throwIfNotLoaded("_ReferenceId", this.__R, _typeRange, this._isNull);
+				return this.__R;
 			},
 			enumerable: true,
 			configurable: true
@@ -16609,120 +17901,123 @@ var Word;
 				"parentTableCell",
 				"parentTableCellOrNullObject",
 				"parentTableOrNullObject",
-				"tables",
-				"contentControls",
-				"inlinePictures",
-				"lists",
-				"paragraphs",
-				"parentBody",
-				"parentContentControl",
-				"parentContentControlOrNullObject",
-				"parentTable",
-				"parentTableCell",
-				"parentTableCellOrNullObject",
-				"parentTableOrNullObject",
 				"tables"
 			]);
 		};
 		Range.prototype.clear=function () {
-			_createMethodAction(this.context, this, "Clear", 0, []);
+			_createMethodAction(this.context, this, "Clear", 0, [], false);
 		};
 		Range.prototype.compareLocationWith=function (range) {
-			var action=_createMethodAction(this.context, this, "CompareLocationWith", 1, [range]);
+			_throwIfApiNotSupported("Range.compareLocationWith", _defaultApiSetName, "1.3", _hostName);
+			var action=_createMethodAction(this.context, this, "CompareLocationWith", 1, [range], false);
 			var ret=new OfficeExtension.ClientResult();
 			_addActionResultHandler(this, action, ret);
 			return ret;
 		};
 		Range.prototype.delete=function () {
-			_createMethodAction(this.context, this, "Delete", 0, []);
+			_createMethodAction(this.context, this, "Delete", 0, [], false);
 		};
 		Range.prototype.expandTo=function (range) {
-			return new Word.Range(this.context, _createMethodObjectPath(this.context, this, "ExpandTo", 0, [range], false, false, null));
+			_throwIfApiNotSupported("Range.expandTo", _defaultApiSetName, "1.3", _hostName);
+			return new Word.Range(this.context, _createMethodObjectPath(this.context, this, "ExpandTo", 0, [range], false, false, null, false));
 		};
 		Range.prototype.expandToOrNullObject=function (range) {
-			return new Word.Range(this.context, _createMethodObjectPath(this.context, this, "ExpandToOrNullObject", 0, [range], false, false, null));
+			_throwIfApiNotSupported("Range.expandToOrNullObject", _defaultApiSetName, "1.3", _hostName);
+			return new Word.Range(this.context, _createMethodObjectPath(this.context, this, "ExpandToOrNullObject", 0, [range], false, false, null, false));
 		};
 		Range.prototype.getBookmarks=function (includeHidden, includeAdjacent) {
-			var action=_createMethodAction(this.context, this, "GetBookmarks", 1, [includeHidden, includeAdjacent]);
+			_throwIfApiNotSupported("Range.getBookmarks", _defaultApiSetName, "1.4", _hostName);
+			var action=_createMethodAction(this.context, this, "GetBookmarks", 1, [includeHidden, includeAdjacent], false);
 			var ret=new OfficeExtension.ClientResult();
 			_addActionResultHandler(this, action, ret);
 			return ret;
 		};
 		Range.prototype.getHtml=function () {
-			var action=_createMethodAction(this.context, this, "GetHtml", 1, []);
+			var action=_createMethodAction(this.context, this, "GetHtml", 1, [], false);
 			var ret=new OfficeExtension.ClientResult();
 			_addActionResultHandler(this, action, ret);
 			return ret;
 		};
 		Range.prototype.getHyperlinkRanges=function () {
-			return new Word.RangeCollection(this.context, _createMethodObjectPath(this.context, this, "GetHyperlinkRanges", 1, [], true, false, null));
+			_throwIfApiNotSupported("Range.getHyperlinkRanges", _defaultApiSetName, "1.3", _hostName);
+			return new Word.RangeCollection(this.context, _createMethodObjectPath(this.context, this, "GetHyperlinkRanges", 1, [], true, false, null, false));
 		};
 		Range.prototype.getNextTextRange=function (endingMarks, trimSpacing) {
-			return new Word.Range(this.context, _createMethodObjectPath(this.context, this, "GetNextTextRange", 1, [endingMarks, trimSpacing], false, false, null));
+			_throwIfApiNotSupported("Range.getNextTextRange", _defaultApiSetName, "1.3", _hostName);
+			return new Word.Range(this.context, _createMethodObjectPath(this.context, this, "GetNextTextRange", 1, [endingMarks, trimSpacing], false, false, null, false));
 		};
 		Range.prototype.getNextTextRangeOrNullObject=function (endingMarks, trimSpacing) {
-			return new Word.Range(this.context, _createMethodObjectPath(this.context, this, "GetNextTextRangeOrNullObject", 1, [endingMarks, trimSpacing], false, false, null));
+			_throwIfApiNotSupported("Range.getNextTextRangeOrNullObject", _defaultApiSetName, "1.3", _hostName);
+			return new Word.Range(this.context, _createMethodObjectPath(this.context, this, "GetNextTextRangeOrNullObject", 1, [endingMarks, trimSpacing], false, false, null, false));
 		};
 		Range.prototype.getOoxml=function () {
-			var action=_createMethodAction(this.context, this, "GetOoxml", 1, []);
+			var action=_createMethodAction(this.context, this, "GetOoxml", 1, [], false);
 			var ret=new OfficeExtension.ClientResult();
 			_addActionResultHandler(this, action, ret);
 			return ret;
 		};
 		Range.prototype.getRange=function (rangeLocation) {
-			return new Word.Range(this.context, _createMethodObjectPath(this.context, this, "GetRange", 1, [rangeLocation], false, false, null));
+			_throwIfApiNotSupported("Range.getRange", _defaultApiSetName, "1.3", _hostName);
+			return new Word.Range(this.context, _createMethodObjectPath(this.context, this, "GetRange", 1, [rangeLocation], false, false, null, false));
 		};
 		Range.prototype.getTextRanges=function (endingMarks, trimSpacing) {
-			return new Word.RangeCollection(this.context, _createMethodObjectPath(this.context, this, "GetTextRanges", 1, [endingMarks, trimSpacing], true, false, null));
+			_throwIfApiNotSupported("Range.getTextRanges", _defaultApiSetName, "1.3", _hostName);
+			return new Word.RangeCollection(this.context, _createMethodObjectPath(this.context, this, "GetTextRanges", 1, [endingMarks, trimSpacing], true, false, null, false));
 		};
 		Range.prototype.insertBookmark=function (name) {
-			_createMethodAction(this.context, this, "InsertBookmark", 0, [name]);
+			_throwIfApiNotSupported("Range.insertBookmark", _defaultApiSetName, "1.4", _hostName);
+			_createMethodAction(this.context, this, "InsertBookmark", 0, [name], false);
 		};
 		Range.prototype.insertBreak=function (breakType, insertLocation) {
-			_createMethodAction(this.context, this, "InsertBreak", 0, [breakType, insertLocation]);
+			_createMethodAction(this.context, this, "InsertBreak", 0, [breakType, insertLocation], false);
 		};
 		Range.prototype.insertContentControl=function () {
-			return new Word.ContentControl(this.context, _createMethodObjectPath(this.context, this, "InsertContentControl", 0, [], false, true, null));
+			return new Word.ContentControl(this.context, _createMethodObjectPath(this.context, this, "InsertContentControl", 0, [], false, true, null, false));
 		};
 		Range.prototype.insertFileFromBase64=function (base64File, insertLocation) {
-			return new Word.Range(this.context, _createMethodObjectPath(this.context, this, "InsertFileFromBase64", 0, [base64File, insertLocation], false, true, null));
+			return new Word.Range(this.context, _createMethodObjectPath(this.context, this, "InsertFileFromBase64", 0, [base64File, insertLocation], false, true, null, false));
 		};
 		Range.prototype.insertHtml=function (html, insertLocation) {
-			return new Word.Range(this.context, _createMethodObjectPath(this.context, this, "InsertHtml", 0, [html, insertLocation], false, true, null));
+			return new Word.Range(this.context, _createMethodObjectPath(this.context, this, "InsertHtml", 0, [html, insertLocation], false, true, null, false));
 		};
 		Range.prototype.insertInlinePictureFromBase64=function (base64EncodedImage, insertLocation) {
-			return new Word.InlinePicture(this.context, _createMethodObjectPath(this.context, this, "InsertInlinePictureFromBase64", 0, [base64EncodedImage, insertLocation], false, true, null));
+			_throwIfApiNotSupported("Range.insertInlinePictureFromBase64", _defaultApiSetName, "1.2", _hostName);
+			return new Word.InlinePicture(this.context, _createMethodObjectPath(this.context, this, "InsertInlinePictureFromBase64", 0, [base64EncodedImage, insertLocation], false, true, null, false));
 		};
 		Range.prototype.insertOoxml=function (ooxml, insertLocation) {
-			return new Word.Range(this.context, _createMethodObjectPath(this.context, this, "InsertOoxml", 0, [ooxml, insertLocation], false, true, null));
+			return new Word.Range(this.context, _createMethodObjectPath(this.context, this, "InsertOoxml", 0, [ooxml, insertLocation], false, true, null, false));
 		};
 		Range.prototype.insertParagraph=function (paragraphText, insertLocation) {
-			return new Word.Paragraph(this.context, _createMethodObjectPath(this.context, this, "InsertParagraph", 0, [paragraphText, insertLocation], false, true, null));
+			return new Word.Paragraph(this.context, _createMethodObjectPath(this.context, this, "InsertParagraph", 0, [paragraphText, insertLocation], false, true, null, false));
 		};
 		Range.prototype.insertTable=function (rowCount, columnCount, insertLocation, values) {
-			return new Word.Table(this.context, _createMethodObjectPath(this.context, this, "InsertTable", 0, [rowCount, columnCount, insertLocation, values], false, true, null));
+			_throwIfApiNotSupported("Range.insertTable", _defaultApiSetName, "1.3", _hostName);
+			return new Word.Table(this.context, _createMethodObjectPath(this.context, this, "InsertTable", 0, [rowCount, columnCount, insertLocation, values], false, true, null, false));
 		};
 		Range.prototype.insertText=function (text, insertLocation) {
-			return new Word.Range(this.context, _createMethodObjectPath(this.context, this, "InsertText", 0, [text, insertLocation], false, true, null));
+			return new Word.Range(this.context, _createMethodObjectPath(this.context, this, "InsertText", 0, [text, insertLocation], false, true, null, false));
 		};
 		Range.prototype.intersectWith=function (range) {
-			return new Word.Range(this.context, _createMethodObjectPath(this.context, this, "IntersectWith", 0, [range], false, false, null));
+			_throwIfApiNotSupported("Range.intersectWith", _defaultApiSetName, "1.3", _hostName);
+			return new Word.Range(this.context, _createMethodObjectPath(this.context, this, "IntersectWith", 0, [range], false, false, null, false));
 		};
 		Range.prototype.intersectWithOrNullObject=function (range) {
-			return new Word.Range(this.context, _createMethodObjectPath(this.context, this, "IntersectWithOrNullObject", 0, [range], false, false, null));
+			_throwIfApiNotSupported("Range.intersectWithOrNullObject", _defaultApiSetName, "1.3", _hostName);
+			return new Word.Range(this.context, _createMethodObjectPath(this.context, this, "IntersectWithOrNullObject", 0, [range], false, false, null, false));
 		};
 		Range.prototype.search=function (searchText, searchOptions) {
 			searchOptions=_normalizeSearchOptions(this.context, searchOptions);
-			return new Word.RangeCollection(this.context, _createMethodObjectPath(this.context, this, "Search", 1, [searchText, searchOptions], true, false, null));
+			return new Word.RangeCollection(this.context, _createMethodObjectPath(this.context, this, "Search", 1, [searchText, searchOptions], true, false, null, false));
 		};
 		Range.prototype.select=function (selectionMode) {
-			_createMethodAction(this.context, this, "Select", 1, [selectionMode]);
+			_createMethodAction(this.context, this, "Select", 1, [selectionMode], false);
 		};
 		Range.prototype.split=function (delimiters, multiParagraphs, trimDelimiters, trimSpacing) {
-			return new Word.RangeCollection(this.context, _createMethodObjectPath(this.context, this, "Split", 1, [delimiters, multiParagraphs, trimDelimiters, trimSpacing], true, false, null));
+			_throwIfApiNotSupported("Range.split", _defaultApiSetName, "1.3", _hostName);
+			return new Word.RangeCollection(this.context, _createMethodObjectPath(this.context, this, "Split", 1, [delimiters, multiParagraphs, trimDelimiters, trimSpacing], true, false, null, false));
 		};
 		Range.prototype._KeepReference=function () {
-			_createMethodAction(this.context, this, "_KeepReference", 1, []);
+			_createMethodAction(this.context, this, "_KeepReference", 1, [], false);
 		};
 		Range.prototype._handleResult=function (value) {
 			_super.prototype._handleResult.call(this, value);
@@ -16731,31 +18026,39 @@ var Word;
 			var obj=value;
 			_fixObjectPathIfNecessary(this, obj);
 			if (!_isUndefined(obj["Hyperlink"])) {
-				this.m_hyperlink=obj["Hyperlink"];
+				this._H=obj["Hyperlink"];
 			}
 			if (!_isUndefined(obj["IsEmpty"])) {
-				this.m_isEmpty=obj["IsEmpty"];
+				this._Is=obj["IsEmpty"];
 			}
 			if (!_isUndefined(obj["Style"])) {
-				this.m_style=obj["Style"];
+				this._S=obj["Style"];
 			}
 			if (!_isUndefined(obj["StyleBuiltIn"])) {
-				this.m_styleBuiltIn=obj["StyleBuiltIn"];
+				this._St=obj["StyleBuiltIn"];
 			}
 			if (!_isUndefined(obj["Text"])) {
-				this.m_text=obj["Text"];
+				this._Te=obj["Text"];
 			}
 			if (!_isUndefined(obj["_Id"])) {
-				this.m__Id=obj["_Id"];
+				this.__I=obj["_Id"];
 			}
 			if (!_isUndefined(obj["_ReferenceId"])) {
-				this.m__ReferenceId=obj["_ReferenceId"];
+				this.__R=obj["_ReferenceId"];
 			}
 			_handleNavigationPropertyResults(this, obj, ["contentControls", "ContentControls", "font", "Font", "inlinePictures", "InlinePictures", "lists", "Lists", "paragraphs", "Paragraphs", "parentBody", "ParentBody", "parentContentControl", "ParentContentControl", "parentContentControlOrNullObject", "ParentContentControlOrNullObject", "parentTable", "ParentTable", "parentTableCell", "ParentTableCell", "parentTableCellOrNullObject", "ParentTableCellOrNullObject", "parentTableOrNullObject", "ParentTableOrNullObject", "tables", "Tables"]);
 		};
 		Range.prototype.load=function (option) {
-			_load(this, option);
-			return this;
+			return _load(this, option);
+		};
+		Range.prototype.loadAndSync=function (option) {
+			return _loadAndSync(this, option);
+		};
+		Range.prototype.retrieve=function (option) {
+			return _retrieve(this, option);
+		};
+		Range.prototype.retrieveAndSync=function (option) {
+			return _retrieveAndSync(this, option);
 		};
 		Range.prototype._handleIdResult=function (value) {
 			_super.prototype._handleIdResult.call(this, value);
@@ -16763,10 +18066,10 @@ var Word;
 				return;
 			}
 			if (!_isUndefined(value["_ReferenceId"])) {
-				this.m__ReferenceId=value["_ReferenceId"];
+				this.__R=value["_ReferenceId"];
 			}
 			if (!_isUndefined(value["_Id"])) {
-				this.m__Id=value["_Id"];
+				this.__I=value["_Id"];
 			}
 		};
 		Range.prototype.track=function () {
@@ -16778,22 +18081,29 @@ var Word;
 			return this;
 		};
 		Range.prototype.toJSON=function () {
-			return {
-				"font": this.m_font,
-				"hyperlink": this.m_hyperlink,
-				"isEmpty": this.m_isEmpty,
-				"style": this.m_style,
-				"styleBuiltIn": this.m_styleBuiltIn,
-				"text": this.m_text
-			};
+			return _toJson(this, {
+				"hyperlink": this._H,
+				"isEmpty": this._Is,
+				"style": this._S,
+				"styleBuiltIn": this._St,
+				"text": this._Te,
+			}, {
+				"font": this._F,
+				"inlinePictures": this._I,
+			});
+		};
+		Range.prototype.ensureUnchanged=function (data) {
+			_createEnsureUnchangedAction(this.context, this, data);
+			return;
 		};
 		return Range;
 	}(OfficeExtension.ClientObject));
 	Word.Range=Range;
+	var _typeRangeCollection="RangeCollection";
 	var RangeCollection=(function (_super) {
 		__extends(RangeCollection, _super);
 		function RangeCollection() {
-			_super.apply(this, arguments);
+			return _super !==null && _super.apply(this, arguments) || this;
 		}
 		Object.defineProperty(RangeCollection.prototype, "_className", {
 			get: function () {
@@ -16804,7 +18114,7 @@ var Word;
 		});
 		Object.defineProperty(RangeCollection.prototype, "items", {
 			get: function () {
-				_throwIfNotLoaded("items", this.m__items, "RangeCollection", this._isNull);
+				_throwIfNotLoaded("items", this.m__items, _typeRangeCollection, this._isNull);
 				return this.m__items;
 			},
 			enumerable: true,
@@ -16812,23 +18122,25 @@ var Word;
 		});
 		Object.defineProperty(RangeCollection.prototype, "_ReferenceId", {
 			get: function () {
-				_throwIfNotLoaded("_ReferenceId", this.m__ReferenceId, "RangeCollection", this._isNull);
-				return this.m__ReferenceId;
+				_throwIfNotLoaded("_ReferenceId", this.__R, _typeRangeCollection, this._isNull);
+				return this.__R;
 			},
 			enumerable: true,
 			configurable: true
 		});
 		RangeCollection.prototype.getFirst=function () {
-			return new Word.Range(this.context, _createMethodObjectPath(this.context, this, "GetFirst", 1, [], false, false, null));
+			_throwIfApiNotSupported("RangeCollection.getFirst", _defaultApiSetName, "1.3", _hostName);
+			return new Word.Range(this.context, _createMethodObjectPath(this.context, this, "GetFirst", 1, [], false, false, null, false));
 		};
 		RangeCollection.prototype.getFirstOrNullObject=function () {
-			return new Word.Range(this.context, _createMethodObjectPath(this.context, this, "GetFirstOrNullObject", 1, [], false, false, null));
+			_throwIfApiNotSupported("RangeCollection.getFirstOrNullObject", _defaultApiSetName, "1.3", _hostName);
+			return new Word.Range(this.context, _createMethodObjectPath(this.context, this, "GetFirstOrNullObject", 1, [], false, false, null, false));
 		};
 		RangeCollection.prototype._GetItem=function (index) {
 			return new Word.Range(this.context, _createIndexerObjectPath(this.context, this, [index]));
 		};
 		RangeCollection.prototype._KeepReference=function () {
-			_createMethodAction(this.context, this, "_KeepReference", 1, []);
+			_createMethodAction(this.context, this, "_KeepReference", 1, [], false);
 		};
 		RangeCollection.prototype._handleResult=function (value) {
 			_super.prototype._handleResult.call(this, value);
@@ -16837,7 +18149,7 @@ var Word;
 			var obj=value;
 			_fixObjectPathIfNecessary(this, obj);
 			if (!_isUndefined(obj["_ReferenceId"])) {
-				this.m__ReferenceId=obj["_ReferenceId"];
+				this.__R=obj["_ReferenceId"];
 			}
 			if (!_isNullOrUndefined(obj[OfficeExtension.Constants.items])) {
 				this.m__items=[];
@@ -16850,8 +18162,16 @@ var Word;
 			}
 		};
 		RangeCollection.prototype.load=function (option) {
-			_load(this, option);
-			return this;
+			return _load(this, option);
+		};
+		RangeCollection.prototype.loadAndSync=function (option) {
+			return _loadAndSync(this, option);
+		};
+		RangeCollection.prototype.retrieve=function (option) {
+			return _retrieve(this, option);
+		};
+		RangeCollection.prototype.retrieveAndSync=function (option) {
+			return _retrieveAndSync(this, option);
 		};
 		RangeCollection.prototype._handleIdResult=function (value) {
 			_super.prototype._handleIdResult.call(this, value);
@@ -16859,7 +18179,7 @@ var Word;
 				return;
 			}
 			if (!_isUndefined(value["_ReferenceId"])) {
-				this.m__ReferenceId=value["_ReferenceId"];
+				this.__R=value["_ReferenceId"];
 			}
 		};
 		RangeCollection.prototype.track=function () {
@@ -16871,15 +18191,16 @@ var Word;
 			return this;
 		};
 		RangeCollection.prototype.toJSON=function () {
-			return {};
+			return _toJson(this, {}, {}, this.m__items);
 		};
 		return RangeCollection;
 	}(OfficeExtension.ClientObject));
 	Word.RangeCollection=RangeCollection;
+	var _typeSearchOptions="SearchOptions";
 	var SearchOptions=(function (_super) {
 		__extends(SearchOptions, _super);
 		function SearchOptions() {
-			_super.apply(this, arguments);
+			return _super !==null && _super.apply(this, arguments) || this;
 		}
 		Object.defineProperty(SearchOptions.prototype, "_className", {
 			get: function () {
@@ -16902,11 +18223,11 @@ var Word;
 		});
 		Object.defineProperty(SearchOptions.prototype, "ignorePunct", {
 			get: function () {
-				_throwIfNotLoaded("ignorePunct", this.m_ignorePunct, "SearchOptions", this._isNull);
-				return this.m_ignorePunct;
+				_throwIfNotLoaded("ignorePunct", this._I, _typeSearchOptions, this._isNull);
+				return this._I;
 			},
 			set: function (value) {
-				this.m_ignorePunct=value;
+				this._I=value;
 				_createSetPropertyAction(this.context, this, "IgnorePunct", value);
 			},
 			enumerable: true,
@@ -16914,11 +18235,11 @@ var Word;
 		});
 		Object.defineProperty(SearchOptions.prototype, "ignoreSpace", {
 			get: function () {
-				_throwIfNotLoaded("ignoreSpace", this.m_ignoreSpace, "SearchOptions", this._isNull);
-				return this.m_ignoreSpace;
+				_throwIfNotLoaded("ignoreSpace", this._Ig, _typeSearchOptions, this._isNull);
+				return this._Ig;
 			},
 			set: function (value) {
-				this.m_ignoreSpace=value;
+				this._Ig=value;
 				_createSetPropertyAction(this.context, this, "IgnoreSpace", value);
 			},
 			enumerable: true,
@@ -16926,11 +18247,11 @@ var Word;
 		});
 		Object.defineProperty(SearchOptions.prototype, "matchCase", {
 			get: function () {
-				_throwIfNotLoaded("matchCase", this.m_matchCase, "SearchOptions", this._isNull);
-				return this.m_matchCase;
+				_throwIfNotLoaded("matchCase", this._M, _typeSearchOptions, this._isNull);
+				return this._M;
 			},
 			set: function (value) {
-				this.m_matchCase=value;
+				this._M=value;
 				_createSetPropertyAction(this.context, this, "MatchCase", value);
 			},
 			enumerable: true,
@@ -16938,11 +18259,11 @@ var Word;
 		});
 		Object.defineProperty(SearchOptions.prototype, "matchPrefix", {
 			get: function () {
-				_throwIfNotLoaded("matchPrefix", this.m_matchPrefix, "SearchOptions", this._isNull);
-				return this.m_matchPrefix;
+				_throwIfNotLoaded("matchPrefix", this._Ma, _typeSearchOptions, this._isNull);
+				return this._Ma;
 			},
 			set: function (value) {
-				this.m_matchPrefix=value;
+				this._Ma=value;
 				_createSetPropertyAction(this.context, this, "MatchPrefix", value);
 			},
 			enumerable: true,
@@ -16950,11 +18271,11 @@ var Word;
 		});
 		Object.defineProperty(SearchOptions.prototype, "matchSuffix", {
 			get: function () {
-				_throwIfNotLoaded("matchSuffix", this.m_matchSuffix, "SearchOptions", this._isNull);
-				return this.m_matchSuffix;
+				_throwIfNotLoaded("matchSuffix", this._Mat, _typeSearchOptions, this._isNull);
+				return this._Mat;
 			},
 			set: function (value) {
-				this.m_matchSuffix=value;
+				this._Mat=value;
 				_createSetPropertyAction(this.context, this, "MatchSuffix", value);
 			},
 			enumerable: true,
@@ -16962,11 +18283,11 @@ var Word;
 		});
 		Object.defineProperty(SearchOptions.prototype, "matchWholeWord", {
 			get: function () {
-				_throwIfNotLoaded("matchWholeWord", this.m_matchWholeWord, "SearchOptions", this._isNull);
-				return this.m_matchWholeWord;
+				_throwIfNotLoaded("matchWholeWord", this._Matc, _typeSearchOptions, this._isNull);
+				return this._Matc;
 			},
 			set: function (value) {
-				this.m_matchWholeWord=value;
+				this._Matc=value;
 				_createSetPropertyAction(this.context, this, "MatchWholeWord", value);
 			},
 			enumerable: true,
@@ -16974,7 +18295,7 @@ var Word;
 		});
 		Object.defineProperty(SearchOptions.prototype, "matchWildcards", {
 			get: function () {
-				_throwIfNotLoaded("matchWildcards", this.m_matchWildcards, "SearchOptions", this._isNull);
+				_throwIfNotLoaded("matchWildcards", this.m_matchWildcards, _typeSearchOptions, this._isNull);
 				return this.m_matchWildcards;
 			},
 			set: function (value) {
@@ -16994,53 +18315,66 @@ var Word;
 			var obj=value;
 			_fixObjectPathIfNecessary(this, obj);
 			if (!_isUndefined(obj["IgnorePunct"])) {
-				this.m_ignorePunct=obj["IgnorePunct"];
+				this._I=obj["IgnorePunct"];
 			}
 			if (!_isUndefined(obj["IgnoreSpace"])) {
-				this.m_ignoreSpace=obj["IgnoreSpace"];
+				this._Ig=obj["IgnoreSpace"];
 			}
 			if (!_isUndefined(obj["MatchCase"])) {
-				this.m_matchCase=obj["MatchCase"];
+				this._M=obj["MatchCase"];
 			}
 			if (!_isUndefined(obj["MatchPrefix"])) {
-				this.m_matchPrefix=obj["MatchPrefix"];
+				this._Ma=obj["MatchPrefix"];
 			}
 			if (!_isUndefined(obj["MatchSuffix"])) {
-				this.m_matchSuffix=obj["MatchSuffix"];
+				this._Mat=obj["MatchSuffix"];
 			}
 			if (!_isUndefined(obj["MatchWholeWord"])) {
-				this.m_matchWholeWord=obj["MatchWholeWord"];
+				this._Matc=obj["MatchWholeWord"];
 			}
 			if (!_isUndefined(obj["MatchWildcards"])) {
 				this.m_matchWildcards=obj["MatchWildcards"];
 			}
 		};
 		SearchOptions.prototype.load=function (option) {
-			_load(this, option);
-			return this;
+			return _load(this, option);
+		};
+		SearchOptions.prototype.loadAndSync=function (option) {
+			return _loadAndSync(this, option);
+		};
+		SearchOptions.prototype.retrieve=function (option) {
+			return _retrieve(this, option);
+		};
+		SearchOptions.prototype.retrieveAndSync=function (option) {
+			return _retrieveAndSync(this, option);
 		};
 		SearchOptions.newObject=function (context) {
-			var ret=new Word.SearchOptions(context, _createNewObjectObjectPath(context, "Microsoft.WordServices.SearchOptions", false));
+			var ret=new Word.SearchOptions(context, _createNewObjectObjectPath(context, "Microsoft.WordServices.SearchOptions", false, false));
 			return ret;
 		};
 		SearchOptions.prototype.toJSON=function () {
-			return {
-				"ignorePunct": this.m_ignorePunct,
-				"ignoreSpace": this.m_ignoreSpace,
-				"matchCase": this.m_matchCase,
-				"matchPrefix": this.m_matchPrefix,
-				"matchSuffix": this.m_matchSuffix,
-				"matchWholeWord": this.m_matchWholeWord,
-				"matchWildcards": this.m_matchWildcards
-			};
+			return _toJson(this, {
+				"ignorePunct": this._I,
+				"ignoreSpace": this._Ig,
+				"matchCase": this._M,
+				"matchPrefix": this._Ma,
+				"matchSuffix": this._Mat,
+				"matchWholeWord": this._Matc,
+				"matchWildcards": this.m_matchWildcards,
+			}, {});
+		};
+		SearchOptions.prototype.ensureUnchanged=function (data) {
+			_createEnsureUnchangedAction(this.context, this, data);
+			return;
 		};
 		return SearchOptions;
 	}(OfficeExtension.ClientObject));
 	Word.SearchOptions=SearchOptions;
+	var _typeSection="Section";
 	var Section=(function (_super) {
 		__extends(Section, _super);
 		function Section() {
-			_super.apply(this, arguments);
+			return _super !==null && _super.apply(this, arguments) || this;
 		}
 		Object.defineProperty(Section.prototype, "_className", {
 			get: function () {
@@ -17051,26 +18385,26 @@ var Word;
 		});
 		Object.defineProperty(Section.prototype, "body", {
 			get: function () {
-				if (!this.m_body) {
-					this.m_body=new Word.Body(this.context, _createPropertyObjectPath(this.context, this, "Body", false, false));
+				if (!this._B) {
+					this._B=new Word.Body(this.context, _createPropertyObjectPath(this.context, this, "Body", false, false, false));
 				}
-				return this.m_body;
+				return this._B;
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(Section.prototype, "_Id", {
 			get: function () {
-				_throwIfNotLoaded("_Id", this.m__Id, "Section", this._isNull);
-				return this.m__Id;
+				_throwIfNotLoaded("_Id", this.__I, _typeSection, this._isNull);
+				return this.__I;
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(Section.prototype, "_ReferenceId", {
 			get: function () {
-				_throwIfNotLoaded("_ReferenceId", this.m__ReferenceId, "Section", this._isNull);
-				return this.m__ReferenceId;
+				_throwIfNotLoaded("_ReferenceId", this.__R, _typeSection, this._isNull);
+				return this.__R;
 			},
 			enumerable: true,
 			configurable: true
@@ -17079,19 +18413,21 @@ var Word;
 			this._recursivelySet(properties, options, [], ["body"], []);
 		};
 		Section.prototype.getFooter=function (type) {
-			return new Word.Body(this.context, _createMethodObjectPath(this.context, this, "GetFooter", 1, [type], false, true, null));
+			return new Word.Body(this.context, _createMethodObjectPath(this.context, this, "GetFooter", 1, [type], false, true, null, false));
 		};
 		Section.prototype.getHeader=function (type) {
-			return new Word.Body(this.context, _createMethodObjectPath(this.context, this, "GetHeader", 1, [type], false, true, null));
+			return new Word.Body(this.context, _createMethodObjectPath(this.context, this, "GetHeader", 1, [type], false, true, null, false));
 		};
 		Section.prototype.getNext=function () {
-			return new Word.Section(this.context, _createMethodObjectPath(this.context, this, "GetNext", 1, [], false, false, null));
+			_throwIfApiNotSupported("Section.getNext", _defaultApiSetName, "1.3", _hostName);
+			return new Word.Section(this.context, _createMethodObjectPath(this.context, this, "GetNext", 1, [], false, false, null, false));
 		};
 		Section.prototype.getNextOrNullObject=function () {
-			return new Word.Section(this.context, _createMethodObjectPath(this.context, this, "GetNextOrNullObject", 1, [], false, false, null));
+			_throwIfApiNotSupported("Section.getNextOrNullObject", _defaultApiSetName, "1.3", _hostName);
+			return new Word.Section(this.context, _createMethodObjectPath(this.context, this, "GetNextOrNullObject", 1, [], false, false, null, false));
 		};
 		Section.prototype._KeepReference=function () {
-			_createMethodAction(this.context, this, "_KeepReference", 1, []);
+			_createMethodAction(this.context, this, "_KeepReference", 1, [], false);
 		};
 		Section.prototype._handleResult=function (value) {
 			_super.prototype._handleResult.call(this, value);
@@ -17100,16 +18436,24 @@ var Word;
 			var obj=value;
 			_fixObjectPathIfNecessary(this, obj);
 			if (!_isUndefined(obj["_Id"])) {
-				this.m__Id=obj["_Id"];
+				this.__I=obj["_Id"];
 			}
 			if (!_isUndefined(obj["_ReferenceId"])) {
-				this.m__ReferenceId=obj["_ReferenceId"];
+				this.__R=obj["_ReferenceId"];
 			}
 			_handleNavigationPropertyResults(this, obj, ["body", "Body"]);
 		};
 		Section.prototype.load=function (option) {
-			_load(this, option);
-			return this;
+			return _load(this, option);
+		};
+		Section.prototype.loadAndSync=function (option) {
+			return _loadAndSync(this, option);
+		};
+		Section.prototype.retrieve=function (option) {
+			return _retrieve(this, option);
+		};
+		Section.prototype.retrieveAndSync=function (option) {
+			return _retrieveAndSync(this, option);
 		};
 		Section.prototype._handleIdResult=function (value) {
 			_super.prototype._handleIdResult.call(this, value);
@@ -17117,10 +18461,10 @@ var Word;
 				return;
 			}
 			if (!_isUndefined(value["_ReferenceId"])) {
-				this.m__ReferenceId=value["_ReferenceId"];
+				this.__R=value["_ReferenceId"];
 			}
 			if (!_isUndefined(value["_Id"])) {
-				this.m__Id=value["_Id"];
+				this.__I=value["_Id"];
 			}
 		};
 		Section.prototype.track=function () {
@@ -17132,17 +18476,22 @@ var Word;
 			return this;
 		};
 		Section.prototype.toJSON=function () {
-			return {
-				"body": this.m_body
-			};
+			return _toJson(this, {}, {
+				"body": this._B,
+			});
+		};
+		Section.prototype.ensureUnchanged=function (data) {
+			_createEnsureUnchangedAction(this.context, this, data);
+			return;
 		};
 		return Section;
 	}(OfficeExtension.ClientObject));
 	Word.Section=Section;
+	var _typeSectionCollection="SectionCollection";
 	var SectionCollection=(function (_super) {
 		__extends(SectionCollection, _super);
 		function SectionCollection() {
-			_super.apply(this, arguments);
+			return _super !==null && _super.apply(this, arguments) || this;
 		}
 		Object.defineProperty(SectionCollection.prototype, "_className", {
 			get: function () {
@@ -17153,7 +18502,7 @@ var Word;
 		});
 		Object.defineProperty(SectionCollection.prototype, "items", {
 			get: function () {
-				_throwIfNotLoaded("items", this.m__items, "SectionCollection", this._isNull);
+				_throwIfNotLoaded("items", this.m__items, _typeSectionCollection, this._isNull);
 				return this.m__items;
 			},
 			enumerable: true,
@@ -17161,23 +18510,25 @@ var Word;
 		});
 		Object.defineProperty(SectionCollection.prototype, "_ReferenceId", {
 			get: function () {
-				_throwIfNotLoaded("_ReferenceId", this.m__ReferenceId, "SectionCollection", this._isNull);
-				return this.m__ReferenceId;
+				_throwIfNotLoaded("_ReferenceId", this.__R, _typeSectionCollection, this._isNull);
+				return this.__R;
 			},
 			enumerable: true,
 			configurable: true
 		});
 		SectionCollection.prototype.getFirst=function () {
-			return new Word.Section(this.context, _createMethodObjectPath(this.context, this, "GetFirst", 1, [], false, false, null));
+			_throwIfApiNotSupported("SectionCollection.getFirst", _defaultApiSetName, "1.3", _hostName);
+			return new Word.Section(this.context, _createMethodObjectPath(this.context, this, "GetFirst", 1, [], false, false, null, false));
 		};
 		SectionCollection.prototype.getFirstOrNullObject=function () {
-			return new Word.Section(this.context, _createMethodObjectPath(this.context, this, "GetFirstOrNullObject", 1, [], false, false, null));
+			_throwIfApiNotSupported("SectionCollection.getFirstOrNullObject", _defaultApiSetName, "1.3", _hostName);
+			return new Word.Section(this.context, _createMethodObjectPath(this.context, this, "GetFirstOrNullObject", 1, [], false, false, null, false));
 		};
 		SectionCollection.prototype._GetItem=function (index) {
 			return new Word.Section(this.context, _createIndexerObjectPath(this.context, this, [index]));
 		};
 		SectionCollection.prototype._KeepReference=function () {
-			_createMethodAction(this.context, this, "_KeepReference", 1, []);
+			_createMethodAction(this.context, this, "_KeepReference", 1, [], false);
 		};
 		SectionCollection.prototype._handleResult=function (value) {
 			_super.prototype._handleResult.call(this, value);
@@ -17186,7 +18537,7 @@ var Word;
 			var obj=value;
 			_fixObjectPathIfNecessary(this, obj);
 			if (!_isUndefined(obj["_ReferenceId"])) {
-				this.m__ReferenceId=obj["_ReferenceId"];
+				this.__R=obj["_ReferenceId"];
 			}
 			if (!_isNullOrUndefined(obj[OfficeExtension.Constants.items])) {
 				this.m__items=[];
@@ -17199,8 +18550,16 @@ var Word;
 			}
 		};
 		SectionCollection.prototype.load=function (option) {
-			_load(this, option);
-			return this;
+			return _load(this, option);
+		};
+		SectionCollection.prototype.loadAndSync=function (option) {
+			return _loadAndSync(this, option);
+		};
+		SectionCollection.prototype.retrieve=function (option) {
+			return _retrieve(this, option);
+		};
+		SectionCollection.prototype.retrieveAndSync=function (option) {
+			return _retrieveAndSync(this, option);
 		};
 		SectionCollection.prototype._handleIdResult=function (value) {
 			_super.prototype._handleIdResult.call(this, value);
@@ -17208,7 +18567,7 @@ var Word;
 				return;
 			}
 			if (!_isUndefined(value["_ReferenceId"])) {
-				this.m__ReferenceId=value["_ReferenceId"];
+				this.__R=value["_ReferenceId"];
 			}
 		};
 		SectionCollection.prototype.track=function () {
@@ -17220,15 +18579,16 @@ var Word;
 			return this;
 		};
 		SectionCollection.prototype.toJSON=function () {
-			return {};
+			return _toJson(this, {}, {}, this.m__items);
 		};
 		return SectionCollection;
 	}(OfficeExtension.ClientObject));
 	Word.SectionCollection=SectionCollection;
+	var _typeSetting="Setting";
 	var Setting=(function (_super) {
 		__extends(Setting, _super);
 		function Setting() {
-			_super.apply(this, arguments);
+			return _super !==null && _super.apply(this, arguments) || this;
 		}
 		Object.defineProperty(Setting.prototype, "_className", {
 			get: function () {
@@ -17260,8 +18620,8 @@ var Word;
 		};
 		Object.defineProperty(Setting.prototype, "key", {
 			get: function () {
-				_throwIfNotLoaded("key", this.m_key, "Setting", this._isNull);
-				return this.m_key;
+				_throwIfNotLoaded("key", this._K, _typeSetting, this._isNull);
+				return this._K;
 			},
 			enumerable: true,
 			configurable: true
@@ -17279,7 +18639,7 @@ var Word;
 					newValue=Setting.replaceStringDateWithDate(newValue);
 					return newValue;
 				}
-				_throwIfNotLoaded("value", this.m_value, "Setting", this._isNull);
+				_throwIfNotLoaded("value", this.m_value, _typeSetting, this._isNull);
 				return this.m_value;
 			},
 			set: function (value) {
@@ -17297,16 +18657,16 @@ var Word;
 		});
 		Object.defineProperty(Setting.prototype, "_Id", {
 			get: function () {
-				_throwIfNotLoaded("_Id", this.m__Id, "Setting", this._isNull);
-				return this.m__Id;
+				_throwIfNotLoaded("_Id", this.__I, _typeSetting, this._isNull);
+				return this.__I;
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(Setting.prototype, "_ReferenceId", {
 			get: function () {
-				_throwIfNotLoaded("_ReferenceId", this.m__ReferenceId, "Setting", this._isNull);
-				return this.m__ReferenceId;
+				_throwIfNotLoaded("_ReferenceId", this.__R, _typeSetting, this._isNull);
+				return this.__R;
 			},
 			enumerable: true,
 			configurable: true
@@ -17315,10 +18675,10 @@ var Word;
 			this._recursivelySet(properties, options, ["value"], [], []);
 		};
 		Setting.prototype.delete=function () {
-			_createMethodAction(this.context, this, "Delete", 0, []);
+			_createMethodAction(this.context, this, "Delete", 0, [], false);
 		};
 		Setting.prototype._KeepReference=function () {
-			_createMethodAction(this.context, this, "_KeepReference", 1, []);
+			_createMethodAction(this.context, this, "_KeepReference", 1, [], false);
 		};
 		Setting.prototype._handleResult=function (value) {
 			_super.prototype._handleResult.call(this, value);
@@ -17327,22 +18687,30 @@ var Word;
 			var obj=value;
 			_fixObjectPathIfNecessary(this, obj);
 			if (!_isUndefined(obj["Key"])) {
-				this.m_key=obj["Key"];
+				this._K=obj["Key"];
 			}
 			if (!_isUndefined(obj["Value"])) {
 				this.m_value=obj["Value"];
 				this.m_value=Setting.replaceStringDateWithDate(this.m_value);
 			}
 			if (!_isUndefined(obj["_Id"])) {
-				this.m__Id=obj["_Id"];
+				this.__I=obj["_Id"];
 			}
 			if (!_isUndefined(obj["_ReferenceId"])) {
-				this.m__ReferenceId=obj["_ReferenceId"];
+				this.__R=obj["_ReferenceId"];
 			}
 		};
 		Setting.prototype.load=function (option) {
-			_load(this, option);
-			return this;
+			return _load(this, option);
+		};
+		Setting.prototype.loadAndSync=function (option) {
+			return _loadAndSync(this, option);
+		};
+		Setting.prototype.retrieve=function (option) {
+			return _retrieve(this, option);
+		};
+		Setting.prototype.retrieveAndSync=function (option) {
+			return _retrieveAndSync(this, option);
 		};
 		Setting.prototype._handleIdResult=function (value) {
 			_super.prototype._handleIdResult.call(this, value);
@@ -17350,10 +18718,10 @@ var Word;
 				return;
 			}
 			if (!_isUndefined(value["_ReferenceId"])) {
-				this.m__ReferenceId=value["_ReferenceId"];
+				this.__R=value["_ReferenceId"];
 			}
 			if (!_isUndefined(value["_Id"])) {
-				this.m__Id=value["_Id"];
+				this.__I=value["_Id"];
 			}
 		};
 		Setting.prototype.track=function () {
@@ -17365,20 +18733,25 @@ var Word;
 			return this;
 		};
 		Setting.prototype.toJSON=function () {
-			return {
-				"key": this.m_key,
-				"value": this.m_value
-			};
+			return _toJson(this, {
+				"key": this._K,
+				"value": this.m_value,
+			}, {});
 		};
-		Setting.DateJSONPrefix="Date(";
-		Setting.DateJSONSuffix=")";
+		Setting.prototype.ensureUnchanged=function (data) {
+			_createEnsureUnchangedAction(this.context, this, data);
+			return;
+		};
 		return Setting;
 	}(OfficeExtension.ClientObject));
+	Setting.DateJSONPrefix="Date(";
+	Setting.DateJSONSuffix=")";
 	Word.Setting=Setting;
+	var _typeSettingCollection="SettingCollection";
 	var SettingCollection=(function (_super) {
 		__extends(SettingCollection, _super);
 		function SettingCollection() {
-			_super.apply(this, arguments);
+			return _super !==null && _super.apply(this, arguments) || this;
 		}
 		Object.defineProperty(SettingCollection.prototype, "_className", {
 			get: function () {
@@ -17389,7 +18762,7 @@ var Word;
 		});
 		Object.defineProperty(SettingCollection.prototype, "items", {
 			get: function () {
-				_throwIfNotLoaded("items", this.m__items, "SettingCollection", this._isNull);
+				_throwIfNotLoaded("items", this.m__items, _typeSettingCollection, this._isNull);
 				return this.m__items;
 			},
 			enumerable: true,
@@ -17397,8 +18770,8 @@ var Word;
 		});
 		Object.defineProperty(SettingCollection.prototype, "_ReferenceId", {
 			get: function () {
-				_throwIfNotLoaded("_ReferenceId", this.m__ReferenceId, "SettingCollection", this._isNull);
-				return this.m__ReferenceId;
+				_throwIfNotLoaded("_ReferenceId", this.__R, _typeSettingCollection, this._isNull);
+				return this.__R;
 			},
 			enumerable: true,
 			configurable: true
@@ -17408,13 +18781,13 @@ var Word;
 			if (newValue !==null) {
 				return new Word.Setting(this.context, _createMethodObjectPath(this.context, this, "Add", 0, [key, newValue], false, false, null));
 			}
-			return new Word.Setting(this.context, _createMethodObjectPath(this.context, this, "Add", 0, [key, value], false, true, null));
+			return new Word.Setting(this.context, _createMethodObjectPath(this.context, this, "Add", 0, [key, value], false, true, null, false));
 		};
 		SettingCollection.prototype.deleteAll=function () {
-			_createMethodAction(this.context, this, "DeleteAll", 0, []);
+			_createMethodAction(this.context, this, "DeleteAll", 0, [], false);
 		};
 		SettingCollection.prototype.getCount=function () {
-			var action=_createMethodAction(this.context, this, "GetCount", 1, []);
+			var action=_createMethodAction(this.context, this, "GetCount", 1, [], false);
 			var ret=new OfficeExtension.ClientResult();
 			_addActionResultHandler(this, action, ret);
 			return ret;
@@ -17423,10 +18796,10 @@ var Word;
 			return new Word.Setting(this.context, _createIndexerObjectPath(this.context, this, [key]));
 		};
 		SettingCollection.prototype.getItemOrNullObject=function (key) {
-			return new Word.Setting(this.context, _createMethodObjectPath(this.context, this, "GetItemOrNullObject", 1, [key], false, false, null));
+			return new Word.Setting(this.context, _createMethodObjectPath(this.context, this, "GetItemOrNullObject", 1, [key], false, false, null, false));
 		};
 		SettingCollection.prototype._KeepReference=function () {
-			_createMethodAction(this.context, this, "_KeepReference", 1, []);
+			_createMethodAction(this.context, this, "_KeepReference", 1, [], false);
 		};
 		SettingCollection.prototype._handleResult=function (value) {
 			_super.prototype._handleResult.call(this, value);
@@ -17435,7 +18808,7 @@ var Word;
 			var obj=value;
 			_fixObjectPathIfNecessary(this, obj);
 			if (!_isUndefined(obj["_ReferenceId"])) {
-				this.m__ReferenceId=obj["_ReferenceId"];
+				this.__R=obj["_ReferenceId"];
 			}
 			if (!_isNullOrUndefined(obj[OfficeExtension.Constants.items])) {
 				this.m__items=[];
@@ -17448,8 +18821,16 @@ var Word;
 			}
 		};
 		SettingCollection.prototype.load=function (option) {
-			_load(this, option);
-			return this;
+			return _load(this, option);
+		};
+		SettingCollection.prototype.loadAndSync=function (option) {
+			return _loadAndSync(this, option);
+		};
+		SettingCollection.prototype.retrieve=function (option) {
+			return _retrieve(this, option);
+		};
+		SettingCollection.prototype.retrieveAndSync=function (option) {
+			return _retrieveAndSync(this, option);
 		};
 		SettingCollection.prototype._handleIdResult=function (value) {
 			_super.prototype._handleIdResult.call(this, value);
@@ -17457,7 +18838,7 @@ var Word;
 				return;
 			}
 			if (!_isUndefined(value["_ReferenceId"])) {
-				this.m__ReferenceId=value["_ReferenceId"];
+				this.__R=value["_ReferenceId"];
 			}
 		};
 		SettingCollection.prototype.track=function () {
@@ -17469,15 +18850,16 @@ var Word;
 			return this;
 		};
 		SettingCollection.prototype.toJSON=function () {
-			return {};
+			return _toJson(this, {}, {}, this.m__items);
 		};
 		return SettingCollection;
 	}(OfficeExtension.ClientObject));
 	Word.SettingCollection=SettingCollection;
+	var _typeTable="Table";
 	var Table=(function (_super) {
 		__extends(Table, _super);
 		function Table() {
-			_super.apply(this, arguments);
+			return _super !==null && _super.apply(this, arguments) || this;
 		}
 		Object.defineProperty(Table.prototype, "_className", {
 			get: function () {
@@ -17488,111 +18870,111 @@ var Word;
 		});
 		Object.defineProperty(Table.prototype, "font", {
 			get: function () {
-				if (!this.m_font) {
-					this.m_font=new Word.Font(this.context, _createPropertyObjectPath(this.context, this, "Font", false, false));
+				if (!this._F) {
+					this._F=new Word.Font(this.context, _createPropertyObjectPath(this.context, this, "Font", false, false, false));
 				}
-				return this.m_font;
+				return this._F;
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(Table.prototype, "parentBody", {
 			get: function () {
-				if (!this.m_parentBody) {
-					this.m_parentBody=new Word.Body(this.context, _createPropertyObjectPath(this.context, this, "ParentBody", false, false));
+				if (!this._P) {
+					this._P=new Word.Body(this.context, _createPropertyObjectPath(this.context, this, "ParentBody", false, false, false));
 				}
-				return this.m_parentBody;
+				return this._P;
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(Table.prototype, "parentContentControl", {
 			get: function () {
-				if (!this.m_parentContentControl) {
-					this.m_parentContentControl=new Word.ContentControl(this.context, _createPropertyObjectPath(this.context, this, "ParentContentControl", false, false));
+				if (!this._Pa) {
+					this._Pa=new Word.ContentControl(this.context, _createPropertyObjectPath(this.context, this, "ParentContentControl", false, false, false));
 				}
-				return this.m_parentContentControl;
+				return this._Pa;
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(Table.prototype, "parentContentControlOrNullObject", {
 			get: function () {
-				if (!this.m_parentContentControlOrNullObject) {
-					this.m_parentContentControlOrNullObject=new Word.ContentControl(this.context, _createPropertyObjectPath(this.context, this, "ParentContentControlOrNullObject", false, false));
+				if (!this._Par) {
+					this._Par=new Word.ContentControl(this.context, _createPropertyObjectPath(this.context, this, "ParentContentControlOrNullObject", false, false, false));
 				}
-				return this.m_parentContentControlOrNullObject;
+				return this._Par;
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(Table.prototype, "parentTable", {
 			get: function () {
-				if (!this.m_parentTable) {
-					this.m_parentTable=new Word.Table(this.context, _createPropertyObjectPath(this.context, this, "ParentTable", false, false));
+				if (!this._Pare) {
+					this._Pare=new Word.Table(this.context, _createPropertyObjectPath(this.context, this, "ParentTable", false, false, false));
 				}
-				return this.m_parentTable;
+				return this._Pare;
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(Table.prototype, "parentTableCell", {
 			get: function () {
-				if (!this.m_parentTableCell) {
-					this.m_parentTableCell=new Word.TableCell(this.context, _createPropertyObjectPath(this.context, this, "ParentTableCell", false, false));
+				if (!this._Paren) {
+					this._Paren=new Word.TableCell(this.context, _createPropertyObjectPath(this.context, this, "ParentTableCell", false, false, false));
 				}
-				return this.m_parentTableCell;
+				return this._Paren;
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(Table.prototype, "parentTableCellOrNullObject", {
 			get: function () {
-				if (!this.m_parentTableCellOrNullObject) {
-					this.m_parentTableCellOrNullObject=new Word.TableCell(this.context, _createPropertyObjectPath(this.context, this, "ParentTableCellOrNullObject", false, false));
+				if (!this._Parent) {
+					this._Parent=new Word.TableCell(this.context, _createPropertyObjectPath(this.context, this, "ParentTableCellOrNullObject", false, false, false));
 				}
-				return this.m_parentTableCellOrNullObject;
+				return this._Parent;
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(Table.prototype, "parentTableOrNullObject", {
 			get: function () {
-				if (!this.m_parentTableOrNullObject) {
-					this.m_parentTableOrNullObject=new Word.Table(this.context, _createPropertyObjectPath(this.context, this, "ParentTableOrNullObject", false, false));
+				if (!this._ParentT) {
+					this._ParentT=new Word.Table(this.context, _createPropertyObjectPath(this.context, this, "ParentTableOrNullObject", false, false, false));
 				}
-				return this.m_parentTableOrNullObject;
+				return this._ParentT;
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(Table.prototype, "rows", {
 			get: function () {
-				if (!this.m_rows) {
-					this.m_rows=new Word.TableRowCollection(this.context, _createPropertyObjectPath(this.context, this, "Rows", true, false));
+				if (!this._Ro) {
+					this._Ro=new Word.TableRowCollection(this.context, _createPropertyObjectPath(this.context, this, "Rows", true, false, false));
 				}
-				return this.m_rows;
+				return this._Ro;
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(Table.prototype, "tables", {
 			get: function () {
-				if (!this.m_tables) {
-					this.m_tables=new Word.TableCollection(this.context, _createPropertyObjectPath(this.context, this, "Tables", true, false));
+				if (!this._T) {
+					this._T=new Word.TableCollection(this.context, _createPropertyObjectPath(this.context, this, "Tables", true, false, false));
 				}
-				return this.m_tables;
+				return this._T;
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(Table.prototype, "alignment", {
 			get: function () {
-				_throwIfNotLoaded("alignment", this.m_alignment, "Table", this._isNull);
-				return this.m_alignment;
+				_throwIfNotLoaded("alignment", this._A, _typeTable, this._isNull);
+				return this._A;
 			},
 			set: function (value) {
-				this.m_alignment=value;
+				this._A=value;
 				_createSetPropertyAction(this.context, this, "Alignment", value);
 			},
 			enumerable: true,
@@ -17600,11 +18982,11 @@ var Word;
 		});
 		Object.defineProperty(Table.prototype, "headerRowCount", {
 			get: function () {
-				_throwIfNotLoaded("headerRowCount", this.m_headerRowCount, "Table", this._isNull);
-				return this.m_headerRowCount;
+				_throwIfNotLoaded("headerRowCount", this._H, _typeTable, this._isNull);
+				return this._H;
 			},
 			set: function (value) {
-				this.m_headerRowCount=value;
+				this._H=value;
 				_createSetPropertyAction(this.context, this, "HeaderRowCount", value);
 			},
 			enumerable: true,
@@ -17612,11 +18994,11 @@ var Word;
 		});
 		Object.defineProperty(Table.prototype, "horizontalAlignment", {
 			get: function () {
-				_throwIfNotLoaded("horizontalAlignment", this.m_horizontalAlignment, "Table", this._isNull);
-				return this.m_horizontalAlignment;
+				_throwIfNotLoaded("horizontalAlignment", this._Ho, _typeTable, this._isNull);
+				return this._Ho;
 			},
 			set: function (value) {
-				this.m_horizontalAlignment=value;
+				this._Ho=value;
 				_createSetPropertyAction(this.context, this, "HorizontalAlignment", value);
 			},
 			enumerable: true,
@@ -17624,35 +19006,35 @@ var Word;
 		});
 		Object.defineProperty(Table.prototype, "isUniform", {
 			get: function () {
-				_throwIfNotLoaded("isUniform", this.m_isUniform, "Table", this._isNull);
-				return this.m_isUniform;
+				_throwIfNotLoaded("isUniform", this._I, _typeTable, this._isNull);
+				return this._I;
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(Table.prototype, "nestingLevel", {
 			get: function () {
-				_throwIfNotLoaded("nestingLevel", this.m_nestingLevel, "Table", this._isNull);
-				return this.m_nestingLevel;
+				_throwIfNotLoaded("nestingLevel", this._N, _typeTable, this._isNull);
+				return this._N;
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(Table.prototype, "rowCount", {
 			get: function () {
-				_throwIfNotLoaded("rowCount", this.m_rowCount, "Table", this._isNull);
-				return this.m_rowCount;
+				_throwIfNotLoaded("rowCount", this._R, _typeTable, this._isNull);
+				return this._R;
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(Table.prototype, "shadingColor", {
 			get: function () {
-				_throwIfNotLoaded("shadingColor", this.m_shadingColor, "Table", this._isNull);
-				return this.m_shadingColor;
+				_throwIfNotLoaded("shadingColor", this._S, _typeTable, this._isNull);
+				return this._S;
 			},
 			set: function (value) {
-				this.m_shadingColor=value;
+				this._S=value;
 				_createSetPropertyAction(this.context, this, "ShadingColor", value);
 			},
 			enumerable: true,
@@ -17660,11 +19042,11 @@ var Word;
 		});
 		Object.defineProperty(Table.prototype, "style", {
 			get: function () {
-				_throwIfNotLoaded("style", this.m_style, "Table", this._isNull);
-				return this.m_style;
+				_throwIfNotLoaded("style", this._St, _typeTable, this._isNull);
+				return this._St;
 			},
 			set: function (value) {
-				this.m_style=value;
+				this._St=value;
 				_createSetPropertyAction(this.context, this, "Style", value);
 			},
 			enumerable: true,
@@ -17672,11 +19054,11 @@ var Word;
 		});
 		Object.defineProperty(Table.prototype, "styleBandedColumns", {
 			get: function () {
-				_throwIfNotLoaded("styleBandedColumns", this.m_styleBandedColumns, "Table", this._isNull);
-				return this.m_styleBandedColumns;
+				_throwIfNotLoaded("styleBandedColumns", this._Sty, _typeTable, this._isNull);
+				return this._Sty;
 			},
 			set: function (value) {
-				this.m_styleBandedColumns=value;
+				this._Sty=value;
 				_createSetPropertyAction(this.context, this, "StyleBandedColumns", value);
 			},
 			enumerable: true,
@@ -17684,11 +19066,11 @@ var Word;
 		});
 		Object.defineProperty(Table.prototype, "styleBandedRows", {
 			get: function () {
-				_throwIfNotLoaded("styleBandedRows", this.m_styleBandedRows, "Table", this._isNull);
-				return this.m_styleBandedRows;
+				_throwIfNotLoaded("styleBandedRows", this._Styl, _typeTable, this._isNull);
+				return this._Styl;
 			},
 			set: function (value) {
-				this.m_styleBandedRows=value;
+				this._Styl=value;
 				_createSetPropertyAction(this.context, this, "StyleBandedRows", value);
 			},
 			enumerable: true,
@@ -17696,11 +19078,11 @@ var Word;
 		});
 		Object.defineProperty(Table.prototype, "styleBuiltIn", {
 			get: function () {
-				_throwIfNotLoaded("styleBuiltIn", this.m_styleBuiltIn, "Table", this._isNull);
-				return this.m_styleBuiltIn;
+				_throwIfNotLoaded("styleBuiltIn", this._Style, _typeTable, this._isNull);
+				return this._Style;
 			},
 			set: function (value) {
-				this.m_styleBuiltIn=value;
+				this._Style=value;
 				_createSetPropertyAction(this.context, this, "StyleBuiltIn", value);
 			},
 			enumerable: true,
@@ -17708,11 +19090,11 @@ var Word;
 		});
 		Object.defineProperty(Table.prototype, "styleFirstColumn", {
 			get: function () {
-				_throwIfNotLoaded("styleFirstColumn", this.m_styleFirstColumn, "Table", this._isNull);
-				return this.m_styleFirstColumn;
+				_throwIfNotLoaded("styleFirstColumn", this._StyleF, _typeTable, this._isNull);
+				return this._StyleF;
 			},
 			set: function (value) {
-				this.m_styleFirstColumn=value;
+				this._StyleF=value;
 				_createSetPropertyAction(this.context, this, "StyleFirstColumn", value);
 			},
 			enumerable: true,
@@ -17720,11 +19102,11 @@ var Word;
 		});
 		Object.defineProperty(Table.prototype, "styleLastColumn", {
 			get: function () {
-				_throwIfNotLoaded("styleLastColumn", this.m_styleLastColumn, "Table", this._isNull);
-				return this.m_styleLastColumn;
+				_throwIfNotLoaded("styleLastColumn", this._StyleL, _typeTable, this._isNull);
+				return this._StyleL;
 			},
 			set: function (value) {
-				this.m_styleLastColumn=value;
+				this._StyleL=value;
 				_createSetPropertyAction(this.context, this, "StyleLastColumn", value);
 			},
 			enumerable: true,
@@ -17732,11 +19114,11 @@ var Word;
 		});
 		Object.defineProperty(Table.prototype, "styleTotalRow", {
 			get: function () {
-				_throwIfNotLoaded("styleTotalRow", this.m_styleTotalRow, "Table", this._isNull);
-				return this.m_styleTotalRow;
+				_throwIfNotLoaded("styleTotalRow", this._StyleT, _typeTable, this._isNull);
+				return this._StyleT;
 			},
 			set: function (value) {
-				this.m_styleTotalRow=value;
+				this._StyleT=value;
 				_createSetPropertyAction(this.context, this, "StyleTotalRow", value);
 			},
 			enumerable: true,
@@ -17744,11 +19126,11 @@ var Word;
 		});
 		Object.defineProperty(Table.prototype, "values", {
 			get: function () {
-				_throwIfNotLoaded("values", this.m_values, "Table", this._isNull);
-				return this.m_values;
+				_throwIfNotLoaded("values", this._V, _typeTable, this._isNull);
+				return this._V;
 			},
 			set: function (value) {
-				this.m_values=value;
+				this._V=value;
 				_createSetPropertyAction(this.context, this, "Values", value);
 			},
 			enumerable: true,
@@ -17756,11 +19138,11 @@ var Word;
 		});
 		Object.defineProperty(Table.prototype, "verticalAlignment", {
 			get: function () {
-				_throwIfNotLoaded("verticalAlignment", this.m_verticalAlignment, "Table", this._isNull);
-				return this.m_verticalAlignment;
+				_throwIfNotLoaded("verticalAlignment", this._Ve, _typeTable, this._isNull);
+				return this._Ve;
 			},
 			set: function (value) {
-				this.m_verticalAlignment=value;
+				this._Ve=value;
 				_createSetPropertyAction(this.context, this, "VerticalAlignment", value);
 			},
 			enumerable: true,
@@ -17768,11 +19150,11 @@ var Word;
 		});
 		Object.defineProperty(Table.prototype, "width", {
 			get: function () {
-				_throwIfNotLoaded("width", this.m_width, "Table", this._isNull);
-				return this.m_width;
+				_throwIfNotLoaded("width", this._W, _typeTable, this._isNull);
+				return this._W;
 			},
 			set: function (value) {
-				this.m_width=value;
+				this._W=value;
 				_createSetPropertyAction(this.context, this, "Width", value);
 			},
 			enumerable: true,
@@ -17780,16 +19162,16 @@ var Word;
 		});
 		Object.defineProperty(Table.prototype, "_Id", {
 			get: function () {
-				_throwIfNotLoaded("_Id", this.m__Id, "Table", this._isNull);
-				return this.m__Id;
+				_throwIfNotLoaded("_Id", this.__I, _typeTable, this._isNull);
+				return this.__I;
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(Table.prototype, "_ReferenceId", {
 			get: function () {
-				_throwIfNotLoaded("_ReferenceId", this.m__ReferenceId, "Table", this._isNull);
-				return this.m__ReferenceId;
+				_throwIfNotLoaded("_ReferenceId", this.__R, _typeTable, this._isNull);
+				return this.__R;
 			},
 			enumerable: true,
 			configurable: true
@@ -17804,102 +19186,94 @@ var Word;
 				"parentTableCellOrNullObject",
 				"parentTableOrNullObject",
 				"rows",
-				"tables",
-				"parentBody",
-				"parentContentControl",
-				"parentContentControlOrNullObject",
-				"parentTable",
-				"parentTableCell",
-				"parentTableCellOrNullObject",
-				"parentTableOrNullObject",
-				"rows",
 				"tables"
 			]);
 		};
 		Table.prototype.addColumns=function (insertLocation, columnCount, values) {
-			_createMethodAction(this.context, this, "AddColumns", 0, [insertLocation, columnCount, values]);
+			_createMethodAction(this.context, this, "AddColumns", 0, [insertLocation, columnCount, values], false);
 		};
 		Table.prototype.addRows=function (insertLocation, rowCount, values) {
-			return new Word.TableRowCollection(this.context, _createMethodObjectPath(this.context, this, "AddRows", 0, [insertLocation, rowCount, values], true, false, null));
+			return new Word.TableRowCollection(this.context, _createMethodObjectPath(this.context, this, "AddRows", 0, [insertLocation, rowCount, values], true, false, null, false));
 		};
 		Table.prototype.autoFitWindow=function () {
-			_createMethodAction(this.context, this, "AutoFitWindow", 0, []);
+			_createMethodAction(this.context, this, "AutoFitWindow", 0, [], false);
 		};
 		Table.prototype.clear=function () {
-			_createMethodAction(this.context, this, "Clear", 0, []);
+			_createMethodAction(this.context, this, "Clear", 0, [], false);
 		};
 		Table.prototype.delete=function () {
-			_createMethodAction(this.context, this, "Delete", 0, []);
+			_createMethodAction(this.context, this, "Delete", 0, [], false);
 		};
 		Table.prototype.deleteColumns=function (columnIndex, columnCount) {
-			_createMethodAction(this.context, this, "DeleteColumns", 0, [columnIndex, columnCount]);
+			_createMethodAction(this.context, this, "DeleteColumns", 0, [columnIndex, columnCount], false);
 		};
 		Table.prototype.deleteRows=function (rowIndex, rowCount) {
-			_createMethodAction(this.context, this, "DeleteRows", 0, [rowIndex, rowCount]);
+			_createMethodAction(this.context, this, "DeleteRows", 0, [rowIndex, rowCount], false);
 		};
 		Table.prototype.distributeColumns=function () {
-			_createMethodAction(this.context, this, "DistributeColumns", 0, []);
+			_createMethodAction(this.context, this, "DistributeColumns", 0, [], false);
 		};
 		Table.prototype.getBorder=function (borderLocation) {
-			return new Word.TableBorder(this.context, _createMethodObjectPath(this.context, this, "GetBorder", 1, [borderLocation], false, false, null));
+			return new Word.TableBorder(this.context, _createMethodObjectPath(this.context, this, "GetBorder", 1, [borderLocation], false, false, null, false));
 		};
 		Table.prototype.getCell=function (rowIndex, cellIndex) {
-			return new Word.TableCell(this.context, _createMethodObjectPath(this.context, this, "GetCell", 1, [rowIndex, cellIndex], false, false, null));
+			return new Word.TableCell(this.context, _createMethodObjectPath(this.context, this, "GetCell", 1, [rowIndex, cellIndex], false, false, null, false));
 		};
 		Table.prototype.getCellOrNullObject=function (rowIndex, cellIndex) {
-			return new Word.TableCell(this.context, _createMethodObjectPath(this.context, this, "GetCellOrNullObject", 1, [rowIndex, cellIndex], false, false, null));
+			return new Word.TableCell(this.context, _createMethodObjectPath(this.context, this, "GetCellOrNullObject", 1, [rowIndex, cellIndex], false, false, null, false));
 		};
 		Table.prototype.getCellPadding=function (cellPaddingLocation) {
-			var action=_createMethodAction(this.context, this, "GetCellPadding", 1, [cellPaddingLocation]);
+			var action=_createMethodAction(this.context, this, "GetCellPadding", 1, [cellPaddingLocation], false);
 			var ret=new OfficeExtension.ClientResult();
 			_addActionResultHandler(this, action, ret);
 			return ret;
 		};
 		Table.prototype.getNext=function () {
-			return new Word.Table(this.context, _createMethodObjectPath(this.context, this, "GetNext", 1, [], false, false, null));
+			return new Word.Table(this.context, _createMethodObjectPath(this.context, this, "GetNext", 1, [], false, false, null, false));
 		};
 		Table.prototype.getNextOrNullObject=function () {
-			return new Word.Table(this.context, _createMethodObjectPath(this.context, this, "GetNextOrNullObject", 1, [], false, false, null));
+			return new Word.Table(this.context, _createMethodObjectPath(this.context, this, "GetNextOrNullObject", 1, [], false, false, null, false));
 		};
 		Table.prototype.getParagraphAfter=function () {
-			return new Word.Paragraph(this.context, _createMethodObjectPath(this.context, this, "GetParagraphAfter", 1, [], false, false, null));
+			return new Word.Paragraph(this.context, _createMethodObjectPath(this.context, this, "GetParagraphAfter", 1, [], false, false, null, false));
 		};
 		Table.prototype.getParagraphAfterOrNullObject=function () {
-			return new Word.Paragraph(this.context, _createMethodObjectPath(this.context, this, "GetParagraphAfterOrNullObject", 1, [], false, false, null));
+			return new Word.Paragraph(this.context, _createMethodObjectPath(this.context, this, "GetParagraphAfterOrNullObject", 1, [], false, false, null, false));
 		};
 		Table.prototype.getParagraphBefore=function () {
-			return new Word.Paragraph(this.context, _createMethodObjectPath(this.context, this, "GetParagraphBefore", 1, [], false, false, null));
+			return new Word.Paragraph(this.context, _createMethodObjectPath(this.context, this, "GetParagraphBefore", 1, [], false, false, null, false));
 		};
 		Table.prototype.getParagraphBeforeOrNullObject=function () {
-			return new Word.Paragraph(this.context, _createMethodObjectPath(this.context, this, "GetParagraphBeforeOrNullObject", 1, [], false, false, null));
+			return new Word.Paragraph(this.context, _createMethodObjectPath(this.context, this, "GetParagraphBeforeOrNullObject", 1, [], false, false, null, false));
 		};
 		Table.prototype.getRange=function (rangeLocation) {
-			return new Word.Range(this.context, _createMethodObjectPath(this.context, this, "GetRange", 1, [rangeLocation], false, false, null));
+			return new Word.Range(this.context, _createMethodObjectPath(this.context, this, "GetRange", 1, [rangeLocation], false, false, null, false));
 		};
 		Table.prototype.insertContentControl=function () {
-			return new Word.ContentControl(this.context, _createMethodObjectPath(this.context, this, "InsertContentControl", 0, [], false, true, null));
+			return new Word.ContentControl(this.context, _createMethodObjectPath(this.context, this, "InsertContentControl", 0, [], false, true, null, false));
 		};
 		Table.prototype.insertParagraph=function (paragraphText, insertLocation) {
-			return new Word.Paragraph(this.context, _createMethodObjectPath(this.context, this, "InsertParagraph", 0, [paragraphText, insertLocation], false, true, null));
+			return new Word.Paragraph(this.context, _createMethodObjectPath(this.context, this, "InsertParagraph", 0, [paragraphText, insertLocation], false, true, null, false));
 		};
 		Table.prototype.insertTable=function (rowCount, columnCount, insertLocation, values) {
-			return new Word.Table(this.context, _createMethodObjectPath(this.context, this, "InsertTable", 0, [rowCount, columnCount, insertLocation, values], false, true, null));
+			return new Word.Table(this.context, _createMethodObjectPath(this.context, this, "InsertTable", 0, [rowCount, columnCount, insertLocation, values], false, true, null, false));
 		};
 		Table.prototype.mergeCells=function (topRow, firstCell, bottomRow, lastCell) {
-			return new Word.TableCell(this.context, _createMethodObjectPath(this.context, this, "MergeCells", 0, [topRow, firstCell, bottomRow, lastCell], false, true, null));
+			_throwIfApiNotSupported("Table.mergeCells", _defaultApiSetName, "1.4", _hostName);
+			return new Word.TableCell(this.context, _createMethodObjectPath(this.context, this, "MergeCells", 0, [topRow, firstCell, bottomRow, lastCell], false, true, null, false));
 		};
 		Table.prototype.search=function (searchText, searchOptions) {
 			searchOptions=_normalizeSearchOptions(this.context, searchOptions);
-			return new Word.RangeCollection(this.context, _createMethodObjectPath(this.context, this, "Search", 1, [searchText, searchOptions], true, false, null));
+			return new Word.RangeCollection(this.context, _createMethodObjectPath(this.context, this, "Search", 1, [searchText, searchOptions], true, false, null, false));
 		};
 		Table.prototype.select=function (selectionMode) {
-			_createMethodAction(this.context, this, "Select", 1, [selectionMode]);
+			_createMethodAction(this.context, this, "Select", 1, [selectionMode], false);
 		};
 		Table.prototype.setCellPadding=function (cellPaddingLocation, cellPadding) {
-			_createMethodAction(this.context, this, "SetCellPadding", 0, [cellPaddingLocation, cellPadding]);
+			_createMethodAction(this.context, this, "SetCellPadding", 0, [cellPaddingLocation, cellPadding], false);
 		};
 		Table.prototype._KeepReference=function () {
-			_createMethodAction(this.context, this, "_KeepReference", 1, []);
+			_createMethodAction(this.context, this, "_KeepReference", 1, [], false);
 		};
 		Table.prototype._handleResult=function (value) {
 			_super.prototype._handleResult.call(this, value);
@@ -17908,67 +19282,75 @@ var Word;
 			var obj=value;
 			_fixObjectPathIfNecessary(this, obj);
 			if (!_isUndefined(obj["Alignment"])) {
-				this.m_alignment=obj["Alignment"];
+				this._A=obj["Alignment"];
 			}
 			if (!_isUndefined(obj["HeaderRowCount"])) {
-				this.m_headerRowCount=obj["HeaderRowCount"];
+				this._H=obj["HeaderRowCount"];
 			}
 			if (!_isUndefined(obj["HorizontalAlignment"])) {
-				this.m_horizontalAlignment=obj["HorizontalAlignment"];
+				this._Ho=obj["HorizontalAlignment"];
 			}
 			if (!_isUndefined(obj["IsUniform"])) {
-				this.m_isUniform=obj["IsUniform"];
+				this._I=obj["IsUniform"];
 			}
 			if (!_isUndefined(obj["NestingLevel"])) {
-				this.m_nestingLevel=obj["NestingLevel"];
+				this._N=obj["NestingLevel"];
 			}
 			if (!_isUndefined(obj["RowCount"])) {
-				this.m_rowCount=obj["RowCount"];
+				this._R=obj["RowCount"];
 			}
 			if (!_isUndefined(obj["ShadingColor"])) {
-				this.m_shadingColor=obj["ShadingColor"];
+				this._S=obj["ShadingColor"];
 			}
 			if (!_isUndefined(obj["Style"])) {
-				this.m_style=obj["Style"];
+				this._St=obj["Style"];
 			}
 			if (!_isUndefined(obj["StyleBandedColumns"])) {
-				this.m_styleBandedColumns=obj["StyleBandedColumns"];
+				this._Sty=obj["StyleBandedColumns"];
 			}
 			if (!_isUndefined(obj["StyleBandedRows"])) {
-				this.m_styleBandedRows=obj["StyleBandedRows"];
+				this._Styl=obj["StyleBandedRows"];
 			}
 			if (!_isUndefined(obj["StyleBuiltIn"])) {
-				this.m_styleBuiltIn=obj["StyleBuiltIn"];
+				this._Style=obj["StyleBuiltIn"];
 			}
 			if (!_isUndefined(obj["StyleFirstColumn"])) {
-				this.m_styleFirstColumn=obj["StyleFirstColumn"];
+				this._StyleF=obj["StyleFirstColumn"];
 			}
 			if (!_isUndefined(obj["StyleLastColumn"])) {
-				this.m_styleLastColumn=obj["StyleLastColumn"];
+				this._StyleL=obj["StyleLastColumn"];
 			}
 			if (!_isUndefined(obj["StyleTotalRow"])) {
-				this.m_styleTotalRow=obj["StyleTotalRow"];
+				this._StyleT=obj["StyleTotalRow"];
 			}
 			if (!_isUndefined(obj["Values"])) {
-				this.m_values=obj["Values"];
+				this._V=obj["Values"];
 			}
 			if (!_isUndefined(obj["VerticalAlignment"])) {
-				this.m_verticalAlignment=obj["VerticalAlignment"];
+				this._Ve=obj["VerticalAlignment"];
 			}
 			if (!_isUndefined(obj["Width"])) {
-				this.m_width=obj["Width"];
+				this._W=obj["Width"];
 			}
 			if (!_isUndefined(obj["_Id"])) {
-				this.m__Id=obj["_Id"];
+				this.__I=obj["_Id"];
 			}
 			if (!_isUndefined(obj["_ReferenceId"])) {
-				this.m__ReferenceId=obj["_ReferenceId"];
+				this.__R=obj["_ReferenceId"];
 			}
 			_handleNavigationPropertyResults(this, obj, ["font", "Font", "parentBody", "ParentBody", "parentContentControl", "ParentContentControl", "parentContentControlOrNullObject", "ParentContentControlOrNullObject", "parentTable", "ParentTable", "parentTableCell", "ParentTableCell", "parentTableCellOrNullObject", "ParentTableCellOrNullObject", "parentTableOrNullObject", "ParentTableOrNullObject", "rows", "Rows", "tables", "Tables"]);
 		};
 		Table.prototype.load=function (option) {
-			_load(this, option);
-			return this;
+			return _load(this, option);
+		};
+		Table.prototype.loadAndSync=function (option) {
+			return _loadAndSync(this, option);
+		};
+		Table.prototype.retrieve=function (option) {
+			return _retrieve(this, option);
+		};
+		Table.prototype.retrieveAndSync=function (option) {
+			return _retrieveAndSync(this, option);
 		};
 		Table.prototype._handleIdResult=function (value) {
 			_super.prototype._handleIdResult.call(this, value);
@@ -17976,10 +19358,10 @@ var Word;
 				return;
 			}
 			if (!_isUndefined(value["_ReferenceId"])) {
-				this.m__ReferenceId=value["_ReferenceId"];
+				this.__R=value["_ReferenceId"];
 			}
 			if (!_isUndefined(value["_Id"])) {
-				this.m__Id=value["_Id"];
+				this.__I=value["_Id"];
 			}
 		};
 		Table.prototype.track=function () {
@@ -17991,34 +19373,42 @@ var Word;
 			return this;
 		};
 		Table.prototype.toJSON=function () {
-			return {
-				"alignment": this.m_alignment,
-				"font": this.m_font,
-				"headerRowCount": this.m_headerRowCount,
-				"horizontalAlignment": this.m_horizontalAlignment,
-				"isUniform": this.m_isUniform,
-				"nestingLevel": this.m_nestingLevel,
-				"rowCount": this.m_rowCount,
-				"shadingColor": this.m_shadingColor,
-				"style": this.m_style,
-				"styleBandedColumns": this.m_styleBandedColumns,
-				"styleBandedRows": this.m_styleBandedRows,
-				"styleBuiltIn": this.m_styleBuiltIn,
-				"styleFirstColumn": this.m_styleFirstColumn,
-				"styleLastColumn": this.m_styleLastColumn,
-				"styleTotalRow": this.m_styleTotalRow,
-				"values": this.m_values,
-				"verticalAlignment": this.m_verticalAlignment,
-				"width": this.m_width
-			};
+			return _toJson(this, {
+				"alignment": this._A,
+				"headerRowCount": this._H,
+				"horizontalAlignment": this._Ho,
+				"isUniform": this._I,
+				"nestingLevel": this._N,
+				"rowCount": this._R,
+				"shadingColor": this._S,
+				"style": this._St,
+				"styleBandedColumns": this._Sty,
+				"styleBandedRows": this._Styl,
+				"styleBuiltIn": this._Style,
+				"styleFirstColumn": this._StyleF,
+				"styleLastColumn": this._StyleL,
+				"styleTotalRow": this._StyleT,
+				"values": this._V,
+				"verticalAlignment": this._Ve,
+				"width": this._W,
+			}, {
+				"font": this._F,
+				"rows": this._Ro,
+				"tables": this._T,
+			});
+		};
+		Table.prototype.ensureUnchanged=function (data) {
+			_createEnsureUnchangedAction(this.context, this, data);
+			return;
 		};
 		return Table;
 	}(OfficeExtension.ClientObject));
 	Word.Table=Table;
+	var _typeTableCollection="TableCollection";
 	var TableCollection=(function (_super) {
 		__extends(TableCollection, _super);
 		function TableCollection() {
-			_super.apply(this, arguments);
+			return _super !==null && _super.apply(this, arguments) || this;
 		}
 		Object.defineProperty(TableCollection.prototype, "_className", {
 			get: function () {
@@ -18029,7 +19419,7 @@ var Word;
 		});
 		Object.defineProperty(TableCollection.prototype, "items", {
 			get: function () {
-				_throwIfNotLoaded("items", this.m__items, "TableCollection", this._isNull);
+				_throwIfNotLoaded("items", this.m__items, _typeTableCollection, this._isNull);
 				return this.m__items;
 			},
 			enumerable: true,
@@ -18037,23 +19427,23 @@ var Word;
 		});
 		Object.defineProperty(TableCollection.prototype, "_ReferenceId", {
 			get: function () {
-				_throwIfNotLoaded("_ReferenceId", this.m__ReferenceId, "TableCollection", this._isNull);
-				return this.m__ReferenceId;
+				_throwIfNotLoaded("_ReferenceId", this.__R, _typeTableCollection, this._isNull);
+				return this.__R;
 			},
 			enumerable: true,
 			configurable: true
 		});
 		TableCollection.prototype.getFirst=function () {
-			return new Word.Table(this.context, _createMethodObjectPath(this.context, this, "GetFirst", 1, [], false, false, null));
+			return new Word.Table(this.context, _createMethodObjectPath(this.context, this, "GetFirst", 1, [], false, false, null, false));
 		};
 		TableCollection.prototype.getFirstOrNullObject=function () {
-			return new Word.Table(this.context, _createMethodObjectPath(this.context, this, "GetFirstOrNullObject", 1, [], false, false, null));
+			return new Word.Table(this.context, _createMethodObjectPath(this.context, this, "GetFirstOrNullObject", 1, [], false, false, null, false));
 		};
 		TableCollection.prototype._GetItem=function (index) {
 			return new Word.Table(this.context, _createIndexerObjectPath(this.context, this, [index]));
 		};
 		TableCollection.prototype._KeepReference=function () {
-			_createMethodAction(this.context, this, "_KeepReference", 1, []);
+			_createMethodAction(this.context, this, "_KeepReference", 1, [], false);
 		};
 		TableCollection.prototype._handleResult=function (value) {
 			_super.prototype._handleResult.call(this, value);
@@ -18062,7 +19452,7 @@ var Word;
 			var obj=value;
 			_fixObjectPathIfNecessary(this, obj);
 			if (!_isUndefined(obj["_ReferenceId"])) {
-				this.m__ReferenceId=obj["_ReferenceId"];
+				this.__R=obj["_ReferenceId"];
 			}
 			if (!_isNullOrUndefined(obj[OfficeExtension.Constants.items])) {
 				this.m__items=[];
@@ -18075,8 +19465,16 @@ var Word;
 			}
 		};
 		TableCollection.prototype.load=function (option) {
-			_load(this, option);
-			return this;
+			return _load(this, option);
+		};
+		TableCollection.prototype.loadAndSync=function (option) {
+			return _loadAndSync(this, option);
+		};
+		TableCollection.prototype.retrieve=function (option) {
+			return _retrieve(this, option);
+		};
+		TableCollection.prototype.retrieveAndSync=function (option) {
+			return _retrieveAndSync(this, option);
 		};
 		TableCollection.prototype._handleIdResult=function (value) {
 			_super.prototype._handleIdResult.call(this, value);
@@ -18084,7 +19482,7 @@ var Word;
 				return;
 			}
 			if (!_isUndefined(value["_ReferenceId"])) {
-				this.m__ReferenceId=value["_ReferenceId"];
+				this.__R=value["_ReferenceId"];
 			}
 		};
 		TableCollection.prototype.track=function () {
@@ -18096,15 +19494,16 @@ var Word;
 			return this;
 		};
 		TableCollection.prototype.toJSON=function () {
-			return {};
+			return _toJson(this, {}, {}, this.m__items);
 		};
 		return TableCollection;
 	}(OfficeExtension.ClientObject));
 	Word.TableCollection=TableCollection;
+	var _typeTableRow="TableRow";
 	var TableRow=(function (_super) {
 		__extends(TableRow, _super);
 		function TableRow() {
-			_super.apply(this, arguments);
+			return _super !==null && _super.apply(this, arguments) || this;
 		}
 		Object.defineProperty(TableRow.prototype, "_className", {
 			get: function () {
@@ -18115,49 +19514,49 @@ var Word;
 		});
 		Object.defineProperty(TableRow.prototype, "cells", {
 			get: function () {
-				if (!this.m_cells) {
-					this.m_cells=new Word.TableCellCollection(this.context, _createPropertyObjectPath(this.context, this, "Cells", true, false));
+				if (!this._Ce) {
+					this._Ce=new Word.TableCellCollection(this.context, _createPropertyObjectPath(this.context, this, "Cells", true, false, false));
 				}
-				return this.m_cells;
+				return this._Ce;
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(TableRow.prototype, "font", {
 			get: function () {
-				if (!this.m_font) {
-					this.m_font=new Word.Font(this.context, _createPropertyObjectPath(this.context, this, "Font", false, false));
+				if (!this._F) {
+					this._F=new Word.Font(this.context, _createPropertyObjectPath(this.context, this, "Font", false, false, false));
 				}
-				return this.m_font;
+				return this._F;
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(TableRow.prototype, "parentTable", {
 			get: function () {
-				if (!this.m_parentTable) {
-					this.m_parentTable=new Word.Table(this.context, _createPropertyObjectPath(this.context, this, "ParentTable", false, false));
+				if (!this._P) {
+					this._P=new Word.Table(this.context, _createPropertyObjectPath(this.context, this, "ParentTable", false, false, false));
 				}
-				return this.m_parentTable;
+				return this._P;
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(TableRow.prototype, "cellCount", {
 			get: function () {
-				_throwIfNotLoaded("cellCount", this.m_cellCount, "TableRow", this._isNull);
-				return this.m_cellCount;
+				_throwIfNotLoaded("cellCount", this._C, _typeTableRow, this._isNull);
+				return this._C;
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(TableRow.prototype, "horizontalAlignment", {
 			get: function () {
-				_throwIfNotLoaded("horizontalAlignment", this.m_horizontalAlignment, "TableRow", this._isNull);
-				return this.m_horizontalAlignment;
+				_throwIfNotLoaded("horizontalAlignment", this._H, _typeTableRow, this._isNull);
+				return this._H;
 			},
 			set: function (value) {
-				this.m_horizontalAlignment=value;
+				this._H=value;
 				_createSetPropertyAction(this.context, this, "HorizontalAlignment", value);
 			},
 			enumerable: true,
@@ -18165,19 +19564,19 @@ var Word;
 		});
 		Object.defineProperty(TableRow.prototype, "isHeader", {
 			get: function () {
-				_throwIfNotLoaded("isHeader", this.m_isHeader, "TableRow", this._isNull);
-				return this.m_isHeader;
+				_throwIfNotLoaded("isHeader", this._I, _typeTableRow, this._isNull);
+				return this._I;
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(TableRow.prototype, "preferredHeight", {
 			get: function () {
-				_throwIfNotLoaded("preferredHeight", this.m_preferredHeight, "TableRow", this._isNull);
-				return this.m_preferredHeight;
+				_throwIfNotLoaded("preferredHeight", this._Pr, _typeTableRow, this._isNull);
+				return this._Pr;
 			},
 			set: function (value) {
-				this.m_preferredHeight=value;
+				this._Pr=value;
 				_createSetPropertyAction(this.context, this, "PreferredHeight", value);
 			},
 			enumerable: true,
@@ -18185,19 +19584,19 @@ var Word;
 		});
 		Object.defineProperty(TableRow.prototype, "rowIndex", {
 			get: function () {
-				_throwIfNotLoaded("rowIndex", this.m_rowIndex, "TableRow", this._isNull);
-				return this.m_rowIndex;
+				_throwIfNotLoaded("rowIndex", this._R, _typeTableRow, this._isNull);
+				return this._R;
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(TableRow.prototype, "shadingColor", {
 			get: function () {
-				_throwIfNotLoaded("shadingColor", this.m_shadingColor, "TableRow", this._isNull);
-				return this.m_shadingColor;
+				_throwIfNotLoaded("shadingColor", this._S, _typeTableRow, this._isNull);
+				return this._S;
 			},
 			set: function (value) {
-				this.m_shadingColor=value;
+				this._S=value;
 				_createSetPropertyAction(this.context, this, "ShadingColor", value);
 			},
 			enumerable: true,
@@ -18205,11 +19604,11 @@ var Word;
 		});
 		Object.defineProperty(TableRow.prototype, "values", {
 			get: function () {
-				_throwIfNotLoaded("values", this.m_values, "TableRow", this._isNull);
-				return this.m_values;
+				_throwIfNotLoaded("values", this._V, _typeTableRow, this._isNull);
+				return this._V;
 			},
 			set: function (value) {
-				this.m_values=value;
+				this._V=value;
 				_createSetPropertyAction(this.context, this, "Values", value);
 			},
 			enumerable: true,
@@ -18217,11 +19616,11 @@ var Word;
 		});
 		Object.defineProperty(TableRow.prototype, "verticalAlignment", {
 			get: function () {
-				_throwIfNotLoaded("verticalAlignment", this.m_verticalAlignment, "TableRow", this._isNull);
-				return this.m_verticalAlignment;
+				_throwIfNotLoaded("verticalAlignment", this._Ve, _typeTableRow, this._isNull);
+				return this._Ve;
 			},
 			set: function (value) {
-				this.m_verticalAlignment=value;
+				this._Ve=value;
 				_createSetPropertyAction(this.context, this, "VerticalAlignment", value);
 			},
 			enumerable: true,
@@ -18229,16 +19628,16 @@ var Word;
 		});
 		Object.defineProperty(TableRow.prototype, "_Id", {
 			get: function () {
-				_throwIfNotLoaded("_Id", this.m__Id, "TableRow", this._isNull);
-				return this.m__Id;
+				_throwIfNotLoaded("_Id", this.__I, _typeTableRow, this._isNull);
+				return this.__I;
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(TableRow.prototype, "_ReferenceId", {
 			get: function () {
-				_throwIfNotLoaded("_ReferenceId", this.m__ReferenceId, "TableRow", this._isNull);
-				return this.m__ReferenceId;
+				_throwIfNotLoaded("_ReferenceId", this.__R, _typeTableRow, this._isNull);
+				return this.__R;
 			},
 			enumerable: true,
 			configurable: true
@@ -18246,53 +19645,53 @@ var Word;
 		TableRow.prototype.set=function (properties, options) {
 			this._recursivelySet(properties, options, ["values", "shadingColor", "horizontalAlignment", "verticalAlignment", "preferredHeight"], ["font"], [
 				"cells",
-				"parentTable",
-				"cells",
 				"parentTable"
 			]);
 		};
 		TableRow.prototype.clear=function () {
-			_createMethodAction(this.context, this, "Clear", 0, []);
+			_createMethodAction(this.context, this, "Clear", 0, [], false);
 		};
 		TableRow.prototype.delete=function () {
-			_createMethodAction(this.context, this, "Delete", 0, []);
+			_createMethodAction(this.context, this, "Delete", 0, [], false);
 		};
 		TableRow.prototype.getBorder=function (borderLocation) {
-			return new Word.TableBorder(this.context, _createMethodObjectPath(this.context, this, "GetBorder", 1, [borderLocation], false, false, null));
+			return new Word.TableBorder(this.context, _createMethodObjectPath(this.context, this, "GetBorder", 1, [borderLocation], false, false, null, false));
 		};
 		TableRow.prototype.getCellPadding=function (cellPaddingLocation) {
-			var action=_createMethodAction(this.context, this, "GetCellPadding", 1, [cellPaddingLocation]);
+			var action=_createMethodAction(this.context, this, "GetCellPadding", 1, [cellPaddingLocation], false);
 			var ret=new OfficeExtension.ClientResult();
 			_addActionResultHandler(this, action, ret);
 			return ret;
 		};
 		TableRow.prototype.getNext=function () {
-			return new Word.TableRow(this.context, _createMethodObjectPath(this.context, this, "GetNext", 1, [], false, false, null));
+			return new Word.TableRow(this.context, _createMethodObjectPath(this.context, this, "GetNext", 1, [], false, false, null, false));
 		};
 		TableRow.prototype.getNextOrNullObject=function () {
-			return new Word.TableRow(this.context, _createMethodObjectPath(this.context, this, "GetNextOrNullObject", 1, [], false, false, null));
+			return new Word.TableRow(this.context, _createMethodObjectPath(this.context, this, "GetNextOrNullObject", 1, [], false, false, null, false));
 		};
 		TableRow.prototype.insertContentControl=function () {
-			return new Word.ContentControl(this.context, _createMethodObjectPath(this.context, this, "InsertContentControl", 0, [], false, false, null));
+			_throwIfApiNotSupported("TableRow.insertContentControl", _defaultApiSetName, "1.4", _hostName);
+			return new Word.ContentControl(this.context, _createMethodObjectPath(this.context, this, "InsertContentControl", 0, [], false, false, null, false));
 		};
 		TableRow.prototype.insertRows=function (insertLocation, rowCount, values) {
-			return new Word.TableRowCollection(this.context, _createMethodObjectPath(this.context, this, "InsertRows", 1, [insertLocation, rowCount, values], true, false, null));
+			return new Word.TableRowCollection(this.context, _createMethodObjectPath(this.context, this, "InsertRows", 1, [insertLocation, rowCount, values], true, false, null, false));
 		};
 		TableRow.prototype.merge=function () {
-			return new Word.TableCell(this.context, _createMethodObjectPath(this.context, this, "Merge", 0, [], false, false, null));
+			_throwIfApiNotSupported("TableRow.merge", _defaultApiSetName, "1.4", _hostName);
+			return new Word.TableCell(this.context, _createMethodObjectPath(this.context, this, "Merge", 0, [], false, false, null, false));
 		};
 		TableRow.prototype.search=function (searchText, searchOptions) {
 			searchOptions=_normalizeSearchOptions(this.context, searchOptions);
-			return new Word.RangeCollection(this.context, _createMethodObjectPath(this.context, this, "Search", 1, [searchText, searchOptions], true, false, null));
+			return new Word.RangeCollection(this.context, _createMethodObjectPath(this.context, this, "Search", 1, [searchText, searchOptions], true, false, null, false));
 		};
 		TableRow.prototype.select=function (selectionMode) {
-			_createMethodAction(this.context, this, "Select", 1, [selectionMode]);
+			_createMethodAction(this.context, this, "Select", 1, [selectionMode], false);
 		};
 		TableRow.prototype.setCellPadding=function (cellPaddingLocation, cellPadding) {
-			_createMethodAction(this.context, this, "SetCellPadding", 0, [cellPaddingLocation, cellPadding]);
+			_createMethodAction(this.context, this, "SetCellPadding", 0, [cellPaddingLocation, cellPadding], false);
 		};
 		TableRow.prototype._KeepReference=function () {
-			_createMethodAction(this.context, this, "_KeepReference", 1, []);
+			_createMethodAction(this.context, this, "_KeepReference", 1, [], false);
 		};
 		TableRow.prototype._handleResult=function (value) {
 			_super.prototype._handleResult.call(this, value);
@@ -18301,40 +19700,48 @@ var Word;
 			var obj=value;
 			_fixObjectPathIfNecessary(this, obj);
 			if (!_isUndefined(obj["CellCount"])) {
-				this.m_cellCount=obj["CellCount"];
+				this._C=obj["CellCount"];
 			}
 			if (!_isUndefined(obj["HorizontalAlignment"])) {
-				this.m_horizontalAlignment=obj["HorizontalAlignment"];
+				this._H=obj["HorizontalAlignment"];
 			}
 			if (!_isUndefined(obj["IsHeader"])) {
-				this.m_isHeader=obj["IsHeader"];
+				this._I=obj["IsHeader"];
 			}
 			if (!_isUndefined(obj["PreferredHeight"])) {
-				this.m_preferredHeight=obj["PreferredHeight"];
+				this._Pr=obj["PreferredHeight"];
 			}
 			if (!_isUndefined(obj["RowIndex"])) {
-				this.m_rowIndex=obj["RowIndex"];
+				this._R=obj["RowIndex"];
 			}
 			if (!_isUndefined(obj["ShadingColor"])) {
-				this.m_shadingColor=obj["ShadingColor"];
+				this._S=obj["ShadingColor"];
 			}
 			if (!_isUndefined(obj["Values"])) {
-				this.m_values=obj["Values"];
+				this._V=obj["Values"];
 			}
 			if (!_isUndefined(obj["VerticalAlignment"])) {
-				this.m_verticalAlignment=obj["VerticalAlignment"];
+				this._Ve=obj["VerticalAlignment"];
 			}
 			if (!_isUndefined(obj["_Id"])) {
-				this.m__Id=obj["_Id"];
+				this.__I=obj["_Id"];
 			}
 			if (!_isUndefined(obj["_ReferenceId"])) {
-				this.m__ReferenceId=obj["_ReferenceId"];
+				this.__R=obj["_ReferenceId"];
 			}
 			_handleNavigationPropertyResults(this, obj, ["cells", "Cells", "font", "Font", "parentTable", "ParentTable"]);
 		};
 		TableRow.prototype.load=function (option) {
-			_load(this, option);
-			return this;
+			return _load(this, option);
+		};
+		TableRow.prototype.loadAndSync=function (option) {
+			return _loadAndSync(this, option);
+		};
+		TableRow.prototype.retrieve=function (option) {
+			return _retrieve(this, option);
+		};
+		TableRow.prototype.retrieveAndSync=function (option) {
+			return _retrieveAndSync(this, option);
 		};
 		TableRow.prototype._handleIdResult=function (value) {
 			_super.prototype._handleIdResult.call(this, value);
@@ -18342,10 +19749,10 @@ var Word;
 				return;
 			}
 			if (!_isUndefined(value["_ReferenceId"])) {
-				this.m__ReferenceId=value["_ReferenceId"];
+				this.__R=value["_ReferenceId"];
 			}
 			if (!_isUndefined(value["_Id"])) {
-				this.m__Id=value["_Id"];
+				this.__I=value["_Id"];
 			}
 		};
 		TableRow.prototype.track=function () {
@@ -18357,25 +19764,32 @@ var Word;
 			return this;
 		};
 		TableRow.prototype.toJSON=function () {
-			return {
-				"cellCount": this.m_cellCount,
-				"font": this.m_font,
-				"horizontalAlignment": this.m_horizontalAlignment,
-				"isHeader": this.m_isHeader,
-				"preferredHeight": this.m_preferredHeight,
-				"rowIndex": this.m_rowIndex,
-				"shadingColor": this.m_shadingColor,
-				"values": this.m_values,
-				"verticalAlignment": this.m_verticalAlignment
-			};
+			return _toJson(this, {
+				"cellCount": this._C,
+				"horizontalAlignment": this._H,
+				"isHeader": this._I,
+				"preferredHeight": this._Pr,
+				"rowIndex": this._R,
+				"shadingColor": this._S,
+				"values": this._V,
+				"verticalAlignment": this._Ve,
+			}, {
+				"cells": this._Ce,
+				"font": this._F,
+			});
+		};
+		TableRow.prototype.ensureUnchanged=function (data) {
+			_createEnsureUnchangedAction(this.context, this, data);
+			return;
 		};
 		return TableRow;
 	}(OfficeExtension.ClientObject));
 	Word.TableRow=TableRow;
+	var _typeTableRowCollection="TableRowCollection";
 	var TableRowCollection=(function (_super) {
 		__extends(TableRowCollection, _super);
 		function TableRowCollection() {
-			_super.apply(this, arguments);
+			return _super !==null && _super.apply(this, arguments) || this;
 		}
 		Object.defineProperty(TableRowCollection.prototype, "_className", {
 			get: function () {
@@ -18386,7 +19800,7 @@ var Word;
 		});
 		Object.defineProperty(TableRowCollection.prototype, "items", {
 			get: function () {
-				_throwIfNotLoaded("items", this.m__items, "TableRowCollection", this._isNull);
+				_throwIfNotLoaded("items", this.m__items, _typeTableRowCollection, this._isNull);
 				return this.m__items;
 			},
 			enumerable: true,
@@ -18394,23 +19808,23 @@ var Word;
 		});
 		Object.defineProperty(TableRowCollection.prototype, "_ReferenceId", {
 			get: function () {
-				_throwIfNotLoaded("_ReferenceId", this.m__ReferenceId, "TableRowCollection", this._isNull);
-				return this.m__ReferenceId;
+				_throwIfNotLoaded("_ReferenceId", this.__R, _typeTableRowCollection, this._isNull);
+				return this.__R;
 			},
 			enumerable: true,
 			configurable: true
 		});
 		TableRowCollection.prototype.getFirst=function () {
-			return new Word.TableRow(this.context, _createMethodObjectPath(this.context, this, "GetFirst", 1, [], false, false, null));
+			return new Word.TableRow(this.context, _createMethodObjectPath(this.context, this, "GetFirst", 1, [], false, false, null, false));
 		};
 		TableRowCollection.prototype.getFirstOrNullObject=function () {
-			return new Word.TableRow(this.context, _createMethodObjectPath(this.context, this, "GetFirstOrNullObject", 1, [], false, false, null));
+			return new Word.TableRow(this.context, _createMethodObjectPath(this.context, this, "GetFirstOrNullObject", 1, [], false, false, null, false));
 		};
 		TableRowCollection.prototype._GetItem=function (index) {
 			return new Word.TableRow(this.context, _createIndexerObjectPath(this.context, this, [index]));
 		};
 		TableRowCollection.prototype._KeepReference=function () {
-			_createMethodAction(this.context, this, "_KeepReference", 1, []);
+			_createMethodAction(this.context, this, "_KeepReference", 1, [], false);
 		};
 		TableRowCollection.prototype._handleResult=function (value) {
 			_super.prototype._handleResult.call(this, value);
@@ -18419,7 +19833,7 @@ var Word;
 			var obj=value;
 			_fixObjectPathIfNecessary(this, obj);
 			if (!_isUndefined(obj["_ReferenceId"])) {
-				this.m__ReferenceId=obj["_ReferenceId"];
+				this.__R=obj["_ReferenceId"];
 			}
 			if (!_isNullOrUndefined(obj[OfficeExtension.Constants.items])) {
 				this.m__items=[];
@@ -18432,8 +19846,16 @@ var Word;
 			}
 		};
 		TableRowCollection.prototype.load=function (option) {
-			_load(this, option);
-			return this;
+			return _load(this, option);
+		};
+		TableRowCollection.prototype.loadAndSync=function (option) {
+			return _loadAndSync(this, option);
+		};
+		TableRowCollection.prototype.retrieve=function (option) {
+			return _retrieve(this, option);
+		};
+		TableRowCollection.prototype.retrieveAndSync=function (option) {
+			return _retrieveAndSync(this, option);
 		};
 		TableRowCollection.prototype._handleIdResult=function (value) {
 			_super.prototype._handleIdResult.call(this, value);
@@ -18441,7 +19863,7 @@ var Word;
 				return;
 			}
 			if (!_isUndefined(value["_ReferenceId"])) {
-				this.m__ReferenceId=value["_ReferenceId"];
+				this.__R=value["_ReferenceId"];
 			}
 		};
 		TableRowCollection.prototype.track=function () {
@@ -18453,15 +19875,16 @@ var Word;
 			return this;
 		};
 		TableRowCollection.prototype.toJSON=function () {
-			return {};
+			return _toJson(this, {}, {}, this.m__items);
 		};
 		return TableRowCollection;
 	}(OfficeExtension.ClientObject));
 	Word.TableRowCollection=TableRowCollection;
+	var _typeTableCell="TableCell";
 	var TableCell=(function (_super) {
 		__extends(TableCell, _super);
 		function TableCell() {
-			_super.apply(this, arguments);
+			return _super !==null && _super.apply(this, arguments) || this;
 		}
 		Object.defineProperty(TableCell.prototype, "_className", {
 			get: function () {
@@ -18472,49 +19895,49 @@ var Word;
 		});
 		Object.defineProperty(TableCell.prototype, "body", {
 			get: function () {
-				if (!this.m_body) {
-					this.m_body=new Word.Body(this.context, _createPropertyObjectPath(this.context, this, "Body", false, false));
+				if (!this._B) {
+					this._B=new Word.Body(this.context, _createPropertyObjectPath(this.context, this, "Body", false, false, false));
 				}
-				return this.m_body;
+				return this._B;
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(TableCell.prototype, "parentRow", {
 			get: function () {
-				if (!this.m_parentRow) {
-					this.m_parentRow=new Word.TableRow(this.context, _createPropertyObjectPath(this.context, this, "ParentRow", false, false));
+				if (!this._P) {
+					this._P=new Word.TableRow(this.context, _createPropertyObjectPath(this.context, this, "ParentRow", false, false, false));
 				}
-				return this.m_parentRow;
+				return this._P;
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(TableCell.prototype, "parentTable", {
 			get: function () {
-				if (!this.m_parentTable) {
-					this.m_parentTable=new Word.Table(this.context, _createPropertyObjectPath(this.context, this, "ParentTable", false, false));
+				if (!this._Pa) {
+					this._Pa=new Word.Table(this.context, _createPropertyObjectPath(this.context, this, "ParentTable", false, false, false));
 				}
-				return this.m_parentTable;
+				return this._Pa;
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(TableCell.prototype, "cellIndex", {
 			get: function () {
-				_throwIfNotLoaded("cellIndex", this.m_cellIndex, "TableCell", this._isNull);
-				return this.m_cellIndex;
+				_throwIfNotLoaded("cellIndex", this._C, _typeTableCell, this._isNull);
+				return this._C;
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(TableCell.prototype, "columnWidth", {
 			get: function () {
-				_throwIfNotLoaded("columnWidth", this.m_columnWidth, "TableCell", this._isNull);
-				return this.m_columnWidth;
+				_throwIfNotLoaded("columnWidth", this._Co, _typeTableCell, this._isNull);
+				return this._Co;
 			},
 			set: function (value) {
-				this.m_columnWidth=value;
+				this._Co=value;
 				_createSetPropertyAction(this.context, this, "ColumnWidth", value);
 			},
 			enumerable: true,
@@ -18522,11 +19945,11 @@ var Word;
 		});
 		Object.defineProperty(TableCell.prototype, "horizontalAlignment", {
 			get: function () {
-				_throwIfNotLoaded("horizontalAlignment", this.m_horizontalAlignment, "TableCell", this._isNull);
-				return this.m_horizontalAlignment;
+				_throwIfNotLoaded("horizontalAlignment", this._H, _typeTableCell, this._isNull);
+				return this._H;
 			},
 			set: function (value) {
-				this.m_horizontalAlignment=value;
+				this._H=value;
 				_createSetPropertyAction(this.context, this, "HorizontalAlignment", value);
 			},
 			enumerable: true,
@@ -18534,19 +19957,19 @@ var Word;
 		});
 		Object.defineProperty(TableCell.prototype, "rowIndex", {
 			get: function () {
-				_throwIfNotLoaded("rowIndex", this.m_rowIndex, "TableCell", this._isNull);
-				return this.m_rowIndex;
+				_throwIfNotLoaded("rowIndex", this._R, _typeTableCell, this._isNull);
+				return this._R;
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(TableCell.prototype, "shadingColor", {
 			get: function () {
-				_throwIfNotLoaded("shadingColor", this.m_shadingColor, "TableCell", this._isNull);
-				return this.m_shadingColor;
+				_throwIfNotLoaded("shadingColor", this._S, _typeTableCell, this._isNull);
+				return this._S;
 			},
 			set: function (value) {
-				this.m_shadingColor=value;
+				this._S=value;
 				_createSetPropertyAction(this.context, this, "ShadingColor", value);
 			},
 			enumerable: true,
@@ -18554,11 +19977,11 @@ var Word;
 		});
 		Object.defineProperty(TableCell.prototype, "value", {
 			get: function () {
-				_throwIfNotLoaded("value", this.m_value, "TableCell", this._isNull);
-				return this.m_value;
+				_throwIfNotLoaded("value", this._V, _typeTableCell, this._isNull);
+				return this._V;
 			},
 			set: function (value) {
-				this.m_value=value;
+				this._V=value;
 				_createSetPropertyAction(this.context, this, "Value", value);
 			},
 			enumerable: true,
@@ -18566,11 +19989,11 @@ var Word;
 		});
 		Object.defineProperty(TableCell.prototype, "verticalAlignment", {
 			get: function () {
-				_throwIfNotLoaded("verticalAlignment", this.m_verticalAlignment, "TableCell", this._isNull);
-				return this.m_verticalAlignment;
+				_throwIfNotLoaded("verticalAlignment", this._Ve, _typeTableCell, this._isNull);
+				return this._Ve;
 			},
 			set: function (value) {
-				this.m_verticalAlignment=value;
+				this._Ve=value;
 				_createSetPropertyAction(this.context, this, "VerticalAlignment", value);
 			},
 			enumerable: true,
@@ -18578,24 +20001,24 @@ var Word;
 		});
 		Object.defineProperty(TableCell.prototype, "width", {
 			get: function () {
-				_throwIfNotLoaded("width", this.m_width, "TableCell", this._isNull);
-				return this.m_width;
+				_throwIfNotLoaded("width", this._W, _typeTableCell, this._isNull);
+				return this._W;
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(TableCell.prototype, "_Id", {
 			get: function () {
-				_throwIfNotLoaded("_Id", this.m__Id, "TableCell", this._isNull);
-				return this.m__Id;
+				_throwIfNotLoaded("_Id", this.__I, _typeTableCell, this._isNull);
+				return this.__I;
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(TableCell.prototype, "_ReferenceId", {
 			get: function () {
-				_throwIfNotLoaded("_ReferenceId", this.m__ReferenceId, "TableCell", this._isNull);
-				return this.m__ReferenceId;
+				_throwIfNotLoaded("_ReferenceId", this.__R, _typeTableCell, this._isNull);
+				return this.__R;
 			},
 			enumerable: true,
 			configurable: true
@@ -18603,46 +20026,45 @@ var Word;
 		TableCell.prototype.set=function (properties, options) {
 			this._recursivelySet(properties, options, ["value", "shadingColor", "horizontalAlignment", "verticalAlignment", "columnWidth"], ["body"], [
 				"parentRow",
-				"parentTable",
-				"parentRow",
 				"parentTable"
 			]);
 		};
 		TableCell.prototype.deleteColumn=function () {
-			_createMethodAction(this.context, this, "DeleteColumn", 0, []);
+			_createMethodAction(this.context, this, "DeleteColumn", 0, [], false);
 		};
 		TableCell.prototype.deleteRow=function () {
-			_createMethodAction(this.context, this, "DeleteRow", 0, []);
+			_createMethodAction(this.context, this, "DeleteRow", 0, [], false);
 		};
 		TableCell.prototype.getBorder=function (borderLocation) {
-			return new Word.TableBorder(this.context, _createMethodObjectPath(this.context, this, "GetBorder", 1, [borderLocation], false, false, null));
+			return new Word.TableBorder(this.context, _createMethodObjectPath(this.context, this, "GetBorder", 1, [borderLocation], false, false, null, false));
 		};
 		TableCell.prototype.getCellPadding=function (cellPaddingLocation) {
-			var action=_createMethodAction(this.context, this, "GetCellPadding", 1, [cellPaddingLocation]);
+			var action=_createMethodAction(this.context, this, "GetCellPadding", 1, [cellPaddingLocation], false);
 			var ret=new OfficeExtension.ClientResult();
 			_addActionResultHandler(this, action, ret);
 			return ret;
 		};
 		TableCell.prototype.getNext=function () {
-			return new Word.TableCell(this.context, _createMethodObjectPath(this.context, this, "GetNext", 1, [], false, false, null));
+			return new Word.TableCell(this.context, _createMethodObjectPath(this.context, this, "GetNext", 1, [], false, false, null, false));
 		};
 		TableCell.prototype.getNextOrNullObject=function () {
-			return new Word.TableCell(this.context, _createMethodObjectPath(this.context, this, "GetNextOrNullObject", 1, [], false, false, null));
+			return new Word.TableCell(this.context, _createMethodObjectPath(this.context, this, "GetNextOrNullObject", 1, [], false, false, null, false));
 		};
 		TableCell.prototype.insertColumns=function (insertLocation, columnCount, values) {
-			_createMethodAction(this.context, this, "InsertColumns", 0, [insertLocation, columnCount, values]);
+			_createMethodAction(this.context, this, "InsertColumns", 0, [insertLocation, columnCount, values], false);
 		};
 		TableCell.prototype.insertRows=function (insertLocation, rowCount, values) {
-			return new Word.TableRowCollection(this.context, _createMethodObjectPath(this.context, this, "InsertRows", 0, [insertLocation, rowCount, values], true, false, null));
+			return new Word.TableRowCollection(this.context, _createMethodObjectPath(this.context, this, "InsertRows", 0, [insertLocation, rowCount, values], true, false, null, false));
 		};
 		TableCell.prototype.setCellPadding=function (cellPaddingLocation, cellPadding) {
-			_createMethodAction(this.context, this, "SetCellPadding", 0, [cellPaddingLocation, cellPadding]);
+			_createMethodAction(this.context, this, "SetCellPadding", 0, [cellPaddingLocation, cellPadding], false);
 		};
 		TableCell.prototype.split=function (rowCount, columnCount) {
-			_createMethodAction(this.context, this, "Split", 0, [rowCount, columnCount]);
+			_throwIfApiNotSupported("TableCell.split", _defaultApiSetName, "1.4", _hostName);
+			_createMethodAction(this.context, this, "Split", 0, [rowCount, columnCount], false);
 		};
 		TableCell.prototype._KeepReference=function () {
-			_createMethodAction(this.context, this, "_KeepReference", 1, []);
+			_createMethodAction(this.context, this, "_KeepReference", 1, [], false);
 		};
 		TableCell.prototype._handleResult=function (value) {
 			_super.prototype._handleResult.call(this, value);
@@ -18651,40 +20073,48 @@ var Word;
 			var obj=value;
 			_fixObjectPathIfNecessary(this, obj);
 			if (!_isUndefined(obj["CellIndex"])) {
-				this.m_cellIndex=obj["CellIndex"];
+				this._C=obj["CellIndex"];
 			}
 			if (!_isUndefined(obj["ColumnWidth"])) {
-				this.m_columnWidth=obj["ColumnWidth"];
+				this._Co=obj["ColumnWidth"];
 			}
 			if (!_isUndefined(obj["HorizontalAlignment"])) {
-				this.m_horizontalAlignment=obj["HorizontalAlignment"];
+				this._H=obj["HorizontalAlignment"];
 			}
 			if (!_isUndefined(obj["RowIndex"])) {
-				this.m_rowIndex=obj["RowIndex"];
+				this._R=obj["RowIndex"];
 			}
 			if (!_isUndefined(obj["ShadingColor"])) {
-				this.m_shadingColor=obj["ShadingColor"];
+				this._S=obj["ShadingColor"];
 			}
 			if (!_isUndefined(obj["Value"])) {
-				this.m_value=obj["Value"];
+				this._V=obj["Value"];
 			}
 			if (!_isUndefined(obj["VerticalAlignment"])) {
-				this.m_verticalAlignment=obj["VerticalAlignment"];
+				this._Ve=obj["VerticalAlignment"];
 			}
 			if (!_isUndefined(obj["Width"])) {
-				this.m_width=obj["Width"];
+				this._W=obj["Width"];
 			}
 			if (!_isUndefined(obj["_Id"])) {
-				this.m__Id=obj["_Id"];
+				this.__I=obj["_Id"];
 			}
 			if (!_isUndefined(obj["_ReferenceId"])) {
-				this.m__ReferenceId=obj["_ReferenceId"];
+				this.__R=obj["_ReferenceId"];
 			}
 			_handleNavigationPropertyResults(this, obj, ["body", "Body", "parentRow", "ParentRow", "parentTable", "ParentTable"]);
 		};
 		TableCell.prototype.load=function (option) {
-			_load(this, option);
-			return this;
+			return _load(this, option);
+		};
+		TableCell.prototype.loadAndSync=function (option) {
+			return _loadAndSync(this, option);
+		};
+		TableCell.prototype.retrieve=function (option) {
+			return _retrieve(this, option);
+		};
+		TableCell.prototype.retrieveAndSync=function (option) {
+			return _retrieveAndSync(this, option);
 		};
 		TableCell.prototype._handleIdResult=function (value) {
 			_super.prototype._handleIdResult.call(this, value);
@@ -18692,10 +20122,10 @@ var Word;
 				return;
 			}
 			if (!_isUndefined(value["_ReferenceId"])) {
-				this.m__ReferenceId=value["_ReferenceId"];
+				this.__R=value["_ReferenceId"];
 			}
 			if (!_isUndefined(value["_Id"])) {
-				this.m__Id=value["_Id"];
+				this.__I=value["_Id"];
 			}
 		};
 		TableCell.prototype.track=function () {
@@ -18707,25 +20137,31 @@ var Word;
 			return this;
 		};
 		TableCell.prototype.toJSON=function () {
-			return {
-				"body": this.m_body,
-				"cellIndex": this.m_cellIndex,
-				"columnWidth": this.m_columnWidth,
-				"horizontalAlignment": this.m_horizontalAlignment,
-				"rowIndex": this.m_rowIndex,
-				"shadingColor": this.m_shadingColor,
-				"value": this.m_value,
-				"verticalAlignment": this.m_verticalAlignment,
-				"width": this.m_width
-			};
+			return _toJson(this, {
+				"cellIndex": this._C,
+				"columnWidth": this._Co,
+				"horizontalAlignment": this._H,
+				"rowIndex": this._R,
+				"shadingColor": this._S,
+				"value": this._V,
+				"verticalAlignment": this._Ve,
+				"width": this._W,
+			}, {
+				"body": this._B,
+			});
+		};
+		TableCell.prototype.ensureUnchanged=function (data) {
+			_createEnsureUnchangedAction(this.context, this, data);
+			return;
 		};
 		return TableCell;
 	}(OfficeExtension.ClientObject));
 	Word.TableCell=TableCell;
+	var _typeTableCellCollection="TableCellCollection";
 	var TableCellCollection=(function (_super) {
 		__extends(TableCellCollection, _super);
 		function TableCellCollection() {
-			_super.apply(this, arguments);
+			return _super !==null && _super.apply(this, arguments) || this;
 		}
 		Object.defineProperty(TableCellCollection.prototype, "_className", {
 			get: function () {
@@ -18736,7 +20172,7 @@ var Word;
 		});
 		Object.defineProperty(TableCellCollection.prototype, "items", {
 			get: function () {
-				_throwIfNotLoaded("items", this.m__items, "TableCellCollection", this._isNull);
+				_throwIfNotLoaded("items", this.m__items, _typeTableCellCollection, this._isNull);
 				return this.m__items;
 			},
 			enumerable: true,
@@ -18744,23 +20180,23 @@ var Word;
 		});
 		Object.defineProperty(TableCellCollection.prototype, "_ReferenceId", {
 			get: function () {
-				_throwIfNotLoaded("_ReferenceId", this.m__ReferenceId, "TableCellCollection", this._isNull);
-				return this.m__ReferenceId;
+				_throwIfNotLoaded("_ReferenceId", this.__R, _typeTableCellCollection, this._isNull);
+				return this.__R;
 			},
 			enumerable: true,
 			configurable: true
 		});
 		TableCellCollection.prototype.getFirst=function () {
-			return new Word.TableCell(this.context, _createMethodObjectPath(this.context, this, "GetFirst", 1, [], false, false, null));
+			return new Word.TableCell(this.context, _createMethodObjectPath(this.context, this, "GetFirst", 1, [], false, false, null, false));
 		};
 		TableCellCollection.prototype.getFirstOrNullObject=function () {
-			return new Word.TableCell(this.context, _createMethodObjectPath(this.context, this, "GetFirstOrNullObject", 1, [], false, false, null));
+			return new Word.TableCell(this.context, _createMethodObjectPath(this.context, this, "GetFirstOrNullObject", 1, [], false, false, null, false));
 		};
 		TableCellCollection.prototype._GetItem=function (index) {
 			return new Word.TableCell(this.context, _createIndexerObjectPath(this.context, this, [index]));
 		};
 		TableCellCollection.prototype._KeepReference=function () {
-			_createMethodAction(this.context, this, "_KeepReference", 1, []);
+			_createMethodAction(this.context, this, "_KeepReference", 1, [], false);
 		};
 		TableCellCollection.prototype._handleResult=function (value) {
 			_super.prototype._handleResult.call(this, value);
@@ -18769,7 +20205,7 @@ var Word;
 			var obj=value;
 			_fixObjectPathIfNecessary(this, obj);
 			if (!_isUndefined(obj["_ReferenceId"])) {
-				this.m__ReferenceId=obj["_ReferenceId"];
+				this.__R=obj["_ReferenceId"];
 			}
 			if (!_isNullOrUndefined(obj[OfficeExtension.Constants.items])) {
 				this.m__items=[];
@@ -18782,8 +20218,16 @@ var Word;
 			}
 		};
 		TableCellCollection.prototype.load=function (option) {
-			_load(this, option);
-			return this;
+			return _load(this, option);
+		};
+		TableCellCollection.prototype.loadAndSync=function (option) {
+			return _loadAndSync(this, option);
+		};
+		TableCellCollection.prototype.retrieve=function (option) {
+			return _retrieve(this, option);
+		};
+		TableCellCollection.prototype.retrieveAndSync=function (option) {
+			return _retrieveAndSync(this, option);
 		};
 		TableCellCollection.prototype._handleIdResult=function (value) {
 			_super.prototype._handleIdResult.call(this, value);
@@ -18791,7 +20235,7 @@ var Word;
 				return;
 			}
 			if (!_isUndefined(value["_ReferenceId"])) {
-				this.m__ReferenceId=value["_ReferenceId"];
+				this.__R=value["_ReferenceId"];
 			}
 		};
 		TableCellCollection.prototype.track=function () {
@@ -18803,15 +20247,16 @@ var Word;
 			return this;
 		};
 		TableCellCollection.prototype.toJSON=function () {
-			return {};
+			return _toJson(this, {}, {}, this.m__items);
 		};
 		return TableCellCollection;
 	}(OfficeExtension.ClientObject));
 	Word.TableCellCollection=TableCellCollection;
+	var _typeTableBorder="TableBorder";
 	var TableBorder=(function (_super) {
 		__extends(TableBorder, _super);
 		function TableBorder() {
-			_super.apply(this, arguments);
+			return _super !==null && _super.apply(this, arguments) || this;
 		}
 		Object.defineProperty(TableBorder.prototype, "_className", {
 			get: function () {
@@ -18822,11 +20267,11 @@ var Word;
 		});
 		Object.defineProperty(TableBorder.prototype, "color", {
 			get: function () {
-				_throwIfNotLoaded("color", this.m_color, "TableBorder", this._isNull);
-				return this.m_color;
+				_throwIfNotLoaded("color", this._C, _typeTableBorder, this._isNull);
+				return this._C;
 			},
 			set: function (value) {
-				this.m_color=value;
+				this._C=value;
 				_createSetPropertyAction(this.context, this, "Color", value);
 			},
 			enumerable: true,
@@ -18834,11 +20279,11 @@ var Word;
 		});
 		Object.defineProperty(TableBorder.prototype, "type", {
 			get: function () {
-				_throwIfNotLoaded("type", this.m_type, "TableBorder", this._isNull);
-				return this.m_type;
+				_throwIfNotLoaded("type", this._T, _typeTableBorder, this._isNull);
+				return this._T;
 			},
 			set: function (value) {
-				this.m_type=value;
+				this._T=value;
 				_createSetPropertyAction(this.context, this, "Type", value);
 			},
 			enumerable: true,
@@ -18846,11 +20291,11 @@ var Word;
 		});
 		Object.defineProperty(TableBorder.prototype, "width", {
 			get: function () {
-				_throwIfNotLoaded("width", this.m_width, "TableBorder", this._isNull);
-				return this.m_width;
+				_throwIfNotLoaded("width", this._W, _typeTableBorder, this._isNull);
+				return this._W;
 			},
 			set: function (value) {
-				this.m_width=value;
+				this._W=value;
 				_createSetPropertyAction(this.context, this, "Width", value);
 			},
 			enumerable: true,
@@ -18858,8 +20303,8 @@ var Word;
 		});
 		Object.defineProperty(TableBorder.prototype, "_ReferenceId", {
 			get: function () {
-				_throwIfNotLoaded("_ReferenceId", this.m__ReferenceId, "TableBorder", this._isNull);
-				return this.m__ReferenceId;
+				_throwIfNotLoaded("_ReferenceId", this.__R, _typeTableBorder, this._isNull);
+				return this.__R;
 			},
 			enumerable: true,
 			configurable: true
@@ -18868,7 +20313,7 @@ var Word;
 			this._recursivelySet(properties, options, ["color", "type", "width"], [], []);
 		};
 		TableBorder.prototype._KeepReference=function () {
-			_createMethodAction(this.context, this, "_KeepReference", 1, []);
+			_createMethodAction(this.context, this, "_KeepReference", 1, [], false);
 		};
 		TableBorder.prototype._handleResult=function (value) {
 			_super.prototype._handleResult.call(this, value);
@@ -18877,21 +20322,29 @@ var Word;
 			var obj=value;
 			_fixObjectPathIfNecessary(this, obj);
 			if (!_isUndefined(obj["Color"])) {
-				this.m_color=obj["Color"];
+				this._C=obj["Color"];
 			}
 			if (!_isUndefined(obj["Type"])) {
-				this.m_type=obj["Type"];
+				this._T=obj["Type"];
 			}
 			if (!_isUndefined(obj["Width"])) {
-				this.m_width=obj["Width"];
+				this._W=obj["Width"];
 			}
 			if (!_isUndefined(obj["_ReferenceId"])) {
-				this.m__ReferenceId=obj["_ReferenceId"];
+				this.__R=obj["_ReferenceId"];
 			}
 		};
 		TableBorder.prototype.load=function (option) {
-			_load(this, option);
-			return this;
+			return _load(this, option);
+		};
+		TableBorder.prototype.loadAndSync=function (option) {
+			return _loadAndSync(this, option);
+		};
+		TableBorder.prototype.retrieve=function (option) {
+			return _retrieve(this, option);
+		};
+		TableBorder.prototype.retrieveAndSync=function (option) {
+			return _retrieveAndSync(this, option);
 		};
 		TableBorder.prototype._handleIdResult=function (value) {
 			_super.prototype._handleIdResult.call(this, value);
@@ -18899,7 +20352,7 @@ var Word;
 				return;
 			}
 			if (!_isUndefined(value["_ReferenceId"])) {
-				this.m__ReferenceId=value["_ReferenceId"];
+				this.__R=value["_ReferenceId"];
 			}
 		};
 		TableBorder.prototype.track=function () {
@@ -18911,11 +20364,15 @@ var Word;
 			return this;
 		};
 		TableBorder.prototype.toJSON=function () {
-			return {
-				"color": this.m_color,
-				"type": this.m_type,
-				"width": this.m_width
-			};
+			return _toJson(this, {
+				"color": this._C,
+				"type": this._T,
+				"width": this._W,
+			}, {});
+		};
+		TableBorder.prototype.ensureUnchanged=function (data) {
+			_createEnsureUnchangedAction(this.context, this, data);
+			return;
 		};
 		return TableBorder;
 	}(OfficeExtension.ClientObject));
@@ -19311,9 +20768,10 @@ var Word;
 	var RequestContext=(function (_super) {
 		__extends(RequestContext, _super);
 		function RequestContext(url) {
-			_super.call(this, url);
-			this.m_document=new Word.Document(this, OfficeExtension.ObjectPathFactory.createGlobalObjectObjectPath(this));
-			this._rootObject=this.m_document;
+			var _this=_super.call(this, url) || this;
+			_this.m_document=new Word.Document(_this, OfficeExtension.ObjectPathFactory.createGlobalObjectObjectPath(_this));
+			_this._rootObject=_this.m_document;
+			return _this;
 		}
 		Object.defineProperty(RequestContext.prototype, "document", {
 			get: function () {

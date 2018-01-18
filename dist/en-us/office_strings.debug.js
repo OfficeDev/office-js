@@ -1,4 +1,4 @@
-/* Version: 16.0.8626.1000 */
+/* Version: 16.0.8828.1000 */
 
 if (window.Type && window.Type.registerNamespace) {
 Type.registerNamespace('Strings');} else {
@@ -157,6 +157,8 @@ Strings.OfficeOM.L_RowIndexOutOfRange='The row index value is out of the allowed
 Strings.OfficeOM.L_RunMustReturnPromise='The batch function passed to the \".run\" method didn\'t return a promise. The function must return a promise, so that any automatically-tracked objects can be released at the completion of the batch operation. Typically, you return a promise by returning the response from \"context.sync()\".';
 Strings.OfficeOM.L_SSOClientError='Error occurred in the authentication request from Office.';
 Strings.OfficeOM.L_SSOClientErrorMessage='An unexpected error occurred in the client.';
+Strings.OfficeOM.L_SSOConnectionLostError='A connection was lost during the sign in process.';
+Strings.OfficeOM.L_SSOConnectionLostErrorMessage='A connection was lost during the sign in process, and the user may not be signed in. This was likely due to the user\'s browser configuration settings, such as security zones.';
 Strings.OfficeOM.L_SSOServerError='Error occurred in the authentication provider.';
 Strings.OfficeOM.L_SSOServerErrorMessage='An unexpected error occurred on the server.';
 Strings.OfficeOM.L_SSOUserConsentNotSupportedByCurrentAddinCategory='This add-in does not support user consent.';
