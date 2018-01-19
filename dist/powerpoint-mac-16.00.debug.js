@@ -1,5 +1,5 @@
 /* PowerPoint Mac specific API library */
-/* Version: 16.0.8118.1000 */
+/* Version: 16.0.8916.1000 */
 /*
 	Copyright (c) Microsoft Corporation.  All rights reserved.
 */
@@ -247,6 +247,54 @@ OSF.OUtil = (function () {
             if (parent && name && parent[name]) {
                 delete parent[name];
             }
+        },
+        serializeSettings: function OSF_OUtil$serializeSettings(settingsCollection) {
+            var ret = {};
+            for (var key in settingsCollection) {
+                var value = settingsCollection[key];
+                try {
+                    if (JSON) {
+                        value = JSON.stringify(value, function dateReplacer(k, v) {
+                            return OSF.OUtil.isDate(this[k]) ? OSF.DDA.SettingsManager.DateJSONPrefix + this[k].getTime() + OSF.DDA.SettingsManager.DataJSONSuffix : v;
+                        });
+                    }
+                    else {
+                        value = Sys.Serialization.JavaScriptSerializer.serialize(value);
+                    }
+                    ret[key] = value;
+                }
+                catch (ex) {
+                }
+            }
+            return ret;
+        },
+        deserializeSettings: function OSF_OUtil$deserializeSettings(serializedSettings) {
+            var ret = {};
+            serializedSettings = serializedSettings || {};
+            for (var key in serializedSettings) {
+                var value = serializedSettings[key];
+                try {
+                    if (JSON) {
+                        value = JSON.parse(value, function dateReviver(k, v) {
+                            var d;
+                            if (typeof v === 'string' && v && v.length > 6 && v.slice(0, 5) === OSF.DDA.SettingsManager.DateJSONPrefix && v.slice(-1) === OSF.DDA.SettingsManager.DataJSONSuffix) {
+                                d = new Date(parseInt(v.slice(5, -1)));
+                                if (d) {
+                                    return d;
+                                }
+                            }
+                            return v;
+                        });
+                    }
+                    else {
+                        value = Sys.Serialization.JavaScriptSerializer.deserialize(value, true);
+                    }
+                    ret[key] = value;
+                }
+                catch (ex) {
+                }
+            }
+            return ret;
         },
         loadScript: function OSF_OUtil$loadScript(url, callback, timeoutInMs) {
             if (url && callback) {
@@ -828,6 +876,14 @@ OSF.OUtil = (function () {
                 }
             }
         },
+        removeClass: function OSF_OUtil$removeClass(elmt, val) {
+            if (OSF.OUtil.hasClass(elmt, val)) {
+                var className = elmt.getAttribute(_classN);
+                var reg = new RegExp('(\\s|^)' + val + '(\\s|$)');
+                className = className.replace(reg, '');
+                elmt.setAttribute(_classN, className);
+            }
+        },
         hasClass: function OSF_OUtil$hasClass(elmt, clsName) {
             var className = elmt.getAttribute(_classN);
             return className && className.match(new RegExp('(\\s|^)' + clsName + '(\\s|$)'));
@@ -964,6 +1020,12 @@ OSF.OUtil.Guid = (function () {
 })();
 window.OSF = OSF;
 OSF.OUtil.setNamespace("OSF", window);
+OSF.MessageIDs = {
+    "FetchBundleUrl": 0,
+    "LoadReactBundle": 1,
+    "LoadBundleSuccess": 2,
+    "LoadBundleError": 3
+};
 OSF.AppName = {
     Unsupported: 0,
     Excel: 1,
@@ -991,7 +1053,10 @@ OSF.AppName = {
     OutlookAndroid: 4194304,
     OneNoteWinRT: 8388608,
     ExcelAndroid: 8388609,
-    VisioWebApp: 8388610
+    VisioWebApp: 8388610,
+    OneNoteIOS: 8388611,
+    WordAndroid: 8388613,
+    PowerpointAndroid: 8388614
 };
 OSF.InternalPerfMarker = {
     DataCoercionBegin: "Agave.HostCall.CoerceDataStart",
@@ -1021,7 +1086,9 @@ OSF.AgaveHostAction = {
     "EscExit": 15,
     "F2Exit": 16,
     "ExitNoFocusable": 17,
-    "ExitNoFocusableShift": 18
+    "ExitNoFocusableShift": 18,
+    "MouseEnter": 19,
+    "MouseLeave": 20
 };
 OSF.SharedConstants = {
     "NotificationConversationIdSuffix": '_ntf'
@@ -1157,6 +1224,8 @@ Microsoft.Office.WebExtension.Parameters = {
     HostType: "hostType",
     ForceConsent: "forceConsent",
     ForceAddAccount: "forceAddAccount",
+    AuthChallenge: "authChallenge",
+    Reserved: "reserved",
     Xml: "xml",
     Namespace: "namespace",
     Prefix: "prefix",
@@ -1189,7 +1258,9 @@ Microsoft.Office.WebExtension.Parameters = {
     DisplayInIframe: "displayInIframe",
     MessageContent: "messageContent",
     HideTitle: "hideTitle",
-    AppCommandInvocationCompletedData: "appCommandInvocationCompletedData"
+    UseDeviceIndependentPixels: "useDeviceIndependentPixels",
+    AppCommandInvocationCompletedData: "appCommandInvocationCompletedData",
+    Base64: "base64"
 };
 OSF.OUtil.setNamespace("DDA", OSF);
 OSF.DDA.DocumentMode = {
@@ -1246,6 +1317,8 @@ OSF.DDA.MethodDispId = {
     dispidAppCommandInvocationCompletedMethod: 94,
     dispidCloseContainerMethod: 97,
     dispidGetAccessTokenMethod: 98,
+    dispidOpenBrowserWindow: 102,
+    dispidCreateDocumentMethod: 105,
     dispidGetSelectedTaskMethod: 110,
     dispidGetSelectedResourceMethod: 111,
     dispidGetTaskMethod: 112,
@@ -1301,8 +1374,11 @@ OSF.DDA.EventDispId = {
     dispidObjectDataChangedEvent: 15,
     dispidContentControlAddedEvent: 16,
     dispidActivationStatusChangedEvent: 32,
+    dispidRichApiMessageEvent: 33,
     dispidAppCommandInvokedEvent: 39,
     dispidOlkItemSelectedChangedEvent: 46,
+    dispidOlkRecipientsChangedEvent: 47,
+    dispidOlkAppointmentTimeChangedEvent: 48,
     dispidTaskSelectionChangedEvent: 56,
     dispidResourceSelectionChangedEvent: 57,
     dispidViewSelectionChangedEvent: 58,
@@ -1434,7 +1510,9 @@ OSF.DDA.ErrorCodeManager = (function () {
             ooeSSOInvalidGrant: 13005,
             ooeSSOClientError: 13006,
             ooeSSOServerError: 13007,
-            ooeAddinIsAlreadyRequestingToken: 13008
+            ooeAddinIsAlreadyRequestingToken: 13008,
+            ooeSSOUserConsentNotSupportedByCurrentAddinCategory: 13009,
+            ooeSSOConnectionLost: 13010
         },
         initializeErrorMessages: function OSF_DDA_ErrorCodeManager$initializeErrorMessages(stringNS) {
             _errorMappings[OSF.DDA.ErrorCodeManager.errorCodes.ooeCoercionTypeNotSupported] = { name: stringNS.L_InvalidCoercion, message: stringNS.L_CoercionTypeNotSupported };
@@ -1532,6 +1610,8 @@ OSF.DDA.ErrorCodeManager = (function () {
             _errorMappings[OSF.DDA.ErrorCodeManager.errorCodes.ooeSSOClientError] = { name: stringNS.L_SSOClientError, message: stringNS.L_SSOClientErrorMessage };
             _errorMappings[OSF.DDA.ErrorCodeManager.errorCodes.ooeSSOServerError] = { name: stringNS.L_SSOServerError, message: stringNS.L_SSOServerErrorMessage };
             _errorMappings[OSF.DDA.ErrorCodeManager.errorCodes.ooeAddinIsAlreadyRequestingToken] = { name: stringNS.L_AddinIsAlreadyRequestingToken, message: stringNS.L_AddinIsAlreadyRequestingTokenMessage };
+            _errorMappings[OSF.DDA.ErrorCodeManager.errorCodes.ooeSSOUserConsentNotSupportedByCurrentAddinCategory] = { name: stringNS.L_SSOUserConsentNotSupportedByCurrentAddinCategory, message: stringNS.L_SSOUserConsentNotSupportedByCurrentAddinCategoryMessage };
+            _errorMappings[OSF.DDA.ErrorCodeManager.errorCodes.ooeSSOConnectionLost] = { name: stringNS.L_SSOConnectionLostError, message: stringNS.L_SSOConnectionLostErrorMessage };
         }
     };
 })();
@@ -2233,6 +2313,11 @@ OSF.DDA.Context = function OSF_DDA_Context(officeAppContext, document, license, 
             value: officeAppContext.auth
         });
     }
+    if (officeAppContext.application) {
+        OSF.OUtil.defineEnumerableProperty(this, "application", {
+            value: officeAppContext.application
+        });
+    }
     if (officeAppContext.get_isDialog()) {
         var requirements = OfficeExt.Requirement.RequirementsMatrixFactory.getDefaultDialogRequirementMatrix(officeAppContext);
         OSF.OUtil.defineEnumerableProperty(this, "requirements", {
@@ -2275,6 +2360,8 @@ OSF.DDA.OutlookContext = function OSF_DDA_OutlookContext(appContext, settings, l
 };
 OSF.OUtil.extend(OSF.DDA.OutlookContext, OSF.DDA.Context);
 OSF.DDA.OutlookAppOm = function OSF_DDA_OutlookAppOm(appContext, window, appReady) { };
+OSF.DDA.Application = function OSF_DDA_Application(officeAppContext) {
+};
 OSF.DDA.Document = function OSF_DDA_Document(officeAppContext, settings) {
     var mode;
     switch (officeAppContext.get_clientMode()) {
@@ -3011,6 +3098,8 @@ OSF.DDA.DispIdHost.Facade = function OSF_DDA_DispIdHost_Facade(getDelegateMethod
         "ExecuteRichApiRequestAsync": did.dispidExecuteRichApiRequestMethod,
         "AppCommandInvocationCompletedAsync": did.dispidAppCommandInvocationCompletedMethod,
         "CloseContainerAsync": did.dispidCloseContainerMethod,
+        "OpenBrowserWindow": did.dispidOpenBrowserWindow,
+        "CreateDocumentAsync": did.dispidCreateDocumentMethod,
         "AddDataPartAsync": did.dispidAddDataPartMethod,
         "GetDataPartByIdAsync": did.dispidGetDataPartByIdMethod,
         "GetDataPartsByNameSpaceAsync": did.dispidGetDataPartsByNamespaceMethod,
@@ -3050,13 +3139,13 @@ OSF.DDA.DispIdHost.Facade = function OSF_DDA_DispIdHost_Facade(getDelegateMethod
     }
     jsom = OSF.DDA.SyncMethodNames;
     did = OSF.DDA.MethodDispId;
-    var asyncMethodMap = {
+    var syncMethodMap = {
         "MessageParent": did.dispidMessageParentMethod,
         "SendMessage": did.dispidSendMessageMethod
     };
-    for (var method in asyncMethodMap) {
+    for (var method in syncMethodMap) {
         if (jsom[method]) {
-            dispIdMap[jsom[method].id] = asyncMethodMap[method];
+            dispIdMap[jsom[method].id] = syncMethodMap[method];
         }
     }
     jsom = Microsoft.Office.WebExtension.EventType;
@@ -3076,7 +3165,10 @@ OSF.DDA.DispIdHost.Facade = function OSF_DDA_DispIdHost_Facade(getDelegateMethod
         "ObjectSelectionChanged": did.dispidObjectSelectionChangedEvent,
         "ObjectDataChanged": did.dispidObjectDataChangedEvent,
         "ContentControlAdded": did.dispidContentControlAddedEvent,
+        "RichApiMessage": did.dispidRichApiMessageEvent,
         "ItemChanged": did.dispidOlkItemSelectedChangedEvent,
+        "RecipientsChanged": did.dispidOlkRecipientsChangedEvent,
+        "AppointmentTimeChanged": did.dispidOlkAppointmentTimeChangedEvent,
         "TaskSelectionChanged": did.dispidTaskSelectionChangedEvent,
         "ResourceSelectionChanged": did.dispidResourceSelectionChangedEvent,
         "ViewSelectionChanged": did.dispidViewSelectionChangedEvent,
@@ -3152,6 +3244,7 @@ OSF.DDA.DispIdHost.Facade = function OSF_DDA_DispIdHost_Facade(getDelegateMethod
                 else {
                     hostCallArgs = callArgs;
                 }
+                var startTime = (new Date()).getTime();
                 delegate[OSF.DDA.DispIdHost.Delegates.ExecuteAsync]({
                     "dispId": dispId,
                     "hostCallArgs": hostCallArgs,
@@ -3172,6 +3265,9 @@ OSF.DDA.DispIdHost.Facade = function OSF_DDA_DispIdHost_Facade(getDelegateMethod
                         }
                         var payload = asyncMethodCall.processResponse(status, responseArgs, caller, callArgs);
                         OSF.DDA.issueAsyncResult(callArgs, status, payload);
+                        if (OSF.AppTelemetry) {
+                            OSF.AppTelemetry.onMethodDone(dispId, hostCallArgs, Math.abs((new Date()).getTime() - startTime), status);
+                        }
                     }
                 });
             }
@@ -4039,7 +4135,6 @@ OSF.DDA.SafeArray.Delegate.executeAsync = function OSF_DDA_SafeArray_Delegate$Ex
         if (args.onCalling) {
             args.onCalling();
         }
-        var startTime = (new Date()).getTime();
         OSF.ClientHostController.execute(args.dispId, toArray(args.hostCallArgs), function OSF_DDA_SafeArrayFacade$Execute_OnResponse(hostResponseArgs, resultCode) {
             var result = hostResponseArgs.toArray();
             var status = result[OSF.DDA.SafeArray.Response.Status];
@@ -4085,9 +4180,6 @@ OSF.DDA.SafeArray.Delegate.executeAsync = function OSF_DDA_SafeArray_Delegate$Ex
                     payload = result[OSF.DDA.SafeArray.Response.Payload];
                 }
                 args.onComplete(status, payload);
-            }
-            if (OSF.AppTelemetry) {
-                OSF.AppTelemetry.onMethodDone(args.dispId, args.hostCallArgs, Math.abs((new Date()).getTime() - startTime), status);
             }
             return true;
         });
@@ -4203,6 +4295,9 @@ OSF.InitializationHelper.prototype.prepareApiSurface = function OSF_Initializati
                 OSF.DDA.DispIdHost.addAsyncMethods(appContext.ui, [OSF.DDA.AsyncMethodNames.CloseContainerAsync]);
             }
         }
+    }
+    if (OSF.DDA.OpenBrowser) {
+        OSF.DDA.DispIdHost.addAsyncMethods(appContext.ui, [OSF.DDA.AsyncMethodNames.OpenBrowserWindow]);
     }
     if (OSF.DDA.Auth) {
         appContext.auth = new OSF.DDA.Auth();
@@ -5002,7 +5097,7 @@ var OSFAriaLogger;
         function AriaLogger() {
         }
         AriaLogger.prototype.getAriaCDNLocation = function () {
-            return (OSF._OfficeAppFactory.getLoadScriptHelper().getOfficeJsBasePath() + "/ariatelemetry/aria-web-telemetry-2.8.0.min.js");
+            return (OSF._OfficeAppFactory.getLoadScriptHelper().getOfficeJsBasePath() + "/ariatelemetry/aria-web-telemetry.js");
         };
         AriaLogger.getInstance = function () {
             if (AriaLogger.AriaLoggerObj === undefined) {
@@ -5019,13 +5114,10 @@ var OSFAriaLogger;
                 try {
                     if (!this.ALogger) {
                         var OfficeExtensibilityTenantID = "db334b301e7b474db5e0f02f07c51a47-a1b5bc36-1bbe-482f-a64a-c2d9cb606706-7439";
-                        var configuration = new microsoft.applications.telemetry.LogConfiguration();
-                        configuration.enableAutoUserSession = true;
-                        microsoft.applications.telemetry.LogManager.initialize(OfficeExtensibilityTenantID, configuration);
-                        this.ALogger = new microsoft.applications.telemetry.Logger();
+                        this.ALogger = AWTLogManager.initialize(OfficeExtensibilityTenantID);
                     }
-                    var eventProperties = new microsoft.applications.telemetry.EventProperties();
-                    eventProperties.name = "Office.Extensibility.OfficeJS." + tableName;
+                    var eventProperties = new AWTEventProperties();
+                    eventProperties.setName("Office.Extensibility.OfficeJS." + tableName);
                     for (var key in telemetryData) {
                         if (key.toLowerCase() !== "table") {
                             eventProperties.setProperty(key, telemetryData[key]);
@@ -5058,6 +5150,7 @@ var OSFAppTelemetry;
     var sessionId = OSF.OUtil.Guid.generateNewGuid();
     var osfControlAppCorrelationId = "";
     var omexDomainRegex = new RegExp("^https?://store\\.office(ppe|-int)?\\.com/", "i");
+    OSFAppTelemetry.enableTelemetry = true;
     ;
     var AppInfo = (function () {
         function AppInfo() {
@@ -5141,17 +5234,19 @@ var OSFAppTelemetry;
         function AppLogger() {
         }
         AppLogger.prototype.LogData = function (data) {
-            if (!OSF.Logger) {
+            if (!OSF.Logger || !OSFAppTelemetry.enableTelemetry) {
                 return;
             }
-            OSF.Logger.sendLog(OSF.Logger.TraceLevel.info, data.SerializeRow(), OSF.Logger.SendFlag.none);
-            OSFAriaLogger.AriaLogger.getInstance().logData(data);
+            try {
+                OSFAriaLogger.AriaLogger.getInstance().logData(data);
+            }
+            catch (e) {
+            }
         };
         AppLogger.prototype.LogRawData = function (log) {
-            if (!OSF.Logger) {
+            if (!OSF.Logger || !OSFAppTelemetry.enableTelemetry) {
                 return;
             }
-            OSF.Logger.sendLog(OSF.Logger.TraceLevel.info, log, OSF.Logger.SendFlag.none);
             try {
                 OSFAriaLogger.AriaLogger.getInstance().logData(JSON.parse(log));
             }
@@ -5191,7 +5286,7 @@ var OSFAppTelemetry;
         }
         appInfo.message = context.get_hostCustomMessage();
         appInfo.officeJSVersion = OSF.ConstantNames.FileVersion;
-        appInfo.hostJSVersion = "16.0.8118.1000";
+        appInfo.hostJSVersion = "16.0.8916.1000";
         if (context._wacHostEnvironment) {
             appInfo.wacHostEnvironment = context._wacHostEnvironment;
         }
@@ -5422,14 +5517,16 @@ OSF.EventDispatch = function OSF_EventDispatch(eventTypes) {
     this._eventHandlers = {};
     this._objectEventHandlers = {};
     this._queuedEventsArgs = {};
-    for (var entry in eventTypes) {
-        var eventType = eventTypes[entry];
-        var isObjectEvent = (eventType == "objectDeleted" || eventType == "objectSelectionChanged" || eventType == "objectDataChanged" || eventType == "contentControlAdded");
-        if (!isObjectEvent)
-            this._eventHandlers[eventType] = [];
-        else
-            this._objectEventHandlers[eventType] = {};
-        this._queuedEventsArgs[eventType] = [];
+    if (eventTypes != null) {
+        for (var i = 0; i < eventTypes.length; i++) {
+            var eventType = eventTypes[i];
+            var isObjectEvent = (eventType == "objectDeleted" || eventType == "objectSelectionChanged" || eventType == "objectDataChanged" || eventType == "contentControlAdded");
+            if (!isObjectEvent)
+                this._eventHandlers[eventType] = [];
+            else
+                this._objectEventHandlers[eventType] = {};
+            this._queuedEventsArgs[eventType] = [];
+        }
     }
 };
 OSF.EventDispatch.prototype = {
@@ -5455,8 +5552,8 @@ OSF.EventDispatch.prototype = {
     hasEventHandler: function OSF_EventDispatch$hasEventHandler(eventType, handler) {
         var handlers = this._eventHandlers[eventType];
         if (handlers && handlers.length > 0) {
-            for (var h in handlers) {
-                if (handlers[h] === handler)
+            for (var i = 0; i < handlers.length; i++) {
+                if (handlers[i] === handler)
                     return true;
             }
         }
@@ -5561,8 +5658,9 @@ OSF.EventDispatch.prototype = {
         var eventType = eventArgs.type;
         if (eventType && this._eventHandlers[eventType]) {
             var eventHandlers = this._eventHandlers[eventType];
-            for (var handler in eventHandlers)
-                eventHandlers[handler](eventArgs);
+            for (var i = 0; i < eventHandlers.length; i++) {
+                eventHandlers[i](eventArgs);
+            }
             return true;
         }
         else {
@@ -5659,6 +5757,9 @@ OSF.DDA.OMFactory.manufactureEventArgs = function OSF_DDA_OMFactory$manufactureE
         case Microsoft.Office.WebExtension.EventType.ContentControlAdded:
             args = new OSF.DDA.ObjectEventArgs(eventType, eventProperties[Microsoft.Office.WebExtension.Parameters.Id]);
             break;
+        case Microsoft.Office.WebExtension.EventType.RichApiMessage:
+            args = new OSF.DDA.RichApiMessageEventArgs(eventType, eventProperties);
+            break;
         case Microsoft.Office.WebExtension.EventType.DataNodeInserted:
             args = new OSF.DDA.NodeInsertedEventArgs(this.manufactureDataNode(eventProperties[OSF.DDA.DataNodeEventProperties.NewNode]), eventProperties[OSF.DDA.DataNodeEventProperties.InUndoRedo]);
             break;
@@ -5684,10 +5785,28 @@ OSF.DDA.OMFactory.manufactureEventArgs = function OSF_DDA_OMFactory$manufactureE
             args = new OSF.DDA.DialogParentEventArgs(eventProperties);
             break;
         case Microsoft.Office.WebExtension.EventType.ItemChanged:
-            if (OSF._OfficeAppFactory.getHostInfo()["hostType"] == "outlook" || OSF._OfficeAppFactory.getHostInfo()["hostType"] == "outlookwebapp") {
+            if (OSF._OfficeAppFactory.getHostInfo()["hostType"] == "outlook") {
                 args = new OSF.DDA.OlkItemSelectedChangedEventArgs(eventProperties);
                 target.initialize(args["initialData"]);
-                target.setCurrentItemNumber(args["itemNumber"].itemNumber);
+                if (OSF._OfficeAppFactory.getHostInfo()["hostPlatform"] == "win32" || OSF._OfficeAppFactory.getHostInfo()["hostPlatform"] == "mac") {
+                    target.setCurrentItemNumber(args["itemNumber"].itemNumber);
+                }
+            }
+            else {
+                throw OsfMsAjaxFactory.msAjaxError.argument(Microsoft.Office.WebExtension.Parameters.EventType, OSF.OUtil.formatString(Strings.OfficeOM.L_NotSupportedEventType, eventType));
+            }
+            break;
+        case Microsoft.Office.WebExtension.EventType.RecipientsChanged:
+            if (OSF._OfficeAppFactory.getHostInfo()["hostType"] == "outlook") {
+                args = new OSF.DDA.OlkRecipientsChangedEventArgs(eventProperties);
+            }
+            else {
+                throw OsfMsAjaxFactory.msAjaxError.argument(Microsoft.Office.WebExtension.Parameters.EventType, OSF.OUtil.formatString(Strings.OfficeOM.L_NotSupportedEventType, eventType));
+            }
+            break;
+        case Microsoft.Office.WebExtension.EventType.AppointmentTimeChanged:
+            if (OSF._OfficeAppFactory.getHostInfo()["hostType"] == "outlook") {
+                args = new OSF.DDA.OlkAppointmentTimeChangedEventArgs(eventProperties);
             }
             else {
                 throw OsfMsAjaxFactory.msAjaxError.argument(Microsoft.Office.WebExtension.Parameters.EventType, OSF.OUtil.formatString(Strings.OfficeOM.L_NotSupportedEventType, eventType));
@@ -5874,6 +5993,13 @@ OSF.DDA.AsyncMethodCalls.define({
                 "types": ["boolean"],
                 "defaultValue": false
             }
+        },
+        {
+            name: Microsoft.Office.WebExtension.Parameters.UseDeviceIndependentPixels,
+            value: {
+                "types": ["boolean"],
+                "defaultValue": false
+            }
         }
     ],
     privateStateCallbacks: [],
@@ -5911,13 +6037,13 @@ OSF.DDA.AsyncMethodCalls.define({
         if (callArgs[Microsoft.Office.WebExtension.Parameters.Width] <= 0) {
             callArgs[Microsoft.Office.WebExtension.Parameters.Width] = 1;
         }
-        if (callArgs[Microsoft.Office.WebExtension.Parameters.Width] > 100) {
+        if (!callArgs[Microsoft.Office.WebExtension.Parameters.UseDeviceIndependentPixels] && callArgs[Microsoft.Office.WebExtension.Parameters.Width] > 100) {
             callArgs[Microsoft.Office.WebExtension.Parameters.Width] = 99;
         }
         if (callArgs[Microsoft.Office.WebExtension.Parameters.Height] <= 0) {
             callArgs[Microsoft.Office.WebExtension.Parameters.Height] = 1;
         }
-        if (callArgs[Microsoft.Office.WebExtension.Parameters.Height] > 100) {
+        if (!callArgs[Microsoft.Office.WebExtension.Parameters.UseDeviceIndependentPixels] && callArgs[Microsoft.Office.WebExtension.Parameters.Height] > 100) {
             callArgs[Microsoft.Office.WebExtension.Parameters.Height] = 99;
         }
         if (!callArgs[Microsoft.Office.WebExtension.Parameters.RequireHTTPs]) {
@@ -7246,52 +7372,10 @@ OSF.DDA.SettingsManager = {
     DateJSONPrefix: "Date(",
     DataJSONSuffix: ")",
     serializeSettings: function OSF_DDA_SettingsManager$serializeSettings(settingsCollection) {
-        var ret = {};
-        for (var key in settingsCollection) {
-            var value = settingsCollection[key];
-            try {
-                if (JSON) {
-                    value = JSON.stringify(value, function dateReplacer(k, v) {
-                        return OSF.OUtil.isDate(this[k]) ? OSF.DDA.SettingsManager.DateJSONPrefix + this[k].getTime() + OSF.DDA.SettingsManager.DataJSONSuffix : v;
-                    });
-                }
-                else {
-                    value = Sys.Serialization.JavaScriptSerializer.serialize(value);
-                }
-                ret[key] = value;
-            }
-            catch (ex) {
-            }
-        }
-        return ret;
+        return OSF.OUtil.serializeSettings(settingsCollection);
     },
     deserializeSettings: function OSF_DDA_SettingsManager$deserializeSettings(serializedSettings) {
-        var ret = {};
-        serializedSettings = serializedSettings || {};
-        for (var key in serializedSettings) {
-            var value = serializedSettings[key];
-            try {
-                if (JSON) {
-                    value = JSON.parse(value, function dateReviver(k, v) {
-                        var d;
-                        if (typeof v === 'string' && v && v.length > 6 && v.slice(0, 5) === OSF.DDA.SettingsManager.DateJSONPrefix && v.slice(-1) === OSF.DDA.SettingsManager.DataJSONSuffix) {
-                            d = new Date(parseInt(v.slice(5, -1)));
-                            if (d) {
-                                return d;
-                            }
-                        }
-                        return v;
-                    });
-                }
-                else {
-                    value = Sys.Serialization.JavaScriptSerializer.deserialize(value, true);
-                }
-                ret[key] = value;
-            }
-            catch (ex) {
-            }
-        }
-        return ret;
+        return OSF.OUtil.deserializeSettings(serializedSettings);
     }
 };
 OSF.DDA.Settings = function OSF_DDA_Settings(settings) {
@@ -8187,6 +8271,51 @@ var OfficeExt;
         AppCommand.registerDdaFacade = registerDdaFacade;
     })(AppCommand = OfficeExt.AppCommand || (OfficeExt.AppCommand = {}));
 })(OfficeExt || (OfficeExt = {}));
+OSF.DDA.AsyncMethodNames.addNames({ GetAccessTokenAsync: "getAccessTokenAsync" });
+OSF.DDA.Auth = function OSF_DDA_Auth() {
+};
+OSF.DDA.AsyncMethodCalls.define({
+    method: OSF.DDA.AsyncMethodNames.GetAccessTokenAsync,
+    requiredArguments: [],
+    supportedOptions: [
+        {
+            name: Microsoft.Office.WebExtension.Parameters.ForceConsent,
+            value: {
+                "types": ["boolean"],
+                "defaultValue": false
+            }
+        },
+        {
+            name: Microsoft.Office.WebExtension.Parameters.ForceAddAccount,
+            value: {
+                "types": ["boolean"],
+                "defaultValue": false
+            }
+        },
+        {
+            name: Microsoft.Office.WebExtension.Parameters.AuthChallenge,
+            value: {
+                "types": ["string"],
+                "defaultValue": ""
+            }
+        }
+    ],
+    onSucceeded: function (dataDescriptor, caller, callArgs) {
+        var data = dataDescriptor[Microsoft.Office.WebExtension.Parameters.Data];
+        return data;
+    }
+});
+OSF.DDA.SafeArray.Delegate.ParameterMap.define({
+    type: OSF.DDA.MethodDispId.dispidGetAccessTokenMethod,
+    toHost: [
+        { name: Microsoft.Office.WebExtension.Parameters.ForceConsent, value: 0 },
+        { name: Microsoft.Office.WebExtension.Parameters.ForceAddAccount, value: 1 },
+        { name: Microsoft.Office.WebExtension.Parameters.AuthChallenge, value: 2 }
+    ],
+    fromHost: [
+        { name: Microsoft.Office.WebExtension.Parameters.Data, value: OSF.DDA.SafeArray.Delegate.ParameterMap.self }
+    ]
+});
 OSF.DDA.PowerPointDocument = function OSF_DDA_PowerPointDocument(officeAppContext, settings) {
     OSF.DDA.PowerPointDocument.uber.constructor.call(this, officeAppContext, settings);
     OSF.DDA.DispIdHost.addAsyncMethods(this, [
@@ -8220,6 +8349,10 @@ OSF.InitializationHelper.prototype.prepareApiSurface = function OSF_Initializati
     }
     else {
         appContext.ui = new OSF.DDA.UI.ParentUI();
+    }
+    if (OSF.DDA.Auth) {
+        appContext.auth = new OSF.DDA.Auth();
+        OSF.DDA.DispIdHost.addAsyncMethods(appContext.auth, [OSF.DDA.AsyncMethodNames.GetAccessTokenAsync]);
     }
     OSF._OfficeAppFactory.setContext(new OSF.DDA.Context(appContext, appContext.doc, license));
     OSF._OfficeAppFactory.setHostFacade(new OSF.DDA.DispIdHost.Facade(OSF.DDA.DispIdHost.getClientDelegateMethods, OSF.DDA.SafeArray.Delegate.ParameterMap));
