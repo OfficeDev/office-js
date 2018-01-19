@@ -1,4 +1,4 @@
-/* Version: 16.0.8503.1000 */
+/* Version: 16.0.8828.1000 */
 /*
 	Copyright (c) Microsoft Corporation.  All rights reserved.
 */
@@ -67,7 +67,7 @@ Office._AccessWebAppMask = 0x40;
         }
     }
 
-	Office._DialogEventArgs = function (eventType) {
+    Office._DialogEventArgs = function (eventType) {
         Office._processContents(this, {
             type: {
                 annotate: {
@@ -89,7 +89,7 @@ Office._AccessWebAppMask = 0x40;
                 "message"
             );
         } else if (eventType == "dialogEventReceived") {
-			Office._processItem(
+            Office._processItem(
                 this,
                 {
                     annotate: {
@@ -99,7 +99,7 @@ Office._AccessWebAppMask = 0x40;
                 },
                 "error"
             );
-		}
+        }
     }
 
     Office._CustomXmlNodeEvents = function (eventType) {
@@ -463,12 +463,12 @@ Office._AccessWebAppMask = 0x40;
         this.size = {};
     }
 
-	Office._Dialog = function () {
-		this.data = {};
+    Office._Dialog = function () {
+        this.data = {};
         this.close = function () {
             ///<summary> Allows the add-in to close its dialog box. </summary>
         };
-		this.addEventHandler = function (eventType, handler) {
+        this.addEventHandler = function (eventType, handler) {
             ///<summary> Registers an event handler. </summary>
             ///<param name="eventType" type="Office.EventType"> The two supported events are: DialogMessageReceived or DialogEventReceived </param>
             ///<param name="handler" type="function" optional="true"> The name of the handler </param>
@@ -690,32 +690,53 @@ Office._AccessWebAppMask = 0x40;
 
     };
 
-	Office._context_ui = {
-		displayDialogAsync: {
-			value: function (startAddress, options, callback) {
-				///<summary> Displays a dialog box in an Office host. </summary>
-				///<param name="startAddress" type="string"> Accepts the initial HTTPS(TLS) URL that opens in the dialog box. </param>
-				///<param name="options" type="Object" optional="true">
+    Office._context_ui = {
+        displayDialogAsync: {
+            value: function (startAddress, options, callback) {
+                ///<summary> Displays a dialog box in an Office host. </summary>
+                ///<param name="startAddress" type="string"> Accepts the initial HTTPS(TLS) URL that opens in the dialog box. </param>
+                ///<param name="options" type="Object" optional="true">
                 ///    Syntax example: {width:80} 
                 /// &#10;     width: Defines the width of the dialog box as a percentage of the current display.
                 /// &#10;     height: Defines the height of the dialog box as a percentage of the current display.
                 /// &#10;     displayInIFrame: false (defult): The dialog will be displayed as a new browser window
-				///	&#10;                      true:  The dialog will be displayed as a floating overlay with an IFrame. 
+                ///    &#10;                      true:  The dialog will be displayed as a floating overlay with an IFrame. 
                 ///</param>
                 ///<param name="callback" type="function" optional="true">The optional callback method</param>
                 ///
-				if (arguments.length == 2) { callback = options; };
+                if (arguments.length == 2) { callback = options; };
                 var result = new Office._AsyncResult("displayDialogAsync");
                 callback(result);
-			}
-		},
-		messageParent: {
-			value: function (messageObject) {
-				///<summary> Delivers a message from the dialog box to its parent/opener page. The page calling this API must be on the same domain as the parent.  </summary>
+            }
+        },
+        closeContainer: {
+            value: function () {
+                ///<summary>
+                /// Closes the UI container where the JavaScript is executing.
+                /// <br />
+                /// <br />
+                /// Supported hosts:
+                /// <br />
+                /// * Outlook. Minimum requirement set: Mailbox 1.5
+                /// <br />
+                /// <br />
+                /// The behavior of this method is specified as follows.  When called from:
+                /// <br />
+                /// * A UI-less command button: No effect. Any dialogs opened by displayDialogAsync will remain open.
+                /// <br />
+                /// * A taskpane: The taskpane will close. Any dialogs opened by displayDialogAsync will also close. If the taskpane supports pinning and was pinned by the user, it will be un-pinned.
+                /// <br />
+                /// * A module extension: No effect.
+                /// </summary>
+            }
+        },
+        messageParent: {
+            value: function (messageObject) {
+                ///<summary> Delivers a message from the dialog box to its parent/opener page. The page calling this API must be on the same domain as the parent.  </summary>
                 ///<param name="messageObject" type="string"> Accepts a message from the dialog box to deliver to the add-in.</param>
-			}
-		}
-	}
+            }
+        }
+    }
 
     Office._context_document = {
         mode: {
@@ -1018,9 +1039,9 @@ Office._AccessWebAppMask = 0x40;
 Office._items = {
     context: {
         contents: {
-			host: "",
+            host: "",
             platform: "",
-			diagnostics: {},
+            diagnostics: {},
             contentLanguage: {},
             displayLanguage: {},
             license: {
@@ -1074,16 +1095,13 @@ Office._items = {
                     },
                 }
             }, 
-			ui: {
-				conditions: {
-					reqs: ["set DialogAPI GE 1.1"]
-                },
+            ui: {
                 annotate: {
                     // Office UI
                     ui: undefined
                 },
                 contents: Office._context_ui
-			}
+            }
         }
     },
     initialize: {
@@ -2897,7 +2915,7 @@ Office.context.diagnostics = {
     __proto__: null,
     host: "",
     platform: "",
-	version: ""
+    version: ""
 };
 
 if (!!intellisense) {
@@ -3263,7 +3281,7 @@ var Excel;
 		}
 		Application.prototype.suspendApiCalculationUntilNextSync = function() {
 			/// <summary>
-			/// Suspends calculation until the next &quot;context.sync()&quot; is called. Once set, it is the developer&apos;s responsibility to re-calc the workbook, to ensure that any dependencies are propagated. [Api set: ExcelApi 1.6 (PREVIEW)]
+			/// Suspends calculation until the next &quot;context.sync()&quot; is called. Once set, it is the developer&apos;s responsibility to re-calc the workbook, to ensure that any dependencies are propagated. [Api set: ExcelApi 1.6]
 			/// </summary>
 			/// <returns ></returns>
 		}
@@ -3562,11 +3580,11 @@ var Excel;
 	var CellValueConditionalFormat = (function(_super) {
 		__extends(CellValueConditionalFormat, _super);
 		function CellValueConditionalFormat() {
-			/// <summary> Represents a cell value conditional format. [Api set: ExcelApi 1.6 (PREVIEW)] </summary>
+			/// <summary> Represents a cell value conditional format. [Api set: ExcelApi 1.6] </summary>
 			/// <field name="context" type="Excel.RequestContext">The request context associated with this object.</field>
 			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
-			/// <field name="format" type="Excel.ConditionalRangeFormat">Returns a format object, encapsulating the conditional formats font, fill, borders, and other properties. Read-only. [Api set: ExcelApi 1.6 (PREVIEW)]</field>
-			/// <field name="rule" type="Excel.Interfaces.ConditionalCellValueRule">Represents the Rule object on this conditional format. [Api set: ExcelApi 1.6 (PREVIEW)]</field>
+			/// <field name="format" type="Excel.ConditionalRangeFormat">Returns a format object, encapsulating the conditional formats font, fill, borders, and other properties. Read-only. [Api set: ExcelApi 1.6]</field>
+			/// <field name="rule" type="Excel.Interfaces.ConditionalCellValueRule">Represents the Rule object on this conditional format. [Api set: ExcelApi 1.6]</field>
 		}
 
 		CellValueConditionalFormat.prototype.load = function(option) {
@@ -4808,13 +4826,14 @@ var Excel;
 
 var Excel;
 (function (Excel) {
-	/// <summary> [Api set: ExcelApi 1.1 for All/Formats/Contents, 1.7 for Hyperlinks.] </summary>
+	/// <summary> [Api set: ExcelApi 1.1 for All/Formats/Contents, 1.7 for Hyperlinks & HyperlinksAndFormats.] </summary>
 	var ClearApplyTo = {
 		__proto__: null,
 		"all": "all",
 		"formats": "formats",
 		"contents": "contents",
 		"hyperlinks": "hyperlinks",
+		"removeHyperlinks": "removeHyperlinks",
 	}
 	Excel.ClearApplyTo = ClearApplyTo;
 })(Excel || (Excel = {__proto__: null}));
@@ -4824,11 +4843,11 @@ var Excel;
 	var ColorScaleConditionalFormat = (function(_super) {
 		__extends(ColorScaleConditionalFormat, _super);
 		function ColorScaleConditionalFormat() {
-			/// <summary> Represents an IconSet criteria for conditional formatting. [Api set: ExcelApi 1.6 (PREVIEW)] </summary>
+			/// <summary> Represents an IconSet criteria for conditional formatting. [Api set: ExcelApi 1.6] </summary>
 			/// <field name="context" type="Excel.RequestContext">The request context associated with this object.</field>
 			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
-			/// <field name="criteria" type="Excel.Interfaces.ConditionalColorScaleCriteria">The criteria of the color scale. Midpoint is optional when using a two point color scale. [Api set: ExcelApi 1.6 (PREVIEW)]</field>
-			/// <field name="threeColorScale" type="Boolean">If true the color scale will have three points (minimum, midpoint, maximum), otherwise it will have two (minimum, maximum). [Api set: ExcelApi 1.6 (PREVIEW)]</field>
+			/// <field name="criteria" type="Excel.Interfaces.ConditionalColorScaleCriteria">The criteria of the color scale. Midpoint is optional when using a two point color scale. [Api set: ExcelApi 1.6]</field>
+			/// <field name="threeColorScale" type="Boolean">If true the color scale will have three points (minimum, midpoint, maximum), otherwise it will have two (minimum, maximum). [Api set: ExcelApi 1.6]</field>
 		}
 
 		ColorScaleConditionalFormat.prototype.load = function(option) {
@@ -4861,7 +4880,7 @@ var Excel;
 
 var Excel;
 (function (Excel) {
-	/// <summary> Represents the operator of the text conditional format type. [Api set: ExcelApi 1.6 (PREVIEW)] </summary>
+	/// <summary> Represents the operator of the text conditional format type. [Api set: ExcelApi 1.6] </summary>
 	var ConditionalCellValueOperator = {
 		__proto__: null,
 		"invalid": "invalid",
@@ -4883,10 +4902,10 @@ var Excel;
 	(function (Interfaces) {
 		var ConditionalCellValueRule = (function() {
 			function ConditionalCellValueRule() {
-				/// <summary> Represents a Cell Value Conditional Format Rule [Api set: ExcelApi 1.6 (PREVIEW)] </summary>
-				/// <field name="formula1" >The formula, if required, to evaluate the conditional format rule on. [Api set: ExcelApi 1.6 (PREVIEW)]</field>
-				/// <field name="formula2" >The formula, if required, to evaluate the conditional format rule on. [Api set: ExcelApi 1.6 (PREVIEW)]</field>
-				/// <field name="operator" type="String">The operator of the text conditional format. [Api set: ExcelApi 1.6 (PREVIEW)]</field>
+				/// <summary> Represents a Cell Value Conditional Format Rule [Api set: ExcelApi 1.6] </summary>
+				/// <field name="formula1" >The formula, if required, to evaluate the conditional format rule on. [Api set: ExcelApi 1.6]</field>
+				/// <field name="formula2" >The formula, if required, to evaluate the conditional format rule on. [Api set: ExcelApi 1.6]</field>
+				/// <field name="operator" type="String">The operator of the text conditional format. [Api set: ExcelApi 1.6]</field>
 			}
 			return ConditionalCellValueRule;
 		})();
@@ -4901,10 +4920,10 @@ var Excel;
 	(function (Interfaces) {
 		var ConditionalColorScaleCriteria = (function() {
 			function ConditionalColorScaleCriteria() {
-				/// <summary> Represents the criteria of the color scale. [Api set: ExcelApi 1.6 (PREVIEW)] </summary>
-				/// <field name="maximum" type="Excel.Interfaces.ConditionalColorScaleCriterion">The maximum point Color Scale Criterion. [Api set: ExcelApi 1.6 (PREVIEW)]</field>
-				/// <field name="midpoint" type="Excel.Interfaces.ConditionalColorScaleCriterion">The midpoint Color Scale Criterion if the color scale is a 3-color scale. [Api set: ExcelApi 1.6 (PREVIEW)]</field>
-				/// <field name="minimum" type="Excel.Interfaces.ConditionalColorScaleCriterion">The minimum point Color Scale Criterion. [Api set: ExcelApi 1.6 (PREVIEW)]</field>
+				/// <summary> Represents the criteria of the color scale. [Api set: ExcelApi 1.6] </summary>
+				/// <field name="maximum" type="Excel.Interfaces.ConditionalColorScaleCriterion">The maximum point Color Scale Criterion. [Api set: ExcelApi 1.6]</field>
+				/// <field name="midpoint" type="Excel.Interfaces.ConditionalColorScaleCriterion">The midpoint Color Scale Criterion if the color scale is a 3-color scale. [Api set: ExcelApi 1.6]</field>
+				/// <field name="minimum" type="Excel.Interfaces.ConditionalColorScaleCriterion">The minimum point Color Scale Criterion. [Api set: ExcelApi 1.6]</field>
 			}
 			return ConditionalColorScaleCriteria;
 		})();
@@ -4919,10 +4938,10 @@ var Excel;
 	(function (Interfaces) {
 		var ConditionalColorScaleCriterion = (function() {
 			function ConditionalColorScaleCriterion() {
-				/// <summary> Represents a Color Scale Criterion which contains a type, value and a color. [Api set: ExcelApi 1.6 (PREVIEW)] </summary>
-				/// <field name="color" type="String">HTML color code representation of the color scale color. E.g. #FF0000 represents Red. [Api set: ExcelApi 1.6 (PREVIEW)]</field>
-				/// <field name="formula" >A number, a formula, or null (if Type is LowestValue). [Api set: ExcelApi 1.6 (PREVIEW)]</field>
-				/// <field name="type" type="String">What the icon conditional formula should be based on. [Api set: ExcelApi 1.6 (PREVIEW)]</field>
+				/// <summary> Represents a Color Scale Criterion which contains a type, value and a color. [Api set: ExcelApi 1.6] </summary>
+				/// <field name="color" type="String">HTML color code representation of the color scale color. E.g. #FF0000 represents Red. [Api set: ExcelApi 1.6]</field>
+				/// <field name="formula" >A number, a formula, or null (if Type is LowestValue). [Api set: ExcelApi 1.6]</field>
+				/// <field name="type" type="String">What the icon conditional formula should be based on. [Api set: ExcelApi 1.6]</field>
 			}
 			return ConditionalColorScaleCriterion;
 		})();
@@ -4933,7 +4952,7 @@ var Excel;
 
 var Excel;
 (function (Excel) {
-	/// <summary> Represents the format options for a Data Bar Axis. [Api set: ExcelApi 1.6 (PREVIEW)] </summary>
+	/// <summary> Represents the format options for a Data Bar Axis. [Api set: ExcelApi 1.6] </summary>
 	var ConditionalDataBarAxisFormat = {
 		__proto__: null,
 		"automatic": "automatic",
@@ -4945,7 +4964,7 @@ var Excel;
 
 var Excel;
 (function (Excel) {
-	/// <summary> Represents the Data Bar direction within a cell. [Api set: ExcelApi 1.6 (PREVIEW)] </summary>
+	/// <summary> Represents the Data Bar direction within a cell. [Api set: ExcelApi 1.6] </summary>
 	var ConditionalDataBarDirection = {
 		__proto__: null,
 		"context": "context",
@@ -4960,13 +4979,13 @@ var Excel;
 	var ConditionalDataBarNegativeFormat = (function(_super) {
 		__extends(ConditionalDataBarNegativeFormat, _super);
 		function ConditionalDataBarNegativeFormat() {
-			/// <summary> Represents a conditional format DataBar Format for the negative side of the data bar. [Api set: ExcelApi 1.6 (PREVIEW)] </summary>
+			/// <summary> Represents a conditional format DataBar Format for the negative side of the data bar. [Api set: ExcelApi 1.6] </summary>
 			/// <field name="context" type="Excel.RequestContext">The request context associated with this object.</field>
 			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
-			/// <field name="borderColor" type="String">HTML color code representing the color of the border line, of the form #RRGGBB (e.g. &quot;FFA500&quot;) or as a named HTML color (e.g. &quot;orange&quot;).              &quot;Empty String&quot; if no border is present or set. [Api set: ExcelApi 1.6 (PREVIEW)]</field>
-			/// <field name="fillColor" type="String">HTML color code representing the fill color, of the form #RRGGBB (e.g. &quot;FFA500&quot;) or as a named HTML color (e.g. &quot;orange&quot;). [Api set: ExcelApi 1.6 (PREVIEW)]</field>
-			/// <field name="matchPositiveBorderColor" type="Boolean">Boolean representation of whether or not the negative DataBar has the same border color as the positive DataBar. [Api set: ExcelApi 1.6 (PREVIEW)]</field>
-			/// <field name="matchPositiveFillColor" type="Boolean">Boolean representation of whether or not the negative DataBar has the same fill color as the positive DataBar. [Api set: ExcelApi 1.6 (PREVIEW)]</field>
+			/// <field name="borderColor" type="String">HTML color code representing the color of the border line, of the form #RRGGBB (e.g. &quot;FFA500&quot;) or as a named HTML color (e.g. &quot;orange&quot;).              &quot;Empty String&quot; if no border is present or set. [Api set: ExcelApi 1.6]</field>
+			/// <field name="fillColor" type="String">HTML color code representing the fill color, of the form #RRGGBB (e.g. &quot;FFA500&quot;) or as a named HTML color (e.g. &quot;orange&quot;). [Api set: ExcelApi 1.6]</field>
+			/// <field name="matchPositiveBorderColor" type="Boolean">Boolean representation of whether or not the negative DataBar has the same border color as the positive DataBar. [Api set: ExcelApi 1.6]</field>
+			/// <field name="matchPositiveFillColor" type="Boolean">Boolean representation of whether or not the negative DataBar has the same fill color as the positive DataBar. [Api set: ExcelApi 1.6]</field>
 		}
 
 		ConditionalDataBarNegativeFormat.prototype.load = function(option) {
@@ -5002,12 +5021,12 @@ var Excel;
 	var ConditionalDataBarPositiveFormat = (function(_super) {
 		__extends(ConditionalDataBarPositiveFormat, _super);
 		function ConditionalDataBarPositiveFormat() {
-			/// <summary> Represents a conditional format DataBar Format for the positive side of the data bar. [Api set: ExcelApi 1.6 (PREVIEW)] </summary>
+			/// <summary> Represents a conditional format DataBar Format for the positive side of the data bar. [Api set: ExcelApi 1.6] </summary>
 			/// <field name="context" type="Excel.RequestContext">The request context associated with this object.</field>
 			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
-			/// <field name="borderColor" type="String">HTML color code representing the color of the border line, of the form #RRGGBB (e.g. &quot;FFA500&quot;) or as a named HTML color (e.g. &quot;orange&quot;).              &quot;&quot; (empty string) if no border is present or set. [Api set: ExcelApi 1.6 (PREVIEW)]</field>
-			/// <field name="fillColor" type="String">HTML color code representing the fill color, of the form #RRGGBB (e.g. &quot;FFA500&quot;) or as a named HTML color (e.g. &quot;orange&quot;). [Api set: ExcelApi 1.6 (PREVIEW)]</field>
-			/// <field name="gradientFill" type="Boolean">Boolean representation of whether or not the DataBar has a gradient. [Api set: ExcelApi 1.6 (PREVIEW)]</field>
+			/// <field name="borderColor" type="String">HTML color code representing the color of the border line, of the form #RRGGBB (e.g. &quot;FFA500&quot;) or as a named HTML color (e.g. &quot;orange&quot;).              &quot;&quot; (empty string) if no border is present or set. [Api set: ExcelApi 1.6]</field>
+			/// <field name="fillColor" type="String">HTML color code representing the fill color, of the form #RRGGBB (e.g. &quot;FFA500&quot;) or as a named HTML color (e.g. &quot;orange&quot;). [Api set: ExcelApi 1.6]</field>
+			/// <field name="gradientFill" type="Boolean">Boolean representation of whether or not the DataBar has a gradient. [Api set: ExcelApi 1.6]</field>
 		}
 
 		ConditionalDataBarPositiveFormat.prototype.load = function(option) {
@@ -5044,9 +5063,9 @@ var Excel;
 	(function (Interfaces) {
 		var ConditionalDataBarRule = (function() {
 			function ConditionalDataBarRule() {
-				/// <summary> Represents a rule-type for a Data Bar. [Api set: ExcelApi 1.6 (PREVIEW)] </summary>
-				/// <field name="formula" >The formula, if required, to evaluate the databar rule on. [Api set: ExcelApi 1.6 (PREVIEW)]</field>
-				/// <field name="type" type="String">The type of rule for the databar. [Api set: ExcelApi 1.6 (PREVIEW)]</field>
+				/// <summary> Represents a rule-type for a Data Bar. [Api set: ExcelApi 1.6] </summary>
+				/// <field name="formula" >The formula, if required, to evaluate the databar rule on. [Api set: ExcelApi 1.6]</field>
+				/// <field name="type" type="String">The type of rule for the databar. [Api set: ExcelApi 1.6]</field>
 			}
 			return ConditionalDataBarRule;
 		})();
@@ -5060,29 +5079,29 @@ var Excel;
 	var ConditionalFormat = (function(_super) {
 		__extends(ConditionalFormat, _super);
 		function ConditionalFormat() {
-			/// <summary> An object encapsulating a conditional format&apos;s range, format, rule, and other properties. [Api set: ExcelApi 1.6 (PREVIEW)] </summary>
+			/// <summary> An object encapsulating a conditional format&apos;s range, format, rule, and other properties. [Api set: ExcelApi 1.6] </summary>
 			/// <field name="context" type="Excel.RequestContext">The request context associated with this object.</field>
 			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
-			/// <field name="cellValue" type="Excel.CellValueConditionalFormat">Returns the cell value conditional format properties if the current conditional format is a CellValue type.              For example to format all cells between 5 and 10. [Api set: ExcelApi 1.6 (PREVIEW)]</field>
-			/// <field name="cellValueOrNullObject" type="Excel.CellValueConditionalFormat">Returns the cell value conditional format properties if the current conditional format is a CellValue type.              For example to format all cells between 5 and 10. [Api set: ExcelApi 1.6 (PREVIEW)]</field>
-			/// <field name="colorScale" type="Excel.ColorScaleConditionalFormat">Returns the ColorScale conditional format properties if the current conditional format is an ColorScale type. [Api set: ExcelApi 1.6 (PREVIEW)]</field>
-			/// <field name="colorScaleOrNullObject" type="Excel.ColorScaleConditionalFormat">Returns the ColorScale conditional format properties if the current conditional format is an ColorScale type. [Api set: ExcelApi 1.6 (PREVIEW)]</field>
-			/// <field name="custom" type="Excel.CustomConditionalFormat">Returns the custom conditional format properties if the current conditional format is a custom type. [Api set: ExcelApi 1.6 (PREVIEW)]</field>
-			/// <field name="customOrNullObject" type="Excel.CustomConditionalFormat">Returns the custom conditional format properties if the current conditional format is a custom type. [Api set: ExcelApi 1.6 (PREVIEW)]</field>
-			/// <field name="dataBar" type="Excel.DataBarConditionalFormat">Returns the data bar properties if the current conditional format is a data bar. [Api set: ExcelApi 1.6 (PREVIEW)]</field>
-			/// <field name="dataBarOrNullObject" type="Excel.DataBarConditionalFormat">Returns the data bar properties if the current conditional format is a data bar. [Api set: ExcelApi 1.6 (PREVIEW)]</field>
-			/// <field name="iconSet" type="Excel.IconSetConditionalFormat">Returns the IconSet conditional format properties if the current conditional format is an IconSet type. [Api set: ExcelApi 1.6 (PREVIEW)]</field>
-			/// <field name="iconSetOrNullObject" type="Excel.IconSetConditionalFormat">Returns the IconSet conditional format properties if the current conditional format is an IconSet type. [Api set: ExcelApi 1.6 (PREVIEW)]</field>
-			/// <field name="id" type="String">The Priority of the Conditional Format within the current ConditionalFormatCollection. [Api set: ExcelApi 1.6 (PREVIEW)]</field>
-			/// <field name="preset" type="Excel.PresetCriteriaConditionalFormat">Returns the preset criteria conditional format such as above average/below average/unique values/contains blank/nonblank/error/noerror properties. [Api set: ExcelApi 1.6 (PREVIEW)]</field>
-			/// <field name="presetOrNullObject" type="Excel.PresetCriteriaConditionalFormat">Returns the preset criteria conditional format such as above average/below average/unique values/contains blank/nonblank/error/noerror properties. [Api set: ExcelApi 1.6 (PREVIEW)]</field>
-			/// <field name="priority" type="Number">The priority (or index) within the conditional format collection that this conditional format currently exists in. Changing this also               changes other conditional formats&apos; priorities, to allow for a contiguous priority order.              Use a negative priority to begin from the back.              Priorities greater than than bounds will get and set to the maximum (or minimum if negative) priority.              Also note that if you change the priority, you have to re-fetch a new copy of the object at that new priority location if you want to make further changes to it. [Api set: ExcelApi 1.6 (PREVIEW)]</field>
-			/// <field name="stopIfTrue" type="Boolean">If the conditions of this conditional format are met, no lower-priority formats shall take effect on that cell.              Null on databars, icon sets, and colorscales as there&apos;s no concept of StopIfTrue for these [Api set: ExcelApi 1.6 (PREVIEW)]</field>
-			/// <field name="textComparison" type="Excel.TextConditionalFormat">Returns the specific text conditional format properties if the current conditional format is a text type.              For example to format cells matching the word &quot;Text&quot;. [Api set: ExcelApi 1.6 (PREVIEW)]</field>
-			/// <field name="textComparisonOrNullObject" type="Excel.TextConditionalFormat">Returns the specific text conditional format properties if the current conditional format is a text type.              For example to format cells matching the word &quot;Text&quot;. [Api set: ExcelApi 1.6 (PREVIEW)]</field>
-			/// <field name="topBottom" type="Excel.TopBottomConditionalFormat">Returns the Top/Bottom conditional format properties if the current conditional format is an TopBottom type.              For example to format the top 10% or bottom 10 items. [Api set: ExcelApi 1.6 (PREVIEW)]</field>
-			/// <field name="topBottomOrNullObject" type="Excel.TopBottomConditionalFormat">Returns the Top/Bottom conditional format properties if the current conditional format is an TopBottom type.              For example to format the top 10% or bottom 10 items. [Api set: ExcelApi 1.6 (PREVIEW)]</field>
-			/// <field name="type" type="String">A type of conditional format. Only one can be set at a time. Read-Only. [Api set: ExcelApi 1.6 (PREVIEW)]</field>
+			/// <field name="cellValue" type="Excel.CellValueConditionalFormat">Returns the cell value conditional format properties if the current conditional format is a CellValue type.              For example to format all cells between 5 and 10. [Api set: ExcelApi 1.6]</field>
+			/// <field name="cellValueOrNullObject" type="Excel.CellValueConditionalFormat">Returns the cell value conditional format properties if the current conditional format is a CellValue type.              For example to format all cells between 5 and 10. [Api set: ExcelApi 1.6]</field>
+			/// <field name="colorScale" type="Excel.ColorScaleConditionalFormat">Returns the ColorScale conditional format properties if the current conditional format is an ColorScale type. [Api set: ExcelApi 1.6]</field>
+			/// <field name="colorScaleOrNullObject" type="Excel.ColorScaleConditionalFormat">Returns the ColorScale conditional format properties if the current conditional format is an ColorScale type. [Api set: ExcelApi 1.6]</field>
+			/// <field name="custom" type="Excel.CustomConditionalFormat">Returns the custom conditional format properties if the current conditional format is a custom type. [Api set: ExcelApi 1.6]</field>
+			/// <field name="customOrNullObject" type="Excel.CustomConditionalFormat">Returns the custom conditional format properties if the current conditional format is a custom type. [Api set: ExcelApi 1.6]</field>
+			/// <field name="dataBar" type="Excel.DataBarConditionalFormat">Returns the data bar properties if the current conditional format is a data bar. [Api set: ExcelApi 1.6]</field>
+			/// <field name="dataBarOrNullObject" type="Excel.DataBarConditionalFormat">Returns the data bar properties if the current conditional format is a data bar. [Api set: ExcelApi 1.6]</field>
+			/// <field name="iconSet" type="Excel.IconSetConditionalFormat">Returns the IconSet conditional format properties if the current conditional format is an IconSet type. [Api set: ExcelApi 1.6]</field>
+			/// <field name="iconSetOrNullObject" type="Excel.IconSetConditionalFormat">Returns the IconSet conditional format properties if the current conditional format is an IconSet type. [Api set: ExcelApi 1.6]</field>
+			/// <field name="id" type="String">The Priority of the Conditional Format within the current ConditionalFormatCollection. [Api set: ExcelApi 1.6]</field>
+			/// <field name="preset" type="Excel.PresetCriteriaConditionalFormat">Returns the preset criteria conditional format such as above average/below average/unique values/contains blank/nonblank/error/noerror properties. [Api set: ExcelApi 1.6]</field>
+			/// <field name="presetOrNullObject" type="Excel.PresetCriteriaConditionalFormat">Returns the preset criteria conditional format such as above average/below average/unique values/contains blank/nonblank/error/noerror properties. [Api set: ExcelApi 1.6]</field>
+			/// <field name="priority" type="Number">The priority (or index) within the conditional format collection that this conditional format currently exists in. Changing this also               changes other conditional formats&apos; priorities, to allow for a contiguous priority order.              Use a negative priority to begin from the back.              Priorities greater than than bounds will get and set to the maximum (or minimum if negative) priority.              Also note that if you change the priority, you have to re-fetch a new copy of the object at that new priority location if you want to make further changes to it. [Api set: ExcelApi 1.6]</field>
+			/// <field name="stopIfTrue" type="Boolean">If the conditions of this conditional format are met, no lower-priority formats shall take effect on that cell.              Null on databars, icon sets, and colorscales as there&apos;s no concept of StopIfTrue for these [Api set: ExcelApi 1.6]</field>
+			/// <field name="textComparison" type="Excel.TextConditionalFormat">Returns the specific text conditional format properties if the current conditional format is a text type.              For example to format cells matching the word &quot;Text&quot;. [Api set: ExcelApi 1.6]</field>
+			/// <field name="textComparisonOrNullObject" type="Excel.TextConditionalFormat">Returns the specific text conditional format properties if the current conditional format is a text type.              For example to format cells matching the word &quot;Text&quot;. [Api set: ExcelApi 1.6]</field>
+			/// <field name="topBottom" type="Excel.TopBottomConditionalFormat">Returns the Top/Bottom conditional format properties if the current conditional format is an TopBottom type.              For example to format the top 10% or bottom 10 items. [Api set: ExcelApi 1.6]</field>
+			/// <field name="topBottomOrNullObject" type="Excel.TopBottomConditionalFormat">Returns the Top/Bottom conditional format properties if the current conditional format is an TopBottom type.              For example to format the top 10% or bottom 10 items. [Api set: ExcelApi 1.6]</field>
+			/// <field name="type" type="String">A type of conditional format. Only one can be set at a time. Read-Only. [Api set: ExcelApi 1.6]</field>
 		}
 
 		ConditionalFormat.prototype.load = function(option) {
@@ -5109,19 +5128,19 @@ var Excel;
 		}
 		ConditionalFormat.prototype.delete = function() {
 			/// <summary>
-			/// Deletes this conditional format. [Api set: ExcelApi 1.6 (PREVIEW)]
+			/// Deletes this conditional format. [Api set: ExcelApi 1.6]
 			/// </summary>
 			/// <returns ></returns>
 		}
 		ConditionalFormat.prototype.getRange = function() {
 			/// <summary>
-			/// Returns the range the conditonal format is applied to or a null object if the range is discontiguous. Read-only. [Api set: ExcelApi 1.6 (PREVIEW)]
+			/// Returns the range the conditonal format is applied to or a null object if the range is discontiguous. Read-only. [Api set: ExcelApi 1.6]
 			/// </summary>
 			/// <returns type="Excel.Range"></returns>
 		}
 		ConditionalFormat.prototype.getRangeOrNullObject = function() {
 			/// <summary>
-			/// Returns the range the conditonal format is applied to or a null object if the range is discontiguous. Read-only. [Api set: ExcelApi 1.6 (PREVIEW)]
+			/// Returns the range the conditonal format is applied to or a null object if the range is discontiguous. Read-only. [Api set: ExcelApi 1.6]
 			/// </summary>
 			/// <returns type="Excel.Range"></returns>
 		}
@@ -5136,7 +5155,7 @@ var Excel;
 	var ConditionalFormatCollection = (function(_super) {
 		__extends(ConditionalFormatCollection, _super);
 		function ConditionalFormatCollection() {
-			/// <summary> Represents a collection of all the conditional formats that are overlap the range. [Api set: ExcelApi 1.6 (PREVIEW)] </summary>
+			/// <summary> Represents a collection of all the conditional formats that are overlap the range. [Api set: ExcelApi 1.6] </summary>
 			/// <field name="context" type="Excel.RequestContext">The request context associated with this object.</field>
 			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
 			/// <field name="items" type="Array" elementType="Excel.ConditionalFormat">Gets the loaded child items in this collection.</field>
@@ -5151,20 +5170,20 @@ var Excel;
 		}
 		ConditionalFormatCollection.prototype.add = function(type) {
 			/// <summary>
-			/// Adds a new conditional format to the collection at the first/top priority. [Api set: ExcelApi 1.6 (PREVIEW)]
+			/// Adds a new conditional format to the collection at the first/top priority. [Api set: ExcelApi 1.6]
 			/// </summary>
 			/// <param name="type" type="String">The type of conditional format being added. See Excel.ConditionalFormatType for details.</param>
 			/// <returns type="Excel.ConditionalFormat"></returns>
 		}
 		ConditionalFormatCollection.prototype.clearAll = function() {
 			/// <summary>
-			/// Clears all conditional formats active on the current specified range. [Api set: ExcelApi 1.6 (PREVIEW)]
+			/// Clears all conditional formats active on the current specified range. [Api set: ExcelApi 1.6]
 			/// </summary>
 			/// <returns ></returns>
 		}
 		ConditionalFormatCollection.prototype.getCount = function() {
 			/// <summary>
-			/// Returns the number of conditional formats in the workbook. Read-only. [Api set: ExcelApi 1.6 (PREVIEW)]
+			/// Returns the number of conditional formats in the workbook. Read-only. [Api set: ExcelApi 1.6]
 			/// </summary>
 			/// <returns type="OfficeExtension.ClientResult&lt;number&gt;"></returns>
 			var result = new OfficeExtension.ClientResult();
@@ -5174,14 +5193,14 @@ var Excel;
 		}
 		ConditionalFormatCollection.prototype.getItem = function(id) {
 			/// <summary>
-			/// Returns a conditional format for the given ID. [Api set: ExcelApi 1.6 (PREVIEW)]
+			/// Returns a conditional format for the given ID. [Api set: ExcelApi 1.6]
 			/// </summary>
 			/// <param name="id" type="String">The id of the conditional format.</param>
 			/// <returns type="Excel.ConditionalFormat">Conditional Format object.</returns>
 		}
 		ConditionalFormatCollection.prototype.getItemAt = function(index) {
 			/// <summary>
-			/// Returns a conditional format at the given index. [Api set: ExcelApi 1.6 (PREVIEW)]
+			/// Returns a conditional format at the given index. [Api set: ExcelApi 1.6]
 			/// </summary>
 			/// <param name="index" type="Number">Index of the conditional formats to be retrieved.</param>
 			/// <returns type="Excel.ConditionalFormat"></returns>
@@ -5194,7 +5213,7 @@ var Excel;
 
 var Excel;
 (function (Excel) {
-	/// <summary> Represents the types of conditional format values. [Api set: ExcelApi 1.6 (PREVIEW)] </summary>
+	/// <summary> Represents the types of conditional format values. [Api set: ExcelApi 1.6] </summary>
 	var ConditionalFormatColorCriterionType = {
 		__proto__: null,
 		"invalid": "invalid",
@@ -5210,7 +5229,7 @@ var Excel;
 
 var Excel;
 (function (Excel) {
-	/// <summary> Represents the direction for a selection. [Api set: ExcelApi 1.6 (PREVIEW)] </summary>
+	/// <summary> Represents the direction for a selection. [Api set: ExcelApi 1.6] </summary>
 	var ConditionalFormatDirection = {
 		__proto__: null,
 		"top": "top",
@@ -5221,7 +5240,7 @@ var Excel;
 
 var Excel;
 (function (Excel) {
-	/// <summary> Represents the types of conditional format values. [Api set: ExcelApi 1.6 (PREVIEW)] </summary>
+	/// <summary> Represents the types of conditional format values. [Api set: ExcelApi 1.6] </summary>
 	var ConditionalFormatIconRuleType = {
 		__proto__: null,
 		"invalid": "invalid",
@@ -5235,7 +5254,7 @@ var Excel;
 
 var Excel;
 (function (Excel) {
-	/// <summary> Represents the criteria for the Preset Criteria conditional format type. [Api set: ExcelApi 1.6 (PREVIEW)] </summary>
+	/// <summary> Represents the criteria for the Preset Criteria conditional format type. [Api set: ExcelApi 1.6] </summary>
 	var ConditionalFormatPresetCriterion = {
 		__proto__: null,
 		"invalid": "invalid",
@@ -5274,12 +5293,12 @@ var Excel;
 	var ConditionalFormatRule = (function(_super) {
 		__extends(ConditionalFormatRule, _super);
 		function ConditionalFormatRule() {
-			/// <summary> Represents a rule, for all traditional rule/format pairings. [Api set: ExcelApi 1.6 (PREVIEW)] </summary>
+			/// <summary> Represents a rule, for all traditional rule/format pairings. [Api set: ExcelApi 1.6] </summary>
 			/// <field name="context" type="Excel.RequestContext">The request context associated with this object.</field>
 			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
-			/// <field name="formula" >The formula, if required, to evaluate the conditional format rule on. [Api set: ExcelApi 1.6 (PREVIEW)]</field>
-			/// <field name="formulaLocal" >The formula, if required, to evaluate the conditional format rule on in the user&apos;s language. [Api set: ExcelApi 1.6 (PREVIEW)]</field>
-			/// <field name="formulaR1C1" >The formula, if required, to evaluate the conditional format rule on in R1C1-style notation. [Api set: ExcelApi 1.6 (PREVIEW)]</field>
+			/// <field name="formula" >The formula, if required, to evaluate the conditional format rule on. [Api set: ExcelApi 1.6]</field>
+			/// <field name="formulaLocal" >The formula, if required, to evaluate the conditional format rule on in the user&apos;s language. [Api set: ExcelApi 1.6]</field>
+			/// <field name="formulaR1C1" >The formula, if required, to evaluate the conditional format rule on in R1C1-style notation. [Api set: ExcelApi 1.6]</field>
 		}
 
 		ConditionalFormatRule.prototype.load = function(option) {
@@ -5312,7 +5331,7 @@ var Excel;
 
 var Excel;
 (function (Excel) {
-	/// <summary> Represents the types of conditional format values. [Api set: ExcelApi 1.6 (PREVIEW)] </summary>
+	/// <summary> Represents the types of conditional format values. [Api set: ExcelApi 1.6] </summary>
 	var ConditionalFormatRuleType = {
 		__proto__: null,
 		"invalid": "invalid",
@@ -5329,7 +5348,7 @@ var Excel;
 
 var Excel;
 (function (Excel) {
-	/// <summary> [Api set: ExcelApi 1.6 (PREVIEW)] </summary>
+	/// <summary> [Api set: ExcelApi 1.6] </summary>
 	var ConditionalFormatType = {
 		__proto__: null,
 		"custom": "custom",
@@ -5350,11 +5369,11 @@ var Excel;
 	(function (Interfaces) {
 		var ConditionalIconCriterion = (function() {
 			function ConditionalIconCriterion() {
-				/// <summary> Represents an Icon Criterion which contains a type, value, an Operator, and an optional custom icon, if not using an iconset. [Api set: ExcelApi 1.6 (PREVIEW)] </summary>
-				/// <field name="customIcon" type="Excel.Interfaces.Icon">The custom icon for the current criterion if different from the default IconSet, else null will be returned. [Api set: ExcelApi 1.6 (PREVIEW)]</field>
-				/// <field name="formula" >A number or a formula depending on the type. [Api set: ExcelApi 1.6 (PREVIEW)]</field>
-				/// <field name="operator" type="String">GreaterThan or GreaterThanOrEqual for each of the rule type for the Icon conditional format. [Api set: ExcelApi 1.6 (PREVIEW)]</field>
-				/// <field name="type" type="String">What the icon conditional formula should be based on. [Api set: ExcelApi 1.6 (PREVIEW)]</field>
+				/// <summary> Represents an Icon Criterion which contains a type, value, an Operator, and an optional custom icon, if not using an iconset. [Api set: ExcelApi 1.6] </summary>
+				/// <field name="customIcon" type="Excel.Interfaces.Icon">The custom icon for the current criterion if different from the default IconSet, else null will be returned. [Api set: ExcelApi 1.6]</field>
+				/// <field name="formula" >A number or a formula depending on the type. [Api set: ExcelApi 1.6]</field>
+				/// <field name="operator" type="String">GreaterThan or GreaterThanOrEqual for each of the rule type for the Icon conditional format. [Api set: ExcelApi 1.6]</field>
+				/// <field name="type" type="String">What the icon conditional formula should be based on. [Api set: ExcelApi 1.6]</field>
 			}
 			return ConditionalIconCriterion;
 		})();
@@ -5365,7 +5384,7 @@ var Excel;
 
 var Excel;
 (function (Excel) {
-	/// <summary> Represents the operator for each icon criteria. [Api set: ExcelApi 1.6 (PREVIEW)] </summary>
+	/// <summary> Represents the operator for each icon criteria. [Api set: ExcelApi 1.6] </summary>
 	var ConditionalIconCriterionOperator = {
 		__proto__: null,
 		"invalid": "invalid",
@@ -5381,8 +5400,8 @@ var Excel;
 	(function (Interfaces) {
 		var ConditionalPresetCriteriaRule = (function() {
 			function ConditionalPresetCriteriaRule() {
-				/// <summary> Represents the Preset Criteria Conditional Format Rule [Api set: ExcelApi 1.6 (PREVIEW)] </summary>
-				/// <field name="criterion" type="String">The criterion of the conditional format. [Api set: ExcelApi 1.6 (PREVIEW)]</field>
+				/// <summary> Represents the Preset Criteria Conditional Format Rule [Api set: ExcelApi 1.6] </summary>
+				/// <field name="criterion" type="String">The criterion of the conditional format. [Api set: ExcelApi 1.6]</field>
 			}
 			return ConditionalPresetCriteriaRule;
 		})();
@@ -5396,12 +5415,12 @@ var Excel;
 	var ConditionalRangeBorder = (function(_super) {
 		__extends(ConditionalRangeBorder, _super);
 		function ConditionalRangeBorder() {
-			/// <summary> Represents the border of an object. [Api set: ExcelApi 1.6 (PREVIEW)] </summary>
+			/// <summary> Represents the border of an object. [Api set: ExcelApi 1.6] </summary>
 			/// <field name="context" type="Excel.RequestContext">The request context associated with this object.</field>
 			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
-			/// <field name="color" type="String">HTML color code representing the color of the border line, of the form #RRGGBB (e.g. &quot;FFA500&quot;) or as a named HTML color (e.g. &quot;orange&quot;). [Api set: ExcelApi 1.6 (PREVIEW)]</field>
-			/// <field name="sideIndex" type="String">Constant value that indicates the specific side of the border. See Excel.ConditionalRangeBorderIndex for details. Read-only. [Api set: ExcelApi 1.6 (PREVIEW)]</field>
-			/// <field name="style" type="String">One of the constants of line style specifying the line style for the border. See Excel.BorderLineStyle for details. [Api set: ExcelApi 1.6 (PREVIEW)]</field>
+			/// <field name="color" type="String">HTML color code representing the color of the border line, of the form #RRGGBB (e.g. &quot;FFA500&quot;) or as a named HTML color (e.g. &quot;orange&quot;). [Api set: ExcelApi 1.6]</field>
+			/// <field name="sideIndex" type="String">Constant value that indicates the specific side of the border. See Excel.ConditionalRangeBorderIndex for details. Read-only. [Api set: ExcelApi 1.6]</field>
+			/// <field name="style" type="String">One of the constants of line style specifying the line style for the border. See Excel.BorderLineStyle for details. [Api set: ExcelApi 1.6]</field>
 		}
 
 		ConditionalRangeBorder.prototype.load = function(option) {
@@ -5437,14 +5456,14 @@ var Excel;
 	var ConditionalRangeBorderCollection = (function(_super) {
 		__extends(ConditionalRangeBorderCollection, _super);
 		function ConditionalRangeBorderCollection() {
-			/// <summary> Represents the border objects that make up range border. [Api set: ExcelApi 1.6 (PREVIEW)] </summary>
+			/// <summary> Represents the border objects that make up range border. [Api set: ExcelApi 1.6] </summary>
 			/// <field name="context" type="Excel.RequestContext">The request context associated with this object.</field>
 			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
-			/// <field name="bottom" type="Excel.ConditionalRangeBorder">Gets the top border [Api set: ExcelApi 1.6 (PREVIEW)]</field>
-			/// <field name="count" type="Number">Number of border objects in the collection. Read-only. [Api set: ExcelApi 1.6 (PREVIEW)]</field>
-			/// <field name="left" type="Excel.ConditionalRangeBorder">Gets the top border [Api set: ExcelApi 1.6 (PREVIEW)]</field>
-			/// <field name="right" type="Excel.ConditionalRangeBorder">Gets the top border [Api set: ExcelApi 1.6 (PREVIEW)]</field>
-			/// <field name="top" type="Excel.ConditionalRangeBorder">Gets the top border [Api set: ExcelApi 1.6 (PREVIEW)]</field>
+			/// <field name="bottom" type="Excel.ConditionalRangeBorder">Gets the top border [Api set: ExcelApi 1.6]</field>
+			/// <field name="count" type="Number">Number of border objects in the collection. Read-only. [Api set: ExcelApi 1.6]</field>
+			/// <field name="left" type="Excel.ConditionalRangeBorder">Gets the top border [Api set: ExcelApi 1.6]</field>
+			/// <field name="right" type="Excel.ConditionalRangeBorder">Gets the top border [Api set: ExcelApi 1.6]</field>
+			/// <field name="top" type="Excel.ConditionalRangeBorder">Gets the top border [Api set: ExcelApi 1.6]</field>
 			/// <field name="items" type="Array" elementType="Excel.ConditionalRangeBorder">Gets the loaded child items in this collection.</field>
 		}
 
@@ -5455,16 +5474,31 @@ var Excel;
 			/// <param name="option" type="string | string[] | OfficeExtension.LoadOption"/>
 			/// <returns type="Excel.ConditionalRangeBorderCollection"/>
 		}
+
+		ConditionalRangeBorderCollection.prototype.set = function() {
+			/// <signature>
+			/// <summary>Sets multiple properties on the object at the same time, based on JSON input.</summary>
+			/// <param name="properties" type="Excel.Interfaces.ConditionalRangeBorderCollectionUpdateData">Properties described by the Excel.Interfaces.ConditionalRangeBorderCollectionUpdateData interface.</param>
+			/// <param name="options" type="string">Options of the form { throwOnReadOnly?: boolean }
+			/// <br />
+			/// * throwOnReadOnly: Throw an error if the passed-in property list includes read-only properties (default = true).
+			/// </param>
+			/// </signature>
+			/// <signature>
+			/// <summary>Sets multiple properties on the object at the same time, based on an existing loaded object.</summary>
+			/// <param name="properties" type="ConditionalRangeBorderCollection">An existing ConditionalRangeBorderCollection object, with properties that have already been loaded and synced.</param>
+			/// </signature>
+		}
 		ConditionalRangeBorderCollection.prototype.getItem = function(index) {
 			/// <summary>
-			/// Gets a border object using its name [Api set: ExcelApi 1.6 (PREVIEW)]
+			/// Gets a border object using its name [Api set: ExcelApi 1.6]
 			/// </summary>
 			/// <param name="index" type="String">Index value of the border object to be retrieved. See Excel.ConditionalRangeBorderIndex for details.</param>
 			/// <returns type="Excel.ConditionalRangeBorder"></returns>
 		}
 		ConditionalRangeBorderCollection.prototype.getItemAt = function(index) {
 			/// <summary>
-			/// Gets a border object using its index [Api set: ExcelApi 1.6 (PREVIEW)]
+			/// Gets a border object using its index [Api set: ExcelApi 1.6]
 			/// </summary>
 			/// <param name="index" type="Number">Index value of the object to be retrieved. Zero-indexed.</param>
 			/// <returns type="Excel.ConditionalRangeBorder"></returns>
@@ -5477,7 +5511,7 @@ var Excel;
 
 var Excel;
 (function (Excel) {
-	/// <summary> [Api set: ExcelApi 1.6 (PREVIEW)] </summary>
+	/// <summary> [Api set: ExcelApi 1.6] </summary>
 	var ConditionalRangeBorderIndex = {
 		__proto__: null,
 		"edgeTop": "edgeTop",
@@ -5490,7 +5524,7 @@ var Excel;
 
 var Excel;
 (function (Excel) {
-	/// <summary> [Api set: ExcelApi 1.6 (PREVIEW)] </summary>
+	/// <summary> [Api set: ExcelApi 1.6] </summary>
 	var ConditionalRangeBorderLineStyle = {
 		__proto__: null,
 		"none": "none",
@@ -5508,10 +5542,10 @@ var Excel;
 	var ConditionalRangeFill = (function(_super) {
 		__extends(ConditionalRangeFill, _super);
 		function ConditionalRangeFill() {
-			/// <summary> Represents the background of a conditional range object. [Api set: ExcelApi 1.6 (PREVIEW)] </summary>
+			/// <summary> Represents the background of a conditional range object. [Api set: ExcelApi 1.6] </summary>
 			/// <field name="context" type="Excel.RequestContext">The request context associated with this object.</field>
 			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
-			/// <field name="color" type="String">HTML color code representing the color of the fill, of the form #RRGGBB (e.g. &quot;FFA500&quot;) or as a named HTML color (e.g. &quot;orange&quot;). [Api set: ExcelApi 1.6 (PREVIEW)]</field>
+			/// <field name="color" type="String">HTML color code representing the color of the fill, of the form #RRGGBB (e.g. &quot;FFA500&quot;) or as a named HTML color (e.g. &quot;orange&quot;). [Api set: ExcelApi 1.6]</field>
 		}
 
 		ConditionalRangeFill.prototype.load = function(option) {
@@ -5538,7 +5572,7 @@ var Excel;
 		}
 		ConditionalRangeFill.prototype.clear = function() {
 			/// <summary>
-			/// Resets the fill. [Api set: ExcelApi 1.6 (PREVIEW)]
+			/// Resets the fill. [Api set: ExcelApi 1.6]
 			/// </summary>
 			/// <returns ></returns>
 		}
@@ -5553,14 +5587,14 @@ var Excel;
 	var ConditionalRangeFont = (function(_super) {
 		__extends(ConditionalRangeFont, _super);
 		function ConditionalRangeFont() {
-			/// <summary> This object represents the font attributes (font style,, color, etc.) for an object. [Api set: ExcelApi 1.6 (PREVIEW)] </summary>
+			/// <summary> This object represents the font attributes (font style,, color, etc.) for an object. [Api set: ExcelApi 1.6] </summary>
 			/// <field name="context" type="Excel.RequestContext">The request context associated with this object.</field>
 			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
-			/// <field name="bold" type="Boolean">Represents the bold status of font. [Api set: ExcelApi 1.6 (PREVIEW)]</field>
-			/// <field name="color" type="String">HTML color code representation of the text color. E.g. #FF0000 represents Red. [Api set: ExcelApi 1.6 (PREVIEW)]</field>
-			/// <field name="italic" type="Boolean">Represents the italic status of the font. [Api set: ExcelApi 1.6 (PREVIEW)]</field>
-			/// <field name="strikethrough" type="Boolean">Represents the strikethrough status of the font. [Api set: ExcelApi 1.6 (PREVIEW)]</field>
-			/// <field name="underline" type="String">Type of underline applied to the font. See Excel.ConditionalRangeFontUnderlineStyle for details. [Api set: ExcelApi 1.6 (PREVIEW)]</field>
+			/// <field name="bold" type="Boolean">Represents the bold status of font. [Api set: ExcelApi 1.6]</field>
+			/// <field name="color" type="String">HTML color code representation of the text color. E.g. #FF0000 represents Red. [Api set: ExcelApi 1.6]</field>
+			/// <field name="italic" type="Boolean">Represents the italic status of the font. [Api set: ExcelApi 1.6]</field>
+			/// <field name="strikethrough" type="Boolean">Represents the strikethrough status of the font. [Api set: ExcelApi 1.6]</field>
+			/// <field name="underline" type="String">Type of underline applied to the font. See Excel.ConditionalRangeFontUnderlineStyle for details. [Api set: ExcelApi 1.6]</field>
 		}
 
 		ConditionalRangeFont.prototype.load = function(option) {
@@ -5587,7 +5621,7 @@ var Excel;
 		}
 		ConditionalRangeFont.prototype.clear = function() {
 			/// <summary>
-			/// Resets the font formats. [Api set: ExcelApi 1.6 (PREVIEW)]
+			/// Resets the font formats. [Api set: ExcelApi 1.6]
 			/// </summary>
 			/// <returns ></returns>
 		}
@@ -5599,7 +5633,7 @@ var Excel;
 
 var Excel;
 (function (Excel) {
-	/// <summary> [Api set: ExcelApi 1.6 (PREVIEW)] </summary>
+	/// <summary> [Api set: ExcelApi 1.6] </summary>
 	var ConditionalRangeFontUnderlineStyle = {
 		__proto__: null,
 		"none": "none",
@@ -5614,13 +5648,13 @@ var Excel;
 	var ConditionalRangeFormat = (function(_super) {
 		__extends(ConditionalRangeFormat, _super);
 		function ConditionalRangeFormat() {
-			/// <summary> A format object encapsulating the conditional formats range&apos;s font, fill, borders, and other properties. [Api set: ExcelApi 1.6 (PREVIEW)] </summary>
+			/// <summary> A format object encapsulating the conditional formats range&apos;s font, fill, borders, and other properties. [Api set: ExcelApi 1.6] </summary>
 			/// <field name="context" type="Excel.RequestContext">The request context associated with this object.</field>
 			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
-			/// <field name="borders" type="Excel.ConditionalRangeBorderCollection">Collection of border objects that apply to the overall conditional format range. Read-only. [Api set: ExcelApi 1.6 (PREVIEW)]</field>
-			/// <field name="fill" type="Excel.ConditionalRangeFill">Returns the fill object defined on the overall conditional format range. Read-only. [Api set: ExcelApi 1.6 (PREVIEW)]</field>
-			/// <field name="font" type="Excel.ConditionalRangeFont">Returns the font object defined on the overall conditional format range. Read-only. [Api set: ExcelApi 1.6 (PREVIEW)]</field>
-			/// <field name="numberFormat" >Represents Excel&apos;s number format code for the given range. Cleared if null is passed in. [Api set: ExcelApi 1.6 (PREVIEW)]</field>
+			/// <field name="borders" type="Excel.ConditionalRangeBorderCollection">Collection of border objects that apply to the overall conditional format range. Read-only. [Api set: ExcelApi 1.6]</field>
+			/// <field name="fill" type="Excel.ConditionalRangeFill">Returns the fill object defined on the overall conditional format range. Read-only. [Api set: ExcelApi 1.6]</field>
+			/// <field name="font" type="Excel.ConditionalRangeFont">Returns the font object defined on the overall conditional format range. Read-only. [Api set: ExcelApi 1.6]</field>
+			/// <field name="numberFormat" >Represents Excel&apos;s number format code for the given range. Cleared if null is passed in. [Api set: ExcelApi 1.6]</field>
 		}
 
 		ConditionalRangeFormat.prototype.load = function(option) {
@@ -5657,9 +5691,9 @@ var Excel;
 	(function (Interfaces) {
 		var ConditionalTextComparisonRule = (function() {
 			function ConditionalTextComparisonRule() {
-				/// <summary> Represents a Cell Value Conditional Format Rule [Api set: ExcelApi 1.6 (PREVIEW)] </summary>
-				/// <field name="operator" type="String">The operator of the text conditional format. [Api set: ExcelApi 1.6 (PREVIEW)]</field>
-				/// <field name="text" type="String">The Text value of conditional format. [Api set: ExcelApi 1.6 (PREVIEW)]</field>
+				/// <summary> Represents a Cell Value Conditional Format Rule [Api set: ExcelApi 1.6] </summary>
+				/// <field name="operator" type="String">The operator of the text conditional format. [Api set: ExcelApi 1.6]</field>
+				/// <field name="text" type="String">The Text value of conditional format. [Api set: ExcelApi 1.6]</field>
 			}
 			return ConditionalTextComparisonRule;
 		})();
@@ -5670,7 +5704,7 @@ var Excel;
 
 var Excel;
 (function (Excel) {
-	/// <summary> Represents the operator of the text conditional format type. [Api set: ExcelApi 1.6 (PREVIEW)] </summary>
+	/// <summary> Represents the operator of the text conditional format type. [Api set: ExcelApi 1.6] </summary>
 	var ConditionalTextOperator = {
 		__proto__: null,
 		"invalid": "invalid",
@@ -5684,7 +5718,7 @@ var Excel;
 
 var Excel;
 (function (Excel) {
-	/// <summary> Represents the criteria for the above/below average conditional format type. [Api set: ExcelApi 1.6 (PREVIEW)] </summary>
+	/// <summary> Represents the criteria for the above/below average conditional format type. [Api set: ExcelApi 1.6] </summary>
 	var ConditionalTopBottomCriterionType = {
 		__proto__: null,
 		"invalid": "invalid",
@@ -5702,9 +5736,9 @@ var Excel;
 	(function (Interfaces) {
 		var ConditionalTopBottomRule = (function() {
 			function ConditionalTopBottomRule() {
-				/// <summary> Represents the rule of the top/bottom conditional format. [Api set: ExcelApi 1.6 (PREVIEW)] </summary>
-				/// <field name="rank" type="Number">The rank between 1 and 1000 for numeric ranks or 1 and 100 for percent ranks. [Api set: ExcelApi 1.6 (PREVIEW)]</field>
-				/// <field name="type" type="String">Format values based on the top or bottom rank. [Api set: ExcelApi 1.6 (PREVIEW)]</field>
+				/// <summary> Represents the rule of the top/bottom conditional format. [Api set: ExcelApi 1.6] </summary>
+				/// <field name="rank" type="Number">The rank between 1 and 1000 for numeric ranks or 1 and 100 for percent ranks. [Api set: ExcelApi 1.6]</field>
+				/// <field name="type" type="String">Format values based on the top or bottom rank. [Api set: ExcelApi 1.6]</field>
 			}
 			return ConditionalTopBottomRule;
 		})();
@@ -5718,11 +5752,11 @@ var Excel;
 	var CustomConditionalFormat = (function(_super) {
 		__extends(CustomConditionalFormat, _super);
 		function CustomConditionalFormat() {
-			/// <summary> Represents a custom conditional format type. [Api set: ExcelApi 1.6 (PREVIEW)] </summary>
+			/// <summary> Represents a custom conditional format type. [Api set: ExcelApi 1.6] </summary>
 			/// <field name="context" type="Excel.RequestContext">The request context associated with this object.</field>
 			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
-			/// <field name="format" type="Excel.ConditionalRangeFormat">Returns a format object, encapsulating the conditional formats font, fill, borders, and other properties. Read-only. [Api set: ExcelApi 1.6 (PREVIEW)]</field>
-			/// <field name="rule" type="Excel.ConditionalFormatRule">Represents the Rule object on this conditional format. [Api set: ExcelApi 1.6 (PREVIEW)]</field>
+			/// <field name="format" type="Excel.ConditionalRangeFormat">Returns a format object, encapsulating the conditional formats font, fill, borders, and other properties. Read-only. [Api set: ExcelApi 1.6]</field>
+			/// <field name="rule" type="Excel.ConditionalFormatRule">Represents the Rule object on this conditional format. [Api set: ExcelApi 1.6]</field>
 		}
 
 		CustomConditionalFormat.prototype.load = function(option) {
@@ -5928,17 +5962,17 @@ var Excel;
 	var DataBarConditionalFormat = (function(_super) {
 		__extends(DataBarConditionalFormat, _super);
 		function DataBarConditionalFormat() {
-			/// <summary> Represents an Excel Conditional Data Bar Type. [Api set: ExcelApi 1.6 (PREVIEW)] </summary>
+			/// <summary> Represents an Excel Conditional Data Bar Type. [Api set: ExcelApi 1.6] </summary>
 			/// <field name="context" type="Excel.RequestContext">The request context associated with this object.</field>
 			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
-			/// <field name="axisColor" type="String">HTML color code representing the color of the Axis line, of the form #RRGGBB (e.g. &quot;FFA500&quot;) or as a named HTML color (e.g. &quot;orange&quot;).              &quot;&quot; (empty string) if no axis is present or set. [Api set: ExcelApi 1.6 (PREVIEW)]</field>
-			/// <field name="axisFormat" type="String">Representation of how the axis is determined for an Excel data bar. [Api set: ExcelApi 1.6 (PREVIEW)]</field>
-			/// <field name="barDirection" type="String">Represents the direction that the data bar graphic should be based on. [Api set: ExcelApi 1.6 (PREVIEW)]</field>
-			/// <field name="lowerBoundRule" type="Excel.Interfaces.ConditionalDataBarRule">The rule for what consistutes the lower bound (and how to calculate it, if applicable) for a data bar. [Api set: ExcelApi 1.6 (PREVIEW)]</field>
-			/// <field name="negativeFormat" type="Excel.ConditionalDataBarNegativeFormat">Representation of all values to the left of the axis in an Excel data bar. [Api set: ExcelApi 1.6 (PREVIEW)]</field>
-			/// <field name="positiveFormat" type="Excel.ConditionalDataBarPositiveFormat">Representation of all values to the right of the axis in an Excel data bar. [Api set: ExcelApi 1.6 (PREVIEW)]</field>
-			/// <field name="showDataBarOnly" type="Boolean">If true, hides the values from the cells where the data bar is applied. [Api set: ExcelApi 1.6 (PREVIEW)]</field>
-			/// <field name="upperBoundRule" type="Excel.Interfaces.ConditionalDataBarRule">The rule for what constitutes the upper bound (and how to calculate it, if applicable) for a data bar. [Api set: ExcelApi 1.6 (PREVIEW)]</field>
+			/// <field name="axisColor" type="String">HTML color code representing the color of the Axis line, of the form #RRGGBB (e.g. &quot;FFA500&quot;) or as a named HTML color (e.g. &quot;orange&quot;).              &quot;&quot; (empty string) if no axis is present or set. [Api set: ExcelApi 1.6]</field>
+			/// <field name="axisFormat" type="String">Representation of how the axis is determined for an Excel data bar. [Api set: ExcelApi 1.6]</field>
+			/// <field name="barDirection" type="String">Represents the direction that the data bar graphic should be based on. [Api set: ExcelApi 1.6]</field>
+			/// <field name="lowerBoundRule" type="Excel.Interfaces.ConditionalDataBarRule">The rule for what consistutes the lower bound (and how to calculate it, if applicable) for a data bar. [Api set: ExcelApi 1.6]</field>
+			/// <field name="negativeFormat" type="Excel.ConditionalDataBarNegativeFormat">Representation of all values to the left of the axis in an Excel data bar. [Api set: ExcelApi 1.6]</field>
+			/// <field name="positiveFormat" type="Excel.ConditionalDataBarPositiveFormat">Representation of all values to the right of the axis in an Excel data bar. [Api set: ExcelApi 1.6]</field>
+			/// <field name="showDataBarOnly" type="Boolean">If true, hides the values from the cells where the data bar is applied. [Api set: ExcelApi 1.6]</field>
+			/// <field name="upperBoundRule" type="Excel.Interfaces.ConditionalDataBarRule">The rule for what constitutes the upper bound (and how to calculate it, if applicable) for a data bar. [Api set: ExcelApi 1.6]</field>
 		}
 
 		DataBarConditionalFormat.prototype.load = function(option) {
@@ -9386,13 +9420,13 @@ var Excel;
 	var IconSetConditionalFormat = (function(_super) {
 		__extends(IconSetConditionalFormat, _super);
 		function IconSetConditionalFormat() {
-			/// <summary> Represents an IconSet criteria for conditional formatting. [Api set: ExcelApi 1.6 (PREVIEW)] </summary>
+			/// <summary> Represents an IconSet criteria for conditional formatting. [Api set: ExcelApi 1.6] </summary>
 			/// <field name="context" type="Excel.RequestContext">The request context associated with this object.</field>
 			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
-			/// <field name="criteria" type="Array" elementType="Excel.Interfaces.ConditionalIconCriterion">An array of Criteria and IconSets for the rules and potential custom icons for conditional icons. Note that for the first criterion only the custom icon can be modified, while type, formula and operator will be ignored when set. [Api set: ExcelApi 1.6 (PREVIEW)]</field>
-			/// <field name="reverseIconOrder" type="Boolean">If true, reverses the icon orders for the IconSet. Note that this cannot be set if custom icons are used. [Api set: ExcelApi 1.6 (PREVIEW)]</field>
-			/// <field name="showIconOnly" type="Boolean">If true, hides the values and only shows icons. [Api set: ExcelApi 1.6 (PREVIEW)]</field>
-			/// <field name="style" type="String">If set, displays the IconSet option for the conditional format. [Api set: ExcelApi 1.6 (PREVIEW)]</field>
+			/// <field name="criteria" type="Array" elementType="Excel.Interfaces.ConditionalIconCriterion">An array of Criteria and IconSets for the rules and potential custom icons for conditional icons. Note that for the first criterion only the custom icon can be modified, while type, formula and operator will be ignored when set. [Api set: ExcelApi 1.6]</field>
+			/// <field name="reverseIconOrder" type="Boolean">If true, reverses the icon orders for the IconSet. Note that this cannot be set if custom icons are used. [Api set: ExcelApi 1.6]</field>
+			/// <field name="showIconOnly" type="Boolean">If true, hides the values and only shows icons. [Api set: ExcelApi 1.6]</field>
+			/// <field name="style" type="String">If set, displays the IconSet option for the conditional format. [Api set: ExcelApi 1.6]</field>
 		}
 
 		IconSetConditionalFormat.prototype.load = function(option) {
@@ -9709,11 +9743,11 @@ var Excel;
 	var PresetCriteriaConditionalFormat = (function(_super) {
 		__extends(PresetCriteriaConditionalFormat, _super);
 		function PresetCriteriaConditionalFormat() {
-			/// <summary> Represents the the preset criteria conditional format such as above average/below average/unique values/contains blank/nonblank/error/noerror. [Api set: ExcelApi 1.6 (PREVIEW)] </summary>
+			/// <summary> Represents the the preset criteria conditional format such as above average/below average/unique values/contains blank/nonblank/error/noerror. [Api set: ExcelApi 1.6] </summary>
 			/// <field name="context" type="Excel.RequestContext">The request context associated with this object.</field>
 			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
-			/// <field name="format" type="Excel.ConditionalRangeFormat">Returns a format object, encapsulating the conditional formats font, fill, borders, and other properties. Read-only. [Api set: ExcelApi 1.6 (PREVIEW)]</field>
-			/// <field name="rule" type="Excel.Interfaces.ConditionalPresetCriteriaRule">The rule of the conditional format. [Api set: ExcelApi 1.6 (PREVIEW)]</field>
+			/// <field name="format" type="Excel.ConditionalRangeFormat">Returns a format object, encapsulating the conditional formats font, fill, borders, and other properties. Read-only. [Api set: ExcelApi 1.6]</field>
+			/// <field name="rule" type="Excel.Interfaces.ConditionalPresetCriteriaRule">The rule of the conditional format. [Api set: ExcelApi 1.6]</field>
 		}
 
 		PresetCriteriaConditionalFormat.prototype.load = function(option) {
@@ -9758,7 +9792,7 @@ var Excel;
 			/// <field name="columnCount" type="Number">Represents the total number of columns in the range. Read-only. [Api set: ExcelApi 1.1]</field>
 			/// <field name="columnHidden" type="Boolean">Represents if all columns of the current range are hidden. [Api set: ExcelApi 1.2]</field>
 			/// <field name="columnIndex" type="Number">Represents the column number of the first cell in the range. Zero-indexed. Read-only. [Api set: ExcelApi 1.1]</field>
-			/// <field name="conditionalFormats" type="Excel.ConditionalFormatCollection">Collection of ConditionalFormats that intersect the range. Read-only. [Api set: ExcelApi 1.6 (PREVIEW)]</field>
+			/// <field name="conditionalFormats" type="Excel.ConditionalFormatCollection">Collection of ConditionalFormats that intersect the range. Read-only. [Api set: ExcelApi 1.6]</field>
 			/// <field name="format" type="Excel.RangeFormat">Returns a format object, encapsulating the range&apos;s font, fill, borders, alignment, and other properties. Read-only. [Api set: ExcelApi 1.1]</field>
 			/// <field name="formulas" type="Array" elementType="Array">Represents the formula in A1-style notation. [Api set: ExcelApi 1.1]</field>
 			/// <field name="formulasLocal" type="Array" elementType="Array">Represents the formula in A1-style notation, in the user&apos;s language and number-formatting locale.  For example, the English &quot;=SUM(A1, 1.5)&quot; formula would become &quot;=SUMME(A1; 1,5)&quot; in German. [Api set: ExcelApi 1.1]</field>
@@ -9799,7 +9833,7 @@ var Excel;
 		}
 		Range.prototype.calculate = function() {
 			/// <summary>
-			/// Calculates a range of cells on a worksheet. [Api set: ExcelApi 1.6 (PREVIEW)]
+			/// Calculates a range of cells on a worksheet. [Api set: ExcelApi 1.6]
 			/// </summary>
 			/// <returns ></returns>
 		}
@@ -10295,7 +10329,7 @@ var Excel;
 
 var Excel;
 (function (Excel) {
-	/// <summary> [Api set: ExcelApi 1.1] </summary>
+	/// <summary> [Api set: ExcelApi 1.1 for Unknown, Empty, String, Integer, Double, Boolean, Error. 1.7 for RichValue] </summary>
 	var RangeValueType = {
 		__proto__: null,
 		"unknown": "unknown",
@@ -10305,6 +10339,7 @@ var Excel;
 		"double": "double",
 		"boolean": "boolean",
 		"error": "error",
+		"richValue": "richValue",
 	}
 	Excel.RangeValueType = RangeValueType;
 })(Excel || (Excel = {__proto__: null}));
@@ -10645,7 +10680,7 @@ var Excel;
 			/// <field name="columns" type="Excel.TableColumnCollection">Represents a collection of all the columns in the table. Read-only. [Api set: ExcelApi 1.1]</field>
 			/// <field name="highlightFirstColumn" type="Boolean">Indicates whether the first column contains special formatting. [Api set: ExcelApi 1.3]</field>
 			/// <field name="highlightLastColumn" type="Boolean">Indicates whether the last column contains special formatting. [Api set: ExcelApi 1.3]</field>
-			/// <field name="id" type="Number">Returns a value that uniquely identifies the table in a given workbook. The value of the identifier remains the same even when the table is renamed. Read-only. [Api set: ExcelApi 1.1]</field>
+			/// <field name="id" type="String">Returns a value that uniquely identifies the table in a given workbook. The value of the identifier remains the same even when the table is renamed. Read-only. [Api set: ExcelApi 1.1]</field>
 			/// <field name="name" type="String">Name of the table. [Api set: ExcelApi 1.1]</field>
 			/// <field name="rows" type="Excel.TableRowCollection">Represents a collection of all the rows in the table. Read-only. [Api set: ExcelApi 1.1]</field>
 			/// <field name="showBandedColumns" type="Boolean">Indicates whether the columns show banded formatting in which odd columns are highlighted differently from even ones to make reading the table easier. [Api set: ExcelApi 1.3]</field>
@@ -11090,11 +11125,11 @@ var Excel;
 	var TextConditionalFormat = (function(_super) {
 		__extends(TextConditionalFormat, _super);
 		function TextConditionalFormat() {
-			/// <summary> Represents a specific text conditional format. [Api set: ExcelApi 1.6 (PREVIEW)] </summary>
+			/// <summary> Represents a specific text conditional format. [Api set: ExcelApi 1.6] </summary>
 			/// <field name="context" type="Excel.RequestContext">The request context associated with this object.</field>
 			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
-			/// <field name="format" type="Excel.ConditionalRangeFormat">Returns a format object, encapsulating the conditional formats font, fill, borders, and other properties. Read-only. [Api set: ExcelApi 1.6 (PREVIEW)]</field>
-			/// <field name="rule" type="Excel.Interfaces.ConditionalTextComparisonRule">The rule of the conditional format. [Api set: ExcelApi 1.6 (PREVIEW)]</field>
+			/// <field name="format" type="Excel.ConditionalRangeFormat">Returns a format object, encapsulating the conditional formats font, fill, borders, and other properties. Read-only. [Api set: ExcelApi 1.6]</field>
+			/// <field name="rule" type="Excel.Interfaces.ConditionalTextComparisonRule">The rule of the conditional format. [Api set: ExcelApi 1.6]</field>
 		}
 
 		TextConditionalFormat.prototype.load = function(option) {
@@ -11130,11 +11165,11 @@ var Excel;
 	var TopBottomConditionalFormat = (function(_super) {
 		__extends(TopBottomConditionalFormat, _super);
 		function TopBottomConditionalFormat() {
-			/// <summary> Represents a Top/Bottom conditional format. [Api set: ExcelApi 1.6 (PREVIEW)] </summary>
+			/// <summary> Represents a Top/Bottom conditional format. [Api set: ExcelApi 1.6] </summary>
 			/// <field name="context" type="Excel.RequestContext">The request context associated with this object.</field>
 			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
-			/// <field name="format" type="Excel.ConditionalRangeFormat">Returns a format object, encapsulating the conditional formats font, fill, borders, and other properties. Read-only. [Api set: ExcelApi 1.6 (PREVIEW)]</field>
-			/// <field name="rule" type="Excel.Interfaces.ConditionalTopBottomRule">The criteria of the Top/Bottom conditional format. [Api set: ExcelApi 1.6 (PREVIEW)]</field>
+			/// <field name="format" type="Excel.ConditionalRangeFormat">Returns a format object, encapsulating the conditional formats font, fill, borders, and other properties. Read-only. [Api set: ExcelApi 1.6]</field>
+			/// <field name="rule" type="Excel.Interfaces.ConditionalTopBottomRule">The criteria of the Top/Bottom conditional format. [Api set: ExcelApi 1.6]</field>
 		}
 
 		TopBottomConditionalFormat.prototype.load = function(option) {
@@ -11212,10 +11247,10 @@ var Excel;
 			/// <summary> Workbook is the top level object which contains related workbook objects such as worksheets, tables, ranges, etc. [Api set: ExcelApi 1.1] </summary>
 			/// <field name="context" type="Excel.RequestContext">The request context associated with this object.</field>
 			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
-			/// <field name="application" type="Excel.Application">Represents Excel application instance that contains this workbook. Read-only. [Api set: ExcelApi 1.1]</field>
+			/// <field name="application" type="Excel.Application">Represents the Excel application instance that contains this workbook. Read-only. [Api set: ExcelApi 1.1]</field>
 			/// <field name="bindings" type="Excel.BindingCollection">Represents a collection of bindings that are part of the workbook. Read-only. [Api set: ExcelApi 1.1]</field>
 			/// <field name="customXmlParts" type="Excel.CustomXmlPartCollection">Represents the collection of custom XML parts contained by this workbook. Read-only. [Api set: ExcelApi 1.5]</field>
-			/// <field name="functions" type="Excel.Functions">Represents Excel application instance that contains this workbook. Read-only. [Api set: ExcelApi 1.2]</field>
+			/// <field name="functions" type="Excel.Functions">Represents a collection of worksheet functions that can be used for computation. Read-only. [Api set: ExcelApi 1.2]</field>
 			/// <field name="names" type="Excel.NamedItemCollection">Represents a collection of workbook scoped named items (named ranges and constants). Read-only. [Api set: ExcelApi 1.1]</field>
 			/// <field name="pivotTables" type="Excel.PivotTableCollection">Represents a collection of PivotTables associated with the workbook. Read-only. [Api set: ExcelApi 1.3]</field>
 			/// <field name="settings" type="Excel.SettingCollection">Represents a collection of Settings associated with the workbook. Read-only. [Api set: ExcelApi 1.4]</field>
@@ -11306,7 +11341,7 @@ var Excel;
 		}
 		Worksheet.prototype.calculate = function(markAllDirty) {
 			/// <summary>
-			/// Calculates all cells on a worksheet. [Api set: ExcelApi 1.6 (PREVIEW)]
+			/// Calculates all cells on a worksheet. [Api set: ExcelApi 1.6]
 			/// </summary>
 			/// <returns ></returns>
 		}
@@ -11471,17 +11506,19 @@ var Excel;
 			/// <param name="option" type="string | string[] | OfficeExtension.LoadOption"/>
 			/// <returns type="Excel.WorksheetProtection"/>
 		}
-		WorksheetProtection.prototype.protect = function(options) {
+		WorksheetProtection.prototype.protect = function(options, password) {
 			/// <summary>
-			/// Protects a worksheet. Fails if the worksheet has been protected. [Api set: ExcelApi 1.2]
+			/// Protects a worksheet. Fails if the worksheet has already been protected. [Api set: ExcelApi 1.2 for options; 1.7 for password]
 			/// </summary>
 			/// <param name="options" type="Excel.Interfaces.WorksheetProtectionOptions" optional="true">sheet protection options.</param>
+			/// <param name="password" type="String" optional="true">sheet protection password.</param>
 			/// <returns ></returns>
 		}
-		WorksheetProtection.prototype.unprotect = function() {
+		WorksheetProtection.prototype.unprotect = function(password) {
 			/// <summary>
-			/// Unprotects a worksheet. [Api set: ExcelApi 1.2]
+			/// Unprotects a worksheet. [Api set: ExcelApi BETA (PREVIEW ONLY) for password]
 			/// </summary>
+			/// <param name="password" type="String" optional="true">sheet protection password.</param>
 			/// <returns ></returns>
 		}
 
@@ -12131,24 +12168,24 @@ var Excel;
 		var ConditionalFormatUpdateData = (function() {
 			function ConditionalFormatUpdateData() {
 				/// <summary>An interface for updating data on the ConditionalFormat object, for use in "conditionalFormat.set({ ... })".</summary>
-				/// <field name="cellValue" type="Excel.Interfaces.CellValueConditionalFormatUpdateData">Returns the cell value conditional format properties if the current conditional format is a CellValue type.              For example to format all cells between 5 and 10. [Api set: ExcelApi 1.6 (PREVIEW)]</field>
-				/// <field name="cellValueOrNullObject" type="Excel.Interfaces.CellValueConditionalFormatUpdateData">Returns the cell value conditional format properties if the current conditional format is a CellValue type.              For example to format all cells between 5 and 10. [Api set: ExcelApi 1.6 (PREVIEW)]</field>
-				/// <field name="colorScale" type="Excel.Interfaces.ColorScaleConditionalFormatUpdateData">Returns the ColorScale conditional format properties if the current conditional format is an ColorScale type. [Api set: ExcelApi 1.6 (PREVIEW)]</field>
-				/// <field name="colorScaleOrNullObject" type="Excel.Interfaces.ColorScaleConditionalFormatUpdateData">Returns the ColorScale conditional format properties if the current conditional format is an ColorScale type. [Api set: ExcelApi 1.6 (PREVIEW)]</field>
-				/// <field name="custom" type="Excel.Interfaces.CustomConditionalFormatUpdateData">Returns the custom conditional format properties if the current conditional format is a custom type. [Api set: ExcelApi 1.6 (PREVIEW)]</field>
-				/// <field name="customOrNullObject" type="Excel.Interfaces.CustomConditionalFormatUpdateData">Returns the custom conditional format properties if the current conditional format is a custom type. [Api set: ExcelApi 1.6 (PREVIEW)]</field>
-				/// <field name="dataBar" type="Excel.Interfaces.DataBarConditionalFormatUpdateData">Returns the data bar properties if the current conditional format is a data bar. [Api set: ExcelApi 1.6 (PREVIEW)]</field>
-				/// <field name="dataBarOrNullObject" type="Excel.Interfaces.DataBarConditionalFormatUpdateData">Returns the data bar properties if the current conditional format is a data bar. [Api set: ExcelApi 1.6 (PREVIEW)]</field>
-				/// <field name="iconSet" type="Excel.Interfaces.IconSetConditionalFormatUpdateData">Returns the IconSet conditional format properties if the current conditional format is an IconSet type. [Api set: ExcelApi 1.6 (PREVIEW)]</field>
-				/// <field name="iconSetOrNullObject" type="Excel.Interfaces.IconSetConditionalFormatUpdateData">Returns the IconSet conditional format properties if the current conditional format is an IconSet type. [Api set: ExcelApi 1.6 (PREVIEW)]</field>
-				/// <field name="preset" type="Excel.Interfaces.PresetCriteriaConditionalFormatUpdateData">Returns the preset criteria conditional format such as above average/below average/unique values/contains blank/nonblank/error/noerror properties. [Api set: ExcelApi 1.6 (PREVIEW)]</field>
-				/// <field name="presetOrNullObject" type="Excel.Interfaces.PresetCriteriaConditionalFormatUpdateData">Returns the preset criteria conditional format such as above average/below average/unique values/contains blank/nonblank/error/noerror properties. [Api set: ExcelApi 1.6 (PREVIEW)]</field>
-				/// <field name="textComparison" type="Excel.Interfaces.TextConditionalFormatUpdateData">Returns the specific text conditional format properties if the current conditional format is a text type.              For example to format cells matching the word &quot;Text&quot;. [Api set: ExcelApi 1.6 (PREVIEW)]</field>
-				/// <field name="textComparisonOrNullObject" type="Excel.Interfaces.TextConditionalFormatUpdateData">Returns the specific text conditional format properties if the current conditional format is a text type.              For example to format cells matching the word &quot;Text&quot;. [Api set: ExcelApi 1.6 (PREVIEW)]</field>
-				/// <field name="topBottom" type="Excel.Interfaces.TopBottomConditionalFormatUpdateData">Returns the Top/Bottom conditional format properties if the current conditional format is an TopBottom type.              For example to format the top 10% or bottom 10 items. [Api set: ExcelApi 1.6 (PREVIEW)]</field>
-				/// <field name="topBottomOrNullObject" type="Excel.Interfaces.TopBottomConditionalFormatUpdateData">Returns the Top/Bottom conditional format properties if the current conditional format is an TopBottom type.              For example to format the top 10% or bottom 10 items. [Api set: ExcelApi 1.6 (PREVIEW)]</field>
-				/// <field name="priority" type="Number">The priority (or index) within the conditional format collection that this conditional format currently exists in. Changing this also               changes other conditional formats&apos; priorities, to allow for a contiguous priority order.              Use a negative priority to begin from the back.              Priorities greater than than bounds will get and set to the maximum (or minimum if negative) priority.              Also note that if you change the priority, you have to re-fetch a new copy of the object at that new priority location if you want to make further changes to it. [Api set: ExcelApi 1.6 (PREVIEW)]</field>;
-				/// <field name="stopIfTrue" type="Boolean">If the conditions of this conditional format are met, no lower-priority formats shall take effect on that cell.              Null on databars, icon sets, and colorscales as there&apos;s no concept of StopIfTrue for these [Api set: ExcelApi 1.6 (PREVIEW)]</field>;
+				/// <field name="cellValue" type="Excel.Interfaces.CellValueConditionalFormatUpdateData">Returns the cell value conditional format properties if the current conditional format is a CellValue type.              For example to format all cells between 5 and 10. [Api set: ExcelApi 1.6]</field>
+				/// <field name="cellValueOrNullObject" type="Excel.Interfaces.CellValueConditionalFormatUpdateData">Returns the cell value conditional format properties if the current conditional format is a CellValue type.              For example to format all cells between 5 and 10. [Api set: ExcelApi 1.6]</field>
+				/// <field name="colorScale" type="Excel.Interfaces.ColorScaleConditionalFormatUpdateData">Returns the ColorScale conditional format properties if the current conditional format is an ColorScale type. [Api set: ExcelApi 1.6]</field>
+				/// <field name="colorScaleOrNullObject" type="Excel.Interfaces.ColorScaleConditionalFormatUpdateData">Returns the ColorScale conditional format properties if the current conditional format is an ColorScale type. [Api set: ExcelApi 1.6]</field>
+				/// <field name="custom" type="Excel.Interfaces.CustomConditionalFormatUpdateData">Returns the custom conditional format properties if the current conditional format is a custom type. [Api set: ExcelApi 1.6]</field>
+				/// <field name="customOrNullObject" type="Excel.Interfaces.CustomConditionalFormatUpdateData">Returns the custom conditional format properties if the current conditional format is a custom type. [Api set: ExcelApi 1.6]</field>
+				/// <field name="dataBar" type="Excel.Interfaces.DataBarConditionalFormatUpdateData">Returns the data bar properties if the current conditional format is a data bar. [Api set: ExcelApi 1.6]</field>
+				/// <field name="dataBarOrNullObject" type="Excel.Interfaces.DataBarConditionalFormatUpdateData">Returns the data bar properties if the current conditional format is a data bar. [Api set: ExcelApi 1.6]</field>
+				/// <field name="iconSet" type="Excel.Interfaces.IconSetConditionalFormatUpdateData">Returns the IconSet conditional format properties if the current conditional format is an IconSet type. [Api set: ExcelApi 1.6]</field>
+				/// <field name="iconSetOrNullObject" type="Excel.Interfaces.IconSetConditionalFormatUpdateData">Returns the IconSet conditional format properties if the current conditional format is an IconSet type. [Api set: ExcelApi 1.6]</field>
+				/// <field name="preset" type="Excel.Interfaces.PresetCriteriaConditionalFormatUpdateData">Returns the preset criteria conditional format such as above average/below average/unique values/contains blank/nonblank/error/noerror properties. [Api set: ExcelApi 1.6]</field>
+				/// <field name="presetOrNullObject" type="Excel.Interfaces.PresetCriteriaConditionalFormatUpdateData">Returns the preset criteria conditional format such as above average/below average/unique values/contains blank/nonblank/error/noerror properties. [Api set: ExcelApi 1.6]</field>
+				/// <field name="textComparison" type="Excel.Interfaces.TextConditionalFormatUpdateData">Returns the specific text conditional format properties if the current conditional format is a text type.              For example to format cells matching the word &quot;Text&quot;. [Api set: ExcelApi 1.6]</field>
+				/// <field name="textComparisonOrNullObject" type="Excel.Interfaces.TextConditionalFormatUpdateData">Returns the specific text conditional format properties if the current conditional format is a text type.              For example to format cells matching the word &quot;Text&quot;. [Api set: ExcelApi 1.6]</field>
+				/// <field name="topBottom" type="Excel.Interfaces.TopBottomConditionalFormatUpdateData">Returns the Top/Bottom conditional format properties if the current conditional format is an TopBottom type.              For example to format the top 10% or bottom 10 items. [Api set: ExcelApi 1.6]</field>
+				/// <field name="topBottomOrNullObject" type="Excel.Interfaces.TopBottomConditionalFormatUpdateData">Returns the Top/Bottom conditional format properties if the current conditional format is an TopBottom type.              For example to format the top 10% or bottom 10 items. [Api set: ExcelApi 1.6]</field>
+				/// <field name="priority" type="Number">The priority (or index) within the conditional format collection that this conditional format currently exists in. Changing this also               changes other conditional formats&apos; priorities, to allow for a contiguous priority order.              Use a negative priority to begin from the back.              Priorities greater than than bounds will get and set to the maximum (or minimum if negative) priority.              Also note that if you change the priority, you have to re-fetch a new copy of the object at that new priority location if you want to make further changes to it. [Api set: ExcelApi 1.6]</field>;
+				/// <field name="stopIfTrue" type="Boolean">If the conditions of this conditional format are met, no lower-priority formats shall take effect on that cell.              Null on databars, icon sets, and colorscales as there&apos;s no concept of StopIfTrue for these [Api set: ExcelApi 1.6]</field>;
 			}
 			return ConditionalFormatUpdateData;
 		})();
@@ -12164,14 +12201,14 @@ var Excel;
 		var DataBarConditionalFormatUpdateData = (function() {
 			function DataBarConditionalFormatUpdateData() {
 				/// <summary>An interface for updating data on the DataBarConditionalFormat object, for use in "dataBarConditionalFormat.set({ ... })".</summary>
-				/// <field name="negativeFormat" type="Excel.Interfaces.ConditionalDataBarNegativeFormatUpdateData">Representation of all values to the left of the axis in an Excel data bar. [Api set: ExcelApi 1.6 (PREVIEW)]</field>
-				/// <field name="positiveFormat" type="Excel.Interfaces.ConditionalDataBarPositiveFormatUpdateData">Representation of all values to the right of the axis in an Excel data bar. [Api set: ExcelApi 1.6 (PREVIEW)]</field>
-				/// <field name="axisColor" type="String">HTML color code representing the color of the Axis line, of the form #RRGGBB (e.g. &quot;FFA500&quot;) or as a named HTML color (e.g. &quot;orange&quot;).              &quot;&quot; (empty string) if no axis is present or set. [Api set: ExcelApi 1.6 (PREVIEW)]</field>;
-				/// <field name="axisFormat" type="String">Representation of how the axis is determined for an Excel data bar. [Api set: ExcelApi 1.6 (PREVIEW)]</field>;
-				/// <field name="barDirection" type="String">Represents the direction that the data bar graphic should be based on. [Api set: ExcelApi 1.6 (PREVIEW)]</field>;
-				/// <field name="lowerBoundRule" type="Excel.Interfaces.ConditionalDataBarRule">The rule for what consistutes the lower bound (and how to calculate it, if applicable) for a data bar. [Api set: ExcelApi 1.6 (PREVIEW)]</field>;
-				/// <field name="showDataBarOnly" type="Boolean">If true, hides the values from the cells where the data bar is applied. [Api set: ExcelApi 1.6 (PREVIEW)]</field>;
-				/// <field name="upperBoundRule" type="Excel.Interfaces.ConditionalDataBarRule">The rule for what constitutes the upper bound (and how to calculate it, if applicable) for a data bar. [Api set: ExcelApi 1.6 (PREVIEW)]</field>;
+				/// <field name="negativeFormat" type="Excel.Interfaces.ConditionalDataBarNegativeFormatUpdateData">Representation of all values to the left of the axis in an Excel data bar. [Api set: ExcelApi 1.6]</field>
+				/// <field name="positiveFormat" type="Excel.Interfaces.ConditionalDataBarPositiveFormatUpdateData">Representation of all values to the right of the axis in an Excel data bar. [Api set: ExcelApi 1.6]</field>
+				/// <field name="axisColor" type="String">HTML color code representing the color of the Axis line, of the form #RRGGBB (e.g. &quot;FFA500&quot;) or as a named HTML color (e.g. &quot;orange&quot;).              &quot;&quot; (empty string) if no axis is present or set. [Api set: ExcelApi 1.6]</field>;
+				/// <field name="axisFormat" type="String">Representation of how the axis is determined for an Excel data bar. [Api set: ExcelApi 1.6]</field>;
+				/// <field name="barDirection" type="String">Represents the direction that the data bar graphic should be based on. [Api set: ExcelApi 1.6]</field>;
+				/// <field name="lowerBoundRule" type="Excel.Interfaces.ConditionalDataBarRule">The rule for what consistutes the lower bound (and how to calculate it, if applicable) for a data bar. [Api set: ExcelApi 1.6]</field>;
+				/// <field name="showDataBarOnly" type="Boolean">If true, hides the values from the cells where the data bar is applied. [Api set: ExcelApi 1.6]</field>;
+				/// <field name="upperBoundRule" type="Excel.Interfaces.ConditionalDataBarRule">The rule for what constitutes the upper bound (and how to calculate it, if applicable) for a data bar. [Api set: ExcelApi 1.6]</field>;
 			}
 			return DataBarConditionalFormatUpdateData;
 		})();
@@ -12187,9 +12224,9 @@ var Excel;
 		var ConditionalDataBarPositiveFormatUpdateData = (function() {
 			function ConditionalDataBarPositiveFormatUpdateData() {
 				/// <summary>An interface for updating data on the ConditionalDataBarPositiveFormat object, for use in "conditionalDataBarPositiveFormat.set({ ... })".</summary>
-				/// <field name="borderColor" type="String">HTML color code representing the color of the border line, of the form #RRGGBB (e.g. &quot;FFA500&quot;) or as a named HTML color (e.g. &quot;orange&quot;).              &quot;&quot; (empty string) if no border is present or set. [Api set: ExcelApi 1.6 (PREVIEW)]</field>;
-				/// <field name="fillColor" type="String">HTML color code representing the fill color, of the form #RRGGBB (e.g. &quot;FFA500&quot;) or as a named HTML color (e.g. &quot;orange&quot;). [Api set: ExcelApi 1.6 (PREVIEW)]</field>;
-				/// <field name="gradientFill" type="Boolean">Boolean representation of whether or not the DataBar has a gradient. [Api set: ExcelApi 1.6 (PREVIEW)]</field>;
+				/// <field name="borderColor" type="String">HTML color code representing the color of the border line, of the form #RRGGBB (e.g. &quot;FFA500&quot;) or as a named HTML color (e.g. &quot;orange&quot;).              &quot;&quot; (empty string) if no border is present or set. [Api set: ExcelApi 1.6]</field>;
+				/// <field name="fillColor" type="String">HTML color code representing the fill color, of the form #RRGGBB (e.g. &quot;FFA500&quot;) or as a named HTML color (e.g. &quot;orange&quot;). [Api set: ExcelApi 1.6]</field>;
+				/// <field name="gradientFill" type="Boolean">Boolean representation of whether or not the DataBar has a gradient. [Api set: ExcelApi 1.6]</field>;
 			}
 			return ConditionalDataBarPositiveFormatUpdateData;
 		})();
@@ -12205,10 +12242,10 @@ var Excel;
 		var ConditionalDataBarNegativeFormatUpdateData = (function() {
 			function ConditionalDataBarNegativeFormatUpdateData() {
 				/// <summary>An interface for updating data on the ConditionalDataBarNegativeFormat object, for use in "conditionalDataBarNegativeFormat.set({ ... })".</summary>
-				/// <field name="borderColor" type="String">HTML color code representing the color of the border line, of the form #RRGGBB (e.g. &quot;FFA500&quot;) or as a named HTML color (e.g. &quot;orange&quot;).              &quot;Empty String&quot; if no border is present or set. [Api set: ExcelApi 1.6 (PREVIEW)]</field>;
-				/// <field name="fillColor" type="String">HTML color code representing the fill color, of the form #RRGGBB (e.g. &quot;FFA500&quot;) or as a named HTML color (e.g. &quot;orange&quot;). [Api set: ExcelApi 1.6 (PREVIEW)]</field>;
-				/// <field name="matchPositiveBorderColor" type="Boolean">Boolean representation of whether or not the negative DataBar has the same border color as the positive DataBar. [Api set: ExcelApi 1.6 (PREVIEW)]</field>;
-				/// <field name="matchPositiveFillColor" type="Boolean">Boolean representation of whether or not the negative DataBar has the same fill color as the positive DataBar. [Api set: ExcelApi 1.6 (PREVIEW)]</field>;
+				/// <field name="borderColor" type="String">HTML color code representing the color of the border line, of the form #RRGGBB (e.g. &quot;FFA500&quot;) or as a named HTML color (e.g. &quot;orange&quot;).              &quot;Empty String&quot; if no border is present or set. [Api set: ExcelApi 1.6]</field>;
+				/// <field name="fillColor" type="String">HTML color code representing the fill color, of the form #RRGGBB (e.g. &quot;FFA500&quot;) or as a named HTML color (e.g. &quot;orange&quot;). [Api set: ExcelApi 1.6]</field>;
+				/// <field name="matchPositiveBorderColor" type="Boolean">Boolean representation of whether or not the negative DataBar has the same border color as the positive DataBar. [Api set: ExcelApi 1.6]</field>;
+				/// <field name="matchPositiveFillColor" type="Boolean">Boolean representation of whether or not the negative DataBar has the same fill color as the positive DataBar. [Api set: ExcelApi 1.6]</field>;
 			}
 			return ConditionalDataBarNegativeFormatUpdateData;
 		})();
@@ -12224,8 +12261,8 @@ var Excel;
 		var CustomConditionalFormatUpdateData = (function() {
 			function CustomConditionalFormatUpdateData() {
 				/// <summary>An interface for updating data on the CustomConditionalFormat object, for use in "customConditionalFormat.set({ ... })".</summary>
-				/// <field name="format" type="Excel.Interfaces.ConditionalRangeFormatUpdateData">Returns a format object, encapsulating the conditional formats font, fill, borders, and other properties. [Api set: ExcelApi 1.6 (PREVIEW)]</field>
-				/// <field name="rule" type="Excel.Interfaces.ConditionalFormatRuleUpdateData">Represents the Rule object on this conditional format. [Api set: ExcelApi 1.6 (PREVIEW)]</field>
+				/// <field name="format" type="Excel.Interfaces.ConditionalRangeFormatUpdateData">Returns a format object, encapsulating the conditional formats font, fill, borders, and other properties. [Api set: ExcelApi 1.6]</field>
+				/// <field name="rule" type="Excel.Interfaces.ConditionalFormatRuleUpdateData">Represents the Rule object on this conditional format. [Api set: ExcelApi 1.6]</field>
 			}
 			return CustomConditionalFormatUpdateData;
 		})();
@@ -12241,9 +12278,9 @@ var Excel;
 		var ConditionalFormatRuleUpdateData = (function() {
 			function ConditionalFormatRuleUpdateData() {
 				/// <summary>An interface for updating data on the ConditionalFormatRule object, for use in "conditionalFormatRule.set({ ... })".</summary>
-				/// <field name="formula" >The formula, if required, to evaluate the conditional format rule on. [Api set: ExcelApi 1.6 (PREVIEW)]</field>;
-				/// <field name="formulaLocal" >The formula, if required, to evaluate the conditional format rule on in the user&apos;s language. [Api set: ExcelApi 1.6 (PREVIEW)]</field>;
-				/// <field name="formulaR1C1" >The formula, if required, to evaluate the conditional format rule on in R1C1-style notation. [Api set: ExcelApi 1.6 (PREVIEW)]</field>;
+				/// <field name="formula" >The formula, if required, to evaluate the conditional format rule on. [Api set: ExcelApi 1.6]</field>;
+				/// <field name="formulaLocal" >The formula, if required, to evaluate the conditional format rule on in the user&apos;s language. [Api set: ExcelApi 1.6]</field>;
+				/// <field name="formulaR1C1" >The formula, if required, to evaluate the conditional format rule on in R1C1-style notation. [Api set: ExcelApi 1.6]</field>;
 			}
 			return ConditionalFormatRuleUpdateData;
 		})();
@@ -12259,10 +12296,10 @@ var Excel;
 		var IconSetConditionalFormatUpdateData = (function() {
 			function IconSetConditionalFormatUpdateData() {
 				/// <summary>An interface for updating data on the IconSetConditionalFormat object, for use in "iconSetConditionalFormat.set({ ... })".</summary>
-				/// <field name="criteria" type="Array" elementType="Excel.Interfaces.ConditionalIconCriterion">An array of Criteria and IconSets for the rules and potential custom icons for conditional icons. Note that for the first criterion only the custom icon can be modified, while type, formula and operator will be ignored when set. [Api set: ExcelApi 1.6 (PREVIEW)]</field>;
-				/// <field name="reverseIconOrder" type="Boolean">If true, reverses the icon orders for the IconSet. Note that this cannot be set if custom icons are used. [Api set: ExcelApi 1.6 (PREVIEW)]</field>;
-				/// <field name="showIconOnly" type="Boolean">If true, hides the values and only shows icons. [Api set: ExcelApi 1.6 (PREVIEW)]</field>;
-				/// <field name="style" type="String">If set, displays the IconSet option for the conditional format. [Api set: ExcelApi 1.6 (PREVIEW)]</field>;
+				/// <field name="criteria" type="Array" elementType="Excel.Interfaces.ConditionalIconCriterion">An array of Criteria and IconSets for the rules and potential custom icons for conditional icons. Note that for the first criterion only the custom icon can be modified, while type, formula and operator will be ignored when set. [Api set: ExcelApi 1.6]</field>;
+				/// <field name="reverseIconOrder" type="Boolean">If true, reverses the icon orders for the IconSet. Note that this cannot be set if custom icons are used. [Api set: ExcelApi 1.6]</field>;
+				/// <field name="showIconOnly" type="Boolean">If true, hides the values and only shows icons. [Api set: ExcelApi 1.6]</field>;
+				/// <field name="style" type="String">If set, displays the IconSet option for the conditional format. [Api set: ExcelApi 1.6]</field>;
 			}
 			return IconSetConditionalFormatUpdateData;
 		})();
@@ -12278,7 +12315,7 @@ var Excel;
 		var ColorScaleConditionalFormatUpdateData = (function() {
 			function ColorScaleConditionalFormatUpdateData() {
 				/// <summary>An interface for updating data on the ColorScaleConditionalFormat object, for use in "colorScaleConditionalFormat.set({ ... })".</summary>
-				/// <field name="criteria" type="Excel.Interfaces.ConditionalColorScaleCriteria">The criteria of the color scale. Midpoint is optional when using a two point color scale. [Api set: ExcelApi 1.6 (PREVIEW)]</field>;
+				/// <field name="criteria" type="Excel.Interfaces.ConditionalColorScaleCriteria">The criteria of the color scale. Midpoint is optional when using a two point color scale. [Api set: ExcelApi 1.6]</field>;
 			}
 			return ColorScaleConditionalFormatUpdateData;
 		})();
@@ -12294,8 +12331,8 @@ var Excel;
 		var TopBottomConditionalFormatUpdateData = (function() {
 			function TopBottomConditionalFormatUpdateData() {
 				/// <summary>An interface for updating data on the TopBottomConditionalFormat object, for use in "topBottomConditionalFormat.set({ ... })".</summary>
-				/// <field name="format" type="Excel.Interfaces.ConditionalRangeFormatUpdateData">Returns a format object, encapsulating the conditional formats font, fill, borders, and other properties. [Api set: ExcelApi 1.6 (PREVIEW)]</field>
-				/// <field name="rule" type="Excel.Interfaces.ConditionalTopBottomRule">The criteria of the Top/Bottom conditional format. [Api set: ExcelApi 1.6 (PREVIEW)]</field>;
+				/// <field name="format" type="Excel.Interfaces.ConditionalRangeFormatUpdateData">Returns a format object, encapsulating the conditional formats font, fill, borders, and other properties. [Api set: ExcelApi 1.6]</field>
+				/// <field name="rule" type="Excel.Interfaces.ConditionalTopBottomRule">The criteria of the Top/Bottom conditional format. [Api set: ExcelApi 1.6]</field>;
 			}
 			return TopBottomConditionalFormatUpdateData;
 		})();
@@ -12311,8 +12348,8 @@ var Excel;
 		var PresetCriteriaConditionalFormatUpdateData = (function() {
 			function PresetCriteriaConditionalFormatUpdateData() {
 				/// <summary>An interface for updating data on the PresetCriteriaConditionalFormat object, for use in "presetCriteriaConditionalFormat.set({ ... })".</summary>
-				/// <field name="format" type="Excel.Interfaces.ConditionalRangeFormatUpdateData">Returns a format object, encapsulating the conditional formats font, fill, borders, and other properties. [Api set: ExcelApi 1.6 (PREVIEW)]</field>
-				/// <field name="rule" type="Excel.Interfaces.ConditionalPresetCriteriaRule">The rule of the conditional format. [Api set: ExcelApi 1.6 (PREVIEW)]</field>;
+				/// <field name="format" type="Excel.Interfaces.ConditionalRangeFormatUpdateData">Returns a format object, encapsulating the conditional formats font, fill, borders, and other properties. [Api set: ExcelApi 1.6]</field>
+				/// <field name="rule" type="Excel.Interfaces.ConditionalPresetCriteriaRule">The rule of the conditional format. [Api set: ExcelApi 1.6]</field>;
 			}
 			return PresetCriteriaConditionalFormatUpdateData;
 		})();
@@ -12328,8 +12365,8 @@ var Excel;
 		var TextConditionalFormatUpdateData = (function() {
 			function TextConditionalFormatUpdateData() {
 				/// <summary>An interface for updating data on the TextConditionalFormat object, for use in "textConditionalFormat.set({ ... })".</summary>
-				/// <field name="format" type="Excel.Interfaces.ConditionalRangeFormatUpdateData">Returns a format object, encapsulating the conditional formats font, fill, borders, and other properties. [Api set: ExcelApi 1.6 (PREVIEW)]</field>
-				/// <field name="rule" type="Excel.Interfaces.ConditionalTextComparisonRule">The rule of the conditional format. [Api set: ExcelApi 1.6 (PREVIEW)]</field>;
+				/// <field name="format" type="Excel.Interfaces.ConditionalRangeFormatUpdateData">Returns a format object, encapsulating the conditional formats font, fill, borders, and other properties. [Api set: ExcelApi 1.6]</field>
+				/// <field name="rule" type="Excel.Interfaces.ConditionalTextComparisonRule">The rule of the conditional format. [Api set: ExcelApi 1.6]</field>;
 			}
 			return TextConditionalFormatUpdateData;
 		})();
@@ -12345,8 +12382,8 @@ var Excel;
 		var CellValueConditionalFormatUpdateData = (function() {
 			function CellValueConditionalFormatUpdateData() {
 				/// <summary>An interface for updating data on the CellValueConditionalFormat object, for use in "cellValueConditionalFormat.set({ ... })".</summary>
-				/// <field name="format" type="Excel.Interfaces.ConditionalRangeFormatUpdateData">Returns a format object, encapsulating the conditional formats font, fill, borders, and other properties. [Api set: ExcelApi 1.6 (PREVIEW)]</field>
-				/// <field name="rule" type="Excel.Interfaces.ConditionalCellValueRule">Represents the Rule object on this conditional format. [Api set: ExcelApi 1.6 (PREVIEW)]</field>;
+				/// <field name="format" type="Excel.Interfaces.ConditionalRangeFormatUpdateData">Returns a format object, encapsulating the conditional formats font, fill, borders, and other properties. [Api set: ExcelApi 1.6]</field>
+				/// <field name="rule" type="Excel.Interfaces.ConditionalCellValueRule">Represents the Rule object on this conditional format. [Api set: ExcelApi 1.6]</field>;
 			}
 			return CellValueConditionalFormatUpdateData;
 		})();
@@ -12362,7 +12399,10 @@ var Excel;
 		var ConditionalRangeFormatUpdateData = (function() {
 			function ConditionalRangeFormatUpdateData() {
 				/// <summary>An interface for updating data on the ConditionalRangeFormat object, for use in "conditionalRangeFormat.set({ ... })".</summary>
-				/// <field name="numberFormat" >Represents Excel&apos;s number format code for the given range. Cleared if null is passed in. [Api set: ExcelApi 1.6 (PREVIEW)]</field>;
+				/// <field name="borders" type="Excel.Interfaces.ConditionalRangeBorderCollectionUpdateData">Collection of border objects that apply to the overall conditional format range. [Api set: ExcelApi 1.6]</field>
+				/// <field name="fill" type="Excel.Interfaces.ConditionalRangeFillUpdateData">Returns the fill object defined on the overall conditional format range. [Api set: ExcelApi 1.6]</field>
+				/// <field name="font" type="Excel.Interfaces.ConditionalRangeFontUpdateData">Returns the font object defined on the overall conditional format range. [Api set: ExcelApi 1.6]</field>
+				/// <field name="numberFormat" >Represents Excel&apos;s number format code for the given range. Cleared if null is passed in. [Api set: ExcelApi 1.6]</field>;
 			}
 			return ConditionalRangeFormatUpdateData;
 		})();
@@ -12378,11 +12418,11 @@ var Excel;
 		var ConditionalRangeFontUpdateData = (function() {
 			function ConditionalRangeFontUpdateData() {
 				/// <summary>An interface for updating data on the ConditionalRangeFont object, for use in "conditionalRangeFont.set({ ... })".</summary>
-				/// <field name="bold" type="Boolean">Represents the bold status of font. [Api set: ExcelApi 1.6 (PREVIEW)]</field>;
-				/// <field name="color" type="String">HTML color code representation of the text color. E.g. #FF0000 represents Red. [Api set: ExcelApi 1.6 (PREVIEW)]</field>;
-				/// <field name="italic" type="Boolean">Represents the italic status of the font. [Api set: ExcelApi 1.6 (PREVIEW)]</field>;
-				/// <field name="strikethrough" type="Boolean">Represents the strikethrough status of the font. [Api set: ExcelApi 1.6 (PREVIEW)]</field>;
-				/// <field name="underline" type="String">Type of underline applied to the font. See Excel.ConditionalRangeFontUnderlineStyle for details. [Api set: ExcelApi 1.6 (PREVIEW)]</field>;
+				/// <field name="bold" type="Boolean">Represents the bold status of font. [Api set: ExcelApi 1.6]</field>;
+				/// <field name="color" type="String">HTML color code representation of the text color. E.g. #FF0000 represents Red. [Api set: ExcelApi 1.6]</field>;
+				/// <field name="italic" type="Boolean">Represents the italic status of the font. [Api set: ExcelApi 1.6]</field>;
+				/// <field name="strikethrough" type="Boolean">Represents the strikethrough status of the font. [Api set: ExcelApi 1.6]</field>;
+				/// <field name="underline" type="String">Type of underline applied to the font. See Excel.ConditionalRangeFontUnderlineStyle for details. [Api set: ExcelApi 1.6]</field>;
 			}
 			return ConditionalRangeFontUpdateData;
 		})();
@@ -12398,7 +12438,7 @@ var Excel;
 		var ConditionalRangeFillUpdateData = (function() {
 			function ConditionalRangeFillUpdateData() {
 				/// <summary>An interface for updating data on the ConditionalRangeFill object, for use in "conditionalRangeFill.set({ ... })".</summary>
-				/// <field name="color" type="String">HTML color code representing the color of the fill, of the form #RRGGBB (e.g. &quot;FFA500&quot;) or as a named HTML color (e.g. &quot;orange&quot;). [Api set: ExcelApi 1.6 (PREVIEW)]</field>;
+				/// <field name="color" type="String">HTML color code representing the color of the fill, of the form #RRGGBB (e.g. &quot;FFA500&quot;) or as a named HTML color (e.g. &quot;orange&quot;). [Api set: ExcelApi 1.6]</field>;
 			}
 			return ConditionalRangeFillUpdateData;
 		})();
@@ -12414,13 +12454,32 @@ var Excel;
 		var ConditionalRangeBorderUpdateData = (function() {
 			function ConditionalRangeBorderUpdateData() {
 				/// <summary>An interface for updating data on the ConditionalRangeBorder object, for use in "conditionalRangeBorder.set({ ... })".</summary>
-				/// <field name="color" type="String">HTML color code representing the color of the border line, of the form #RRGGBB (e.g. &quot;FFA500&quot;) or as a named HTML color (e.g. &quot;orange&quot;). [Api set: ExcelApi 1.6 (PREVIEW)]</field>;
-				/// <field name="style" type="String">One of the constants of line style specifying the line style for the border. See Excel.BorderLineStyle for details. [Api set: ExcelApi 1.6 (PREVIEW)]</field>;
+				/// <field name="color" type="String">HTML color code representing the color of the border line, of the form #RRGGBB (e.g. &quot;FFA500&quot;) or as a named HTML color (e.g. &quot;orange&quot;). [Api set: ExcelApi 1.6]</field>;
+				/// <field name="style" type="String">One of the constants of line style specifying the line style for the border. See Excel.BorderLineStyle for details. [Api set: ExcelApi 1.6]</field>;
 			}
 			return ConditionalRangeBorderUpdateData;
 		})();
 		Interfaces.ConditionalRangeBorderUpdateData.__proto__ = null;
 		Interfaces.ConditionalRangeBorderUpdateData = ConditionalRangeBorderUpdateData;
+	})(Interfaces = Excel.Interfaces || (Excel.Interfaces = { __proto__: null}));
+})(Excel || (Excel = {__proto__: null}));
+
+var Excel;
+(function (Excel) {
+	var Interfaces;
+	(function (Interfaces) {
+		var ConditionalRangeBorderCollectionUpdateData = (function() {
+			function ConditionalRangeBorderCollectionUpdateData() {
+				/// <summary>An interface for updating data on the ConditionalRangeBorderCollection object, for use in "conditionalRangeBorderCollection.set({ ... })".</summary>
+				/// <field name="bottom" type="Excel.Interfaces.ConditionalRangeBorderUpdateData">Gets the top border [Api set: ExcelApi 1.6]</field>
+				/// <field name="left" type="Excel.Interfaces.ConditionalRangeBorderUpdateData">Gets the top border [Api set: ExcelApi 1.6]</field>
+				/// <field name="right" type="Excel.Interfaces.ConditionalRangeBorderUpdateData">Gets the top border [Api set: ExcelApi 1.6]</field>
+				/// <field name="top" type="Excel.Interfaces.ConditionalRangeBorderUpdateData">Gets the top border [Api set: ExcelApi 1.6]</field>
+			}
+			return ConditionalRangeBorderCollectionUpdateData;
+		})();
+		Interfaces.ConditionalRangeBorderCollectionUpdateData.__proto__ = null;
+		Interfaces.ConditionalRangeBorderCollectionUpdateData = ConditionalRangeBorderCollectionUpdateData;
 	})(Interfaces = Excel.Interfaces || (Excel.Interfaces = { __proto__: null}));
 })(Excel || (Excel = {__proto__: null}));
 var Excel;
@@ -12496,6 +12555,36 @@ var Word;
 		"justified": "justified",
 	}
 	Word.Alignment = Alignment;
+})(Word || (Word = {__proto__: null}));
+
+var Word;
+(function (Word) {
+	var Application = (function(_super) {
+		__extends(Application, _super);
+		function Application() {
+			/// <summary> The Application object. [Api set: WordApi 1.3] </summary>
+			/// <field name="context" type="Word.RequestContext">The request context associated with this object.</field>
+			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
+		}
+
+		Application.prototype.load = function(option) {
+			/// <summary>
+			/// Queues up a command to load the specified properties of the object. You must call "context.sync()" before reading the properties.
+			/// </summary>
+			/// <param name="option" type="string | string[] | OfficeExtension.LoadOption"/>
+			/// <returns type="Word.Application"/>
+		}
+		Application.prototype.createDocument = function(base64File) {
+			/// <summary>
+			/// Creates a new hidden document by using an optional base64 encoded .docx file. [Api set: WordApi 1.3]
+			/// </summary>
+			/// <param name="base64File" type="String" optional="true">Optional. The base64 encoded .docx file. The default value is null.</param>
+			/// <returns type="Word.DocumentCreated"></returns>
+		}
+
+		return Application;
+	})(OfficeExtension.ClientObject);
+	Word.Application = Application;
 })(Word || (Word = {__proto__: null}));
 
 var Word;
@@ -13274,8 +13363,8 @@ var Word;
 			/// <field name="context" type="Word.RequestContext">The request context associated with this object.</field>
 			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
 			/// <field name="body" type="Word.Body">Gets the body object of the document. The body is the text that excludes headers, footers, footnotes, textboxes, etc.. Read-only. [Api set: WordApi 1.1]</field>
-			/// <field name="contentControls" type="Word.ContentControlCollection">Gets the collection of content control objects in the current document. This includes content controls in the body of the document, headers, footers, textboxes, etc.. Read-only. [Api set: WordApi 1.1]</field>
-			/// <field name="properties" type="Word.DocumentProperties">Gets the properties of the current document. Read-only. [Api set: WordApi 1.3]</field>
+			/// <field name="contentControls" type="Word.ContentControlCollection">Gets the collection of content control objects in the document. This includes content controls in the body of the document, headers, footers, textboxes, etc.. Read-only. [Api set: WordApi 1.1]</field>
+			/// <field name="properties" type="Word.DocumentProperties">Gets the properties of the document. Read-only. [Api set: WordApi 1.3]</field>
 			/// <field name="saved" type="Boolean">Indicates whether the changes in the document have been saved. A value of true indicates that the document hasn&apos;t changed since it was saved. Read-only. [Api set: WordApi 1.1]</field>
 			/// <field name="sections" type="Word.SectionCollection">Gets the collection of section objects in the document. Read-only. [Api set: WordApi 1.1]</field>
 		}
@@ -13308,6 +13397,12 @@ var Word;
 			/// </summary>
 			/// <returns type="Word.Range"></returns>
 		}
+		Document.prototype.open = function() {
+			/// <summary>
+			/// Open the document. [Api set: WordApi 1.3]
+			/// </summary>
+			/// <returns ></returns>
+		}
 		Document.prototype.save = function() {
 			/// <summary>
 			/// Saves the document. This will use the Word default file naming convention if the document has not been saved before. [Api set: WordApi 1.1]
@@ -13332,6 +13427,75 @@ var Word;
 		return Document;
 	})(OfficeExtension.ClientObject);
 	Word.Document = Document;
+})(Word || (Word = {__proto__: null}));
+
+var Word;
+(function (Word) {
+	var DocumentCreated = (function(_super) {
+		__extends(DocumentCreated, _super);
+		function DocumentCreated() {
+			/// <summary> The DocumentCreated object is the top level object created by Application.CreateDocument. A DocumentCreated object is a special Document object. [Api set: WordApi 1.3] </summary>
+			/// <field name="context" type="Word.RequestContext">The request context associated with this object.</field>
+			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
+			/// <field name="body" type="Word.Body">Gets the body object of the document. The body is the text that excludes headers, footers, footnotes, textboxes, etc.. Read-only. [Api set: WordApiHiddenDocument 1.3]</field>
+			/// <field name="contentControls" type="Word.ContentControlCollection">Gets the collection of content control objects in the document. This includes content controls in the body of the document, headers, footers, textboxes, etc.. Read-only. [Api set: WordApiHiddenDocument 1.3]</field>
+			/// <field name="properties" type="Word.DocumentProperties">Gets the properties of the document. Read-only. [Api set: WordApiHiddenDocument 1.3]</field>
+			/// <field name="saved" type="Boolean">Indicates whether the changes in the document have been saved. A value of true indicates that the document hasn&apos;t changed since it was saved. Read-only. [Api set: WordApiHiddenDocument 1.3]</field>
+			/// <field name="sections" type="Word.SectionCollection">Gets the collection of section objects in the document. Read-only. [Api set: WordApiHiddenDocument 1.3]</field>
+		}
+
+		DocumentCreated.prototype.load = function(option) {
+			/// <summary>
+			/// Queues up a command to load the specified properties of the object. You must call "context.sync()" before reading the properties.
+			/// </summary>
+			/// <param name="option" type="string | string[] | OfficeExtension.LoadOption"/>
+			/// <returns type="Word.DocumentCreated"/>
+		}
+
+		DocumentCreated.prototype.set = function() {
+			/// <signature>
+			/// <summary>Sets multiple properties on the object at the same time, based on JSON input.</summary>
+			/// <param name="properties" type="Word.Interfaces.DocumentCreatedUpdateData">Properties described by the Word.Interfaces.DocumentCreatedUpdateData interface.</param>
+			/// <param name="options" type="string">Options of the form { throwOnReadOnly?: boolean }
+			/// <br />
+			/// * throwOnReadOnly: Throw an error if the passed-in property list includes read-only properties (default = true).
+			/// </param>
+			/// </signature>
+			/// <signature>
+			/// <summary>Sets multiple properties on the object at the same time, based on an existing loaded object.</summary>
+			/// <param name="properties" type="DocumentCreated">An existing DocumentCreated object, with properties that have already been loaded and synced.</param>
+			/// </signature>
+		}
+		DocumentCreated.prototype.open = function() {
+			/// <summary>
+			/// Open the document. [Api set: WordApi 1.3]
+			/// </summary>
+			/// <returns ></returns>
+		}
+		DocumentCreated.prototype.save = function() {
+			/// <summary>
+			/// Saves the document. This will use the Word default file naming convention if the document has not been saved before. [Api set: WordApiHiddenDocument 1.3]
+			/// </summary>
+			/// <returns ></returns>
+		}
+
+		DocumentCreated.prototype.track = function() {
+			/// <summary>
+			/// Track the object for automatic adjustment based on surrounding changes in the document. This call is a shorthand for context.trackedObjects.add(thisObject). If you are using this object across ".sync" calls and outside the sequential execution of a ".run" batch, and get an "InvalidObjectPath" error when setting a property or invoking a method on the object, you needed to have added the object to the tracked object collection when the object was first created.
+			/// </summary>
+			/// <returns type="Word.DocumentCreated"/>
+		}
+
+		DocumentCreated.prototype.untrack = function() {
+			/// <summary>
+			/// Release the memory associated with this object, if has previous been tracked. This call is shorthand for context.trackedObjects.remove(thisObject). Having many tracked objects slows down the host application, so please remember to free any objects you add, once you're done using them. You will need to call "context.sync()" before the memory release takes effect.
+			/// </summary>
+			/// <returns type="Word.DocumentCreated"/>
+		}
+
+		return DocumentCreated;
+	})(OfficeExtension.ClientObject);
+	Word.DocumentCreated = DocumentCreated;
 })(Word || (Word = {__proto__: null}));
 
 var Word;
@@ -15929,12 +16093,29 @@ var Word;
 			function DocumentUpdateData() {
 				/// <summary>An interface for updating data on the Document object, for use in "document.set({ ... })".</summary>
 				/// <field name="body" type="Word.Interfaces.BodyUpdateData">Gets the body object of the document. The body is the text that excludes headers, footers, footnotes, textboxes, etc.. [Api set: WordApi 1.1]</field>
-				/// <field name="properties" type="Word.Interfaces.DocumentPropertiesUpdateData">Gets the properties of the current document. [Api set: WordApi 1.3]</field>
+				/// <field name="properties" type="Word.Interfaces.DocumentPropertiesUpdateData">Gets the properties of the document. [Api set: WordApi 1.3]</field>
 			}
 			return DocumentUpdateData;
 		})();
 		Interfaces.DocumentUpdateData.__proto__ = null;
 		Interfaces.DocumentUpdateData = DocumentUpdateData;
+	})(Interfaces = Word.Interfaces || (Word.Interfaces = { __proto__: null}));
+})(Word || (Word = {__proto__: null}));
+
+var Word;
+(function (Word) {
+	var Interfaces;
+	(function (Interfaces) {
+		var DocumentCreatedUpdateData = (function() {
+			function DocumentCreatedUpdateData() {
+				/// <summary>An interface for updating data on the DocumentCreated object, for use in "documentCreated.set({ ... })".</summary>
+				/// <field name="body" type="Word.Interfaces.BodyUpdateData">Gets the body object of the document. The body is the text that excludes headers, footers, footnotes, textboxes, etc.. [Api set: WordApiHiddenDocument 1.3]</field>
+				/// <field name="properties" type="Word.Interfaces.DocumentPropertiesUpdateData">Gets the properties of the document. [Api set: WordApiHiddenDocument 1.3]</field>
+			}
+			return DocumentCreatedUpdateData;
+		})();
+		Interfaces.DocumentCreatedUpdateData.__proto__ = null;
+		Interfaces.DocumentCreatedUpdateData = DocumentCreatedUpdateData;
 	})(Interfaces = Word.Interfaces || (Word.Interfaces = { __proto__: null}));
 })(Word || (Word = {__proto__: null}));
 
@@ -16209,7 +16390,7 @@ var Word;
 			/// <summary>
 			/// The RequestContext object facilitates requests to the Word application. Since the Office add-in and the Word application run in two different processes, the request context is required to get access to the Word object model from the add-in.
 			/// </summary>
-			/// <field name="document" type="Word.Document">Root object for interacting with the document</field>
+				/// <field name="document" type="Word.Document">Root object for interacting with the document</field>
 			_super.call(this, null);
 		}
 		return RequestContext;

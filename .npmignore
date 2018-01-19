@@ -1,0 +1,91 @@
+# Addition files to ignore from the NPM package:
+.vscode
+deployment.script
+.travis.yml
+gulpfile.js
+
+# Until we publish sources, no point to have tslint.json and yarn.lock
+#   (which today are only used for the deployment.script folder, which is excluded)
+tslint.json
+yarn.lock
+
+# Don't include the .github folder either; the only useful thing it contains
+# is an image used in the README file, but that's not worth it.
+.github
+
+
+
+
+##################################################################
+####### The rest of this file is IDENTICAL to .gitignore #########
+################ Please keep BOTH OF THEM IN SYNC ################
+##################################################################
+
+
+
+.npmrc
+node_modules/**
+typings/**
+deployment.script/*.js
+deployment.script/*.map
+npm-debug.log*
+
+.vs
+*.log
+obj
+bin
+*.user
+
+
+
+# The rest is created by https://www.gitignore.io/api/osx,windows
+
+### OSX ###
+*.DS_Store
+.AppleDouble
+.LSOverride
+
+# Icon must end with two \r
+Icon
+
+# Thumbnails
+._*
+
+# Files that might appear in the root of a volume
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+
+# Directories potentially created on remote AFP share
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk
+
+### Windows ###
+# Windows thumbnail cache files
+Thumbs.db
+ehthumbs.db
+ehthumbs_vista.db
+
+# Folder config file
+Desktop.ini
+
+# Recycle Bin used on file shares
+$RECYCLE.BIN/
+
+# Windows Installer files
+*.cab
+*.msi
+*.msm
+*.msp
+
+# Windows shortcuts
+*.lnk
+
+# End of https://www.gitignore.io/api/osx,windows

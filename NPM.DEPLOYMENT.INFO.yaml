@@ -1,0 +1,49 @@
+version: 1.1.5-release-next.0
+tag: release-next
+githubReleaseUrl: https://github.com/OfficeDev/office-js/releases/tag/v1.1.5-release-next.0
+githubViewUrl: https://github.com/OfficeDev/office-js/tree/v1.1.5-release-next.0
+deployedAt: 2018-01-19 3:49 am UTC  (2018-01-18 7:49 pm Pacific Time)
+
+history:
+    adhocBranchName: __adhoc--release--16.0.9002.5450--2018-01-18--7.46pm--release-next
+    commitMessage: __adhoc--release--16.0.9002.5450--2018-01-18--7.46pm--release-next
+    fullCommitHistory:
+        - 
+            sha: >-
+                https://github.com/OfficeDev/office-js/commits/9508fa24390b3c6030f4cc62ca5af59519ddefc6
+            message: >-
+                JS dist files --
+                __adhoc--release--16.0.9002.5450--2018-01-18--7.46pm--release-next
+        - 
+            sha: >-
+                https://github.com/OfficeDev/office-js/commits/0dec497a0319ed848493ea9596f89214e7813c06
+            message: >-
+                Localized strings --
+                __adhoc--release--16.0.9002.5450--2018-01-18--7.46pm--release-next
+        - 
+            sha: >-
+                https://github.com/OfficeDev/office-js/commits/cee0168c7b6adeba8566fdc25cd06bacbf66bf71
+            message: Copying other assets from the release branch of the repo
+        - 
+            sha: >-
+                https://github.com/OfficeDev/office-js/commits/a25825259f88ed2c8a5c419211600d14beddd438
+            message: >-
+                [PUBLISH TOOL] Add deployment infrastructure for adhoc NPM
+                publish
+        - 
+            sha: >-
+                https://github.com/OfficeDev/office-js/commits/718664a35db1091955cd22cc562e51c29ed91e8e
+            message: >-
+                [BEGIN PUBLISH UPDATES] --
+                __adhoc--release--16.0.9002.5450--2018-01-18--7.46pm--release-next
+
+
+unpkgUrls: |-
+    this specific build number:
+        https://unpkg.com/@microsoft/office-js@1.1.5-release-next.0/dist/office.js
+        https://unpkg.com/@microsoft/office-js@1.1.5-release-next.0/dist/office.d.ts
+    builds using this same tag ("release-next"):
+        https://unpkg.com/@microsoft/office-js@release-next/dist/office.js
+        https://unpkg.com/@microsoft/office-js@release-next/dist/office.d.ts
+
+buildLog: https://travis-ci.org/OfficeDev/office-js/builds/330656584
