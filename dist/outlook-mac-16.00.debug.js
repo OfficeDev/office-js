@@ -7888,6 +7888,7 @@ OSF.InitializationHelper.prototype.loadAppSpecificScriptAndCreateOM = function O
                 case 34:
                 case 99:
                 case 103:
+                case 107:
                     break;
                 case 12:
                     optionalParameters["isRest"] = data["isRest"];
@@ -8927,6 +8928,24 @@ OSF.InitializationHelper.prototype.loadAppSpecificScriptAndCreateOM = function O
         var dataToHost = {coercionType: hostCoercionType};
         window["OSF"]["DDA"]["OutlookAppOm"]._instance$p._standardInvokeHostMethod$i$0(37,dataToHost,null,commonParameters._asyncContext$p$0,commonParameters._callback$p$0)
     };
+    $h.ComposeFrom = function()
+    {
+        this.$$d__getAsyncFormatter$p$0 = Function.createDelegate(this,this._getAsyncFormatter$p$0)
+    };
+    $h.ComposeFrom.prototype = {_getAsyncFormatter$p$0: function(rawInput)
+        {
+            var from = rawInput;
+            return $h.ScriptHelpers.isNullOrUndefined(from) ? null : new $h.EmailAddressDetails(from)
+        }};
+    $h.ComposeFrom.prototype.getAsync = function()
+    {
+        var args = [];
+        for(var $$pai_2 = 0; $$pai_2 < arguments["length"]; ++$$pai_2)
+            args[$$pai_2] = arguments[$$pai_2];
+        window["OSF"]["DDA"]["OutlookAppOm"]._instance$p._throwOnMethodCallForInsufficientPermission$i$0(1,"from.getAsync");
+        var parameters = $h.CommonParameters.parse(args,true);
+        window["OSF"]["DDA"]["OutlookAppOm"]._instance$p._standardInvokeHostMethod$i$0(107,null,this.$$d__getAsyncFormatter$p$0,parameters._asyncContext$p$0,parameters._callback$p$0)
+    };
     $h.ComposeBody = function()
     {
         $h.ComposeBody["initializeBase"](this)
@@ -9033,15 +9052,18 @@ OSF.InitializationHelper.prototype.loadAppSpecificScriptAndCreateOM = function O
     };
     $h.ComposeItem = function(data)
     {
+        this.$$d__getFrom$p$1 = Function.createDelegate(this,this._getFrom$p$1);
         this.$$d__getBody$p$1 = Function.createDelegate(this,this._getBody$p$1);
         this.$$d__getSubject$p$1 = Function.createDelegate(this,this._getSubject$p$1);
         $h.ComposeItem["initializeBase"](this,[data]);
         $h.InitialData._defineReadOnlyProperty$i(this,"subject",this.$$d__getSubject$p$1);
-        $h.InitialData._defineReadOnlyProperty$i(this,"body",this.$$d__getBody$p$1)
+        $h.InitialData._defineReadOnlyProperty$i(this,"body",this.$$d__getBody$p$1);
+        $h.InitialData._defineReadOnlyProperty$i(this,"from",this.$$d__getFrom$p$1)
     };
     $h.ComposeItem.prototype = {
         _subject$p$1: null,
         _body$p$1: null,
+        _from$p$1: null,
         _getBody$p$1: function()
         {
             this._data$p$0._throwOnRestrictedPermissionLevel$i$0();
@@ -9055,6 +9077,13 @@ OSF.InitializationHelper.prototype.loadAppSpecificScriptAndCreateOM = function O
             if(!this._subject$p$1)
                 this._subject$p$1 = new $h.ComposeSubject;
             return this._subject$p$1
+        },
+        _getFrom$p$1: function()
+        {
+            this._data$p$0._throwOnRestrictedPermissionLevel$i$0();
+            if(!this._from$p$1)
+                this._from$p$1 = new $h.ComposeFrom;
+            return this._from$p$1
         }
     };
     $h.ComposeItem.prototype.addFileAttachmentAsync = function(uri, attachmentName)
@@ -9281,6 +9310,131 @@ OSF.InitializationHelper.prototype.loadAppSpecificScriptAndCreateOM = function O
         recurrenceCopy["seriesTime"] = seriesTime;
         return recurrenceCopy
     };
+    $h.ComposeRecurrence._throwOnNullParameter$p = function(recurrenceObject, parameterName)
+    {
+        var recurrenceDictionary = recurrenceObject;
+        if(!recurrenceDictionary[parameterName])
+            throw Error.argumentNull(parameterName);
+    };
+    $h.ComposeRecurrence._throwOnInvalidRecurrenceType$p = function(recurrenceType)
+    {
+        if(recurrenceType !== window["Microsoft"]["Office"]["WebExtension"]["MailboxEnums"]["RecurrenceType"]["Daily"] && recurrenceType !== window["Microsoft"]["Office"]["WebExtension"]["MailboxEnums"]["RecurrenceType"]["Weekly"] && recurrenceType !== window["Microsoft"]["Office"]["WebExtension"]["MailboxEnums"]["RecurrenceType"]["Weekday"] && recurrenceType !== window["Microsoft"]["Office"]["WebExtension"]["MailboxEnums"]["RecurrenceType"]["Yearly"] && recurrenceType !== window["Microsoft"]["Office"]["WebExtension"]["MailboxEnums"]["RecurrenceType"]["Monthly"])
+            throw Error.argument("recurrenceType");
+    };
+    $h.ComposeRecurrence._throwOnInvalidDailyRecurrence$p = function(recurrenceProperties)
+    {
+        $h.ComposeRecurrence._throwOnNullParameter$p(recurrenceProperties,"interval");
+        window["OSF"]["DDA"]["OutlookAppOm"].throwOnArgumentType(recurrenceProperties["interval"],Number,"interval")
+    };
+    $h.ComposeRecurrence._verifyDays$p = function(dayEnum, checkGroupedDays)
+    {
+        var fRegularDay = dayEnum === window["Microsoft"]["Office"]["WebExtension"]["MailboxEnums"]["Days"]["Mon"] || dayEnum === window["Microsoft"]["Office"]["WebExtension"]["MailboxEnums"]["Days"]["Tue"] || dayEnum === window["Microsoft"]["Office"]["WebExtension"]["MailboxEnums"]["Days"]["Wed"] || dayEnum === window["Microsoft"]["Office"]["WebExtension"]["MailboxEnums"]["Days"]["Thu"] || dayEnum === window["Microsoft"]["Office"]["WebExtension"]["MailboxEnums"]["Days"]["Fri"] || dayEnum === window["Microsoft"]["Office"]["WebExtension"]["MailboxEnums"]["Days"]["Sat"] || dayEnum === window["Microsoft"]["Office"]["WebExtension"]["MailboxEnums"]["Days"]["Sun"];
+        if(checkGroupedDays)
+        {
+            var fGroupedDay = dayEnum === window["Microsoft"]["Office"]["WebExtension"]["MailboxEnums"]["Days"]["WeekendDay"] || dayEnum === window["Microsoft"]["Office"]["WebExtension"]["MailboxEnums"]["Days"]["Weekday"] || dayEnum === window["Microsoft"]["Office"]["WebExtension"]["MailboxEnums"]["Days"]["Day"];
+            return fGroupedDay || fRegularDay
+        }
+        else
+            return fRegularDay
+    };
+    $h.ComposeRecurrence._throwOnInvalidDaysArray$p = function(daysArray)
+    {
+        for(var i = 0; i < daysArray["length"]; i++)
+            if(!$h.ComposeRecurrence._verifyDays$p(daysArray[i],false))
+                throw Error.argument("days");
+    };
+    $h.ComposeRecurrence._throwOnInvalidWeeklyRecurrence$p = function(recurrenceProperties)
+    {
+        var recurrenceDictionary = recurrenceProperties;
+        $h.ComposeRecurrence._throwOnNullParameter$p(recurrenceProperties,"interval");
+        window["OSF"]["DDA"]["OutlookAppOm"].throwOnArgumentType(recurrenceDictionary["interval"],Number,"interval");
+        $h.ComposeRecurrence._throwOnNullParameter$p(recurrenceProperties,"days");
+        window["OSF"]["DDA"]["OutlookAppOm"].throwOnArgumentType(recurrenceDictionary["days"],Array,"days");
+        $h.ComposeRecurrence._throwOnInvalidDaysArray$p(recurrenceDictionary["days"])
+    };
+    $h.ComposeRecurrence._throwOnInvalidWeekNumber$p = function(weekNumber)
+    {
+        if(weekNumber !== window["Microsoft"]["Office"]["WebExtension"]["MailboxEnums"]["WeekNumber"]["First"] && weekNumber !== window["Microsoft"]["Office"]["WebExtension"]["MailboxEnums"]["WeekNumber"]["Second"] && weekNumber !== window["Microsoft"]["Office"]["WebExtension"]["MailboxEnums"]["WeekNumber"]["Third"] && weekNumber !== window["Microsoft"]["Office"]["WebExtension"]["MailboxEnums"]["WeekNumber"]["Fourth"] && weekNumber !== window["Microsoft"]["Office"]["WebExtension"]["MailboxEnums"]["WeekNumber"]["Last"])
+            throw Error.argument("weekNumber");
+    };
+    $h.ComposeRecurrence._throwOnInvalidDayOfMonth$p = function(iDayOfMonth)
+    {
+        if(iDayOfMonth < 1 || iDayOfMonth > 31)
+            throw Error.argument("dayOfMonth");
+    };
+    $h.ComposeRecurrence._throwOnInvalidMonthlyRecurrence$p = function(recurrenceProperties)
+    {
+        var recurrenceDictionary = recurrenceProperties;
+        $h.ComposeRecurrence._throwOnNullParameter$p(recurrenceProperties,"interval");
+        window["OSF"]["DDA"]["OutlookAppOm"].throwOnArgumentType(recurrenceDictionary["interval"],Number,"interval");
+        if(recurrenceDictionary["dayOfMonth"])
+        {
+            window["OSF"]["DDA"]["OutlookAppOm"].throwOnArgumentType(recurrenceDictionary["dayOfMonth"],Number,"dayOfMonth");
+            $h.ComposeRecurrence._throwOnInvalidDayOfMonth$p(recurrenceDictionary["dayOfMonth"])
+        }
+        else if(recurrenceDictionary["dayOfWeek"] && recurrenceDictionary["weekNumber"])
+        {
+            window["OSF"]["DDA"]["OutlookAppOm"].throwOnArgumentType(recurrenceDictionary["dayOfWeek"],String,"dayOfMonth");
+            if(!$h.ComposeRecurrence._verifyDays$p(recurrenceDictionary["dayOfWeek"],true))
+                throw Error.argument("dayOfWeek");
+            window["OSF"]["DDA"]["OutlookAppOm"].throwOnArgumentType(recurrenceDictionary["weekNumber"],String,"dayOfMonth");
+            $h.ComposeRecurrence._throwOnInvalidWeekNumber$p(recurrenceDictionary["weekNumber"])
+        }
+        else
+            throw Error.create(window["_u"]["ExtensibilityStrings"]["l_Recurrence_Error_Properties_Invalid_Text"]);
+    };
+    $h.ComposeRecurrence._throwOnInvalidMonth$p = function(month)
+    {
+        if(month !== window["Microsoft"]["Office"]["WebExtension"]["MailboxEnums"]["Month"]["Jan"] && month !== window["Microsoft"]["Office"]["WebExtension"]["MailboxEnums"]["Month"]["Feb"] && month !== window["Microsoft"]["Office"]["WebExtension"]["MailboxEnums"]["Month"]["Mar"] && month !== window["Microsoft"]["Office"]["WebExtension"]["MailboxEnums"]["Month"]["Apr"] && month !== window["Microsoft"]["Office"]["WebExtension"]["MailboxEnums"]["Month"]["May"] && month !== window["Microsoft"]["Office"]["WebExtension"]["MailboxEnums"]["Month"]["Jun"] && month !== window["Microsoft"]["Office"]["WebExtension"]["MailboxEnums"]["Month"]["Jul"] && month !== window["Microsoft"]["Office"]["WebExtension"]["MailboxEnums"]["Month"]["Aug"] && month !== window["Microsoft"]["Office"]["WebExtension"]["MailboxEnums"]["Month"]["Sep"] && month !== window["Microsoft"]["Office"]["WebExtension"]["MailboxEnums"]["Month"]["Oct"] && month !== window["Microsoft"]["Office"]["WebExtension"]["MailboxEnums"]["Month"]["Nov"] && month !== window["Microsoft"]["Office"]["WebExtension"]["MailboxEnums"]["Month"]["Dec"])
+            throw Error.argument("month");
+    };
+    $h.ComposeRecurrence._throwOnInvalidYearlyRecurrence$p = function(recurrenceProperties)
+    {
+        var recurrenceDictionary = recurrenceProperties;
+        $h.ComposeRecurrence._throwOnNullParameter$p(recurrenceProperties,"interval");
+        window["OSF"]["DDA"]["OutlookAppOm"].throwOnArgumentType(recurrenceDictionary["interval"],Number,"interval");
+        $h.ComposeRecurrence._throwOnNullParameter$p(recurrenceProperties,"month");
+        window["OSF"]["DDA"]["OutlookAppOm"].throwOnArgumentType(recurrenceDictionary["month"],String,"month");
+        $h.ComposeRecurrence._throwOnInvalidMonth$p(recurrenceDictionary["month"]);
+        if(recurrenceDictionary["dayOfMonth"])
+        {
+            window["OSF"]["DDA"]["OutlookAppOm"].throwOnArgumentType(recurrenceDictionary["dayOfMonth"],Number,"dayOfMonth");
+            $h.ComposeRecurrence._throwOnInvalidDayOfMonth$p(recurrenceDictionary["dayOfMonth"])
+        }
+        else if(recurrenceDictionary["weekNumber"] && recurrenceDictionary["dayOfWeek"])
+        {
+            window["OSF"]["DDA"]["OutlookAppOm"].throwOnArgumentType(recurrenceDictionary["dayOfWeek"],String,"dayOfMonth");
+            if(!$h.ComposeRecurrence._verifyDays$p(recurrenceDictionary["dayOfWeek"],true))
+                throw Error.argument("dayOfWeek");
+            window["OSF"]["DDA"]["OutlookAppOm"].throwOnArgumentType(recurrenceDictionary["weekNumber"],String,"dayOfMonth");
+            $h.ComposeRecurrence._throwOnInvalidWeekNumber$p(recurrenceDictionary["weekNumber"])
+        }
+        else
+            throw Error.create(window["_u"]["ExtensibilityStrings"]["l_Recurrence_Error_Properties_Invalid_Text"]);
+    };
+    $h.ComposeRecurrence.verifyRecurrenceObject = function(recurrenceObject)
+    {
+        if(!recurrenceObject)
+            return;
+        var recurrenceDictionary = recurrenceObject;
+        $h.ComposeRecurrence._throwOnNullParameter$p(recurrenceObject,"recurrenceType");
+        $h.ComposeRecurrence._throwOnNullParameter$p(recurrenceObject,"seriesTime");
+        if(!window["Microsoft"]["Office"]["WebExtension"]["SeriesTime"]["isInstanceOfType"](recurrenceDictionary["seriesTime"]) || !recurrenceDictionary["seriesTime"].isValid())
+            throw Error.argument("seriesTime");
+        if(!recurrenceDictionary["seriesTime"].isEndAfterStart())
+            throw Error.create(window["_u"]["ExtensibilityStrings"]["l_InvalidEventDates_Text"]);
+        $h.ComposeRecurrence._throwOnInvalidRecurrenceType$p(recurrenceDictionary["recurrenceType"]);
+        if(recurrenceDictionary["recurrenceType"] !== window["Microsoft"]["Office"]["WebExtension"]["MailboxEnums"]["RecurrenceType"]["Weekday"])
+            $h.ComposeRecurrence._throwOnNullParameter$p(recurrenceObject,"recurrenceProperties");
+        if(recurrenceDictionary["recurrenceType"] === window["Microsoft"]["Office"]["WebExtension"]["MailboxEnums"]["RecurrenceType"]["Daily"])
+            $h.ComposeRecurrence._throwOnInvalidDailyRecurrence$p(recurrenceDictionary["recurrenceProperties"]);
+        else if(recurrenceDictionary["recurrenceType"] === window["Microsoft"]["Office"]["WebExtension"]["MailboxEnums"]["RecurrenceType"]["Weekly"])
+            $h.ComposeRecurrence._throwOnInvalidWeeklyRecurrence$p(recurrenceDictionary["recurrenceProperties"]);
+        else if(recurrenceDictionary["recurrenceType"] === window["Microsoft"]["Office"]["WebExtension"]["MailboxEnums"]["RecurrenceType"]["Monthly"])
+            $h.ComposeRecurrence._throwOnInvalidMonthlyRecurrence$p(recurrenceDictionary["recurrenceProperties"]);
+        else if(recurrenceDictionary["recurrenceType"] === window["Microsoft"]["Office"]["WebExtension"]["MailboxEnums"]["RecurrenceType"]["Yearly"])
+            $h.ComposeRecurrence._throwOnInvalidYearlyRecurrence$p(recurrenceDictionary["recurrenceProperties"])
+    };
     $h.ComposeRecurrence.prototype = {
         _isInstance$p$0: false,
         _convertRecurrenceToDateFormatter$p$0: function(rawInput)
@@ -9298,132 +9452,10 @@ OSF.InitializationHelper.prototype.loadAppSpecificScriptAndCreateOM = function O
             }
             return rawInput
         },
-        _throwOnNullParameter$p$0: function(recurrenceObject, parameterName)
-        {
-            var recurrenceDictionary = recurrenceObject;
-            if(!recurrenceDictionary[parameterName])
-                throw Error.argumentNull(parameterName);
-        },
-        _throwOnInvalidRecurrenceType$p$0: function(recurrenceType)
-        {
-            if(recurrenceType !== window["Microsoft"]["Office"]["WebExtension"]["MailboxEnums"]["RecurrenceType"]["Daily"] && recurrenceType !== window["Microsoft"]["Office"]["WebExtension"]["MailboxEnums"]["RecurrenceType"]["Weekly"] && recurrenceType !== window["Microsoft"]["Office"]["WebExtension"]["MailboxEnums"]["RecurrenceType"]["Weekday"] && recurrenceType !== window["Microsoft"]["Office"]["WebExtension"]["MailboxEnums"]["RecurrenceType"]["Yearly"] && recurrenceType !== window["Microsoft"]["Office"]["WebExtension"]["MailboxEnums"]["RecurrenceType"]["Monthly"])
-                throw Error.argument("recurrenceType");
-        },
-        _throwOnInvalidDailyRecurrence$p$0: function(recurrenceProperties)
-        {
-            this._throwOnNullParameter$p$0(recurrenceProperties,"interval");
-            window["OSF"]["DDA"]["OutlookAppOm"].throwOnArgumentType(recurrenceProperties["interval"],Number,"interval")
-        },
-        _verifyDays$p$0: function(dayEnum, checkGroupedDays)
-        {
-            var fRegularDay = dayEnum === window["Microsoft"]["Office"]["WebExtension"]["MailboxEnums"]["Days"]["Mon"] || dayEnum === window["Microsoft"]["Office"]["WebExtension"]["MailboxEnums"]["Days"]["Tue"] || dayEnum === window["Microsoft"]["Office"]["WebExtension"]["MailboxEnums"]["Days"]["Wed"] || dayEnum === window["Microsoft"]["Office"]["WebExtension"]["MailboxEnums"]["Days"]["Thu"] || dayEnum === window["Microsoft"]["Office"]["WebExtension"]["MailboxEnums"]["Days"]["Fri"] || dayEnum === window["Microsoft"]["Office"]["WebExtension"]["MailboxEnums"]["Days"]["Sat"] || dayEnum === window["Microsoft"]["Office"]["WebExtension"]["MailboxEnums"]["Days"]["Sun"];
-            if(checkGroupedDays)
-            {
-                var fGroupedDay = dayEnum === window["Microsoft"]["Office"]["WebExtension"]["MailboxEnums"]["Days"]["WeekendDay"] || dayEnum === window["Microsoft"]["Office"]["WebExtension"]["MailboxEnums"]["Days"]["Weekday"] || dayEnum === window["Microsoft"]["Office"]["WebExtension"]["MailboxEnums"]["Days"]["Day"];
-                return fGroupedDay || fRegularDay
-            }
-            else
-                return fRegularDay
-        },
-        _throwOnInvalidDaysArray$p$0: function(daysArray)
-        {
-            for(var i = 0; i < daysArray["length"]; i++)
-                if(!this._verifyDays$p$0(daysArray[i],false))
-                    throw Error.argument("days");
-        },
-        _throwOnInvalidWeeklyRecurrence$p$0: function(recurrenceProperties)
-        {
-            var recurrenceDictionary = recurrenceProperties;
-            this._throwOnNullParameter$p$0(recurrenceProperties,"interval");
-            window["OSF"]["DDA"]["OutlookAppOm"].throwOnArgumentType(recurrenceDictionary["interval"],Number,"interval");
-            this._throwOnNullParameter$p$0(recurrenceProperties,"days");
-            window["OSF"]["DDA"]["OutlookAppOm"].throwOnArgumentType(recurrenceDictionary["days"],Array,"days");
-            this._throwOnInvalidDaysArray$p$0(recurrenceDictionary["days"])
-        },
-        _throwOnInvalidWeekNumber$p$0: function(weekNumber)
-        {
-            if(weekNumber !== window["Microsoft"]["Office"]["WebExtension"]["MailboxEnums"]["WeekNumber"]["First"] && weekNumber !== window["Microsoft"]["Office"]["WebExtension"]["MailboxEnums"]["WeekNumber"]["Second"] && weekNumber !== window["Microsoft"]["Office"]["WebExtension"]["MailboxEnums"]["WeekNumber"]["Third"] && weekNumber !== window["Microsoft"]["Office"]["WebExtension"]["MailboxEnums"]["WeekNumber"]["Fourth"] && weekNumber !== window["Microsoft"]["Office"]["WebExtension"]["MailboxEnums"]["WeekNumber"]["Last"])
-                throw Error.argument("weekNumber");
-        },
-        _throwOnInvalidDayOfMonth$p$0: function(iDayOfMonth)
-        {
-            if(iDayOfMonth < 1 || iDayOfMonth > 31)
-                throw Error.argument("dayOfMonth");
-        },
-        _throwOnInvalidMonthlyRecurrence$p$0: function(recurrenceProperties)
-        {
-            var recurrenceDictionary = recurrenceProperties;
-            this._throwOnNullParameter$p$0(recurrenceProperties,"interval");
-            window["OSF"]["DDA"]["OutlookAppOm"].throwOnArgumentType(recurrenceDictionary["interval"],Number,"interval");
-            if(recurrenceDictionary["dayOfMonth"])
-            {
-                window["OSF"]["DDA"]["OutlookAppOm"].throwOnArgumentType(recurrenceDictionary["dayOfMonth"],Number,"dayOfMonth");
-                this._throwOnInvalidDayOfMonth$p$0(recurrenceDictionary["dayOfMonth"])
-            }
-            else if(recurrenceDictionary["dayOfWeek"] && recurrenceDictionary["weekNumber"])
-            {
-                window["OSF"]["DDA"]["OutlookAppOm"].throwOnArgumentType(recurrenceDictionary["dayOfWeek"],String,"dayOfMonth");
-                if(!this._verifyDays$p$0(recurrenceDictionary["dayOfWeek"],true))
-                    throw Error.argument("dayOfWeek");
-                window["OSF"]["DDA"]["OutlookAppOm"].throwOnArgumentType(recurrenceDictionary["weekNumber"],String,"dayOfMonth");
-                this._throwOnInvalidWeekNumber$p$0(recurrenceDictionary["weekNumber"])
-            }
-            else
-                throw Error.create(window["_u"]["ExtensibilityStrings"]["l_Recurrence_Error_Properties_Invalid_Text"]);
-        },
-        _throwOnInvalidMonth$p$0: function(month)
-        {
-            if(month !== window["Microsoft"]["Office"]["WebExtension"]["MailboxEnums"]["Month"]["Jan"] && month !== window["Microsoft"]["Office"]["WebExtension"]["MailboxEnums"]["Month"]["Feb"] && month !== window["Microsoft"]["Office"]["WebExtension"]["MailboxEnums"]["Month"]["Mar"] && month !== window["Microsoft"]["Office"]["WebExtension"]["MailboxEnums"]["Month"]["Apr"] && month !== window["Microsoft"]["Office"]["WebExtension"]["MailboxEnums"]["Month"]["May"] && month !== window["Microsoft"]["Office"]["WebExtension"]["MailboxEnums"]["Month"]["Jun"] && month !== window["Microsoft"]["Office"]["WebExtension"]["MailboxEnums"]["Month"]["Jul"] && month !== window["Microsoft"]["Office"]["WebExtension"]["MailboxEnums"]["Month"]["Aug"] && month !== window["Microsoft"]["Office"]["WebExtension"]["MailboxEnums"]["Month"]["Sep"] && month !== window["Microsoft"]["Office"]["WebExtension"]["MailboxEnums"]["Month"]["Oct"] && month !== window["Microsoft"]["Office"]["WebExtension"]["MailboxEnums"]["Month"]["Nov"] && month !== window["Microsoft"]["Office"]["WebExtension"]["MailboxEnums"]["Month"]["Dec"])
-                throw Error.argument("month");
-        },
-        _throwOnInvalidYearlyRecurrence$p$0: function(recurrenceProperties)
-        {
-            var recurrenceDictionary = recurrenceProperties;
-            this._throwOnNullParameter$p$0(recurrenceProperties,"interval");
-            window["OSF"]["DDA"]["OutlookAppOm"].throwOnArgumentType(recurrenceDictionary["interval"],Number,"interval");
-            this._throwOnNullParameter$p$0(recurrenceProperties,"month");
-            window["OSF"]["DDA"]["OutlookAppOm"].throwOnArgumentType(recurrenceDictionary["month"],String,"month");
-            this._throwOnInvalidMonth$p$0(recurrenceDictionary["month"]);
-            if(recurrenceDictionary["dayOfMonth"])
-            {
-                window["OSF"]["DDA"]["OutlookAppOm"].throwOnArgumentType(recurrenceDictionary["dayOfMonth"],Number,"dayOfMonth");
-                this._throwOnInvalidDayOfMonth$p$0(recurrenceDictionary["dayOfMonth"])
-            }
-            else if(recurrenceDictionary["weekNumber"] && recurrenceDictionary["dayOfWeek"])
-            {
-                window["OSF"]["DDA"]["OutlookAppOm"].throwOnArgumentType(recurrenceDictionary["dayOfWeek"],String,"dayOfMonth");
-                if(!this._verifyDays$p$0(recurrenceDictionary["dayOfWeek"],true))
-                    throw Error.argument("dayOfWeek");
-                window["OSF"]["DDA"]["OutlookAppOm"].throwOnArgumentType(recurrenceDictionary["weekNumber"],String,"dayOfMonth");
-                this._throwOnInvalidWeekNumber$p$0(recurrenceDictionary["weekNumber"])
-            }
-            else
-                throw Error.create(window["_u"]["ExtensibilityStrings"]["l_Recurrence_Error_Properties_Invalid_Text"]);
-        },
-        _verifyRecurrenceObject$p$0: function(recurrenceObject)
-        {
-            var recurrenceDictionary = recurrenceObject;
-            this._throwOnNullParameter$p$0(recurrenceObject,"recurrenceType");
-            this._throwOnNullParameter$p$0(recurrenceObject,"recurrenceProperties");
-            this._throwOnNullParameter$p$0(recurrenceObject,"seriesTime");
-            if(!window["Microsoft"]["Office"]["WebExtension"]["SeriesTime"]["isInstanceOfType"](recurrenceDictionary["seriesTime"]) || !recurrenceDictionary["seriesTime"].isValid())
-                throw Error.argument("seriesTime");
-            if(!recurrenceDictionary["seriesTime"].isEndAfterStart())
-                throw Error.create(window["_u"]["ExtensibilityStrings"]["l_InvalidEventDates_Text"]);
-            this._throwOnInvalidRecurrenceType$p$0(recurrenceDictionary["recurrenceType"]);
-            if(recurrenceDictionary["recurrenceType"] === window["Microsoft"]["Office"]["WebExtension"]["MailboxEnums"]["RecurrenceType"]["Daily"])
-                this._throwOnInvalidDailyRecurrence$p$0(recurrenceDictionary["recurrenceProperties"]);
-            else if(recurrenceDictionary["recurrenceType"] === window["Microsoft"]["Office"]["WebExtension"]["MailboxEnums"]["RecurrenceType"]["Weekly"])
-                this._throwOnInvalidWeeklyRecurrence$p$0(recurrenceDictionary["recurrenceProperties"]);
-            else if(recurrenceDictionary["recurrenceType"] === window["Microsoft"]["Office"]["WebExtension"]["MailboxEnums"]["RecurrenceType"]["Monthly"])
-                this._throwOnInvalidMonthlyRecurrence$p$0(recurrenceDictionary["recurrenceProperties"]);
-            else if(recurrenceDictionary["recurrenceType"] === window["Microsoft"]["Office"]["WebExtension"]["MailboxEnums"]["RecurrenceType"]["Yearly"])
-                this._throwOnInvalidYearlyRecurrence$p$0(recurrenceDictionary["recurrenceProperties"])
-        },
         convertSeriesTime: function(recurrenceObject)
         {
             var recurrenceDictionary = recurrenceObject;
-            if(recurrenceDictionary["seriesTime"])
+            if(recurrenceDictionary && recurrenceDictionary["seriesTime"])
                 if(window["Microsoft"]["Office"]["WebExtension"]["SeriesTime"]["isInstanceOfType"](recurrenceDictionary["seriesTime"]))
                 {
                     var recurrenceCopy = {};
@@ -9452,7 +9484,7 @@ OSF.InitializationHelper.prototype.loadAppSpecificScriptAndCreateOM = function O
         window["OSF"]["DDA"]["OutlookAppOm"]._instance$p._throwOnMethodCallForInsufficientPermission$i$0(2,"recurrence.setAsync");
         if(this._isInstance$p$0)
             throw Error.create(window["_u"]["ExtensibilityStrings"]["l_Recurrence_Error_Instance_SetAsync_Text"]);
-        this._verifyRecurrenceObject$p$0(recurrenceObject);
+        $h.ComposeRecurrence.verifyRecurrenceObject(recurrenceObject);
         var parameters = $h.CommonParameters.parse(args,false);
         window["OSF"]["DDA"]["OutlookAppOm"]._instance$p._standardInvokeHostMethod$i$0(104,{recurrenceData: this.convertSeriesTime(recurrenceObject)},null,parameters._asyncContext$p$0,parameters._callback$p$0)
     };
@@ -11258,7 +11290,6 @@ OSF.InitializationHelper.prototype.loadAppSpecificScriptAndCreateOM = function O
     };
     $h.UserProfile = function(data)
     {
-        this.$$d__getCapabilities$p$0 = Function.createDelegate(this,this._getCapabilities$p$0);
         this.$$d__getUserProfileType$p$0 = Function.createDelegate(this,this._getUserProfileType$p$0);
         this.$$d__getTimeZone$p$0 = Function.createDelegate(this,this._getTimeZone$p$0);
         this.$$d__getEmailAddress$p$0 = Function.createDelegate(this,this._getEmailAddress$p$0);
@@ -11267,15 +11298,10 @@ OSF.InitializationHelper.prototype.loadAppSpecificScriptAndCreateOM = function O
         $h.InitialData._defineReadOnlyProperty$i(this,"displayName",this.$$d__getDisplayName$p$0);
         $h.InitialData._defineReadOnlyProperty$i(this,"emailAddress",this.$$d__getEmailAddress$p$0);
         $h.InitialData._defineReadOnlyProperty$i(this,"timeZone",this.$$d__getTimeZone$p$0);
-        $h.InitialData._defineReadOnlyProperty$i(this,"accountType",this.$$d__getUserProfileType$p$0);
-        $h.InitialData._defineReadOnlyProperty$i(this,"capabilities",this.$$d__getCapabilities$p$0)
+        $h.InitialData._defineReadOnlyProperty$i(this,"accountType",this.$$d__getUserProfileType$p$0)
     };
     $h.UserProfile.prototype = {
         _data$p$0: null,
-        _getCapabilities$p$0: function()
-        {
-            return this._data$p$0.get__userProfileCapabilities$i$0() || {}
-        },
         _getUserProfileType$p$0: function()
         {
             return this._data$p$0.get__userProfileType$i$0()
@@ -11347,6 +11373,7 @@ OSF.InitializationHelper.prototype.loadAppSpecificScriptAndCreateOM = function O
         moveToFolder: 101,
         getRecurrenceAsync: 103,
         setRecurrenceAsync: 104,
+        getFromAsync: 107,
         messageParent: 144,
         trackCtq: 400,
         recordTrace: 401,
@@ -11679,10 +11706,6 @@ OSF.InitializationHelper.prototype.loadAppSpecificScriptAndCreateOM = function O
             this._throwOnRestrictedPermissionLevel$i$0();
             return this._data$p$0["seriesId"]
         },
-        get__userProfileCapabilities$i$0: function()
-        {
-            return this._data$p$0["userProfileCapabilities"]
-        },
         get__userDisplayName$i$0: function()
         {
             return this._data$p$0["userDisplayName"]
@@ -11981,6 +12004,7 @@ OSF.InitializationHelper.prototype.loadAppSpecificScriptAndCreateOM = function O
     $h.AppointmentCompose["registerClass"]("$h.AppointmentCompose",$h.ComposeItem);
     $h.AttachmentDetails["registerClass"]("$h.AttachmentDetails");
     $h.Body["registerClass"]("$h.Body");
+    $h.ComposeFrom["registerClass"]("$h.ComposeFrom");
     $h.ComposeBody["registerClass"]("$h.ComposeBody",$h.Body);
     $h.ComposeRecipient["registerClass"]("$h.ComposeRecipient");
     $h.ComposeRecurrence["registerClass"]("$h.ComposeRecurrence");

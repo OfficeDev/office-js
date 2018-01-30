@@ -1,5 +1,5 @@
 /* PowerPoint specific API library */
-/* Version: 16.0.8916.1000 */
+/* Version: 16.0.9009.1000 */
 /*
 	Copyright (c) Microsoft Corporation.  All rights reserved.
 */
@@ -1260,7 +1260,8 @@ Microsoft.Office.WebExtension.Parameters = {
     HideTitle: "hideTitle",
     UseDeviceIndependentPixels: "useDeviceIndependentPixels",
     AppCommandInvocationCompletedData: "appCommandInvocationCompletedData",
-    Base64: "base64"
+    Base64: "base64",
+    FormId: "formId"
 };
 OSF.OUtil.setNamespace("DDA", OSF);
 OSF.DDA.DocumentMode = {
@@ -1319,6 +1320,7 @@ OSF.DDA.MethodDispId = {
     dispidGetAccessTokenMethod: 98,
     dispidOpenBrowserWindow: 102,
     dispidCreateDocumentMethod: 105,
+    dispidInsertFormMethod: 106,
     dispidGetSelectedTaskMethod: 110,
     dispidGetSelectedResourceMethod: 111,
     dispidGetTaskMethod: 112,
@@ -3100,6 +3102,7 @@ OSF.DDA.DispIdHost.Facade = function OSF_DDA_DispIdHost_Facade(getDelegateMethod
         "CloseContainerAsync": did.dispidCloseContainerMethod,
         "OpenBrowserWindow": did.dispidOpenBrowserWindow,
         "CreateDocumentAsync": did.dispidCreateDocumentMethod,
+        "InsertFormAsync": did.dispidInsertFormMethod,
         "AddDataPartAsync": did.dispidAddDataPartMethod,
         "GetDataPartByIdAsync": did.dispidGetDataPartByIdMethod,
         "GetDataPartsByNameSpaceAsync": did.dispidGetDataPartsByNamespaceMethod,
@@ -5216,7 +5219,7 @@ var OSFAppTelemetry;
         }
         appInfo.message = context.get_hostCustomMessage();
         appInfo.officeJSVersion = OSF.ConstantNames.FileVersion;
-        appInfo.hostJSVersion = "16.0.8916.1000";
+        appInfo.hostJSVersion = "16.0.9009.1000";
         if (context._wacHostEnvironment) {
             appInfo.wacHostEnvironment = context._wacHostEnvironment;
         }
@@ -8322,6 +8325,26 @@ OSF.DDA.SafeArray.Delegate.ParameterMap.define({
         { name: Microsoft.Office.WebExtension.Parameters.Base64, value: 0 }
     ]
 });
+OSF.DDA.AsyncMethodNames.addNames({
+    InsertFormAsync: "insertFormAsync"
+});
+OSF.DDA.AsyncMethodCalls.define({
+    method: OSF.DDA.AsyncMethodNames.InsertFormAsync,
+    requiredArguments: [
+        {
+            "name": Microsoft.Office.WebExtension.Parameters.FormId,
+            "types": ["string"]
+        }
+    ],
+    supportedOptions: [],
+    privateStateCallbacks: []
+});
+OSF.DDA.SafeArray.Delegate.ParameterMap.define({
+    type: OSF.DDA.MethodDispId.dispidInsertFormMethod,
+    toHost: [
+        { name: Microsoft.Office.WebExtension.Parameters.FormId, value: 0 }
+    ]
+});
 OSF.DDA.PowerPointDocument = function OSF_DDA_PowerPointDocument(officeAppContext, settings) {
     OSF.DDA.PowerPointDocument.uber.constructor.call(this, officeAppContext, settings);
     OSF.DDA.DispIdHost.addAsyncMethods(this, [
@@ -8330,7 +8353,8 @@ OSF.DDA.PowerPointDocument = function OSF_DDA_PowerPointDocument(officeAppContex
         OSF.DDA.AsyncMethodNames.GetDocumentCopyAsync,
         OSF.DDA.AsyncMethodNames.GetActiveViewAsync,
         OSF.DDA.AsyncMethodNames.GetFilePropertiesAsync,
-        OSF.DDA.AsyncMethodNames.GoToByIdAsync
+        OSF.DDA.AsyncMethodNames.GoToByIdAsync,
+        OSF.DDA.AsyncMethodNames.InsertFormAsync
     ]);
     OSF.DDA.DispIdHost.addEventSupport(this, new OSF.EventDispatch([
         Microsoft.Office.WebExtension.EventType.DocumentSelectionChanged,

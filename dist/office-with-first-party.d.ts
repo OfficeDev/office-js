@@ -2890,6 +2890,21 @@ declare namespace OfficeExtension {
 
 
 declare namespace OfficeCore {
+    /**
+     * [Api set: AgaveVisual 0.5]
+     */
+    class BiShim extends OfficeExtension.ClientObject {
+        initialize(capabilities: string): void;
+        uninitialize(): void;
+        getData(): OfficeExtension.ClientResult<string>;
+        /**
+         * Create a new instance of OfficeCore.BiShim object
+         */
+        static newObject(context: OfficeExtension.ClientRequestContext): OfficeCore.BiShim;
+        toJSON(): {
+            [key: string]: string;
+        };
+    }
     namespace ErrorCodes {
         var generalException: string;
     }
@@ -2901,6 +2916,65 @@ declare namespace OfficeCore {
     }
 }
 declare namespace OfficeCore {
+    /**
+     * [Api set: Experimentation 1.1 (PREVIEW)]
+     */
+    class FlightingService extends OfficeExtension.ClientObject {
+        getClientSessionId(): OfficeExtension.ClientResult<string>;
+        getDeferredFlights(): OfficeExtension.ClientResult<string>;
+        getFeature(featureName: string, type: string, defaultValue: number | boolean | string, possibleValues?: Array<number> | Array<string> | Array<boolean> | Array<ScopedValue>): OfficeCore.ABType;
+        getFeatureGate(featureName: string, scope?: string): OfficeCore.ABType;
+        resetOverride(featureName: string): void;
+        setOverride(featureName: string, type: string, value: number | boolean | string): void;
+        /**
+         * Create a new instance of OfficeCore.FlightingService object
+         */
+        static newObject(context: OfficeExtension.ClientRequestContext): OfficeCore.FlightingService;
+        toJSON(): {};
+    }
+    /**
+     *
+     * Provides information about the scoped value.
+     *
+     * [Api set: Experimentation 1.1 (PREVIEW)]
+     */
+    interface ScopedValue {
+        /**
+         *
+         * Gets the scope.
+         *
+         * [Api set: Experimentation 1.1 (PREVIEW)]
+         */
+        scope: string;
+        /**
+         *
+         * Gets the value.
+         *
+         * [Api set: Experimentation 1.1 (PREVIEW)]
+         */
+        value: string | number | boolean;
+    }
+    /**
+     * [Api set: Experimentation 1.1 (PREVIEW)]
+     */
+    class ABType extends OfficeExtension.ClientObject {
+        readonly value: string | number | boolean;
+        /**
+         * Queues up a command to load the specified properties of the object. You must call "context.sync()" before reading the properties.
+         */
+        load(option?: string | string[] | OfficeExtension.LoadOption): OfficeCore.ABType;
+        toJSON(): {
+            "value": string | number | boolean;
+        };
+    }
+    /**
+     * [Api set: Experimentation 1.1 (PREVIEW)]
+     */
+    namespace FeatureType {
+        var boolean: string;
+        var integer: string;
+        var string: string;
+    }
     namespace ExperimentErrorCodes {
         var generalException: string;
     }
@@ -2910,9 +2984,46 @@ declare namespace OfficeCore {
 declare namespace OfficeCore {
     class RequestContext extends OfficeExtension.ClientRequestContext {
         constructor(url?: string | OfficeExtension.RequestUrlAndHeaderInfo | any);
+        readonly flighting: FlightingService;
+        readonly telemetry: TelemetryService;
+        readonly bi: BiShim;
     }
 }
 declare namespace OfficeCore {
+    /**
+     * [Api set: Telemetry 1.1]
+     */
+    class TelemetryService extends OfficeExtension.ClientObject {
+        sendTelemetryEvent(telemetryProperties: OfficeCore.TelemetryProperties, eventName: string, eventContract: string, eventFlags: OfficeCore.EventFlags, value: Array<OfficeCore.DataField>): void;
+        /**
+         * Create a new instance of OfficeCore.TelemetryService object
+         */
+        static newObject(context: OfficeExtension.ClientRequestContext): OfficeCore.TelemetryService;
+        toJSON(): {};
+    }
+    /**
+     * [Api set: Telemetry 1.1]
+     */
+    interface EventFlags {
+        costPriority: number;
+        persistencePriority: number;
+        samplingPolicy: number;
+    }
+    /**
+     * [Api set: Telemetry 1.1]
+     */
+    interface DataField {
+        classification: number;
+        name: string;
+        value: any;
+    }
+    /**
+     * [Api set: Telemetry 1.1]
+     */
+    interface TelemetryProperties {
+        ariaTenantToken?: string;
+        nexusTenantToken?: number;
+    }
     namespace TelemetryErrorCodes {
         var generalException: string;
     }
