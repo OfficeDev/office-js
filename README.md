@@ -16,7 +16,7 @@ To install "office-js" locally via the NPM package, run
 
 Once installed, the Office.js script reference can be used as
 
-    <src script="node_modules\@microsoft\office-js\dist\office.js"></script>
+    <script src="node_modules\@microsoft\office-js\dist\office.js"></script>
 
 
 <br />
@@ -41,7 +41,7 @@ Visual Studio 2017+ can use these same TypeScript definitions, even for regular 
 
 In addition to downloading the files locally, you can also use them via an external service like <https://unpkg.com>, which provides best-effort (no uptime guarantees) CDN hosting for npm packages.  This is especially useful for trying out alpha or beta builds.  To do so, simply change the script reference to:
 
-    <src script="https://unpkg.com/@microsoft/office-js/dist/office.js"></script>
+    <script src="https://unpkg.com/@microsoft/office-js/dist/office.js"></script>
 
 You can see the different versions of the NPM package listed in the dropdown on the top right at <https://unpkg.com/@microsoft/office-js/>.  This provides the alpha and beta versions as well.
 
@@ -51,7 +51,7 @@ To view the latest version numbers for each of the tags, you can also run the fo
 
 When you have a version number, can use it as follows with <https://unpkg.com>: (appending `@<version-#>` right after `office-js`; e.g., `.../office-js@1.1.2-alpha.0/dist/...`
 
-    <src script="https://unpkg.com/@microsoft/office-js@1.1.2-alpha.0/dist/office.js"></script>
+    <script src="https://unpkg.com/@microsoft/office-js@1.1.2-alpha.0/dist/office.js"></script>
 
 
 <br />
