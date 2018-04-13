@@ -1,6 +1,6 @@
 #!/usr/bin/env node --harmony
 
-import { isString, isNil, cloneDeep } from "lodash";
+import { isString, cloneDeep } from "lodash";
 import * as chalk from 'chalk';
 import * as shell from 'shelljs';
 import * as fs from "fs-extra";
@@ -15,10 +15,11 @@ declare var process: {
     exit: (status: number) => void;
 };
 
+const OUTPUT_DIRECTORIES_TO_COPY = ["dist", "embedded"];
+
 const TRAVIS_AUTO_COMMIT_TEXT = "[TRAVIS CI AUTO-COMMIT]";
 const TOKENIZED_GITHUB_PUSH_URL = `https://<<<token>>>@github.com/OfficeDev/office-js.git`;
-const DEPLOYMENT_YAML_FILENAME = "NPM.DEPLOYMENT.INFO.yaml";
-const DEPLOY_REQUEST_FILENAME = "DEPLOY_REQUEST.yaml";
+const NPM_DEPLOYMENT_INFO_YAML_FILENAME = "NPM.DEPLOYMENT.INFO.yaml";
 
 const REQUIRED_ADDITIONAL_FIELDS: Array<keyof IEnvironmentVariables> = ['GH_TOKEN'];
 
@@ -49,7 +50,7 @@ interface IEnvironmentVariables {
 
 const OFFICIAL_BRANCHES = ["release", "release-next", "beta", "beta-next"];
 const OFFICIAL_TAGS = cloneDeep(OFFICIAL_BRANCHES).concat("latest");
-const DEPLOYMENT_QUEUE_BRANCH = "deployment-queue";
+const DEPLOYMENT_QUEUE_BRANCH_PREFIX = "deployment-queue";
 const ADHOC_BRANCH_PREFIX = "__adhoc";
 const DEFAULT_ADHOC_TAG = "adhoc";
 
@@ -65,12 +66,6 @@ interface IDeploymentInfoFromSubmittedRepoHistory {
 
 const WORKING_DIRECTORY = path.resolve(process.env.TRAVIS_BUILD_DIR, "..", "working-travis-output-dir");
 
-interface IOfficialBranchDeployRequest {
-    targetBranch: string;
-    from: string;
-    deleteAdhocBranchOnSuccessfulDeployment: boolean;
-}
-
 interface IDeploymentParams {
     isOfficialBuild: boolean;
     branchToCheckOut: string;
@@ -82,8 +77,6 @@ interface IDeploymentParams {
     /** A script to run after cloning. Note that the current working directory at that point
      * is still the original one from the start of the script */
     afterCloneBeforeCommit?: (repoLocalFolderPath: string) => Promise<any>;
-
-    rightBeforeCompletion?: () => Promise<any>;
 }
 
 (async () => {
@@ -118,14 +111,14 @@ async function attemptDeployScript() {
         });
         return;
 
-    } else if (process.env.TRAVIS_BRANCH === DEPLOYMENT_QUEUE_BRANCH) {
+    } else if (process.env.TRAVIS_BRANCH.startsWith(DEPLOYMENT_QUEUE_BRANCH_PREFIX)) {
         await doOfficialDeployment();
         return;
 
     } else if (OFFICIAL_BRANCHES.indexOf(process.env.TRAVIS_BRANCH) >= 0) {
         const message = stripSpaces(`
-            Deployment to one of the official branches must happen through the
-            "${DEPLOYMENT_QUEUE_BRANCH}" branch. Please see
+            Deployment to one of the official branches must happen through one of the
+            "${DEPLOYMENT_QUEUE_BRANCH_PREFIX}" branches. Please see
             https://github.com/OfficeDev/office-js/blob/deployment-queue/README.md
             for more info.
         `);
@@ -135,8 +128,8 @@ async function attemptDeployScript() {
     } else {
         const message = stripSpaces(`
             UNKNOWN BRANCH: Branch "${process.env.TRAVIS_BRANCH}" does not match any of the following:
-                * A branch that starts with "__${ADHOC_BRANCH_PREFIX}".
-                * The "${DEPLOYMENT_QUEUE_BRANCH}" branch.
+                * A branch that starts with "${ADHOC_BRANCH_PREFIX}".
+                * A branch that starts with "${DEPLOYMENT_QUEUE_BRANCH_PREFIX}" branch.
                 * Any of the following official branches: [${OFFICIAL_BRANCHES.map(item => `"${item}"`).join(", ")}].
         `);
         banner('SKIPPING DEPLOYMENT', message, chalk.yellow.bold);
@@ -253,11 +246,11 @@ async function doDeployment(params: IDeploymentParams): Promise<void> {
         });
         markdownReleasesNotes = VersionUtils.generateMarkdownDescription({
             ...commonHandlebarsParams,
-            DEPLOYMENT_YAML_FILENAME,
+            NPM_DEPLOYMENT_INFO_YAML_FILENAME,
             commitMessage: historyInfo.commitMessage,
         });
 
-        fs.writeFileSync(DEPLOYMENT_YAML_FILENAME, deploymentFileContents!);
+        fs.writeFileSync(NPM_DEPLOYMENT_INFO_YAML_FILENAME, deploymentFileContents!);
         VersionUtils.updatePackageJson(version);
 
         // Publish to NPM first (even before writing to repo).
@@ -340,11 +333,6 @@ async function doDeployment(params: IDeploymentParams): Promise<void> {
     shell.popd();
 
 
-    if (params.rightBeforeCompletion) {
-        await params.rightBeforeCompletion();
-    }
-
-
     banner('SUCCESS, DEPLOYMENT COMPLETE!', markdownReleasesNotes!.replace(/&nbsp;/g, ' '), chalk.green.bold);
 
     banner(`GitHub Releases page for v${version}`, `https://github.com/OfficeDev/office-js/releases/tag/v${version}`, chalk.green.bold);
@@ -360,66 +348,51 @@ function isPublishOverPreviouslyPublishVersionErrorString(errorText: string): bo
     return phraseMatchIndex >= 0;
 }
 
-async function getDeploymentInfoFromGithubRepoState(lookupBranch: string): Promise<IDeploymentInfoFromSubmittedRepo> {
-    const url = `https://raw.githubusercontent.com/OfficeDev/office-js/${lookupBranch}/NPM.DEPLOYMENT.INFO.yaml`;
-    const contents = await fetchAndThrowOnError(url, "text");
-
-    const result = jsyaml.safeLoad(contents) as IDeploymentInfoFromSubmittedRepo;
-    if (result.history && result.tag) {
-        return result;
-    } else {
-        throw new Error(`Missing required fields from in-repo "${DEPLOYMENT_YAML_FILENAME}" file of branch "${lookupBranch}".` +
-            "\n\n" + url + "\n\n" + contents);
-    }
-}
-
 async function doOfficialDeployment(): Promise<void> {
-    console.log(`First off: is there a request for a "targetBranch" and "from" in the ${DEPLOY_REQUEST_FILENAME} file?`);
-    let currentYaml: IOfficialBranchDeployRequest = jsyaml.safeLoad(
-        fs.readFileSync(process.env.TRAVIS_BUILD_DIR + "/" + DEPLOY_REQUEST_FILENAME).toString());
+    const targetBranch = process.env.TRAVIS_BRANCH.substr((DEPLOYMENT_QUEUE_BRANCH_PREFIX + "-").length);
 
-    if (isNil(currentYaml.targetBranch) || isNil(currentYaml.from)) {
-        banner('SKIPPING DEPLOYMENT', `Nothing to deploy: missing "targetBranch" and/or "from" parameters.`, chalk.yellow.bold);
-        return;
-    }
-
-    if (OFFICIAL_BRANCHES.indexOf(currentYaml.targetBranch) < 0) {
-        throw new Error(`Invalid target branch "${currentYaml.targetBranch}"; does not belong to the list of official branches`);
+    if (OFFICIAL_BRANCHES.indexOf(targetBranch) < 0) {
+        throw new Error(`Invalid target branch "${targetBranch}"; does not belong to the list of official branches`);
     }
 
     banner("DEPLOYMENT REQUEST DETECTED", stripSpaces(`
         Acknowledging request to deploy to
-            "${currentYaml.targetBranch}"
-        from
-            ${currentYaml.from}
+            "${targetBranch}"
+        from a pull request to this branch ("${process.env.TRAVIS_BRANCH}")
     `));
 
+    const repoThisBranchCopyFolderPath = `${WORKING_DIRECTORY}/office-js-repo-this-branch-copy-${new Date().getTime()}/`;
+    execCommand(`git clone --single-branch --depth 1 -b ${process.env.TRAVIS_BRANCH} ${TOKENIZED_GITHUB_PUSH_URL} ${repoThisBranchCopyFolderPath}`, {
+        token: process.env.GH_TOKEN
+    });
+
     // for purposes of the official tags, the NPM publish tag will be the same as the branch name (beta, release-next, etc)
-    const npmPublishTag = currentYaml.targetBranch;
-    const historyInfo = (await getDeploymentInfoFromGithubRepoState(currentYaml.from)).history;
+    const npmPublishTag = targetBranch;
+    const historyInfo = (await getDeploymentInfoFromLocalRepoCopy(repoThisBranchCopyFolderPath)).history;
 
     await doDeployment({
         isOfficialBuild: true,
-        commitMessagePartial: `Deploy to '${currentYaml.targetBranch}' from '${currentYaml.from}'`,
-        branchToCheckOut: currentYaml.targetBranch,
+        commitMessagePartial: `Deploy to '${targetBranch}' from '${historyInfo.adhocBranchName}'`,
+        branchToCheckOut: targetBranch,
         npmPublishTag,
         historyInfo,
         afterCloneBeforeCommit: async (repoLocalFolderPath: string) => {
-            console.log(`Delete all files except ".git" and the "dist" folder`);
+            console.log(`Delete all files except ".git"`);
             fs.readdirSync(repoLocalFolderPath)
-                .filter(filename => [".git", "dist"].indexOf(filename) < 0)
+                .filter(filename => [".git"].indexOf(filename) < 0)
                 .forEach(filename => fs.removeSync(repoLocalFolderPath + '/' + filename));
 
-
             (() => {
-                console.log(`Now copy over all files from the release branch except ".git" and "dist":`);
+                console.log(`Now copy over all files from the release branch except ".git" and the output directories":`);
                 const repoReleaseCopyFolderPath = `${WORKING_DIRECTORY}/office-js-repo-release-copy-${new Date().getTime()}/`;
                 fs.removeSync(repoReleaseCopyFolderPath);
                 execCommand(`git clone --single-branch --depth 1 ${TOKENIZED_GITHUB_PUSH_URL} ${repoReleaseCopyFolderPath}`, {
                     token: process.env.GH_TOKEN
                 });
+
+                const gitFolderAndOutputDirectories = [".git"].concat(OUTPUT_DIRECTORIES_TO_COPY);
                 fs.readdirSync(repoReleaseCopyFolderPath)
-                    .filter(filename => [".git", "dist"].indexOf(filename) < 0)
+                    .filter(filename => gitFolderAndOutputDirectories.indexOf(filename) < 0)
                     .forEach(filename => fs.copySync(
                         repoReleaseCopyFolderPath + '/' + filename,
                         repoLocalFolderPath + '/' + filename,
@@ -430,51 +403,38 @@ async function doOfficialDeployment(): Promise<void> {
             })();
 
             (() => {
-                // And do this again, this time with copying ONLY the DIST folder from the "from" branch:
-                const repoFromBranchCopyFolderPath = `${WORKING_DIRECTORY}/office-js-repo-release-copy-${new Date().getTime()}/`;
-                execCommand(`git clone --single-branch --depth 1 -b ${currentYaml.from} ${TOKENIZED_GITHUB_PUSH_URL} ${repoFromBranchCopyFolderPath}`, {
-                    token: process.env.GH_TOKEN
-                });
-                fs.copySync(
-                    repoFromBranchCopyFolderPath + '/dist',
-                    repoLocalFolderPath + '/dist',
-                    {
-                        preserveTimestamps: true
-                    }
-                );
-            })();
-        },
-        rightBeforeCompletion: async () => {
-            (() => {
-                console.log(`Reset the ${DEPLOY_REQUEST_FILENAME} "from" and "targetBranch" keys:`);
-                const repoDeployCopyFolderPath = `${WORKING_DIRECTORY}/office-js-repo-deploy-copy-${new Date().getTime()}/`;
-                fs.removeSync(repoDeployCopyFolderPath);
-                execCommand(`git clone --single-branch --depth 1 -b ${DEPLOYMENT_QUEUE_BRANCH} ${TOKENIZED_GITHUB_PUSH_URL} ${repoDeployCopyFolderPath}`, {
-                    token: process.env.GH_TOKEN
-                });
-                shell.pushd(repoDeployCopyFolderPath);
-
-                const repoDeployCopyDeployRequestFilePath = repoDeployCopyFolderPath + "/" + DEPLOY_REQUEST_FILENAME;
-                const sanitizedDeployRequestFileContents =
-                    (fs.readFileSync(repoDeployCopyDeployRequestFilePath).toString().split("\n"))
-                        .map(line => {
-                            if (line.startsWith("from:")) {
-                                return "from:";
-                            } else if (line.startsWith("targetBranch:")) {
-                                return "targetBranch:";
-                            }
-                            return line;
-                        })
-                        .join("\n");
-                fs.writeFileSync(repoDeployCopyDeployRequestFilePath, sanitizedDeployRequestFileContents);
-                execCommand(`git add -A`);
-                execCommand(`git commit --allow-empty -m "Remove ${DEPLOY_REQUEST_FILENAME} parameters, to ready for next job [skip ci]"`);
-                execCommand(`git push origin ${DEPLOYMENT_QUEUE_BRANCH}`);
-
-                if (currentYaml.deleteAdhocBranchOnSuccessfulDeployment) {
-                    execCommand(`git push origin --delete ${currentYaml.from}`);
-                }
+                console.log(`Now do the remainder of the copying -- but this time, from the "from" branch, and only including`);
+                console.log(`    the output directories (which is the only truly-worthwhile bit on the pull request branch)`);
+                fs.readdirSync(repoThisBranchCopyFolderPath)
+                    .filter(filename => OUTPUT_DIRECTORIES_TO_COPY.indexOf(filename) < 0)
+                    .forEach(filename => fs.copySync(
+                        repoThisBranchCopyFolderPath + '/' + filename,
+                        repoLocalFolderPath + '/' + filename,
+                        {
+                            preserveTimestamps: true
+                        }
+                    ));
             })();
         }
     });
+}
+
+async function getDeploymentInfoFromGithubRepoState(lookupBranch: string): Promise<IDeploymentInfoFromSubmittedRepo> {
+    const url = `https://raw.githubusercontent.com/OfficeDev/office-js/${lookupBranch}/${NPM_DEPLOYMENT_INFO_YAML_FILENAME}`;
+    return getDeploymentInfoFromStringHelper(await fetchAndThrowOnError(url, "text"));
+}
+
+async function getDeploymentInfoFromLocalRepoCopy(repoDir: string): Promise<IDeploymentInfoFromSubmittedRepo> {
+    return getDeploymentInfoFromStringHelper(
+        fs.readFileSync(path.resolve(repoDir, NPM_DEPLOYMENT_INFO_YAML_FILENAME)).toString());
+}
+
+function getDeploymentInfoFromStringHelper(contents: string) {
+    const result = jsyaml.safeLoad(contents) as IDeploymentInfoFromSubmittedRepo;
+    if (result.history && result.tag) {
+        return result;
+    } else {
+        throw new Error(`Missing required fields from in-repo "${NPM_DEPLOYMENT_INFO_YAML_FILENAME}" file.` +
+            "\n\n" + contents);
+    }
 }

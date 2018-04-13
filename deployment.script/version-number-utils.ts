@@ -100,7 +100,7 @@ export function generateMarkdownDescription(context: {
     travisBuildId: string;
     npmPublishTag: string;
     includeTagUrls: boolean;
-    DEPLOYMENT_YAML_FILENAME: string;
+    NPM_DEPLOYMENT_INFO_YAML_FILENAME: string;
 }): string {
     const template = stripSpaces(`
         ### From version "{{{commitMessage}}}"
