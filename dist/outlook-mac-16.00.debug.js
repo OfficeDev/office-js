@@ -1,5 +1,5 @@
 /* Outlook Mac specific API library */
-/* Version: 16.0.8809.1000 */
+/* Version: 16.0.9117.1000 */
 /*!
 Copyright (c) Microsoft Corporation.  All rights reserved.
 */
@@ -260,6 +260,56 @@ OSF.OUtil = function()
             {
                 if(parent && name && parent[name])
                     delete parent[name]
+            },
+            serializeSettings: function OSF_OUtil$serializeSettings(settingsCollection)
+            {
+                var ret = {};
+                for(var key in settingsCollection)
+                {
+                    var value = settingsCollection[key];
+                    try
+                    {
+                        if(JSON)
+                            value = JSON.stringify(value,function dateReplacer(k, v)
+                            {
+                                return OSF.OUtil.isDate(this[k]) ? OSF.DDA.SettingsManager.DateJSONPrefix + this[k].getTime() + OSF.DDA.SettingsManager.DataJSONSuffix : v
+                            });
+                        else
+                            value = Sys.Serialization.JavaScriptSerializer.serialize(value);
+                        ret[key] = value
+                    }
+                    catch(ex){}
+                }
+                return ret
+            },
+            deserializeSettings: function OSF_OUtil$deserializeSettings(serializedSettings)
+            {
+                var ret = {};
+                serializedSettings = serializedSettings || {};
+                for(var key in serializedSettings)
+                {
+                    var value = serializedSettings[key];
+                    try
+                    {
+                        if(JSON)
+                            value = JSON.parse(value,function dateReviver(k, v)
+                            {
+                                var d;
+                                if(typeof v === "string" && v && v.length > 6 && v.slice(0,5) === OSF.DDA.SettingsManager.DateJSONPrefix && v.slice(-1) === OSF.DDA.SettingsManager.DataJSONSuffix)
+                                {
+                                    d = new Date(parseInt(v.slice(5,-1)));
+                                    if(d)
+                                        return d
+                                }
+                                return v
+                            });
+                        else
+                            value = Sys.Serialization.JavaScriptSerializer.deserialize(value,true);
+                        ret[key] = value
+                    }
+                    catch(ex){}
+                }
+                return ret
             },
             loadScript: function OSF_OUtil$loadScript(url, callback, timeoutInMs)
             {
@@ -1097,7 +1147,9 @@ OSF.AppName = {
     OneNoteWinRT: 8388608,
     ExcelAndroid: 8388609,
     VisioWebApp: 8388610,
-    OneNoteIOS: 8388611
+    OneNoteIOS: 8388611,
+    WordAndroid: 8388613,
+    PowerpointAndroid: 8388614
 };
 OSF.InternalPerfMarker = {
     DataCoercionBegin: "Agave.HostCall.CoerceDataStart",
@@ -1375,7 +1427,9 @@ Microsoft.Office.WebExtension.Parameters = {
     MessageContent: "messageContent",
     HideTitle: "hideTitle",
     UseDeviceIndependentPixels: "useDeviceIndependentPixels",
-    AppCommandInvocationCompletedData: "appCommandInvocationCompletedData"
+    AppCommandInvocationCompletedData: "appCommandInvocationCompletedData",
+    Base64: "base64",
+    FormId: "formId"
 };
 OSF.OUtil.setNamespace("DDA",OSF);
 OSF.DDA.DocumentMode = {
@@ -1426,6 +1480,9 @@ OSF.DDA.MethodDispId = {
     dispidCloseContainerMethod: 97,
     dispidGetAccessTokenMethod: 98,
     dispidOpenBrowserWindow: 102,
+    dispidCreateDocumentMethod: 105,
+    dispidInsertFormMethod: 106,
+    dispidDisplayRibbonCalloutAsyncMethod: 109,
     dispidGetSelectedTaskMethod: 110,
     dispidGetSelectedResourceMethod: 111,
     dispidGetTaskMethod: 112,
@@ -1486,6 +1543,7 @@ OSF.DDA.EventDispId = {
     dispidOlkItemSelectedChangedEvent: 46,
     dispidOlkRecipientsChangedEvent: 47,
     dispidOlkAppointmentTimeChangedEvent: 48,
+    dispidOlkRecurrenceChangedEvent: 49,
     dispidTaskSelectionChangedEvent: 56,
     dispidResourceSelectionChangedEvent: 57,
     dispidViewSelectionChangedEvent: 58,
@@ -1574,6 +1632,7 @@ OSF.DDA.ErrorCodeManager = function()
                 ooeRequestTimeout: 5011,
                 ooeInvalidOrTimedOutSession: 5012,
                 ooeInvalidApiArguments: 5013,
+                ooeOperationCancelled: 5014,
                 ooeTooManyIncompleteRequests: 5100,
                 ooeRequestTokenUnavailable: 5101,
                 ooeActivityLimitReached: 5102,
@@ -1619,7 +1678,8 @@ OSF.DDA.ErrorCodeManager = function()
                 ooeSSOClientError: 13006,
                 ooeSSOServerError: 13007,
                 ooeAddinIsAlreadyRequestingToken: 13008,
-                ooeSSOUserConsentNotSupportedByCurrentAddinCategory: 13009
+                ooeSSOUserConsentNotSupportedByCurrentAddinCategory: 13009,
+                ooeSSOConnectionLost: 13010
             },
             initializeErrorMessages: function OSF_DDA_ErrorCodeManager$initializeErrorMessages(stringNS)
             {
@@ -2006,6 +2066,14 @@ OSF.DDA.ErrorCodeManager = function()
                 _errorMappings[OSF.DDA.ErrorCodeManager.errorCodes.ooeSSOUserConsentNotSupportedByCurrentAddinCategory] = {
                     name: stringNS.L_SSOUserConsentNotSupportedByCurrentAddinCategory,
                     message: stringNS.L_SSOUserConsentNotSupportedByCurrentAddinCategoryMessage
+                };
+                _errorMappings[OSF.DDA.ErrorCodeManager.errorCodes.ooeSSOConnectionLost] = {
+                    name: stringNS.L_SSOConnectionLostError,
+                    message: stringNS.L_SSOConnectionLostErrorMessage
+                };
+                _errorMappings[OSF.DDA.ErrorCodeManager.errorCodes.ooeOperationCancelled] = {
+                    name: stringNS.L_OperationCancelledError,
+                    message: stringNS.L_OperationCancelledErrorMessage
                 }
             }
         }
@@ -2728,6 +2796,8 @@ OSF.DDA.Context = function OSF_DDA_Context(officeAppContext, document, license, 
         OSF.OUtil.defineEnumerableProperty(this,"ui",{value: officeAppContext.ui});
     if(officeAppContext.auth)
         OSF.OUtil.defineEnumerableProperty(this,"auth",{value: officeAppContext.auth});
+    if(officeAppContext.application)
+        OSF.OUtil.defineEnumerableProperty(this,"application",{value: officeAppContext.application});
     if(officeAppContext.get_isDialog())
     {
         var requirements = OfficeExt.Requirement.RequirementsMatrixFactory.getDefaultDialogRequirementMatrix(officeAppContext);
@@ -2760,6 +2830,7 @@ OSF.DDA.OutlookContext = function OSF_DDA_OutlookContext(appContext, settings, l
 };
 OSF.OUtil.extend(OSF.DDA.OutlookContext,OSF.DDA.Context);
 OSF.DDA.OutlookAppOm = function OSF_DDA_OutlookAppOm(appContext, window, appReady){};
+OSF.DDA.Application = function OSF_DDA_Application(officeAppContext){};
 OSF.DDA.Document = function OSF_DDA_Document(officeAppContext, settings)
 {
     var mode;
@@ -3496,6 +3567,8 @@ OSF.DDA.DispIdHost.Facade = function OSF_DDA_DispIdHost_Facade(getDelegateMethod
             AppCommandInvocationCompletedAsync: did.dispidAppCommandInvocationCompletedMethod,
             CloseContainerAsync: did.dispidCloseContainerMethod,
             OpenBrowserWindow: did.dispidOpenBrowserWindow,
+            CreateDocumentAsync: did.dispidCreateDocumentMethod,
+            InsertFormAsync: did.dispidInsertFormMethod,
             AddDataPartAsync: did.dispidAddDataPartMethod,
             GetDataPartByIdAsync: did.dispidGetDataPartByIdMethod,
             GetDataPartsByNameSpaceAsync: did.dispidGetDataPartsByNamespaceMethod,
@@ -3561,6 +3634,7 @@ OSF.DDA.DispIdHost.Facade = function OSF_DDA_DispIdHost_Facade(getDelegateMethod
             ItemChanged: did.dispidOlkItemSelectedChangedEvent,
             RecipientsChanged: did.dispidOlkRecipientsChangedEvent,
             AppointmentTimeChanged: did.dispidOlkAppointmentTimeChangedEvent,
+            RecurrenceChanged: did.dispidOlkRecurrenceChangedEvent,
             TaskSelectionChanged: did.dispidTaskSelectionChangedEvent,
             ResourceSelectionChanged: did.dispidResourceSelectionChangedEvent,
             ViewSelectionChanged: did.dispidViewSelectionChangedEvent,
@@ -4806,16 +4880,17 @@ OSF.EventDispatch = function OSF_EventDispatch(eventTypes)
     this._eventHandlers = {};
     this._objectEventHandlers = {};
     this._queuedEventsArgs = {};
-    for(var entry in eventTypes)
-    {
-        var eventType = eventTypes[entry];
-        var isObjectEvent = eventType == "objectDeleted" || eventType == "objectSelectionChanged" || eventType == "objectDataChanged" || eventType == "contentControlAdded";
-        if(!isObjectEvent)
-            this._eventHandlers[eventType] = [];
-        else
-            this._objectEventHandlers[eventType] = {};
-        this._queuedEventsArgs[eventType] = []
-    }
+    if(eventTypes != null)
+        for(var i = 0; i < eventTypes.length; i++)
+        {
+            var eventType = eventTypes[i];
+            var isObjectEvent = eventType == "objectDeleted" || eventType == "objectSelectionChanged" || eventType == "objectDataChanged" || eventType == "contentControlAdded";
+            if(!isObjectEvent)
+                this._eventHandlers[eventType] = [];
+            else
+                this._objectEventHandlers[eventType] = {};
+            this._queuedEventsArgs[eventType] = []
+        }
 };
 OSF.EventDispatch.prototype = {
     getSupportedEvents: function OSF_EventDispatch$getSupportedEvents()
@@ -4841,8 +4916,8 @@ OSF.EventDispatch.prototype = {
     {
         var handlers = this._eventHandlers[eventType];
         if(handlers && handlers.length > 0)
-            for(var h in handlers)
-                if(handlers[h] === handler)
+            for(var i = 0; i < handlers.length; i++)
+                if(handlers[i] === handler)
                     return true;
         return false
     },
@@ -4957,8 +5032,8 @@ OSF.EventDispatch.prototype = {
         if(eventType && this._eventHandlers[eventType])
         {
             var eventHandlers = this._eventHandlers[eventType];
-            for(var handler in eventHandlers)
-                eventHandlers[handler](eventArgs);
+            for(var i = 0; i < eventHandlers.length; i++)
+                eventHandlers[i](eventArgs);
             return true
         }
         else
@@ -5095,7 +5170,7 @@ OSF.DDA.OMFactory.manufactureEventArgs = function OSF_DDA_OMFactory$manufactureE
             {
                 args = new OSF.DDA.OlkItemSelectedChangedEventArgs(eventProperties);
                 target.initialize(args["initialData"]);
-                if(OSF._OfficeAppFactory.getHostInfo()["hostPlatform"] == "win32")
+                if(OSF._OfficeAppFactory.getHostInfo()["hostPlatform"] == "win32" || OSF._OfficeAppFactory.getHostInfo()["hostPlatform"] == "mac")
                     target.setCurrentItemNumber(args["itemNumber"].itemNumber)
             }
             else
@@ -5110,6 +5185,12 @@ OSF.DDA.OMFactory.manufactureEventArgs = function OSF_DDA_OMFactory$manufactureE
         case Microsoft.Office.WebExtension.EventType.AppointmentTimeChanged:
             if(OSF._OfficeAppFactory.getHostInfo()["hostType"] == "outlook")
                 args = new OSF.DDA.OlkAppointmentTimeChangedEventArgs(eventProperties);
+            else
+                throw OsfMsAjaxFactory.msAjaxError.argument(Microsoft.Office.WebExtension.Parameters.EventType,OSF.OUtil.formatString(Strings.OfficeOM.L_NotSupportedEventType,eventType));
+            break;
+        case Microsoft.Office.WebExtension.EventType.RecurrenceChanged:
+            if(OSF._OfficeAppFactory.getHostInfo()["hostType"] == "outlook")
+                args = new OSF.DDA.OlkRecurrenceChangedEventArgs(eventProperties);
             else
                 throw OsfMsAjaxFactory.msAjaxError.argument(Microsoft.Office.WebExtension.Parameters.EventType,OSF.OUtil.formatString(Strings.OfficeOM.L_NotSupportedEventType,eventType));
             break;
@@ -5485,6 +5566,29 @@ OSF.DDA.OlkAppointmentTimeChangedEventArgs = function OSF_DDA_OlkAppointmentTime
         end: {value: end}
     })
 };
+OSF.OUtil.augmentList(Microsoft.Office.WebExtension.EventType,{RecurrenceChanged: "olkRecurrenceChanged"});
+OSF.OUtil.augmentList(OSF.DDA.EventDescriptors,{OlkRecurrenceData: "OlkRecurrenceData"});
+OSF.DDA.OlkRecurrenceChangedEventArgs = function OSF_DDA_OlkRecurrenceChangedEventArgs(eventData)
+{
+    var recurrenceObject = null;
+    try
+    {
+        var dataObject = JSON.parse(eventData[OSF.DDA.EventDescriptors.OlkRecurrenceChangedData][0]);
+        if(dataObject.recurrence != null)
+        {
+            recurrenceObject = JSON.parse(dataObject.recurrence);
+            recurrenceObject = Microsoft.Office.WebExtension.OutlookBase.SeriesTimeJsonConverter(recurrenceObject)
+        }
+    }
+    catch(e)
+    {
+        recurrenceObject = null
+    }
+    OSF.OUtil.defineEnumerableProperties(this,{
+        type: {value: Microsoft.Office.WebExtension.EventType.RecurrenceChanged},
+        recurrence: {value: recurrenceObject}
+    })
+};
 OSF.DDA.OlkItemSelectedChangedEventArgs = function OSF_DDA_OlkItemSelectedChangedEventArgs(eventData)
 {
     var initialDataSource = eventData[OSF.DDA.EventDescriptors.OlkItemSelectedData][0];
@@ -5516,6 +5620,14 @@ OSF.DDA.SafeArray.Delegate.ParameterMap.define({
     type: OSF.DDA.EventDispId.dispidOlkAppointmentTimeChangedEvent,
     fromHost: [{
             name: OSF.DDA.EventDescriptors.OlkAppointmentTimeChangedData,
+            value: OSF.DDA.SafeArray.Delegate.ParameterMap.sourceData
+        }],
+    isComplexType: true
+});
+OSF.DDA.SafeArray.Delegate.ParameterMap.define({
+    type: OSF.DDA.EventDispId.dispidOlkRecurrenceChangedEvent,
+    fromHost: [{
+            name: OSF.DDA.EventDescriptors.OlkRecurrenceChangedData,
             value: OSF.DDA.SafeArray.Delegate.ParameterMap.sourceData
         }],
     isComplexType: true
@@ -6191,26 +6303,9 @@ var Logger;
         SendFlag[SendFlag["flush"] = 1] = "flush"
     })(Logger.SendFlag || (Logger.SendFlag = {}));
     var SendFlag = Logger.SendFlag;
-    function allowUploadingData()
-    {
-        if(OSF.Logger && OSF.Logger.ulsEndpoint)
-            OSF.Logger.ulsEndpoint.loadProxyFrame()
-    }
+    function allowUploadingData(){}
     Logger.allowUploadingData = allowUploadingData;
-    function sendLog(traceLevel, message, flag)
-    {
-        if(OSF.Logger && OSF.Logger.ulsEndpoint)
-        {
-            var jsonObj = {
-                    traceLevel: traceLevel,
-                    message: message,
-                    flag: flag,
-                    internalLog: true
-                };
-            var logs = JSON.stringify(jsonObj);
-            OSF.Logger.ulsEndpoint.writeLog(logs)
-        }
-    }
+    function sendLog(traceLevel, message, flag){}
     Logger.sendLog = sendLog;
     function creatULSEndpoint()
     {
@@ -6225,64 +6320,9 @@ var Logger;
     }
     var ULSEndpointProxy = function()
         {
-            function ULSEndpointProxy()
-            {
-                var _this = this;
-                this.proxyFrame = null;
-                this.telemetryEndPoint = "https://telemetryservice.firstpartyapps.oaspapps.com/telemetryservice/telemetryproxy.html";
-                this.buffer = [];
-                this.proxyFrameReady = false;
-                OSF.OUtil.addEventListener(window,"message",function(e)
-                {
-                    return _this.tellProxyFrameReady(e)
-                });
-                setTimeout(function()
-                {
-                    _this.loadProxyFrame()
-                },3e3)
-            }
-            ULSEndpointProxy.prototype.writeLog = function(log)
-            {
-                if(this.proxyFrameReady === true)
-                    this.proxyFrame.contentWindow.postMessage(log,ULSEndpointProxy.telemetryOrigin);
-                else if(this.buffer.length < 128)
-                    this.buffer.push(log)
-            };
-            ULSEndpointProxy.prototype.loadProxyFrame = function()
-            {
-                if(this.proxyFrame == null)
-                {
-                    this.proxyFrame = document.createElement("iframe");
-                    this.proxyFrame.setAttribute("style","display:none");
-                    this.proxyFrame.setAttribute("src",this.telemetryEndPoint);
-                    document.head.appendChild(this.proxyFrame)
-                }
-            };
-            ULSEndpointProxy.prototype.tellProxyFrameReady = function(e)
-            {
-                var _this = this;
-                if(e.data === "ProxyFrameReadyToLog")
-                {
-                    this.proxyFrameReady = true;
-                    for(var i = 0; i < this.buffer.length; i++)
-                        this.writeLog(this.buffer[i]);
-                    this.buffer.length = 0;
-                    OSF.OUtil.removeEventListener(window,"message",function(e)
-                    {
-                        return _this.tellProxyFrameReady(e)
-                    })
-                }
-                else if(e.data === "ProxyFrameReadyToInit")
-                {
-                    var initJson = {
-                            appName: "Office APPs",
-                            sessionId: OSF.OUtil.Guid.generateNewGuid()
-                        };
-                    var initStr = JSON.stringify(initJson);
-                    this.proxyFrame.contentWindow.postMessage(initStr,ULSEndpointProxy.telemetryOrigin)
-                }
-            };
-            ULSEndpointProxy.telemetryOrigin = "https://telemetryservice.firstpartyapps.oaspapps.com";
+            function ULSEndpointProxy(){}
+            ULSEndpointProxy.prototype.writeLog = function(log){};
+            ULSEndpointProxy.prototype.loadProxyFrame = function(){};
             return ULSEndpointProxy
         }();
     if(!OSF.Logger)
@@ -6444,7 +6484,7 @@ var OSFAppTelemetry;
             function AppLogger(){}
             AppLogger.prototype.LogData = function(data)
             {
-                if(!OSF.Logger || !OSFAppTelemetry.enableTelemetry)
+                if(!OSFAppTelemetry.enableTelemetry)
                     return;
                 try
                 {
@@ -6454,7 +6494,7 @@ var OSFAppTelemetry;
             };
             AppLogger.prototype.LogRawData = function(log)
             {
-                if(!OSF.Logger || !OSFAppTelemetry.enableTelemetry)
+                if(!OSFAppTelemetry.enableTelemetry)
                     return;
                 try
                 {
@@ -6472,7 +6512,7 @@ var OSFAppTelemetry;
     }
     function initialize(context)
     {
-        if(!OSF.Logger)
+        if(!OSFAppTelemetry.enableTelemetry)
             return;
         if(appInfo)
             return;
@@ -6491,7 +6531,7 @@ var OSFAppTelemetry;
             appInfo.appInstanceId = appInfo.appInstanceId.replace(/[{}]/g,"").toLowerCase();
         appInfo.message = context.get_hostCustomMessage();
         appInfo.officeJSVersion = OSF.ConstantNames.FileVersion;
-        appInfo.hostJSVersion = "16.0.8809.1000";
+        appInfo.hostJSVersion = "16.0.9117.1000";
         if(context._wacHostEnvironment)
             appInfo.wacHostEnvironment = context._wacHostEnvironment;
         if(context._isFromWacAutomation !== undefined && context._isFromWacAutomation !== null)
@@ -6609,13 +6649,7 @@ var OSFAppTelemetry;
             data.WacHostEnvironment = appInfo.wacHostEnvironment;
         if(appInfo.isFromWacAutomation !== undefined && appInfo.isFromWacAutomation !== null)
             data.IsFromWacAutomation = appInfo.isFromWacAutomation;
-        (new AppLogger).LogData(data);
-        setTimeout(function()
-        {
-            if(!OSF.Logger)
-                return;
-            OSF.Logger.allowUploadingData()
-        },100)
+        (new AppLogger).LogData(data)
     }
     OSFAppTelemetry.onAppActivated = onAppActivated;
     function onScriptDone(scriptId, msStartTime, msResponseTime, appCorrelationId)
@@ -7216,6 +7250,46 @@ OSF.InitializationHelper.prototype.loadAppSpecificScriptAndCreateOM = function O
     };
     Microsoft.Office.WebExtension.MailboxEnums.ModuleType = {Addins: "addins"};
     Microsoft.Office.WebExtension.MailboxEnums.ActionType = {ShowTaskPane: "showTaskPane"};
+    Microsoft.Office.WebExtension.MailboxEnums.Days = {
+        Mon: "mon",
+        Tue: "tue",
+        Wed: "wed",
+        Thu: "thu",
+        Fri: "fri",
+        Sat: "sat",
+        Sun: "sun",
+        Weekday: "weekday",
+        WeekendDay: "weekendDay",
+        Day: "day"
+    };
+    Microsoft.Office.WebExtension.MailboxEnums.WeekNumber = {
+        First: "first",
+        Second: "second",
+        Third: "third",
+        Fourth: "fourth",
+        Last: "last"
+    };
+    Microsoft.Office.WebExtension.MailboxEnums.RecurrenceType = {
+        Daily: "daily",
+        Weekday: "weekday",
+        Weekly: "weekly",
+        Monthly: "monthly",
+        Yearly: "yearly"
+    };
+    Microsoft.Office.WebExtension.MailboxEnums.Month = {
+        Jan: "jan",
+        Feb: "feb",
+        Mar: "mar",
+        Apr: "apr",
+        May: "may",
+        Jun: "jun",
+        Jul: "jul",
+        Aug: "aug",
+        Sep: "sep",
+        Oct: "oct",
+        Nov: "nov",
+        Dec: "dec"
+    };
     Type.registerNamespace("OSF.DDA");
     var OSF = window["OSF"] || {};
     OSF.DDA = OSF.DDA || {};
@@ -7403,7 +7477,7 @@ OSF.InitializationHelper.prototype.loadAppSpecificScriptAndCreateOM = function O
     {
         return data
     };
-    window["OSF"]["DDA"]["OutlookAppOm"]._throwOnArgumentType$p = function(value, expectedType, argumentName)
+    window["OSF"]["DDA"]["OutlookAppOm"].throwOnArgumentType = function(value, expectedType, argumentName)
     {
         if(Object["getType"](value) !== expectedType)
             throw Error.argumentType(argumentName);
@@ -7412,7 +7486,7 @@ OSF.InitializationHelper.prototype.loadAppSpecificScriptAndCreateOM = function O
     {
         if($h.ScriptHelpers.isNullOrUndefined(value))
             return;
-        window["OSF"]["DDA"]["OutlookAppOm"]._throwOnArgumentType$p(value,String,name);
+        window["OSF"]["DDA"]["OutlookAppOm"].throwOnArgumentType(value,String,name);
         var stringValue = value;
         window["OSF"]["DDA"]["OutlookAppOm"]._throwOnOutOfRange$i(stringValue.length,minLength,maxLength,name)
     };
@@ -7433,7 +7507,7 @@ OSF.InitializationHelper.prototype.loadAppSpecificScriptAndCreateOM = function O
     {
         if($h.ScriptHelpers.isNullOrUndefined(emailset))
             return null;
-        window["OSF"]["DDA"]["OutlookAppOm"]._throwOnArgumentType$p(emailset,Array,name);
+        window["OSF"]["DDA"]["OutlookAppOm"].throwOnArgumentType(emailset,Array,name);
         var originalAttendees = emailset;
         var updatedAttendees = null;
         var normalizationNeeded = false;
@@ -7450,10 +7524,10 @@ OSF.InitializationHelper.prototype.loadAppSpecificScriptAndCreateOM = function O
             if(normalizationNeeded)
             {
                 updatedAttendees[i] = $h.EmailAddressDetails["isInstanceOfType"](originalAttendees[i]) ? originalAttendees[i]["emailAddress"] : originalAttendees[i];
-                window["OSF"]["DDA"]["OutlookAppOm"]._throwOnArgumentType$p(updatedAttendees[i],String,String.format("{0}[{1}]",name,i))
+                window["OSF"]["DDA"]["OutlookAppOm"].throwOnArgumentType(updatedAttendees[i],String,String.format("{0}[{1}]",name,i))
             }
             else
-                window["OSF"]["DDA"]["OutlookAppOm"]._throwOnArgumentType$p(originalAttendees[i],String,String.format("{0}[{1}]",name,i));
+                window["OSF"]["DDA"]["OutlookAppOm"].throwOnArgumentType(originalAttendees[i],String,String.format("{0}[{1}]",name,i));
         return updatedAttendees
     };
     OSF.DDA.OutlookAppOm.prototype = {
@@ -7492,7 +7566,7 @@ OSF.InitializationHelper.prototype.loadAppSpecificScriptAndCreateOM = function O
         addEventSupport: function()
         {
             if(this._item$p$0)
-                OSF.DDA.DispIdHost["addEventSupport"](this._item$p$0,new OSF.EventDispatch([Microsoft.Office.WebExtension.EventType["RecipientsChanged"],Microsoft.Office.WebExtension.EventType["AppointmentTimeChanged"]]))
+                OSF.DDA.DispIdHost["addEventSupport"](this._item$p$0,new OSF.EventDispatch([Microsoft.Office.WebExtension.EventType["RecipientsChanged"],Microsoft.Office.WebExtension.EventType["AppointmentTimeChanged"],Microsoft.Office.WebExtension.EventType["RecurrenceChanged"]]))
         },
         windowOpenOverrideHandler: function(url, targetName, features, replace)
         {
@@ -7783,6 +7857,9 @@ OSF.InitializationHelper.prototype.loadAppSpecificScriptAndCreateOM = function O
                 case 41:
                 case 34:
                 case 99:
+                case 103:
+                case 107:
+                case 108:
                     break;
                 case 12:
                     optionalParameters["isRest"] = data["isRest"];
@@ -7822,6 +7899,7 @@ OSF.InitializationHelper.prototype.loadAppSpecificScriptAndCreateOM = function O
                     executeParameters = [data["htmlBody"],data["attachments"]];
                     break;
                 case 100:
+                case 104:
                     optionalParameters = data;
                     break;
                 case 23:
@@ -7893,12 +7971,12 @@ OSF.InitializationHelper.prototype.loadAppSpecificScriptAndCreateOM = function O
             window["OSF"]["DDA"]["OutlookAppOm"]._validateOptionalStringParameter$p(parameters["subject"],0,window["OSF"]["DDA"]["OutlookAppOm"]._maxSubjectLength$p,"subject");
             if(!$h.ScriptHelpers.isNullOrUndefined(parameters["start"]))
             {
-                window["OSF"]["DDA"]["OutlookAppOm"]._throwOnArgumentType$p(parameters["start"],Date,"start");
+                window["OSF"]["DDA"]["OutlookAppOm"].throwOnArgumentType(parameters["start"],Date,"start");
                 var startDateTime = parameters["start"];
                 parameters["start"] = startDateTime["getTime"]();
                 if(!$h.ScriptHelpers.isNullOrUndefined(parameters["end"]))
                 {
-                    window["OSF"]["DDA"]["OutlookAppOm"]._throwOnArgumentType$p(parameters["end"],Date,"end");
+                    window["OSF"]["DDA"]["OutlookAppOm"].throwOnArgumentType(parameters["end"],Date,"end");
                     var endDateTime = parameters["end"];
                     if(endDateTime < startDateTime)
                         throw Error.argumentOutOfRange("end",endDateTime,window["_u"]["ExtensibilityStrings"]["l_InvalidEventDates_Text"]);
@@ -8554,6 +8632,8 @@ OSF.InitializationHelper.prototype.loadAppSpecificScriptAndCreateOM = function O
     };
     $h.Appointment = function(dataDictionary)
     {
+        this.$$d__getSeriesId$p$2 = Function.createDelegate(this,this._getSeriesId$p$2);
+        this.$$d__getRecurrence$p$2 = Function.createDelegate(this,this._getRecurrence$p$2);
         this.$$d__getOrganizer$p$2 = Function.createDelegate(this,this._getOrganizer$p$2);
         this.$$d__getNormalizedSubject$p$2 = Function.createDelegate(this,this._getNormalizedSubject$p$2);
         this.$$d__getSubject$p$2 = Function.createDelegate(this,this._getSubject$p$2);
@@ -8572,7 +8652,9 @@ OSF.InitializationHelper.prototype.loadAppSpecificScriptAndCreateOM = function O
         $h.InitialData._defineReadOnlyProperty$i(this,"resources",this.$$d__getResources$p$2);
         $h.InitialData._defineReadOnlyProperty$i(this,"subject",this.$$d__getSubject$p$2);
         $h.InitialData._defineReadOnlyProperty$i(this,"normalizedSubject",this.$$d__getNormalizedSubject$p$2);
-        $h.InitialData._defineReadOnlyProperty$i(this,"organizer",this.$$d__getOrganizer$p$2)
+        $h.InitialData._defineReadOnlyProperty$i(this,"organizer",this.$$d__getOrganizer$p$2);
+        $h.InitialData._defineReadOnlyProperty$i(this,"recurrence",this.$$d__getRecurrence$p$2);
+        $h.InitialData._defineReadOnlyProperty$i(this,"seriesId",this.$$d__getSeriesId$p$2)
     };
     $h.Appointment.prototype = {
         getItemType: function()
@@ -8614,6 +8696,16 @@ OSF.InitializationHelper.prototype.loadAppSpecificScriptAndCreateOM = function O
         _getOrganizer$p$2: function()
         {
             return this._data$p$0.get__organizer$i$0()
+        },
+        _getRecurrence$p$2: function()
+        {
+            if(this._data$p$0.get__recurrence$i$0() && this._data$p$0.get__recurrence$i$0()["seriesTimeJson"])
+                return $h.ComposeRecurrence.copyRecurrenceObjectConvertSeriesTimeJson(this._data$p$0.get__recurrence$i$0());
+            return this._data$p$0.get__recurrence$i$0()
+        },
+        _getSeriesId$p$2: function()
+        {
+            return this._data$p$0.get__seriesId$i$0()
         }
     };
     $h.Appointment.prototype.getEntities = function()
@@ -8657,6 +8749,8 @@ OSF.InitializationHelper.prototype.loadAppSpecificScriptAndCreateOM = function O
     };
     $h.AppointmentCompose = function(data)
     {
+        this.$$d__getSeriesId$p$2 = Function.createDelegate(this,this._getSeriesId$p$2);
+        this.$$d__getRecurrence$p$2 = Function.createDelegate(this,this._getRecurrence$p$2);
         this.$$d__getLocation$p$2 = Function.createDelegate(this,this._getLocation$p$2);
         this.$$d__getEnd$p$2 = Function.createDelegate(this,this._getEnd$p$2);
         this.$$d__getStart$p$2 = Function.createDelegate(this,this._getStart$p$2);
@@ -8667,7 +8761,9 @@ OSF.InitializationHelper.prototype.loadAppSpecificScriptAndCreateOM = function O
         $h.InitialData._defineReadOnlyProperty$i(this,"optionalAttendees",this.$$d__getOptionalAttendees$p$2);
         $h.InitialData._defineReadOnlyProperty$i(this,"start",this.$$d__getStart$p$2);
         $h.InitialData._defineReadOnlyProperty$i(this,"end",this.$$d__getEnd$p$2);
-        $h.InitialData._defineReadOnlyProperty$i(this,"location",this.$$d__getLocation$p$2)
+        $h.InitialData._defineReadOnlyProperty$i(this,"location",this.$$d__getLocation$p$2);
+        $h.InitialData._defineReadOnlyProperty$i(this,"recurrence",this.$$d__getRecurrence$p$2);
+        $h.InitialData._defineReadOnlyProperty$i(this,"seriesId",this.$$d__getSeriesId$p$2)
     };
     $h.AppointmentCompose.prototype = {
         _requiredAttendees$p$2: null,
@@ -8675,6 +8771,7 @@ OSF.InitializationHelper.prototype.loadAppSpecificScriptAndCreateOM = function O
         _start$p$2: null,
         _end$p$2: null,
         _location$p$2: null,
+        _recurrence$p$2: null,
         getItemType: function()
         {
             return window["Microsoft"]["Office"]["WebExtension"]["MailboxEnums"]["ItemType"]["Appointment"]
@@ -8713,6 +8810,21 @@ OSF.InitializationHelper.prototype.loadAppSpecificScriptAndCreateOM = function O
             if(!this._location$p$2)
                 this._location$p$2 = new $h.ComposeLocation;
             return this._location$p$2
+        },
+        _getRecurrence$p$2: function()
+        {
+            this._data$p$0._throwOnRestrictedPermissionLevel$i$0();
+            if(!this._recurrence$p$2)
+            {
+                var isInstance = !!this._data$p$0.get__seriesId$i$0() && this._data$p$0.get__seriesId$i$0().length > 0;
+                this._recurrence$p$2 = new $h.ComposeRecurrence(isInstance)
+            }
+            return this._recurrence$p$2
+        },
+        _getSeriesId$p$2: function()
+        {
+            this._data$p$0._throwOnRestrictedPermissionLevel$i$0();
+            return this._data$p$0.get__seriesId$i$0()
         }
     };
     $h.AttachmentConstants = function(){};
@@ -8786,6 +8898,24 @@ OSF.InitializationHelper.prototype.loadAppSpecificScriptAndCreateOM = function O
             throw Error.argument("coercionType");
         var dataToHost = {coercionType: hostCoercionType};
         window["OSF"]["DDA"]["OutlookAppOm"]._instance$p._standardInvokeHostMethod$i$0(37,dataToHost,null,commonParameters._asyncContext$p$0,commonParameters._callback$p$0)
+    };
+    $h.ComposeFrom = function()
+    {
+        this.$$d__getAsyncFormatter$p$0 = Function.createDelegate(this,this._getAsyncFormatter$p$0)
+    };
+    $h.ComposeFrom.prototype = {_getAsyncFormatter$p$0: function(rawInput)
+        {
+            var from = rawInput;
+            return $h.ScriptHelpers.isNullOrUndefined(from) ? null : new $h.EmailAddressDetails(from)
+        }};
+    $h.ComposeFrom.prototype.getAsync = function()
+    {
+        var args = [];
+        for(var $$pai_2 = 0; $$pai_2 < arguments["length"]; ++$$pai_2)
+            args[$$pai_2] = arguments[$$pai_2];
+        window["OSF"]["DDA"]["OutlookAppOm"]._instance$p._throwOnMethodCallForInsufficientPermission$i$0(1,"from.getAsync");
+        var parameters = $h.CommonParameters.parse(args,true);
+        window["OSF"]["DDA"]["OutlookAppOm"]._instance$p._standardInvokeHostMethod$i$0(107,null,this.$$d__getAsyncFormatter$p$0,parameters._asyncContext$p$0,parameters._callback$p$0)
     };
     $h.ComposeBody = function()
     {
@@ -8893,15 +9023,18 @@ OSF.InitializationHelper.prototype.loadAppSpecificScriptAndCreateOM = function O
     };
     $h.ComposeItem = function(data)
     {
+        this.$$d__getFrom$p$1 = Function.createDelegate(this,this._getFrom$p$1);
         this.$$d__getBody$p$1 = Function.createDelegate(this,this._getBody$p$1);
         this.$$d__getSubject$p$1 = Function.createDelegate(this,this._getSubject$p$1);
         $h.ComposeItem["initializeBase"](this,[data]);
         $h.InitialData._defineReadOnlyProperty$i(this,"subject",this.$$d__getSubject$p$1);
-        $h.InitialData._defineReadOnlyProperty$i(this,"body",this.$$d__getBody$p$1)
+        $h.InitialData._defineReadOnlyProperty$i(this,"body",this.$$d__getBody$p$1);
+        $h.InitialData._defineReadOnlyProperty$i(this,"from",this.$$d__getFrom$p$1)
     };
     $h.ComposeItem.prototype = {
         _subject$p$1: null,
         _body$p$1: null,
+        _from$p$1: null,
         _getBody$p$1: function()
         {
             this._data$p$0._throwOnRestrictedPermissionLevel$i$0();
@@ -8915,6 +9048,13 @@ OSF.InitializationHelper.prototype.loadAppSpecificScriptAndCreateOM = function O
             if(!this._subject$p$1)
                 this._subject$p$1 = new $h.ComposeSubject;
             return this._subject$p$1
+        },
+        _getFrom$p$1: function()
+        {
+            this._data$p$0._throwOnRestrictedPermissionLevel$i$0();
+            if(!this._from$p$1)
+                this._from$p$1 = new $h.ComposeFrom;
+            return this._from$p$1
         }
     };
     $h.ComposeItem.prototype.addFileAttachmentAsync = function(uri, attachmentName)
@@ -9125,6 +9265,190 @@ OSF.InitializationHelper.prototype.loadAppSpecificScriptAndCreateOM = function O
         optionalAttendees: 1
     };
     $h.ComposeRecipient.RecipientField["registerEnum"]("$h.ComposeRecipient.RecipientField",false);
+    $h.ComposeRecurrence = function(isInstance)
+    {
+        this._isInstance$p$0 = isInstance
+    };
+    $h.ComposeRecurrence.copyRecurrenceObjectConvertSeriesTimeJson = function(recurrenceObject)
+    {
+        var seriesTime = new window["Microsoft"]["Office"]["WebExtension"]["SeriesTime"];
+        var recurrenceDictionary = recurrenceObject;
+        var recurrenceCopy = {};
+        if($h.ScriptHelpers.isNullOrUndefined(recurrenceDictionary["recurrenceProperties"]))
+            recurrenceCopy["recurrenceProperties"] = null;
+        else
+            recurrenceCopy["recurrenceProperties"] = $h.ScriptHelpers.deepClone(recurrenceDictionary["recurrenceProperties"]);
+        recurrenceCopy["recurrenceType"] = recurrenceDictionary["recurrenceType"];
+        seriesTime.importFromSeriesTimeJsonObject(recurrenceDictionary["seriesTimeJson"]);
+        recurrenceCopy["seriesTime"] = seriesTime;
+        return recurrenceCopy
+    };
+    $h.ComposeRecurrence._throwOnNullParameter$p = function(recurrenceObject, parameterName)
+    {
+        var recurrenceDictionary = recurrenceObject;
+        if(!recurrenceDictionary[parameterName])
+            throw Error.argumentNull(parameterName);
+    };
+    $h.ComposeRecurrence._throwOnInvalidRecurrenceType$p = function(recurrenceType)
+    {
+        if(recurrenceType !== window["Microsoft"]["Office"]["WebExtension"]["MailboxEnums"]["RecurrenceType"]["Daily"] && recurrenceType !== window["Microsoft"]["Office"]["WebExtension"]["MailboxEnums"]["RecurrenceType"]["Weekly"] && recurrenceType !== window["Microsoft"]["Office"]["WebExtension"]["MailboxEnums"]["RecurrenceType"]["Weekday"] && recurrenceType !== window["Microsoft"]["Office"]["WebExtension"]["MailboxEnums"]["RecurrenceType"]["Yearly"] && recurrenceType !== window["Microsoft"]["Office"]["WebExtension"]["MailboxEnums"]["RecurrenceType"]["Monthly"])
+            throw Error.argument("recurrenceType");
+    };
+    $h.ComposeRecurrence._throwOnInvalidDailyRecurrence$p = function(recurrenceProperties)
+    {
+        $h.ComposeRecurrence._throwOnNullParameter$p(recurrenceProperties,"interval");
+        window["OSF"]["DDA"]["OutlookAppOm"].throwOnArgumentType(recurrenceProperties["interval"],Number,"interval")
+    };
+    $h.ComposeRecurrence._verifyDays$p = function(dayEnum, checkGroupedDays)
+    {
+        var fRegularDay = dayEnum === window["Microsoft"]["Office"]["WebExtension"]["MailboxEnums"]["Days"]["Mon"] || dayEnum === window["Microsoft"]["Office"]["WebExtension"]["MailboxEnums"]["Days"]["Tue"] || dayEnum === window["Microsoft"]["Office"]["WebExtension"]["MailboxEnums"]["Days"]["Wed"] || dayEnum === window["Microsoft"]["Office"]["WebExtension"]["MailboxEnums"]["Days"]["Thu"] || dayEnum === window["Microsoft"]["Office"]["WebExtension"]["MailboxEnums"]["Days"]["Fri"] || dayEnum === window["Microsoft"]["Office"]["WebExtension"]["MailboxEnums"]["Days"]["Sat"] || dayEnum === window["Microsoft"]["Office"]["WebExtension"]["MailboxEnums"]["Days"]["Sun"];
+        if(checkGroupedDays)
+        {
+            var fGroupedDay = dayEnum === window["Microsoft"]["Office"]["WebExtension"]["MailboxEnums"]["Days"]["WeekendDay"] || dayEnum === window["Microsoft"]["Office"]["WebExtension"]["MailboxEnums"]["Days"]["Weekday"] || dayEnum === window["Microsoft"]["Office"]["WebExtension"]["MailboxEnums"]["Days"]["Day"];
+            return fGroupedDay || fRegularDay
+        }
+        else
+            return fRegularDay
+    };
+    $h.ComposeRecurrence._throwOnInvalidDaysArray$p = function(daysArray)
+    {
+        for(var i = 0; i < daysArray["length"]; i++)
+            if(!$h.ComposeRecurrence._verifyDays$p(daysArray[i],false))
+                throw Error.argument("days");
+    };
+    $h.ComposeRecurrence._throwOnInvalidWeeklyRecurrence$p = function(recurrenceProperties)
+    {
+        var recurrenceDictionary = recurrenceProperties;
+        $h.ComposeRecurrence._throwOnNullParameter$p(recurrenceProperties,"interval");
+        window["OSF"]["DDA"]["OutlookAppOm"].throwOnArgumentType(recurrenceDictionary["interval"],Number,"interval");
+        $h.ComposeRecurrence._throwOnNullParameter$p(recurrenceProperties,"days");
+        window["OSF"]["DDA"]["OutlookAppOm"].throwOnArgumentType(recurrenceDictionary["days"],Array,"days");
+        $h.ComposeRecurrence._throwOnInvalidDaysArray$p(recurrenceDictionary["days"])
+    };
+    $h.ComposeRecurrence._throwOnInvalidWeekNumber$p = function(weekNumber)
+    {
+        if(weekNumber !== window["Microsoft"]["Office"]["WebExtension"]["MailboxEnums"]["WeekNumber"]["First"] && weekNumber !== window["Microsoft"]["Office"]["WebExtension"]["MailboxEnums"]["WeekNumber"]["Second"] && weekNumber !== window["Microsoft"]["Office"]["WebExtension"]["MailboxEnums"]["WeekNumber"]["Third"] && weekNumber !== window["Microsoft"]["Office"]["WebExtension"]["MailboxEnums"]["WeekNumber"]["Fourth"] && weekNumber !== window["Microsoft"]["Office"]["WebExtension"]["MailboxEnums"]["WeekNumber"]["Last"])
+            throw Error.argument("weekNumber");
+    };
+    $h.ComposeRecurrence._throwOnInvalidDayOfMonth$p = function(iDayOfMonth)
+    {
+        if(iDayOfMonth < 1 || iDayOfMonth > 31)
+            throw Error.argument("dayOfMonth");
+    };
+    $h.ComposeRecurrence._throwOnInvalidMonthlyRecurrence$p = function(recurrenceProperties)
+    {
+        var recurrenceDictionary = recurrenceProperties;
+        $h.ComposeRecurrence._throwOnNullParameter$p(recurrenceProperties,"interval");
+        window["OSF"]["DDA"]["OutlookAppOm"].throwOnArgumentType(recurrenceDictionary["interval"],Number,"interval");
+        if(recurrenceDictionary["dayOfMonth"])
+        {
+            window["OSF"]["DDA"]["OutlookAppOm"].throwOnArgumentType(recurrenceDictionary["dayOfMonth"],Number,"dayOfMonth");
+            $h.ComposeRecurrence._throwOnInvalidDayOfMonth$p(recurrenceDictionary["dayOfMonth"])
+        }
+        else if(recurrenceDictionary["dayOfWeek"] && recurrenceDictionary["weekNumber"])
+        {
+            window["OSF"]["DDA"]["OutlookAppOm"].throwOnArgumentType(recurrenceDictionary["dayOfWeek"],String,"dayOfMonth");
+            if(!$h.ComposeRecurrence._verifyDays$p(recurrenceDictionary["dayOfWeek"],true))
+                throw Error.argument("dayOfWeek");
+            window["OSF"]["DDA"]["OutlookAppOm"].throwOnArgumentType(recurrenceDictionary["weekNumber"],String,"dayOfMonth");
+            $h.ComposeRecurrence._throwOnInvalidWeekNumber$p(recurrenceDictionary["weekNumber"])
+        }
+        else
+            throw Error.create(window["_u"]["ExtensibilityStrings"]["l_Recurrence_Error_Properties_Invalid_Text"]);
+    };
+    $h.ComposeRecurrence._throwOnInvalidMonth$p = function(month)
+    {
+        if(month !== window["Microsoft"]["Office"]["WebExtension"]["MailboxEnums"]["Month"]["Jan"] && month !== window["Microsoft"]["Office"]["WebExtension"]["MailboxEnums"]["Month"]["Feb"] && month !== window["Microsoft"]["Office"]["WebExtension"]["MailboxEnums"]["Month"]["Mar"] && month !== window["Microsoft"]["Office"]["WebExtension"]["MailboxEnums"]["Month"]["Apr"] && month !== window["Microsoft"]["Office"]["WebExtension"]["MailboxEnums"]["Month"]["May"] && month !== window["Microsoft"]["Office"]["WebExtension"]["MailboxEnums"]["Month"]["Jun"] && month !== window["Microsoft"]["Office"]["WebExtension"]["MailboxEnums"]["Month"]["Jul"] && month !== window["Microsoft"]["Office"]["WebExtension"]["MailboxEnums"]["Month"]["Aug"] && month !== window["Microsoft"]["Office"]["WebExtension"]["MailboxEnums"]["Month"]["Sep"] && month !== window["Microsoft"]["Office"]["WebExtension"]["MailboxEnums"]["Month"]["Oct"] && month !== window["Microsoft"]["Office"]["WebExtension"]["MailboxEnums"]["Month"]["Nov"] && month !== window["Microsoft"]["Office"]["WebExtension"]["MailboxEnums"]["Month"]["Dec"])
+            throw Error.argument("month");
+    };
+    $h.ComposeRecurrence._throwOnInvalidYearlyRecurrence$p = function(recurrenceProperties)
+    {
+        var recurrenceDictionary = recurrenceProperties;
+        $h.ComposeRecurrence._throwOnNullParameter$p(recurrenceProperties,"interval");
+        window["OSF"]["DDA"]["OutlookAppOm"].throwOnArgumentType(recurrenceDictionary["interval"],Number,"interval");
+        $h.ComposeRecurrence._throwOnNullParameter$p(recurrenceProperties,"month");
+        window["OSF"]["DDA"]["OutlookAppOm"].throwOnArgumentType(recurrenceDictionary["month"],String,"month");
+        $h.ComposeRecurrence._throwOnInvalidMonth$p(recurrenceDictionary["month"]);
+        if(recurrenceDictionary["dayOfMonth"])
+        {
+            window["OSF"]["DDA"]["OutlookAppOm"].throwOnArgumentType(recurrenceDictionary["dayOfMonth"],Number,"dayOfMonth");
+            $h.ComposeRecurrence._throwOnInvalidDayOfMonth$p(recurrenceDictionary["dayOfMonth"])
+        }
+        else if(recurrenceDictionary["weekNumber"] && recurrenceDictionary["dayOfWeek"])
+        {
+            window["OSF"]["DDA"]["OutlookAppOm"].throwOnArgumentType(recurrenceDictionary["dayOfWeek"],String,"dayOfMonth");
+            if(!$h.ComposeRecurrence._verifyDays$p(recurrenceDictionary["dayOfWeek"],true))
+                throw Error.argument("dayOfWeek");
+            window["OSF"]["DDA"]["OutlookAppOm"].throwOnArgumentType(recurrenceDictionary["weekNumber"],String,"dayOfMonth");
+            $h.ComposeRecurrence._throwOnInvalidWeekNumber$p(recurrenceDictionary["weekNumber"])
+        }
+        else
+            throw Error.create(window["_u"]["ExtensibilityStrings"]["l_Recurrence_Error_Properties_Invalid_Text"]);
+    };
+    $h.ComposeRecurrence.verifyRecurrenceObject = function(recurrenceObject)
+    {
+        if(!recurrenceObject)
+            return;
+        var recurrenceDictionary = recurrenceObject;
+        $h.ComposeRecurrence._throwOnNullParameter$p(recurrenceObject,"recurrenceType");
+        $h.ComposeRecurrence._throwOnNullParameter$p(recurrenceObject,"seriesTime");
+        if(!window["Microsoft"]["Office"]["WebExtension"]["SeriesTime"]["isInstanceOfType"](recurrenceDictionary["seriesTime"]) || !recurrenceDictionary["seriesTime"].isValid())
+            throw Error.argument("seriesTime");
+        if(!recurrenceDictionary["seriesTime"].isEndAfterStart())
+            throw Error.create(window["_u"]["ExtensibilityStrings"]["l_InvalidEventDates_Text"]);
+        $h.ComposeRecurrence._throwOnInvalidRecurrenceType$p(recurrenceDictionary["recurrenceType"]);
+        if(recurrenceDictionary["recurrenceType"] !== window["Microsoft"]["Office"]["WebExtension"]["MailboxEnums"]["RecurrenceType"]["Weekday"])
+            $h.ComposeRecurrence._throwOnNullParameter$p(recurrenceObject,"recurrenceProperties");
+        if(recurrenceDictionary["recurrenceType"] === window["Microsoft"]["Office"]["WebExtension"]["MailboxEnums"]["RecurrenceType"]["Daily"])
+            $h.ComposeRecurrence._throwOnInvalidDailyRecurrence$p(recurrenceDictionary["recurrenceProperties"]);
+        else if(recurrenceDictionary["recurrenceType"] === window["Microsoft"]["Office"]["WebExtension"]["MailboxEnums"]["RecurrenceType"]["Weekly"])
+            $h.ComposeRecurrence._throwOnInvalidWeeklyRecurrence$p(recurrenceDictionary["recurrenceProperties"]);
+        else if(recurrenceDictionary["recurrenceType"] === window["Microsoft"]["Office"]["WebExtension"]["MailboxEnums"]["RecurrenceType"]["Monthly"])
+            $h.ComposeRecurrence._throwOnInvalidMonthlyRecurrence$p(recurrenceDictionary["recurrenceProperties"]);
+        else if(recurrenceDictionary["recurrenceType"] === window["Microsoft"]["Office"]["WebExtension"]["MailboxEnums"]["RecurrenceType"]["Yearly"])
+            $h.ComposeRecurrence._throwOnInvalidYearlyRecurrence$p(recurrenceDictionary["recurrenceProperties"])
+    };
+    $h.ComposeRecurrence.prototype = {
+        _isInstance$p$0: false,
+        convertSeriesTime: function(recurrenceObject)
+        {
+            var recurrenceDictionary = recurrenceObject;
+            if(recurrenceDictionary && recurrenceDictionary["seriesTime"])
+                if(window["Microsoft"]["Office"]["WebExtension"]["SeriesTime"]["isInstanceOfType"](recurrenceDictionary["seriesTime"]))
+                {
+                    var recurrenceCopy = {};
+                    if($h.ScriptHelpers.isNullOrUndefined(recurrenceDictionary["recurrenceProperties"]))
+                        recurrenceCopy["recurrenceProperties"] = null;
+                    else
+                        recurrenceCopy["recurrenceProperties"] = $h.ScriptHelpers.deepClone(recurrenceDictionary["recurrenceProperties"]);
+                    recurrenceCopy["recurrenceType"] = recurrenceDictionary["recurrenceType"];
+                    recurrenceCopy["seriesTimeJson"] = recurrenceDictionary["seriesTime"].exportToSeriesTimeJsonDictionary();
+                    return recurrenceCopy
+                }
+            return recurrenceObject
+        }
+    };
+    $h.ComposeRecurrence.prototype.getAsync = function()
+    {
+        var args = [];
+        for(var $$pai_2 = 0; $$pai_2 < arguments["length"]; ++$$pai_2)
+            args[$$pai_2] = arguments[$$pai_2];
+        window["OSF"]["DDA"]["OutlookAppOm"]._instance$p._throwOnMethodCallForInsufficientPermission$i$0(1,"recurrence.getAsync");
+        var parameters = $h.CommonParameters.parse(args,true);
+        window["OSF"]["DDA"]["OutlookAppOm"]._instance$p._standardInvokeHostMethod$i$0(103,null,window["Microsoft"]["Office"]["WebExtension"]["OutlookBase"]["SeriesTimeJsonConverter"],parameters._asyncContext$p$0,parameters._callback$p$0)
+    };
+    $h.ComposeRecurrence.prototype.setAsync = function(recurrenceObject)
+    {
+        var args = [];
+        for(var $$pai_3 = 1; $$pai_3 < arguments["length"]; ++$$pai_3)
+            args[$$pai_3 - 1] = arguments[$$pai_3];
+        window["OSF"]["DDA"]["OutlookAppOm"]._instance$p._throwOnMethodCallForInsufficientPermission$i$0(2,"recurrence.setAsync");
+        if(this._isInstance$p$0)
+            throw Error.create(window["_u"]["ExtensibilityStrings"]["l_Recurrence_Error_Instance_SetAsync_Text"]);
+        $h.ComposeRecurrence.verifyRecurrenceObject(recurrenceObject);
+        var parameters = $h.CommonParameters.parse(args,false);
+        window["OSF"]["DDA"]["OutlookAppOm"]._instance$p._standardInvokeHostMethod$i$0(104,{recurrenceData: this.convertSeriesTime(recurrenceObject)},null,parameters._asyncContext$p$0,parameters._callback$p$0)
+    };
     $h.ComposeLocation = function(){};
     $h.ComposeLocation.prototype.getAsync = function()
     {
@@ -9675,6 +9999,227 @@ OSF.InitializationHelper.prototype.loadAppSpecificScriptAndCreateOM = function O
             return this._flightReservations$p$0
         }
     };
+    window["Microsoft"]["Office"]["WebExtension"]["SeriesTime"] = function Microsoft_Office_WebExtension_SeriesTime()
+    {
+        this._startYear$p$0 = 0;
+        this._startMonth$p$0 = 0;
+        this._startDay$p$0 = 0;
+        this._endYear$p$0 = 0;
+        this._endMonth$p$0 = 0;
+        this._endDay$p$0 = 0;
+        this._startTimeMinutes$p$0 = 0;
+        this._durationMinutes$p$0 = 0
+    };
+    Microsoft.Office.WebExtension.SeriesTime.prototype = {
+        _startYear$p$0: 0,
+        _startMonth$p$0: 0,
+        _startDay$p$0: 0,
+        _endYear$p$0: 0,
+        _endMonth$p$0: 0,
+        _endDay$p$0: 0,
+        _startTimeMinutes$p$0: 0,
+        _durationMinutes$p$0: 0,
+        exportToSeriesTimeJsonDictionary: function()
+        {
+            var result = {};
+            result["startYear"] = this._startYear$p$0;
+            result["startMonth"] = this._startMonth$p$0;
+            result["startDay"] = this._startDay$p$0;
+            if(!this._endYear$p$0 && !this._endMonth$p$0 && !this._endDay$p$0)
+                result["noEndDate"] = true;
+            else
+            {
+                result["endYear"] = this._endYear$p$0;
+                result["endMonth"] = this._endMonth$p$0;
+                result["endDay"] = this._endDay$p$0
+            }
+            result["startTimeMin"] = this._startTimeMinutes$p$0;
+            if(this._durationMinutes$p$0 > 0)
+                result["durationMin"] = this._durationMinutes$p$0;
+            return result
+        },
+        importFromSeriesTimeJsonObject: function(jsonObject)
+        {
+            var jsonDictionary = jsonObject;
+            this._startYear$p$0 = jsonDictionary["startYear"];
+            this._startMonth$p$0 = jsonDictionary["startMonth"];
+            this._startDay$p$0 = jsonDictionary["startDay"];
+            if(jsonDictionary["noEndDate"] && jsonDictionary["noEndDate"])
+            {
+                this._endYear$p$0 = 0;
+                this._endMonth$p$0 = 0;
+                this._endDay$p$0 = 0
+            }
+            else
+            {
+                this._endYear$p$0 = jsonDictionary["endYear"];
+                this._endMonth$p$0 = jsonDictionary["endMonth"];
+                this._endDay$p$0 = jsonDictionary["endDay"]
+            }
+            this._startTimeMinutes$p$0 = jsonDictionary["startTimeMin"];
+            this._durationMinutes$p$0 = jsonDictionary["durationMin"]
+        },
+        isValid: function()
+        {
+            if(!this._isValidDate$p$0(this._startYear$p$0,this._startMonth$p$0,this._startDay$p$0))
+                return false;
+            if(this._endDay$p$0 && this._endMonth$p$0 && this._endYear$p$0)
+                if(!this._isValidDate$p$0(this._endYear$p$0,this._endMonth$p$0,this._endDay$p$0))
+                    return false;
+            if(this._startTimeMinutes$p$0 < 0 || this._durationMinutes$p$0 <= 0)
+                return false;
+            return true
+        },
+        isEndAfterStart: function()
+        {
+            if(!this._endYear$p$0 && !this._endMonth$p$0 && !this._endDay$p$0)
+                return true;
+            var startDateTime = new Date;
+            startDateTime["setUTCFullYear"](this._startYear$p$0);
+            startDateTime["setUTCMonth"](this._startMonth$p$0 - 1);
+            startDateTime["setUTCDate"](this._startDay$p$0);
+            var endDateTime = new Date;
+            endDateTime["setUTCFullYear"](this._endYear$p$0);
+            endDateTime["setUTCMonth"](this._endMonth$p$0 - 1);
+            endDateTime["setUTCDate"](this._endDay$p$0);
+            return endDateTime >= startDateTime
+        },
+        _prependZeroToString$p$0: function(number)
+        {
+            if(number < 0)
+                number = 1;
+            if(number < 10)
+                return"0" + number["toString"]();
+            return number["toString"]()
+        },
+        _throwOnInvalidDateString$p$0: function(dateString)
+        {
+            var regEx = new RegExp("^\\d{4}-(?:[0]\\d|1[0-2])-(?:[0-2]\\d|3[01])$");
+            if(!regEx["test"](dateString))
+                throw Error.create(window["_u"]["ExtensibilityStrings"]["l_InvalidDate_Text"]);
+        },
+        _throwOnInvalidDate$p$0: function(year, month, day)
+        {
+            if(!this._isValidDate$p$0(year,month,day))
+                throw Error.create(window["_u"]["ExtensibilityStrings"]["l_InvalidDate_Text"]);
+        },
+        _isValidDate$p$0: function(year, month, day)
+        {
+            if(year < 1601 || month < 1 || month > 12 || day < 1 || day > 31)
+                return false;
+            return true
+        }
+    };
+    Microsoft.Office.WebExtension.SeriesTime.prototype.setStartDate = function(yearOrDateString, month, day)
+    {
+        if(yearOrDateString && month && day)
+        {
+            this._throwOnInvalidDate$p$0(yearOrDateString,month,day);
+            this._startYear$p$0 = yearOrDateString;
+            this._startMonth$p$0 = month;
+            this._startDay$p$0 = day
+        }
+        else if(yearOrDateString)
+        {
+            var dateString = yearOrDateString;
+            this._throwOnInvalidDateString$p$0(dateString);
+            var dateObject = new Date(dateString);
+            if(dateObject && !window["isNaN"](dateObject["getUTCFullYear"]()) && !window["isNaN"](dateObject["getUTCMonth"]()) && !window["isNaN"](dateObject["getUTCDate"]()))
+            {
+                this._throwOnInvalidDate$p$0(dateObject["getUTCFullYear"](),dateObject["getUTCMonth"]() + 1,dateObject["getUTCDate"]());
+                this._startYear$p$0 = dateObject["getUTCFullYear"]();
+                this._startMonth$p$0 = dateObject["getUTCMonth"]() + 1;
+                this._startDay$p$0 = dateObject["getUTCDate"]()
+            }
+        }
+    };
+    Microsoft.Office.WebExtension.SeriesTime.prototype.getStartDate = function()
+    {
+        return this._startYear$p$0["toString"]() + "-" + this._prependZeroToString$p$0(this._startMonth$p$0) + "-" + this._prependZeroToString$p$0(this._startDay$p$0)
+    };
+    Microsoft.Office.WebExtension.SeriesTime.prototype.setEndDate = function(yearOrDateString, month, day)
+    {
+        if(yearOrDateString && month && day)
+        {
+            this._throwOnInvalidDate$p$0(yearOrDateString,month,day);
+            this._endYear$p$0 = yearOrDateString;
+            this._endMonth$p$0 = month;
+            this._endDay$p$0 = day
+        }
+        else if(yearOrDateString)
+        {
+            var dateString = yearOrDateString;
+            this._throwOnInvalidDateString$p$0(dateString);
+            var dateObject = new Date(dateString);
+            if(dateObject && !window["isNaN"](dateObject["getUTCFullYear"]()) && !window["isNaN"](dateObject["getUTCMonth"]()) && !window["isNaN"](dateObject["getUTCDate"]()))
+            {
+                this._throwOnInvalidDate$p$0(dateObject["getUTCFullYear"](),dateObject["getUTCMonth"]() + 1,dateObject["getUTCDate"]());
+                this._endYear$p$0 = dateObject["getUTCFullYear"]();
+                this._endMonth$p$0 = dateObject["getUTCMonth"]() + 1;
+                this._endDay$p$0 = dateObject["getUTCDate"]()
+            }
+        }
+        else if(!yearOrDateString)
+        {
+            this._endYear$p$0 = 0;
+            this._endMonth$p$0 = 0;
+            this._endDay$p$0 = 0
+        }
+    };
+    Microsoft.Office.WebExtension.SeriesTime.prototype.getEndDate = function()
+    {
+        if(!this._endYear$p$0 && !this._endMonth$p$0 && !this._endDay$p$0)
+            return null;
+        return this._endYear$p$0["toString"]() + "-" + this._prependZeroToString$p$0(this._endMonth$p$0) + "-" + this._prependZeroToString$p$0(this._endDay$p$0)
+    };
+    Microsoft.Office.WebExtension.SeriesTime.prototype.setStartTime = function(hoursOrTimeString, minutes)
+    {
+        if(!$h.ScriptHelpers.isNullOrUndefined(hoursOrTimeString) && !$h.ScriptHelpers.isNullOrUndefined(minutes))
+        {
+            var totalMinutes = hoursOrTimeString * 60 + minutes;
+            if(totalMinutes >= 0)
+                this._startTimeMinutes$p$0 = totalMinutes;
+            else
+                throw Error.create(window["_u"]["ExtensibilityStrings"]["l_InvalidTime_Text"]);
+        }
+        else if(!$h.ScriptHelpers.isNullOrUndefined(hoursOrTimeString))
+        {
+            var timeString = hoursOrTimeString;
+            var newDateString = "2017-01-15" + timeString;
+            var RegEx = new RegExp("^T[0-2]\\d:[0-5]\\d:[0-5]\\d\\.\\d{3}Z$");
+            if(!RegEx["test"](timeString))
+                throw Error.create(window["_u"]["ExtensibilityStrings"]["l_InvalidTime_Text"]);
+            var dateObject = new Date(newDateString);
+            if(dateObject && !window["isNaN"](dateObject["getUTCHours"]()) && !window["isNaN"](dateObject["getUTCMinutes"]()))
+                this._startTimeMinutes$p$0 = dateObject["getUTCHours"]() * 60 + dateObject["getUTCMinutes"]();
+            else
+                throw Error.create(window["_u"]["ExtensibilityStrings"]["l_InvalidTime_Text"]);
+        }
+    };
+    Microsoft.Office.WebExtension.SeriesTime.prototype.getStartTime = function()
+    {
+        var minutes = this._startTimeMinutes$p$0 % 60;
+        var hours = Math["floor"](this._startTimeMinutes$p$0 / 60);
+        return"T" + this._prependZeroToString$p$0(hours) + ":" + this._prependZeroToString$p$0(minutes) + ":00.000Z"
+    };
+    Microsoft.Office.WebExtension.SeriesTime.prototype.getEndTime = function()
+    {
+        var endTimeMinutes = this._startTimeMinutes$p$0 + this._durationMinutes$p$0;
+        var minutes = endTimeMinutes % 60;
+        var hours = Math["floor"](endTimeMinutes / 60) % 24;
+        return"T" + this._prependZeroToString$p$0(hours) + ":" + this._prependZeroToString$p$0(minutes) + ":00.000Z"
+    };
+    Microsoft.Office.WebExtension.SeriesTime.prototype.setDuration = function(minutes)
+    {
+        if(minutes >= 0)
+            this._durationMinutes$p$0 = minutes;
+        else
+            throw Error.create(window["_u"]["ExtensibilityStrings"]["l_InvalidTime_Text"]);
+    };
+    Microsoft.Office.WebExtension.SeriesTime.prototype.getDuration = function()
+    {
+        return this._durationMinutes$p$0
+    };
     $h.ReplyConstants = function(){};
     $h.AsyncConstants = function(){};
     window["Office"]["cast"]["item"] = Office.cast.item = function(){};
@@ -9830,12 +10375,23 @@ OSF.InitializationHelper.prototype.loadAppSpecificScriptAndCreateOM = function O
         var args = [];
         for(var $$pai_2 = 0; $$pai_2 < arguments["length"]; ++$$pai_2)
             args[$$pai_2] = arguments[$$pai_2];
-        window["OSF"]["DDA"]["OutlookAppOm"]._instance$p._throwOnMethodCallForInsufficientPermission$i$0(1,"item.getInitializationContextAsync");
+        window["OSF"]["DDA"]["OutlookAppOm"]._instance$p._throwOnMethodCallForInsufficientPermission$i$0(1,"getInitializationContextAsync");
         var parameters = $h.CommonParameters.parse(args,true);
         window["OSF"]["DDA"]["OutlookAppOm"]._instance$p._standardInvokeHostMethod$i$0(99,null,null,parameters._asyncContext$p$0,parameters._callback$p$0)
     };
+    $h.ItemBase.prototype.getSharedPropertiesAsync = function()
+    {
+        var args = [];
+        for(var $$pai_2 = 0; $$pai_2 < arguments["length"]; ++$$pai_2)
+            args[$$pai_2] = arguments[$$pai_2];
+        window["OSF"]["DDA"]["OutlookAppOm"]._instance$p._throwOnMethodCallForInsufficientPermission$i$0(1,"getSharedPropertiesAsync");
+        var parameters = $h.CommonParameters.parse(args,true);
+        window["OSF"]["DDA"]["OutlookAppOm"]._instance$p._standardInvokeHostMethod$i$0(108,null,null,parameters._asyncContext$p$0,parameters._callback$p$0)
+    };
     $h.MeetingRequest = function(data)
     {
+        this.$$d__getSeriesId$p$3 = Function.createDelegate(this,this._getSeriesId$p$3);
+        this.$$d__getRecurrence$p$3 = Function.createDelegate(this,this._getRecurrence$p$3);
         this.$$d__getRequiredAttendees$p$3 = Function.createDelegate(this,this._getRequiredAttendees$p$3);
         this.$$d__getOptionalAttendees$p$3 = Function.createDelegate(this,this._getOptionalAttendees$p$3);
         this.$$d__getLocation$p$3 = Function.createDelegate(this,this._getLocation$p$3);
@@ -9846,7 +10402,9 @@ OSF.InitializationHelper.prototype.loadAppSpecificScriptAndCreateOM = function O
         $h.InitialData._defineReadOnlyProperty$i(this,"end",this.$$d__getEnd$p$3);
         $h.InitialData._defineReadOnlyProperty$i(this,"location",this.$$d__getLocation$p$3);
         $h.InitialData._defineReadOnlyProperty$i(this,"optionalAttendees",this.$$d__getOptionalAttendees$p$3);
-        $h.InitialData._defineReadOnlyProperty$i(this,"requiredAttendees",this.$$d__getRequiredAttendees$p$3)
+        $h.InitialData._defineReadOnlyProperty$i(this,"requiredAttendees",this.$$d__getRequiredAttendees$p$3);
+        $h.InitialData._defineReadOnlyProperty$i(this,"recurrence",this.$$d__getRecurrence$p$3);
+        $h.InitialData._defineReadOnlyProperty$i(this,"seriesId",this.$$d__getSeriesId$p$3)
     };
     $h.MeetingRequest.prototype = {
         _getStart$p$3: function()
@@ -9868,6 +10426,16 @@ OSF.InitializationHelper.prototype.loadAppSpecificScriptAndCreateOM = function O
         _getRequiredAttendees$p$3: function()
         {
             return this._data$p$0.get__to$i$0()
+        },
+        _getRecurrence$p$3: function()
+        {
+            if(this._data$p$0.get__recurrence$i$0() && this._data$p$0.get__recurrence$i$0()["seriesTimeJson"])
+                return $h.ComposeRecurrence.copyRecurrenceObjectConvertSeriesTimeJson(this._data$p$0.get__recurrence$i$0());
+            return this._data$p$0.get__recurrence$i$0()
+        },
+        _getSeriesId$p$3: function()
+        {
+            return this._data$p$0.get__seriesId$i$0()
         }
     };
     $h.MeetingSuggestion = function(data, dateTimeSent)
@@ -10584,6 +11152,22 @@ OSF.InitializationHelper.prototype.loadAppSpecificScriptAndCreateOM = function O
         var dataToHost = {key: key};
         window["OSF"]["DDA"]["OutlookAppOm"]._instance$p._standardInvokeHostMethod$i$0(36,dataToHost,null,commonParameters._asyncContext$p$0,commonParameters._callback$p$0)
     };
+    window["Microsoft"]["Office"]["WebExtension"]["OutlookBase"] = function Microsoft_Office_WebExtension_OutlookBase(){};
+    window["Microsoft"]["Office"]["WebExtension"]["OutlookBase"]["SeriesTimeJsonConverter"] = function(rawInput)
+    {
+        if(rawInput && Object["isInstanceOfType"](rawInput))
+        {
+            var rawDictionary = rawInput;
+            if(rawDictionary["seriesTimeJson"])
+            {
+                var seriesTime = new window["Microsoft"]["Office"]["WebExtension"]["SeriesTime"];
+                seriesTime.importFromSeriesTimeJsonObject(rawDictionary["seriesTimeJson"]);
+                delete rawDictionary["seriesTimeJson"];
+                rawDictionary["seriesTime"] = seriesTime
+            }
+        }
+        return rawInput
+    };
     $h.OutlookErrorManager = function(){};
     $h.OutlookErrorManager.getErrorArgs = function(errorCode)
     {
@@ -10624,6 +11208,10 @@ OSF.InitializationHelper.prototype.loadAppSpecificScriptAndCreateOM = function O
         $h.OutlookErrorManager._addErrorMessage$p(9029,"CanOnlyGetTokenForSavedItem",window["_u"]["ExtensibilityStrings"]["l_CallSaveAsyncBeforeToken_Text"]);
         $h.OutlookErrorManager._addErrorMessage$p(9030,"APICallFailedDueToItemChange",window["_u"]["ExtensibilityStrings"]["l_APICallFailedDueToItemChange_Text"]);
         $h.OutlookErrorManager._addErrorMessage$p(9031,"InvalidParameterValueError",window["_u"]["ExtensibilityStrings"]["l_InvalidParameterValueError_Text"]);
+        $h.OutlookErrorManager._addErrorMessage$p(9033,"SetRecurrenceOnInstanceError",window["_u"]["ExtensibilityStrings"]["l_Recurrence_Error_Instance_SetAsync_Text"]);
+        $h.OutlookErrorManager._addErrorMessage$p(9034,"InvalidRecurrenceError",window["_u"]["ExtensibilityStrings"]["l_Recurrence_Error_Properties_Invalid_Text"]);
+        $h.OutlookErrorManager._addErrorMessage$p(9035,"RecurrenceZeroOccurrences",window["_u"]["ExtensibilityStrings"]["l_RecurrenceErrorZeroOccurrences_Text"]);
+        $h.OutlookErrorManager._addErrorMessage$p(9036,"RecurrenceMaxOccurrences",window["_u"]["ExtensibilityStrings"]["l_RecurrenceErrorMaxOccurrences_Text"]);
         $h.OutlookErrorManager._isInitialized$p = true
     };
     $h.OutlookErrorManager._addErrorMessage$p = function(errorCode, errorName, errorMessage)
@@ -10690,7 +11278,6 @@ OSF.InitializationHelper.prototype.loadAppSpecificScriptAndCreateOM = function O
     };
     $h.UserProfile = function(data)
     {
-        this.$$d__getCapabilities$p$0 = Function.createDelegate(this,this._getCapabilities$p$0);
         this.$$d__getUserProfileType$p$0 = Function.createDelegate(this,this._getUserProfileType$p$0);
         this.$$d__getTimeZone$p$0 = Function.createDelegate(this,this._getTimeZone$p$0);
         this.$$d__getEmailAddress$p$0 = Function.createDelegate(this,this._getEmailAddress$p$0);
@@ -10699,15 +11286,10 @@ OSF.InitializationHelper.prototype.loadAppSpecificScriptAndCreateOM = function O
         $h.InitialData._defineReadOnlyProperty$i(this,"displayName",this.$$d__getDisplayName$p$0);
         $h.InitialData._defineReadOnlyProperty$i(this,"emailAddress",this.$$d__getEmailAddress$p$0);
         $h.InitialData._defineReadOnlyProperty$i(this,"timeZone",this.$$d__getTimeZone$p$0);
-        $h.InitialData._defineReadOnlyProperty$i(this,"accountType",this.$$d__getUserProfileType$p$0);
-        $h.InitialData._defineReadOnlyProperty$i(this,"capabilities",this.$$d__getCapabilities$p$0)
+        $h.InitialData._defineReadOnlyProperty$i(this,"accountType",this.$$d__getUserProfileType$p$0)
     };
     $h.UserProfile.prototype = {
         _data$p$0: null,
-        _getCapabilities$p$0: function()
-        {
-            return this._data$p$0.get__userProfileCapabilities$i$0() || {}
-        },
         _getUserProfileType$p$0: function()
         {
             return this._data$p$0.get__userProfileType$i$0()
@@ -10775,8 +11357,12 @@ OSF.InitializationHelper.prototype.loadAppSpecificScriptAndCreateOM = function O
         eventCompleted: 94,
         closeContainer: 97,
         getInitializationContextAsync: 99,
-        moveToFolder: 101,
         appendOnSendAsync: 100,
+        moveToFolder: 101,
+        getRecurrenceAsync: 103,
+        setRecurrenceAsync: 104,
+        getFromAsync: 107,
+        getSharedPropertiesAsync: 108,
         messageParent: 144,
         trackCtq: 400,
         recordTrace: 401,
@@ -11099,9 +11685,15 @@ OSF.InitializationHelper.prototype.loadAppSpecificScriptAndCreateOM = function O
             var organizer = this._data$p$0["organizer"];
             return $h.ScriptHelpers.isNullOrUndefined(organizer) ? null : new $h.EmailAddressDetails(organizer)
         },
-        get__userProfileCapabilities$i$0: function()
+        get__recurrence$i$0: function()
         {
-            return this._data$p$0["userProfileCapabilities"]
+            this._throwOnRestrictedPermissionLevel$i$0();
+            return this._data$p$0["recurrence"]
+        },
+        get__seriesId$i$0: function()
+        {
+            this._throwOnRestrictedPermissionLevel$i$0();
+            return this._data$p$0["seriesId"]
         },
         get__userDisplayName$i$0: function()
         {
@@ -11401,8 +11993,10 @@ OSF.InitializationHelper.prototype.loadAppSpecificScriptAndCreateOM = function O
     $h.AppointmentCompose["registerClass"]("$h.AppointmentCompose",$h.ComposeItem);
     $h.AttachmentDetails["registerClass"]("$h.AttachmentDetails");
     $h.Body["registerClass"]("$h.Body");
+    $h.ComposeFrom["registerClass"]("$h.ComposeFrom");
     $h.ComposeBody["registerClass"]("$h.ComposeBody",$h.Body);
     $h.ComposeRecipient["registerClass"]("$h.ComposeRecipient");
+    $h.ComposeRecurrence["registerClass"]("$h.ComposeRecurrence");
     $h.ComposeLocation["registerClass"]("$h.ComposeLocation");
     $h.ComposeSubject["registerClass"]("$h.ComposeSubject");
     $h.ComposeTime["registerClass"]("$h.ComposeTime");
@@ -11411,6 +12005,7 @@ OSF.InitializationHelper.prototype.loadAppSpecificScriptAndCreateOM = function O
     $h.Diagnostics["registerClass"]("$h.Diagnostics");
     $h.EmailAddressDetails["registerClass"]("$h.EmailAddressDetails");
     $h.Entities["registerClass"]("$h.Entities");
+    window["Microsoft"]["Office"]["WebExtension"]["SeriesTime"]["registerClass"]("Microsoft.Office.WebExtension.SeriesTime");
     $h.Message["registerClass"]("$h.Message",$h.Item);
     $h.MeetingRequest["registerClass"]("$h.MeetingRequest",$h.Message);
     $h.MeetingSuggestion["registerClass"]("$h.MeetingSuggestion");
@@ -11419,6 +12014,7 @@ OSF.InitializationHelper.prototype.loadAppSpecificScriptAndCreateOM = function O
     $h._relativeDate["registerClass"]("$h._relativeDate",$h._extractedDate);
     $h.MessageCompose["registerClass"]("$h.MessageCompose",$h.ComposeItem);
     $h.NotificationMessages["registerClass"]("$h.NotificationMessages");
+    window["Microsoft"]["Office"]["WebExtension"]["OutlookBase"]["registerClass"]("Microsoft.Office.WebExtension.OutlookBase");
     $h.PhoneNumber["registerClass"]("$h.PhoneNumber");
     $h.TaskSuggestion["registerClass"]("$h.TaskSuggestion");
     $h.UserProfile["registerClass"]("$h.UserProfile");
@@ -11469,6 +12065,20 @@ OSF.InitializationHelper.prototype.loadAppSpecificScriptAndCreateOM = function O
     $h.ComposeRecipient.totalRecipientsLimit = 500;
     $h.ComposeRecipient.addressParameterName = "address";
     $h.ComposeRecipient.nameParameterName = "name";
+    $h.ComposeRecurrence.startDateKey = "startDate";
+    $h.ComposeRecurrence.endDateKey = "endDate";
+    $h.ComposeRecurrence.startTimeKey = "startTime";
+    $h.ComposeRecurrence.endTimeKey = "endTime";
+    $h.ComposeRecurrence.recurrenceTypeKey = "recurrenceType";
+    $h.ComposeRecurrence.seriesTimeKey = "seriesTime";
+    $h.ComposeRecurrence.seriesTimeJsonKey = "seriesTimeJson";
+    $h.ComposeRecurrence.recurrencePropertiesKey = "recurrenceProperties";
+    $h.ComposeRecurrence.intervalKey = "interval";
+    $h.ComposeRecurrence.daysKey = "days";
+    $h.ComposeRecurrence.dayOfMonthKey = "dayOfMonth";
+    $h.ComposeRecurrence.dayOfWeekKey = "dayOfWeek";
+    $h.ComposeRecurrence.weekNumberKey = "weekNumber";
+    $h.ComposeRecurrence.monthKey = "month";
     $h.ComposeLocation.locationKey = "location";
     $h.ComposeLocation.maximumLocationLength = 255;
     $h.ComposeSubject.maximumSubjectLength = 255;
@@ -11482,6 +12092,15 @@ OSF.InitializationHelper.prototype.loadAppSpecificScriptAndCreateOM = function O
     $h.EmailAddressDetails._responseTypeMap$p = [window["Microsoft"]["Office"]["WebExtension"]["MailboxEnums"]["ResponseType"]["None"],window["Microsoft"]["Office"]["WebExtension"]["MailboxEnums"]["ResponseType"]["Organizer"],window["Microsoft"]["Office"]["WebExtension"]["MailboxEnums"]["ResponseType"]["Tentative"],window["Microsoft"]["Office"]["WebExtension"]["MailboxEnums"]["ResponseType"]["Accepted"],window["Microsoft"]["Office"]["WebExtension"]["MailboxEnums"]["ResponseType"]["Declined"]];
     $h.EmailAddressDetails._recipientTypeMap$p = [window["Microsoft"]["Office"]["WebExtension"]["MailboxEnums"]["RecipientType"]["Other"],window["Microsoft"]["Office"]["WebExtension"]["MailboxEnums"]["RecipientType"]["DistributionList"],window["Microsoft"]["Office"]["WebExtension"]["MailboxEnums"]["RecipientType"]["User"],window["Microsoft"]["Office"]["WebExtension"]["MailboxEnums"]["RecipientType"]["ExternalUser"]];
     $h.Entities._allEntityKeys$p = ["Addresses","EmailAddresses","Urls","PhoneNumbers","TaskSuggestions","MeetingSuggestions","Contacts","FlightReservations","ParcelDeliveries"];
+    window["Microsoft"]["Office"]["WebExtension"]["SeriesTime"].startYearKey = "startYear";
+    window["Microsoft"]["Office"]["WebExtension"]["SeriesTime"].startMonthKey = "startMonth";
+    window["Microsoft"]["Office"]["WebExtension"]["SeriesTime"].startDayKey = "startDay";
+    window["Microsoft"]["Office"]["WebExtension"]["SeriesTime"].endYearKey = "endYear";
+    window["Microsoft"]["Office"]["WebExtension"]["SeriesTime"].endMonthKey = "endMonth";
+    window["Microsoft"]["Office"]["WebExtension"]["SeriesTime"].endDayKey = "endDay";
+    window["Microsoft"]["Office"]["WebExtension"]["SeriesTime"].noEndDateKey = "noEndDate";
+    window["Microsoft"]["Office"]["WebExtension"]["SeriesTime"].startTimeMinKey = "startTimeMin";
+    window["Microsoft"]["Office"]["WebExtension"]["SeriesTime"].durationMinKey = "durationMin";
     $h.ReplyConstants.htmlBodyKeyName = "htmlBody";
     $h.AsyncConstants.optionsKeyName = "options";
     $h.AsyncConstants.callbackKeyName = "callback";
@@ -11537,6 +12156,10 @@ OSF.InitializationHelper.prototype.loadAppSpecificScriptAndCreateOM = function O
     $h.OutlookErrorManager.OutlookErrorCodes.callSaveAsyncBeforeToken = 9029;
     $h.OutlookErrorManager.OutlookErrorCodes.apiCallFailedDueToItemChange = 9030;
     $h.OutlookErrorManager.OutlookErrorCodes.invalidParameterValueError = 9031;
+    $h.OutlookErrorManager.OutlookErrorCodes.setRecurrenceOnInstance = 9033;
+    $h.OutlookErrorManager.OutlookErrorCodes.invalidRecurrence = 9034;
+    $h.OutlookErrorManager.OutlookErrorCodes.recurrenceZeroOccurrences = 9035;
+    $h.OutlookErrorManager.OutlookErrorCodes.recurrenceMaxOccurrences = 9036;
     $h.OutlookErrorManager.OutlookErrorCodes.ooeInvalidDataFormat = 2006;
     $h.OutlookErrorManager.OsfDdaErrorCodes.ooeCoercionTypeNotSupported = 1e3;
     $h.CommonParameters.asyncContextKeyName = "asyncContext";
@@ -11548,6 +12171,6 @@ OSF.InitializationHelper.prototype.loadAppSpecificScriptAndCreateOM = function O
     else
         this._settings = this._initializeSettings(false);
     appContext.appOM = new OSF.DDA.OutlookAppOm(appContext,this._webAppState.wnd,appReady);
-    if(appContext.get_appName() == OSF.AppName.Outlook || appContext.get_appName() == OSF.AppName.OutlookWebApp || appContext.get_appName() == OSF.AppName.OutlookIOS)
+    if(appContext.get_appName() == OSF.AppName.Outlook || appContext.get_appName() == OSF.AppName.OutlookWebApp || appContext.get_appName() == OSF.AppName.OutlookIOS || appContext.get_appName() == OSF.AppName.OutlookAndroid)
         OSF.DDA.DispIdHost.addEventSupport(appContext.appOM,new OSF.EventDispatch([Microsoft.Office.WebExtension.EventType.ItemChanged]))
 }
