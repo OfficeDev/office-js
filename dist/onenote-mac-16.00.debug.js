@@ -1,4 +1,4 @@
-/* OneNote iOS-specific API library */
+/* OneNote Mac-specific API library */
 /* Version: 16.0.9213.3000 */
 
 /* Office.js Version: 16.0.9220.1000 */ 
@@ -6478,7 +6478,7 @@ OSF.DDA.AsyncMethodCalls.define({
 			name: Microsoft.Office.WebExtension.Parameters.SliceSize,
 			value: {
 				"types": ["number"],
-				"defaultValue": 64 * 1024
+				"defaultValue": 4 * 1024 * 1024
 			}
 		}
 	],
@@ -6523,7 +6523,7 @@ OSF.DDA.AsyncMethodCalls.define({
 		var slice={};
 		OSF.OUtil.defineEnumerableProperties(slice, {
 			"data": {
-				value: sliceDescriptor[Microsoft.Office.WebExtension.Parameters.Data]
+				value: OSF.OUtil.shallowCopy(sliceDescriptor[Microsoft.Office.WebExtension.Parameters.Data])
 			},
 			"index": {
 				value: callArgs[Microsoft.Office.WebExtension.Parameters.SliceIndex]

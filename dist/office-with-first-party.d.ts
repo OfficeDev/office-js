@@ -2913,6 +2913,21 @@ declare namespace OfficeExtension {
 
 
 declare namespace OfficeCore {
+    /**
+     * [Api set: AgaveVisual 0.5]
+     */
+    class BiShim extends OfficeExtension.ClientObject {
+        initialize(capabilities: string): void;
+        uninitialize(): void;
+        getData(): OfficeExtension.ClientResult<string>;
+        /**
+         * Create a new instance of OfficeCore.BiShim object
+         */
+        static newObject(context: OfficeExtension.ClientRequestContext): OfficeCore.BiShim;
+        toJSON(): {
+            [key: string]: string;
+        };
+    }
     enum ErrorCodes {
         generalException = "GeneralException",
     }
@@ -2924,6 +2939,65 @@ declare namespace OfficeCore {
     }
 }
 declare namespace OfficeCore {
+    /**
+     * [Api set: Experimentation 1.1 (PREVIEW)]
+     */
+    class FlightingService extends OfficeExtension.ClientObject {
+        getClientSessionId(): OfficeExtension.ClientResult<string>;
+        getDeferredFlights(): OfficeExtension.ClientResult<string>;
+        getFeature(featureName: string, type: string, defaultValue: number | boolean | string, possibleValues?: Array<number> | Array<string> | Array<boolean> | Array<ScopedValue>): OfficeCore.ABType;
+        getFeatureGate(featureName: string, scope?: string): OfficeCore.ABType;
+        resetOverride(featureName: string): void;
+        setOverride(featureName: string, type: string, value: number | boolean | string): void;
+        /**
+         * Create a new instance of OfficeCore.FlightingService object
+         */
+        static newObject(context: OfficeExtension.ClientRequestContext): OfficeCore.FlightingService;
+        toJSON(): {};
+    }
+    /**
+     *
+     * Provides information about the scoped value.
+     *
+     * [Api set: Experimentation 1.1 (PREVIEW)]
+     */
+    interface ScopedValue {
+        /**
+         *
+         * Gets the scope.
+         *
+         * [Api set: Experimentation 1.1 (PREVIEW)]
+         */
+        scope: string;
+        /**
+         *
+         * Gets the value.
+         *
+         * [Api set: Experimentation 1.1 (PREVIEW)]
+         */
+        value: string | number | boolean;
+    }
+    /**
+     * [Api set: Experimentation 1.1 (PREVIEW)]
+     */
+    class ABType extends OfficeExtension.ClientObject {
+        readonly value: string | number | boolean;
+        /**
+         * Queues up a command to load the specified properties of the object. You must call "context.sync()" before reading the properties.
+         */
+        load(option?: string | string[] | OfficeExtension.LoadOption): OfficeCore.ABType;
+        toJSON(): {
+            "value": string | number | boolean;
+        };
+    }
+    /**
+     * [Api set: Experimentation 1.1 (PREVIEW)]
+     */
+    namespace FeatureType {
+        var boolean: string;
+        var integer: string;
+        var string: string;
+    }
     namespace ExperimentErrorCodes {
         var generalException: string;
     }
@@ -2931,8 +3005,17 @@ declare namespace OfficeCore {
     }
 }
 declare namespace OfficeCore {
+    class FirstPartyApis {
+        private context;
+        constructor(context: RequestContext);
+        readonly authentication: AuthenticationService;
+    }
     class RequestContext extends OfficeExtension.ClientRequestContext {
         constructor(url?: string | OfficeExtension.RequestUrlAndHeaderInfo | any);
+        readonly firstParty: FirstPartyApis;
+        readonly flighting: FlightingService;
+        readonly telemetry: TelemetryService;
+        readonly bi: BiShim;
     }
     /**
      * Executes a batch script that performs actions on the Office object model, using a new RequestContext. When the promise is resolved, any tracked objects that were automatically allocated during execution will be released.
@@ -2959,6 +3042,40 @@ declare namespace OfficeCore {
     function run<T>(objects: OfficeExtension.ClientObject[], batch: (context: OfficeCore.RequestContext) => OfficeExtension.IPromise<T>): OfficeExtension.IPromise<T>;
 }
 declare namespace OfficeCore {
+    /**
+     * [Api set: Telemetry 1.1]
+     */
+    class TelemetryService extends OfficeExtension.ClientObject {
+        sendTelemetryEvent(telemetryProperties: OfficeCore.TelemetryProperties, eventName: string, eventContract: string, eventFlags: OfficeCore.EventFlags, value: Array<OfficeCore.DataField>): void;
+        /**
+         * Create a new instance of OfficeCore.TelemetryService object
+         */
+        static newObject(context: OfficeExtension.ClientRequestContext): OfficeCore.TelemetryService;
+        toJSON(): {};
+    }
+    /**
+     * [Api set: Telemetry 1.1]
+     */
+    interface EventFlags {
+        costPriority: number;
+        persistencePriority: number;
+        samplingPolicy: number;
+    }
+    /**
+     * [Api set: Telemetry 1.1]
+     */
+    interface DataField {
+        classification: number;
+        name: string;
+        value: any;
+    }
+    /**
+     * [Api set: Telemetry 1.1]
+     */
+    interface TelemetryProperties {
+        ariaTenantToken?: string;
+        nexusTenantToken?: number;
+    }
     namespace TelemetryErrorCodes {
         var generalException: string;
     }
@@ -2969,6 +3086,124 @@ declare namespace OfficeFirstPartyAuth {
     function getAccessToken<T>(options: object): OfficeExtension.IPromise<T>;
 }
 declare namespace OfficeCore {
+    /**
+     * [Api set: FirstPartyAuthentication 1.1]
+     */
+    enum IdentityType {
+        organizationAccount = "OrganizationAccount",
+        microsoftAccount = "MicrosoftAccount",
+    }
+    /**
+     *
+     * Office identity object that holds the user information
+     *
+     * [Api set: FirstPartyAuthentication 1.2]
+     */
+    interface OfficeIdentityInfo {
+        /**
+         *
+         * A display name for the user
+         *
+         * [Api set: FirstPartyAuthentication 1.2]
+         */
+        displayName: string;
+        /**
+         *
+         * The Email address associated with the identity
+         *
+         * [Api set: FirstPartyAuthentication 1.2]
+         */
+        email: string;
+        /**
+         *
+         * The federation provider (such as Worldwide, BlackForest or Gallatin)
+         *
+         * [Api set: FirstPartyAuthentication 1.2]
+         */
+        federationProvider: string;
+        /**
+         *
+         * The identity account type
+         *
+         * [Api set: FirstPartyAuthentication 1.2]
+         */
+        identityType: OfficeCore.IdentityType | "OrganizationAccount" | "MicrosoftAccount";
+    }
+    /**
+     * [Api set: FirstPartyAuthentication 1.1]
+     */
+    class AuthenticationService extends OfficeExtension.ClientObject {
+        /**
+         *
+         * Get the access token for the current primary identity.
+         *
+         * [Api set: FirstPartyAuthentication 1.1]
+         *
+         * @param tokenParameters The parameter for the required access token.
+         * @returns The access token object.
+         */
+        getAccessToken(tokenParameters: OfficeCore.TokenParameters): OfficeExtension.ClientResult<OfficeCore.SingleSignOnToken>;
+        /**
+         *
+         * Get the information of the primary identity (in rich client, it's the active profile).
+         *
+         * [Api set: FirstPartyAuthentication 1.2]
+         * @returns The primary identity type.
+         */
+        getPrimaryIdentityInfo(): OfficeExtension.ClientResult<OfficeCore.OfficeIdentityInfo>;
+        /**
+         * Create a new instance of OfficeCore.AuthenticationService object
+         */
+        static newObject(context: OfficeExtension.ClientRequestContext): OfficeCore.AuthenticationService;
+        toJSON(): {
+            [key: string]: string;
+        };
+    }
+    /**
+     * [Api set: FirstPartyAuthentication 1.1]
+     */
+    interface TokenParameters {
+        /**
+         *
+         * The auth challenge string.
+         *
+         * [Api set: FirstPartyAuthentication 1.1]
+         */
+        authChallenge?: string;
+        /**
+         *
+         * The auth policy string.
+         *
+         * [Api set: FirstPartyAuthentication 1.1]
+         */
+        policy?: string;
+        /**
+         *
+         * The resource URL (or target)
+         *
+         * [Api set: FirstPartyAuthentication 1.1]
+         */
+        resource?: string;
+    }
+    /**
+     * [Api set: FirstPartyAuthentication 1.1]
+     */
+    interface SingleSignOnToken {
+        /**
+         *
+         * The access token for the primary identity.
+         *
+         * [Api set: FirstPartyAuthentication 1.1]
+         */
+        accessToken: string;
+        /**
+         *
+         * The identity type associated with the access token
+         *
+         * [Api set: FirstPartyAuthentication 1.1]
+         */
+        tokenIdenityType: OfficeCore.IdentityType | "OrganizationAccount" | "MicrosoftAccount";
+    }
     /**
      *
      * Represents a single comment in the document.
