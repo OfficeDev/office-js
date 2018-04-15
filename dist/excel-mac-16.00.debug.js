@@ -1,7 +1,7 @@
 /* Excel Mac-specific API library */
-/* Version: 16.0.8916.3000 */
+/* Version: 16.0.9219.3000 */
 
-/* Office.js Version: 16.0.8717.1000 */ 
+/* Office.js Version: 16.0.9124.1000 */ 
 /*
 	Copyright (c) Microsoft Corporation.  All rights reserved.
 */
@@ -256,6 +256,54 @@ OSF.OUtil=(function () {
 			if (parent && name && parent[name]) {
 				delete parent[name];
 			}
+		},
+		serializeSettings: function OSF_OUtil$serializeSettings(settingsCollection) {
+			var ret={};
+			for (var key in settingsCollection) {
+				var value=settingsCollection[key];
+				try {
+					if (JSON) {
+						value=JSON.stringify(value, function dateReplacer(k, v) {
+							return OSF.OUtil.isDate(this[k]) ? OSF.DDA.SettingsManager.DateJSONPrefix+this[k].getTime()+OSF.DDA.SettingsManager.DataJSONSuffix : v;
+						});
+					}
+					else {
+						value=Sys.Serialization.JavaScriptSerializer.serialize(value);
+					}
+					ret[key]=value;
+				}
+				catch (ex) {
+				}
+			}
+			return ret;
+		},
+		deserializeSettings: function OSF_OUtil$deserializeSettings(serializedSettings) {
+			var ret={};
+			serializedSettings=serializedSettings || {};
+			for (var key in serializedSettings) {
+				var value=serializedSettings[key];
+				try {
+					if (JSON) {
+						value=JSON.parse(value, function dateReviver(k, v) {
+							var d;
+							if (typeof v==='string' && v && v.length > 6 && v.slice(0, 5)===OSF.DDA.SettingsManager.DateJSONPrefix && v.slice(-1)===OSF.DDA.SettingsManager.DataJSONSuffix) {
+								d=new Date(parseInt(v.slice(5, -1)));
+								if (d) {
+									return d;
+								}
+							}
+							return v;
+						});
+					}
+					else {
+						value=Sys.Serialization.JavaScriptSerializer.deserialize(value, true);
+					}
+					ret[key]=value;
+				}
+				catch (ex) {
+				}
+			}
+			return ret;
 		},
 		loadScript: function OSF_OUtil$loadScript(url, callback, timeoutInMs) {
 			if (url && callback) {
@@ -981,6 +1029,12 @@ OSF.OUtil.Guid=(function () {
 })();
 window.OSF=OSF;
 OSF.OUtil.setNamespace("OSF", window);
+OSF.MessageIDs={
+	"FetchBundleUrl": 0,
+	"LoadReactBundle": 1,
+	"LoadBundleSuccess": 2,
+	"LoadBundleError": 3
+};
 OSF.AppName={
 	Unsupported: 0,
 	Excel: 1,
@@ -1009,7 +1063,9 @@ OSF.AppName={
 	OneNoteWinRT: 8388608,
 	ExcelAndroid: 8388609,
 	VisioWebApp: 8388610,
-	OneNoteIOS: 8388611
+	OneNoteIOS: 8388611,
+	WordAndroid: 8388613,
+	PowerpointAndroid: 8388614
 };
 OSF.InternalPerfMarker={
 	DataCoercionBegin: "Agave.HostCall.CoerceDataStart",
@@ -1211,7 +1267,10 @@ Microsoft.Office.WebExtension.Parameters={
 	DisplayInIframe: "displayInIframe",
 	MessageContent: "messageContent",
 	HideTitle: "hideTitle",
-	AppCommandInvocationCompletedData: "appCommandInvocationCompletedData"
+	UseDeviceIndependentPixels: "useDeviceIndependentPixels",
+	AppCommandInvocationCompletedData: "appCommandInvocationCompletedData",
+	Base64: "base64",
+	FormId: "formId"
 };
 OSF.OUtil.setNamespace("DDA", OSF);
 OSF.DDA.DocumentMode={
@@ -1269,6 +1328,9 @@ OSF.DDA.MethodDispId={
 	dispidCloseContainerMethod: 97,
 	dispidGetAccessTokenMethod: 98,
 	dispidOpenBrowserWindow: 102,
+	dispidCreateDocumentMethod: 105,
+	dispidInsertFormMethod: 106,
+	dispidDisplayRibbonCalloutAsyncMethod: 109,
 	dispidGetSelectedTaskMethod: 110,
 	dispidGetSelectedResourceMethod: 111,
 	dispidGetTaskMethod: 112,
@@ -1329,6 +1391,7 @@ OSF.DDA.EventDispId={
 	dispidOlkItemSelectedChangedEvent: 46,
 	dispidOlkRecipientsChangedEvent: 47,
 	dispidOlkAppointmentTimeChangedEvent: 48,
+	dispidOlkRecurrenceChangedEvent: 49,
 	dispidTaskSelectionChangedEvent: 56,
 	dispidResourceSelectionChangedEvent: 57,
 	dispidViewSelectionChangedEvent: 58,
@@ -1416,6 +1479,7 @@ OSF.DDA.ErrorCodeManager=(function () {
 			ooeRequestTimeout: 5011,
 			ooeInvalidOrTimedOutSession: 5012,
 			ooeInvalidApiArguments: 5013,
+			ooeOperationCancelled: 5014,
 			ooeTooManyIncompleteRequests: 5100,
 			ooeRequestTokenUnavailable: 5101,
 			ooeActivityLimitReached: 5102,
@@ -1461,7 +1525,8 @@ OSF.DDA.ErrorCodeManager=(function () {
 			ooeSSOClientError: 13006,
 			ooeSSOServerError: 13007,
 			ooeAddinIsAlreadyRequestingToken: 13008,
-			ooeSSOUserConsentNotSupportedByCurrentAddinCategory: 13009
+			ooeSSOUserConsentNotSupportedByCurrentAddinCategory: 13009,
+			ooeSSOConnectionLost: 13010
 		},
 		initializeErrorMessages: function OSF_DDA_ErrorCodeManager$initializeErrorMessages(stringNS) {
 			_errorMappings[OSF.DDA.ErrorCodeManager.errorCodes.ooeCoercionTypeNotSupported]={ name: stringNS.L_InvalidCoercion, message: stringNS.L_CoercionTypeNotSupported };
@@ -1560,6 +1625,8 @@ OSF.DDA.ErrorCodeManager=(function () {
 			_errorMappings[OSF.DDA.ErrorCodeManager.errorCodes.ooeSSOServerError]={ name: stringNS.L_SSOServerError, message: stringNS.L_SSOServerErrorMessage };
 			_errorMappings[OSF.DDA.ErrorCodeManager.errorCodes.ooeAddinIsAlreadyRequestingToken]={ name: stringNS.L_AddinIsAlreadyRequestingToken, message: stringNS.L_AddinIsAlreadyRequestingTokenMessage };
 			_errorMappings[OSF.DDA.ErrorCodeManager.errorCodes.ooeSSOUserConsentNotSupportedByCurrentAddinCategory]={ name: stringNS.L_SSOUserConsentNotSupportedByCurrentAddinCategory, message: stringNS.L_SSOUserConsentNotSupportedByCurrentAddinCategoryMessage };
+			_errorMappings[OSF.DDA.ErrorCodeManager.errorCodes.ooeSSOConnectionLost]={ name: stringNS.L_SSOConnectionLostError, message: stringNS.L_SSOConnectionLostErrorMessage };
+			_errorMappings[OSF.DDA.ErrorCodeManager.errorCodes.ooeOperationCancelled]={ name: stringNS.L_OperationCancelledError, message: stringNS.L_OperationCancelledErrorMessage };
 		}
 	};
 })();
@@ -2261,6 +2328,11 @@ OSF.DDA.Context=function OSF_DDA_Context(officeAppContext, document, license, ap
 			value: officeAppContext.auth
 		});
 	}
+	if (officeAppContext.application) {
+		OSF.OUtil.defineEnumerableProperty(this, "application", {
+			value: officeAppContext.application
+		});
+	}
 	if (officeAppContext.get_isDialog()) {
 		var requirements=OfficeExt.Requirement.RequirementsMatrixFactory.getDefaultDialogRequirementMatrix(officeAppContext);
 		OSF.OUtil.defineEnumerableProperty(this, "requirements", {
@@ -2303,6 +2375,8 @@ OSF.DDA.OutlookContext=function OSF_DDA_OutlookContext(appContext, settings, lic
 };
 OSF.OUtil.extend(OSF.DDA.OutlookContext, OSF.DDA.Context);
 OSF.DDA.OutlookAppOm=function OSF_DDA_OutlookAppOm(appContext, window, appReady) { };
+OSF.DDA.Application=function OSF_DDA_Application(officeAppContext) {
+};
 OSF.DDA.Document=function OSF_DDA_Document(officeAppContext, settings) {
 	var mode;
 	switch (officeAppContext.get_clientMode()) {
@@ -3040,6 +3114,8 @@ OSF.DDA.DispIdHost.Facade=function OSF_DDA_DispIdHost_Facade(getDelegateMethods,
 		"AppCommandInvocationCompletedAsync": did.dispidAppCommandInvocationCompletedMethod,
 		"CloseContainerAsync": did.dispidCloseContainerMethod,
 		"OpenBrowserWindow": did.dispidOpenBrowserWindow,
+		"CreateDocumentAsync": did.dispidCreateDocumentMethod,
+		"InsertFormAsync": did.dispidInsertFormMethod,
 		"AddDataPartAsync": did.dispidAddDataPartMethod,
 		"GetDataPartByIdAsync": did.dispidGetDataPartByIdMethod,
 		"GetDataPartsByNameSpaceAsync": did.dispidGetDataPartsByNamespaceMethod,
@@ -3109,6 +3185,7 @@ OSF.DDA.DispIdHost.Facade=function OSF_DDA_DispIdHost_Facade(getDelegateMethods,
 		"ItemChanged": did.dispidOlkItemSelectedChangedEvent,
 		"RecipientsChanged": did.dispidOlkRecipientsChangedEvent,
 		"AppointmentTimeChanged": did.dispidOlkAppointmentTimeChangedEvent,
+		"RecurrenceChanged": did.dispidOlkRecurrenceChangedEvent,
 		"TaskSelectionChanged": did.dispidTaskSelectionChangedEvent,
 		"ResourceSelectionChanged": did.dispidResourceSelectionChangedEvent,
 		"ViewSelectionChanged": did.dispidViewSelectionChangedEvent,
@@ -4956,17 +5033,9 @@ var Logger;
 	})(Logger.SendFlag || (Logger.SendFlag={}));
 	var SendFlag=Logger.SendFlag;
 	function allowUploadingData() {
-		if (OSF.Logger && OSF.Logger.ulsEndpoint) {
-			OSF.Logger.ulsEndpoint.loadProxyFrame();
-		}
 	}
 	Logger.allowUploadingData=allowUploadingData;
 	function sendLog(traceLevel, message, flag) {
-		if (OSF.Logger && OSF.Logger.ulsEndpoint) {
-			var jsonObj={ traceLevel: traceLevel, message: message, flag: flag, internalLog: true };
-			var logs=JSON.stringify(jsonObj);
-			OSF.Logger.ulsEndpoint.writeLog(logs);
-		}
 	}
 	Logger.sendLog=sendLog;
 	function creatULSEndpoint() {
@@ -4979,51 +5048,11 @@ var Logger;
 	}
 	var ULSEndpointProxy=(function () {
 		function ULSEndpointProxy() {
-			var _this=this;
-			this.proxyFrame=null;
-			this.telemetryEndPoint="https://telemetryservice.firstpartyapps.oaspapps.com/telemetryservice/telemetryproxy.html";
-			this.buffer=[];
-			this.proxyFrameReady=false;
-			OSF.OUtil.addEventListener(window, "message", function (e) { return _this.tellProxyFrameReady(e); });
-			setTimeout(function () {
-				_this.loadProxyFrame();
-			}, 3000);
 		}
 		ULSEndpointProxy.prototype.writeLog=function (log) {
-			if (this.proxyFrameReady===true) {
-				this.proxyFrame.contentWindow.postMessage(log, ULSEndpointProxy.telemetryOrigin);
-			}
-			else {
-				if (this.buffer.length < 128) {
-					this.buffer.push(log);
-				}
-			}
 		};
 		ULSEndpointProxy.prototype.loadProxyFrame=function () {
-			if (this.proxyFrame==null) {
-				this.proxyFrame=document.createElement("iframe");
-				this.proxyFrame.setAttribute("style", "display:none");
-				this.proxyFrame.setAttribute("src", this.telemetryEndPoint);
-				document.head.appendChild(this.proxyFrame);
-			}
 		};
-		ULSEndpointProxy.prototype.tellProxyFrameReady=function (e) {
-			var _this=this;
-			if (e.data==="ProxyFrameReadyToLog") {
-				this.proxyFrameReady=true;
-				for (var i=0; i < this.buffer.length; i++) {
-					this.writeLog(this.buffer[i]);
-				}
-				this.buffer.length=0;
-				OSF.OUtil.removeEventListener(window, "message", function (e) { return _this.tellProxyFrameReady(e); });
-			}
-			else if (e.data==="ProxyFrameReadyToInit") {
-				var initJson={ appName: "Office APPs", sessionId: OSF.OUtil.Guid.generateNewGuid() };
-				var initStr=JSON.stringify(initJson);
-				this.proxyFrame.contentWindow.postMessage(initStr, ULSEndpointProxy.telemetryOrigin);
-			}
-		};
-		ULSEndpointProxy.telemetryOrigin="https://telemetryservice.firstpartyapps.oaspapps.com";
 		return ULSEndpointProxy;
 	})();
 	if (!OSF.Logger) {
@@ -5174,7 +5203,7 @@ var OSFAppTelemetry;
 		function AppLogger() {
 		}
 		AppLogger.prototype.LogData=function (data) {
-			if (!OSF.Logger || !OSFAppTelemetry.enableTelemetry) {
+			if (!OSFAppTelemetry.enableTelemetry) {
 				return;
 			}
 			try {
@@ -5184,7 +5213,7 @@ var OSFAppTelemetry;
 			}
 		};
 		AppLogger.prototype.LogRawData=function (log) {
-			if (!OSF.Logger || !OSFAppTelemetry.enableTelemetry) {
+			if (!OSFAppTelemetry.enableTelemetry) {
 				return;
 			}
 			try {
@@ -5202,7 +5231,7 @@ var OSFAppTelemetry;
 		return (input || "");
 	}
 	function initialize(context) {
-		if (!OSF.Logger) {
+		if (!OSFAppTelemetry.enableTelemetry) {
 			return;
 		}
 		if (appInfo) {
@@ -5226,7 +5255,7 @@ var OSFAppTelemetry;
 		}
 		appInfo.message=context.get_hostCustomMessage();
 		appInfo.officeJSVersion=OSF.ConstantNames.FileVersion;
-		appInfo.hostJSVersion="16.0.8717.1000";
+		appInfo.hostJSVersion="16.0.9124.1000";
 		if (context._wacHostEnvironment) {
 			appInfo.wacHostEnvironment=context._wacHostEnvironment;
 		}
@@ -5343,12 +5372,6 @@ var OSFAppTelemetry;
 			data.IsFromWacAutomation=appInfo.isFromWacAutomation;
 		}
 		(new AppLogger()).LogData(data);
-		setTimeout(function () {
-			if (!OSF.Logger) {
-				return;
-			}
-			OSF.Logger.allowUploadingData();
-		}, 100);
 	}
 	OSFAppTelemetry.onAppActivated=onAppActivated;
 	function onScriptDone(scriptId, msStartTime, msResponseTime, appCorrelationId) {
@@ -5457,14 +5480,16 @@ OSF.EventDispatch=function OSF_EventDispatch(eventTypes) {
 	this._eventHandlers={};
 	this._objectEventHandlers={};
 	this._queuedEventsArgs={};
-	for (var entry in eventTypes) {
-		var eventType=eventTypes[entry];
-		var isObjectEvent=(eventType=="objectDeleted" || eventType=="objectSelectionChanged" || eventType=="objectDataChanged" || eventType=="contentControlAdded");
-		if (!isObjectEvent)
-			this._eventHandlers[eventType]=[];
-		else
-			this._objectEventHandlers[eventType]={};
-		this._queuedEventsArgs[eventType]=[];
+	if (eventTypes !=null) {
+		for (var i=0; i < eventTypes.length; i++) {
+			var eventType=eventTypes[i];
+			var isObjectEvent=(eventType=="objectDeleted" || eventType=="objectSelectionChanged" || eventType=="objectDataChanged" || eventType=="contentControlAdded");
+			if (!isObjectEvent)
+				this._eventHandlers[eventType]=[];
+			else
+				this._objectEventHandlers[eventType]={};
+			this._queuedEventsArgs[eventType]=[];
+		}
 	}
 };
 OSF.EventDispatch.prototype={
@@ -5490,8 +5515,8 @@ OSF.EventDispatch.prototype={
 	hasEventHandler: function OSF_EventDispatch$hasEventHandler(eventType, handler) {
 		var handlers=this._eventHandlers[eventType];
 		if (handlers && handlers.length > 0) {
-			for (var h in handlers) {
-				if (handlers[h]===handler)
+			for (var i=0; i < handlers.length; i++) {
+				if (handlers[i]===handler)
 					return true;
 			}
 		}
@@ -5596,8 +5621,9 @@ OSF.EventDispatch.prototype={
 		var eventType=eventArgs.type;
 		if (eventType && this._eventHandlers[eventType]) {
 			var eventHandlers=this._eventHandlers[eventType];
-			for (var handler in eventHandlers)
-				eventHandlers[handler](eventArgs);
+			for (var i=0; i < eventHandlers.length; i++) {
+				eventHandlers[i](eventArgs);
+			}
 			return true;
 		}
 		else {
@@ -5722,17 +5748,19 @@ OSF.DDA.OMFactory.manufactureEventArgs=function OSF_DDA_OMFactory$manufactureEve
 			args=new OSF.DDA.DialogParentEventArgs(eventProperties);
 			break;
 		case Microsoft.Office.WebExtension.EventType.ItemChanged:
-			if (OSF._OfficeAppFactory.getHostInfo()["hostType"]=="outlook" || OSF._OfficeAppFactory.getHostInfo()["hostType"]=="outlookwebapp") {
+			if (OSF._OfficeAppFactory.getHostInfo()["hostType"]=="outlook") {
 				args=new OSF.DDA.OlkItemSelectedChangedEventArgs(eventProperties);
 				target.initialize(args["initialData"]);
-				target.setCurrentItemNumber(args["itemNumber"].itemNumber);
+				if (OSF._OfficeAppFactory.getHostInfo()["hostPlatform"]=="win32" || OSF._OfficeAppFactory.getHostInfo()["hostPlatform"]=="mac") {
+					target.setCurrentItemNumber(args["itemNumber"].itemNumber);
+				}
 			}
 			else {
 				throw OsfMsAjaxFactory.msAjaxError.argument(Microsoft.Office.WebExtension.Parameters.EventType, OSF.OUtil.formatString(Strings.OfficeOM.L_NotSupportedEventType, eventType));
 			}
 			break;
 		case Microsoft.Office.WebExtension.EventType.RecipientsChanged:
-			if (OSF._OfficeAppFactory.getHostInfo()["hostType"]=="outlook" || OSF._OfficeAppFactory.getHostInfo()["hostType"]=="outlookwebapp") {
+			if (OSF._OfficeAppFactory.getHostInfo()["hostType"]=="outlook") {
 				args=new OSF.DDA.OlkRecipientsChangedEventArgs(eventProperties);
 			}
 			else {
@@ -5740,8 +5768,16 @@ OSF.DDA.OMFactory.manufactureEventArgs=function OSF_DDA_OMFactory$manufactureEve
 			}
 			break;
 		case Microsoft.Office.WebExtension.EventType.AppointmentTimeChanged:
-			if (OSF._OfficeAppFactory.getHostInfo()["hostType"]=="outlook" || OSF._OfficeAppFactory.getHostInfo()["hostType"]=="outlookwebapp") {
+			if (OSF._OfficeAppFactory.getHostInfo()["hostType"]=="outlook") {
 				args=new OSF.DDA.OlkAppointmentTimeChangedEventArgs(eventProperties);
+			}
+			else {
+				throw OsfMsAjaxFactory.msAjaxError.argument(Microsoft.Office.WebExtension.Parameters.EventType, OSF.OUtil.formatString(Strings.OfficeOM.L_NotSupportedEventType, eventType));
+			}
+			break;
+		case Microsoft.Office.WebExtension.EventType.RecurrenceChanged:
+			if (OSF._OfficeAppFactory.getHostInfo()["hostType"]=="outlook") {
+				args=new OSF.DDA.OlkRecurrenceChangedEventArgs(eventProperties);
 			}
 			else {
 				throw OsfMsAjaxFactory.msAjaxError.argument(Microsoft.Office.WebExtension.Parameters.EventType, OSF.OUtil.formatString(Strings.OfficeOM.L_NotSupportedEventType, eventType));
@@ -5928,6 +5964,13 @@ OSF.DDA.AsyncMethodCalls.define({
 				"types": ["boolean"],
 				"defaultValue": false
 			}
+		},
+		{
+			name: Microsoft.Office.WebExtension.Parameters.UseDeviceIndependentPixels,
+			value: {
+				"types": ["boolean"],
+				"defaultValue": false
+			}
 		}
 	],
 	privateStateCallbacks: [],
@@ -5965,13 +6008,13 @@ OSF.DDA.AsyncMethodCalls.define({
 		if (callArgs[Microsoft.Office.WebExtension.Parameters.Width] <=0) {
 			callArgs[Microsoft.Office.WebExtension.Parameters.Width]=1;
 		}
-		if (callArgs[Microsoft.Office.WebExtension.Parameters.Width] > 100) {
+		if (!callArgs[Microsoft.Office.WebExtension.Parameters.UseDeviceIndependentPixels] && callArgs[Microsoft.Office.WebExtension.Parameters.Width] > 100) {
 			callArgs[Microsoft.Office.WebExtension.Parameters.Width]=99;
 		}
 		if (callArgs[Microsoft.Office.WebExtension.Parameters.Height] <=0) {
 			callArgs[Microsoft.Office.WebExtension.Parameters.Height]=1;
 		}
-		if (callArgs[Microsoft.Office.WebExtension.Parameters.Height] > 100) {
+		if (!callArgs[Microsoft.Office.WebExtension.Parameters.UseDeviceIndependentPixels] && callArgs[Microsoft.Office.WebExtension.Parameters.Height] > 100) {
 			callArgs[Microsoft.Office.WebExtension.Parameters.Height]=99;
 		}
 		if (!callArgs[Microsoft.Office.WebExtension.Parameters.RequireHTTPs]) {
@@ -6417,52 +6460,10 @@ OSF.DDA.SettingsManager={
 	DateJSONPrefix: "Date(",
 	DataJSONSuffix: ")",
 	serializeSettings: function OSF_DDA_SettingsManager$serializeSettings(settingsCollection) {
-		var ret={};
-		for (var key in settingsCollection) {
-			var value=settingsCollection[key];
-			try {
-				if (JSON) {
-					value=JSON.stringify(value, function dateReplacer(k, v) {
-						return OSF.OUtil.isDate(this[k]) ? OSF.DDA.SettingsManager.DateJSONPrefix+this[k].getTime()+OSF.DDA.SettingsManager.DataJSONSuffix : v;
-					});
-				}
-				else {
-					value=Sys.Serialization.JavaScriptSerializer.serialize(value);
-				}
-				ret[key]=value;
-			}
-			catch (ex) {
-			}
-		}
-		return ret;
+		return OSF.OUtil.serializeSettings(settingsCollection);
 	},
 	deserializeSettings: function OSF_DDA_SettingsManager$deserializeSettings(serializedSettings) {
-		var ret={};
-		serializedSettings=serializedSettings || {};
-		for (var key in serializedSettings) {
-			var value=serializedSettings[key];
-			try {
-				if (JSON) {
-					value=JSON.parse(value, function dateReviver(k, v) {
-						var d;
-						if (typeof v==='string' && v && v.length > 6 && v.slice(0, 5)===OSF.DDA.SettingsManager.DateJSONPrefix && v.slice(-1)===OSF.DDA.SettingsManager.DataJSONSuffix) {
-							d=new Date(parseInt(v.slice(5, -1)));
-							if (d) {
-								return d;
-							}
-						}
-						return v;
-					});
-				}
-				else {
-					value=Sys.Serialization.JavaScriptSerializer.deserialize(value, true);
-				}
-				ret[key]=value;
-			}
-			catch (ex) {
-			}
-		}
-		return ret;
+		return OSF.OUtil.deserializeSettings(serializedSettings);
 	}
 };
 OSF.DDA.Settings=function OSF_DDA_Settings(settings) {
@@ -8672,10 +8673,10 @@ var __extends=(this && this.__extends) || function (d, b) {
 var OfficeExtension;
 (function (OfficeExtension) {
 	var Action=(function () {
-		function Action(actionInfo, isWriteOperation, isRestrictedResourceAccess) {
+		function Action(actionInfo, operationType, flags) {
 			this.m_actionInfo=actionInfo;
-			this.m_isWriteOperation=isWriteOperation;
-			this.m_isRestrictedResourceAccess=isRestrictedResourceAccess;
+			this.m_operationType=operationType;
+			this.m_flags=flags;
 		}
 		Object.defineProperty(Action.prototype, "actionInfo", {
 			get: function () {
@@ -8684,16 +8685,16 @@ var OfficeExtension;
 			enumerable: true,
 			configurable: true
 		});
-		Object.defineProperty(Action.prototype, "isWriteOperation", {
+		Object.defineProperty(Action.prototype, "operationType", {
 			get: function () {
-				return this.m_isWriteOperation;
+				return this.m_operationType;
 			},
 			enumerable: true,
 			configurable: true
 		});
-		Object.defineProperty(Action.prototype, "isRestrictedResourceAccess", {
+		Object.defineProperty(Action.prototype, "flags", {
 			get: function () {
-				return this.m_isRestrictedResourceAccess;
+				return this.m_flags;
 			},
 			enumerable: true,
 			configurable: true
@@ -8718,7 +8719,7 @@ var OfficeExtension;
 	var ActionFactory=(function () {
 		function ActionFactory() {
 		}
-		ActionFactory.createSetPropertyAction=function (context, parent, propertyName, value) {
+		ActionFactory.createSetPropertyAction=function (context, parent, propertyName, value, flags) {
 			OfficeExtension.Utility.validateObjectPath(parent);
 			var actionInfo={
 				Id: context._nextId(),
@@ -8732,7 +8733,7 @@ var OfficeExtension;
 			OfficeExtension.Utility.validateReferencedObjectPaths(referencedArgumentObjectPaths);
 			context._pendingRequest.ensureInstantiateObjectPath(parent._objectPath);
 			context._pendingRequest.ensureInstantiateObjectPaths(referencedArgumentObjectPaths);
-			var ret=new OfficeExtension.Action(actionInfo, true, false);
+			var ret=new OfficeExtension.Action(actionInfo, 0, flags);
 			context._pendingRequest.addAction(ret);
 			context._pendingRequest.addReferencedObjectPath(parent._objectPath);
 			context._pendingRequest.addReferencedObjectPaths(referencedArgumentObjectPaths);
@@ -8740,7 +8741,7 @@ var OfficeExtension;
 			ret.referencedArgumentObjectPaths=referencedArgumentObjectPaths;
 			return ret;
 		};
-		ActionFactory.createMethodAction=function (context, parent, methodName, operationType, args, isRestrictedResourceAccess) {
+		ActionFactory.createMethodAction=function (context, parent, methodName, operationType, args, flags) {
 			OfficeExtension.Utility.validateObjectPath(parent);
 			var actionInfo={
 				Id: context._nextId(),
@@ -8753,8 +8754,7 @@ var OfficeExtension;
 			OfficeExtension.Utility.validateReferencedObjectPaths(referencedArgumentObjectPaths);
 			context._pendingRequest.ensureInstantiateObjectPath(parent._objectPath);
 			context._pendingRequest.ensureInstantiateObjectPaths(referencedArgumentObjectPaths);
-			var isWriteOperation=operationType !=1;
-			var ret=new OfficeExtension.Action(actionInfo, isWriteOperation, isRestrictedResourceAccess);
+			var ret=new OfficeExtension.Action(actionInfo, operationType, OfficeExtension.Utility._fixupApiFlags(flags));
 			context._pendingRequest.addAction(ret);
 			context._pendingRequest.addReferencedObjectPath(parent._objectPath);
 			context._pendingRequest.addReferencedObjectPaths(referencedArgumentObjectPaths);
@@ -8772,7 +8772,7 @@ var OfficeExtension;
 				ObjectPathId: parent._objectPath.objectPathInfo.Id,
 			};
 			actionInfo.QueryInfo=queryOption;
-			var ret=new OfficeExtension.Action(actionInfo, false, false);
+			var ret=new OfficeExtension.Action(actionInfo, 1, 4);
 			context._pendingRequest.addAction(ret);
 			context._pendingRequest.addReferencedObjectPath(parent._objectPath);
 			ret.referencedObjectPath=parent._objectPath;
@@ -8788,7 +8788,7 @@ var OfficeExtension;
 				ObjectPathId: parent._objectPath.objectPathInfo.Id,
 				RecursiveQueryInfo: query
 			};
-			var ret=new OfficeExtension.Action(actionInfo, false, false);
+			var ret=new OfficeExtension.Action(actionInfo, 1, 4);
 			context._pendingRequest.addAction(ret);
 			context._pendingRequest.addReferencedObjectPath(parent._objectPath);
 			ret.referencedObjectPath=parent._objectPath;
@@ -8804,7 +8804,7 @@ var OfficeExtension;
 				ObjectPathId: parent._objectPath.objectPathInfo.Id,
 			};
 			actionInfo.QueryInfo=queryOption;
-			var ret=new OfficeExtension.Action(actionInfo, false, false);
+			var ret=new OfficeExtension.Action(actionInfo, 1, 4);
 			context._pendingRequest.addAction(ret);
 			context._pendingRequest.addReferencedObjectPath(parent._objectPath);
 			ret.referencedObjectPath=parent._objectPath;
@@ -8820,7 +8820,7 @@ var OfficeExtension;
 				ObjectPathId: parent._objectPath.objectPathInfo.Id,
 				ObjectState: objectState
 			};
-			var ret=new OfficeExtension.Action(actionInfo, false, false);
+			var ret=new OfficeExtension.Action(actionInfo, 1, 4);
 			context._pendingRequest.addAction(ret);
 			context._pendingRequest.addReferencedObjectPath(parent._objectPath);
 			ret.referencedObjectPath=parent._objectPath;
@@ -8836,7 +8836,7 @@ var OfficeExtension;
 				ObjectPathId: parent._objectPath.objectPathInfo.Id,
 				ObjectState: objectState
 			};
-			var ret=new OfficeExtension.Action(actionInfo, true, false);
+			var ret=new OfficeExtension.Action(actionInfo, 0, 0);
 			context._pendingRequest.addAction(ret);
 			context._pendingRequest.addReferencedObjectPath(parent._objectPath);
 			ret.referencedObjectPath=parent._objectPath;
@@ -8852,7 +8852,7 @@ var OfficeExtension;
 				Name: "",
 				ObjectPathId: obj._objectPath.objectPathInfo.Id
 			};
-			var ret=new OfficeExtension.Action(actionInfo, false, false);
+			var ret=new OfficeExtension.Action(actionInfo, 1, 4);
 			ret.referencedObjectPath=obj._objectPath;
 			context._pendingRequest.addAction(ret);
 			context._pendingRequest.addReferencedObjectPath(obj._objectPath);
@@ -8866,7 +8866,7 @@ var OfficeExtension;
 				Name: "Trace",
 				ObjectPathId: 0
 			};
-			var ret=new OfficeExtension.Action(actionInfo, false, false);
+			var ret=new OfficeExtension.Action(actionInfo, 1, 4);
 			context._pendingRequest.addAction(ret);
 			if (addTraceMessage) {
 				context._pendingRequest.addTrace(actionInfo.Id, message);
@@ -9137,7 +9137,6 @@ var OfficeExtension;
 			this.m_actionResultHandler={};
 			this.m_referencedObjectPaths={};
 			this.m_instantiatedObjectPaths={};
-			this.m_flags=0;
 			this.m_traceInfos={};
 			this.m_pendingProcessEventHandlers=[];
 			this.m_pendingEventHandlerActions={};
@@ -9145,13 +9144,6 @@ var OfficeExtension;
 			this.m_responseTraceMessages=[];
 			this.m_preSyncPromises=[];
 		}
-		Object.defineProperty(ClientRequest.prototype, "flags", {
-			get: function () {
-				return this.m_flags;
-			},
-			enumerable: true,
-			configurable: true
-		});
 		Object.defineProperty(ClientRequest.prototype, "traceInfos", {
 			get: function () {
 				return this.m_traceInfos;
@@ -9196,12 +9188,6 @@ var OfficeExtension;
 					this.m_context.ensureInProgressBatchIfBatchMode();
 				}
 			}
-			if (action.isWriteOperation) {
-				this.m_flags=this.m_flags | 1;
-			}
-			if (action.isRestrictedResourceAccess) {
-				this.m_flags=this.m_flags | 2;
-			}
 			this.m_actions.push(action);
 			if (action.actionInfo.ActionType==1) {
 				this.m_instantiatedObjectPaths[action.actionInfo.ObjectPathId]=action;
@@ -9234,7 +9220,7 @@ var OfficeExtension;
 						Name: "",
 						ObjectPathId: objectPath.objectPathInfo.Id
 					};
-					var instantiateAction=new OfficeExtension.Action(actionInfo, false, false);
+					var instantiateAction=new OfficeExtension.Action(actionInfo, 1, 4);
 					instantiateAction.referencedObjectPath=objectPath;
 					this.addReferencedObjectPath(objectPath);
 					this.addAction(instantiateAction);
@@ -9262,12 +9248,6 @@ var OfficeExtension;
 				});
 			}
 			while (objectPath) {
-				if (objectPath.isWriteOperation) {
-					this.m_flags=this.m_flags | 1;
-				}
-				if (objectPath.isRestrictedResourceAccess) {
-					this.m_flags=this.m_flags | 2;
-				}
 				this.m_referencedObjectPaths[objectPath.objectPathInfo.Id]=objectPath;
 				if (objectPath.objectPathInfo.ObjectPathType==3) {
 					this.addReferencedObjectPaths(objectPath.argumentObjectPaths);
@@ -9285,24 +9265,67 @@ var OfficeExtension;
 		ClientRequest.prototype.addActionResultHandler=function (action, resultHandler) {
 			this.m_actionResultHandler[action.actionInfo.Id]=resultHandler;
 		};
-		ClientRequest.prototype.buildRequestMessageBody=function () {
+		ClientRequest.prototype.aggregrateRequestFlags=function (requestFlags, operationType, flags) {
+			if (operationType===0) {
+				requestFlags=requestFlags | 1;
+				if ((flags & 2)===0) {
+					requestFlags=requestFlags & ~(16);
+				}
+				requestFlags=requestFlags & ~(4);
+			}
+			if (flags & 1) {
+				requestFlags=requestFlags | 2;
+			}
+			if ((flags & 4)===0) {
+				requestFlags=requestFlags & ~(4);
+			}
+			return requestFlags;
+		};
+		ClientRequest.prototype.finallyNormalizeFlags=function (requestFlags) {
+			if ((requestFlags & 1)===0) {
+				requestFlags=requestFlags & ~16;
+			}
+			if (!OfficeExtension._internalConfig.enableConcurrentFlag) {
+				requestFlags=requestFlags & ~4;
+			}
+			if (!OfficeExtension._internalConfig.enableUndoableFlag) {
+				requestFlags=requestFlags & ~16;
+			}
+			if (typeof (this.m_flagsForTesting)==="number") {
+				requestFlags=this.m_flagsForTesting;
+			}
+			return requestFlags;
+		};
+		ClientRequest.prototype.buildRequestMessageBodyAndRequestFlags=function () {
 			if (OfficeExtension._internalConfig.enableEarlyDispose) {
 				ClientRequest._calculateLastUsedObjectPathIds(this.m_actions);
 			}
+			var requestFlags=4 | 16;
 			var objectPaths={};
 			for (var i in this.m_referencedObjectPaths) {
+				requestFlags=this.aggregrateRequestFlags(requestFlags, this.m_referencedObjectPaths[i].operationType, this.m_referencedObjectPaths[i].flags);
 				objectPaths[i]=this.m_referencedObjectPaths[i].objectPathInfo;
 			}
 			var actions=[];
+			var hasKeepReference=false;
 			for (var index=0; index < this.m_actions.length; index++) {
-				actions.push(this.m_actions[index].actionInfo);
+				var action=this.m_actions[index];
+				if (action.actionInfo.ActionType===3 && action.actionInfo.Name===OfficeExtension.Constants.keepReference) {
+					hasKeepReference=true;
+				}
+				requestFlags=this.aggregrateRequestFlags(requestFlags, action.operationType, action.flags);
+				actions.push(action.actionInfo);
 			}
-			var ret={
-				AutoKeepReference: this.m_context._autoCleanup,
+			requestFlags=this.finallyNormalizeFlags(requestFlags);
+			var body={
+				AutoKeepReference: this.m_context._autoCleanup && hasKeepReference,
 				Actions: actions,
 				ObjectPaths: objectPaths
 			};
-			return ret;
+			return {
+				body: body,
+				flags: requestFlags
+			};
 		};
 		ClientRequest.prototype.processResponse=function (actionResults) {
 			if (actionResults) {
@@ -9363,6 +9386,15 @@ var OfficeExtension;
 			enumerable: true,
 			configurable: true
 		});
+		ClientRequest.prototype._removeKeepReferenceAction=function (objectPathId) {
+			for (var i=this.m_actions.length - 1; i >=0; i--) {
+				var actionInfo=this.m_actions[i].actionInfo;
+				if (actionInfo.ObjectPathId===objectPathId && actionInfo.ActionType===3 && actionInfo.Name===OfficeExtension.Constants.keepReference) {
+					this.m_actions.splice(i);
+					break;
+				}
+			}
+		};
 		ClientRequest._updateLastUsedActionIdOfObjectPathId=function (lastUsedActionIdOfObjectPathId, objectPath, actionId) {
 			while (objectPath) {
 				if (lastUsedActionIdOfObjectPathId[objectPath.objectPathInfo.Id]) {
@@ -9425,9 +9457,15 @@ var OfficeExtension;
 (function (OfficeExtension) {
 	OfficeExtension._internalConfig={
 		showDisposeInfoInDebugInfo: false,
+		showInternalApiInDebugInfo: false,
 		enableEarlyDispose: true,
 		alwaysPolyfillClientObjectUpdateMethod: false,
-		alwaysPolyfillClientObjectRetrieveMethod: false
+		alwaysPolyfillClientObjectRetrieveMethod: false,
+		enableConcurrentFlag: true,
+		enableUndoableFlag: true,
+	};
+	OfficeExtension.config={
+		extendedErrorLogging: false
 	};
 	var SessionBase=(function () {
 		function SessionBase() {
@@ -9476,7 +9514,7 @@ var OfficeExtension;
 					OfficeExtension.Utility._copyHeaders(requestInfo.headers, this.m_requestUrlAndHeaderInfo.headers);
 				}
 				else {
-					throw OfficeExtension._Internal.RuntimeError._createInvalidArgError("url");
+					throw OfficeExtension._Internal.RuntimeError._createInvalidArgError({ argumentName: "url" });
 				}
 			}
 			if (this.m_requestUrlAndHeaderInfoResolver instanceof SessionBase) {
@@ -9599,7 +9637,7 @@ var OfficeExtension;
 				var value=option[key];
 				if (key==="$all") {
 					if (typeof (value) !=="boolean") {
-						throw OfficeExtension._Internal.RuntimeError._createInvalidArgError(ClientRequestContext.combineQueryPath(argPrefix, key, "."));
+						throw OfficeExtension._Internal.RuntimeError._createInvalidArgError({ argumentName: ClientRequestContext.combineQueryPath(argPrefix, key, ".") });
 					}
 					if (value) {
 						queryInfo.Select.push(ClientRequestContext.combineQueryPath(pathPrefix, "*", "/"));
@@ -9607,13 +9645,13 @@ var OfficeExtension;
 				}
 				else if (key==="$top") {
 					if (typeof (value) !=="number" || pathPrefix.length > 0) {
-						throw OfficeExtension._Internal.RuntimeError._createInvalidArgError(ClientRequestContext.combineQueryPath(argPrefix, key, "."));
+						throw OfficeExtension._Internal.RuntimeError._createInvalidArgError({ argumentName: ClientRequestContext.combineQueryPath(argPrefix, key, ".") });
 					}
 					queryInfo.Top=value;
 				}
 				else if (key==="$skip") {
 					if (typeof (value) !=="number" || pathPrefix.length > 0) {
-						throw OfficeExtension._Internal.RuntimeError._createInvalidArgError(ClientRequestContext.combineQueryPath(argPrefix, key, "."));
+						throw OfficeExtension._Internal.RuntimeError._createInvalidArgError({ argumentName: ClientRequestContext.combineQueryPath(argPrefix, key, ".") });
 					}
 					queryInfo.Skip=value;
 				}
@@ -9627,7 +9665,7 @@ var OfficeExtension;
 						ClientRequestContext.parseStrictLoadOptionHelper(queryInfo, ClientRequestContext.combineQueryPath(pathPrefix, key, "/"), ClientRequestContext.combineQueryPath(argPrefix, key, "."), value);
 					}
 					else {
-						throw OfficeExtension._Internal.RuntimeError._createInvalidArgError(ClientRequestContext.combineQueryPath(argPrefix, key, "."));
+						throw OfficeExtension._Internal.RuntimeError._createInvalidArgError({ argumentName: ClientRequestContext.combineQueryPath(argPrefix, key, ".") });
 					}
 				}
 			}
@@ -9651,7 +9689,7 @@ var OfficeExtension;
 						queryOption.Select=loadOption.select;
 					}
 					else if (!OfficeExtension.Utility.isNullOrUndefined(loadOption.select)) {
-						throw OfficeExtension._Internal.RuntimeError._createInvalidArgError("option.select");
+						throw OfficeExtension._Internal.RuntimeError._createInvalidArgError({ argumentName: "option.select" });
 					}
 					if (typeof (loadOption.expand)=="string") {
 						queryOption.Expand=OfficeExtension.Utility._parseSelectExpand(loadOption.expand);
@@ -9660,19 +9698,19 @@ var OfficeExtension;
 						queryOption.Expand=loadOption.expand;
 					}
 					else if (!OfficeExtension.Utility.isNullOrUndefined(loadOption.expand)) {
-						throw OfficeExtension._Internal.RuntimeError._createInvalidArgError("option.expand");
+						throw OfficeExtension._Internal.RuntimeError._createInvalidArgError({ argumentName: "option.expand" });
 					}
 					if (typeof (loadOption.top)==="number") {
 						queryOption.Top=loadOption.top;
 					}
 					else if (!OfficeExtension.Utility.isNullOrUndefined(loadOption.top)) {
-						throw OfficeExtension._Internal.RuntimeError._createInvalidArgError("option.top");
+						throw OfficeExtension._Internal.RuntimeError._createInvalidArgError({ argumentName: "option.top" });
 					}
 					if (typeof (loadOption.skip)==="number") {
 						queryOption.Skip=loadOption.skip;
 					}
 					else if (!OfficeExtension.Utility.isNullOrUndefined(loadOption.skip)) {
-						throw OfficeExtension._Internal.RuntimeError._createInvalidArgError("option.skip");
+						throw OfficeExtension._Internal.RuntimeError._createInvalidArgError({ argumentName: "option.skip" });
 					}
 				}
 				else {
@@ -9680,13 +9718,13 @@ var OfficeExtension;
 				}
 			}
 			else if (!OfficeExtension.Utility.isNullOrUndefined(option)) {
-				throw OfficeExtension._Internal.RuntimeError._createInvalidArgError("option");
+				throw OfficeExtension._Internal.RuntimeError._createInvalidArgError({ argumentName: "option" });
 			}
 			return queryOption;
 		};
 		ClientRequestContext.prototype.loadRecursive=function (clientObj, options, maxDepth) {
 			if (!OfficeExtension.Utility.isPlainJsonObject(options)) {
-				throw OfficeExtension._Internal.RuntimeError._createInvalidArgError("options");
+				throw OfficeExtension._Internal.RuntimeError._createInvalidArgError({ argumentName: "options" });
 			}
 			var quries={};
 			for (var key in options) {
@@ -9742,8 +9780,7 @@ var OfficeExtension;
 			if (!req.hasActions) {
 				return this.processPendingEventHandlers(req);
 			}
-			var msgBody=req.buildRequestMessageBody();
-			var requestFlags=req.flags;
+			var _a=req.buildRequestMessageBodyAndRequestFlags(), msgBody=_a.body, requestFlags=_a.flags;
 			if (!this._requestExecutor) {
 				if (OfficeExtension.Utility._isLocalDocumentUrl(this.m_requestUrlAndHeaderInfo.url)) {
 					this._requestExecutor=new OfficeExtension.OfficeJsRequestExecutor(this);
@@ -9765,6 +9802,7 @@ var OfficeExtension;
 			var errorFromResponse=null;
 			var errorFromProcessEventHandlers=null;
 			this._lastSyncStart=performance.now();
+			this._lastRequestFlags=requestFlags;
 			return requestExecutor.executeAsync(this._customData, requestFlags, requestExecutorRequestMessage)
 				.then(function (response) {
 				_this._lastSyncEnd=performance.now();
@@ -9818,8 +9856,17 @@ var OfficeExtension;
 			if (response.Body) {
 				if (response.Body.Error &&
 					response.Body.Error.ActionIndex >=0) {
-					var prettyPrinter=new OfficeExtension.RequestPrettyPrinter(this._rootObjectPropertyName, req._objectPaths, req._actions);
-					errorStatementInfo=prettyPrinter.processForDebugStatementInfo(response.Body.Error.ActionIndex);
+					var prettyPrinter=new OfficeExtension.RequestPrettyPrinter(this._rootObjectPropertyName, req._objectPaths, req._actions, false, true);
+					var debugInfoStatementInfo=prettyPrinter.processForDebugStatementInfo(response.Body.Error.ActionIndex);
+					errorStatementInfo={
+						statement: debugInfoStatementInfo.statement,
+						surroundingStatements: debugInfoStatementInfo.surroundingStatements,
+						fullStatements: ["Please enable config.extendedErrorLogging to see full statements."]
+					};
+					if (OfficeExtension.config.extendedErrorLogging) {
+						prettyPrinter=new OfficeExtension.RequestPrettyPrinter(this._rootObjectPropertyName, req._objectPaths, req._actions, false, false);
+						errorStatementInfo.fullStatements=prettyPrinter.process();
+					}
 				}
 				var actionResults=null;
 				if (response.Body.Results) {
@@ -9852,6 +9899,7 @@ var OfficeExtension;
 				if (errorStatementInfo) {
 					debugInfo.statement=errorStatementInfo.statement;
 					debugInfo.surroundingStatements=errorStatementInfo.surroundingStatements;
+					debugInfo.fullStatements=errorStatementInfo.fullStatements;
 				}
 				return new OfficeExtension._Internal.RuntimeError({
 					code: response.Body.Error.Code,
@@ -10345,10 +10393,13 @@ var OfficeExtension;
 		Constants.iterativeExecutor="IterativeExecutor";
 		Constants.localDocument="http://document.localhost/";
 		Constants.localDocumentApiPrefix="http://document.localhost/_api/";
+		Constants.keepReference="_KeepReference";
+		Constants.objectPathIdPrivate="_ObjectPathId";
 		Constants.processQuery="ProcessQuery";
 		Constants.referenceId="_ReferenceId";
 		Constants.isTracked="_IsTracked";
 		Constants.sourceLibHeader="SdkVersion";
+		Constants.sessionContext="sc";
 		Constants.embeddingPageOrigin="EmbeddingPageOrigin";
 		Constants.embeddingPageSessionInfo="EmbeddingPageSessionInfo";
 		Constants.eventMessageCategory=65536;
@@ -10361,6 +10412,8 @@ var OfficeExtension;
 		Constants.className="_className";
 		Constants.isCollection="_isCollection";
 		Constants.scalarPropertyUpdateable="_scalarPropertyUpdateable";
+		Constants.collectionPropertyPath="_collectionPropertyPath";
+		Constants.objectPathInfoDoNotKeepReferenceFieldName="D";
 		return Constants;
 	}());
 	OfficeExtension.Constants=Constants;
@@ -10434,6 +10487,9 @@ var OfficeExtension;
 			if (!this.m_options.width) {
 				this.m_options.width="100%";
 			}
+			if (!(this.m_options.webApplication && this.m_options.webApplication.accessToken && this.m_options.webApplication.accessTokenTtl)) {
+				this.m_options.webApplication=null;
+			}
 		}
 		EmbeddedSession.prototype._getIFrameSrc=function () {
 			var origin=window.location.protocol+"//"+window.location.host;
@@ -10445,7 +10501,16 @@ var OfficeExtension;
 			}
 			var a=document.createElement("a");
 			a.href=this.m_url;
-			if (useHash) {
+			if (this.m_options.webApplication) {
+				var toAppendWAC=OfficeExtension.Constants.embeddingPageOrigin+"="+origin+"&"+OfficeExtension.Constants.embeddingPageSessionInfo+"="+this.m_options.sessionKey;
+				if (a.search.length===0 || a.search==="?") {
+					a.search="?"+OfficeExtension.Constants.sessionContext+"="+encodeURIComponent(toAppendWAC);
+				}
+				else {
+					a.search=a.search+"&"+OfficeExtension.Constants.sessionContext+"="+encodeURIComponent(toAppendWAC);
+				}
+			}
+			else if (useHash) {
 				if (a.hash.length===0 || a.hash==="#") {
 					a.hash="#"+toAppend;
 				}
@@ -10472,11 +10537,33 @@ var OfficeExtension;
 				var iframeElement=document.createElement("iframe");
 				if (_this.m_options.id) {
 					iframeElement.id=_this.m_options.id;
+					iframeElement.name=_this.m_options.id;
 				}
 				iframeElement.style.height=_this.m_options.height;
 				iframeElement.style.width=_this.m_options.width;
-				iframeElement.src=iframeSrc;
-				_this.m_options.container.appendChild(iframeElement);
+				if (!_this.m_options.webApplication) {
+					iframeElement.src=iframeSrc;
+					_this.m_options.container.appendChild(iframeElement);
+				}
+				else {
+					var webApplicationForm=document.createElement('form');
+					webApplicationForm.setAttribute("action", iframeSrc);
+					webApplicationForm.setAttribute("method", "post");
+					webApplicationForm.setAttribute("target", iframeElement.name);
+					_this.m_options.container.appendChild(webApplicationForm);
+					var token_input=document.createElement('input');
+					token_input.setAttribute("type", "hidden");
+					token_input.setAttribute("name", "access_token");
+					token_input.setAttribute("value", _this.m_options.webApplication.accessToken);
+					webApplicationForm.appendChild(token_input);
+					var token_ttl_input=document.createElement('input');
+					token_ttl_input.setAttribute("type", "hidden");
+					token_ttl_input.setAttribute("name", "access_token_ttl");
+					token_ttl_input.setAttribute("value", _this.m_options.webApplication.accessTokenTtl);
+					webApplicationForm.appendChild(token_ttl_input);
+					_this.m_options.container.appendChild(iframeElement);
+					webApplicationForm.submit();
+				}
 				_this.m_timeoutId=setTimeout(function () {
 					_this.close();
 					var err=OfficeExtension.Utility.createRuntimeError(OfficeExtension.ErrorCodes.timeout, OfficeExtension.Utility._getResourceString(OfficeExtension.ResourceStrings.timeout), "EmbeddedSession.init");
@@ -10937,7 +11024,7 @@ var OfficeExtension;
 					case 16:
 						return OfficeExtension.Utility.promisify(function (callback) { return Office.context.document.addHandlerAsync(Office.EventType.ContentControlAdded, handler, { id: targetId }, callback); });
 					default:
-						throw _Internal.RuntimeError._createInvalidArgError("eventId");
+						throw _Internal.RuntimeError._createInvalidArgError({ argumentName: "eventId" });
 				}
 			};
 			OfficeJsEventRegistration.prototype.unregister=function (eventId, targetId, handler) {
@@ -10967,7 +11054,7 @@ var OfficeExtension;
 					case 16:
 						return OfficeExtension.Utility.promisify(function (callback) { return Office.context.document.removeHandlerAsync(Office.EventType.ContentControlAdded, { id: targetId, handler: handler }, callback); });
 					default:
-						throw _Internal.RuntimeError._createInvalidArgError("eventId");
+						throw _Internal.RuntimeError._createInvalidArgError({ argumentName: "eventId" });
 				}
 			};
 			return OfficeJsEventRegistration;
@@ -10998,7 +11085,7 @@ var OfficeExtension;
 		};
 		EventRegistration.prototype.register=function (eventId, targetId, handler) {
 			if (!handler) {
-				throw _Internal.RuntimeError._createInvalidArgError("handler");
+				throw _Internal.RuntimeError._createInvalidArgError({ argumentName: "handler" });
 			}
 			var handlers=this.getHandlers(eventId, targetId);
 			handlers.push(handler);
@@ -11009,7 +11096,7 @@ var OfficeExtension;
 		};
 		EventRegistration.prototype.unregister=function (eventId, targetId, handler) {
 			if (!handler) {
-				throw _Internal.RuntimeError._createInvalidArgError("handler");
+				throw _Internal.RuntimeError._createInvalidArgError({ argumentName: "handler" });
 			}
 			var handlers=this.getHandlers(eventId, targetId);
 			for (var index=handlers.length - 1; index >=0; index--) {
@@ -11486,13 +11573,14 @@ var OfficeExtension;
 var OfficeExtension;
 (function (OfficeExtension) {
 	var ObjectPath=(function () {
-		function ObjectPath(objectPathInfo, parentObjectPath, isCollection, isInvalidAfterRequest) {
+		function ObjectPath(objectPathInfo, parentObjectPath, isCollection, isInvalidAfterRequest, operationType, flags) {
 			this.m_objectPathInfo=objectPathInfo;
 			this.m_parentObjectPath=parentObjectPath;
-			this.m_isWriteOperation=false;
 			this.m_isCollection=isCollection;
 			this.m_isInvalidAfterRequest=isInvalidAfterRequest;
 			this.m_isValid=true;
+			this.m_operationType=operationType;
+			this.m_flags=flags;
 		}
 		Object.defineProperty(ObjectPath.prototype, "objectPathInfo", {
 			get: function () {
@@ -11501,22 +11589,16 @@ var OfficeExtension;
 			enumerable: true,
 			configurable: true
 		});
-		Object.defineProperty(ObjectPath.prototype, "isWriteOperation", {
+		Object.defineProperty(ObjectPath.prototype, "operationType", {
 			get: function () {
-				return this.m_isWriteOperation;
-			},
-			set: function (value) {
-				this.m_isWriteOperation=value;
+				return this.m_operationType;
 			},
 			enumerable: true,
 			configurable: true
 		});
-		Object.defineProperty(ObjectPath.prototype, "isRestrictedResourceAccess", {
+		Object.defineProperty(ObjectPath.prototype, "flags", {
 			get: function () {
-				return this.m_isRestrictedResourceAccess;
-			},
-			set: function (value) {
-				this.m_isRestrictedResourceAccess=value;
+				return this.m_flags;
 			},
 			enumerable: true,
 			configurable: true
@@ -11570,6 +11652,13 @@ var OfficeExtension;
 			enumerable: true,
 			configurable: true
 		});
+		Object.defineProperty(ObjectPath.prototype, "originalObjectPathInfo", {
+			get: function () {
+				return this.m_originalObjectPathInfo;
+			},
+			enumerable: true,
+			configurable: true
+		});
 		Object.defineProperty(ObjectPath.prototype, "getByIdMethodName", {
 			get: function () {
 				return this.m_getByIdMethodName;
@@ -11581,15 +11670,18 @@ var OfficeExtension;
 			configurable: true
 		});
 		ObjectPath.prototype._updateAsNullObject=function () {
-			this.m_isInvalidAfterRequest=false;
-			this.m_isValid=true;
+			this.resetForUpdateUsingObjectData();
 			this.m_objectPathInfo.ObjectPathType=7;
 			this.m_objectPathInfo.Name="";
-			this.m_objectPathInfo.ArgumentInfo={};
 			this.m_parentObjectPath=null;
-			this.m_argumentObjectPaths=null;
 		};
-		ObjectPath.prototype.updateUsingObjectData=function (value) {
+		ObjectPath.prototype.saveOriginalObjectPathInfo=function () {
+			if (OfficeExtension.config.extendedErrorLogging && !this.m_originalObjectPathInfo) {
+				this.m_originalObjectPathInfo={};
+				ObjectPath.copyObjectPathInfo(this.m_objectPathInfo, this.m_originalObjectPathInfo);
+			}
+		};
+		ObjectPath.prototype.updateUsingObjectData=function (value, clientObject) {
 			var referenceId=value[OfficeExtension.Constants.referenceId];
 			if (!OfficeExtension.Utility.isNullOrEmptyString(referenceId)) {
 				if (!this.m_savedObjectPathInfo &&
@@ -11602,23 +11694,40 @@ var OfficeExtension;
 						parent: this.m_parentObjectPath
 					};
 				}
-				this.m_isInvalidAfterRequest=false;
-				this.m_isValid=true;
+				this.saveOriginalObjectPathInfo();
+				this.resetForUpdateUsingObjectData();
 				this.m_objectPathInfo.ObjectPathType=6;
 				this.m_objectPathInfo.Name=referenceId;
-				this.m_objectPathInfo.ArgumentInfo={};
 				delete this.m_objectPathInfo.ParentObjectPathId;
 				this.m_parentObjectPath=null;
-				this.m_argumentObjectPaths=null;
 				return;
+			}
+			var collectionPropertyPath=clientObject[OfficeExtension.Constants.collectionPropertyPath];
+			if (!OfficeExtension.Utility.isNullOrEmptyString(collectionPropertyPath)) {
+				var id=OfficeExtension.Utility.tryGetObjectIdFromLoadOrRetrieveResult(value);
+				if (!OfficeExtension.Utility.isNullOrUndefined(id)) {
+					var propNames=collectionPropertyPath.split(".");
+					var parent_1=clientObject.context[propNames[0]];
+					for (var i=1; i < propNames.length; i++) {
+						parent_1=parent_1[propNames[i]];
+					}
+					this.saveOriginalObjectPathInfo();
+					this.resetForUpdateUsingObjectData();
+					this.m_parentObjectPath=parent_1._objectPath;
+					this.m_objectPathInfo.ParentObjectPathId=this.m_parentObjectPath.objectPathInfo.Id;
+					this.m_objectPathInfo.ObjectPathType=5;
+					this.m_objectPathInfo.Name="";
+					this.m_objectPathInfo.ArgumentInfo.Arguments=[id];
+					return;
+				}
 			}
 			var parentIsCollection=this.parentObjectPath && this.parentObjectPath.isCollection;
 			var getByIdMethodName=this.getByIdMethodName;
 			if (parentIsCollection || !OfficeExtension.Utility.isNullOrEmptyString(getByIdMethodName)) {
 				var id=OfficeExtension.Utility.tryGetObjectIdFromLoadOrRetrieveResult(value);
 				if (!OfficeExtension.Utility.isNullOrUndefined(id)) {
-					this.m_isInvalidAfterRequest=false;
-					this.m_isValid=true;
+					this.saveOriginalObjectPathInfo();
+					this.resetForUpdateUsingObjectData();
 					if (!OfficeExtension.Utility.isNullOrEmptyString(getByIdMethodName)) {
 						this.m_objectPathInfo.ObjectPathType=3;
 						this.m_objectPathInfo.Name=getByIdMethodName;
@@ -11628,13 +11737,18 @@ var OfficeExtension;
 						this.m_objectPathInfo.ObjectPathType=5;
 						this.m_objectPathInfo.Name="";
 					}
-					this.isWriteOperation=false;
-					this.m_objectPathInfo.ArgumentInfo={};
 					this.m_objectPathInfo.ArgumentInfo.Arguments=[id];
-					this.m_argumentObjectPaths=null;
 					return;
 				}
 			}
+		};
+		ObjectPath.prototype.resetForUpdateUsingObjectData=function () {
+			this.m_isInvalidAfterRequest=false;
+			this.m_isValid=true;
+			this.m_operationType=1;
+			this.m_flags=4;
+			this.m_objectPathInfo.ArgumentInfo={};
+			this.m_argumentObjectPaths=null;
 		};
 		ObjectPath.isRestorableObjectPath=function (objectPathType) {
 			return (objectPathType===1 ||
@@ -11660,23 +11774,21 @@ var OfficeExtension;
 		}
 		ObjectPathFactory.createGlobalObjectObjectPath=function (context) {
 			var objectPathInfo={ Id: context._nextId(), ObjectPathType: 1, Name: "" };
-			return new OfficeExtension.ObjectPath(objectPathInfo, null, false, false);
+			return new OfficeExtension.ObjectPath(objectPathInfo, null, false, false, 1, 4);
 		};
-		ObjectPathFactory.createNewObjectObjectPath=function (context, typeName, isCollection, isRestrictedResourceAccess) {
+		ObjectPathFactory.createNewObjectObjectPath=function (context, typeName, isCollection, flags) {
 			var objectPathInfo={ Id: context._nextId(), ObjectPathType: 2, Name: typeName };
-			var ret=new OfficeExtension.ObjectPath(objectPathInfo, null, isCollection, false);
-			ret.isRestrictedResourceAccess=isRestrictedResourceAccess;
+			var ret=new OfficeExtension.ObjectPath(objectPathInfo, null, isCollection, false, 1, OfficeExtension.Utility._fixupApiFlags(flags));
 			return ret;
 		};
-		ObjectPathFactory.createPropertyObjectPath=function (context, parent, propertyName, isCollection, isInvalidAfterRequest, isRestrictedResourceAccess) {
+		ObjectPathFactory.createPropertyObjectPath=function (context, parent, propertyName, isCollection, isInvalidAfterRequest, flags) {
 			var objectPathInfo={
 				Id: context._nextId(),
 				ObjectPathType: 4,
 				Name: propertyName,
 				ParentObjectPathId: parent._objectPath.objectPathInfo.Id,
 			};
-			var ret=new OfficeExtension.ObjectPath(objectPathInfo, parent._objectPath, isCollection, isInvalidAfterRequest);
-			ret.isRestrictedResourceAccess=isRestrictedResourceAccess;
+			var ret=new OfficeExtension.ObjectPath(objectPathInfo, parent._objectPath, isCollection, isInvalidAfterRequest, 1, OfficeExtension.Utility._fixupApiFlags(flags));
 			return ret;
 		};
 		ObjectPathFactory.createIndexerObjectPath=function (context, parent, args) {
@@ -11688,7 +11800,7 @@ var OfficeExtension;
 				ArgumentInfo: {}
 			};
 			objectPathInfo.ArgumentInfo.Arguments=args;
-			return new OfficeExtension.ObjectPath(objectPathInfo, parent._objectPath, false, false);
+			return new OfficeExtension.ObjectPath(objectPathInfo, parent._objectPath, false, false, 1, 4);
 		};
 		ObjectPathFactory.createIndexerObjectPathUsingParentPath=function (context, parentObjectPath, args) {
 			var objectPathInfo={
@@ -11699,9 +11811,9 @@ var OfficeExtension;
 				ArgumentInfo: {}
 			};
 			objectPathInfo.ArgumentInfo.Arguments=args;
-			return new OfficeExtension.ObjectPath(objectPathInfo, parentObjectPath, false, false);
+			return new OfficeExtension.ObjectPath(objectPathInfo, parentObjectPath, false, false, 1, 4);
 		};
-		ObjectPathFactory.createMethodObjectPath=function (context, parent, methodName, operationType, args, isCollection, isInvalidAfterRequest, getByIdMethodName, isRestrictedResourceAccess) {
+		ObjectPathFactory.createMethodObjectPath=function (context, parent, methodName, operationType, args, isCollection, isInvalidAfterRequest, getByIdMethodName, flags) {
 			var objectPathInfo={
 				Id: context._nextId(),
 				ObjectPathType: 3,
@@ -11710,11 +11822,9 @@ var OfficeExtension;
 				ArgumentInfo: {}
 			};
 			var argumentObjectPaths=OfficeExtension.Utility.setMethodArguments(context, objectPathInfo.ArgumentInfo, args);
-			var ret=new OfficeExtension.ObjectPath(objectPathInfo, parent._objectPath, isCollection, isInvalidAfterRequest);
+			var ret=new OfficeExtension.ObjectPath(objectPathInfo, parent._objectPath, isCollection, isInvalidAfterRequest, operationType, OfficeExtension.Utility._fixupApiFlags(flags));
 			ret.argumentObjectPaths=argumentObjectPaths;
-			ret.isWriteOperation=(operationType !=1);
 			ret.getByIdMethodName=getByIdMethodName;
-			ret.isRestrictedResourceAccess=isRestrictedResourceAccess;
 			return ret;
 		};
 		ObjectPathFactory.createReferenceIdObjectPath=function (context, referenceId) {
@@ -11724,7 +11834,7 @@ var OfficeExtension;
 				Name: referenceId,
 				ArgumentInfo: {}
 			};
-			var ret=new OfficeExtension.ObjectPath(objectPathInfo, null, false, false);
+			var ret=new OfficeExtension.ObjectPath(objectPathInfo, null, false, false, 1, 4);
 			return ret;
 		};
 		ObjectPathFactory.createChildItemObjectPathUsingIndexerOrGetItemAt=function (hasIndexerMethod, context, parent, childItem, index) {
@@ -11746,7 +11856,7 @@ var OfficeExtension;
 					ArgumentInfo: {}
 				};
 			objectPathInfo.ArgumentInfo.Arguments=[id];
-			return new OfficeExtension.ObjectPath(objectPathInfo, parent._objectPath, false, false);
+			return new OfficeExtension.ObjectPath(objectPathInfo, parent._objectPath, false, false, 1, 4);
 		};
 		ObjectPathFactory.createChildItemObjectPathUsingGetItemAt=function (context, parent, childItem, index) {
 			var indexFromServer=childItem[OfficeExtension.Constants.index];
@@ -11761,7 +11871,7 @@ var OfficeExtension;
 				ArgumentInfo: {}
 			};
 			objectPathInfo.ArgumentInfo.Arguments=[index];
-			return new OfficeExtension.ObjectPath(objectPathInfo, parent._objectPath, false, false);
+			return new OfficeExtension.ObjectPath(objectPathInfo, parent._objectPath, false, false, 1, 4);
 		};
 		return ObjectPathFactory;
 	}());
@@ -12397,6 +12507,10 @@ var OfficeExtension;
 				return;
 			}
 			var referenceId=object[OfficeExtension.Constants.referenceId];
+			var donotKeepReference=object._objectPath.objectPathInfo[OfficeExtension.Constants.objectPathInfoDoNotKeepReferenceFieldName];
+			if (donotKeepReference) {
+				throw OfficeExtension.Utility.createRuntimeError(OfficeExtension.ErrorCodes.generalException, OfficeExtension.Utility._getResourceString(OfficeExtension.ResourceStrings.objectIsUntracked), null);
+			}
 			if (OfficeExtension.Utility.isNullOrEmptyString(referenceId) && object._KeepReference) {
 				object._KeepReference();
 				OfficeExtension.ActionFactory.createInstantiateAction(this.m_context, object);
@@ -12416,14 +12530,16 @@ var OfficeExtension;
 			}
 		};
 		TrackedObjects.prototype._removeCommon=function (object) {
+			object._objectPath.objectPathInfo[OfficeExtension.Constants.objectPathInfoDoNotKeepReferenceFieldName]=true;
+			object.context._pendingRequest._removeKeepReferenceAction(object._objectPath.objectPathInfo.Id);
 			var referenceId=object[OfficeExtension.Constants.referenceId];
 			if (!OfficeExtension.Utility.isNullOrEmptyString(referenceId)) {
 				var rootObject=this.m_context._rootObject;
 				if (rootObject._RemoveReference) {
 					rootObject._RemoveReference(referenceId);
 				}
-				delete object[OfficeExtension.Constants.isTracked];
 			}
+			delete object[OfficeExtension.Constants.isTracked];
 		};
 		TrackedObjects.prototype._retrieveAndClearAutoCleanupList=function () {
 			var list=this._autoCleanupList;
@@ -12437,7 +12553,7 @@ var OfficeExtension;
 var OfficeExtension;
 (function (OfficeExtension) {
 	var RequestPrettyPrinter=(function () {
-		function RequestPrettyPrinter(globalObjName, referencedObjectPaths, actions, showDispose) {
+		function RequestPrettyPrinter(globalObjName, referencedObjectPaths, actions, showDispose, removePII) {
 			if (!globalObjName) {
 				globalObjName="root";
 			}
@@ -12449,6 +12565,7 @@ var OfficeExtension;
 			this.m_variableNameToObjectPathMap={};
 			this.m_declaredObjectPathMap={};
 			this.m_showDispose=showDispose;
+			this.m_removePII=removePII;
 		}
 		RequestPrettyPrinter.prototype.process=function () {
 			if (this.m_showDispose) {
@@ -12559,6 +12676,9 @@ var OfficeExtension;
 		RequestPrettyPrinter.prototype.processMethodAction=function (action) {
 			var methodName=action.actionInfo.Name;
 			if (methodName==="_KeepReference") {
+				if (!OfficeExtension._internalConfig.showInternalApiInDebugInfo) {
+					return;
+				}
 				methodName="track";
 			}
 			var statement=this.getObjVarName(action.actionInfo.ObjectPathId)+"."+OfficeExtension.Utility._toCamelLowerCase(methodName)+"("+this.buildArgumentsExpression(action.actionInfo.ArgumentInfo)+");";
@@ -12648,27 +12768,41 @@ var OfficeExtension;
 			return this.buildObjectPathExpression(objPath);
 		};
 		RequestPrettyPrinter.prototype.buildObjectPathExpression=function (objPath) {
-			switch (objPath.objectPathInfo.ObjectPathType) {
+			var expr=this.buildObjectPathInfoExpression(objPath.objectPathInfo);
+			var originalObjectPathInfo=objPath.originalObjectPathInfo;
+			if (originalObjectPathInfo) {
+				expr=expr+" /* originally "+this.buildObjectPathInfoExpression(originalObjectPathInfo)+" */";
+			}
+			return expr;
+		};
+		RequestPrettyPrinter.prototype.buildObjectPathInfoExpression=function (objectPathInfo) {
+			switch (objectPathInfo.ObjectPathType) {
 				case 1:
 					return "context."+this.m_globalObjName;
 				case 5:
-					return "getItem("+this.buildArgumentsExpression(objPath.objectPathInfo.ArgumentInfo)+")";
+					return "getItem("+this.buildArgumentsExpression(objectPathInfo.ArgumentInfo)+")";
 				case 3:
-					return OfficeExtension.Utility._toCamelLowerCase(objPath.objectPathInfo.Name)+"("+this.buildArgumentsExpression(objPath.objectPathInfo.ArgumentInfo)+")";
+					return OfficeExtension.Utility._toCamelLowerCase(objectPathInfo.Name)+"("+this.buildArgumentsExpression(objectPathInfo.ArgumentInfo)+")";
 				case 2:
-					return objPath.objectPathInfo.Name+".newObject()";
+					return objectPathInfo.Name+".newObject()";
 				case 7:
 					return "null";
 				case 4:
-					return OfficeExtension.Utility._toCamelLowerCase(objPath.objectPathInfo.Name);
+					return OfficeExtension.Utility._toCamelLowerCase(objectPathInfo.Name);
 				case 6:
-					return "context."+this.m_globalObjName+"._getObjectByReferenceId("+JSON.stringify(objPath.objectPathInfo.Name)+")";
+					return "context."+this.m_globalObjName+"._getObjectByReferenceId("+JSON.stringify(objectPathInfo.Name)+")";
 			}
 		};
 		RequestPrettyPrinter.prototype.buildArgumentsExpression=function (args) {
 			var ret="";
-			if (!args.Arguments) {
+			if (!args.Arguments || args.Arguments.length===0) {
 				return ret;
+			}
+			if (this.m_removePII) {
+				if (typeof (args.Arguments[0])==="undefined") {
+					return ret;
+				}
+				return "...";
 			}
 			for (var i=0; i < args.Arguments.length; i++) {
 				if (i > 0) {
@@ -12765,6 +12899,7 @@ var OfficeExtension;
 		ResourceStrings.valueNotLoaded="ValueNotLoaded";
 		ResourceStrings.invalidOrTimedOutSessionMessage="InvalidOrTimedOutSessionMessage";
 		ResourceStrings.invalidOperationInCellEditMode="InvalidOperationInCellEditMode";
+		ResourceStrings.objectIsUntracked="ObjectIsUntracked";
 		ResourceStrings.customFunctionDefintionMissing="CustomFunctionDefintionMissing";
 		ResourceStrings.customFunctionImplementationMissing="CustomFunctionImplementationMissing";
 		ResourceStrings.customFunctionNameContainsBadChars="CustomFunctionNameContainsBadChars";
@@ -12806,6 +12941,7 @@ var OfficeExtension;
 		ResourceStringValues.PendingBatchInProgress="There is a pending batch in progress. The batch method may not be called inside another batch, or simultaneously with another batch.";
 		ResourceStringValues.NotInsideBatch="Operations may not be invoked outside of a batch method.";
 		ResourceStringValues.CannotUpdateReadOnlyProperty="The property '{0}' is read-only and it cannot be updated.";
+		ResourceStringValues.ObjectIsUntracked="The object is untracked.";
 		return ResourceStringValues;
 	}());
 	OfficeExtension.ResourceStringValues=ResourceStringValues;
@@ -12932,7 +13068,7 @@ var OfficeExtension;
 		}
 		Utility.checkArgumentNull=function (value, name) {
 			if (Utility.isNullOrUndefined(value)) {
-				throw OfficeExtension._Internal.RuntimeError._createInvalidArgError(name);
+				throw OfficeExtension._Internal.RuntimeError._createInvalidArgError({ argumentName: name });
 			}
 		};
 		Utility.isNullOrUndefined=function (value) {
@@ -13001,7 +13137,7 @@ var OfficeExtension;
 				}
 				return arr;
 			}
-			throw OfficeExtension._Internal.RuntimeError._createInvalidArgError("date");
+			throw OfficeExtension._Internal.RuntimeError._createInvalidArgError({ argumentName: "date" });
 		};
 		Utility.isReadonlyRestRequest=function (method) {
 			return Utility.caseInsensitiveCompareString(method, "GET");
@@ -13016,9 +13152,8 @@ var OfficeExtension;
 			argumentInfo.Arguments=args;
 			if (hasOne) {
 				argumentInfo.ReferencedObjectPathIds=referencedObjectPathIds;
-				return referencedObjectPaths;
 			}
-			return null;
+			return referencedObjectPaths;
 		};
 		Utility.collectObjectPathInfos=function (context, args, referencedObjectPaths, referencedObjectPathIds) {
 			var hasOne=false;
@@ -13042,15 +13177,46 @@ var OfficeExtension;
 						referencedObjectPathIds.push(0);
 					}
 				}
+				else if (Utility.isPlainJsonObject(args[i])) {
+					referencedObjectPathIds.push(0);
+					Utility.replaceClientObjectPropertiesWithObjectPathIds(args[i], referencedObjectPaths);
+				}
 				else {
 					referencedObjectPathIds.push(0);
 				}
 			}
 			return hasOne;
 		};
+		Utility.replaceClientObjectPropertiesWithObjectPathIds=function (value, referencedObjectPaths) {
+			for (var key in value) {
+				var propValue=value[key];
+				if (propValue instanceof OfficeExtension.ClientObject) {
+					referencedObjectPaths.push(propValue._objectPath);
+					value[key]=(_a={}, _a[OfficeExtension.Constants.objectPathIdPrivate]=propValue._objectPath.objectPathInfo.Id, _a);
+				}
+				else if (Array.isArray(propValue)) {
+					for (var i=0; i < propValue.length; i++) {
+						if (propValue[i] instanceof OfficeExtension.ClientObject) {
+							var elem=propValue[i];
+							referencedObjectPaths.push(elem._objectPath);
+							propValue[i]=(_b={}, _b[OfficeExtension.Constants.objectPathIdPrivate]=elem._objectPath.objectPathInfo.Id, _b);
+						}
+						else if (Utility.isPlainJsonObject(propValue[i])) {
+							Utility.replaceClientObjectPropertiesWithObjectPathIds(propValue[i], referencedObjectPaths);
+						}
+					}
+				}
+				else if (Utility.isPlainJsonObject(propValue)) {
+					Utility.replaceClientObjectPropertiesWithObjectPathIds(propValue, referencedObjectPaths);
+				}
+				else {
+				}
+			}
+			var _a, _b;
+		};
 		Utility.fixObjectPathIfNecessary=function (clientObject, value) {
 			if (clientObject && clientObject._objectPath && value) {
-				clientObject._objectPath.updateUsingObjectData(value);
+				clientObject._objectPath.updateUsingObjectData(value, clientObject);
 			}
 		};
 		Utility.tryGetObjectIdFromLoadOrRetrieveResult=function (value) {
@@ -13240,7 +13406,7 @@ var OfficeExtension;
 					return arrArg[position];
 				}
 				else {
-					throw OfficeExtension._Internal.RuntimeError._createInvalidArgError("format");
+					throw OfficeExtension._Internal.RuntimeError._createInvalidArgError({ argumentName: "format" });
 				}
 			});
 		};
@@ -13473,6 +13639,17 @@ var OfficeExtension;
 				return name.toLowerCase();
 			}
 		};
+		Utility._fixupApiFlags=function (flags) {
+			if (typeof (flags)==="boolean") {
+				if (flags) {
+					flags=1;
+				}
+				else {
+					flags=0;
+				}
+			}
+			return flags;
+		};
 		Utility.definePropertyThrowUnloadedException=function (obj, typeName, propertyName) {
 			Object.defineProperty(obj, propertyName, {
 				configurable: true,
@@ -13563,11 +13740,16 @@ var OfficeExtension;
 	OfficeExtension.Utility=Utility;
 })(OfficeExtension || (OfficeExtension={}));
 
-var __extends=(this && this.__extends) || function (d, b) {
-	for (var p in b) if (b.hasOwnProperty(p)) d[p]=b[p];
-	function __() { this.constructor=d; }
-	d.prototype=b===null ? Object.create(b) : (__.prototype=b.prototype, new __());
-};
+var __extends=(this && this.__extends) || (function () {
+	var extendStatics=Object.setPrototypeOf ||
+		({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__=b; }) ||
+		function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p]=b[p]; };
+	return function (d, b) {
+		extendStatics(d, b);
+		function __() { this.constructor=d; }
+		d.prototype=b===null ? Object.create(b) : (__.prototype=b.prototype, new __());
+	};
+})();
 var OfficeCore;
 (function (OfficeCore) {
 	var _hostName="OfficeCore";
@@ -13587,19 +13769,18 @@ var OfficeCore;
 	var _throwIfNotLoaded=OfficeExtension.Utility.throwIfNotLoaded;
 	var _throwIfApiNotSupported=OfficeExtension.Utility.throwIfApiNotSupported;
 	var _load=OfficeExtension.Utility.load;
-	var _loadAndSync=OfficeExtension.Utility.loadAndSync;
 	var _retrieve=OfficeExtension.Utility.retrieve;
-	var _retrieveAndSync=OfficeExtension.Utility.retrieveAndSync;
 	var _toJson=OfficeExtension.Utility.toJson;
 	var _fixObjectPathIfNecessary=OfficeExtension.Utility.fixObjectPathIfNecessary;
 	var _addActionResultHandler=OfficeExtension.Utility._addActionResultHandler;
 	var _handleNavigationPropertyResults=OfficeExtension.Utility._handleNavigationPropertyResults;
 	var _adjustToDateTime=OfficeExtension.Utility.adjustToDateTime;
+	var _processRetrieveResult=OfficeExtension.Utility.processRetrieveResult;
 	var _typeBiShim="BiShim";
 	var BiShim=(function (_super) {
 		__extends(BiShim, _super);
 		function BiShim() {
-			_super.apply(this, arguments);
+			return _super !==null && _super.apply(this, arguments) || this;
 		}
 		Object.defineProperty(BiShim.prototype, "_className", {
 			get: function () {
@@ -13611,14 +13792,14 @@ var OfficeCore;
 		BiShim.prototype.initialize=function (capabilities) {
 			_createMethodAction(this.context, this, "Initialize", 0, [capabilities], false);
 		};
-		BiShim.prototype.uninitialize=function () {
-			_createMethodAction(this.context, this, "Uninitialize", 0, [], false);
-		};
 		BiShim.prototype.getData=function () {
 			var action=_createMethodAction(this.context, this, "getData", 1, [], false);
 			var ret=new OfficeExtension.ClientResult();
 			_addActionResultHandler(this, action, ret);
 			return ret;
+		};
+		BiShim.prototype.setVisualObjects=function (visualObjects) {
+			_createMethodAction(this.context, this, "setVisualObjects", 0, [visualObjects], false);
 		};
 		BiShim.prototype._handleResult=function (value) {
 			_super.prototype._handleResult.call(this, value);
@@ -13626,6 +13807,10 @@ var OfficeCore;
 				return;
 			var obj=value;
 			_fixObjectPathIfNecessary(this, obj);
+		};
+		BiShim.prototype._handleRetrieveResult=function (value, result) {
+			_super.prototype._handleRetrieveResult.call(this, value, result);
+			_processRetrieveResult(this, value, result);
 		};
 		BiShim.newObject=function (context) {
 			var ret=new OfficeCore.BiShim(context, _createNewObjectObjectPath(context, "Microsoft.AgaveVisual.BiShim", false, false));
@@ -13637,10 +13822,10 @@ var OfficeCore;
 		return BiShim;
 	}(OfficeExtension.ClientObject));
 	OfficeCore.BiShim=BiShim;
-	var ErrorCodes;
-	(function (ErrorCodes) {
-		ErrorCodes.generalException="GeneralException";
-	})(ErrorCodes=OfficeCore.ErrorCodes || (OfficeCore.ErrorCodes={}));
+	var AgaveVisualErrorCodes;
+	(function (AgaveVisualErrorCodes) {
+		AgaveVisualErrorCodes["generalException"]="GeneralException";
+	})(AgaveVisualErrorCodes=OfficeCore.AgaveVisualErrorCodes || (OfficeCore.AgaveVisualErrorCodes={}));
 })(OfficeCore || (OfficeCore={}));
 var OfficeCore;
 (function (OfficeCore) {
@@ -13667,7 +13852,7 @@ var OfficeCore;
 	var FlightingService=(function (_super) {
 		__extends(FlightingService, _super);
 		function FlightingService() {
-			_super.apply(this, arguments);
+			return _super !==null && _super.apply(this, arguments) || this;
 		}
 		Object.defineProperty(FlightingService.prototype, "_className", {
 			get: function () {
@@ -13720,7 +13905,7 @@ var OfficeCore;
 	var ABType=(function (_super) {
 		__extends(ABType, _super);
 		function ABType() {
-			_super.apply(this, arguments);
+			return _super !==null && _super.apply(this, arguments) || this;
 		}
 		Object.defineProperty(ABType.prototype, "_className", {
 			get: function () {
@@ -13772,11 +13957,38 @@ var OfficeCore;
 })(OfficeCore || (OfficeCore={}));
 var OfficeCore;
 (function (OfficeCore) {
+	var FirstPartyApis=(function () {
+		function FirstPartyApis(context) {
+			this.context=context;
+		}
+		Object.defineProperty(FirstPartyApis.prototype, "authentication", {
+			get: function () {
+				if (!this.m_authentication) {
+					this.m_authentication=OfficeCore.AuthenticationService.newObject(this.context);
+				}
+				return this.m_authentication;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		return FirstPartyApis;
+	}());
+	OfficeCore.FirstPartyApis=FirstPartyApis;
 	var RequestContext=(function (_super) {
 		__extends(RequestContext, _super);
 		function RequestContext(url) {
-			_super.call(this, url);
+			return _super.call(this, url) || this;
 		}
+		Object.defineProperty(RequestContext.prototype, "firstParty", {
+			get: function () {
+				if (!this.m_firstPartyApis) {
+					this.m_firstPartyApis=new FirstPartyApis(this);
+				}
+				return this.m_firstPartyApis;
+			},
+			enumerable: true,
+			configurable: true
+		});
 		Object.defineProperty(RequestContext.prototype, "flighting", {
 			get: function () {
 				return this.flightingService;
@@ -13794,16 +14006,6 @@ var OfficeCore;
 			enumerable: true,
 			configurable: true
 		});
-		Object.defineProperty(RequestContext.prototype, "flightingService", {
-			get: function () {
-				if (!this.m_flightingService) {
-					this.m_flightingService=OfficeCore.FlightingService.newObject(this);
-				}
-				return this.m_flightingService;
-			},
-			enumerable: true,
-			configurable: true
-		});
 		Object.defineProperty(RequestContext.prototype, "bi", {
 			get: function () {
 				if (!this.m_biShim) {
@@ -13814,9 +14016,23 @@ var OfficeCore;
 			enumerable: true,
 			configurable: true
 		});
+		Object.defineProperty(RequestContext.prototype, "flightingService", {
+			get: function () {
+				if (!this.m_flightingService) {
+					this.m_flightingService=OfficeCore.FlightingService.newObject(this);
+				}
+				return this.m_flightingService;
+			},
+			enumerable: true,
+			configurable: true
+		});
 		return RequestContext;
 	}(OfficeExtension.ClientRequestContext));
 	OfficeCore.RequestContext=RequestContext;
+	function run(arg1, arg2) {
+		return OfficeExtension.ClientRequestContext._runBatch("OfficeCore.run", arguments, function (requestInfo) { return new OfficeCore.RequestContext(requestInfo); });
+	}
+	OfficeCore.run=run;
 })(OfficeCore || (OfficeCore={}));
 var OfficeCore;
 (function (OfficeCore) {
@@ -13844,7 +14060,7 @@ var OfficeCore;
 	var TelemetryService=(function (_super) {
 		__extends(TelemetryService, _super);
 		function TelemetryService() {
-			_super.apply(this, arguments);
+			return _super !==null && _super.apply(this, arguments) || this;
 		}
 		Object.defineProperty(TelemetryService.prototype, "_className", {
 			get: function () {
@@ -13877,6 +14093,450 @@ var OfficeCore;
 	(function (TelemetryErrorCodes) {
 		TelemetryErrorCodes.generalException="GeneralException";
 	})(TelemetryErrorCodes=OfficeCore.TelemetryErrorCodes || (OfficeCore.TelemetryErrorCodes={}));
+})(OfficeCore || (OfficeCore={}));
+var OfficeFirstPartyAuth;
+(function (OfficeFirstPartyAuth) {
+	function getAccessToken(options) {
+		var context=new OfficeCore.RequestContext();
+		var auth=OfficeCore.AuthenticationService.newObject(context);
+		context._customData="WacPartition";
+		var promise=new OfficeExtension.Promise(function (resolve, reject) {
+			var result=auth.getAccessToken(options);
+			context.sync()
+				.then(function () {
+				resolve(result);
+			})
+				.catch(function (e) {
+				throw e;
+			});
+		});
+		return promise.then(function (accessTokenResult) {
+			return new OfficeExtension.Promise(function (resolve, reject) {
+				resolve(accessTokenResult);
+			});
+		});
+	}
+	OfficeFirstPartyAuth.getAccessToken=getAccessToken;
+	function getPrimaryIdentityInfo() {
+		var context=new OfficeCore.RequestContext();
+		var auth=OfficeCore.AuthenticationService.newObject(context);
+		context._customData="WacPartition";
+		var promise=new OfficeExtension.Promise(function (resolve, reject) {
+			var result=auth.getPrimaryIdentityInfo();
+			context.sync()
+				.then(function () {
+				resolve(result);
+			})
+				.catch(function (e) {
+				throw e;
+			});
+		});
+		return promise.then(function (idInfoResult) {
+			return new OfficeExtension.Promise(function (resolve, reject) {
+				resolve(idInfoResult);
+			});
+		});
+	}
+	OfficeFirstPartyAuth.getPrimaryIdentityInfo=getPrimaryIdentityInfo;
+})(OfficeFirstPartyAuth || (OfficeFirstPartyAuth={}));
+var OfficeCore;
+(function (OfficeCore) {
+	var _hostName="Office";
+	var _defaultApiSetName="OfficeSharedApi";
+	var _createPropertyObjectPath=OfficeExtension.ObjectPathFactory.createPropertyObjectPath;
+	var _createMethodObjectPath=OfficeExtension.ObjectPathFactory.createMethodObjectPath;
+	var _createIndexerObjectPath=OfficeExtension.ObjectPathFactory.createIndexerObjectPath;
+	var _createNewObjectObjectPath=OfficeExtension.ObjectPathFactory.createNewObjectObjectPath;
+	var _createChildItemObjectPathUsingIndexer=OfficeExtension.ObjectPathFactory.createChildItemObjectPathUsingIndexer;
+	var _createChildItemObjectPathUsingGetItemAt=OfficeExtension.ObjectPathFactory.createChildItemObjectPathUsingGetItemAt;
+	var _createChildItemObjectPathUsingIndexerOrGetItemAt=OfficeExtension.ObjectPathFactory.createChildItemObjectPathUsingIndexerOrGetItemAt;
+	var _createMethodAction=OfficeExtension.ActionFactory.createMethodAction;
+	var _createEnsureUnchangedAction=OfficeExtension.ActionFactory.createEnsureUnchangedAction;
+	var _createSetPropertyAction=OfficeExtension.ActionFactory.createSetPropertyAction;
+	var _isNullOrUndefined=OfficeExtension.Utility.isNullOrUndefined;
+	var _isUndefined=OfficeExtension.Utility.isUndefined;
+	var _throwIfNotLoaded=OfficeExtension.Utility.throwIfNotLoaded;
+	var _throwIfApiNotSupported=OfficeExtension.Utility.throwIfApiNotSupported;
+	var _load=OfficeExtension.Utility.load;
+	var _retrieve=OfficeExtension.Utility.retrieve;
+	var _toJson=OfficeExtension.Utility.toJson;
+	var _fixObjectPathIfNecessary=OfficeExtension.Utility.fixObjectPathIfNecessary;
+	var _addActionResultHandler=OfficeExtension.Utility._addActionResultHandler;
+	var _handleNavigationPropertyResults=OfficeExtension.Utility._handleNavigationPropertyResults;
+	var _adjustToDateTime=OfficeExtension.Utility.adjustToDateTime;
+	var _processRetrieveResult=OfficeExtension.Utility.processRetrieveResult;
+	var IdentityType;
+	(function (IdentityType) {
+		IdentityType["organizationAccount"]="OrganizationAccount";
+		IdentityType["microsoftAccount"]="MicrosoftAccount";
+	})(IdentityType=OfficeCore.IdentityType || (OfficeCore.IdentityType={}));
+	var _typeAuthenticationService="AuthenticationService";
+	var AuthenticationService=(function (_super) {
+		__extends(AuthenticationService, _super);
+		function AuthenticationService() {
+			return _super !==null && _super.apply(this, arguments) || this;
+		}
+		Object.defineProperty(AuthenticationService.prototype, "_className", {
+			get: function () {
+				return "AuthenticationService";
+			},
+			enumerable: true,
+			configurable: true
+		});
+		AuthenticationService.prototype.getAccessToken=function (tokenParameters) {
+			var action=_createMethodAction(this.context, this, "GetAccessToken", 1, [tokenParameters], true);
+			var ret=new OfficeExtension.ClientResult();
+			_addActionResultHandler(this, action, ret);
+			return ret;
+		};
+		AuthenticationService.prototype.getPrimaryIdentityInfo=function () {
+			_throwIfApiNotSupported("AuthenticationService.getPrimaryIdentityInfo", "FirstPartyAuthentication", "1.2", _hostName);
+			var action=_createMethodAction(this.context, this, "GetPrimaryIdentityInfo", 1, [], true);
+			var ret=new OfficeExtension.ClientResult();
+			_addActionResultHandler(this, action, ret);
+			return ret;
+		};
+		AuthenticationService.prototype._handleResult=function (value) {
+			_super.prototype._handleResult.call(this, value);
+			if (_isNullOrUndefined(value))
+				return;
+			var obj=value;
+			_fixObjectPathIfNecessary(this, obj);
+		};
+		AuthenticationService.prototype._handleRetrieveResult=function (value, result) {
+			_super.prototype._handleRetrieveResult.call(this, value, result);
+			_processRetrieveResult(this, value, result);
+		};
+		AuthenticationService.newObject=function (context) {
+			var ret=new OfficeCore.AuthenticationService(context, _createNewObjectObjectPath(context, "Microsoft.Authentication.AuthenticationService", false, false));
+			return ret;
+		};
+		AuthenticationService.prototype.toJSON=function () {
+			return _toJson(this, {}, {});
+		};
+		return AuthenticationService;
+	}(OfficeExtension.ClientObject));
+	OfficeCore.AuthenticationService=AuthenticationService;
+	var _typeComment="Comment";
+	var Comment=(function (_super) {
+		__extends(Comment, _super);
+		function Comment() {
+			return _super !==null && _super.apply(this, arguments) || this;
+		}
+		Object.defineProperty(Comment.prototype, "_className", {
+			get: function () {
+				return "Comment";
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(Comment.prototype, "_scalarPropertyNames", {
+			get: function () {
+				return ["id", "text", "created", "level", "resolved", "author", "mentions"];
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(Comment.prototype, "_scalarPropertyUpdateable", {
+			get: function () {
+				return [false, true, false, false, true, false, false];
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(Comment.prototype, "_navigationPropertyNames", {
+			get: function () {
+				return ["parent", "parentOrNullObject", "replies"];
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(Comment.prototype, "parent", {
+			get: function () {
+				if (!this._P) {
+					this._P=new OfficeCore.Comment(this.context, _createPropertyObjectPath(this.context, this, "Parent", false, false, false));
+				}
+				return this._P;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(Comment.prototype, "parentOrNullObject", {
+			get: function () {
+				if (!this._Pa) {
+					this._Pa=new OfficeCore.Comment(this.context, _createPropertyObjectPath(this.context, this, "ParentOrNullObject", false, false, false));
+				}
+				return this._Pa;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(Comment.prototype, "replies", {
+			get: function () {
+				if (!this._R) {
+					this._R=new OfficeCore.CommentCollection(this.context, _createPropertyObjectPath(this.context, this, "Replies", true, false, false));
+				}
+				return this._R;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(Comment.prototype, "author", {
+			get: function () {
+				_throwIfNotLoaded("author", this._A, _typeComment, this._isNull);
+				return this._A;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(Comment.prototype, "created", {
+			get: function () {
+				_throwIfNotLoaded("created", this._C, _typeComment, this._isNull);
+				return this._C;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(Comment.prototype, "id", {
+			get: function () {
+				_throwIfNotLoaded("id", this._I, _typeComment, this._isNull);
+				return this._I;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(Comment.prototype, "level", {
+			get: function () {
+				_throwIfNotLoaded("level", this._L, _typeComment, this._isNull);
+				return this._L;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(Comment.prototype, "mentions", {
+			get: function () {
+				_throwIfNotLoaded("mentions", this._M, _typeComment, this._isNull);
+				return this._M;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(Comment.prototype, "resolved", {
+			get: function () {
+				_throwIfNotLoaded("resolved", this._Re, _typeComment, this._isNull);
+				return this._Re;
+			},
+			set: function (value) {
+				this._Re=value;
+				_createSetPropertyAction(this.context, this, "Resolved", value);
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(Comment.prototype, "text", {
+			get: function () {
+				_throwIfNotLoaded("text", this._T, _typeComment, this._isNull);
+				return this._T;
+			},
+			set: function (value) {
+				this._T=value;
+				_createSetPropertyAction(this.context, this, "Text", value);
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Comment.prototype.set=function (properties, options) {
+			this._recursivelySet(properties, options, ["text", "resolved"], [], [
+				"parent",
+				"parentOrNullObject",
+				"replies"
+			]);
+		};
+		Comment.prototype.update=function (properties) {
+			this._recursivelyUpdate(properties);
+		};
+		Comment.prototype.delete=function () {
+			_createMethodAction(this.context, this, "Delete", 0, [], false);
+		};
+		Comment.prototype.getParentOrSelf=function () {
+			return new OfficeCore.Comment(this.context, _createMethodObjectPath(this.context, this, "GetParentOrSelf", 1, [], false, false, null, false));
+		};
+		Comment.prototype.getRichText=function (format) {
+			var action=_createMethodAction(this.context, this, "GetRichText", 1, [format], false);
+			var ret=new OfficeExtension.ClientResult();
+			_addActionResultHandler(this, action, ret);
+			return ret;
+		};
+		Comment.prototype.reply=function (text, format) {
+			return new OfficeCore.Comment(this.context, _createMethodObjectPath(this.context, this, "Reply", 0, [text, format], false, false, null, false));
+		};
+		Comment.prototype.setRichText=function (text, format) {
+			var action=_createMethodAction(this.context, this, "SetRichText", 0, [text, format], false);
+			var ret=new OfficeExtension.ClientResult();
+			_addActionResultHandler(this, action, ret);
+			return ret;
+		};
+		Comment.prototype._handleResult=function (value) {
+			_super.prototype._handleResult.call(this, value);
+			if (_isNullOrUndefined(value))
+				return;
+			var obj=value;
+			_fixObjectPathIfNecessary(this, obj);
+			if (!_isUndefined(obj["Author"])) {
+				this._A=obj["Author"];
+			}
+			if (!_isUndefined(obj["Created"])) {
+				this._C=_adjustToDateTime(obj["Created"]);
+			}
+			if (!_isUndefined(obj["Id"])) {
+				this._I=obj["Id"];
+			}
+			if (!_isUndefined(obj["Level"])) {
+				this._L=obj["Level"];
+			}
+			if (!_isUndefined(obj["Mentions"])) {
+				this._M=obj["Mentions"];
+			}
+			if (!_isUndefined(obj["Resolved"])) {
+				this._Re=obj["Resolved"];
+			}
+			if (!_isUndefined(obj["Text"])) {
+				this._T=obj["Text"];
+			}
+			_handleNavigationPropertyResults(this, obj, ["parent", "Parent", "parentOrNullObject", "ParentOrNullObject", "replies", "Replies"]);
+		};
+		Comment.prototype.load=function (option) {
+			return _load(this, option);
+		};
+		Comment.prototype.retrieve=function (option) {
+			return _retrieve(this, option);
+		};
+		Comment.prototype._handleIdResult=function (value) {
+			_super.prototype._handleIdResult.call(this, value);
+			if (_isNullOrUndefined(value)) {
+				return;
+			}
+			if (!_isUndefined(value["Id"])) {
+				this._I=value["Id"];
+			}
+		};
+		Comment.prototype._handleRetrieveResult=function (value, result) {
+			_super.prototype._handleRetrieveResult.call(this, value, result);
+			if (_isNullOrUndefined(value))
+				return;
+			var obj=value;
+			if (!_isUndefined(obj["Created"])) {
+				obj["created"]=_adjustToDateTime(obj["created"]);
+			}
+			_processRetrieveResult(this, value, result);
+		};
+		Comment.prototype.toJSON=function () {
+			return _toJson(this, {
+				"author": this._A,
+				"created": this._C,
+				"id": this._I,
+				"level": this._L,
+				"mentions": this._M,
+				"resolved": this._Re,
+				"text": this._T,
+			}, {
+				"replies": this._R,
+			});
+		};
+		Comment.prototype.ensureUnchanged=function (data) {
+			_createEnsureUnchangedAction(this.context, this, data);
+			return;
+		};
+		return Comment;
+	}(OfficeExtension.ClientObject));
+	OfficeCore.Comment=Comment;
+	var _typeCommentCollection="CommentCollection";
+	var CommentCollection=(function (_super) {
+		__extends(CommentCollection, _super);
+		function CommentCollection() {
+			return _super !==null && _super.apply(this, arguments) || this;
+		}
+		Object.defineProperty(CommentCollection.prototype, "_className", {
+			get: function () {
+				return "CommentCollection";
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(CommentCollection.prototype, "_isCollection", {
+			get: function () {
+				return true;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(CommentCollection.prototype, "items", {
+			get: function () {
+				_throwIfNotLoaded("items", this.m__items, _typeCommentCollection, this._isNull);
+				return this.m__items;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		CommentCollection.prototype.getCount=function () {
+			var action=_createMethodAction(this.context, this, "GetCount", 1, [], false);
+			var ret=new OfficeExtension.ClientResult();
+			_addActionResultHandler(this, action, ret);
+			return ret;
+		};
+		CommentCollection.prototype.getItem=function (id) {
+			return new OfficeCore.Comment(this.context, _createIndexerObjectPath(this.context, this, [id]));
+		};
+		CommentCollection.prototype._handleResult=function (value) {
+			_super.prototype._handleResult.call(this, value);
+			if (_isNullOrUndefined(value))
+				return;
+			var obj=value;
+			_fixObjectPathIfNecessary(this, obj);
+			if (!_isNullOrUndefined(obj[OfficeExtension.Constants.items])) {
+				this.m__items=[];
+				var _data=obj[OfficeExtension.Constants.items];
+				for (var i=0; i < _data.length; i++) {
+					var _item=new OfficeCore.Comment(this.context, _createChildItemObjectPathUsingIndexerOrGetItemAt(true, this.context, this, _data[i], i));
+					_item._handleResult(_data[i]);
+					this.m__items.push(_item);
+				}
+			}
+		};
+		CommentCollection.prototype.load=function (option) {
+			return _load(this, option);
+		};
+		CommentCollection.prototype.retrieve=function (option) {
+			return _retrieve(this, option);
+		};
+		CommentCollection.prototype._handleRetrieveResult=function (value, result) {
+			var _this=this;
+			_super.prototype._handleRetrieveResult.call(this, value, result);
+			_processRetrieveResult(this, value, result, function (childItemData, index) { return new OfficeCore.Comment(_this.context, _createChildItemObjectPathUsingIndexerOrGetItemAt(true, _this.context, _this, childItemData, index)); });
+		};
+		CommentCollection.prototype.toJSON=function () {
+			return _toJson(this, {}, {}, this.m__items);
+		};
+		return CommentCollection;
+	}(OfficeExtension.ClientObject));
+	OfficeCore.CommentCollection=CommentCollection;
+	var CommentTextFormat;
+	(function (CommentTextFormat) {
+		CommentTextFormat["plain"]="Plain";
+		CommentTextFormat["markdown"]="Markdown";
+		CommentTextFormat["delta"]="Delta";
+	})(CommentTextFormat=OfficeCore.CommentTextFormat || (OfficeCore.CommentTextFormat={}));
+	var ErrorCodes;
+	(function (ErrorCodes) {
+		ErrorCodes["apiNotAvailable"]="ApiNotAvailable";
+		ErrorCodes["clientError"]="ClientError";
+		ErrorCodes["invalidArgument"]="InvalidArgument";
+		ErrorCodes["invalidGrant"]="InvalidGrant";
+		ErrorCodes["invalidResourceUrl"]="InvalidResourceUrl";
+		ErrorCodes["serverError"]="ServerError";
+		ErrorCodes["unsupportedUserIdentity"]="UnsupportedUserIdentity";
+		ErrorCodes["userNotSignedIn"]="UserNotSignedIn";
+	})(ErrorCodes=OfficeCore.ErrorCodes || (OfficeCore.ErrorCodes={}));
 })(OfficeCore || (OfficeCore={}));
 
 var __extends=(this && this.__extends) || (function () {
@@ -13955,7 +14615,7 @@ var Excel;
 				if (startRowIndex+rowCount > values.length) {
 					rowCount=values.length - startRowIndex;
 				}
-				var chunk=range.getRow(startRowIndex).getBoundingRect(range.getRow(startRowIndex+rowCount - 1));
+				var chunk=range.getRow(startRowIndex).untrack().getBoundingRect(range.getRow(startRowIndex+rowCount - 1).untrack()).untrack();
 				var valueSlice=values.slice(startRowIndex, startRowIndex+rowCount);
 				_createSetPropertyAction(chunk.context, chunk, propertyName, valueSlice);
 			}
@@ -13963,13 +14623,22 @@ var Excel;
 		}
 		return false;
 	}
-	function isExcel1_3OrAbove() {
+	function isExcelApiSetSupported(version) {
 		if (typeof (window) !=="undefined" && window.Office && window.Office.context && window.Office.context.requirements) {
-			return window.Office.context.requirements.isSetSupported("ExcelApi", 1.3);
+			return window.Office.context.requirements.isSetSupported("ExcelApi", version);
 		}
 		else {
 			return true;
 		}
+	}
+	function isExcel1_3OrAbove() {
+		return isExcelApiSetSupported(1.3);
+	}
+	function isOfficePlatform(platform) {
+		if (typeof (window) !=="undefined" && window.Office && window.Office.context) {
+			return window.Office.context.platform===platform;
+		}
+		return false;
 	}
 	var Session=(function () {
 		function Session(workbookUrl, requestHeaders, persisted) {
@@ -13988,7 +14657,7 @@ var Excel;
 			if (this.m_requestUrlAndHeaderInfo &&
 				!OfficeExtension.Utility._isLocalDocumentUrl(this.m_requestUrlAndHeaderInfo.url)) {
 				var url=this.m_requestUrlAndHeaderInfo.url;
-				if (url.charAt(url.length - 1) !="/") {
+				if (url.charAt(url.length - 1) !=="/") {
 					url=url+"/";
 				}
 				url=url+"closeSession";
@@ -13997,14 +14666,14 @@ var Excel;
 				this.m_requestUrlAndHeaderInfo=null;
 				return OfficeExtension.HttpUtility.sendRequest(req)
 					.then(function (resp) {
-					if (resp.statusCode !=204) {
+					if (resp.statusCode !==204) {
 						var err=OfficeExtension.Utility._parseErrorResponse(resp);
 						throw OfficeExtension.Utility.createRuntimeError(err.errorCode, err.errorMessage, "Session.close");
 					}
 					_this.m_requestUrlAndHeaderInfo=null;
 					var foundSessionKey=null;
 					for (var key in _this.m_requestHeaders) {
-						if (key.toLowerCase()==Session.WorkbookSessionIdHeaderNameLower) {
+						if (key.toLowerCase()===Session.WorkbookSessionIdHeaderNameLower) {
 							foundSessionKey=key;
 							break;
 						}
@@ -14030,7 +14699,7 @@ var Excel;
 			}
 			var foundSessionId=false;
 			for (var key in this.m_requestHeaders) {
-				if (key.toLowerCase()==Session.WorkbookSessionIdHeaderNameLower) {
+				if (key.toLowerCase()===Session.WorkbookSessionIdHeaderNameLower) {
 					foundSessionId=true;
 					break;
 				}
@@ -14040,7 +14709,7 @@ var Excel;
 				return OfficeExtension.Utility._createPromiseFromResult(this.m_requestUrlAndHeaderInfo);
 			}
 			var url=this.m_workbookUrl;
-			if (url.charAt(url.length - 1) !="/") {
+			if (url.charAt(url.length - 1) !=="/") {
 				url=url+"/";
 			}
 			url=url+"createSession";
@@ -14065,10 +14734,10 @@ var Excel;
 				return _this.m_requestUrlAndHeaderInfo;
 			});
 		};
+		Session.WorkbookSessionIdHeaderName="Workbook-Session-Id";
+		Session.WorkbookSessionIdHeaderNameLower="workbook-session-id";
 		return Session;
 	}());
-	Session.WorkbookSessionIdHeaderName="Workbook-Session-Id";
-	Session.WorkbookSessionIdHeaderNameLower="workbook-session-id";
 	Excel.Session=Session;
 	var RequestContext=(function (_super) {
 		__extends(RequestContext, _super);
@@ -14081,7 +14750,7 @@ var Excel;
 		}
 		RequestContext.prototype._processOfficeJsErrorResponse=function (officeJsErrorCode, response) {
 			var ooeInvalidApiCallInContext=5004;
-			if (officeJsErrorCode==ooeInvalidApiCallInContext) {
+			if (officeJsErrorCode===ooeInvalidApiCallInContext) {
 				response.ErrorCode=ErrorCodes.invalidOperationInCellEditMode;
 				response.ErrorMessage=OfficeExtension.Utility._getResourceString(OfficeExtension.ResourceStrings.invalidOperationInCellEditMode);
 			}
@@ -14252,9 +14921,9 @@ var Excel;
 			data=response;
 		}
 		data=window.OSF.DDA.DataCoercion.coerceData(data, callArgs[window.Microsoft.Office.WebExtension.Parameters.CoercionType]);
-		return data==undefined ? null : data;
+		return data===undefined ? null : data;
 	}
-	function versionNumberIsEarlierThan(desiredMajor, desiredMinor, desiredBuild) {
+	function versionNumberIsEarlierThan(versionsForPlatformMap) {
 		var hasOfficeVersion=typeof (window) !=="undefined" &&
 			window.Office &&
 			window.Office.context &&
@@ -14262,6 +14931,10 @@ var Excel;
 			window.Office.context.diagnostics.version;
 		if (!hasOfficeVersion) {
 			return false;
+		}
+		var versionForCurrentPlatform=versionsForPlatformMap[window.Office.context.diagnostics.platform.toLowerCase()];
+		if (versionForCurrentPlatform==null) {
+			versionForCurrentPlatform=versionsForPlatformMap.general;
 		}
 		var version=window.Office.context.diagnostics.version;
 		var versionExtractor=/^(\d+)\.(\d+)\.(\d+)\.(\d+)$/;
@@ -14272,13 +14945,13 @@ var Excel;
 			var build=parseInt(result[3]);
 			var revision=parseInt(result[4]);
 			var devBuild=3000;
-			if (major < desiredMajor) {
+			if (major < versionForCurrentPlatform.desiredMajor) {
 				return true;
 			}
-			if (major==desiredMajor && minor < desiredMinor) {
+			if (major===versionForCurrentPlatform.desiredMajor && minor < versionForCurrentPlatform.desiredMinor) {
 				return true;
 			}
-			if (major==desiredMajor && minor==desiredMinor && build < desiredBuild) {
+			if (major===versionForCurrentPlatform.desiredMajor && minor===versionForCurrentPlatform.desiredMinor && build < versionForCurrentPlatform.desiredBuild) {
 				if (revision < devBuild) {
 					return true;
 				}
@@ -14286,6 +14959,7 @@ var Excel;
 		}
 		return false;
 	}
+	var ALWAYS_TRUE_PLACEHOLDER_OVERRIDE=true;
 	var _hostName="Excel";
 	var _defaultApiSetName="ExcelApi";
 	var _createPropertyObjectPath=OfficeExtension.ObjectPathFactory.createPropertyObjectPath;
@@ -14340,11 +15014,12 @@ var Excel;
 		Object.defineProperty(Runtime.prototype, "enableEvents", {
 			get: function () {
 				_throwIfNotLoaded("enableEvents", this._E, _typeRuntime, this._isNull);
+				_throwIfApiNotSupported("Runtime.enableEvents", _defaultApiSetName, "1.8", _hostName);
 				return this._E;
 			},
 			set: function (value) {
 				this._E=value;
-				_createSetPropertyAction(this.context, this, "EnableEvents", value);
+				_createSetPropertyAction(this.context, this, "EnableEvents", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -14407,24 +15082,52 @@ var Excel;
 			enumerable: true,
 			configurable: true
 		});
+		Object.defineProperty(Application.prototype, "_scalarPropertyUpdateable", {
+			get: function () {
+				return [true];
+			},
+			enumerable: true,
+			configurable: true
+		});
 		Object.defineProperty(Application.prototype, "calculationMode", {
 			get: function () {
 				_throwIfNotLoaded("calculationMode", this._C, _typeApplication, this._isNull);
 				return this._C;
 			},
+			set: function (value) {
+				this._C=value;
+				_createSetPropertyAction(this.context, this, "CalculationMode", value, 0);
+			},
 			enumerable: true,
 			configurable: true
 		});
+		Application.prototype.set=function (properties, options) {
+			this._recursivelySet(properties, options, ["calculationMode"], [], []);
+		};
+		Application.prototype.update=function (properties) {
+			this._recursivelyUpdate(properties);
+		};
 		Application.prototype.calculate=function (calculationType) {
-			_createMethodAction(this.context, this, "Calculate", 0, [calculationType], false);
+			_createMethodAction(this.context, this, "Calculate", 0, [calculationType], 0);
 		};
 		Application.prototype.createWorkbook=function (base64File) {
 			_throwIfApiNotSupported("Application.createWorkbook", _defaultApiSetName, "1.8", _hostName);
-			return new Excel.WorkbookCreated(this.context, _createMethodObjectPath(this.context, this, "CreateWorkbook", 1, [base64File], false, false, null, false));
+			return new Excel.WorkbookCreated(this.context, _createMethodObjectPath(this.context, this, "CreateWorkbook", 1, [base64File], false, true, "_GetWorkbookCreatedById", 0));
 		};
 		Application.prototype.suspendApiCalculationUntilNextSync=function () {
+			if (isOfficePlatform("Mac") && isExcelApiSetSupported(1.6) && !isExcelApiSetSupported(1.7)) {
+				return;
+			}
 			_throwIfApiNotSupported("Application.suspendApiCalculationUntilNextSync", _defaultApiSetName, "1.6", _hostName);
-			_createMethodAction(this.context, this, "SuspendApiCalculationUntilNextSync", 0, [], false);
+			_createMethodAction(this.context, this, "SuspendApiCalculationUntilNextSync", 0, [], 0);
+		};
+		Application.prototype.suspendScreenUpdatingUntilNextSync=function () {
+			_throwIfApiNotSupported("Application.suspendScreenUpdatingUntilNextSync", _defaultApiSetName, "1.9", _hostName);
+			_createMethodAction(this.context, this, "SuspendScreenUpdatingUntilNextSync", 0, [], 0);
+		};
+		Application.prototype._GetWorkbookCreatedById=function (id) {
+			_throwIfApiNotSupported("Application._GetWorkbookCreatedById", _defaultApiSetName, "1.8", _hostName);
+			return new Excel.WorkbookCreated(this.context, _createMethodObjectPath(this.context, this, "_GetWorkbookCreatedById", 1, [id], false, false, null, 4));
 		};
 		Application.prototype._handleResult=function (value) {
 			_super.prototype._handleResult.call(this, value);
@@ -14473,21 +15176,21 @@ var Excel;
 		});
 		Object.defineProperty(Workbook.prototype, "_scalarPropertyNames", {
 			get: function () {
-				return ["name", "readOnly", "saved"];
+				return ["name", "readOnly", "saved", "use1904DateSystem", "chartDataPointTrack", "usePrecisionAsDisplayed"];
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(Workbook.prototype, "_scalarPropertyUpdateable", {
 			get: function () {
-				return [false, false, true];
+				return [false, false, true, true, true, true];
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(Workbook.prototype, "_navigationPropertyNames", {
 			get: function () {
-				return ["worksheets", "names", "tables", "application", "bindings", "functions", "_V1Api", "pivotTables", "settings", "customXmlParts", "internalTest", "properties", "customFunctions", "styles", "protection", "dataConnections", "_Runtime", "pivotCaches"];
+				return ["worksheets", "names", "tables", "application", "bindings", "functions", "_V1Api", "pivotTables", "settings", "customXmlParts", "internalTest", "properties", "customFunctions", "styles", "protection", "dataConnections", "_Runtime"];
 			},
 			enumerable: true,
 			configurable: true
@@ -14495,7 +15198,7 @@ var Excel;
 		Object.defineProperty(Workbook.prototype, "application", {
 			get: function () {
 				if (!this._A) {
-					this._A=new Excel.Application(this.context, _createPropertyObjectPath(this.context, this, "Application", false, false, false));
+					this._A=new Excel.Application(this.context, _createPropertyObjectPath(this.context, this, "Application", false, false, 4));
 				}
 				return this._A;
 			},
@@ -14505,7 +15208,7 @@ var Excel;
 		Object.defineProperty(Workbook.prototype, "bindings", {
 			get: function () {
 				if (!this._B) {
-					this._B=new Excel.BindingCollection(this.context, _createPropertyObjectPath(this.context, this, "Bindings", true, false, false));
+					this._B=new Excel.BindingCollection(this.context, _createPropertyObjectPath(this.context, this, "Bindings", true, false, 4));
 				}
 				return this._B;
 			},
@@ -14515,10 +15218,10 @@ var Excel;
 		Object.defineProperty(Workbook.prototype, "customFunctions", {
 			get: function () {
 				_throwIfApiNotSupported("Workbook.customFunctions", "CustomFunctions", "1.1", _hostName);
-				if (!this._C) {
-					this._C=new Excel.CustomFunctionCollection(this.context, _createPropertyObjectPath(this.context, this, "CustomFunctions", true, false, false));
+				if (!this._Cu) {
+					this._Cu=new Excel.CustomFunctionCollection(this.context, _createPropertyObjectPath(this.context, this, "CustomFunctions", true, false, 4));
 				}
-				return this._C;
+				return this._Cu;
 			},
 			enumerable: true,
 			configurable: true
@@ -14526,10 +15229,10 @@ var Excel;
 		Object.defineProperty(Workbook.prototype, "customXmlParts", {
 			get: function () {
 				_throwIfApiNotSupported("Workbook.customXmlParts", _defaultApiSetName, "1.5", _hostName);
-				if (!this._Cu) {
-					this._Cu=new Excel.CustomXmlPartCollection(this.context, _createPropertyObjectPath(this.context, this, "CustomXmlParts", true, false, false));
+				if (!this._Cus) {
+					this._Cus=new Excel.CustomXmlPartCollection(this.context, _createPropertyObjectPath(this.context, this, "CustomXmlParts", true, false, 4));
 				}
-				return this._Cu;
+				return this._Cus;
 			},
 			enumerable: true,
 			configurable: true
@@ -14538,7 +15241,7 @@ var Excel;
 			get: function () {
 				_throwIfApiNotSupported("Workbook.dataConnections", _defaultApiSetName, "1.7", _hostName);
 				if (!this._D) {
-					this._D=new Excel.DataConnectionCollection(this.context, _createPropertyObjectPath(this.context, this, "DataConnections", false, false, false));
+					this._D=new Excel.DataConnectionCollection(this.context, _createPropertyObjectPath(this.context, this, "DataConnections", false, false, 4));
 				}
 				return this._D;
 			},
@@ -14549,7 +15252,7 @@ var Excel;
 			get: function () {
 				_throwIfApiNotSupported("Workbook.functions", _defaultApiSetName, "1.2", _hostName);
 				if (!this._F) {
-					this._F=new Excel.Functions(this.context, _createPropertyObjectPath(this.context, this, "Functions", false, false, false));
+					this._F=new Excel.Functions(this.context, _createPropertyObjectPath(this.context, this, "Functions", false, false, 4));
 				}
 				return this._F;
 			},
@@ -14560,7 +15263,7 @@ var Excel;
 			get: function () {
 				_throwIfApiNotSupported("Workbook.internalTest", _defaultApiSetName, "1.6", _hostName);
 				if (!this._I) {
-					this._I=new Excel.InternalTest(this.context, _createPropertyObjectPath(this.context, this, "InternalTest", false, false, false));
+					this._I=new Excel.InternalTest(this.context, _createPropertyObjectPath(this.context, this, "InternalTest", false, false, 4));
 				}
 				return this._I;
 			},
@@ -14570,7 +15273,7 @@ var Excel;
 		Object.defineProperty(Workbook.prototype, "names", {
 			get: function () {
 				if (!this._Na) {
-					this._Na=new Excel.NamedItemCollection(this.context, _createPropertyObjectPath(this.context, this, "Names", true, false, false));
+					this._Na=new Excel.NamedItemCollection(this.context, _createPropertyObjectPath(this.context, this, "Names", true, false, 4));
 				}
 				return this._Na;
 			},
@@ -14580,10 +15283,10 @@ var Excel;
 		Object.defineProperty(Workbook.prototype, "pivotTables", {
 			get: function () {
 				_throwIfApiNotSupported("Workbook.pivotTables", _defaultApiSetName, "1.3", _hostName);
-				if (!this._Pi) {
-					this._Pi=new Excel.PivotTableCollection(this.context, _createPropertyObjectPath(this.context, this, "PivotTables", true, false, false));
+				if (!this._P) {
+					this._P=new Excel.PivotTableCollection(this.context, _createPropertyObjectPath(this.context, this, "PivotTables", true, false, 4));
 				}
-				return this._Pi;
+				return this._P;
 			},
 			enumerable: true,
 			configurable: true
@@ -14592,7 +15295,7 @@ var Excel;
 			get: function () {
 				_throwIfApiNotSupported("Workbook.properties", _defaultApiSetName, "1.7", _hostName);
 				if (!this._Pr) {
-					this._Pr=new Excel.DocumentProperties(this.context, _createPropertyObjectPath(this.context, this, "Properties", false, false, false));
+					this._Pr=new Excel.DocumentProperties(this.context, _createPropertyObjectPath(this.context, this, "Properties", false, false, 4));
 				}
 				return this._Pr;
 			},
@@ -14603,7 +15306,7 @@ var Excel;
 			get: function () {
 				_throwIfApiNotSupported("Workbook.protection", _defaultApiSetName, "1.7", _hostName);
 				if (!this._Pro) {
-					this._Pro=new Excel.WorkbookProtection(this.context, _createPropertyObjectPath(this.context, this, "Protection", false, false, false));
+					this._Pro=new Excel.WorkbookProtection(this.context, _createPropertyObjectPath(this.context, this, "Protection", false, false, 4));
 				}
 				return this._Pro;
 			},
@@ -14614,7 +15317,7 @@ var Excel;
 			get: function () {
 				_throwIfApiNotSupported("Workbook.settings", _defaultApiSetName, "1.4", _hostName);
 				if (!this._Se) {
-					this._Se=new Excel.SettingCollection(this.context, _createPropertyObjectPath(this.context, this, "Settings", true, false, false));
+					this._Se=new Excel.SettingCollection(this.context, _createPropertyObjectPath(this.context, this, "Settings", true, false, 4));
 				}
 				return this._Se;
 			},
@@ -14625,7 +15328,7 @@ var Excel;
 			get: function () {
 				_throwIfApiNotSupported("Workbook.styles", _defaultApiSetName, "1.7", _hostName);
 				if (!this._St) {
-					this._St=new Excel.StyleCollection(this.context, _createPropertyObjectPath(this.context, this, "Styles", true, false, false));
+					this._St=new Excel.StyleCollection(this.context, _createPropertyObjectPath(this.context, this, "Styles", true, false, 4));
 				}
 				return this._St;
 			},
@@ -14635,7 +15338,7 @@ var Excel;
 		Object.defineProperty(Workbook.prototype, "tables", {
 			get: function () {
 				if (!this._T) {
-					this._T=new Excel.TableCollection(this.context, _createPropertyObjectPath(this.context, this, "Tables", true, false, false));
+					this._T=new Excel.TableCollection(this.context, _createPropertyObjectPath(this.context, this, "Tables", true, false, 4));
 				}
 				return this._T;
 			},
@@ -14645,7 +15348,7 @@ var Excel;
 		Object.defineProperty(Workbook.prototype, "worksheets", {
 			get: function () {
 				if (!this._W) {
-					this._W=new Excel.WorksheetCollection(this.context, _createPropertyObjectPath(this.context, this, "Worksheets", true, false, false));
+					this._W=new Excel.WorksheetCollection(this.context, _createPropertyObjectPath(this.context, this, "Worksheets", true, false, 4));
 				}
 				return this._W;
 			},
@@ -14654,9 +15357,9 @@ var Excel;
 		});
 		Object.defineProperty(Workbook.prototype, "_Runtime", {
 			get: function () {
-				_throwIfApiNotSupported("Workbook._Runtime", _defaultApiSetName, "1.8", _hostName);
+				_throwIfApiNotSupported("Workbook._Runtime", _defaultApiSetName, "1.5", _hostName);
 				if (!this.__R) {
-					this.__R=new Excel.Runtime(this.context, _createPropertyObjectPath(this.context, this, "_Runtime", false, false, false));
+					this.__R=new Excel.Runtime(this.context, _createPropertyObjectPath(this.context, this, "_Runtime", false, false, 4));
 				}
 				return this.__R;
 			},
@@ -14667,20 +15370,22 @@ var Excel;
 			get: function () {
 				_throwIfApiNotSupported("Workbook._V1Api", _defaultApiSetName, "1.3", _hostName);
 				if (!this.__V) {
-					this.__V=new Excel._V1Api(this.context, _createPropertyObjectPath(this.context, this, "_V1Api", false, false, false));
+					this.__V=new Excel._V1Api(this.context, _createPropertyObjectPath(this.context, this, "_V1Api", false, false, 4));
 				}
 				return this.__V;
 			},
 			enumerable: true,
 			configurable: true
 		});
-		Object.defineProperty(Workbook.prototype, "pivotCaches", {
+		Object.defineProperty(Workbook.prototype, "chartDataPointTrack", {
 			get: function () {
-				_throwIfApiNotSupported("Workbook.pivotCaches", "Pivot", "1.1", _hostName);
-				if (!this._P) {
-					this._P=new Excel.PivotCacheCollection(this.context, _createPropertyObjectPath(this.context, this, "PivotCaches", true, false, false));
-				}
-				return this._P;
+				_throwIfNotLoaded("chartDataPointTrack", this._C, _typeWorkbook, this._isNull);
+				_throwIfApiNotSupported("Workbook.chartDataPointTrack", _defaultApiSetName, "1.9", _hostName);
+				return this._C;
+			},
+			set: function (value) {
+				this._C=value;
+				_createSetPropertyAction(this.context, this, "ChartDataPointTrack", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -14711,13 +15416,39 @@ var Excel;
 			},
 			set: function (value) {
 				this._S=value;
-				_createSetPropertyAction(this.context, this, "Saved", value);
+				_createSetPropertyAction(this.context, this, "Saved", value, 0);
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(Workbook.prototype, "use1904DateSystem", {
+			get: function () {
+				_throwIfNotLoaded("use1904DateSystem", this._U, _typeWorkbook, this._isNull);
+				_throwIfApiNotSupported("Workbook.use1904DateSystem", _defaultApiSetName, "1.9", _hostName);
+				return this._U;
+			},
+			set: function (value) {
+				this._U=value;
+				_createSetPropertyAction(this.context, this, "Use1904DateSystem", value, 0);
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(Workbook.prototype, "usePrecisionAsDisplayed", {
+			get: function () {
+				_throwIfNotLoaded("usePrecisionAsDisplayed", this._Us, _typeWorkbook, this._isNull);
+				_throwIfApiNotSupported("Workbook.usePrecisionAsDisplayed", _defaultApiSetName, "1.9", _hostName);
+				return this._Us;
+			},
+			set: function (value) {
+				this._Us=value;
+				_createSetPropertyAction(this.context, this, "UsePrecisionAsDisplayed", value, 0);
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Workbook.prototype.set=function (properties, options) {
-			this._recursivelySet(properties, options, ["saved"], ["properties"], [
+			this._recursivelySet(properties, options, ["saved", "use1904DateSystem", "chartDataPointTrack", "usePrecisionAsDisplayed"], ["properties"], [
 				"_Runtime",
 				"_V1Api",
 				"application",
@@ -14728,7 +15459,6 @@ var Excel;
 				"functions",
 				"internalTest",
 				"names",
-				"pivotCaches",
 				"pivotTables",
 				"protection",
 				"settings",
@@ -14742,34 +15472,51 @@ var Excel;
 		};
 		Workbook.prototype.getActiveCell=function () {
 			_throwIfApiNotSupported("Workbook.getActiveCell", _defaultApiSetName, "1.7", _hostName);
-			return new Excel.Range(this.context, _createMethodObjectPath(this.context, this, "GetActiveCell", 1, [], false, true, null, false));
+			return new Excel.Range(this.context, _createMethodObjectPath(this.context, this, "GetActiveCell", 1, [], false, true, null, 4));
+		};
+		Workbook.prototype.getIsActiveCollabSession=function () {
+			_throwIfApiNotSupported("Workbook.getIsActiveCollabSession", _defaultApiSetName, "1.9", _hostName);
+			var action=_createMethodAction(this.context, this, "GetIsActiveCollabSession", 0, [], 0);
+			var ret=new OfficeExtension.ClientResult();
+			_addActionResultHandler(this, action, ret);
+			return ret;
 		};
 		Workbook.prototype.getSelectedRange=function () {
-			return new Excel.Range(this.context, _createMethodObjectPath(this.context, this, "GetSelectedRange", 1, [], false, true, null, false));
+			return new Excel.Range(this.context, _createMethodObjectPath(this.context, this, "GetSelectedRange", 1, [], false, true, null, 4));
+		};
+		Workbook.prototype.registerCustomFunctions=function (addinNamespace, metadataContent, addinId) {
+			_throwIfApiNotSupported("Workbook.registerCustomFunctions", "CustomFunctions", "1.1", _hostName);
+			_createMethodAction(this.context, this, "RegisterCustomFunctions", 0, [addinNamespace, metadataContent, addinId], 0);
 		};
 		Workbook.prototype._GetObjectByReferenceId=function (bstrReferenceId) {
-			var action=_createMethodAction(this.context, this, "_GetObjectByReferenceId", 1, [bstrReferenceId], false);
+			var action=_createMethodAction(this.context, this, "_GetObjectByReferenceId", 1, [bstrReferenceId], 4);
 			var ret=new OfficeExtension.ClientResult();
 			_addActionResultHandler(this, action, ret);
 			return ret;
 		};
 		Workbook.prototype._GetObjectTypeNameByReferenceId=function (bstrReferenceId) {
-			var action=_createMethodAction(this.context, this, "_GetObjectTypeNameByReferenceId", 1, [bstrReferenceId], false);
+			var action=_createMethodAction(this.context, this, "_GetObjectTypeNameByReferenceId", 1, [bstrReferenceId], 4);
 			var ret=new OfficeExtension.ClientResult();
 			_addActionResultHandler(this, action, ret);
 			return ret;
 		};
+		Workbook.prototype._GetRangeForEventByReferenceId=function (bstrReferenceId) {
+			return new Excel.Range(this.context, _createMethodObjectPath(this.context, this, "_GetRangeForEventByReferenceId", 1, [bstrReferenceId], false, false, null, 4));
+		};
+		Workbook.prototype._GetRangeOrNullObjectForEventByReferenceId=function (bstrReferenceId) {
+			return new Excel.Range(this.context, _createMethodObjectPath(this.context, this, "_GetRangeOrNullObjectForEventByReferenceId", 1, [bstrReferenceId], false, false, null, 4));
+		};
 		Workbook.prototype._GetReferenceCount=function () {
-			var action=_createMethodAction(this.context, this, "_GetReferenceCount", 1, [], false);
+			var action=_createMethodAction(this.context, this, "_GetReferenceCount", 1, [], 4);
 			var ret=new OfficeExtension.ClientResult();
 			_addActionResultHandler(this, action, ret);
 			return ret;
 		};
 		Workbook.prototype._RemoveAllReferences=function () {
-			_createMethodAction(this.context, this, "_RemoveAllReferences", 1, [], false);
+			_createMethodAction(this.context, this, "_RemoveAllReferences", 1, [], 0);
 		};
 		Workbook.prototype._RemoveReference=function (bstrReferenceId) {
-			_createMethodAction(this.context, this, "_RemoveReference", 1, [bstrReferenceId], false);
+			_createMethodAction(this.context, this, "_RemoveReference", 1, [bstrReferenceId], 0);
 		};
 		Workbook.prototype._handleResult=function (value) {
 			_super.prototype._handleResult.call(this, value);
@@ -14777,6 +15524,9 @@ var Excel;
 				return;
 			var obj=value;
 			_fixObjectPathIfNecessary(this, obj);
+			if (!_isUndefined(obj["ChartDataPointTrack"])) {
+				this._C=obj["ChartDataPointTrack"];
+			}
 			if (!_isUndefined(obj["Name"])) {
 				this._N=obj["Name"];
 			}
@@ -14786,7 +15536,13 @@ var Excel;
 			if (!_isUndefined(obj["Saved"])) {
 				this._S=obj["Saved"];
 			}
-			_handleNavigationPropertyResults(this, obj, ["application", "Application", "bindings", "Bindings", "customFunctions", "CustomFunctions", "customXmlParts", "CustomXmlParts", "dataConnections", "DataConnections", "functions", "Functions", "internalTest", "InternalTest", "names", "Names", "pivotTables", "PivotTables", "properties", "Properties", "protection", "Protection", "settings", "Settings", "styles", "Styles", "tables", "Tables", "worksheets", "Worksheets", "_Runtime", "_Runtime", "_V1Api", "_V1Api", "pivotCaches", "PivotCaches"]);
+			if (!_isUndefined(obj["Use1904DateSystem"])) {
+				this._U=obj["Use1904DateSystem"];
+			}
+			if (!_isUndefined(obj["UsePrecisionAsDisplayed"])) {
+				this._Us=obj["UsePrecisionAsDisplayed"];
+			}
+			_handleNavigationPropertyResults(this, obj, ["application", "Application", "bindings", "Bindings", "customFunctions", "CustomFunctions", "customXmlParts", "CustomXmlParts", "dataConnections", "DataConnections", "functions", "Functions", "internalTest", "InternalTest", "names", "Names", "pivotTables", "PivotTables", "properties", "Properties", "protection", "Protection", "settings", "Settings", "styles", "Styles", "tables", "Tables", "worksheets", "Worksheets", "_Runtime", "_Runtime", "_V1Api", "_V1Api"]);
 		};
 		Workbook.prototype.load=function (option) {
 			return _load(this, option);
@@ -14847,15 +15603,17 @@ var Excel;
 		});
 		Workbook.prototype.toJSON=function () {
 			return _toJson(this, {
+				"chartDataPointTrack": this._C,
 				"name": this._N,
 				"readOnly": this._R,
 				"saved": this._S,
+				"use1904DateSystem": this._U,
+				"usePrecisionAsDisplayed": this._Us,
 			}, {
 				"bindings": this._B,
-				"customXmlParts": this._Cu,
+				"customXmlParts": this._Cus,
 				"names": this._Na,
-				"pivotCaches": this._P,
-				"pivotTables": this._Pi,
+				"pivotTables": this._P,
 				"properties": this._Pr,
 				"protection": this._Pro,
 				"settings": this._Se,
@@ -14894,16 +15652,17 @@ var Excel;
 		Object.defineProperty(WorkbookProtection.prototype, "protected", {
 			get: function () {
 				_throwIfNotLoaded("protected", this._P, _typeWorkbookProtection, this._isNull);
+				_throwIfApiNotSupported("WorkbookProtection.protected", _defaultApiSetName, "1.8", _hostName);
 				return this._P;
 			},
 			enumerable: true,
 			configurable: true
 		});
 		WorkbookProtection.prototype.protect=function (password) {
-			_createMethodAction(this.context, this, "Protect", 0, [password], false);
+			_createMethodAction(this.context, this, "Protect", 0, [password], 0);
 		};
 		WorkbookProtection.prototype.unprotect=function (password) {
-			_createMethodAction(this.context, this, "Unprotect", 0, [password], false);
+			_createMethodAction(this.context, this, "Unprotect", 0, [password], 0);
 		};
 		WorkbookProtection.prototype._handleResult=function (value) {
 			_super.prototype._handleResult.call(this, value);
@@ -14950,8 +15709,23 @@ var Excel;
 			enumerable: true,
 			configurable: true
 		});
+		Object.defineProperty(WorkbookCreated.prototype, "_scalarPropertyNames", {
+			get: function () {
+				return ["id"];
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(WorkbookCreated.prototype, "id", {
+			get: function () {
+				_throwIfNotLoaded("id", this._I, _typeWorkbookCreated, this._isNull);
+				return this._I;
+			},
+			enumerable: true,
+			configurable: true
+		});
 		WorkbookCreated.prototype.open=function () {
-			_createMethodAction(this.context, this, "Open", 1, [], false);
+			_createMethodAction(this.context, this, "Open", 1, [], 4);
 		};
 		WorkbookCreated.prototype._handleResult=function (value) {
 			_super.prototype._handleResult.call(this, value);
@@ -14959,13 +15733,37 @@ var Excel;
 				return;
 			var obj=value;
 			_fixObjectPathIfNecessary(this, obj);
+			if (!_isUndefined(obj["Id"])) {
+				this._I=obj["Id"];
+			}
+		};
+		WorkbookCreated.prototype.load=function (option) {
+			return _load(this, option);
+		};
+		WorkbookCreated.prototype.retrieve=function (option) {
+			return _retrieve(this, option);
+		};
+		WorkbookCreated.prototype._handleIdResult=function (value) {
+			_super.prototype._handleIdResult.call(this, value);
+			if (_isNullOrUndefined(value)) {
+				return;
+			}
+			if (!_isUndefined(value["Id"])) {
+				this._I=value["Id"];
+			}
 		};
 		WorkbookCreated.prototype._handleRetrieveResult=function (value, result) {
 			_super.prototype._handleRetrieveResult.call(this, value, result);
 			_processRetrieveResult(this, value, result);
 		};
 		WorkbookCreated.prototype.toJSON=function () {
-			return _toJson(this, {}, {});
+			return _toJson(this, {
+				"id": this._I,
+			}, {});
+		};
+		WorkbookCreated.prototype.ensureUnchanged=function (data) {
+			_createEnsureUnchangedAction(this.context, this, data);
+			return;
 		};
 		return WorkbookCreated;
 	}(OfficeExtension.ClientObject));
@@ -14983,16 +15781,23 @@ var Excel;
 			enumerable: true,
 			configurable: true
 		});
+		Object.defineProperty(Worksheet.prototype, "_collectionPropertyPath", {
+			get: function () {
+				return "workbook.worksheets";
+			},
+			enumerable: true,
+			configurable: true
+		});
 		Object.defineProperty(Worksheet.prototype, "_scalarPropertyNames", {
 			get: function () {
-				return ["name", "id", "position", "visibility", "tabColor", "gridlines", "headings", "standardWidth", "standardHeight"];
+				return ["name", "id", "position", "visibility", "tabColor", "standardWidth", "standardHeight", "showGridlines", "showHeadings"];
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(Worksheet.prototype, "_scalarPropertyUpdateable", {
 			get: function () {
-				return [true, false, true, true, true, true, true, true, false];
+				return [true, false, true, true, true, true, false, true, true];
 			},
 			enumerable: true,
 			configurable: true
@@ -15007,7 +15812,7 @@ var Excel;
 		Object.defineProperty(Worksheet.prototype, "charts", {
 			get: function () {
 				if (!this._C) {
-					this._C=new Excel.ChartCollection(this.context, _createPropertyObjectPath(this.context, this, "Charts", true, false, false));
+					this._C=new Excel.ChartCollection(this.context, _createPropertyObjectPath(this.context, this, "Charts", true, false, 4));
 				}
 				this._C._ParentObject=this;
 				return this._C;
@@ -15019,7 +15824,7 @@ var Excel;
 			get: function () {
 				_throwIfApiNotSupported("Worksheet.freezePanes", _defaultApiSetName, "1.7", _hostName);
 				if (!this._F) {
-					this._F=new Excel.WorksheetFreezePanes(this.context, _createPropertyObjectPath(this.context, this, "FreezePanes", false, false, false));
+					this._F=new Excel.WorksheetFreezePanes(this.context, _createPropertyObjectPath(this.context, this, "FreezePanes", false, false, 4));
 				}
 				return this._F;
 			},
@@ -15030,7 +15835,7 @@ var Excel;
 			get: function () {
 				_throwIfApiNotSupported("Worksheet.names", _defaultApiSetName, "1.4", _hostName);
 				if (!this._Na) {
-					this._Na=new Excel.NamedItemCollection(this.context, _createPropertyObjectPath(this.context, this, "Names", true, false, false));
+					this._Na=new Excel.NamedItemCollection(this.context, _createPropertyObjectPath(this.context, this, "Names", true, false, 4));
 				}
 				return this._Na;
 			},
@@ -15041,7 +15846,7 @@ var Excel;
 			get: function () {
 				_throwIfApiNotSupported("Worksheet.pageLayout", _defaultApiSetName, "1.8", _hostName);
 				if (!this._P) {
-					this._P=new Excel.PageLayout(this.context, _createPropertyObjectPath(this.context, this, "PageLayout", false, false, false));
+					this._P=new Excel.PageLayout(this.context, _createPropertyObjectPath(this.context, this, "PageLayout", false, false, 4));
 				}
 				return this._P;
 			},
@@ -15052,7 +15857,7 @@ var Excel;
 			get: function () {
 				_throwIfApiNotSupported("Worksheet.pivotTables", _defaultApiSetName, "1.3", _hostName);
 				if (!this._Pi) {
-					this._Pi=new Excel.PivotTableCollection(this.context, _createPropertyObjectPath(this.context, this, "PivotTables", true, false, false));
+					this._Pi=new Excel.PivotTableCollection(this.context, _createPropertyObjectPath(this.context, this, "PivotTables", true, false, 4));
 				}
 				return this._Pi;
 			},
@@ -15063,7 +15868,7 @@ var Excel;
 			get: function () {
 				_throwIfApiNotSupported("Worksheet.protection", _defaultApiSetName, "1.2", _hostName);
 				if (!this._Pr) {
-					this._Pr=new Excel.WorksheetProtection(this.context, _createPropertyObjectPath(this.context, this, "Protection", false, false, false));
+					this._Pr=new Excel.WorksheetProtection(this.context, _createPropertyObjectPath(this.context, this, "Protection", false, false, 4));
 				}
 				return this._Pr;
 			},
@@ -15073,36 +15878,10 @@ var Excel;
 		Object.defineProperty(Worksheet.prototype, "tables", {
 			get: function () {
 				if (!this.m_tables) {
-					this.m_tables=new Excel.TableCollection(this.context, _createPropertyObjectPath(this.context, this, "Tables", true, false, false));
+					this.m_tables=new Excel.TableCollection(this.context, _createPropertyObjectPath(this.context, this, "Tables", true, false, 4));
 				}
 				this.m_tables._ParentObject=this;
 				return this.m_tables;
-			},
-			enumerable: true,
-			configurable: true
-		});
-		Object.defineProperty(Worksheet.prototype, "gridlines", {
-			get: function () {
-				_throwIfNotLoaded("gridlines", this._G, _typeWorksheet, this._isNull);
-				_throwIfApiNotSupported("Worksheet.gridlines", _defaultApiSetName, "1.7", _hostName);
-				return this._G;
-			},
-			set: function (value) {
-				this._G=value;
-				_createSetPropertyAction(this.context, this, "Gridlines", value);
-			},
-			enumerable: true,
-			configurable: true
-		});
-		Object.defineProperty(Worksheet.prototype, "headings", {
-			get: function () {
-				_throwIfNotLoaded("headings", this._H, _typeWorksheet, this._isNull);
-				_throwIfApiNotSupported("Worksheet.headings", _defaultApiSetName, "1.7", _hostName);
-				return this._H;
-			},
-			set: function (value) {
-				this._H=value;
-				_createSetPropertyAction(this.context, this, "Headings", value);
 			},
 			enumerable: true,
 			configurable: true
@@ -15122,7 +15901,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._N=value;
-				_createSetPropertyAction(this.context, this, "Name", value);
+				_createSetPropertyAction(this.context, this, "Name", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -15134,7 +15913,43 @@ var Excel;
 			},
 			set: function (value) {
 				this._Po=value;
-				_createSetPropertyAction(this.context, this, "Position", value);
+				_createSetPropertyAction(this.context, this, "Position", value, 0);
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(Worksheet.prototype, "showGridlines", {
+			get: function () {
+				_throwIfNotLoaded("showGridlines", this.m_showGridlines, _typeWorksheet, this._isNull);
+				_throwIfApiNotSupported("Worksheet.showGridlines", _defaultApiSetName, "1.7", _hostName);
+				return this.m_showGridlines;
+			},
+			set: function (value) {
+				if (ALWAYS_TRUE_PLACEHOLDER_OVERRIDE) {
+					this.m_showGridlines=value;
+					_createSetPropertyAction(this.context, this, "Gridlines", value);
+					return;
+				}
+				this.m_showGridlines=value;
+				_createSetPropertyAction(this.context, this, "ShowGridlines", value, 0);
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(Worksheet.prototype, "showHeadings", {
+			get: function () {
+				_throwIfNotLoaded("showHeadings", this.m_showHeadings, _typeWorksheet, this._isNull);
+				_throwIfApiNotSupported("Worksheet.showHeadings", _defaultApiSetName, "1.7", _hostName);
+				return this.m_showHeadings;
+			},
+			set: function (value) {
+				if (ALWAYS_TRUE_PLACEHOLDER_OVERRIDE) {
+					this.m_showHeadings=value;
+					_createSetPropertyAction(this.context, this, "Headings", value);
+					return;
+				}
+				this.m_showHeadings=value;
+				_createSetPropertyAction(this.context, this, "ShowHeadings", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -15156,7 +15971,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._St=value;
-				_createSetPropertyAction(this.context, this, "StandardWidth", value);
+				_createSetPropertyAction(this.context, this, "StandardWidth", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -15169,7 +15984,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._T=value;
-				_createSetPropertyAction(this.context, this, "TabColor", value);
+				_createSetPropertyAction(this.context, this, "TabColor", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -15181,15 +15996,17 @@ var Excel;
 			},
 			set: function (value) {
 				this._V=value;
-				_createSetPropertyAction(this.context, this, "Visibility", value);
+				_createSetPropertyAction(this.context, this, "Visibility", value, 0);
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Worksheet.prototype.set=function (properties, options) {
-			this._recursivelySet(properties, options, ["name", "position", "visibility", "tabColor", "gridlines", "headings", "standardWidth"], ["pageLayout"], [
+			this._recursivelySet(properties, options, ["name", "position", "visibility", "tabColor", "standardWidth", "showGridlines", "showHeadings"], ["pageLayout"], [
 				"charts",
 				"freezePanes",
+				"gridlines",
+				"headings",
 				"names",
 				"pivotTables",
 				"protection",
@@ -15200,91 +16017,114 @@ var Excel;
 			this._recursivelyUpdate(properties);
 		};
 		Worksheet.prototype.activate=function () {
-			_createMethodAction(this.context, this, "Activate", 1, [], false);
+			_createMethodAction(this.context, this, "Activate", 1, [], 0);
 		};
 		Worksheet.prototype.calculate=function (markAllDirty) {
 			_throwIfApiNotSupported("Worksheet.calculate", _defaultApiSetName, "1.6", _hostName);
-			_createMethodAction(this.context, this, "Calculate", 0, [markAllDirty], false);
+			_createMethodAction(this.context, this, "Calculate", 0, [markAllDirty], 0);
 		};
 		Worksheet.prototype.copy=function (positionType, relativeTo) {
 			_throwIfApiNotSupported("Worksheet.copy", _defaultApiSetName, "1.7", _hostName);
-			return new Excel.Worksheet(this.context, _createMethodObjectPath(this.context, this, "Copy", 0, [positionType, relativeTo], false, false, "_GetAnotherWorksheetById", false));
+			return new Excel.Worksheet(this.context, _createMethodObjectPath(this.context, this, "Copy", 0, [positionType, relativeTo], false, false, "_GetAnotherWorksheetById", 0));
 		};
 		Worksheet.prototype.delete=function () {
-			_createMethodAction(this.context, this, "Delete", 0, [], false);
+			_createMethodAction(this.context, this, "Delete", 0, [], 0);
+		};
+		Worksheet.prototype.findAll=function (text, criteria) {
+			_throwIfApiNotSupported("Worksheet.findAll", _defaultApiSetName, "1.9", _hostName);
+			return new Excel.Range(this.context, _createMethodObjectPath(this.context, this, "FindAll", 1, [text, criteria], false, true, null, 4));
+		};
+		Worksheet.prototype.findAllOrNullObject=function (text, criteria) {
+			_throwIfApiNotSupported("Worksheet.findAllOrNullObject", _defaultApiSetName, "1.9", _hostName);
+			return new Excel.Range(this.context, _createMethodObjectPath(this.context, this, "FindAllOrNullObject", 1, [text, criteria], false, true, null, 4));
 		};
 		Worksheet.prototype.getCell=function (row, column) {
-			return new Excel.Range(this.context, _createMethodObjectPath(this.context, this, "GetCell", 1, [row, column], false, true, null, false));
+			return new Excel.Range(this.context, _createMethodObjectPath(this.context, this, "GetCell", 1, [row, column], false, true, null, 4));
 		};
 		Worksheet.prototype.getNext=function (visibleOnly) {
 			_throwIfApiNotSupported("Worksheet.getNext", _defaultApiSetName, "1.5", _hostName);
-			return new Excel.Worksheet(this.context, _createMethodObjectPath(this.context, this, "GetNext", 1, [visibleOnly], false, true, "_GetSheetById", false));
+			return new Excel.Worksheet(this.context, _createMethodObjectPath(this.context, this, "GetNext", 1, [visibleOnly], false, true, "_GetSheetById", 4));
 		};
 		Worksheet.prototype.getNextOrNullObject=function (visibleOnly) {
 			_throwIfApiNotSupported("Worksheet.getNextOrNullObject", _defaultApiSetName, "1.5", _hostName);
-			return new Excel.Worksheet(this.context, _createMethodObjectPath(this.context, this, "GetNextOrNullObject", 1, [visibleOnly], false, true, "_GetSheetById", false));
+			return new Excel.Worksheet(this.context, _createMethodObjectPath(this.context, this, "GetNextOrNullObject", 1, [visibleOnly], false, true, "_GetSheetById", 4));
 		};
 		Worksheet.prototype.getPrevious=function (visibleOnly) {
 			_throwIfApiNotSupported("Worksheet.getPrevious", _defaultApiSetName, "1.5", _hostName);
-			return new Excel.Worksheet(this.context, _createMethodObjectPath(this.context, this, "GetPrevious", 1, [visibleOnly], false, true, "_GetSheetById", false));
+			return new Excel.Worksheet(this.context, _createMethodObjectPath(this.context, this, "GetPrevious", 1, [visibleOnly], false, true, "_GetSheetById", 4));
 		};
 		Worksheet.prototype.getPreviousOrNullObject=function (visibleOnly) {
 			_throwIfApiNotSupported("Worksheet.getPreviousOrNullObject", _defaultApiSetName, "1.5", _hostName);
-			return new Excel.Worksheet(this.context, _createMethodObjectPath(this.context, this, "GetPreviousOrNullObject", 1, [visibleOnly], false, true, "_GetSheetById", false));
+			return new Excel.Worksheet(this.context, _createMethodObjectPath(this.context, this, "GetPreviousOrNullObject", 1, [visibleOnly], false, true, "_GetSheetById", 4));
 		};
 		Worksheet.prototype.getRange=function (address) {
-			return new Excel.Range(this.context, _createMethodObjectPath(this.context, this, "GetRange", 1, [address], false, true, null, false));
+			return new Excel.Range(this.context, _createMethodObjectPath(this.context, this, "GetRange", 1, [address], false, true, null, 4));
 		};
 		Worksheet.prototype.getRangeByIndexes=function (startRow, startColumn, rowCount, columnCount) {
 			_throwIfApiNotSupported("Worksheet.getRangeByIndexes", _defaultApiSetName, "1.7", _hostName);
-			return new Excel.Range(this.context, _createMethodObjectPath(this.context, this, "GetRangeByIndexes", 1, [startRow, startColumn, rowCount, columnCount], false, true, null, false));
+			return new Excel.Range(this.context, _createMethodObjectPath(this.context, this, "GetRangeByIndexes", 1, [startRow, startColumn, rowCount, columnCount], false, true, null, 4));
 		};
 		Worksheet.prototype.getUsedRange=function (valuesOnly) {
-			return new Excel.Range(this.context, _createMethodObjectPath(this.context, this, "GetUsedRange", 1, [valuesOnly], false, true, null, false));
+			return new Excel.Range(this.context, _createMethodObjectPath(this.context, this, "GetUsedRange", 1, [valuesOnly], false, true, null, 4));
 		};
 		Worksheet.prototype.getUsedRangeOrNullObject=function (valuesOnly) {
 			_throwIfApiNotSupported("Worksheet.getUsedRangeOrNullObject", _defaultApiSetName, "1.4", _hostName);
-			return new Excel.Range(this.context, _createMethodObjectPath(this.context, this, "GetUsedRangeOrNullObject", 1, [valuesOnly], false, true, null, false));
+			return new Excel.Range(this.context, _createMethodObjectPath(this.context, this, "GetUsedRangeOrNullObject", 1, [valuesOnly], false, true, null, 4));
+		};
+		Worksheet.prototype.replaceAll=function (text, replacement, criteria) {
+			_throwIfApiNotSupported("Worksheet.replaceAll", _defaultApiSetName, "1.9", _hostName);
+			var action=_createMethodAction(this.context, this, "ReplaceAll", 0, [text, replacement, criteria], 0);
+			var ret=new OfficeExtension.ClientResult();
+			_addActionResultHandler(this, action, ret);
+			return ret;
 		};
 		Worksheet.prototype._GetAnotherWorksheetById=function (id) {
 			_throwIfApiNotSupported("Worksheet._GetAnotherWorksheetById", _defaultApiSetName, "1.7", _hostName);
-			return new Excel.Worksheet(this.context, _createMethodObjectPath(this.context, this, "_GetAnotherWorksheetById", 0, [id], false, false, null, false));
+			return new Excel.Worksheet(this.context, _createMethodObjectPath(this.context, this, "_GetAnotherWorksheetById", 0, [id], false, false, null, 0));
 		};
 		Worksheet.prototype._GetSheetById=function (id) {
 			_throwIfApiNotSupported("Worksheet._GetSheetById", _defaultApiSetName, "1.7", _hostName);
-			return new Excel.Worksheet(this.context, _createMethodObjectPath(this.context, this, "_GetSheetById", 1, [id], false, false, null, false));
+			return new Excel.Worksheet(this.context, _createMethodObjectPath(this.context, this, "_GetSheetById", 1, [id], false, false, null, 4));
 		};
 		Worksheet.prototype._RegisterActivatedEvent=function () {
 			_throwIfApiNotSupported("Worksheet._RegisterActivatedEvent", _defaultApiSetName, "1.7", _hostName);
-			_createMethodAction(this.context, this, "_RegisterActivatedEvent", 0, [], false);
+			_createMethodAction(this.context, this, "_RegisterActivatedEvent", 0, [], 0);
+		};
+		Worksheet.prototype._RegisterCalculatedEvent=function () {
+			_throwIfApiNotSupported("Worksheet._RegisterCalculatedEvent", _defaultApiSetName, "1.8", _hostName);
+			_createMethodAction(this.context, this, "_RegisterCalculatedEvent", 0, [], 0);
 		};
 		Worksheet.prototype._RegisterDataChangedEvent=function () {
 			_throwIfApiNotSupported("Worksheet._RegisterDataChangedEvent", _defaultApiSetName, "1.7", _hostName);
-			_createMethodAction(this.context, this, "_RegisterDataChangedEvent", 0, [], false);
+			_createMethodAction(this.context, this, "_RegisterDataChangedEvent", 0, [], 0);
 		};
 		Worksheet.prototype._RegisterDeactivatedEvent=function () {
 			_throwIfApiNotSupported("Worksheet._RegisterDeactivatedEvent", _defaultApiSetName, "1.7", _hostName);
-			_createMethodAction(this.context, this, "_RegisterDeactivatedEvent", 0, [], false);
+			_createMethodAction(this.context, this, "_RegisterDeactivatedEvent", 0, [], 0);
 		};
 		Worksheet.prototype._RegisterSelectionChangedEvent=function () {
 			_throwIfApiNotSupported("Worksheet._RegisterSelectionChangedEvent", _defaultApiSetName, "1.7", _hostName);
-			_createMethodAction(this.context, this, "_RegisterSelectionChangedEvent", 0, [], false);
+			_createMethodAction(this.context, this, "_RegisterSelectionChangedEvent", 0, [], 0);
 		};
 		Worksheet.prototype._UnregisterActivatedEvent=function () {
 			_throwIfApiNotSupported("Worksheet._UnregisterActivatedEvent", _defaultApiSetName, "1.7", _hostName);
-			_createMethodAction(this.context, this, "_UnregisterActivatedEvent", 0, [], false);
+			_createMethodAction(this.context, this, "_UnregisterActivatedEvent", 0, [], 0);
+		};
+		Worksheet.prototype._UnregisterCalculatedEvent=function () {
+			_throwIfApiNotSupported("Worksheet._UnregisterCalculatedEvent", _defaultApiSetName, "1.8", _hostName);
+			_createMethodAction(this.context, this, "_UnregisterCalculatedEvent", 0, [], 0);
 		};
 		Worksheet.prototype._UnregisterDataChangedEvent=function () {
 			_throwIfApiNotSupported("Worksheet._UnregisterDataChangedEvent", _defaultApiSetName, "1.7", _hostName);
-			_createMethodAction(this.context, this, "_UnregisterDataChangedEvent", 0, [], false);
+			_createMethodAction(this.context, this, "_UnregisterDataChangedEvent", 0, [], 0);
 		};
 		Worksheet.prototype._UnregisterDeactivatedEvent=function () {
 			_throwIfApiNotSupported("Worksheet._UnregisterDeactivatedEvent", _defaultApiSetName, "1.7", _hostName);
-			_createMethodAction(this.context, this, "_UnregisterDeactivatedEvent", 0, [], false);
+			_createMethodAction(this.context, this, "_UnregisterDeactivatedEvent", 0, [], 0);
 		};
 		Worksheet.prototype._UnregisterSelectionChangedEvent=function () {
 			_throwIfApiNotSupported("Worksheet._UnregisterSelectionChangedEvent", _defaultApiSetName, "1.7", _hostName);
-			_createMethodAction(this.context, this, "_UnregisterSelectionChangedEvent", 0, [], false);
+			_createMethodAction(this.context, this, "_UnregisterSelectionChangedEvent", 0, [], 0);
 		};
 		Worksheet.prototype._handleResult=function (value) {
 			_super.prototype._handleResult.call(this, value);
@@ -15293,10 +16133,10 @@ var Excel;
 			var obj=value;
 			_fixObjectPathIfNecessary(this, obj);
 			if (!_isUndefined(obj["Gridlines"])) {
-				this._G=obj["Gridlines"];
+				this.m_showGridlines=obj["Gridlines"];
 			}
 			if (!_isUndefined(obj["Headings"])) {
-				this._H=obj["Headings"];
+				this.m_showHeadings=obj["Headings"];
 			}
 			if (!_isUndefined(obj["Id"])) {
 				this._I=obj["Id"];
@@ -15306,6 +16146,12 @@ var Excel;
 			}
 			if (!_isUndefined(obj["Position"])) {
 				this._Po=obj["Position"];
+			}
+			if (!_isUndefined(obj["ShowGridlines"])) {
+				this.m_showGridlines=obj["ShowGridlines"];
+			}
+			if (!_isUndefined(obj["ShowHeadings"])) {
+				this.m_showHeadings=obj["ShowHeadings"];
 			}
 			if (!_isUndefined(obj["StandardHeight"])) {
 				this._S=obj["StandardHeight"];
@@ -15366,15 +16212,20 @@ var Excel;
 		});
 		Object.defineProperty(Worksheet.prototype, "onCalculated", {
 			get: function () {
+				var _this=this;
 				_throwIfApiNotSupported("Worksheet.onCalculated", _defaultApiSetName, "1.8", _hostName);
 				if (!this.m_calculated) {
 					this.m_calculated=new OfficeExtension.GenericEventHandlers(this.context, this, "Calculated", {
 						eventType: 16,
-						registerFunc: function () { return null; },
-						unregisterFunc: function () { return null; },
-						getTargetIdFunc: null,
+						registerFunc: function () { _this._RegisterCalculatedEvent(); },
+						unregisterFunc: function () { _this._UnregisterCalculatedEvent(); },
+						getTargetIdFunc: function () { return _this.id; },
 						eventArgsTransformFunc: function (value) {
-							return null;
+							var newArgs={
+								type: EventType.worksheetCalculated,
+								worksheetId: value.worksheetId,
+							};
+							return OfficeExtension.Utility._createPromiseFromResult(newArgs);
 						}
 					});
 				}
@@ -15383,29 +16234,37 @@ var Excel;
 			enumerable: true,
 			configurable: true
 		});
-		Object.defineProperty(Worksheet.prototype, "onDataChanged", {
+		Object.defineProperty(Worksheet.prototype, "onChanged", {
 			get: function () {
 				var _this=this;
-				_throwIfApiNotSupported("Worksheet.onDataChanged", _defaultApiSetName, "1.7", _hostName);
-				if (!this.m_dataChanged) {
-					this.m_dataChanged=new OfficeExtension.GenericEventHandlers(this.context, this, "DataChanged", {
+				_throwIfApiNotSupported("Worksheet.onChanged", _defaultApiSetName, "1.7", _hostName);
+				if (!this.m_changed) {
+					this.m_changed=new OfficeExtension.GenericEventHandlers(this.context, this, "Changed", {
 						eventType: 10,
 						registerFunc: function () { return _this._RegisterDataChangedEvent(); },
 						unregisterFunc: function () { return _this._UnregisterDataChangedEvent(); },
 						getTargetIdFunc: function () { return _this.id; },
 						eventArgsTransformFunc: function (value) {
 							var newArgs={
-								type: EventType.worksheetDataChanged,
+								type: EventType.worksheetChanged,
 								changeType: value.changeType,
 								source: value.source,
 								worksheetId: _this.id,
-								address: value.address
+								address: value.address,
+								getRange: function (ctx) {
+									_throwIfApiNotSupported("WorksheetChangedEventArgs.getRange", _defaultApiSetName, "1.8", _hostName);
+									return ctx.workbook._GetRangeForEventByReferenceId(value.referenceId);
+								},
+								getRangeOrNullObject: function (ctx) {
+									_throwIfApiNotSupported("WorksheetChangedEventArgs.getRangeOrNullObject", _defaultApiSetName, "1.8", _hostName);
+									return ctx.workbook._GetRangeOrNullObjectForEventByReferenceId(value.referenceId);
+								}
 							};
 							return OfficeExtension.Utility._createPromiseFromResult(newArgs);
 						}
 					});
 				}
-				return this.m_dataChanged;
+				return this.m_changed;
 			},
 			enumerable: true,
 			configurable: true
@@ -15461,11 +16320,11 @@ var Excel;
 		});
 		Worksheet.prototype.toJSON=function () {
 			return _toJson(this, {
-				"gridlines": this._G,
-				"headings": this._H,
 				"id": this._I,
 				"name": this._N,
 				"position": this._Po,
+				"showGridlines": this.m_showGridlines,
+				"showHeadings": this.m_showHeadings,
 				"standardHeight": this._S,
 				"standardWidth": this._St,
 				"tabColor": this._T,
@@ -15515,64 +16374,72 @@ var Excel;
 			configurable: true
 		});
 		WorksheetCollection.prototype.add=function (name) {
-			return new Excel.Worksheet(this.context, _createMethodObjectPath(this.context, this, "Add", 0, [name], false, true, null, false));
+			return new Excel.Worksheet(this.context, _createMethodObjectPath(this.context, this, "Add", 0, [name], false, true, null, 0));
 		};
 		WorksheetCollection.prototype.getActiveWorksheet=function () {
-			return new Excel.Worksheet(this.context, _createMethodObjectPath(this.context, this, "GetActiveWorksheet", 1, [], false, false, null, false));
+			return new Excel.Worksheet(this.context, _createMethodObjectPath(this.context, this, "GetActiveWorksheet", 1, [], false, false, null, 4));
 		};
 		WorksheetCollection.prototype.getCount=function (visibleOnly) {
 			_throwIfApiNotSupported("WorksheetCollection.getCount", _defaultApiSetName, "1.4", _hostName);
-			var action=_createMethodAction(this.context, this, "GetCount", 1, [visibleOnly], false);
+			var action=_createMethodAction(this.context, this, "GetCount", 1, [visibleOnly], 4);
 			var ret=new OfficeExtension.ClientResult();
 			_addActionResultHandler(this, action, ret);
 			return ret;
 		};
 		WorksheetCollection.prototype.getFirst=function (visibleOnly) {
 			_throwIfApiNotSupported("WorksheetCollection.getFirst", _defaultApiSetName, "1.5", _hostName);
-			return new Excel.Worksheet(this.context, _createMethodObjectPath(this.context, this, "GetFirst", 1, [visibleOnly], false, true, null, false));
+			return new Excel.Worksheet(this.context, _createMethodObjectPath(this.context, this, "GetFirst", 1, [visibleOnly], false, true, null, 4));
 		};
 		WorksheetCollection.prototype.getItem=function (key) {
 			return new Excel.Worksheet(this.context, _createIndexerObjectPath(this.context, this, [key]));
 		};
 		WorksheetCollection.prototype.getItemOrNullObject=function (key) {
 			_throwIfApiNotSupported("WorksheetCollection.getItemOrNullObject", _defaultApiSetName, "1.4", _hostName);
-			return new Excel.Worksheet(this.context, _createMethodObjectPath(this.context, this, "GetItemOrNullObject", 1, [key], false, false, null, false));
+			return new Excel.Worksheet(this.context, _createMethodObjectPath(this.context, this, "GetItemOrNullObject", 1, [key], false, false, null, 4));
 		};
 		WorksheetCollection.prototype.getLast=function (visibleOnly) {
 			_throwIfApiNotSupported("WorksheetCollection.getLast", _defaultApiSetName, "1.5", _hostName);
-			return new Excel.Worksheet(this.context, _createMethodObjectPath(this.context, this, "GetLast", 1, [visibleOnly], false, true, null, false));
+			return new Excel.Worksheet(this.context, _createMethodObjectPath(this.context, this, "GetLast", 1, [visibleOnly], false, true, null, 4));
 		};
 		WorksheetCollection.prototype._RegisterActivatedEvent=function () {
 			_throwIfApiNotSupported("WorksheetCollection._RegisterActivatedEvent", _defaultApiSetName, "1.7", _hostName);
-			_createMethodAction(this.context, this, "_RegisterActivatedEvent", 0, [], false);
+			_createMethodAction(this.context, this, "_RegisterActivatedEvent", 0, [], 0);
 		};
 		WorksheetCollection.prototype._RegisterAddedEvent=function () {
 			_throwIfApiNotSupported("WorksheetCollection._RegisterAddedEvent", _defaultApiSetName, "1.7", _hostName);
-			_createMethodAction(this.context, this, "_RegisterAddedEvent", 0, [], false);
+			_createMethodAction(this.context, this, "_RegisterAddedEvent", 0, [], 0);
+		};
+		WorksheetCollection.prototype._RegisterCalculatedEvent=function () {
+			_throwIfApiNotSupported("WorksheetCollection._RegisterCalculatedEvent", _defaultApiSetName, "1.8", _hostName);
+			_createMethodAction(this.context, this, "_RegisterCalculatedEvent", 0, [], 0);
 		};
 		WorksheetCollection.prototype._RegisterDeactivatedEvent=function () {
 			_throwIfApiNotSupported("WorksheetCollection._RegisterDeactivatedEvent", _defaultApiSetName, "1.7", _hostName);
-			_createMethodAction(this.context, this, "_RegisterDeactivatedEvent", 0, [], false);
+			_createMethodAction(this.context, this, "_RegisterDeactivatedEvent", 0, [], 0);
 		};
 		WorksheetCollection.prototype._RegisterDeletedEvent=function () {
 			_throwIfApiNotSupported("WorksheetCollection._RegisterDeletedEvent", _defaultApiSetName, "1.7", _hostName);
-			_createMethodAction(this.context, this, "_RegisterDeletedEvent", 0, [], false);
+			_createMethodAction(this.context, this, "_RegisterDeletedEvent", 0, [], 0);
 		};
 		WorksheetCollection.prototype._UnregisterActivatedEvent=function () {
 			_throwIfApiNotSupported("WorksheetCollection._UnregisterActivatedEvent", _defaultApiSetName, "1.7", _hostName);
-			_createMethodAction(this.context, this, "_UnregisterActivatedEvent", 0, [], false);
+			_createMethodAction(this.context, this, "_UnregisterActivatedEvent", 0, [], 0);
 		};
 		WorksheetCollection.prototype._UnregisterAddedEvent=function () {
 			_throwIfApiNotSupported("WorksheetCollection._UnregisterAddedEvent", _defaultApiSetName, "1.7", _hostName);
-			_createMethodAction(this.context, this, "_UnregisterAddedEvent", 0, [], false);
+			_createMethodAction(this.context, this, "_UnregisterAddedEvent", 0, [], 0);
+		};
+		WorksheetCollection.prototype._UnregisterCalculatedEvent=function () {
+			_throwIfApiNotSupported("WorksheetCollection._UnregisterCalculatedEvent", _defaultApiSetName, "1.8", _hostName);
+			_createMethodAction(this.context, this, "_UnregisterCalculatedEvent", 0, [], 0);
 		};
 		WorksheetCollection.prototype._UnregisterDeactivatedEvent=function () {
 			_throwIfApiNotSupported("WorksheetCollection._UnregisterDeactivatedEvent", _defaultApiSetName, "1.7", _hostName);
-			_createMethodAction(this.context, this, "_UnregisterDeactivatedEvent", 0, [], false);
+			_createMethodAction(this.context, this, "_UnregisterDeactivatedEvent", 0, [], 0);
 		};
 		WorksheetCollection.prototype._UnregisterDeletedEvent=function () {
 			_throwIfApiNotSupported("WorksheetCollection._UnregisterDeletedEvent", _defaultApiSetName, "1.7", _hostName);
-			_createMethodAction(this.context, this, "_UnregisterDeletedEvent", 0, [], false);
+			_createMethodAction(this.context, this, "_UnregisterDeletedEvent", 0, [], 0);
 		};
 		WorksheetCollection.prototype._handleResult=function (value) {
 			_super.prototype._handleResult.call(this, value);
@@ -15652,15 +16519,20 @@ var Excel;
 		});
 		Object.defineProperty(WorksheetCollection.prototype, "onCalculated", {
 			get: function () {
+				var _this=this;
 				_throwIfApiNotSupported("WorksheetCollection.onCalculated", _defaultApiSetName, "1.8", _hostName);
 				if (!this.m_calculated) {
 					this.m_calculated=new OfficeExtension.GenericEventHandlers(this.context, this, "Calculated", {
 						eventType: 16,
-						registerFunc: function () { return null; },
-						unregisterFunc: function () { return null; },
-						getTargetIdFunc: null,
+						registerFunc: function () { _this._RegisterCalculatedEvent(); },
+						unregisterFunc: function () { _this._UnregisterCalculatedEvent(); },
+						getTargetIdFunc: function () { return OfficeExtension.Constants.eventWorkbookId; },
 						eventArgsTransformFunc: function (value) {
-							return null;
+							var newArgs={
+								type: EventType.worksheetCalculated,
+								worksheetId: value.worksheetId,
+							};
+							return OfficeExtension.Utility._createPromiseFromResult(newArgs);
 						}
 					});
 				}
@@ -15696,7 +16568,7 @@ var Excel;
 		Object.defineProperty(WorksheetCollection.prototype, "onDeleted", {
 			get: function () {
 				var _this=this;
-				_throwIfApiNotSupported("WorksheetCollection.onDeleted", _defaultApiSetName, "1.8", _hostName);
+				_throwIfApiNotSupported("WorksheetCollection.onDeleted", _defaultApiSetName, "1.7", _hostName);
 				if (!this.m_deleted) {
 					this.m_deleted=new OfficeExtension.GenericEventHandlers(this.context, this, "Deleted", {
 						eventType: 15,
@@ -15761,14 +16633,18 @@ var Excel;
 			configurable: true
 		});
 		WorksheetProtection.prototype.protect=function (options, password) {
-			if (versionNumberIsEarlierThan(16, 0, 8716)) {
+			if (versionNumberIsEarlierThan({
+				mac: { desiredMajor: 16, desiredMinor: 7, desiredBuild: 17101600 },
+				ios: { desiredMajor: 2, desiredMinor: 7, desiredBuild: 1016 },
+				general: { desiredMajor: 16, desiredMinor: 0, desiredBuild: 8716 }
+			})) {
 				_createMethodAction(this.context, this, "Protect", 0, [options], false);
 				return;
 			}
-			_createMethodAction(this.context, this, "Protect", 0, [options, password], false);
+			_createMethodAction(this.context, this, "Protect", 0, [options, password], 0);
 		};
 		WorksheetProtection.prototype.unprotect=function (password) {
-			_createMethodAction(this.context, this, "Unprotect", 0, [password], false);
+			_createMethodAction(this.context, this, "Unprotect", 0, [password], 0);
 		};
 		WorksheetProtection.prototype._handleResult=function (value) {
 			_super.prototype._handleResult.call(this, value);
@@ -15820,22 +16696,22 @@ var Excel;
 			configurable: true
 		});
 		WorksheetFreezePanes.prototype.freezeAt=function (frozenRange) {
-			_createMethodAction(this.context, this, "FreezeAt", 0, [frozenRange], false);
+			_createMethodAction(this.context, this, "FreezeAt", 0, [frozenRange], 0);
 		};
 		WorksheetFreezePanes.prototype.freezeColumns=function (count) {
-			_createMethodAction(this.context, this, "FreezeColumns", 0, [count], false);
+			_createMethodAction(this.context, this, "FreezeColumns", 0, [count], 0);
 		};
 		WorksheetFreezePanes.prototype.freezeRows=function (count) {
-			_createMethodAction(this.context, this, "FreezeRows", 0, [count], false);
+			_createMethodAction(this.context, this, "FreezeRows", 0, [count], 0);
 		};
 		WorksheetFreezePanes.prototype.getLocation=function () {
-			return new Excel.Range(this.context, _createMethodObjectPath(this.context, this, "GetLocation", 1, [], false, true, null, false));
+			return new Excel.Range(this.context, _createMethodObjectPath(this.context, this, "GetLocation", 1, [], false, true, null, 4));
 		};
 		WorksheetFreezePanes.prototype.getLocationOrNullObject=function () {
-			return new Excel.Range(this.context, _createMethodObjectPath(this.context, this, "GetLocationOrNullObject", 1, [], false, true, null, false));
+			return new Excel.Range(this.context, _createMethodObjectPath(this.context, this, "GetLocationOrNullObject", 1, [], false, true, null, 4));
 		};
 		WorksheetFreezePanes.prototype.unfreeze=function () {
-			_createMethodAction(this.context, this, "Unfreeze", 0, [], false);
+			_createMethodAction(this.context, this, "Unfreeze", 0, [], 0);
 		};
 		WorksheetFreezePanes.prototype._handleResult=function (value) {
 			_super.prototype._handleResult.call(this, value);
@@ -15909,7 +16785,7 @@ var Excel;
 				rowOffset=rowDirection;
 				columnOffset=columnDirection;
 			}
-			if (Math.abs(count)==1) {
+			if (Math.abs(count)===1) {
 				return startRange;
 			}
 			return startRange.getBoundingRect(referenceRange.getOffsetRange(rowDirection * count+rowOffset, columnDirection * count+columnOffset));
@@ -15918,7 +16794,7 @@ var Excel;
 			get: function () {
 				_throwIfApiNotSupported("Range.areas", _defaultApiSetName, "1.8", _hostName);
 				if (!this._Ar) {
-					this._Ar=new Excel.AreaCollection(this.context, _createPropertyObjectPath(this.context, this, "Areas", true, false, false));
+					this._Ar=new Excel.AreaCollection(this.context, _createPropertyObjectPath(this.context, this, "Areas", true, false, 4));
 				}
 				return this._Ar;
 			},
@@ -15929,7 +16805,7 @@ var Excel;
 			get: function () {
 				_throwIfApiNotSupported("Range.conditionalFormats", _defaultApiSetName, "1.6", _hostName);
 				if (!this._Con) {
-					this._Con=new Excel.ConditionalFormatCollection(this.context, _createPropertyObjectPath(this.context, this, "ConditionalFormats", true, false, false));
+					this._Con=new Excel.ConditionalFormatCollection(this.context, _createPropertyObjectPath(this.context, this, "ConditionalFormats", true, false, 4));
 				}
 				return this._Con;
 			},
@@ -15938,9 +16814,9 @@ var Excel;
 		});
 		Object.defineProperty(Range.prototype, "dataValidation", {
 			get: function () {
-				_throwIfApiNotSupported("Range.dataValidation", _defaultApiSetName, "1.7", _hostName);
+				_throwIfApiNotSupported("Range.dataValidation", _defaultApiSetName, "1.8", _hostName);
 				if (!this._D) {
-					this._D=new Excel.DataValidation(this.context, _createPropertyObjectPath(this.context, this, "DataValidation", false, false, false));
+					this._D=new Excel.DataValidation(this.context, _createPropertyObjectPath(this.context, this, "DataValidation", false, false, 4));
 				}
 				return this._D;
 			},
@@ -15950,7 +16826,7 @@ var Excel;
 		Object.defineProperty(Range.prototype, "format", {
 			get: function () {
 				if (!this._F) {
-					this._F=new Excel.RangeFormat(this.context, _createPropertyObjectPath(this.context, this, "Format", false, false, false));
+					this._F=new Excel.RangeFormat(this.context, _createPropertyObjectPath(this.context, this, "Format", false, false, 4));
 				}
 				return this._F;
 			},
@@ -15961,7 +16837,7 @@ var Excel;
 			get: function () {
 				_throwIfApiNotSupported("Range.sort", _defaultApiSetName, "1.2", _hostName);
 				if (!this._S) {
-					this._S=new Excel.RangeSort(this.context, _createPropertyObjectPath(this.context, this, "Sort", false, false, false));
+					this._S=new Excel.RangeSort(this.context, _createPropertyObjectPath(this.context, this, "Sort", false, false, 4));
 				}
 				return this._S;
 			},
@@ -15971,7 +16847,7 @@ var Excel;
 		Object.defineProperty(Range.prototype, "worksheet", {
 			get: function () {
 				if (!this._W) {
-					this._W=new Excel.Worksheet(this.context, _createPropertyObjectPath(this.context, this, "Worksheet", false, false, false));
+					this._W=new Excel.Worksheet(this.context, _createPropertyObjectPath(this.context, this, "Worksheet", false, false, 4));
 				}
 				return this._W;
 			},
@@ -16018,7 +16894,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._Col=value;
-				_createSetPropertyAction(this.context, this, "ColumnHidden", value);
+				_createSetPropertyAction(this.context, this, "ColumnHidden", value, 2);
 			},
 			enumerable: true,
 			configurable: true
@@ -16042,7 +16918,7 @@ var Excel;
 					return;
 				}
 				this.m_formulas=value;
-				_createSetPropertyAction(this.context, this, "Formulas", value);
+				_createSetPropertyAction(this.context, this, "Formulas", value, 2);
 			},
 			enumerable: true,
 			configurable: true
@@ -16058,7 +16934,7 @@ var Excel;
 					return;
 				}
 				this.m_formulasLocal=value;
-				_createSetPropertyAction(this.context, this, "FormulasLocal", value);
+				_createSetPropertyAction(this.context, this, "FormulasLocal", value, 2);
 			},
 			enumerable: true,
 			configurable: true
@@ -16075,7 +16951,7 @@ var Excel;
 					return;
 				}
 				this.m_formulasR1C1=value;
-				_createSetPropertyAction(this.context, this, "FormulasR1C1", value);
+				_createSetPropertyAction(this.context, this, "FormulasR1C1", value, 2);
 			},
 			enumerable: true,
 			configurable: true
@@ -16097,7 +16973,25 @@ var Excel;
 			},
 			set: function (value) {
 				this._Hy=value;
-				_createSetPropertyAction(this.context, this, "Hyperlink", value);
+				_createSetPropertyAction(this.context, this, "Hyperlink", value, 2);
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(Range.prototype, "isEntireColumn", {
+			get: function () {
+				_throwIfNotLoaded("isEntireColumn", this.m_isEntireColumn, _typeRange, this._isNull);
+				_throwIfApiNotSupported("Range.isEntireColumn", _defaultApiSetName, "1.7", _hostName);
+				return this.m_isEntireColumn;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(Range.prototype, "isEntireRow", {
+			get: function () {
+				_throwIfNotLoaded("isEntireRow", this.m_isEntireRow, _typeRange, this._isNull);
+				_throwIfApiNotSupported("Range.isEntireRow", _defaultApiSetName, "1.7", _hostName);
+				return this.m_isEntireRow;
 			},
 			enumerable: true,
 			configurable: true
@@ -16113,7 +17007,7 @@ var Excel;
 					return;
 				}
 				this.m_numberFormat=value;
-				_createSetPropertyAction(this.context, this, "NumberFormat", value);
+				_createSetPropertyAction(this.context, this, "NumberFormat", value, 2);
 			},
 			enumerable: true,
 			configurable: true
@@ -16126,7 +17020,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._N=value;
-				_createSetPropertyAction(this.context, this, "NumberFormatLocal", value);
+				_createSetPropertyAction(this.context, this, "NumberFormatLocal", value, 2);
 			},
 			enumerable: true,
 			configurable: true
@@ -16147,7 +17041,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._Ro=value;
-				_createSetPropertyAction(this.context, this, "RowHidden", value);
+				_createSetPropertyAction(this.context, this, "RowHidden", value, 2);
 			},
 			enumerable: true,
 			configurable: true
@@ -16168,7 +17062,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._St=value;
-				_createSetPropertyAction(this.context, this, "Style", value);
+				_createSetPropertyAction(this.context, this, "Style", value, 2);
 			},
 			enumerable: true,
 			configurable: true
@@ -16200,7 +17094,7 @@ var Excel;
 					return;
 				}
 				this.m_values=value;
-				_createSetPropertyAction(this.context, this, "Values", value);
+				_createSetPropertyAction(this.context, this, "Values", value, 2);
 			},
 			enumerable: true,
 			configurable: true
@@ -16209,24 +17103,6 @@ var Excel;
 			get: function () {
 				_throwIfNotLoaded("_ReferenceId", this.__R, _typeRange, this._isNull);
 				return this.__R;
-			},
-			enumerable: true,
-			configurable: true
-		});
-		Object.defineProperty(Range.prototype, "isEntireColumn", {
-			get: function () {
-				_throwIfNotLoaded("isEntireColumn", this._i, _typeRange, this._isNull);
-				_throwIfApiNotSupported("Range.isEntireColumn", _defaultApiSetName, "1.7", _hostName);
-				return this._i;
-			},
-			enumerable: true,
-			configurable: true
-		});
-		Object.defineProperty(Range.prototype, "isEntireRow", {
-			get: function () {
-				_throwIfNotLoaded("isEntireRow", this._is, _typeRange, this._isNull);
-				_throwIfApiNotSupported("Range.isEntireRow", _defaultApiSetName, "1.7", _hostName);
-				return this._is;
 			},
 			enumerable: true,
 			configurable: true
@@ -16244,26 +17120,34 @@ var Excel;
 		};
 		Range.prototype.calculate=function () {
 			_throwIfApiNotSupported("Range.calculate", _defaultApiSetName, "1.6", _hostName);
-			_createMethodAction(this.context, this, "Calculate", 0, [], false);
+			_createMethodAction(this.context, this, "Calculate", 0, [], 0);
 		};
 		Range.prototype.clear=function (applyTo) {
-			_createMethodAction(this.context, this, "Clear", 0, [applyTo], false);
+			_createMethodAction(this.context, this, "Clear", 0, [applyTo], 0);
 		};
 		Range.prototype.delete=function (shift) {
-			_createMethodAction(this.context, this, "Delete", 0, [shift], false);
+			_createMethodAction(this.context, this, "Delete", 0, [shift], 0);
+		};
+		Range.prototype.find=function (text, criteria) {
+			_throwIfApiNotSupported("Range.find", _defaultApiSetName, "1.9", _hostName);
+			return new Excel.Range(this.context, _createMethodObjectPath(this.context, this, "Find", 1, [text, criteria], false, true, null, 4));
+		};
+		Range.prototype.findOrNullObject=function (text, criteria) {
+			_throwIfApiNotSupported("Range.findOrNullObject", _defaultApiSetName, "1.9", _hostName);
+			return new Excel.Range(this.context, _createMethodObjectPath(this.context, this, "FindOrNullObject", 1, [text, criteria], false, true, null, 4));
 		};
 		Range.prototype.getAbsoluteResizedRange=function (numRows, numColumns) {
 			_throwIfApiNotSupported("Range.getAbsoluteResizedRange", _defaultApiSetName, "1.7", _hostName);
-			return new Excel.Range(this.context, _createMethodObjectPath(this.context, this, "GetAbsoluteResizedRange", 1, [numRows, numColumns], false, true, null, false));
+			return new Excel.Range(this.context, _createMethodObjectPath(this.context, this, "GetAbsoluteResizedRange", 1, [numRows, numColumns], false, true, null, 4));
 		};
 		Range.prototype.getBoundingRect=function (anotherRange) {
-			return new Excel.Range(this.context, _createMethodObjectPath(this.context, this, "GetBoundingRect", 1, [anotherRange], false, true, null, false));
+			return new Excel.Range(this.context, _createMethodObjectPath(this.context, this, "GetBoundingRect", 1, [anotherRange], false, true, null, 4));
 		};
 		Range.prototype.getCell=function (row, column) {
-			return new Excel.Range(this.context, _createMethodObjectPath(this.context, this, "GetCell", 1, [row, column], false, true, null, false));
+			return new Excel.Range(this.context, _createMethodObjectPath(this.context, this, "GetCell", 1, [row, column], false, true, null, 4));
 		};
 		Range.prototype.getColumn=function (column) {
-			return new Excel.Range(this.context, _createMethodObjectPath(this.context, this, "GetColumn", 1, [column], false, true, null, false));
+			return new Excel.Range(this.context, _createMethodObjectPath(this.context, this, "GetColumn", 1, [column], false, true, null, 4));
 		};
 		Range.prototype.getColumnsAfter=function (count) {
 			if (!isExcel1_3OrAbove()) {
@@ -16271,13 +17155,13 @@ var Excel;
 					count=1;
 				}
 				this._ensureInteger(count, "RowsAbove");
-				if (count==0) {
+				if (count===0) {
 					OfficeExtension.Utility.throwError(Excel.ErrorCodes.invalidArgument, "count", "RowsAbove");
 				}
 				return this._getAdjacentRange("getColumnsAfter", count, this.getLastColumn(), 0, 1);
 			}
 			_throwIfApiNotSupported("Range.getColumnsAfter", _defaultApiSetName, "1.3", _hostName);
-			return new Excel.Range(this.context, _createMethodObjectPath(this.context, this, "GetColumnsAfter", 1, [count], false, true, null, false));
+			return new Excel.Range(this.context, _createMethodObjectPath(this.context, this, "GetColumnsAfter", 1, [count], false, true, null, 4));
 		};
 		Range.prototype.getColumnsBefore=function (count) {
 			if (!isExcel1_3OrAbove()) {
@@ -16285,45 +17169,53 @@ var Excel;
 					count=1;
 				}
 				this._ensureInteger(count, "RowsAbove");
-				if (count==0) {
+				if (count===0) {
 					OfficeExtension.Utility.throwError(Excel.ErrorCodes.invalidArgument, "count", "RowsAbove");
 				}
 				return this._getAdjacentRange("getColumnsBefore", count, this.getColumn(0), 0, -1);
 			}
 			_throwIfApiNotSupported("Range.getColumnsBefore", _defaultApiSetName, "1.3", _hostName);
-			return new Excel.Range(this.context, _createMethodObjectPath(this.context, this, "GetColumnsBefore", 1, [count], false, true, null, false));
+			return new Excel.Range(this.context, _createMethodObjectPath(this.context, this, "GetColumnsBefore", 1, [count], false, true, null, 4));
+		};
+		Range.prototype.getDataValidationRange=function () {
+			_throwIfApiNotSupported("Range.getDataValidationRange", _defaultApiSetName, "1.8", _hostName);
+			return new Excel.Range(this.context, _createMethodObjectPath(this.context, this, "GetDataValidationRange", 1, [], false, true, null, 4));
+		};
+		Range.prototype.getDataValidationRangeOrNullObject=function () {
+			_throwIfApiNotSupported("Range.getDataValidationRangeOrNullObject", _defaultApiSetName, "1.8", _hostName);
+			return new Excel.Range(this.context, _createMethodObjectPath(this.context, this, "GetDataValidationRangeOrNullObject", 1, [], false, true, null, 4));
 		};
 		Range.prototype.getEntireColumn=function () {
-			return new Excel.Range(this.context, _createMethodObjectPath(this.context, this, "GetEntireColumn", 1, [], false, true, null, false));
+			return new Excel.Range(this.context, _createMethodObjectPath(this.context, this, "GetEntireColumn", 1, [], false, true, null, 4));
 		};
 		Range.prototype.getEntireRow=function () {
-			return new Excel.Range(this.context, _createMethodObjectPath(this.context, this, "GetEntireRow", 1, [], false, true, null, false));
+			return new Excel.Range(this.context, _createMethodObjectPath(this.context, this, "GetEntireRow", 1, [], false, true, null, 4));
 		};
 		Range.prototype.getImage=function () {
 			_throwIfApiNotSupported("Range.getImage", _defaultApiSetName, "1.7", _hostName);
-			var action=_createMethodAction(this.context, this, "GetImage", 1, [], false);
+			var action=_createMethodAction(this.context, this, "GetImage", 1, [], 4);
 			var ret=new OfficeExtension.ClientResult();
 			_addActionResultHandler(this, action, ret);
 			return ret;
 		};
 		Range.prototype.getIntersection=function (anotherRange) {
-			return new Excel.Range(this.context, _createMethodObjectPath(this.context, this, "GetIntersection", 1, [anotherRange], false, true, null, false));
+			return new Excel.Range(this.context, _createMethodObjectPath(this.context, this, "GetIntersection", 1, [anotherRange], false, true, null, 4));
 		};
 		Range.prototype.getIntersectionOrNullObject=function (anotherRange) {
 			_throwIfApiNotSupported("Range.getIntersectionOrNullObject", _defaultApiSetName, "1.4", _hostName);
-			return new Excel.Range(this.context, _createMethodObjectPath(this.context, this, "GetIntersectionOrNullObject", 1, [anotherRange], false, true, null, false));
+			return new Excel.Range(this.context, _createMethodObjectPath(this.context, this, "GetIntersectionOrNullObject", 1, [anotherRange], false, true, null, 4));
 		};
 		Range.prototype.getLastCell=function () {
-			return new Excel.Range(this.context, _createMethodObjectPath(this.context, this, "GetLastCell", 1, [], false, true, null, false));
+			return new Excel.Range(this.context, _createMethodObjectPath(this.context, this, "GetLastCell", 1, [], false, true, null, 4));
 		};
 		Range.prototype.getLastColumn=function () {
-			return new Excel.Range(this.context, _createMethodObjectPath(this.context, this, "GetLastColumn", 1, [], false, true, null, false));
+			return new Excel.Range(this.context, _createMethodObjectPath(this.context, this, "GetLastColumn", 1, [], false, true, null, 4));
 		};
 		Range.prototype.getLastRow=function () {
-			return new Excel.Range(this.context, _createMethodObjectPath(this.context, this, "GetLastRow", 1, [], false, true, null, false));
+			return new Excel.Range(this.context, _createMethodObjectPath(this.context, this, "GetLastRow", 1, [], false, true, null, 4));
 		};
 		Range.prototype.getOffsetRange=function (rowOffset, columnOffset) {
-			return new Excel.Range(this.context, _createMethodObjectPath(this.context, this, "GetOffsetRange", 1, [rowOffset, columnOffset], false, true, null, false));
+			return new Excel.Range(this.context, _createMethodObjectPath(this.context, this, "GetOffsetRange", 1, [rowOffset, columnOffset], false, true, null, 4));
 		};
 		Range.prototype.getResizedRange=function (deltaRows, deltaColumns) {
 			if (!isExcel1_3OrAbove()) {
@@ -16333,10 +17225,10 @@ var Excel;
 				return referenceRange.getBoundingRect(this.getLastCell().getOffsetRange(deltaRows, deltaColumns));
 			}
 			_throwIfApiNotSupported("Range.getResizedRange", _defaultApiSetName, "1.3", _hostName);
-			return new Excel.Range(this.context, _createMethodObjectPath(this.context, this, "GetResizedRange", 1, [deltaRows, deltaColumns], false, true, null, false));
+			return new Excel.Range(this.context, _createMethodObjectPath(this.context, this, "GetResizedRange", 1, [deltaRows, deltaColumns], false, true, null, 4));
 		};
 		Range.prototype.getRow=function (row) {
-			return new Excel.Range(this.context, _createMethodObjectPath(this.context, this, "GetRow", 1, [row], false, true, null, false));
+			return new Excel.Range(this.context, _createMethodObjectPath(this.context, this, "GetRow", 1, [row], false, true, null, 4));
 		};
 		Range.prototype.getRowsAbove=function (count) {
 			if (!isExcel1_3OrAbove()) {
@@ -16344,13 +17236,13 @@ var Excel;
 					count=1;
 				}
 				this._ensureInteger(count, "RowsAbove");
-				if (count==0) {
+				if (count===0) {
 					OfficeExtension.Utility.throwError(Excel.ErrorCodes.invalidArgument, "count", "RowsAbove");
 				}
 				return this._getAdjacentRange("getRowsAbove", count, this.getRow(0), -1, 0);
 			}
 			_throwIfApiNotSupported("Range.getRowsAbove", _defaultApiSetName, "1.3", _hostName);
-			return new Excel.Range(this.context, _createMethodObjectPath(this.context, this, "GetRowsAbove", 1, [count], false, true, null, false));
+			return new Excel.Range(this.context, _createMethodObjectPath(this.context, this, "GetRowsAbove", 1, [count], false, true, null, 4));
 		};
 		Range.prototype.getRowsBelow=function (count) {
 			if (!isExcel1_3OrAbove()) {
@@ -16358,53 +17250,68 @@ var Excel;
 					count=1;
 				}
 				this._ensureInteger(count, "RowsAbove");
-				if (count==0) {
+				if (count===0) {
 					OfficeExtension.Utility.throwError(Excel.ErrorCodes.invalidArgument, "count", "RowsAbove");
 				}
 				return this._getAdjacentRange("getRowsBelow", count, this.getLastRow(), 1, 0);
 			}
 			_throwIfApiNotSupported("Range.getRowsBelow", _defaultApiSetName, "1.3", _hostName);
-			return new Excel.Range(this.context, _createMethodObjectPath(this.context, this, "GetRowsBelow", 1, [count], false, true, null, false));
+			return new Excel.Range(this.context, _createMethodObjectPath(this.context, this, "GetRowsBelow", 1, [count], false, true, null, 4));
 		};
 		Range.prototype.getSurroundingRegion=function () {
 			_throwIfApiNotSupported("Range.getSurroundingRegion", _defaultApiSetName, "1.7", _hostName);
-			return new Excel.Range(this.context, _createMethodObjectPath(this.context, this, "GetSurroundingRegion", 1, [], false, true, null, false));
+			return new Excel.Range(this.context, _createMethodObjectPath(this.context, this, "GetSurroundingRegion", 1, [], false, true, null, 4));
+		};
+		Range.prototype.getTables=function (fullyContained) {
+			_throwIfApiNotSupported("Range.getTables", _defaultApiSetName, "1.9", _hostName);
+			return new Excel.TableScopedCollection(this.context, _createMethodObjectPath(this.context, this, "GetTables", 1, [fullyContained], true, false, null, 4));
 		};
 		Range.prototype.getUsedRange=function (valuesOnly) {
-			return new Excel.Range(this.context, _createMethodObjectPath(this.context, this, "GetUsedRange", 1, [valuesOnly], false, true, null, false));
+			return new Excel.Range(this.context, _createMethodObjectPath(this.context, this, "GetUsedRange", 1, [valuesOnly], false, true, null, 4));
 		};
 		Range.prototype.getUsedRangeOrNullObject=function (valuesOnly) {
 			_throwIfApiNotSupported("Range.getUsedRangeOrNullObject", _defaultApiSetName, "1.4", _hostName);
-			return new Excel.Range(this.context, _createMethodObjectPath(this.context, this, "GetUsedRangeOrNullObject", 1, [valuesOnly], false, true, null, false));
+			return new Excel.Range(this.context, _createMethodObjectPath(this.context, this, "GetUsedRangeOrNullObject", 1, [valuesOnly], false, true, null, 4));
 		};
 		Range.prototype.getVisibleView=function () {
 			_throwIfApiNotSupported("Range.getVisibleView", _defaultApiSetName, "1.3", _hostName);
-			return new Excel.RangeView(this.context, _createMethodObjectPath(this.context, this, "GetVisibleView", 1, [], false, false, null, false));
+			return new Excel.RangeView(this.context, _createMethodObjectPath(this.context, this, "GetVisibleView", 1, [], false, false, null, 4));
 		};
 		Range.prototype.insert=function (shift) {
-			return new Excel.Range(this.context, _createMethodObjectPath(this.context, this, "Insert", 0, [shift], false, true, null, false));
+			return new Excel.Range(this.context, _createMethodObjectPath(this.context, this, "Insert", 0, [shift], false, true, null, 0));
 		};
 		Range.prototype.merge=function (across) {
 			_throwIfApiNotSupported("Range.merge", _defaultApiSetName, "1.2", _hostName);
-			_createMethodAction(this.context, this, "Merge", 0, [across], false);
+			_createMethodAction(this.context, this, "Merge", 0, [across], 0);
+		};
+		Range.prototype.removeDuplicates=function (columns, includesHeader) {
+			_throwIfApiNotSupported("Range.removeDuplicates", _defaultApiSetName, "1.9", _hostName);
+			return new Excel.RemoveDuplicatesResult(this.context, _createMethodObjectPath(this.context, this, "RemoveDuplicates", 0, [columns, includesHeader], false, true, null, 0));
+		};
+		Range.prototype.replaceAll=function (text, replacement, criteria) {
+			_throwIfApiNotSupported("Range.replaceAll", _defaultApiSetName, "1.9", _hostName);
+			var action=_createMethodAction(this.context, this, "ReplaceAll", 0, [text, replacement, criteria], 0);
+			var ret=new OfficeExtension.ClientResult();
+			_addActionResultHandler(this, action, ret);
+			return ret;
 		};
 		Range.prototype.select=function () {
-			_createMethodAction(this.context, this, "Select", 1, [], false);
+			_createMethodAction(this.context, this, "Select", 1, [], 0);
 		};
 		Range.prototype.showCard=function () {
 			_throwIfApiNotSupported("Range.showCard", _defaultApiSetName, "1.7", _hostName);
-			_createMethodAction(this.context, this, "ShowCard", 0, [], false);
+			_createMethodAction(this.context, this, "ShowCard", 0, [], 0);
 		};
 		Range.prototype.unmerge=function () {
 			_throwIfApiNotSupported("Range.unmerge", _defaultApiSetName, "1.2", _hostName);
-			_createMethodAction(this.context, this, "Unmerge", 0, [], false);
+			_createMethodAction(this.context, this, "Unmerge", 0, [], 0);
 		};
 		Range.prototype._KeepReference=function () {
-			_createMethodAction(this.context, this, "_KeepReference", 1, [], false);
+			_createMethodAction(this.context, this, "_KeepReference", 1, [], 0);
 		};
 		Range.prototype._ValidateArraySize=function (rows, columns) {
 			_throwIfApiNotSupported("Range._ValidateArraySize", _defaultApiSetName, "1.3", _hostName);
-			_createMethodAction(this.context, this, "_ValidateArraySize", 1, [rows, columns], false);
+			_createMethodAction(this.context, this, "_ValidateArraySize", 1, [rows, columns], 4);
 		};
 		Range.prototype._handleResult=function (value) {
 			_super.prototype._handleResult.call(this, value);
@@ -16412,6 +17319,12 @@ var Excel;
 				return;
 			var obj=value;
 			_fixObjectPathIfNecessary(this, obj);
+			if (!_isUndefined(obj["isEntireColumn"])) {
+				this.m_isEntireColumn=obj["isEntireColumn"];
+			}
+			if (!_isUndefined(obj["isEntireRow"])) {
+				this.m_isEntireRow=obj["isEntireRow"];
+			}
 			if (!_isUndefined(obj["Address"])) {
 				this._A=obj["Address"];
 			}
@@ -16445,6 +17358,12 @@ var Excel;
 			if (!_isUndefined(obj["Hyperlink"])) {
 				this._Hy=obj["Hyperlink"];
 			}
+			if (!_isUndefined(obj["IsEntireColumn"])) {
+				this.m_isEntireColumn=obj["IsEntireColumn"];
+			}
+			if (!_isUndefined(obj["IsEntireRow"])) {
+				this.m_isEntireRow=obj["IsEntireRow"];
+			}
 			if (!_isUndefined(obj["NumberFormat"])) {
 				this.m_numberFormat=obj["NumberFormat"];
 			}
@@ -16474,12 +17393,6 @@ var Excel;
 			}
 			if (!_isUndefined(obj["_ReferenceId"])) {
 				this.__R=obj["_ReferenceId"];
-			}
-			if (!_isUndefined(obj["isEntireColumn"])) {
-				this._i=obj["isEntireColumn"];
-			}
-			if (!_isUndefined(obj["isEntireRow"])) {
-				this._is=obj["isEntireRow"];
 			}
 			_handleNavigationPropertyResults(this, obj, ["areas", "Areas", "conditionalFormats", "ConditionalFormats", "dataValidation", "DataValidation", "format", "Format", "sort", "Sort", "worksheet", "Worksheet"]);
 		};
@@ -16523,8 +17436,8 @@ var Excel;
 				"formulasR1C1": this.m_formulasR1C1,
 				"hidden": this._H,
 				"hyperlink": this._Hy,
-				"isEntireColumn": this._i,
-				"isEntireRow": this._is,
+				"isEntireColumn": this.m_isEntireColumn,
+				"isEntireRow": this.m_isEntireRow,
 				"numberFormat": this.m_numberFormat,
 				"numberFormatLocal": this._N,
 				"rowCount": this._R,
@@ -16585,7 +17498,7 @@ var Excel;
 		Object.defineProperty(RangeView.prototype, "rows", {
 			get: function () {
 				if (!this._Ro) {
-					this._Ro=new Excel.RangeViewCollection(this.context, _createPropertyObjectPath(this.context, this, "Rows", true, false, false));
+					this._Ro=new Excel.RangeViewCollection(this.context, _createPropertyObjectPath(this.context, this, "Rows", true, false, 4));
 				}
 				return this._Ro;
 			},
@@ -16615,7 +17528,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._F=value;
-				_createSetPropertyAction(this.context, this, "Formulas", value);
+				_createSetPropertyAction(this.context, this, "Formulas", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -16627,7 +17540,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._Fo=value;
-				_createSetPropertyAction(this.context, this, "FormulasLocal", value);
+				_createSetPropertyAction(this.context, this, "FormulasLocal", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -16639,7 +17552,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._For=value;
-				_createSetPropertyAction(this.context, this, "FormulasR1C1", value);
+				_createSetPropertyAction(this.context, this, "FormulasR1C1", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -16659,7 +17572,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._N=value;
-				_createSetPropertyAction(this.context, this, "NumberFormat", value);
+				_createSetPropertyAction(this.context, this, "NumberFormat", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -16695,7 +17608,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._V=value;
-				_createSetPropertyAction(this.context, this, "Values", value);
+				_createSetPropertyAction(this.context, this, "Values", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -16709,7 +17622,7 @@ var Excel;
 			this._recursivelyUpdate(properties);
 		};
 		RangeView.prototype.getRange=function () {
-			return new Excel.Range(this.context, _createMethodObjectPath(this.context, this, "GetRange", 1, [], false, true, null, false));
+			return new Excel.Range(this.context, _createMethodObjectPath(this.context, this, "GetRange", 1, [], false, true, null, 4));
 		};
 		RangeView.prototype._handleResult=function (value) {
 			_super.prototype._handleResult.call(this, value);
@@ -16816,13 +17729,13 @@ var Excel;
 		});
 		RangeViewCollection.prototype.getCount=function () {
 			_throwIfApiNotSupported("RangeViewCollection.getCount", _defaultApiSetName, "1.4", _hostName);
-			var action=_createMethodAction(this.context, this, "GetCount", 1, [], false);
+			var action=_createMethodAction(this.context, this, "GetCount", 1, [], 4);
 			var ret=new OfficeExtension.ClientResult();
 			_addActionResultHandler(this, action, ret);
 			return ret;
 		};
 		RangeViewCollection.prototype.getItemAt=function (index) {
-			return new Excel.RangeView(this.context, _createMethodObjectPath(this.context, this, "GetItemAt", 1, [index], false, false, null, false));
+			return new Excel.RangeView(this.context, _createMethodObjectPath(this.context, this, "GetItemAt", 1, [index], false, false, null, 4));
 		};
 		RangeViewCollection.prototype._handleResult=function (value) {
 			_super.prototype._handleResult.call(this, value);
@@ -16887,10 +17800,10 @@ var Excel;
 		});
 		SettingCollection.prototype.add=function (key, value) {
 			value=Setting._replaceDateWithStringDate(value);
-			return new Excel.Setting(this.context, _createMethodObjectPath(this.context, this, "Add", 0, [key, value], false, true, null, false));
+			return new Excel.Setting(this.context, _createMethodObjectPath(this.context, this, "Add", 0, [key, value], false, true, null, 0));
 		};
 		SettingCollection.prototype.getCount=function () {
-			var action=_createMethodAction(this.context, this, "GetCount", 1, [], false);
+			var action=_createMethodAction(this.context, this, "GetCount", 1, [], 4);
 			var ret=new OfficeExtension.ClientResult();
 			_addActionResultHandler(this, action, ret);
 			return ret;
@@ -16899,7 +17812,7 @@ var Excel;
 			return new Excel.Setting(this.context, _createIndexerObjectPath(this.context, this, [key]));
 		};
 		SettingCollection.prototype.getItemOrNullObject=function (key) {
-			return new Excel.Setting(this.context, _createMethodObjectPath(this.context, this, "GetItemOrNullObject", 1, [key], false, false, null, false));
+			return new Excel.Setting(this.context, _createMethodObjectPath(this.context, this, "GetItemOrNullObject", 1, [key], false, false, null, 4));
 		};
 		SettingCollection.prototype._handleResult=function (value) {
 			_super.prototype._handleResult.call(this, value);
@@ -17024,7 +17937,7 @@ var Excel;
 					return;
 				}
 				this.m_value=value;
-				_createSetPropertyAction(this.context, this, "Value", value);
+				_createSetPropertyAction(this.context, this, "Value", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -17036,7 +17949,7 @@ var Excel;
 			this._recursivelyUpdate(properties);
 		};
 		Setting.prototype.delete=function () {
-			_createMethodAction(this.context, this, "Delete", 0, [], false);
+			_createMethodAction(this.context, this, "Delete", 0, [], 0);
 		};
 		Setting.prototype._handleResult=function (value) {
 			_super.prototype._handleResult.call(this, value);
@@ -17072,10 +17985,10 @@ var Excel;
 			_createEnsureUnchangedAction(this.context, this, data);
 			return;
 		};
+		Setting.DateJSONPrefix="Date(";
+		Setting.DateJSONSuffix=")";
 		return Setting;
 	}(OfficeExtension.ClientObject));
-	Setting.DateJSONPrefix="Date(";
-	Setting.DateJSONSuffix=")";
 	Excel.Setting=Setting;
 	var _typeNamedItemCollection="NamedItemCollection";
 	var NamedItemCollection=(function (_super) {
@@ -17107,15 +18020,15 @@ var Excel;
 		});
 		NamedItemCollection.prototype.add=function (name, reference, comment) {
 			_throwIfApiNotSupported("NamedItemCollection.add", _defaultApiSetName, "1.4", _hostName);
-			return new Excel.NamedItem(this.context, _createMethodObjectPath(this.context, this, "Add", 0, [name, reference, comment], false, true, null, false));
+			return new Excel.NamedItem(this.context, _createMethodObjectPath(this.context, this, "Add", 0, [name, reference, comment], false, true, null, 0));
 		};
 		NamedItemCollection.prototype.addFormulaLocal=function (name, formula, comment) {
 			_throwIfApiNotSupported("NamedItemCollection.addFormulaLocal", _defaultApiSetName, "1.4", _hostName);
-			return new Excel.NamedItem(this.context, _createMethodObjectPath(this.context, this, "AddFormulaLocal", 0, [name, formula, comment], false, false, null, false));
+			return new Excel.NamedItem(this.context, _createMethodObjectPath(this.context, this, "AddFormulaLocal", 0, [name, formula, comment], false, false, null, 0));
 		};
 		NamedItemCollection.prototype.getCount=function () {
 			_throwIfApiNotSupported("NamedItemCollection.getCount", _defaultApiSetName, "1.4", _hostName);
-			var action=_createMethodAction(this.context, this, "GetCount", 1, [], false);
+			var action=_createMethodAction(this.context, this, "GetCount", 1, [], 4);
 			var ret=new OfficeExtension.ClientResult();
 			_addActionResultHandler(this, action, ret);
 			return ret;
@@ -17125,7 +18038,7 @@ var Excel;
 		};
 		NamedItemCollection.prototype.getItemOrNullObject=function (name) {
 			_throwIfApiNotSupported("NamedItemCollection.getItemOrNullObject", _defaultApiSetName, "1.4", _hostName);
-			return new Excel.NamedItem(this.context, _createMethodObjectPath(this.context, this, "GetItemOrNullObject", 1, [name], false, false, null, false));
+			return new Excel.NamedItem(this.context, _createMethodObjectPath(this.context, this, "GetItemOrNullObject", 1, [name], false, false, null, 4));
 		};
 		NamedItemCollection.prototype._handleResult=function (value) {
 			_super.prototype._handleResult.call(this, value);
@@ -17198,7 +18111,7 @@ var Excel;
 			get: function () {
 				_throwIfApiNotSupported("NamedItem.arrayValues", _defaultApiSetName, "1.7", _hostName);
 				if (!this._A) {
-					this._A=new Excel.NamedItemArrayValues(this.context, _createPropertyObjectPath(this.context, this, "ArrayValues", false, false, false));
+					this._A=new Excel.NamedItemArrayValues(this.context, _createPropertyObjectPath(this.context, this, "ArrayValues", false, false, 4));
 				}
 				return this._A;
 			},
@@ -17209,7 +18122,7 @@ var Excel;
 			get: function () {
 				_throwIfApiNotSupported("NamedItem.worksheet", _defaultApiSetName, "1.4", _hostName);
 				if (!this._W) {
-					this._W=new Excel.Worksheet(this.context, _createPropertyObjectPath(this.context, this, "Worksheet", false, false, false));
+					this._W=new Excel.Worksheet(this.context, _createPropertyObjectPath(this.context, this, "Worksheet", false, false, 4));
 				}
 				return this._W;
 			},
@@ -17220,7 +18133,7 @@ var Excel;
 			get: function () {
 				_throwIfApiNotSupported("NamedItem.worksheetOrNullObject", _defaultApiSetName, "1.4", _hostName);
 				if (!this._Wo) {
-					this._Wo=new Excel.Worksheet(this.context, _createPropertyObjectPath(this.context, this, "WorksheetOrNullObject", false, false, false));
+					this._Wo=new Excel.Worksheet(this.context, _createPropertyObjectPath(this.context, this, "WorksheetOrNullObject", false, false, 4));
 				}
 				return this._Wo;
 			},
@@ -17235,7 +18148,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._C=value;
-				_createSetPropertyAction(this.context, this, "Comment", value);
+				_createSetPropertyAction(this.context, this, "Comment", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -17248,7 +18161,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._F=value;
-				_createSetPropertyAction(this.context, this, "Formula", value);
+				_createSetPropertyAction(this.context, this, "Formula", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -17293,7 +18206,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._Vi=value;
-				_createSetPropertyAction(this.context, this, "Visible", value);
+				_createSetPropertyAction(this.context, this, "Visible", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -17318,14 +18231,14 @@ var Excel;
 		};
 		NamedItem.prototype.delete=function () {
 			_throwIfApiNotSupported("NamedItem.delete", _defaultApiSetName, "1.4", _hostName);
-			_createMethodAction(this.context, this, "Delete", 0, [], false);
+			_createMethodAction(this.context, this, "Delete", 0, [], 0);
 		};
 		NamedItem.prototype.getRange=function () {
-			return new Excel.Range(this.context, _createMethodObjectPath(this.context, this, "GetRange", 1, [], false, true, null, false));
+			return new Excel.Range(this.context, _createMethodObjectPath(this.context, this, "GetRange", 1, [], false, true, null, 4));
 		};
 		NamedItem.prototype.getRangeOrNullObject=function () {
 			_throwIfApiNotSupported("NamedItem.getRangeOrNullObject", _defaultApiSetName, "1.4", _hostName);
-			return new Excel.Range(this.context, _createMethodObjectPath(this.context, this, "GetRangeOrNullObject", 1, [], false, true, null, false));
+			return new Excel.Range(this.context, _createMethodObjectPath(this.context, this, "GetRangeOrNullObject", 1, [], false, true, null, 4));
 		};
 		NamedItem.prototype._handleResult=function (value) {
 			_super.prototype._handleResult.call(this, value);
@@ -17508,16 +18421,16 @@ var Excel;
 		});
 		Binding.prototype.delete=function () {
 			_throwIfApiNotSupported("Binding.delete", _defaultApiSetName, "1.3", _hostName);
-			_createMethodAction(this.context, this, "Delete", 0, [], false);
+			_createMethodAction(this.context, this, "Delete", 0, [], 0);
 		};
 		Binding.prototype.getRange=function () {
-			return new Excel.Range(this.context, _createMethodObjectPath(this.context, this, "GetRange", 1, [], false, false, null, false));
+			return new Excel.Range(this.context, _createMethodObjectPath(this.context, this, "GetRange", 1, [], false, false, null, 4));
 		};
 		Binding.prototype.getTable=function () {
-			return new Excel.Table(this.context, _createMethodObjectPath(this.context, this, "GetTable", 1, [], false, false, null, false));
+			return new Excel.Table(this.context, _createMethodObjectPath(this.context, this, "GetTable", 1, [], false, false, null, 4));
 		};
 		Binding.prototype.getText=function () {
-			var action=_createMethodAction(this.context, this, "GetText", 1, [], false);
+			var action=_createMethodAction(this.context, this, "GetText", 1, [], 4);
 			var ret=new OfficeExtension.ClientResult();
 			_addActionResultHandler(this, action, ret);
 			return ret;
@@ -17666,19 +18579,19 @@ var Excel;
 		});
 		BindingCollection.prototype.add=function (range, bindingType, id) {
 			_throwIfApiNotSupported("BindingCollection.add", _defaultApiSetName, "1.3", _hostName);
-			return new Excel.Binding(this.context, _createMethodObjectPath(this.context, this, "Add", 0, [range, bindingType, id], false, true, null, false));
+			return new Excel.Binding(this.context, _createMethodObjectPath(this.context, this, "Add", 0, [range, bindingType, id], false, true, null, 0));
 		};
 		BindingCollection.prototype.addFromNamedItem=function (name, bindingType, id) {
 			_throwIfApiNotSupported("BindingCollection.addFromNamedItem", _defaultApiSetName, "1.3", _hostName);
-			return new Excel.Binding(this.context, _createMethodObjectPath(this.context, this, "AddFromNamedItem", 0, [name, bindingType, id], false, false, null, false));
+			return new Excel.Binding(this.context, _createMethodObjectPath(this.context, this, "AddFromNamedItem", 0, [name, bindingType, id], false, false, null, 0));
 		};
 		BindingCollection.prototype.addFromSelection=function (bindingType, id) {
 			_throwIfApiNotSupported("BindingCollection.addFromSelection", _defaultApiSetName, "1.3", _hostName);
-			return new Excel.Binding(this.context, _createMethodObjectPath(this.context, this, "AddFromSelection", 0, [bindingType, id], false, false, null, false));
+			return new Excel.Binding(this.context, _createMethodObjectPath(this.context, this, "AddFromSelection", 0, [bindingType, id], false, false, null, 0));
 		};
 		BindingCollection.prototype.getCount=function () {
 			_throwIfApiNotSupported("BindingCollection.getCount", _defaultApiSetName, "1.4", _hostName);
-			var action=_createMethodAction(this.context, this, "GetCount", 1, [], false);
+			var action=_createMethodAction(this.context, this, "GetCount", 1, [], 4);
 			var ret=new OfficeExtension.ClientResult();
 			_addActionResultHandler(this, action, ret);
 			return ret;
@@ -17687,11 +18600,11 @@ var Excel;
 			return new Excel.Binding(this.context, _createIndexerObjectPath(this.context, this, [id]));
 		};
 		BindingCollection.prototype.getItemAt=function (index) {
-			return new Excel.Binding(this.context, _createMethodObjectPath(this.context, this, "GetItemAt", 1, [index], false, false, null, false));
+			return new Excel.Binding(this.context, _createMethodObjectPath(this.context, this, "GetItemAt", 1, [index], false, false, null, 4));
 		};
 		BindingCollection.prototype.getItemOrNullObject=function (id) {
 			_throwIfApiNotSupported("BindingCollection.getItemOrNullObject", _defaultApiSetName, "1.4", _hostName);
-			return new Excel.Binding(this.context, _createMethodObjectPath(this.context, this, "GetItemOrNullObject", 1, [id], false, false, null, false));
+			return new Excel.Binding(this.context, _createMethodObjectPath(this.context, this, "GetItemOrNullObject", 1, [id], false, false, null, 4));
 		};
 		BindingCollection.prototype._handleResult=function (value) {
 			_super.prototype._handleResult.call(this, value);
@@ -17785,11 +18698,11 @@ var Excel;
 			configurable: true
 		});
 		TableCollection.prototype.add=function (address, hasHeaders) {
-			return new Excel.Table(this.context, _createMethodObjectPath(this.context, this, "Add", 0, [address, hasHeaders], false, true, null, false));
+			return new Excel.Table(this.context, _createMethodObjectPath(this.context, this, "Add", 0, [address, hasHeaders], false, true, null, 0));
 		};
 		TableCollection.prototype.getCount=function () {
 			_throwIfApiNotSupported("TableCollection.getCount", _defaultApiSetName, "1.4", _hostName);
-			var action=_createMethodAction(this.context, this, "GetCount", 1, [], false);
+			var action=_createMethodAction(this.context, this, "GetCount", 1, [], 4);
 			var ret=new OfficeExtension.ClientResult();
 			_addActionResultHandler(this, action, ret);
 			return ret;
@@ -17798,19 +18711,19 @@ var Excel;
 			return new Excel.Table(this.context, _createIndexerObjectPath(this.context, this, [key]));
 		};
 		TableCollection.prototype.getItemAt=function (index) {
-			return new Excel.Table(this.context, _createMethodObjectPath(this.context, this, "GetItemAt", 1, [index], false, false, null, false));
+			return new Excel.Table(this.context, _createMethodObjectPath(this.context, this, "GetItemAt", 1, [index], false, false, null, 4));
 		};
 		TableCollection.prototype.getItemOrNullObject=function (key) {
 			_throwIfApiNotSupported("TableCollection.getItemOrNullObject", _defaultApiSetName, "1.4", _hostName);
-			return new Excel.Table(this.context, _createMethodObjectPath(this.context, this, "GetItemOrNullObject", 1, [key], false, false, null, false));
+			return new Excel.Table(this.context, _createMethodObjectPath(this.context, this, "GetItemOrNullObject", 1, [key], false, false, null, 4));
 		};
 		TableCollection.prototype._RegisterDataChangedEvent=function () {
 			_throwIfApiNotSupported("TableCollection._RegisterDataChangedEvent", _defaultApiSetName, "1.7", _hostName);
-			_createMethodAction(this.context, this, "_RegisterDataChangedEvent", 0, [], false);
+			_createMethodAction(this.context, this, "_RegisterDataChangedEvent", 0, [], 0);
 		};
 		TableCollection.prototype._UnregisterDataChangedEvent=function () {
 			_throwIfApiNotSupported("TableCollection._UnregisterDataChangedEvent", _defaultApiSetName, "1.7", _hostName);
-			_createMethodAction(this.context, this, "_UnregisterDataChangedEvent", 0, [], false);
+			_createMethodAction(this.context, this, "_UnregisterDataChangedEvent", 0, [], 0);
 		};
 		TableCollection.prototype._handleResult=function (value) {
 			_super.prototype._handleResult.call(this, value);
@@ -17842,30 +18755,38 @@ var Excel;
 			_super.prototype._handleRetrieveResult.call(this, value, result);
 			_processRetrieveResult(this, value, result, function (childItemData, index) { return new Excel.Table(_this.context, _createChildItemObjectPathUsingIndexerOrGetItemAt(true, _this.context, _this, childItemData, index)); });
 		};
-		Object.defineProperty(TableCollection.prototype, "onDataChanged", {
+		Object.defineProperty(TableCollection.prototype, "onChanged", {
 			get: function () {
 				var _this=this;
-				_throwIfApiNotSupported("TableCollection.onDataChanged", _defaultApiSetName, "1.7", _hostName);
-				if (!this.m_dataChanged) {
-					this.m_dataChanged=new OfficeExtension.GenericEventHandlers(this.context, this, "DataChanged", {
+				_throwIfApiNotSupported("TableCollection.onChanged", _defaultApiSetName, "1.7", _hostName);
+				if (!this.m_changed) {
+					this.m_changed=new OfficeExtension.GenericEventHandlers(this.context, this, "Changed", {
 						eventType: 101,
 						registerFunc: function () { return _this._RegisterDataChangedEvent(); },
 						unregisterFunc: function () { return _this._UnregisterDataChangedEvent(); },
 						getTargetIdFunc: function () { return _this._ParentObject ? _this._ParentObject.id : OfficeExtension.Constants.eventWorkbookId; },
 						eventArgsTransformFunc: function (value) {
 							var newArgs={
-								type: EventType.tableDataChanged,
+								type: EventType.tableChanged,
 								changeType: value.changeType,
 								source: value.source,
 								worksheetId: value.worksheetId,
 								tableId: value.tableId,
-								address: value.address
+								address: value.address,
+								getRange: function (ctx) {
+									_throwIfApiNotSupported("TableChangedEventArgs.getRange", _defaultApiSetName, "1.8", _hostName);
+									return ctx.workbook._GetRangeForEventByReferenceId(value.referenceId);
+								},
+								getRangeOrNullObject: function (ctx) {
+									_throwIfApiNotSupported("TableChangedEventArgs.getRangeOrNullObject", _defaultApiSetName, "1.8", _hostName);
+									return ctx.workbook._GetRangeOrNullObjectForEventByReferenceId(value.referenceId);
+								}
 							};
 							return OfficeExtension.Utility._createPromiseFromResult(newArgs);
 						}
 					});
 				}
-				return this.m_dataChanged;
+				return this.m_changed;
 			},
 			enumerable: true,
 			configurable: true
@@ -17878,6 +18799,79 @@ var Excel;
 		return TableCollection;
 	}(OfficeExtension.ClientObject));
 	Excel.TableCollection=TableCollection;
+	var _typeTableScopedCollection="TableScopedCollection";
+	var TableScopedCollection=(function (_super) {
+		__extends(TableScopedCollection, _super);
+		function TableScopedCollection() {
+			return _super !==null && _super.apply(this, arguments) || this;
+		}
+		Object.defineProperty(TableScopedCollection.prototype, "_className", {
+			get: function () {
+				return "TableScopedCollection";
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(TableScopedCollection.prototype, "_isCollection", {
+			get: function () {
+				return true;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(TableScopedCollection.prototype, "items", {
+			get: function () {
+				_throwIfNotLoaded("items", this.m__items, _typeTableScopedCollection, this._isNull);
+				return this.m__items;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		TableScopedCollection.prototype.getCount=function () {
+			var action=_createMethodAction(this.context, this, "GetCount", 1, [], 4);
+			var ret=new OfficeExtension.ClientResult();
+			_addActionResultHandler(this, action, ret);
+			return ret;
+		};
+		TableScopedCollection.prototype.getFirst=function () {
+			return new Excel.Table(this.context, _createMethodObjectPath(this.context, this, "GetFirst", 1, [], false, true, null, 4));
+		};
+		TableScopedCollection.prototype.getItem=function (key) {
+			return new Excel.Table(this.context, _createIndexerObjectPath(this.context, this, [key]));
+		};
+		TableScopedCollection.prototype._handleResult=function (value) {
+			_super.prototype._handleResult.call(this, value);
+			if (_isNullOrUndefined(value))
+				return;
+			var obj=value;
+			_fixObjectPathIfNecessary(this, obj);
+			if (!_isNullOrUndefined(obj[OfficeExtension.Constants.items])) {
+				this.m__items=[];
+				var _data=obj[OfficeExtension.Constants.items];
+				for (var i=0; i < _data.length; i++) {
+					var _item=new Excel.Table(this.context, _createChildItemObjectPathUsingIndexerOrGetItemAt(true, this.context, this, _data[i], i));
+					_item._handleResult(_data[i]);
+					this.m__items.push(_item);
+				}
+			}
+		};
+		TableScopedCollection.prototype.load=function (option) {
+			return _load(this, option);
+		};
+		TableScopedCollection.prototype.retrieve=function (option) {
+			return _retrieve(this, option);
+		};
+		TableScopedCollection.prototype._handleRetrieveResult=function (value, result) {
+			var _this=this;
+			_super.prototype._handleRetrieveResult.call(this, value, result);
+			_processRetrieveResult(this, value, result, function (childItemData, index) { return new Excel.Table(_this.context, _createChildItemObjectPathUsingIndexerOrGetItemAt(true, _this.context, _this, childItemData, index)); });
+		};
+		TableScopedCollection.prototype.toJSON=function () {
+			return _toJson(this, {}, {}, this.m__items);
+		};
+		return TableScopedCollection;
+	}(OfficeExtension.ClientObject));
+	Excel.TableScopedCollection=TableScopedCollection;
 	var _typeTable="Table";
 	var Table=(function (_super) {
 		__extends(Table, _super);
@@ -17891,16 +18885,23 @@ var Excel;
 			enumerable: true,
 			configurable: true
 		});
+		Object.defineProperty(Table.prototype, "_collectionPropertyPath", {
+			get: function () {
+				return "workbook.tables";
+			},
+			enumerable: true,
+			configurable: true
+		});
 		Object.defineProperty(Table.prototype, "_scalarPropertyNames", {
 			get: function () {
-				return ["id", "name", "showHeaders", "showTotals", "style", "highlightFirstColumn", "highlightLastColumn", "showBandedRows", "showBandedColumns", "showFilterButton"];
+				return ["id", "name", "showHeaders", "showTotals", "style", "highlightFirstColumn", "highlightLastColumn", "showBandedRows", "showBandedColumns", "showFilterButton", "legacyId"];
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(Table.prototype, "_scalarPropertyUpdateable", {
 			get: function () {
-				return [false, true, true, true, true, true, true, true, true, true];
+				return [false, true, true, true, true, true, true, true, true, true, false];
 			},
 			enumerable: true,
 			configurable: true
@@ -17915,7 +18916,7 @@ var Excel;
 		Object.defineProperty(Table.prototype, "columns", {
 			get: function () {
 				if (!this._C) {
-					this._C=new Excel.TableColumnCollection(this.context, _createPropertyObjectPath(this.context, this, "Columns", true, false, false));
+					this._C=new Excel.TableColumnCollection(this.context, _createPropertyObjectPath(this.context, this, "Columns", true, false, 4));
 				}
 				return this._C;
 			},
@@ -17925,7 +18926,7 @@ var Excel;
 		Object.defineProperty(Table.prototype, "rows", {
 			get: function () {
 				if (!this._R) {
-					this._R=new Excel.TableRowCollection(this.context, _createPropertyObjectPath(this.context, this, "Rows", true, false, false));
+					this._R=new Excel.TableRowCollection(this.context, _createPropertyObjectPath(this.context, this, "Rows", true, false, 4));
 				}
 				return this._R;
 			},
@@ -17936,7 +18937,7 @@ var Excel;
 			get: function () {
 				_throwIfApiNotSupported("Table.sort", _defaultApiSetName, "1.2", _hostName);
 				if (!this._So) {
-					this._So=new Excel.TableSort(this.context, _createPropertyObjectPath(this.context, this, "Sort", false, false, false));
+					this._So=new Excel.TableSort(this.context, _createPropertyObjectPath(this.context, this, "Sort", false, false, 4));
 				}
 				return this._So;
 			},
@@ -17947,7 +18948,7 @@ var Excel;
 			get: function () {
 				_throwIfApiNotSupported("Table.worksheet", _defaultApiSetName, "1.2", _hostName);
 				if (!this._W) {
-					this._W=new Excel.Worksheet(this.context, _createPropertyObjectPath(this.context, this, "Worksheet", false, false, false));
+					this._W=new Excel.Worksheet(this.context, _createPropertyObjectPath(this.context, this, "Worksheet", false, false, 4));
 				}
 				return this._W;
 			},
@@ -17962,7 +18963,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._H=value;
-				_createSetPropertyAction(this.context, this, "HighlightFirstColumn", value);
+				_createSetPropertyAction(this.context, this, "HighlightFirstColumn", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -17975,7 +18976,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._Hi=value;
-				_createSetPropertyAction(this.context, this, "HighlightLastColumn", value);
+				_createSetPropertyAction(this.context, this, "HighlightLastColumn", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -17988,6 +18989,15 @@ var Excel;
 			enumerable: true,
 			configurable: true
 		});
+		Object.defineProperty(Table.prototype, "legacyId", {
+			get: function () {
+				_throwIfNotLoaded("legacyId", this._L, _typeTable, this._isNull);
+				_throwIfApiNotSupported("Table.legacyId", _defaultApiSetName, "1.8", _hostName);
+				return this._L;
+			},
+			enumerable: true,
+			configurable: true
+		});
 		Object.defineProperty(Table.prototype, "name", {
 			get: function () {
 				_throwIfNotLoaded("name", this._N, _typeTable, this._isNull);
@@ -17995,7 +19005,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._N=value;
-				_createSetPropertyAction(this.context, this, "Name", value);
+				_createSetPropertyAction(this.context, this, "Name", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -18008,7 +19018,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._S=value;
-				_createSetPropertyAction(this.context, this, "ShowBandedColumns", value);
+				_createSetPropertyAction(this.context, this, "ShowBandedColumns", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -18021,7 +19031,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._Sh=value;
-				_createSetPropertyAction(this.context, this, "ShowBandedRows", value);
+				_createSetPropertyAction(this.context, this, "ShowBandedRows", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -18034,7 +19044,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._Sho=value;
-				_createSetPropertyAction(this.context, this, "ShowFilterButton", value);
+				_createSetPropertyAction(this.context, this, "ShowFilterButton", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -18046,7 +19056,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._Show=value;
-				_createSetPropertyAction(this.context, this, "ShowHeaders", value);
+				_createSetPropertyAction(this.context, this, "ShowHeaders", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -18058,7 +19068,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._ShowT=value;
-				_createSetPropertyAction(this.context, this, "ShowTotals", value);
+				_createSetPropertyAction(this.context, this, "ShowTotals", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -18070,7 +19080,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._St=value;
-				_createSetPropertyAction(this.context, this, "Style", value);
+				_createSetPropertyAction(this.context, this, "Style", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -18088,46 +19098,50 @@ var Excel;
 		};
 		Table.prototype.clearFilters=function () {
 			_throwIfApiNotSupported("Table.clearFilters", _defaultApiSetName, "1.2", _hostName);
-			_createMethodAction(this.context, this, "ClearFilters", 0, [], false);
+			_createMethodAction(this.context, this, "ClearFilters", 0, [], 0);
+		};
+		Table.prototype.clearStyle=function () {
+			_throwIfApiNotSupported("Table.clearStyle", _defaultApiSetName, "1.9", _hostName);
+			_createMethodAction(this.context, this, "ClearStyle", 0, [], 0);
 		};
 		Table.prototype.convertToRange=function () {
 			_throwIfApiNotSupported("Table.convertToRange", _defaultApiSetName, "1.2", _hostName);
-			return new Excel.Range(this.context, _createMethodObjectPath(this.context, this, "ConvertToRange", 0, [], false, true, null, false));
+			return new Excel.Range(this.context, _createMethodObjectPath(this.context, this, "ConvertToRange", 0, [], false, true, null, 0));
 		};
 		Table.prototype.delete=function () {
-			_createMethodAction(this.context, this, "Delete", 0, [], false);
+			_createMethodAction(this.context, this, "Delete", 0, [], 0);
 		};
 		Table.prototype.getDataBodyRange=function () {
-			return new Excel.Range(this.context, _createMethodObjectPath(this.context, this, "GetDataBodyRange", 1, [], false, true, null, false));
+			return new Excel.Range(this.context, _createMethodObjectPath(this.context, this, "GetDataBodyRange", 1, [], false, true, null, 4));
 		};
 		Table.prototype.getHeaderRowRange=function () {
-			return new Excel.Range(this.context, _createMethodObjectPath(this.context, this, "GetHeaderRowRange", 1, [], false, true, null, false));
+			return new Excel.Range(this.context, _createMethodObjectPath(this.context, this, "GetHeaderRowRange", 1, [], false, true, null, 4));
 		};
 		Table.prototype.getRange=function () {
-			return new Excel.Range(this.context, _createMethodObjectPath(this.context, this, "GetRange", 1, [], false, true, null, false));
+			return new Excel.Range(this.context, _createMethodObjectPath(this.context, this, "GetRange", 1, [], false, true, null, 4));
 		};
 		Table.prototype.getTotalRowRange=function () {
-			return new Excel.Range(this.context, _createMethodObjectPath(this.context, this, "GetTotalRowRange", 1, [], false, true, null, false));
+			return new Excel.Range(this.context, _createMethodObjectPath(this.context, this, "GetTotalRowRange", 1, [], false, true, null, 4));
 		};
 		Table.prototype.reapplyFilters=function () {
 			_throwIfApiNotSupported("Table.reapplyFilters", _defaultApiSetName, "1.2", _hostName);
-			_createMethodAction(this.context, this, "ReapplyFilters", 0, [], false);
+			_createMethodAction(this.context, this, "ReapplyFilters", 0, [], 0);
 		};
 		Table.prototype._RegisterDataChangedEvent=function () {
 			_throwIfApiNotSupported("Table._RegisterDataChangedEvent", _defaultApiSetName, "1.7", _hostName);
-			_createMethodAction(this.context, this, "_RegisterDataChangedEvent", 0, [], false);
+			_createMethodAction(this.context, this, "_RegisterDataChangedEvent", 0, [], 0);
 		};
 		Table.prototype._RegisterSelectionChangedEvent=function () {
 			_throwIfApiNotSupported("Table._RegisterSelectionChangedEvent", _defaultApiSetName, "1.7", _hostName);
-			_createMethodAction(this.context, this, "_RegisterSelectionChangedEvent", 0, [], false);
+			_createMethodAction(this.context, this, "_RegisterSelectionChangedEvent", 0, [], 0);
 		};
 		Table.prototype._UnregisterDataChangedEvent=function () {
 			_throwIfApiNotSupported("Table._UnregisterDataChangedEvent", _defaultApiSetName, "1.7", _hostName);
-			_createMethodAction(this.context, this, "_UnregisterDataChangedEvent", 0, [], false);
+			_createMethodAction(this.context, this, "_UnregisterDataChangedEvent", 0, [], 0);
 		};
 		Table.prototype._UnregisterSelectionChangedEvent=function () {
 			_throwIfApiNotSupported("Table._UnregisterSelectionChangedEvent", _defaultApiSetName, "1.7", _hostName);
-			_createMethodAction(this.context, this, "_UnregisterSelectionChangedEvent", 0, [], false);
+			_createMethodAction(this.context, this, "_UnregisterSelectionChangedEvent", 0, [], 0);
 		};
 		Table.prototype._handleResult=function (value) {
 			_super.prototype._handleResult.call(this, value);
@@ -18146,6 +19160,9 @@ var Excel;
 			}
 			if (!_isUndefined(obj["Id"])) {
 				this._I=obj["Id"];
+			}
+			if (!_isUndefined(obj["LegacyId"])) {
+				this._L=obj["LegacyId"];
 			}
 			if (!_isUndefined(obj["Name"])) {
 				this._N=obj["Name"];
@@ -18190,30 +19207,38 @@ var Excel;
 			_super.prototype._handleRetrieveResult.call(this, value, result);
 			_processRetrieveResult(this, value, result);
 		};
-		Object.defineProperty(Table.prototype, "onDataChanged", {
+		Object.defineProperty(Table.prototype, "onChanged", {
 			get: function () {
 				var _this=this;
-				_throwIfApiNotSupported("Table.onDataChanged", _defaultApiSetName, "1.7", _hostName);
-				if (!this.m_dataChanged) {
-					this.m_dataChanged=new OfficeExtension.GenericEventHandlers(this.context, this, "DataChanged", {
+				_throwIfApiNotSupported("Table.onChanged", _defaultApiSetName, "1.7", _hostName);
+				if (!this.m_changed) {
+					this.m_changed=new OfficeExtension.GenericEventHandlers(this.context, this, "Changed", {
 						eventType: 101,
 						registerFunc: function () { return _this._RegisterDataChangedEvent(); },
 						unregisterFunc: function () { return _this._UnregisterDataChangedEvent(); },
 						getTargetIdFunc: function () { return _this.id.toString(); },
 						eventArgsTransformFunc: function (value) {
 							var newArgs={
-								type: EventType.tableDataChanged,
+								type: EventType.tableChanged,
 								changeType: value.changeType,
 								source: value.source,
 								worksheetId: value.worksheetId,
 								tableId: value.tableId,
-								address: value.address
+								address: value.address,
+								getRange: function (ctx) {
+									_throwIfApiNotSupported("TableChangedEventArgs.getRange", _defaultApiSetName, "1.8", _hostName);
+									return ctx.workbook._GetRangeForEventByReferenceId(value.referenceId);
+								},
+								getRangeOrNullObject: function (ctx) {
+									_throwIfApiNotSupported("TableChangedEventArgs.getRangeOrNullObject", _defaultApiSetName, "1.8", _hostName);
+									return ctx.workbook._GetRangeOrNullObjectForEventByReferenceId(value.referenceId);
+								}
 							};
 							return OfficeExtension.Utility._createPromiseFromResult(newArgs);
 						}
 					});
 				}
-				return this.m_dataChanged;
+				return this.m_changed;
 			},
 			enumerable: true,
 			configurable: true
@@ -18251,6 +19276,7 @@ var Excel;
 				"highlightFirstColumn": this._H,
 				"highlightLastColumn": this._Hi,
 				"id": this._I,
+				"legacyId": this._L,
 				"name": this._N,
 				"showBandedColumns": this._S,
 				"showBandedRows": this._Sh,
@@ -18315,11 +19341,11 @@ var Excel;
 			configurable: true
 		});
 		TableColumnCollection.prototype.add=function (index, values, name) {
-			return new Excel.TableColumn(this.context, _createMethodObjectPath(this.context, this, "Add", 0, [index, values, name], false, true, null, false));
+			return new Excel.TableColumn(this.context, _createMethodObjectPath(this.context, this, "Add", 0, [index, values, name], false, true, null, 0));
 		};
 		TableColumnCollection.prototype.getCount=function () {
 			_throwIfApiNotSupported("TableColumnCollection.getCount", _defaultApiSetName, "1.4", _hostName);
-			var action=_createMethodAction(this.context, this, "GetCount", 1, [], false);
+			var action=_createMethodAction(this.context, this, "GetCount", 1, [], 4);
 			var ret=new OfficeExtension.ClientResult();
 			_addActionResultHandler(this, action, ret);
 			return ret;
@@ -18328,11 +19354,11 @@ var Excel;
 			return new Excel.TableColumn(this.context, _createIndexerObjectPath(this.context, this, [key]));
 		};
 		TableColumnCollection.prototype.getItemAt=function (index) {
-			return new Excel.TableColumn(this.context, _createMethodObjectPath(this.context, this, "GetItemAt", 1, [index], false, false, null, false));
+			return new Excel.TableColumn(this.context, _createMethodObjectPath(this.context, this, "GetItemAt", 1, [index], false, false, null, 4));
 		};
 		TableColumnCollection.prototype.getItemOrNullObject=function (key) {
 			_throwIfApiNotSupported("TableColumnCollection.getItemOrNullObject", _defaultApiSetName, "1.4", _hostName);
-			return new Excel.TableColumn(this.context, _createMethodObjectPath(this.context, this, "GetItemOrNullObject", 1, [key], false, false, null, false));
+			return new Excel.TableColumn(this.context, _createMethodObjectPath(this.context, this, "GetItemOrNullObject", 1, [key], false, false, null, 4));
 		};
 		TableColumnCollection.prototype._handleResult=function (value) {
 			_super.prototype._handleResult.call(this, value);
@@ -18410,7 +19436,7 @@ var Excel;
 			get: function () {
 				_throwIfApiNotSupported("TableColumn.filter", _defaultApiSetName, "1.2", _hostName);
 				if (!this._F) {
-					this._F=new Excel.Filter(this.context, _createPropertyObjectPath(this.context, this, "Filter", false, false, false));
+					this._F=new Excel.Filter(this.context, _createPropertyObjectPath(this.context, this, "Filter", false, false, 4));
 				}
 				return this._F;
 			},
@@ -18440,7 +19466,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._N=value;
-				_createSetPropertyAction(this.context, this, "Name", value);
+				_createSetPropertyAction(this.context, this, "Name", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -18452,7 +19478,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._V=value;
-				_createSetPropertyAction(this.context, this, "Values", value);
+				_createSetPropertyAction(this.context, this, "Values", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -18466,19 +19492,19 @@ var Excel;
 			this._recursivelyUpdate(properties);
 		};
 		TableColumn.prototype.delete=function () {
-			_createMethodAction(this.context, this, "Delete", 0, [], false);
+			_createMethodAction(this.context, this, "Delete", 0, [], 0);
 		};
 		TableColumn.prototype.getDataBodyRange=function () {
-			return new Excel.Range(this.context, _createMethodObjectPath(this.context, this, "GetDataBodyRange", 1, [], false, true, null, false));
+			return new Excel.Range(this.context, _createMethodObjectPath(this.context, this, "GetDataBodyRange", 1, [], false, true, null, 4));
 		};
 		TableColumn.prototype.getHeaderRowRange=function () {
-			return new Excel.Range(this.context, _createMethodObjectPath(this.context, this, "GetHeaderRowRange", 1, [], false, true, null, false));
+			return new Excel.Range(this.context, _createMethodObjectPath(this.context, this, "GetHeaderRowRange", 1, [], false, true, null, 4));
 		};
 		TableColumn.prototype.getRange=function () {
-			return new Excel.Range(this.context, _createMethodObjectPath(this.context, this, "GetRange", 1, [], false, true, null, false));
+			return new Excel.Range(this.context, _createMethodObjectPath(this.context, this, "GetRange", 1, [], false, true, null, 4));
 		};
 		TableColumn.prototype.getTotalRowRange=function () {
-			return new Excel.Range(this.context, _createMethodObjectPath(this.context, this, "GetTotalRowRange", 1, [], false, true, null, false));
+			return new Excel.Range(this.context, _createMethodObjectPath(this.context, this, "GetTotalRowRange", 1, [], false, true, null, 4));
 		};
 		TableColumn.prototype._handleResult=function (value) {
 			_super.prototype._handleResult.call(this, value);
@@ -18580,17 +19606,17 @@ var Excel;
 			configurable: true
 		});
 		TableRowCollection.prototype.add=function (index, values) {
-			return new Excel.TableRow(this.context, _createMethodObjectPath(this.context, this, "Add", 0, [index, values], false, true, null, false));
+			return new Excel.TableRow(this.context, _createMethodObjectPath(this.context, this, "Add", 0, [index, values], false, true, null, 0));
 		};
 		TableRowCollection.prototype.getCount=function () {
 			_throwIfApiNotSupported("TableRowCollection.getCount", _defaultApiSetName, "1.4", _hostName);
-			var action=_createMethodAction(this.context, this, "GetCount", 1, [], false);
+			var action=_createMethodAction(this.context, this, "GetCount", 1, [], 4);
 			var ret=new OfficeExtension.ClientResult();
 			_addActionResultHandler(this, action, ret);
 			return ret;
 		};
 		TableRowCollection.prototype.getItemAt=function (index) {
-			return new Excel.TableRow(this.context, _createMethodObjectPath(this.context, this, "GetItemAt", 1, [index], false, false, null, false));
+			return new Excel.TableRow(this.context, _createMethodObjectPath(this.context, this, "GetItemAt", 1, [index], false, false, null, 4));
 		};
 		TableRowCollection.prototype._handleResult=function (value) {
 			_super.prototype._handleResult.call(this, value);
@@ -18672,7 +19698,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._V=value;
-				_createSetPropertyAction(this.context, this, "Values", value);
+				_createSetPropertyAction(this.context, this, "Values", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -18684,10 +19710,10 @@ var Excel;
 			this._recursivelyUpdate(properties);
 		};
 		TableRow.prototype.delete=function () {
-			_createMethodAction(this.context, this, "Delete", 0, [], false);
+			_createMethodAction(this.context, this, "Delete", 0, [], 0);
 		};
 		TableRow.prototype.getRange=function () {
-			return new Excel.Range(this.context, _createMethodObjectPath(this.context, this, "GetRange", 1, [], false, true, null, false));
+			return new Excel.Range(this.context, _createMethodObjectPath(this.context, this, "GetRange", 1, [], false, true, null, 4));
 		};
 		TableRow.prototype._handleResult=function (value) {
 			_super.prototype._handleResult.call(this, value);
@@ -18740,14 +19766,14 @@ var Excel;
 		});
 		Object.defineProperty(DataValidation.prototype, "_scalarPropertyNames", {
 			get: function () {
-				return ["type", "rule", "prompt", "errorAlert", "ignoreBlanks"];
+				return ["type", "rule", "prompt", "errorAlert", "ignoreBlanks", "valid"];
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(DataValidation.prototype, "_scalarPropertyUpdateable", {
 			get: function () {
-				return [false, true, true, true, true];
+				return [false, true, true, true, true, false];
 			},
 			enumerable: true,
 			configurable: true
@@ -18759,7 +19785,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._E=value;
-				_createSetPropertyAction(this.context, this, "ErrorAlert", value);
+				_createSetPropertyAction(this.context, this, "ErrorAlert", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -18771,7 +19797,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._I=value;
-				_createSetPropertyAction(this.context, this, "IgnoreBlanks", value);
+				_createSetPropertyAction(this.context, this, "IgnoreBlanks", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -18783,7 +19809,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._P=value;
-				_createSetPropertyAction(this.context, this, "Prompt", value);
+				_createSetPropertyAction(this.context, this, "Prompt", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -18795,7 +19821,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._R=value;
-				_createSetPropertyAction(this.context, this, "Rule", value);
+				_createSetPropertyAction(this.context, this, "Rule", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -18808,6 +19834,14 @@ var Excel;
 			enumerable: true,
 			configurable: true
 		});
+		Object.defineProperty(DataValidation.prototype, "valid", {
+			get: function () {
+				_throwIfNotLoaded("valid", this._V, _typeDataValidation, this._isNull);
+				return this._V;
+			},
+			enumerable: true,
+			configurable: true
+		});
 		DataValidation.prototype.set=function (properties, options) {
 			this._recursivelySet(properties, options, ["rule", "prompt", "errorAlert", "ignoreBlanks"], [], []);
 		};
@@ -18815,7 +19849,13 @@ var Excel;
 			this._recursivelyUpdate(properties);
 		};
 		DataValidation.prototype.clear=function () {
-			_createMethodAction(this.context, this, "Clear", 0, [], false);
+			_createMethodAction(this.context, this, "Clear", 0, [], 0);
+		};
+		DataValidation.prototype.getInvalidCells=function () {
+			return new Excel.Range(this.context, _createMethodObjectPath(this.context, this, "GetInvalidCells", 1, [], false, true, null, 4));
+		};
+		DataValidation.prototype.getInvalidCellsOrNullObject=function () {
+			return new Excel.Range(this.context, _createMethodObjectPath(this.context, this, "GetInvalidCellsOrNullObject", 1, [], false, true, null, 4));
 		};
 		DataValidation.prototype._handleResult=function (value) {
 			_super.prototype._handleResult.call(this, value);
@@ -18838,6 +19878,9 @@ var Excel;
 			if (!_isUndefined(obj["Type"])) {
 				this._T=obj["Type"];
 			}
+			if (!_isUndefined(obj["Valid"])) {
+				this._V=obj["Valid"];
+			}
 		};
 		DataValidation.prototype.load=function (option) {
 			return _load(this, option);
@@ -18856,6 +19899,7 @@ var Excel;
 				"prompt": this._P,
 				"rule": this._R,
 				"type": this._T,
+				"valid": this._V,
 			}, {});
 		};
 		DataValidation.prototype.ensureUnchanged=function (data) {
@@ -18865,6 +19909,78 @@ var Excel;
 		return DataValidation;
 	}(OfficeExtension.ClientObject));
 	Excel.DataValidation=DataValidation;
+	var _typeRemoveDuplicatesResult="RemoveDuplicatesResult";
+	var RemoveDuplicatesResult=(function (_super) {
+		__extends(RemoveDuplicatesResult, _super);
+		function RemoveDuplicatesResult() {
+			return _super !==null && _super.apply(this, arguments) || this;
+		}
+		Object.defineProperty(RemoveDuplicatesResult.prototype, "_className", {
+			get: function () {
+				return "RemoveDuplicatesResult";
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(RemoveDuplicatesResult.prototype, "_scalarPropertyNames", {
+			get: function () {
+				return ["removed", "uniqueRemaining"];
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(RemoveDuplicatesResult.prototype, "removed", {
+			get: function () {
+				_throwIfNotLoaded("removed", this._R, _typeRemoveDuplicatesResult, this._isNull);
+				return this._R;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(RemoveDuplicatesResult.prototype, "uniqueRemaining", {
+			get: function () {
+				_throwIfNotLoaded("uniqueRemaining", this._U, _typeRemoveDuplicatesResult, this._isNull);
+				return this._U;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		RemoveDuplicatesResult.prototype._handleResult=function (value) {
+			_super.prototype._handleResult.call(this, value);
+			if (_isNullOrUndefined(value))
+				return;
+			var obj=value;
+			_fixObjectPathIfNecessary(this, obj);
+			if (!_isUndefined(obj["Removed"])) {
+				this._R=obj["Removed"];
+			}
+			if (!_isUndefined(obj["UniqueRemaining"])) {
+				this._U=obj["UniqueRemaining"];
+			}
+		};
+		RemoveDuplicatesResult.prototype.load=function (option) {
+			return _load(this, option);
+		};
+		RemoveDuplicatesResult.prototype.retrieve=function (option) {
+			return _retrieve(this, option);
+		};
+		RemoveDuplicatesResult.prototype._handleRetrieveResult=function (value, result) {
+			_super.prototype._handleRetrieveResult.call(this, value, result);
+			_processRetrieveResult(this, value, result);
+		};
+		RemoveDuplicatesResult.prototype.toJSON=function () {
+			return _toJson(this, {
+				"removed": this._R,
+				"uniqueRemaining": this._U,
+			}, {});
+		};
+		RemoveDuplicatesResult.prototype.ensureUnchanged=function (data) {
+			_createEnsureUnchangedAction(this.context, this, data);
+			return;
+		};
+		return RemoveDuplicatesResult;
+	}(OfficeExtension.ClientObject));
+	Excel.RemoveDuplicatesResult=RemoveDuplicatesResult;
 	var _typeRangeFormat="RangeFormat";
 	var RangeFormat=(function (_super) {
 		__extends(RangeFormat, _super);
@@ -18880,14 +19996,14 @@ var Excel;
 		});
 		Object.defineProperty(RangeFormat.prototype, "_scalarPropertyNames", {
 			get: function () {
-				return ["wrapText", "horizontalAlignment", "verticalAlignment", "columnWidth", "rowHeight", "textOrientation", "useStandardHeight", "useStandardWidth"];
+				return ["wrapText", "horizontalAlignment", "verticalAlignment", "columnWidth", "rowHeight", "textOrientation", "useStandardHeight", "useStandardWidth", "readingOrder", "shrinkToFit", "indentLevel", "autoIndent"];
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(RangeFormat.prototype, "_scalarPropertyUpdateable", {
 			get: function () {
-				return [true, true, true, true, true, true, true, true];
+				return [true, true, true, true, true, true, true, true, true, true, true, true];
 			},
 			enumerable: true,
 			configurable: true
@@ -18902,7 +20018,7 @@ var Excel;
 		Object.defineProperty(RangeFormat.prototype, "borders", {
 			get: function () {
 				if (!this._B) {
-					this._B=new Excel.RangeBorderCollection(this.context, _createPropertyObjectPath(this.context, this, "Borders", true, false, false));
+					this._B=new Excel.RangeBorderCollection(this.context, _createPropertyObjectPath(this.context, this, "Borders", true, false, 4));
 				}
 				return this._B;
 			},
@@ -18912,7 +20028,7 @@ var Excel;
 		Object.defineProperty(RangeFormat.prototype, "fill", {
 			get: function () {
 				if (!this._F) {
-					this._F=new Excel.RangeFill(this.context, _createPropertyObjectPath(this.context, this, "Fill", false, false, false));
+					this._F=new Excel.RangeFill(this.context, _createPropertyObjectPath(this.context, this, "Fill", false, false, 4));
 				}
 				return this._F;
 			},
@@ -18922,7 +20038,7 @@ var Excel;
 		Object.defineProperty(RangeFormat.prototype, "font", {
 			get: function () {
 				if (!this._Fo) {
-					this._Fo=new Excel.RangeFont(this.context, _createPropertyObjectPath(this.context, this, "Font", false, false, false));
+					this._Fo=new Excel.RangeFont(this.context, _createPropertyObjectPath(this.context, this, "Font", false, false, 4));
 				}
 				return this._Fo;
 			},
@@ -18933,9 +20049,22 @@ var Excel;
 			get: function () {
 				_throwIfApiNotSupported("RangeFormat.protection", _defaultApiSetName, "1.2", _hostName);
 				if (!this._P) {
-					this._P=new Excel.FormatProtection(this.context, _createPropertyObjectPath(this.context, this, "Protection", false, false, false));
+					this._P=new Excel.FormatProtection(this.context, _createPropertyObjectPath(this.context, this, "Protection", false, false, 4));
 				}
 				return this._P;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(RangeFormat.prototype, "autoIndent", {
+			get: function () {
+				_throwIfNotLoaded("autoIndent", this._A, _typeRangeFormat, this._isNull);
+				_throwIfApiNotSupported("RangeFormat.autoIndent", _defaultApiSetName, "1.9", _hostName);
+				return this._A;
+			},
+			set: function (value) {
+				this._A=value;
+				_createSetPropertyAction(this.context, this, "AutoIndent", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -18948,7 +20077,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._C=value;
-				_createSetPropertyAction(this.context, this, "ColumnWidth", value);
+				_createSetPropertyAction(this.context, this, "ColumnWidth", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -18960,20 +20089,59 @@ var Excel;
 			},
 			set: function (value) {
 				this._H=value;
-				_createSetPropertyAction(this.context, this, "HorizontalAlignment", value);
+				_createSetPropertyAction(this.context, this, "HorizontalAlignment", value, 0);
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(RangeFormat.prototype, "indentLevel", {
+			get: function () {
+				_throwIfNotLoaded("indentLevel", this._I, _typeRangeFormat, this._isNull);
+				_throwIfApiNotSupported("RangeFormat.indentLevel", _defaultApiSetName, "1.9", _hostName);
+				return this._I;
+			},
+			set: function (value) {
+				this._I=value;
+				_createSetPropertyAction(this.context, this, "IndentLevel", value, 0);
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(RangeFormat.prototype, "readingOrder", {
+			get: function () {
+				_throwIfNotLoaded("readingOrder", this._R, _typeRangeFormat, this._isNull);
+				_throwIfApiNotSupported("RangeFormat.readingOrder", _defaultApiSetName, "1.9", _hostName);
+				return this._R;
+			},
+			set: function (value) {
+				this._R=value;
+				_createSetPropertyAction(this.context, this, "ReadingOrder", value, 0);
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(RangeFormat.prototype, "rowHeight", {
 			get: function () {
-				_throwIfNotLoaded("rowHeight", this._R, _typeRangeFormat, this._isNull);
+				_throwIfNotLoaded("rowHeight", this._Ro, _typeRangeFormat, this._isNull);
 				_throwIfApiNotSupported("RangeFormat.rowHeight", _defaultApiSetName, "1.2", _hostName);
-				return this._R;
+				return this._Ro;
 			},
 			set: function (value) {
-				this._R=value;
-				_createSetPropertyAction(this.context, this, "RowHeight", value);
+				this._Ro=value;
+				_createSetPropertyAction(this.context, this, "RowHeight", value, 0);
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(RangeFormat.prototype, "shrinkToFit", {
+			get: function () {
+				_throwIfNotLoaded("shrinkToFit", this._S, _typeRangeFormat, this._isNull);
+				_throwIfApiNotSupported("RangeFormat.shrinkToFit", _defaultApiSetName, "1.9", _hostName);
+				return this._S;
+			},
+			set: function (value) {
+				this._S=value;
+				_createSetPropertyAction(this.context, this, "ShrinkToFit", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -18986,7 +20154,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._T=value;
-				_createSetPropertyAction(this.context, this, "TextOrientation", value);
+				_createSetPropertyAction(this.context, this, "TextOrientation", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -18999,7 +20167,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._U=value;
-				_createSetPropertyAction(this.context, this, "UseStandardHeight", value);
+				_createSetPropertyAction(this.context, this, "UseStandardHeight", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -19012,7 +20180,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._Us=value;
-				_createSetPropertyAction(this.context, this, "UseStandardWidth", value);
+				_createSetPropertyAction(this.context, this, "UseStandardWidth", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -19024,7 +20192,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._V=value;
-				_createSetPropertyAction(this.context, this, "VerticalAlignment", value);
+				_createSetPropertyAction(this.context, this, "VerticalAlignment", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -19036,13 +20204,13 @@ var Excel;
 			},
 			set: function (value) {
 				this._W=value;
-				_createSetPropertyAction(this.context, this, "WrapText", value);
+				_createSetPropertyAction(this.context, this, "WrapText", value, 0);
 			},
 			enumerable: true,
 			configurable: true
 		});
 		RangeFormat.prototype.set=function (properties, options) {
-			this._recursivelySet(properties, options, ["wrapText", "horizontalAlignment", "verticalAlignment", "columnWidth", "rowHeight", "textOrientation", "useStandardHeight", "useStandardWidth"], ["fill", "font", "protection"], [
+			this._recursivelySet(properties, options, ["wrapText", "horizontalAlignment", "verticalAlignment", "columnWidth", "rowHeight", "textOrientation", "useStandardHeight", "useStandardWidth", "readingOrder", "shrinkToFit", "indentLevel", "autoIndent"], ["fill", "font", "protection"], [
 				"borders"
 			]);
 		};
@@ -19051,11 +20219,11 @@ var Excel;
 		};
 		RangeFormat.prototype.autofitColumns=function () {
 			_throwIfApiNotSupported("RangeFormat.autofitColumns", _defaultApiSetName, "1.2", _hostName);
-			_createMethodAction(this.context, this, "AutofitColumns", 0, [], false);
+			_createMethodAction(this.context, this, "AutofitColumns", 0, [], 0);
 		};
 		RangeFormat.prototype.autofitRows=function () {
 			_throwIfApiNotSupported("RangeFormat.autofitRows", _defaultApiSetName, "1.2", _hostName);
-			_createMethodAction(this.context, this, "AutofitRows", 0, [], false);
+			_createMethodAction(this.context, this, "AutofitRows", 0, [], 0);
 		};
 		RangeFormat.prototype._handleResult=function (value) {
 			_super.prototype._handleResult.call(this, value);
@@ -19063,14 +20231,26 @@ var Excel;
 				return;
 			var obj=value;
 			_fixObjectPathIfNecessary(this, obj);
+			if (!_isUndefined(obj["AutoIndent"])) {
+				this._A=obj["AutoIndent"];
+			}
 			if (!_isUndefined(obj["ColumnWidth"])) {
 				this._C=obj["ColumnWidth"];
 			}
 			if (!_isUndefined(obj["HorizontalAlignment"])) {
 				this._H=obj["HorizontalAlignment"];
 			}
+			if (!_isUndefined(obj["IndentLevel"])) {
+				this._I=obj["IndentLevel"];
+			}
+			if (!_isUndefined(obj["ReadingOrder"])) {
+				this._R=obj["ReadingOrder"];
+			}
 			if (!_isUndefined(obj["RowHeight"])) {
-				this._R=obj["RowHeight"];
+				this._Ro=obj["RowHeight"];
+			}
+			if (!_isUndefined(obj["ShrinkToFit"])) {
+				this._S=obj["ShrinkToFit"];
 			}
 			if (!_isUndefined(obj["TextOrientation"])) {
 				this._T=obj["TextOrientation"];
@@ -19101,9 +20281,13 @@ var Excel;
 		};
 		RangeFormat.prototype.toJSON=function () {
 			return _toJson(this, {
+				"autoIndent": this._A,
 				"columnWidth": this._C,
 				"horizontalAlignment": this._H,
-				"rowHeight": this._R,
+				"indentLevel": this._I,
+				"readingOrder": this._R,
+				"rowHeight": this._Ro,
+				"shrinkToFit": this._S,
 				"textOrientation": this._T,
 				"useStandardHeight": this._U,
 				"useStandardWidth": this._Us,
@@ -19157,7 +20341,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._F=value;
-				_createSetPropertyAction(this.context, this, "FormulaHidden", value);
+				_createSetPropertyAction(this.context, this, "FormulaHidden", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -19169,7 +20353,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._L=value;
-				_createSetPropertyAction(this.context, this, "Locked", value);
+				_createSetPropertyAction(this.context, this, "Locked", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -19250,7 +20434,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._C=value;
-				_createSetPropertyAction(this.context, this, "Color", value);
+				_createSetPropertyAction(this.context, this, "Color", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -19262,7 +20446,7 @@ var Excel;
 			this._recursivelyUpdate(properties);
 		};
 		RangeFill.prototype.clear=function () {
-			_createMethodAction(this.context, this, "Clear", 0, [], false);
+			_createMethodAction(this.context, this, "Clear", 0, [], 0);
 		};
 		RangeFill.prototype._handleResult=function (value) {
 			_super.prototype._handleResult.call(this, value);
@@ -19330,7 +20514,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._C=value;
-				_createSetPropertyAction(this.context, this, "Color", value);
+				_createSetPropertyAction(this.context, this, "Color", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -19350,7 +20534,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._St=value;
-				_createSetPropertyAction(this.context, this, "Style", value);
+				_createSetPropertyAction(this.context, this, "Style", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -19362,7 +20546,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._W=value;
-				_createSetPropertyAction(this.context, this, "Weight", value);
+				_createSetPropertyAction(this.context, this, "Weight", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -19464,7 +20648,7 @@ var Excel;
 			return new Excel.RangeBorder(this.context, _createIndexerObjectPath(this.context, this, [index]));
 		};
 		RangeBorderCollection.prototype.getItemAt=function (index) {
-			return new Excel.RangeBorder(this.context, _createMethodObjectPath(this.context, this, "GetItemAt", 1, [index], false, false, null, false));
+			return new Excel.RangeBorder(this.context, _createMethodObjectPath(this.context, this, "GetItemAt", 1, [index], false, false, null, 4));
 		};
 		RangeBorderCollection.prototype._handleResult=function (value) {
 			_super.prototype._handleResult.call(this, value);
@@ -19538,7 +20722,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._B=value;
-				_createSetPropertyAction(this.context, this, "Bold", value);
+				_createSetPropertyAction(this.context, this, "Bold", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -19550,7 +20734,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._C=value;
-				_createSetPropertyAction(this.context, this, "Color", value);
+				_createSetPropertyAction(this.context, this, "Color", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -19562,7 +20746,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._I=value;
-				_createSetPropertyAction(this.context, this, "Italic", value);
+				_createSetPropertyAction(this.context, this, "Italic", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -19574,7 +20758,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._N=value;
-				_createSetPropertyAction(this.context, this, "Name", value);
+				_createSetPropertyAction(this.context, this, "Name", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -19586,7 +20770,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._S=value;
-				_createSetPropertyAction(this.context, this, "Size", value);
+				_createSetPropertyAction(this.context, this, "Size", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -19598,7 +20782,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._U=value;
-				_createSetPropertyAction(this.context, this, "Underline", value);
+				_createSetPropertyAction(this.context, this, "Underline", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -19715,54 +20899,59 @@ var Excel;
 			configurable: true
 		});
 		ChartCollection.prototype.add=function (type, sourceData, seriesBy) {
-			if (!(sourceData instanceof Range)) {
-				throw OfficeExtension.Utility.createRuntimeError(OfficeExtension.ResourceStrings.invalidArgument, "sourceData", "Charts.Add");
-			}
-			return new Excel.Chart(this.context, _createMethodObjectPath(this.context, this, "Add", 0, [type, sourceData, seriesBy], false, true, null, false));
+			return new Excel.Chart(this.context, _createMethodObjectPath(this.context, this, "Add", 0, [type, sourceData, seriesBy], false, true, null, 0));
 		};
 		ChartCollection.prototype.getCount=function () {
 			_throwIfApiNotSupported("ChartCollection.getCount", _defaultApiSetName, "1.4", _hostName);
-			var action=_createMethodAction(this.context, this, "GetCount", 1, [], false);
+			var action=_createMethodAction(this.context, this, "GetCount", 1, [], 4);
 			var ret=new OfficeExtension.ClientResult();
 			_addActionResultHandler(this, action, ret);
 			return ret;
 		};
 		ChartCollection.prototype.getItem=function (name) {
-			return new Excel.Chart(this.context, _createMethodObjectPath(this.context, this, "GetItem", 1, [name], false, false, null, false));
+			return new Excel.Chart(this.context, _createMethodObjectPath(this.context, this, "GetItem", 1, [name], false, false, null, 4));
 		};
 		ChartCollection.prototype.getItemAt=function (index) {
-			return new Excel.Chart(this.context, _createMethodObjectPath(this.context, this, "GetItemAt", 1, [index], false, false, null, false));
+			return new Excel.Chart(this.context, _createMethodObjectPath(this.context, this, "GetItemAt", 1, [index], false, false, null, 4));
 		};
 		ChartCollection.prototype.getItemOrNullObject=function (name) {
 			_throwIfApiNotSupported("ChartCollection.getItemOrNullObject", _defaultApiSetName, "1.4", _hostName);
-			return new Excel.Chart(this.context, _createMethodObjectPath(this.context, this, "GetItemOrNullObject", 1, [name], false, false, null, false));
+			return new Excel.Chart(this.context, _createMethodObjectPath(this.context, this, "GetItemOrNullObject", 1, [name], false, false, null, 4));
 		};
 		ChartCollection.prototype._GetItem=function (key) {
 			return new Excel.Chart(this.context, _createIndexerObjectPath(this.context, this, [key]));
 		};
 		ChartCollection.prototype._RegisterActivatedEvent=function () {
 			_throwIfApiNotSupported("ChartCollection._RegisterActivatedEvent", _defaultApiSetName, "1.8", _hostName);
-			_createMethodAction(this.context, this, "_RegisterActivatedEvent", 0, [], false);
+			_createMethodAction(this.context, this, "_RegisterActivatedEvent", 0, [], 0);
 		};
 		ChartCollection.prototype._RegisterAddedEvent=function () {
 			_throwIfApiNotSupported("ChartCollection._RegisterAddedEvent", _defaultApiSetName, "1.8", _hostName);
-			_createMethodAction(this.context, this, "_RegisterAddedEvent", 0, [], false);
+			_createMethodAction(this.context, this, "_RegisterAddedEvent", 0, [], 0);
 		};
 		ChartCollection.prototype._RegisterDeactivatedEvent=function () {
 			_throwIfApiNotSupported("ChartCollection._RegisterDeactivatedEvent", _defaultApiSetName, "1.8", _hostName);
-			_createMethodAction(this.context, this, "_RegisterDeactivatedEvent", 0, [], false);
+			_createMethodAction(this.context, this, "_RegisterDeactivatedEvent", 0, [], 0);
+		};
+		ChartCollection.prototype._RegisterDeletedEvent=function () {
+			_throwIfApiNotSupported("ChartCollection._RegisterDeletedEvent", _defaultApiSetName, "1.8", _hostName);
+			_createMethodAction(this.context, this, "_RegisterDeletedEvent", 0, [], 0);
 		};
 		ChartCollection.prototype._UnregisterActivatedEvent=function () {
 			_throwIfApiNotSupported("ChartCollection._UnregisterActivatedEvent", _defaultApiSetName, "1.8", _hostName);
-			_createMethodAction(this.context, this, "_UnregisterActivatedEvent", 0, [], false);
+			_createMethodAction(this.context, this, "_UnregisterActivatedEvent", 0, [], 0);
 		};
 		ChartCollection.prototype._UnregisterAddedEvent=function () {
 			_throwIfApiNotSupported("ChartCollection._UnregisterAddedEvent", _defaultApiSetName, "1.8", _hostName);
-			_createMethodAction(this.context, this, "_UnregisterAddedEvent", 0, [], false);
+			_createMethodAction(this.context, this, "_UnregisterAddedEvent", 0, [], 0);
 		};
 		ChartCollection.prototype._UnregisterDeactivatedEvent=function () {
 			_throwIfApiNotSupported("ChartCollection._UnregisterDeactivatedEvent", _defaultApiSetName, "1.8", _hostName);
-			_createMethodAction(this.context, this, "_UnregisterDeactivatedEvent", 0, [], false);
+			_createMethodAction(this.context, this, "_UnregisterDeactivatedEvent", 0, [], 0);
+		};
+		ChartCollection.prototype._UnregisterDeletedEvent=function () {
+			_throwIfApiNotSupported("ChartCollection._UnregisterDeletedEvent", _defaultApiSetName, "1.8", _hostName);
+			_createMethodAction(this.context, this, "_UnregisterDeletedEvent", 0, [], 0);
 		};
 		ChartCollection.prototype._handleResult=function (value) {
 			_super.prototype._handleResult.call(this, value);
@@ -19796,15 +20985,21 @@ var Excel;
 		};
 		Object.defineProperty(ChartCollection.prototype, "onActivated", {
 			get: function () {
+				var _this=this;
 				_throwIfApiNotSupported("ChartCollection.onActivated", _defaultApiSetName, "1.8", _hostName);
 				if (!this.m_activated) {
 					this.m_activated=new OfficeExtension.GenericEventHandlers(this.context, this, "Activated", {
 						eventType: 51,
-						registerFunc: function () { return null; },
-						unregisterFunc: function () { return null; },
-						getTargetIdFunc: null,
+						registerFunc: function () { return _this._RegisterActivatedEvent(); },
+						unregisterFunc: function () { return _this._UnregisterActivatedEvent(); },
+						getTargetIdFunc: function () { return _this._ParentObject.id; },
 						eventArgsTransformFunc: function (value) {
-							return null;
+							var newArgs={
+								type: EventType.chartActivated,
+								worksheetId: value.worksheetId,
+								chartId: value.chartId,
+							};
+							return OfficeExtension.Utility._createPromiseFromResult(newArgs);
 						}
 					});
 				}
@@ -19841,15 +21036,21 @@ var Excel;
 		});
 		Object.defineProperty(ChartCollection.prototype, "onDeactivated", {
 			get: function () {
+				var _this=this;
 				_throwIfApiNotSupported("ChartCollection.onDeactivated", _defaultApiSetName, "1.8", _hostName);
 				if (!this.m_deactivated) {
 					this.m_deactivated=new OfficeExtension.GenericEventHandlers(this.context, this, "Deactivated", {
 						eventType: 52,
-						registerFunc: function () { return null; },
-						unregisterFunc: function () { return null; },
-						getTargetIdFunc: null,
+						registerFunc: function () { return _this._RegisterDeactivatedEvent(); },
+						unregisterFunc: function () { return _this._UnregisterDeactivatedEvent(); },
+						getTargetIdFunc: function () { return _this._ParentObject.id; },
 						eventArgsTransformFunc: function (value) {
-							return null;
+							var newArgs={
+								type: EventType.chartDeactivated,
+								worksheetId: value.worksheetId,
+								chartId: value.chartId,
+							};
+							return OfficeExtension.Utility._createPromiseFromResult(newArgs);
 						}
 					});
 				}
@@ -19860,15 +21061,22 @@ var Excel;
 		});
 		Object.defineProperty(ChartCollection.prototype, "onDeleted", {
 			get: function () {
+				var _this=this;
 				_throwIfApiNotSupported("ChartCollection.onDeleted", _defaultApiSetName, "1.8", _hostName);
 				if (!this.m_deleted) {
 					this.m_deleted=new OfficeExtension.GenericEventHandlers(this.context, this, "Deleted", {
 						eventType: 53,
-						registerFunc: function () { return null; },
-						unregisterFunc: function () { return null; },
-						getTargetIdFunc: null,
+						registerFunc: function () { return _this._RegisterDeletedEvent(); },
+						unregisterFunc: function () { return _this._UnregisterDeletedEvent(); },
+						getTargetIdFunc: function () { return _this._ParentObject.id; },
 						eventArgsTransformFunc: function (value) {
-							return null;
+							var newArgs={
+								type: EventType.chartDeleted,
+								source: value.source,
+								worksheetId: value.worksheetId,
+								chartId: value.chartId,
+							};
+							return OfficeExtension.Utility._createPromiseFromResult(newArgs);
 						}
 					});
 				}
@@ -19900,21 +21108,21 @@ var Excel;
 		});
 		Object.defineProperty(Chart.prototype, "_scalarPropertyNames", {
 			get: function () {
-				return ["name", "top", "left", "width", "height", "id", "showAllFieldButtons", "chartType"];
+				return ["name", "top", "left", "width", "height", "id", "showAllFieldButtons", "chartType", "showAxisFieldButtons", "showLegendFieldButtons", "showReportFilterFieldButtons", "showValueFieldButtons", "showDataLabelsOverMaximum", "categoryLabelLevel", "colorScheme", "style", "displayBlanksAs", "plotBy", "plotVisibleOnly", "seriesNameLevel", "roundedCorners"];
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(Chart.prototype, "_scalarPropertyUpdateable", {
 			get: function () {
-				return [true, true, true, true, true, false, true, true];
+				return [true, true, true, true, true, false, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true];
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(Chart.prototype, "_navigationPropertyNames", {
 			get: function () {
-				return ["title", "dataLabels", "legend", "series", "axes", "format", "worksheet"];
+				return ["title", "dataLabels", "legend", "series", "axes", "format", "worksheet", "plotArea"];
 			},
 			enumerable: true,
 			configurable: true
@@ -19922,7 +21130,7 @@ var Excel;
 		Object.defineProperty(Chart.prototype, "axes", {
 			get: function () {
 				if (!this._A) {
-					this._A=new Excel.ChartAxes(this.context, _createPropertyObjectPath(this.context, this, "Axes", false, false, false));
+					this._A=new Excel.ChartAxes(this.context, _createPropertyObjectPath(this.context, this, "Axes", false, false, 4));
 				}
 				return this._A;
 			},
@@ -19932,7 +21140,7 @@ var Excel;
 		Object.defineProperty(Chart.prototype, "dataLabels", {
 			get: function () {
 				if (!this._D) {
-					this._D=new Excel.ChartDataLabels(this.context, _createPropertyObjectPath(this.context, this, "DataLabels", false, false, false));
+					this._D=new Excel.ChartDataLabels(this.context, _createPropertyObjectPath(this.context, this, "DataLabels", false, false, 4));
 				}
 				return this._D;
 			},
@@ -19942,7 +21150,7 @@ var Excel;
 		Object.defineProperty(Chart.prototype, "format", {
 			get: function () {
 				if (!this._F) {
-					this._F=new Excel.ChartAreaFormat(this.context, _createPropertyObjectPath(this.context, this, "Format", false, false, false));
+					this._F=new Excel.ChartAreaFormat(this.context, _createPropertyObjectPath(this.context, this, "Format", false, false, 4));
 				}
 				return this._F;
 			},
@@ -19952,9 +21160,20 @@ var Excel;
 		Object.defineProperty(Chart.prototype, "legend", {
 			get: function () {
 				if (!this._Le) {
-					this._Le=new Excel.ChartLegend(this.context, _createPropertyObjectPath(this.context, this, "Legend", false, false, false));
+					this._Le=new Excel.ChartLegend(this.context, _createPropertyObjectPath(this.context, this, "Legend", false, false, 4));
 				}
 				return this._Le;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(Chart.prototype, "plotArea", {
+			get: function () {
+				_throwIfApiNotSupported("Chart.plotArea", _defaultApiSetName, "1.8", _hostName);
+				if (!this._P) {
+					this._P=new Excel.ChartPlotArea(this.context, _createPropertyObjectPath(this.context, this, "PlotArea", false, false, 4));
+				}
+				return this._P;
 			},
 			enumerable: true,
 			configurable: true
@@ -19962,7 +21181,7 @@ var Excel;
 		Object.defineProperty(Chart.prototype, "series", {
 			get: function () {
 				if (!this._S) {
-					this._S=new Excel.ChartSeriesCollection(this.context, _createPropertyObjectPath(this.context, this, "Series", true, false, false));
+					this._S=new Excel.ChartSeriesCollection(this.context, _createPropertyObjectPath(this.context, this, "Series", true, false, 4));
 				}
 				return this._S;
 			},
@@ -19972,7 +21191,7 @@ var Excel;
 		Object.defineProperty(Chart.prototype, "title", {
 			get: function () {
 				if (!this._T) {
-					this._T=new Excel.ChartTitle(this.context, _createPropertyObjectPath(this.context, this, "Title", false, false, false));
+					this._T=new Excel.ChartTitle(this.context, _createPropertyObjectPath(this.context, this, "Title", false, false, 4));
 				}
 				return this._T;
 			},
@@ -19983,22 +21202,61 @@ var Excel;
 			get: function () {
 				_throwIfApiNotSupported("Chart.worksheet", _defaultApiSetName, "1.2", _hostName);
 				if (!this._Wo) {
-					this._Wo=new Excel.Worksheet(this.context, _createPropertyObjectPath(this.context, this, "Worksheet", false, false, false));
+					this._Wo=new Excel.Worksheet(this.context, _createPropertyObjectPath(this.context, this, "Worksheet", false, false, 4));
 				}
 				return this._Wo;
 			},
 			enumerable: true,
 			configurable: true
 		});
-		Object.defineProperty(Chart.prototype, "chartType", {
+		Object.defineProperty(Chart.prototype, "categoryLabelLevel", {
 			get: function () {
-				_throwIfNotLoaded("chartType", this._C, _typeChart, this._isNull);
-				_throwIfApiNotSupported("Chart.chartType", _defaultApiSetName, "1.7", _hostName);
+				_throwIfNotLoaded("categoryLabelLevel", this._C, _typeChart, this._isNull);
+				_throwIfApiNotSupported("Chart.categoryLabelLevel", _defaultApiSetName, "1.8", _hostName);
 				return this._C;
 			},
 			set: function (value) {
 				this._C=value;
-				_createSetPropertyAction(this.context, this, "ChartType", value);
+				_createSetPropertyAction(this.context, this, "CategoryLabelLevel", value, 0);
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(Chart.prototype, "chartType", {
+			get: function () {
+				_throwIfNotLoaded("chartType", this._Ch, _typeChart, this._isNull);
+				_throwIfApiNotSupported("Chart.chartType", _defaultApiSetName, "1.8", _hostName);
+				return this._Ch;
+			},
+			set: function (value) {
+				this._Ch=value;
+				_createSetPropertyAction(this.context, this, "ChartType", value, 0);
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(Chart.prototype, "colorScheme", {
+			get: function () {
+				_throwIfNotLoaded("colorScheme", this._Co, _typeChart, this._isNull);
+				_throwIfApiNotSupported("Chart.colorScheme", _defaultApiSetName, "1.8", _hostName);
+				return this._Co;
+			},
+			set: function (value) {
+				this._Co=value;
+				_createSetPropertyAction(this.context, this, "ColorScheme", value, 0);
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(Chart.prototype, "displayBlanksAs", {
+			get: function () {
+				_throwIfNotLoaded("displayBlanksAs", this._Di, _typeChart, this._isNull);
+				_throwIfApiNotSupported("Chart.displayBlanksAs", _defaultApiSetName, "1.8", _hostName);
+				return this._Di;
+			},
+			set: function (value) {
+				this._Di=value;
+				_createSetPropertyAction(this.context, this, "DisplayBlanksAs", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -20010,7 +21268,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._H=value;
-				_createSetPropertyAction(this.context, this, "Height", value);
+				_createSetPropertyAction(this.context, this, "Height", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -20031,7 +21289,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._L=value;
-				_createSetPropertyAction(this.context, this, "Left", value);
+				_createSetPropertyAction(this.context, this, "Left", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -20043,7 +21301,59 @@ var Excel;
 			},
 			set: function (value) {
 				this._N=value;
-				_createSetPropertyAction(this.context, this, "Name", value);
+				_createSetPropertyAction(this.context, this, "Name", value, 0);
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(Chart.prototype, "plotBy", {
+			get: function () {
+				_throwIfNotLoaded("plotBy", this._Pl, _typeChart, this._isNull);
+				_throwIfApiNotSupported("Chart.plotBy", _defaultApiSetName, "1.8", _hostName);
+				return this._Pl;
+			},
+			set: function (value) {
+				this._Pl=value;
+				_createSetPropertyAction(this.context, this, "PlotBy", value, 0);
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(Chart.prototype, "plotVisibleOnly", {
+			get: function () {
+				_throwIfNotLoaded("plotVisibleOnly", this._Plo, _typeChart, this._isNull);
+				_throwIfApiNotSupported("Chart.plotVisibleOnly", _defaultApiSetName, "1.8", _hostName);
+				return this._Plo;
+			},
+			set: function (value) {
+				this._Plo=value;
+				_createSetPropertyAction(this.context, this, "PlotVisibleOnly", value, 0);
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(Chart.prototype, "roundedCorners", {
+			get: function () {
+				_throwIfNotLoaded("roundedCorners", this._R, _typeChart, this._isNull);
+				_throwIfApiNotSupported("Chart.roundedCorners", _defaultApiSetName, "1.8", _hostName);
+				return this._R;
+			},
+			set: function (value) {
+				this._R=value;
+				_createSetPropertyAction(this.context, this, "RoundedCorners", value, 0);
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(Chart.prototype, "seriesNameLevel", {
+			get: function () {
+				_throwIfNotLoaded("seriesNameLevel", this._Se, _typeChart, this._isNull);
+				_throwIfApiNotSupported("Chart.seriesNameLevel", _defaultApiSetName, "1.8", _hostName);
+				return this._Se;
+			},
+			set: function (value) {
+				this._Se=value;
+				_createSetPropertyAction(this.context, this, "SeriesNameLevel", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -20051,12 +21361,90 @@ var Excel;
 		Object.defineProperty(Chart.prototype, "showAllFieldButtons", {
 			get: function () {
 				_throwIfNotLoaded("showAllFieldButtons", this._Sh, _typeChart, this._isNull);
-				_throwIfApiNotSupported("Chart.showAllFieldButtons", _defaultApiSetName, "1.7", _hostName);
+				_throwIfApiNotSupported("Chart.showAllFieldButtons", _defaultApiSetName, "1.8", _hostName);
 				return this._Sh;
 			},
 			set: function (value) {
 				this._Sh=value;
-				_createSetPropertyAction(this.context, this, "ShowAllFieldButtons", value);
+				_createSetPropertyAction(this.context, this, "ShowAllFieldButtons", value, 0);
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(Chart.prototype, "showAxisFieldButtons", {
+			get: function () {
+				_throwIfNotLoaded("showAxisFieldButtons", this._Sho, _typeChart, this._isNull);
+				_throwIfApiNotSupported("Chart.showAxisFieldButtons", _defaultApiSetName, "1.8", _hostName);
+				return this._Sho;
+			},
+			set: function (value) {
+				this._Sho=value;
+				_createSetPropertyAction(this.context, this, "ShowAxisFieldButtons", value, 0);
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(Chart.prototype, "showDataLabelsOverMaximum", {
+			get: function () {
+				_throwIfNotLoaded("showDataLabelsOverMaximum", this._Show, _typeChart, this._isNull);
+				_throwIfApiNotSupported("Chart.showDataLabelsOverMaximum", _defaultApiSetName, "1.8", _hostName);
+				return this._Show;
+			},
+			set: function (value) {
+				this._Show=value;
+				_createSetPropertyAction(this.context, this, "ShowDataLabelsOverMaximum", value, 0);
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(Chart.prototype, "showLegendFieldButtons", {
+			get: function () {
+				_throwIfNotLoaded("showLegendFieldButtons", this._ShowL, _typeChart, this._isNull);
+				_throwIfApiNotSupported("Chart.showLegendFieldButtons", _defaultApiSetName, "1.8", _hostName);
+				return this._ShowL;
+			},
+			set: function (value) {
+				this._ShowL=value;
+				_createSetPropertyAction(this.context, this, "ShowLegendFieldButtons", value, 0);
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(Chart.prototype, "showReportFilterFieldButtons", {
+			get: function () {
+				_throwIfNotLoaded("showReportFilterFieldButtons", this._ShowR, _typeChart, this._isNull);
+				_throwIfApiNotSupported("Chart.showReportFilterFieldButtons", _defaultApiSetName, "1.8", _hostName);
+				return this._ShowR;
+			},
+			set: function (value) {
+				this._ShowR=value;
+				_createSetPropertyAction(this.context, this, "ShowReportFilterFieldButtons", value, 0);
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(Chart.prototype, "showValueFieldButtons", {
+			get: function () {
+				_throwIfNotLoaded("showValueFieldButtons", this._ShowV, _typeChart, this._isNull);
+				_throwIfApiNotSupported("Chart.showValueFieldButtons", _defaultApiSetName, "1.8", _hostName);
+				return this._ShowV;
+			},
+			set: function (value) {
+				this._ShowV=value;
+				_createSetPropertyAction(this.context, this, "ShowValueFieldButtons", value, 0);
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(Chart.prototype, "style", {
+			get: function () {
+				_throwIfNotLoaded("style", this._St, _typeChart, this._isNull);
+				_throwIfApiNotSupported("Chart.style", _defaultApiSetName, "1.8", _hostName);
+				return this._St;
+			},
+			set: function (value) {
+				this._St=value;
+				_createSetPropertyAction(this.context, this, "Style", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -20068,7 +21456,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._To=value;
-				_createSetPropertyAction(this.context, this, "Top", value);
+				_createSetPropertyAction(this.context, this, "Top", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -20080,13 +21468,13 @@ var Excel;
 			},
 			set: function (value) {
 				this._W=value;
-				_createSetPropertyAction(this.context, this, "Width", value);
+				_createSetPropertyAction(this.context, this, "Width", value, 0);
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Chart.prototype.set=function (properties, options) {
-			this._recursivelySet(properties, options, ["name", "top", "left", "width", "height", "showAllFieldButtons", "chartType"], ["title", "dataLabels", "legend", "axes", "format"], [
+			this._recursivelySet(properties, options, ["name", "top", "left", "width", "height", "showAllFieldButtons", "chartType", "showAxisFieldButtons", "showLegendFieldButtons", "showReportFilterFieldButtons", "showValueFieldButtons", "showDataLabelsOverMaximum", "categoryLabelLevel", "colorScheme", "style", "displayBlanksAs", "plotBy", "plotVisibleOnly", "seriesNameLevel", "roundedCorners"], ["title", "dataLabels", "legend", "axes", "format", "plotArea"], [
 				"series",
 				"worksheet"
 			]);
@@ -20095,39 +21483,36 @@ var Excel;
 			this._recursivelyUpdate(properties);
 		};
 		Chart.prototype.delete=function () {
-			_createMethodAction(this.context, this, "Delete", 0, [], false);
+			_createMethodAction(this.context, this, "Delete", 0, [], 0);
 		};
 		Chart.prototype.getImage=function (width, height, fittingMode) {
 			_throwIfApiNotSupported("Chart.getImage", _defaultApiSetName, "1.2", _hostName);
-			var action=_createMethodAction(this.context, this, "GetImage", 1, [width, height, fittingMode], false);
+			var action=_createMethodAction(this.context, this, "GetImage", 1, [width, height, fittingMode], 4);
 			var ret=new OfficeExtension.ClientResult();
 			_addActionResultHandler(this, action, ret);
 			return ret;
 		};
 		Chart.prototype.setData=function (sourceData, seriesBy) {
-			if (!(sourceData instanceof Range)) {
-				throw OfficeExtension.Utility.createRuntimeError(OfficeExtension.ResourceStrings.invalidArgument, "sourceData", "Chart.setData");
-			}
-			_createMethodAction(this.context, this, "SetData", 0, [sourceData, seriesBy], false);
+			_createMethodAction(this.context, this, "SetData", 0, [sourceData, seriesBy], 0);
 		};
 		Chart.prototype.setPosition=function (startCell, endCell) {
-			_createMethodAction(this.context, this, "SetPosition", 0, [startCell, endCell], false);
+			_createMethodAction(this.context, this, "SetPosition", 0, [startCell, endCell], 0);
 		};
 		Chart.prototype._RegisterActivatedEvent=function () {
 			_throwIfApiNotSupported("Chart._RegisterActivatedEvent", _defaultApiSetName, "1.8", _hostName);
-			_createMethodAction(this.context, this, "_RegisterActivatedEvent", 0, [], false);
+			_createMethodAction(this.context, this, "_RegisterActivatedEvent", 0, [], 0);
 		};
 		Chart.prototype._RegisterDeactivatedEvent=function () {
 			_throwIfApiNotSupported("Chart._RegisterDeactivatedEvent", _defaultApiSetName, "1.8", _hostName);
-			_createMethodAction(this.context, this, "_RegisterDeactivatedEvent", 0, [], false);
+			_createMethodAction(this.context, this, "_RegisterDeactivatedEvent", 0, [], 0);
 		};
 		Chart.prototype._UnregisterActivatedEvent=function () {
 			_throwIfApiNotSupported("Chart._UnregisterActivatedEvent", _defaultApiSetName, "1.8", _hostName);
-			_createMethodAction(this.context, this, "_UnregisterActivatedEvent", 0, [], false);
+			_createMethodAction(this.context, this, "_UnregisterActivatedEvent", 0, [], 0);
 		};
 		Chart.prototype._UnregisterDeactivatedEvent=function () {
 			_throwIfApiNotSupported("Chart._UnregisterDeactivatedEvent", _defaultApiSetName, "1.8", _hostName);
-			_createMethodAction(this.context, this, "_UnregisterDeactivatedEvent", 0, [], false);
+			_createMethodAction(this.context, this, "_UnregisterDeactivatedEvent", 0, [], 0);
 		};
 		Chart.prototype._handleResult=function (value) {
 			_super.prototype._handleResult.call(this, value);
@@ -20135,8 +21520,17 @@ var Excel;
 				return;
 			var obj=value;
 			_fixObjectPathIfNecessary(this, obj);
+			if (!_isUndefined(obj["CategoryLabelLevel"])) {
+				this._C=obj["CategoryLabelLevel"];
+			}
 			if (!_isUndefined(obj["ChartType"])) {
-				this._C=obj["ChartType"];
+				this._Ch=obj["ChartType"];
+			}
+			if (!_isUndefined(obj["ColorScheme"])) {
+				this._Co=obj["ColorScheme"];
+			}
+			if (!_isUndefined(obj["DisplayBlanksAs"])) {
+				this._Di=obj["DisplayBlanksAs"];
 			}
 			if (!_isUndefined(obj["Height"])) {
 				this._H=obj["Height"];
@@ -20150,8 +21544,38 @@ var Excel;
 			if (!_isUndefined(obj["Name"])) {
 				this._N=obj["Name"];
 			}
+			if (!_isUndefined(obj["PlotBy"])) {
+				this._Pl=obj["PlotBy"];
+			}
+			if (!_isUndefined(obj["PlotVisibleOnly"])) {
+				this._Plo=obj["PlotVisibleOnly"];
+			}
+			if (!_isUndefined(obj["RoundedCorners"])) {
+				this._R=obj["RoundedCorners"];
+			}
+			if (!_isUndefined(obj["SeriesNameLevel"])) {
+				this._Se=obj["SeriesNameLevel"];
+			}
 			if (!_isUndefined(obj["ShowAllFieldButtons"])) {
 				this._Sh=obj["ShowAllFieldButtons"];
+			}
+			if (!_isUndefined(obj["ShowAxisFieldButtons"])) {
+				this._Sho=obj["ShowAxisFieldButtons"];
+			}
+			if (!_isUndefined(obj["ShowDataLabelsOverMaximum"])) {
+				this._Show=obj["ShowDataLabelsOverMaximum"];
+			}
+			if (!_isUndefined(obj["ShowLegendFieldButtons"])) {
+				this._ShowL=obj["ShowLegendFieldButtons"];
+			}
+			if (!_isUndefined(obj["ShowReportFilterFieldButtons"])) {
+				this._ShowR=obj["ShowReportFilterFieldButtons"];
+			}
+			if (!_isUndefined(obj["ShowValueFieldButtons"])) {
+				this._ShowV=obj["ShowValueFieldButtons"];
+			}
+			if (!_isUndefined(obj["Style"])) {
+				this._St=obj["Style"];
 			}
 			if (!_isUndefined(obj["Top"])) {
 				this._To=obj["Top"];
@@ -20159,7 +21583,7 @@ var Excel;
 			if (!_isUndefined(obj["Width"])) {
 				this._W=obj["Width"];
 			}
-			_handleNavigationPropertyResults(this, obj, ["axes", "Axes", "dataLabels", "DataLabels", "format", "Format", "legend", "Legend", "series", "Series", "title", "Title", "worksheet", "Worksheet"]);
+			_handleNavigationPropertyResults(this, obj, ["axes", "Axes", "dataLabels", "DataLabels", "format", "Format", "legend", "Legend", "plotArea", "PlotArea", "series", "Series", "title", "Title", "worksheet", "Worksheet"]);
 		};
 		Chart.prototype.load=function (option) {
 			return _load(this, option);
@@ -20182,15 +21606,21 @@ var Excel;
 		};
 		Object.defineProperty(Chart.prototype, "onActivated", {
 			get: function () {
+				var _this=this;
 				_throwIfApiNotSupported("Chart.onActivated", _defaultApiSetName, "1.8", _hostName);
 				if (!this.m_activated) {
 					this.m_activated=new OfficeExtension.GenericEventHandlers(this.context, this, "Activated", {
 						eventType: 51,
-						registerFunc: function () { return null; },
-						unregisterFunc: function () { return null; },
-						getTargetIdFunc: null,
+						registerFunc: function () { _this._RegisterActivatedEvent(); },
+						unregisterFunc: function () { _this._UnregisterActivatedEvent(); },
+						getTargetIdFunc: function () { return _this.id; },
 						eventArgsTransformFunc: function (value) {
-							return null;
+							var event={
+								type: EventType.chartActivated,
+								worksheetId: value.worksheetId,
+								chartId: value.chartId
+							};
+							return OfficeExtension.Utility._createPromiseFromResult(event);
 						}
 					});
 				}
@@ -20201,15 +21631,21 @@ var Excel;
 		});
 		Object.defineProperty(Chart.prototype, "onDeactivated", {
 			get: function () {
+				var _this=this;
 				_throwIfApiNotSupported("Chart.onDeactivated", _defaultApiSetName, "1.8", _hostName);
 				if (!this.m_deactivated) {
 					this.m_deactivated=new OfficeExtension.GenericEventHandlers(this.context, this, "Deactivated", {
 						eventType: 52,
-						registerFunc: function () { return null; },
-						unregisterFunc: function () { return null; },
-						getTargetIdFunc: null,
+						registerFunc: function () { _this._RegisterDeactivatedEvent(); },
+						unregisterFunc: function () { _this._UnregisterDeactivatedEvent(); },
+						getTargetIdFunc: function () { return _this.id; },
 						eventArgsTransformFunc: function (value) {
-							return null;
+							var event={
+								type: EventType.chartDeactivated,
+								worksheetId: value.worksheetId,
+								chartId: value.chartId
+							};
+							return OfficeExtension.Utility._createPromiseFromResult(event);
 						}
 					});
 				}
@@ -20220,12 +21656,25 @@ var Excel;
 		});
 		Chart.prototype.toJSON=function () {
 			return _toJson(this, {
-				"chartType": this._C,
+				"categoryLabelLevel": this._C,
+				"chartType": this._Ch,
+				"colorScheme": this._Co,
+				"displayBlanksAs": this._Di,
 				"height": this._H,
 				"id": this._I,
 				"left": this._L,
 				"name": this._N,
+				"plotBy": this._Pl,
+				"plotVisibleOnly": this._Plo,
+				"roundedCorners": this._R,
+				"seriesNameLevel": this._Se,
 				"showAllFieldButtons": this._Sh,
+				"showAxisFieldButtons": this._Sho,
+				"showDataLabelsOverMaximum": this._Show,
+				"showLegendFieldButtons": this._ShowL,
+				"showReportFilterFieldButtons": this._ShowR,
+				"showValueFieldButtons": this._ShowV,
+				"style": this._St,
 				"top": this._To,
 				"width": this._W,
 			}, {
@@ -20233,6 +21682,7 @@ var Excel;
 				"dataLabels": this._D,
 				"format": this._F,
 				"legend": this._Le,
+				"plotArea": this._P,
 				"series": this._S,
 				"title": this._T,
 			});
@@ -20268,7 +21718,7 @@ var Excel;
 			get: function () {
 				_throwIfApiNotSupported("ChartAreaFormat.border", _defaultApiSetName, "1.7", _hostName);
 				if (!this._B) {
-					this._B=new Excel.ChartBorder(this.context, _createPropertyObjectPath(this.context, this, "Border", false, false, false));
+					this._B=new Excel.ChartBorder(this.context, _createPropertyObjectPath(this.context, this, "Border", false, false, 4));
 				}
 				return this._B;
 			},
@@ -20278,7 +21728,7 @@ var Excel;
 		Object.defineProperty(ChartAreaFormat.prototype, "fill", {
 			get: function () {
 				if (!this._F) {
-					this._F=new Excel.ChartFill(this.context, _createPropertyObjectPath(this.context, this, "Fill", false, false, false));
+					this._F=new Excel.ChartFill(this.context, _createPropertyObjectPath(this.context, this, "Fill", false, false, 4));
 				}
 				return this._F;
 			},
@@ -20288,7 +21738,7 @@ var Excel;
 		Object.defineProperty(ChartAreaFormat.prototype, "font", {
 			get: function () {
 				if (!this._Fo) {
-					this._Fo=new Excel.ChartFont(this.context, _createPropertyObjectPath(this.context, this, "Font", false, false, false));
+					this._Fo=new Excel.ChartFont(this.context, _createPropertyObjectPath(this.context, this, "Font", false, false, 4));
 				}
 				return this._Fo;
 			},
@@ -20378,18 +21828,18 @@ var Excel;
 			configurable: true
 		});
 		ChartSeriesCollection.prototype.add=function (name, index) {
-			_throwIfApiNotSupported("ChartSeriesCollection.add", _defaultApiSetName, "1.7", _hostName);
-			return new Excel.ChartSeries(this.context, _createMethodObjectPath(this.context, this, "Add", 0, [name, index], false, true, null, false));
+			_throwIfApiNotSupported("ChartSeriesCollection.add", _defaultApiSetName, "1.8", _hostName);
+			return new Excel.ChartSeries(this.context, _createMethodObjectPath(this.context, this, "Add", 0, [name, index], false, true, null, 0));
 		};
 		ChartSeriesCollection.prototype.getCount=function () {
 			_throwIfApiNotSupported("ChartSeriesCollection.getCount", _defaultApiSetName, "1.4", _hostName);
-			var action=_createMethodAction(this.context, this, "GetCount", 1, [], false);
+			var action=_createMethodAction(this.context, this, "GetCount", 1, [], 4);
 			var ret=new OfficeExtension.ClientResult();
 			_addActionResultHandler(this, action, ret);
 			return ret;
 		};
 		ChartSeriesCollection.prototype.getItemAt=function (index) {
-			return new Excel.ChartSeries(this.context, _createMethodObjectPath(this.context, this, "GetItemAt", 1, [index], false, false, null, false));
+			return new Excel.ChartSeries(this.context, _createMethodObjectPath(this.context, this, "GetItemAt", 1, [index], false, false, null, 4));
 		};
 		ChartSeriesCollection.prototype._handleResult=function (value) {
 			_super.prototype._handleResult.call(this, value);
@@ -20444,21 +21894,32 @@ var Excel;
 		});
 		Object.defineProperty(ChartSeries.prototype, "_scalarPropertyNames", {
 			get: function () {
-				return ["name", "chartType", "hasDataLabels", "filtered", "markerSize", "markerStyle", "showShadow", "markerBackgroundColor", "markerForegroundColor", "smooth", "plotOrder", "gapWidth", "doughnutHoleSize"];
+				return ["name", "chartType", "hasDataLabels", "filtered", "markerSize", "markerStyle", "showShadow", "markerBackgroundColor", "markerForegroundColor", "smooth", "plotOrder", "gapWidth", "doughnutHoleSize", "axisGroup", "explosion", "firstSliceAngle", "invertIfNegative", "type", "bubbleScale", "secondPlotSize", "splitType", "splitValue", "varyByCategories", "hasLeaderLines", "overlap"];
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(ChartSeries.prototype, "_scalarPropertyUpdateable", {
 			get: function () {
-				return [true, true, true, true, true, true, true, true, true, true, true, true, true];
+				return [true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, false, true, true, true, true, true, true, true];
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(ChartSeries.prototype, "_navigationPropertyNames", {
 			get: function () {
-				return ["points", "format", "trendlines"];
+				return ["points", "format", "trendlines", "xerrorBars", "yerrorBars", "dataLabels"];
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(ChartSeries.prototype, "dataLabels", {
+			get: function () {
+				_throwIfApiNotSupported("ChartSeries.dataLabels", _defaultApiSetName, "1.8", _hostName);
+				if (!this._D) {
+					this._D=new Excel.ChartDataLabels(this.context, _createPropertyObjectPath(this.context, this, "DataLabels", false, false, 4));
+				}
+				return this._D;
 			},
 			enumerable: true,
 			configurable: true
@@ -20466,7 +21927,7 @@ var Excel;
 		Object.defineProperty(ChartSeries.prototype, "format", {
 			get: function () {
 				if (!this._Fo) {
-					this._Fo=new Excel.ChartSeriesFormat(this.context, _createPropertyObjectPath(this.context, this, "Format", false, false, false));
+					this._Fo=new Excel.ChartSeriesFormat(this.context, _createPropertyObjectPath(this.context, this, "Format", false, false, 4));
 				}
 				return this._Fo;
 			},
@@ -20476,7 +21937,7 @@ var Excel;
 		Object.defineProperty(ChartSeries.prototype, "points", {
 			get: function () {
 				if (!this._Po) {
-					this._Po=new Excel.ChartPointsCollection(this.context, _createPropertyObjectPath(this.context, this, "Points", true, false, false));
+					this._Po=new Excel.ChartPointsCollection(this.context, _createPropertyObjectPath(this.context, this, "Points", true, false, 4));
 				}
 				return this._Po;
 			},
@@ -20487,9 +21948,57 @@ var Excel;
 			get: function () {
 				_throwIfApiNotSupported("ChartSeries.trendlines", _defaultApiSetName, "1.7", _hostName);
 				if (!this._T) {
-					this._T=new Excel.ChartTrendlineCollection(this.context, _createPropertyObjectPath(this.context, this, "Trendlines", true, false, false));
+					this._T=new Excel.ChartTrendlineCollection(this.context, _createPropertyObjectPath(this.context, this, "Trendlines", true, false, 4));
 				}
 				return this._T;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(ChartSeries.prototype, "xerrorBars", {
+			get: function () {
+				_throwIfApiNotSupported("ChartSeries.xerrorBars", _defaultApiSetName, "1.8", _hostName);
+				if (!this._X) {
+					this._X=new Excel.ChartErrorBars(this.context, _createPropertyObjectPath(this.context, this, "XErrorBars", false, false, 4));
+				}
+				return this._X;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(ChartSeries.prototype, "yerrorBars", {
+			get: function () {
+				_throwIfApiNotSupported("ChartSeries.yerrorBars", _defaultApiSetName, "1.8", _hostName);
+				if (!this._Y) {
+					this._Y=new Excel.ChartErrorBars(this.context, _createPropertyObjectPath(this.context, this, "YErrorBars", false, false, 4));
+				}
+				return this._Y;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(ChartSeries.prototype, "axisGroup", {
+			get: function () {
+				_throwIfNotLoaded("axisGroup", this._A, _typeChartSeries, this._isNull);
+				_throwIfApiNotSupported("ChartSeries.axisGroup", _defaultApiSetName, "1.8", _hostName);
+				return this._A;
+			},
+			set: function (value) {
+				this._A=value;
+				_createSetPropertyAction(this.context, this, "AxisGroup", value, 0);
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(ChartSeries.prototype, "bubbleScale", {
+			get: function () {
+				_throwIfNotLoaded("bubbleScale", this._B, _typeChartSeries, this._isNull);
+				_throwIfApiNotSupported("ChartSeries.bubbleScale", _defaultApiSetName, "1.8", _hostName);
+				return this._B;
+			},
+			set: function (value) {
+				this._B=value;
+				_createSetPropertyAction(this.context, this, "BubbleScale", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -20497,25 +22006,38 @@ var Excel;
 		Object.defineProperty(ChartSeries.prototype, "chartType", {
 			get: function () {
 				_throwIfNotLoaded("chartType", this._C, _typeChartSeries, this._isNull);
-				_throwIfApiNotSupported("ChartSeries.chartType", _defaultApiSetName, "1.7", _hostName);
+				_throwIfApiNotSupported("ChartSeries.chartType", _defaultApiSetName, "1.8", _hostName);
 				return this._C;
 			},
 			set: function (value) {
 				this._C=value;
-				_createSetPropertyAction(this.context, this, "ChartType", value);
+				_createSetPropertyAction(this.context, this, "ChartType", value, 0);
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(ChartSeries.prototype, "doughnutHoleSize", {
 			get: function () {
-				_throwIfNotLoaded("doughnutHoleSize", this._D, _typeChartSeries, this._isNull);
+				_throwIfNotLoaded("doughnutHoleSize", this._Do, _typeChartSeries, this._isNull);
 				_throwIfApiNotSupported("ChartSeries.doughnutHoleSize", _defaultApiSetName, "1.7", _hostName);
-				return this._D;
+				return this._Do;
 			},
 			set: function (value) {
-				this._D=value;
-				_createSetPropertyAction(this.context, this, "DoughnutHoleSize", value);
+				this._Do=value;
+				_createSetPropertyAction(this.context, this, "DoughnutHoleSize", value, 0);
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(ChartSeries.prototype, "explosion", {
+			get: function () {
+				_throwIfNotLoaded("explosion", this._E, _typeChartSeries, this._isNull);
+				_throwIfApiNotSupported("ChartSeries.explosion", _defaultApiSetName, "1.8", _hostName);
+				return this._E;
+			},
+			set: function (value) {
+				this._E=value;
+				_createSetPropertyAction(this.context, this, "Explosion", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -20528,7 +22050,20 @@ var Excel;
 			},
 			set: function (value) {
 				this._F=value;
-				_createSetPropertyAction(this.context, this, "Filtered", value);
+				_createSetPropertyAction(this.context, this, "Filtered", value, 0);
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(ChartSeries.prototype, "firstSliceAngle", {
+			get: function () {
+				_throwIfNotLoaded("firstSliceAngle", this._Fi, _typeChartSeries, this._isNull);
+				_throwIfApiNotSupported("ChartSeries.firstSliceAngle", _defaultApiSetName, "1.8", _hostName);
+				return this._Fi;
+			},
+			set: function (value) {
+				this._Fi=value;
+				_createSetPropertyAction(this.context, this, "FirstSliceAngle", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -20541,7 +22076,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._G=value;
-				_createSetPropertyAction(this.context, this, "GapWidth", value);
+				_createSetPropertyAction(this.context, this, "GapWidth", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -20554,7 +22089,33 @@ var Excel;
 			},
 			set: function (value) {
 				this._H=value;
-				_createSetPropertyAction(this.context, this, "HasDataLabels", value);
+				_createSetPropertyAction(this.context, this, "HasDataLabels", value, 0);
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(ChartSeries.prototype, "hasLeaderLines", {
+			get: function () {
+				_throwIfNotLoaded("hasLeaderLines", this._Ha, _typeChartSeries, this._isNull);
+				_throwIfApiNotSupported("ChartSeries.hasLeaderLines", _defaultApiSetName, "1.8", _hostName);
+				return this._Ha;
+			},
+			set: function (value) {
+				this._Ha=value;
+				_createSetPropertyAction(this.context, this, "HasLeaderLines", value, 0);
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(ChartSeries.prototype, "invertIfNegative", {
+			get: function () {
+				_throwIfNotLoaded("invertIfNegative", this._I, _typeChartSeries, this._isNull);
+				_throwIfApiNotSupported("ChartSeries.invertIfNegative", _defaultApiSetName, "1.8", _hostName);
+				return this._I;
+			},
+			set: function (value) {
+				this._I=value;
+				_createSetPropertyAction(this.context, this, "InvertIfNegative", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -20567,7 +22128,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._M=value;
-				_createSetPropertyAction(this.context, this, "MarkerBackgroundColor", value);
+				_createSetPropertyAction(this.context, this, "MarkerBackgroundColor", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -20580,7 +22141,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._Ma=value;
-				_createSetPropertyAction(this.context, this, "MarkerForegroundColor", value);
+				_createSetPropertyAction(this.context, this, "MarkerForegroundColor", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -20593,7 +22154,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._Mar=value;
-				_createSetPropertyAction(this.context, this, "MarkerSize", value);
+				_createSetPropertyAction(this.context, this, "MarkerSize", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -20606,7 +22167,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._Mark=value;
-				_createSetPropertyAction(this.context, this, "MarkerStyle", value);
+				_createSetPropertyAction(this.context, this, "MarkerStyle", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -20618,7 +22179,20 @@ var Excel;
 			},
 			set: function (value) {
 				this._N=value;
-				_createSetPropertyAction(this.context, this, "Name", value);
+				_createSetPropertyAction(this.context, this, "Name", value, 0);
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(ChartSeries.prototype, "overlap", {
+			get: function () {
+				_throwIfNotLoaded("overlap", this._O, _typeChartSeries, this._isNull);
+				_throwIfApiNotSupported("ChartSeries.overlap", _defaultApiSetName, "1.8", _hostName);
+				return this._O;
+			},
+			set: function (value) {
+				this._O=value;
+				_createSetPropertyAction(this.context, this, "Overlap", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -20631,20 +22205,33 @@ var Excel;
 			},
 			set: function (value) {
 				this._P=value;
-				_createSetPropertyAction(this.context, this, "PlotOrder", value);
+				_createSetPropertyAction(this.context, this, "PlotOrder", value, 0);
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(ChartSeries.prototype, "secondPlotSize", {
+			get: function () {
+				_throwIfNotLoaded("secondPlotSize", this._S, _typeChartSeries, this._isNull);
+				_throwIfApiNotSupported("ChartSeries.secondPlotSize", _defaultApiSetName, "1.8", _hostName);
+				return this._S;
+			},
+			set: function (value) {
+				this._S=value;
+				_createSetPropertyAction(this.context, this, "SecondPlotSize", value, 0);
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(ChartSeries.prototype, "showShadow", {
 			get: function () {
-				_throwIfNotLoaded("showShadow", this._S, _typeChartSeries, this._isNull);
+				_throwIfNotLoaded("showShadow", this._Sh, _typeChartSeries, this._isNull);
 				_throwIfApiNotSupported("ChartSeries.showShadow", _defaultApiSetName, "1.7", _hostName);
-				return this._S;
+				return this._Sh;
 			},
 			set: function (value) {
-				this._S=value;
-				_createSetPropertyAction(this.context, this, "ShowShadow", value);
+				this._Sh=value;
+				_createSetPropertyAction(this.context, this, "ShowShadow", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -20657,13 +22244,61 @@ var Excel;
 			},
 			set: function (value) {
 				this._Sm=value;
-				_createSetPropertyAction(this.context, this, "Smooth", value);
+				_createSetPropertyAction(this.context, this, "Smooth", value, 0);
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(ChartSeries.prototype, "splitType", {
+			get: function () {
+				_throwIfNotLoaded("splitType", this._Sp, _typeChartSeries, this._isNull);
+				_throwIfApiNotSupported("ChartSeries.splitType", _defaultApiSetName, "1.8", _hostName);
+				return this._Sp;
+			},
+			set: function (value) {
+				this._Sp=value;
+				_createSetPropertyAction(this.context, this, "SplitType", value, 0);
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(ChartSeries.prototype, "splitValue", {
+			get: function () {
+				_throwIfNotLoaded("splitValue", this._Spl, _typeChartSeries, this._isNull);
+				_throwIfApiNotSupported("ChartSeries.splitValue", _defaultApiSetName, "1.8", _hostName);
+				return this._Spl;
+			},
+			set: function (value) {
+				this._Spl=value;
+				_createSetPropertyAction(this.context, this, "SplitValue", value, 0);
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(ChartSeries.prototype, "type", {
+			get: function () {
+				_throwIfNotLoaded("type", this._Ty, _typeChartSeries, this._isNull);
+				_throwIfApiNotSupported("ChartSeries.type", _defaultApiSetName, "1.8", _hostName);
+				return this._Ty;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(ChartSeries.prototype, "varyByCategories", {
+			get: function () {
+				_throwIfNotLoaded("varyByCategories", this._V, _typeChartSeries, this._isNull);
+				_throwIfApiNotSupported("ChartSeries.varyByCategories", _defaultApiSetName, "1.8", _hostName);
+				return this._V;
+			},
+			set: function (value) {
+				this._V=value;
+				_createSetPropertyAction(this.context, this, "VaryByCategories", value, 0);
 			},
 			enumerable: true,
 			configurable: true
 		});
 		ChartSeries.prototype.set=function (properties, options) {
-			this._recursivelySet(properties, options, ["name", "chartType", "hasDataLabels", "filtered", "markerSize", "markerStyle", "showShadow", "markerBackgroundColor", "markerForegroundColor", "smooth", "plotOrder", "gapWidth", "doughnutHoleSize"], ["format"], [
+			this._recursivelySet(properties, options, ["name", "chartType", "hasDataLabels", "filtered", "markerSize", "markerStyle", "showShadow", "markerBackgroundColor", "markerForegroundColor", "smooth", "plotOrder", "gapWidth", "doughnutHoleSize", "axisGroup", "explosion", "firstSliceAngle", "invertIfNegative", "bubbleScale", "secondPlotSize", "splitType", "splitValue", "varyByCategories", "hasLeaderLines", "overlap"], ["format", "xerrorBars", "yerrorBars", "dataLabels"], [
 				"points",
 				"trendlines"
 			]);
@@ -20673,19 +22308,19 @@ var Excel;
 		};
 		ChartSeries.prototype.delete=function () {
 			_throwIfApiNotSupported("ChartSeries.delete", _defaultApiSetName, "1.7", _hostName);
-			_createMethodAction(this.context, this, "Delete", 0, [], false);
+			_createMethodAction(this.context, this, "Delete", 0, [], 0);
 		};
 		ChartSeries.prototype.setBubbleSizes=function (sourceData) {
 			_throwIfApiNotSupported("ChartSeries.setBubbleSizes", _defaultApiSetName, "1.7", _hostName);
-			_createMethodAction(this.context, this, "SetBubbleSizes", 0, [sourceData], false);
+			_createMethodAction(this.context, this, "SetBubbleSizes", 0, [sourceData], 0);
 		};
 		ChartSeries.prototype.setValues=function (sourceData) {
 			_throwIfApiNotSupported("ChartSeries.setValues", _defaultApiSetName, "1.7", _hostName);
-			_createMethodAction(this.context, this, "SetValues", 0, [sourceData], false);
+			_createMethodAction(this.context, this, "SetValues", 0, [sourceData], 0);
 		};
 		ChartSeries.prototype.setXAxisValues=function (sourceData) {
 			_throwIfApiNotSupported("ChartSeries.setXAxisValues", _defaultApiSetName, "1.7", _hostName);
-			_createMethodAction(this.context, this, "SetXAxisValues", 0, [sourceData], false);
+			_createMethodAction(this.context, this, "SetXAxisValues", 0, [sourceData], 0);
 		};
 		ChartSeries.prototype._handleResult=function (value) {
 			_super.prototype._handleResult.call(this, value);
@@ -20693,20 +22328,38 @@ var Excel;
 				return;
 			var obj=value;
 			_fixObjectPathIfNecessary(this, obj);
+			if (!_isUndefined(obj["AxisGroup"])) {
+				this._A=obj["AxisGroup"];
+			}
+			if (!_isUndefined(obj["BubbleScale"])) {
+				this._B=obj["BubbleScale"];
+			}
 			if (!_isUndefined(obj["ChartType"])) {
 				this._C=obj["ChartType"];
 			}
 			if (!_isUndefined(obj["DoughnutHoleSize"])) {
-				this._D=obj["DoughnutHoleSize"];
+				this._Do=obj["DoughnutHoleSize"];
+			}
+			if (!_isUndefined(obj["Explosion"])) {
+				this._E=obj["Explosion"];
 			}
 			if (!_isUndefined(obj["Filtered"])) {
 				this._F=obj["Filtered"];
+			}
+			if (!_isUndefined(obj["FirstSliceAngle"])) {
+				this._Fi=obj["FirstSliceAngle"];
 			}
 			if (!_isUndefined(obj["GapWidth"])) {
 				this._G=obj["GapWidth"];
 			}
 			if (!_isUndefined(obj["HasDataLabels"])) {
 				this._H=obj["HasDataLabels"];
+			}
+			if (!_isUndefined(obj["HasLeaderLines"])) {
+				this._Ha=obj["HasLeaderLines"];
+			}
+			if (!_isUndefined(obj["InvertIfNegative"])) {
+				this._I=obj["InvertIfNegative"];
 			}
 			if (!_isUndefined(obj["MarkerBackgroundColor"])) {
 				this._M=obj["MarkerBackgroundColor"];
@@ -20723,16 +22376,34 @@ var Excel;
 			if (!_isUndefined(obj["Name"])) {
 				this._N=obj["Name"];
 			}
+			if (!_isUndefined(obj["Overlap"])) {
+				this._O=obj["Overlap"];
+			}
 			if (!_isUndefined(obj["PlotOrder"])) {
 				this._P=obj["PlotOrder"];
 			}
+			if (!_isUndefined(obj["SecondPlotSize"])) {
+				this._S=obj["SecondPlotSize"];
+			}
 			if (!_isUndefined(obj["ShowShadow"])) {
-				this._S=obj["ShowShadow"];
+				this._Sh=obj["ShowShadow"];
 			}
 			if (!_isUndefined(obj["Smooth"])) {
 				this._Sm=obj["Smooth"];
 			}
-			_handleNavigationPropertyResults(this, obj, ["format", "Format", "points", "Points", "trendlines", "Trendlines"]);
+			if (!_isUndefined(obj["SplitType"])) {
+				this._Sp=obj["SplitType"];
+			}
+			if (!_isUndefined(obj["SplitValue"])) {
+				this._Spl=obj["SplitValue"];
+			}
+			if (!_isUndefined(obj["Type"])) {
+				this._Ty=obj["Type"];
+			}
+			if (!_isUndefined(obj["VaryByCategories"])) {
+				this._V=obj["VaryByCategories"];
+			}
+			_handleNavigationPropertyResults(this, obj, ["dataLabels", "DataLabels", "format", "Format", "points", "Points", "trendlines", "Trendlines", "xerrorBars", "XErrorBars", "yerrorBars", "YErrorBars"]);
 		};
 		ChartSeries.prototype.load=function (option) {
 			return _load(this, option);
@@ -20746,23 +22417,38 @@ var Excel;
 		};
 		ChartSeries.prototype.toJSON=function () {
 			return _toJson(this, {
+				"axisGroup": this._A,
+				"bubbleScale": this._B,
 				"chartType": this._C,
-				"doughnutHoleSize": this._D,
+				"doughnutHoleSize": this._Do,
+				"explosion": this._E,
 				"filtered": this._F,
+				"firstSliceAngle": this._Fi,
 				"gapWidth": this._G,
 				"hasDataLabels": this._H,
+				"hasLeaderLines": this._Ha,
+				"invertIfNegative": this._I,
 				"markerBackgroundColor": this._M,
 				"markerForegroundColor": this._Ma,
 				"markerSize": this._Mar,
 				"markerStyle": this._Mark,
 				"name": this._N,
+				"overlap": this._O,
 				"plotOrder": this._P,
-				"showShadow": this._S,
+				"secondPlotSize": this._S,
+				"showShadow": this._Sh,
 				"smooth": this._Sm,
+				"splitType": this._Sp,
+				"splitValue": this._Spl,
+				"type": this._Ty,
+				"varyByCategories": this._V,
 			}, {
+				"dataLabels": this._D,
 				"format": this._Fo,
 				"points": this._Po,
 				"trendlines": this._T,
+				"xerrorBars": this._X,
+				"yerrorBars": this._Y,
 			});
 		};
 		ChartSeries.prototype.ensureUnchanged=function (data) {
@@ -20795,7 +22481,7 @@ var Excel;
 		Object.defineProperty(ChartSeriesFormat.prototype, "fill", {
 			get: function () {
 				if (!this._F) {
-					this._F=new Excel.ChartFill(this.context, _createPropertyObjectPath(this.context, this, "Fill", false, false, false));
+					this._F=new Excel.ChartFill(this.context, _createPropertyObjectPath(this.context, this, "Fill", false, false, 4));
 				}
 				return this._F;
 			},
@@ -20805,7 +22491,7 @@ var Excel;
 		Object.defineProperty(ChartSeriesFormat.prototype, "line", {
 			get: function () {
 				if (!this._L) {
-					this._L=new Excel.ChartLineFormat(this.context, _createPropertyObjectPath(this.context, this, "Line", false, false, false));
+					this._L=new Excel.ChartLineFormat(this.context, _createPropertyObjectPath(this.context, this, "Line", false, false, 4));
 				}
 				return this._L;
 			},
@@ -20895,13 +22581,13 @@ var Excel;
 		});
 		ChartPointsCollection.prototype.getCount=function () {
 			_throwIfApiNotSupported("ChartPointsCollection.getCount", _defaultApiSetName, "1.4", _hostName);
-			var action=_createMethodAction(this.context, this, "GetCount", 1, [], false);
+			var action=_createMethodAction(this.context, this, "GetCount", 1, [], 4);
 			var ret=new OfficeExtension.ClientResult();
 			_addActionResultHandler(this, action, ret);
 			return ret;
 		};
 		ChartPointsCollection.prototype.getItemAt=function (index) {
-			return new Excel.ChartPoint(this.context, _createMethodObjectPath(this.context, this, "GetItemAt", 1, [index], false, false, null, false));
+			return new Excel.ChartPoint(this.context, _createMethodObjectPath(this.context, this, "GetItemAt", 1, [index], false, false, null, 4));
 		};
 		ChartPointsCollection.prototype._handleResult=function (value) {
 			_super.prototype._handleResult.call(this, value);
@@ -20979,7 +22665,7 @@ var Excel;
 			get: function () {
 				_throwIfApiNotSupported("ChartPoint.dataLabel", _defaultApiSetName, "1.7", _hostName);
 				if (!this._D) {
-					this._D=new Excel.ChartDataLabel(this.context, _createPropertyObjectPath(this.context, this, "DataLabel", false, false, false));
+					this._D=new Excel.ChartDataLabel(this.context, _createPropertyObjectPath(this.context, this, "DataLabel", false, false, 4));
 				}
 				return this._D;
 			},
@@ -20989,7 +22675,7 @@ var Excel;
 		Object.defineProperty(ChartPoint.prototype, "format", {
 			get: function () {
 				if (!this._F) {
-					this._F=new Excel.ChartPointFormat(this.context, _createPropertyObjectPath(this.context, this, "Format", false, false, false));
+					this._F=new Excel.ChartPointFormat(this.context, _createPropertyObjectPath(this.context, this, "Format", false, false, 4));
 				}
 				return this._F;
 			},
@@ -21004,7 +22690,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._H=value;
-				_createSetPropertyAction(this.context, this, "HasDataLabel", value);
+				_createSetPropertyAction(this.context, this, "HasDataLabel", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -21017,7 +22703,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._M=value;
-				_createSetPropertyAction(this.context, this, "MarkerBackgroundColor", value);
+				_createSetPropertyAction(this.context, this, "MarkerBackgroundColor", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -21030,7 +22716,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._Ma=value;
-				_createSetPropertyAction(this.context, this, "MarkerForegroundColor", value);
+				_createSetPropertyAction(this.context, this, "MarkerForegroundColor", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -21043,7 +22729,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._Mar=value;
-				_createSetPropertyAction(this.context, this, "MarkerSize", value);
+				_createSetPropertyAction(this.context, this, "MarkerSize", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -21056,7 +22742,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._Mark=value;
-				_createSetPropertyAction(this.context, this, "MarkerStyle", value);
+				_createSetPropertyAction(this.context, this, "MarkerStyle", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -21155,7 +22841,7 @@ var Excel;
 			get: function () {
 				_throwIfApiNotSupported("ChartPointFormat.border", _defaultApiSetName, "1.7", _hostName);
 				if (!this._B) {
-					this._B=new Excel.ChartBorder(this.context, _createPropertyObjectPath(this.context, this, "Border", false, false, false));
+					this._B=new Excel.ChartBorder(this.context, _createPropertyObjectPath(this.context, this, "Border", false, false, 4));
 				}
 				return this._B;
 			},
@@ -21165,7 +22851,7 @@ var Excel;
 		Object.defineProperty(ChartPointFormat.prototype, "fill", {
 			get: function () {
 				if (!this._F) {
-					this._F=new Excel.ChartFill(this.context, _createPropertyObjectPath(this.context, this, "Fill", false, false, false));
+					this._F=new Excel.ChartFill(this.context, _createPropertyObjectPath(this.context, this, "Fill", false, false, 4));
 				}
 				return this._F;
 			},
@@ -21233,7 +22919,7 @@ var Excel;
 		Object.defineProperty(ChartAxes.prototype, "categoryAxis", {
 			get: function () {
 				if (!this._C) {
-					this._C=new Excel.ChartAxis(this.context, _createPropertyObjectPath(this.context, this, "CategoryAxis", false, false, false));
+					this._C=new Excel.ChartAxis(this.context, _createPropertyObjectPath(this.context, this, "CategoryAxis", false, false, 4));
 				}
 				return this._C;
 			},
@@ -21243,7 +22929,7 @@ var Excel;
 		Object.defineProperty(ChartAxes.prototype, "seriesAxis", {
 			get: function () {
 				if (!this._S) {
-					this._S=new Excel.ChartAxis(this.context, _createPropertyObjectPath(this.context, this, "SeriesAxis", false, false, false));
+					this._S=new Excel.ChartAxis(this.context, _createPropertyObjectPath(this.context, this, "SeriesAxis", false, false, 4));
 				}
 				return this._S;
 			},
@@ -21253,7 +22939,7 @@ var Excel;
 		Object.defineProperty(ChartAxes.prototype, "valueAxis", {
 			get: function () {
 				if (!this._V) {
-					this._V=new Excel.ChartAxis(this.context, _createPropertyObjectPath(this.context, this, "ValueAxis", false, false, false));
+					this._V=new Excel.ChartAxis(this.context, _createPropertyObjectPath(this.context, this, "ValueAxis", false, false, 4));
 				}
 				return this._V;
 			},
@@ -21267,8 +22953,8 @@ var Excel;
 			this._recursivelyUpdate(properties);
 		};
 		ChartAxes.prototype.getItem=function (type, group) {
-			_throwIfApiNotSupported("ChartAxes.getItem", _defaultApiSetName, "1.7", _hostName);
-			return new Excel.ChartAxis(this.context, _createMethodObjectPath(this.context, this, "GetItem", 1, [type, group], false, false, null, false));
+			_throwIfApiNotSupported("ChartAxes.getItem", _defaultApiSetName, "1.8", _hostName);
+			return new Excel.ChartAxis(this.context, _createMethodObjectPath(this.context, this, "GetItem", 1, [type, group], false, false, null, 4));
 		};
 		ChartAxes.prototype._handleResult=function (value) {
 			_super.prototype._handleResult.call(this, value);
@@ -21317,14 +23003,14 @@ var Excel;
 		});
 		Object.defineProperty(ChartAxis.prototype, "_scalarPropertyNames", {
 			get: function () {
-				return ["majorUnit", "maximum", "minimum", "minorUnit", "displayUnit", "showDisplayUnitLabel", "customDisplayUnit", "type", "minorTimeUnitScale", "majorTimeUnitScale", "baseTimeUnit", "categoryType", "axisGroup", "scaleType", "logBase", "left", "top", "height", "width", "reversePlotOrder", "crosses", "crossesAt", "visible", "axisBetweenCategories", "majorTickMark", "minorTickMark", "tickMarkSpacing", "tickLabelPosition", "tickLabelSpacing"];
+				return ["majorUnit", "maximum", "minimum", "minorUnit", "displayUnit", "showDisplayUnitLabel", "customDisplayUnit", "type", "minorTimeUnitScale", "majorTimeUnitScale", "baseTimeUnit", "categoryType", "axisGroup", "scaleType", "logBase", "left", "top", "height", "width", "reversePlotOrder", "crosses", "crossesAt", "visible", "axisBetweenCategories", "majorTickMark", "minorTickMark", "tickMarkSpacing", "tickLabelPosition", "tickLabelSpacing", "alignment", "multiLevel", "numberFormat", "numberFormatLinked", "offset", "textOrientation"];
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(ChartAxis.prototype, "_scalarPropertyUpdateable", {
 			get: function () {
-				return [true, true, true, true, true, true, false, false, true, true, true, true, false, true, true, false, false, false, false, true, true, false, true, true, true, true, true, true, true];
+				return [true, true, true, true, true, true, false, false, true, true, true, true, false, true, true, false, false, false, false, true, true, false, true, true, true, true, true, true, true, true, true, true, true, true, true];
 			},
 			enumerable: true,
 			configurable: true
@@ -21339,7 +23025,7 @@ var Excel;
 		Object.defineProperty(ChartAxis.prototype, "format", {
 			get: function () {
 				if (!this._F) {
-					this._F=new Excel.ChartAxisFormat(this.context, _createPropertyObjectPath(this.context, this, "Format", false, false, false));
+					this._F=new Excel.ChartAxisFormat(this.context, _createPropertyObjectPath(this.context, this, "Format", false, false, 4));
 				}
 				return this._F;
 			},
@@ -21349,7 +23035,7 @@ var Excel;
 		Object.defineProperty(ChartAxis.prototype, "majorGridlines", {
 			get: function () {
 				if (!this._M) {
-					this._M=new Excel.ChartGridlines(this.context, _createPropertyObjectPath(this.context, this, "MajorGridlines", false, false, false));
+					this._M=new Excel.ChartGridlines(this.context, _createPropertyObjectPath(this.context, this, "MajorGridlines", false, false, 4));
 				}
 				return this._M;
 			},
@@ -21359,7 +23045,7 @@ var Excel;
 		Object.defineProperty(ChartAxis.prototype, "minorGridlines", {
 			get: function () {
 				if (!this._Min) {
-					this._Min=new Excel.ChartGridlines(this.context, _createPropertyObjectPath(this.context, this, "MinorGridlines", false, false, false));
+					this._Min=new Excel.ChartGridlines(this.context, _createPropertyObjectPath(this.context, this, "MinorGridlines", false, false, 4));
 				}
 				return this._Min;
 			},
@@ -21369,31 +23055,44 @@ var Excel;
 		Object.defineProperty(ChartAxis.prototype, "title", {
 			get: function () {
 				if (!this._Tit) {
-					this._Tit=new Excel.ChartAxisTitle(this.context, _createPropertyObjectPath(this.context, this, "Title", false, false, false));
+					this._Tit=new Excel.ChartAxisTitle(this.context, _createPropertyObjectPath(this.context, this, "Title", false, false, 4));
 				}
 				return this._Tit;
 			},
 			enumerable: true,
 			configurable: true
 		});
-		Object.defineProperty(ChartAxis.prototype, "axisBetweenCategories", {
+		Object.defineProperty(ChartAxis.prototype, "alignment", {
 			get: function () {
-				_throwIfNotLoaded("axisBetweenCategories", this._A, _typeChartAxis, this._isNull);
-				_throwIfApiNotSupported("ChartAxis.axisBetweenCategories", _defaultApiSetName, "1.7", _hostName);
+				_throwIfNotLoaded("alignment", this._A, _typeChartAxis, this._isNull);
+				_throwIfApiNotSupported("ChartAxis.alignment", _defaultApiSetName, "1.8", _hostName);
 				return this._A;
 			},
 			set: function (value) {
 				this._A=value;
-				_createSetPropertyAction(this.context, this, "AxisBetweenCategories", value);
+				_createSetPropertyAction(this.context, this, "Alignment", value, 0);
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(ChartAxis.prototype, "axisBetweenCategories", {
+			get: function () {
+				_throwIfNotLoaded("axisBetweenCategories", this._Ax, _typeChartAxis, this._isNull);
+				_throwIfApiNotSupported("ChartAxis.axisBetweenCategories", _defaultApiSetName, "1.8", _hostName);
+				return this._Ax;
+			},
+			set: function (value) {
+				this._Ax=value;
+				_createSetPropertyAction(this.context, this, "AxisBetweenCategories", value, 0);
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(ChartAxis.prototype, "axisGroup", {
 			get: function () {
-				_throwIfNotLoaded("axisGroup", this._Ax, _typeChartAxis, this._isNull);
-				_throwIfApiNotSupported("ChartAxis.axisGroup", _defaultApiSetName, "1.7", _hostName);
-				return this._Ax;
+				_throwIfNotLoaded("axisGroup", this._Axi, _typeChartAxis, this._isNull);
+				_throwIfApiNotSupported("ChartAxis.axisGroup", _defaultApiSetName, "1.8", _hostName);
+				return this._Axi;
 			},
 			enumerable: true,
 			configurable: true
@@ -21406,7 +23105,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._B=value;
-				_createSetPropertyAction(this.context, this, "BaseTimeUnit", value);
+				_createSetPropertyAction(this.context, this, "BaseTimeUnit", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -21419,7 +23118,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._C=value;
-				_createSetPropertyAction(this.context, this, "CategoryType", value);
+				_createSetPropertyAction(this.context, this, "CategoryType", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -21427,12 +23126,12 @@ var Excel;
 		Object.defineProperty(ChartAxis.prototype, "crosses", {
 			get: function () {
 				_throwIfNotLoaded("crosses", this._Cr, _typeChartAxis, this._isNull);
-				_throwIfApiNotSupported("ChartAxis.crosses", _defaultApiSetName, "1.7", _hostName);
+				_throwIfApiNotSupported("ChartAxis.crosses", _defaultApiSetName, "1.8", _hostName);
 				return this._Cr;
 			},
 			set: function (value) {
 				this._Cr=value;
-				_createSetPropertyAction(this.context, this, "Crosses", value);
+				_createSetPropertyAction(this.context, this, "Crosses", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -21463,7 +23162,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._D=value;
-				_createSetPropertyAction(this.context, this, "DisplayUnit", value);
+				_createSetPropertyAction(this.context, this, "DisplayUnit", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -21494,7 +23193,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._Lo=value;
-				_createSetPropertyAction(this.context, this, "LogBase", value);
+				_createSetPropertyAction(this.context, this, "LogBase", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -21502,12 +23201,12 @@ var Excel;
 		Object.defineProperty(ChartAxis.prototype, "majorTickMark", {
 			get: function () {
 				_throwIfNotLoaded("majorTickMark", this._Ma, _typeChartAxis, this._isNull);
-				_throwIfApiNotSupported("ChartAxis.majorTickMark", _defaultApiSetName, "1.7", _hostName);
+				_throwIfApiNotSupported("ChartAxis.majorTickMark", _defaultApiSetName, "1.8", _hostName);
 				return this._Ma;
 			},
 			set: function (value) {
 				this._Ma=value;
-				_createSetPropertyAction(this.context, this, "MajorTickMark", value);
+				_createSetPropertyAction(this.context, this, "MajorTickMark", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -21520,7 +23219,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._Maj=value;
-				_createSetPropertyAction(this.context, this, "MajorTimeUnitScale", value);
+				_createSetPropertyAction(this.context, this, "MajorTimeUnitScale", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -21532,7 +23231,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._Majo=value;
-				_createSetPropertyAction(this.context, this, "MajorUnit", value);
+				_createSetPropertyAction(this.context, this, "MajorUnit", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -21544,7 +23243,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._Max=value;
-				_createSetPropertyAction(this.context, this, "Maximum", value);
+				_createSetPropertyAction(this.context, this, "Maximum", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -21556,7 +23255,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._Mi=value;
-				_createSetPropertyAction(this.context, this, "Minimum", value);
+				_createSetPropertyAction(this.context, this, "Minimum", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -21564,12 +23263,12 @@ var Excel;
 		Object.defineProperty(ChartAxis.prototype, "minorTickMark", {
 			get: function () {
 				_throwIfNotLoaded("minorTickMark", this._Mino, _typeChartAxis, this._isNull);
-				_throwIfApiNotSupported("ChartAxis.minorTickMark", _defaultApiSetName, "1.7", _hostName);
+				_throwIfApiNotSupported("ChartAxis.minorTickMark", _defaultApiSetName, "1.8", _hostName);
 				return this._Mino;
 			},
 			set: function (value) {
 				this._Mino=value;
-				_createSetPropertyAction(this.context, this, "MinorTickMark", value);
+				_createSetPropertyAction(this.context, this, "MinorTickMark", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -21582,7 +23281,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._Minor=value;
-				_createSetPropertyAction(this.context, this, "MinorTimeUnitScale", value);
+				_createSetPropertyAction(this.context, this, "MinorTimeUnitScale", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -21594,7 +23293,59 @@ var Excel;
 			},
 			set: function (value) {
 				this._MinorU=value;
-				_createSetPropertyAction(this.context, this, "MinorUnit", value);
+				_createSetPropertyAction(this.context, this, "MinorUnit", value, 0);
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(ChartAxis.prototype, "multiLevel", {
+			get: function () {
+				_throwIfNotLoaded("multiLevel", this._Mu, _typeChartAxis, this._isNull);
+				_throwIfApiNotSupported("ChartAxis.multiLevel", _defaultApiSetName, "1.8", _hostName);
+				return this._Mu;
+			},
+			set: function (value) {
+				this._Mu=value;
+				_createSetPropertyAction(this.context, this, "MultiLevel", value, 0);
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(ChartAxis.prototype, "numberFormat", {
+			get: function () {
+				_throwIfNotLoaded("numberFormat", this._N, _typeChartAxis, this._isNull);
+				_throwIfApiNotSupported("ChartAxis.numberFormat", _defaultApiSetName, "1.8", _hostName);
+				return this._N;
+			},
+			set: function (value) {
+				this._N=value;
+				_createSetPropertyAction(this.context, this, "NumberFormat", value, 0);
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(ChartAxis.prototype, "numberFormatLinked", {
+			get: function () {
+				_throwIfNotLoaded("numberFormatLinked", this._Nu, _typeChartAxis, this._isNull);
+				_throwIfApiNotSupported("ChartAxis.numberFormatLinked", _defaultApiSetName, "1.8", _hostName);
+				return this._Nu;
+			},
+			set: function (value) {
+				this._Nu=value;
+				_createSetPropertyAction(this.context, this, "NumberFormatLinked", value, 0);
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(ChartAxis.prototype, "offset", {
+			get: function () {
+				_throwIfNotLoaded("offset", this._O, _typeChartAxis, this._isNull);
+				_throwIfApiNotSupported("ChartAxis.offset", _defaultApiSetName, "1.8", _hostName);
+				return this._O;
+			},
+			set: function (value) {
+				this._O=value;
+				_createSetPropertyAction(this.context, this, "Offset", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -21607,7 +23358,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._R=value;
-				_createSetPropertyAction(this.context, this, "ReversePlotOrder", value);
+				_createSetPropertyAction(this.context, this, "ReversePlotOrder", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -21615,12 +23366,12 @@ var Excel;
 		Object.defineProperty(ChartAxis.prototype, "scaleType", {
 			get: function () {
 				_throwIfNotLoaded("scaleType", this._S, _typeChartAxis, this._isNull);
-				_throwIfApiNotSupported("ChartAxis.scaleType", _defaultApiSetName, "1.7", _hostName);
+				_throwIfApiNotSupported("ChartAxis.scaleType", _defaultApiSetName, "1.8", _hostName);
 				return this._S;
 			},
 			set: function (value) {
 				this._S=value;
-				_createSetPropertyAction(this.context, this, "ScaleType", value);
+				_createSetPropertyAction(this.context, this, "ScaleType", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -21633,46 +23384,59 @@ var Excel;
 			},
 			set: function (value) {
 				this._Sh=value;
-				_createSetPropertyAction(this.context, this, "ShowDisplayUnitLabel", value);
+				_createSetPropertyAction(this.context, this, "ShowDisplayUnitLabel", value, 0);
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(ChartAxis.prototype, "textOrientation", {
+			get: function () {
+				_throwIfNotLoaded("textOrientation", this._T, _typeChartAxis, this._isNull);
+				_throwIfApiNotSupported("ChartAxis.textOrientation", _defaultApiSetName, "1.8", _hostName);
+				return this._T;
+			},
+			set: function (value) {
+				this._T=value;
+				_createSetPropertyAction(this.context, this, "TextOrientation", value, 0);
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(ChartAxis.prototype, "tickLabelPosition", {
 			get: function () {
-				_throwIfNotLoaded("tickLabelPosition", this._T, _typeChartAxis, this._isNull);
-				_throwIfApiNotSupported("ChartAxis.tickLabelPosition", _defaultApiSetName, "1.7", _hostName);
-				return this._T;
+				_throwIfNotLoaded("tickLabelPosition", this._Ti, _typeChartAxis, this._isNull);
+				_throwIfApiNotSupported("ChartAxis.tickLabelPosition", _defaultApiSetName, "1.8", _hostName);
+				return this._Ti;
 			},
 			set: function (value) {
-				this._T=value;
-				_createSetPropertyAction(this.context, this, "TickLabelPosition", value);
+				this._Ti=value;
+				_createSetPropertyAction(this.context, this, "TickLabelPosition", value, 0);
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(ChartAxis.prototype, "tickLabelSpacing", {
 			get: function () {
-				_throwIfNotLoaded("tickLabelSpacing", this._Ti, _typeChartAxis, this._isNull);
+				_throwIfNotLoaded("tickLabelSpacing", this._Tic, _typeChartAxis, this._isNull);
 				_throwIfApiNotSupported("ChartAxis.tickLabelSpacing", _defaultApiSetName, "1.7", _hostName);
-				return this._Ti;
+				return this._Tic;
 			},
 			set: function (value) {
-				this._Ti=value;
-				_createSetPropertyAction(this.context, this, "TickLabelSpacing", value);
+				this._Tic=value;
+				_createSetPropertyAction(this.context, this, "TickLabelSpacing", value, 0);
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(ChartAxis.prototype, "tickMarkSpacing", {
 			get: function () {
-				_throwIfNotLoaded("tickMarkSpacing", this._Tic, _typeChartAxis, this._isNull);
+				_throwIfNotLoaded("tickMarkSpacing", this._Tick, _typeChartAxis, this._isNull);
 				_throwIfApiNotSupported("ChartAxis.tickMarkSpacing", _defaultApiSetName, "1.7", _hostName);
-				return this._Tic;
+				return this._Tick;
 			},
 			set: function (value) {
-				this._Tic=value;
-				_createSetPropertyAction(this.context, this, "TickMarkSpacing", value);
+				this._Tick=value;
+				_createSetPropertyAction(this.context, this, "TickMarkSpacing", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -21689,7 +23453,7 @@ var Excel;
 		Object.defineProperty(ChartAxis.prototype, "type", {
 			get: function () {
 				_throwIfNotLoaded("type", this._Ty, _typeChartAxis, this._isNull);
-				_throwIfApiNotSupported("ChartAxis.type", _defaultApiSetName, "1.7", _hostName);
+				_throwIfApiNotSupported("ChartAxis.type", _defaultApiSetName, "1.8", _hostName);
 				return this._Ty;
 			},
 			enumerable: true,
@@ -21703,7 +23467,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._V=value;
-				_createSetPropertyAction(this.context, this, "Visible", value);
+				_createSetPropertyAction(this.context, this, "Visible", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -21718,22 +23482,22 @@ var Excel;
 			configurable: true
 		});
 		ChartAxis.prototype.set=function (properties, options) {
-			this._recursivelySet(properties, options, ["majorUnit", "maximum", "minimum", "minorUnit", "displayUnit", "showDisplayUnitLabel", "minorTimeUnitScale", "majorTimeUnitScale", "baseTimeUnit", "categoryType", "scaleType", "logBase", "reversePlotOrder", "crosses", "visible", "axisBetweenCategories", "majorTickMark", "minorTickMark", "tickMarkSpacing", "tickLabelPosition", "tickLabelSpacing"], ["majorGridlines", "minorGridlines", "title", "format"], []);
+			this._recursivelySet(properties, options, ["majorUnit", "maximum", "minimum", "minorUnit", "displayUnit", "showDisplayUnitLabel", "minorTimeUnitScale", "majorTimeUnitScale", "baseTimeUnit", "categoryType", "scaleType", "logBase", "reversePlotOrder", "crosses", "visible", "axisBetweenCategories", "majorTickMark", "minorTickMark", "tickMarkSpacing", "tickLabelPosition", "tickLabelSpacing", "alignment", "multiLevel", "numberFormat", "numberFormatLinked", "offset", "textOrientation"], ["majorGridlines", "minorGridlines", "title", "format"], []);
 		};
 		ChartAxis.prototype.update=function (properties) {
 			this._recursivelyUpdate(properties);
 		};
 		ChartAxis.prototype.setCategoryNames=function (sourceData) {
 			_throwIfApiNotSupported("ChartAxis.setCategoryNames", _defaultApiSetName, "1.7", _hostName);
-			_createMethodAction(this.context, this, "SetCategoryNames", 0, [sourceData], false);
+			_createMethodAction(this.context, this, "SetCategoryNames", 0, [sourceData], 0);
 		};
 		ChartAxis.prototype.setCrossesAt=function (value) {
 			_throwIfApiNotSupported("ChartAxis.setCrossesAt", _defaultApiSetName, "1.7", _hostName);
-			_createMethodAction(this.context, this, "SetCrossesAt", 0, [value], false);
+			_createMethodAction(this.context, this, "SetCrossesAt", 0, [value], 0);
 		};
 		ChartAxis.prototype.setCustomDisplayUnit=function (value) {
-			_throwIfApiNotSupported("ChartAxis.setCustomDisplayUnit", _defaultApiSetName, "1.7", _hostName);
-			_createMethodAction(this.context, this, "SetCustomDisplayUnit", 0, [value], false);
+			_throwIfApiNotSupported("ChartAxis.setCustomDisplayUnit", _defaultApiSetName, "1.8", _hostName);
+			_createMethodAction(this.context, this, "SetCustomDisplayUnit", 0, [value], 0);
 		};
 		ChartAxis.prototype._handleResult=function (value) {
 			_super.prototype._handleResult.call(this, value);
@@ -21741,11 +23505,14 @@ var Excel;
 				return;
 			var obj=value;
 			_fixObjectPathIfNecessary(this, obj);
+			if (!_isUndefined(obj["Alignment"])) {
+				this._A=obj["Alignment"];
+			}
 			if (!_isUndefined(obj["AxisBetweenCategories"])) {
-				this._A=obj["AxisBetweenCategories"];
+				this._Ax=obj["AxisBetweenCategories"];
 			}
 			if (!_isUndefined(obj["AxisGroup"])) {
-				this._Ax=obj["AxisGroup"];
+				this._Axi=obj["AxisGroup"];
 			}
 			if (!_isUndefined(obj["BaseTimeUnit"])) {
 				this._B=obj["BaseTimeUnit"];
@@ -21798,6 +23565,18 @@ var Excel;
 			if (!_isUndefined(obj["MinorUnit"])) {
 				this._MinorU=obj["MinorUnit"];
 			}
+			if (!_isUndefined(obj["MultiLevel"])) {
+				this._Mu=obj["MultiLevel"];
+			}
+			if (!_isUndefined(obj["NumberFormat"])) {
+				this._N=obj["NumberFormat"];
+			}
+			if (!_isUndefined(obj["NumberFormatLinked"])) {
+				this._Nu=obj["NumberFormatLinked"];
+			}
+			if (!_isUndefined(obj["Offset"])) {
+				this._O=obj["Offset"];
+			}
 			if (!_isUndefined(obj["ReversePlotOrder"])) {
 				this._R=obj["ReversePlotOrder"];
 			}
@@ -21807,14 +23586,17 @@ var Excel;
 			if (!_isUndefined(obj["ShowDisplayUnitLabel"])) {
 				this._Sh=obj["ShowDisplayUnitLabel"];
 			}
+			if (!_isUndefined(obj["TextOrientation"])) {
+				this._T=obj["TextOrientation"];
+			}
 			if (!_isUndefined(obj["TickLabelPosition"])) {
-				this._T=obj["TickLabelPosition"];
+				this._Ti=obj["TickLabelPosition"];
 			}
 			if (!_isUndefined(obj["TickLabelSpacing"])) {
-				this._Ti=obj["TickLabelSpacing"];
+				this._Tic=obj["TickLabelSpacing"];
 			}
 			if (!_isUndefined(obj["TickMarkSpacing"])) {
-				this._Tic=obj["TickMarkSpacing"];
+				this._Tick=obj["TickMarkSpacing"];
 			}
 			if (!_isUndefined(obj["Top"])) {
 				this._To=obj["Top"];
@@ -21842,8 +23624,9 @@ var Excel;
 		};
 		ChartAxis.prototype.toJSON=function () {
 			return _toJson(this, {
-				"axisBetweenCategories": this._A,
-				"axisGroup": this._Ax,
+				"alignment": this._A,
+				"axisBetweenCategories": this._Ax,
+				"axisGroup": this._Axi,
 				"baseTimeUnit": this._B,
 				"categoryType": this._C,
 				"crosses": this._Cr,
@@ -21861,12 +23644,17 @@ var Excel;
 				"minorTickMark": this._Mino,
 				"minorTimeUnitScale": this._Minor,
 				"minorUnit": this._MinorU,
+				"multiLevel": this._Mu,
+				"numberFormat": this._N,
+				"numberFormatLinked": this._Nu,
+				"offset": this._O,
 				"reversePlotOrder": this._R,
 				"scaleType": this._S,
 				"showDisplayUnitLabel": this._Sh,
-				"tickLabelPosition": this._T,
-				"tickLabelSpacing": this._Ti,
-				"tickMarkSpacing": this._Tic,
+				"textOrientation": this._T,
+				"tickLabelPosition": this._Ti,
+				"tickLabelSpacing": this._Tic,
+				"tickMarkSpacing": this._Tick,
 				"top": this._To,
 				"type": this._Ty,
 				"visible": this._V,
@@ -21900,17 +23688,28 @@ var Excel;
 		});
 		Object.defineProperty(ChartAxisFormat.prototype, "_navigationPropertyNames", {
 			get: function () {
-				return ["font", "line"];
+				return ["font", "line", "fill"];
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(ChartAxisFormat.prototype, "fill", {
+			get: function () {
+				_throwIfApiNotSupported("ChartAxisFormat.fill", _defaultApiSetName, "1.8", _hostName);
+				if (!this._F) {
+					this._F=new Excel.ChartFill(this.context, _createPropertyObjectPath(this.context, this, "Fill", false, false, 4));
+				}
+				return this._F;
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(ChartAxisFormat.prototype, "font", {
 			get: function () {
-				if (!this._F) {
-					this._F=new Excel.ChartFont(this.context, _createPropertyObjectPath(this.context, this, "Font", false, false, false));
+				if (!this._Fo) {
+					this._Fo=new Excel.ChartFont(this.context, _createPropertyObjectPath(this.context, this, "Font", false, false, 4));
 				}
-				return this._F;
+				return this._Fo;
 			},
 			enumerable: true,
 			configurable: true
@@ -21918,7 +23717,7 @@ var Excel;
 		Object.defineProperty(ChartAxisFormat.prototype, "line", {
 			get: function () {
 				if (!this._L) {
-					this._L=new Excel.ChartLineFormat(this.context, _createPropertyObjectPath(this.context, this, "Line", false, false, false));
+					this._L=new Excel.ChartLineFormat(this.context, _createPropertyObjectPath(this.context, this, "Line", false, false, 4));
 				}
 				return this._L;
 			},
@@ -21926,7 +23725,9 @@ var Excel;
 			configurable: true
 		});
 		ChartAxisFormat.prototype.set=function (properties, options) {
-			this._recursivelySet(properties, options, [], ["font", "line"], []);
+			this._recursivelySet(properties, options, [], ["font", "line"], [
+				"fill"
+			]);
 		};
 		ChartAxisFormat.prototype.update=function (properties) {
 			this._recursivelyUpdate(properties);
@@ -21937,7 +23738,7 @@ var Excel;
 				return;
 			var obj=value;
 			_fixObjectPathIfNecessary(this, obj);
-			_handleNavigationPropertyResults(this, obj, ["font", "Font", "line", "Line"]);
+			_handleNavigationPropertyResults(this, obj, ["fill", "Fill", "font", "Font", "line", "Line"]);
 		};
 		ChartAxisFormat.prototype.load=function (option) {
 			return _load(this, option);
@@ -21951,7 +23752,7 @@ var Excel;
 		};
 		ChartAxisFormat.prototype.toJSON=function () {
 			return _toJson(this, {}, {
-				"font": this._F,
+				"font": this._Fo,
 				"line": this._L,
 			});
 		};
@@ -21999,7 +23800,7 @@ var Excel;
 		Object.defineProperty(ChartAxisTitle.prototype, "format", {
 			get: function () {
 				if (!this._F) {
-					this._F=new Excel.ChartAxisTitleFormat(this.context, _createPropertyObjectPath(this.context, this, "Format", false, false, false));
+					this._F=new Excel.ChartAxisTitleFormat(this.context, _createPropertyObjectPath(this.context, this, "Format", false, false, 4));
 				}
 				return this._F;
 			},
@@ -22013,7 +23814,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._T=value;
-				_createSetPropertyAction(this.context, this, "Text", value);
+				_createSetPropertyAction(this.context, this, "Text", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -22025,7 +23826,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._V=value;
-				_createSetPropertyAction(this.context, this, "Visible", value);
+				_createSetPropertyAction(this.context, this, "Visible", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -22035,6 +23836,10 @@ var Excel;
 		};
 		ChartAxisTitle.prototype.update=function (properties) {
 			this._recursivelyUpdate(properties);
+		};
+		ChartAxisTitle.prototype.setFormula=function (formula) {
+			_throwIfApiNotSupported("ChartAxisTitle.setFormula", _defaultApiSetName, "1.8", _hostName);
+			_createMethodAction(this.context, this, "SetFormula", 0, [formula], 0);
 		};
 		ChartAxisTitle.prototype._handleResult=function (value) {
 			_super.prototype._handleResult.call(this, value);
@@ -22090,23 +23895,47 @@ var Excel;
 		});
 		Object.defineProperty(ChartAxisTitleFormat.prototype, "_navigationPropertyNames", {
 			get: function () {
-				return ["font"];
+				return ["font", "fill", "border"];
 			},
 			enumerable: true,
 			configurable: true
 		});
-		Object.defineProperty(ChartAxisTitleFormat.prototype, "font", {
+		Object.defineProperty(ChartAxisTitleFormat.prototype, "border", {
 			get: function () {
+				_throwIfApiNotSupported("ChartAxisTitleFormat.border", _defaultApiSetName, "1.8", _hostName);
+				if (!this._B) {
+					this._B=new Excel.ChartBorder(this.context, _createPropertyObjectPath(this.context, this, "Border", false, false, 4));
+				}
+				return this._B;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(ChartAxisTitleFormat.prototype, "fill", {
+			get: function () {
+				_throwIfApiNotSupported("ChartAxisTitleFormat.fill", _defaultApiSetName, "1.8", _hostName);
 				if (!this._F) {
-					this._F=new Excel.ChartFont(this.context, _createPropertyObjectPath(this.context, this, "Font", false, false, false));
+					this._F=new Excel.ChartFill(this.context, _createPropertyObjectPath(this.context, this, "Fill", false, false, 4));
 				}
 				return this._F;
 			},
 			enumerable: true,
 			configurable: true
 		});
+		Object.defineProperty(ChartAxisTitleFormat.prototype, "font", {
+			get: function () {
+				if (!this._Fo) {
+					this._Fo=new Excel.ChartFont(this.context, _createPropertyObjectPath(this.context, this, "Font", false, false, 4));
+				}
+				return this._Fo;
+			},
+			enumerable: true,
+			configurable: true
+		});
 		ChartAxisTitleFormat.prototype.set=function (properties, options) {
-			this._recursivelySet(properties, options, [], ["font"], []);
+			this._recursivelySet(properties, options, [], ["font", "border"], [
+				"fill"
+			]);
 		};
 		ChartAxisTitleFormat.prototype.update=function (properties) {
 			this._recursivelyUpdate(properties);
@@ -22117,7 +23946,7 @@ var Excel;
 				return;
 			var obj=value;
 			_fixObjectPathIfNecessary(this, obj);
-			_handleNavigationPropertyResults(this, obj, ["font", "Font"]);
+			_handleNavigationPropertyResults(this, obj, ["border", "Border", "fill", "Fill", "font", "Font"]);
 		};
 		ChartAxisTitleFormat.prototype.load=function (option) {
 			return _load(this, option);
@@ -22131,7 +23960,8 @@ var Excel;
 		};
 		ChartAxisTitleFormat.prototype.toJSON=function () {
 			return _toJson(this, {}, {
-				"font": this._F,
+				"border": this._B,
+				"font": this._Fo,
 			});
 		};
 		ChartAxisTitleFormat.prototype.ensureUnchanged=function (data) {
@@ -22156,14 +23986,14 @@ var Excel;
 		});
 		Object.defineProperty(ChartDataLabels.prototype, "_scalarPropertyNames", {
 			get: function () {
-				return ["position", "showValue", "showSeriesName", "showCategoryName", "showLegendKey", "showPercentage", "showBubbleSize", "separator"];
+				return ["position", "showValue", "showSeriesName", "showCategoryName", "showLegendKey", "showPercentage", "showBubbleSize", "separator", "numberFormat", "numberFormatLinked", "textOrientation", "autoText", "horizontalAlignment", "verticalAlignment"];
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(ChartDataLabels.prototype, "_scalarPropertyUpdateable", {
 			get: function () {
-				return [true, true, true, true, true, true, true, true];
+				return [true, true, true, true, true, true, true, true, true, true, true, true, true, true];
 			},
 			enumerable: true,
 			configurable: true
@@ -22178,9 +24008,61 @@ var Excel;
 		Object.defineProperty(ChartDataLabels.prototype, "format", {
 			get: function () {
 				if (!this._F) {
-					this._F=new Excel.ChartDataLabelFormat(this.context, _createPropertyObjectPath(this.context, this, "Format", false, false, false));
+					this._F=new Excel.ChartDataLabelFormat(this.context, _createPropertyObjectPath(this.context, this, "Format", false, false, 4));
 				}
 				return this._F;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(ChartDataLabels.prototype, "autoText", {
+			get: function () {
+				_throwIfNotLoaded("autoText", this._A, _typeChartDataLabels, this._isNull);
+				_throwIfApiNotSupported("ChartDataLabels.autoText", _defaultApiSetName, "1.8", _hostName);
+				return this._A;
+			},
+			set: function (value) {
+				this._A=value;
+				_createSetPropertyAction(this.context, this, "AutoText", value, 0);
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(ChartDataLabels.prototype, "horizontalAlignment", {
+			get: function () {
+				_throwIfNotLoaded("horizontalAlignment", this._H, _typeChartDataLabels, this._isNull);
+				_throwIfApiNotSupported("ChartDataLabels.horizontalAlignment", _defaultApiSetName, "1.8", _hostName);
+				return this._H;
+			},
+			set: function (value) {
+				this._H=value;
+				_createSetPropertyAction(this.context, this, "HorizontalAlignment", value, 0);
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(ChartDataLabels.prototype, "numberFormat", {
+			get: function () {
+				_throwIfNotLoaded("numberFormat", this._N, _typeChartDataLabels, this._isNull);
+				_throwIfApiNotSupported("ChartDataLabels.numberFormat", _defaultApiSetName, "1.8", _hostName);
+				return this._N;
+			},
+			set: function (value) {
+				this._N=value;
+				_createSetPropertyAction(this.context, this, "NumberFormat", value, 0);
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(ChartDataLabels.prototype, "numberFormatLinked", {
+			get: function () {
+				_throwIfNotLoaded("numberFormatLinked", this._Nu, _typeChartDataLabels, this._isNull);
+				_throwIfApiNotSupported("ChartDataLabels.numberFormatLinked", _defaultApiSetName, "1.8", _hostName);
+				return this._Nu;
+			},
+			set: function (value) {
+				this._Nu=value;
+				_createSetPropertyAction(this.context, this, "NumberFormatLinked", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -22192,7 +24074,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._P=value;
-				_createSetPropertyAction(this.context, this, "Position", value);
+				_createSetPropertyAction(this.context, this, "Position", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -22204,7 +24086,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._S=value;
-				_createSetPropertyAction(this.context, this, "Separator", value);
+				_createSetPropertyAction(this.context, this, "Separator", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -22216,7 +24098,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._Sh=value;
-				_createSetPropertyAction(this.context, this, "ShowBubbleSize", value);
+				_createSetPropertyAction(this.context, this, "ShowBubbleSize", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -22228,7 +24110,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._Sho=value;
-				_createSetPropertyAction(this.context, this, "ShowCategoryName", value);
+				_createSetPropertyAction(this.context, this, "ShowCategoryName", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -22240,7 +24122,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._Show=value;
-				_createSetPropertyAction(this.context, this, "ShowLegendKey", value);
+				_createSetPropertyAction(this.context, this, "ShowLegendKey", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -22252,7 +24134,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._ShowP=value;
-				_createSetPropertyAction(this.context, this, "ShowPercentage", value);
+				_createSetPropertyAction(this.context, this, "ShowPercentage", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -22264,7 +24146,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._ShowS=value;
-				_createSetPropertyAction(this.context, this, "ShowSeriesName", value);
+				_createSetPropertyAction(this.context, this, "ShowSeriesName", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -22276,13 +24158,39 @@ var Excel;
 			},
 			set: function (value) {
 				this._ShowV=value;
-				_createSetPropertyAction(this.context, this, "ShowValue", value);
+				_createSetPropertyAction(this.context, this, "ShowValue", value, 0);
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(ChartDataLabels.prototype, "textOrientation", {
+			get: function () {
+				_throwIfNotLoaded("textOrientation", this._T, _typeChartDataLabels, this._isNull);
+				_throwIfApiNotSupported("ChartDataLabels.textOrientation", _defaultApiSetName, "1.8", _hostName);
+				return this._T;
+			},
+			set: function (value) {
+				this._T=value;
+				_createSetPropertyAction(this.context, this, "TextOrientation", value, 0);
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(ChartDataLabels.prototype, "verticalAlignment", {
+			get: function () {
+				_throwIfNotLoaded("verticalAlignment", this._V, _typeChartDataLabels, this._isNull);
+				_throwIfApiNotSupported("ChartDataLabels.verticalAlignment", _defaultApiSetName, "1.8", _hostName);
+				return this._V;
+			},
+			set: function (value) {
+				this._V=value;
+				_createSetPropertyAction(this.context, this, "VerticalAlignment", value, 0);
 			},
 			enumerable: true,
 			configurable: true
 		});
 		ChartDataLabels.prototype.set=function (properties, options) {
-			this._recursivelySet(properties, options, ["position", "showValue", "showSeriesName", "showCategoryName", "showLegendKey", "showPercentage", "showBubbleSize", "separator"], ["format"], []);
+			this._recursivelySet(properties, options, ["position", "showValue", "showSeriesName", "showCategoryName", "showLegendKey", "showPercentage", "showBubbleSize", "separator", "numberFormat", "numberFormatLinked", "textOrientation", "autoText", "horizontalAlignment", "verticalAlignment"], ["format"], []);
 		};
 		ChartDataLabels.prototype.update=function (properties) {
 			this._recursivelyUpdate(properties);
@@ -22293,6 +24201,18 @@ var Excel;
 				return;
 			var obj=value;
 			_fixObjectPathIfNecessary(this, obj);
+			if (!_isUndefined(obj["AutoText"])) {
+				this._A=obj["AutoText"];
+			}
+			if (!_isUndefined(obj["HorizontalAlignment"])) {
+				this._H=obj["HorizontalAlignment"];
+			}
+			if (!_isUndefined(obj["NumberFormat"])) {
+				this._N=obj["NumberFormat"];
+			}
+			if (!_isUndefined(obj["NumberFormatLinked"])) {
+				this._Nu=obj["NumberFormatLinked"];
+			}
 			if (!_isUndefined(obj["Position"])) {
 				this._P=obj["Position"];
 			}
@@ -22317,6 +24237,12 @@ var Excel;
 			if (!_isUndefined(obj["ShowValue"])) {
 				this._ShowV=obj["ShowValue"];
 			}
+			if (!_isUndefined(obj["TextOrientation"])) {
+				this._T=obj["TextOrientation"];
+			}
+			if (!_isUndefined(obj["VerticalAlignment"])) {
+				this._V=obj["VerticalAlignment"];
+			}
 			_handleNavigationPropertyResults(this, obj, ["format", "Format"]);
 		};
 		ChartDataLabels.prototype.load=function (option) {
@@ -22331,6 +24257,10 @@ var Excel;
 		};
 		ChartDataLabels.prototype.toJSON=function () {
 			return _toJson(this, {
+				"autoText": this._A,
+				"horizontalAlignment": this._H,
+				"numberFormat": this._N,
+				"numberFormatLinked": this._Nu,
 				"position": this._P,
 				"separator": this._S,
 				"showBubbleSize": this._Sh,
@@ -22339,6 +24269,8 @@ var Excel;
 				"showPercentage": this._ShowP,
 				"showSeriesName": this._ShowS,
 				"showValue": this._ShowV,
+				"textOrientation": this._T,
+				"verticalAlignment": this._V,
 			}, {
 				"format": this._F,
 			});
@@ -22365,14 +24297,119 @@ var Excel;
 		});
 		Object.defineProperty(ChartDataLabel.prototype, "_scalarPropertyNames", {
 			get: function () {
-				return ["position", "showValue", "showSeriesName", "showCategoryName", "showLegendKey", "showPercentage", "showBubbleSize", "separator"];
+				return ["position", "showValue", "showSeriesName", "showCategoryName", "showLegendKey", "showPercentage", "showBubbleSize", "separator", "top", "left", "width", "height", "formula", "textOrientation", "horizontalAlignment", "verticalAlignment", "text", "autoText", "numberFormat", "numberFormatLinked"];
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(ChartDataLabel.prototype, "_scalarPropertyUpdateable", {
 			get: function () {
-				return [true, true, true, true, true, true, true, true];
+				return [true, true, true, true, true, true, true, true, true, true, false, false, true, true, true, true, true, true, true, true];
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(ChartDataLabel.prototype, "_navigationPropertyNames", {
+			get: function () {
+				return ["format"];
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(ChartDataLabel.prototype, "format", {
+			get: function () {
+				_throwIfApiNotSupported("ChartDataLabel.format", _defaultApiSetName, "1.8", _hostName);
+				if (!this._F) {
+					this._F=new Excel.ChartDataLabelFormat(this.context, _createPropertyObjectPath(this.context, this, "Format", false, false, 4));
+				}
+				return this._F;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(ChartDataLabel.prototype, "autoText", {
+			get: function () {
+				_throwIfNotLoaded("autoText", this._A, _typeChartDataLabel, this._isNull);
+				_throwIfApiNotSupported("ChartDataLabel.autoText", _defaultApiSetName, "1.8", _hostName);
+				return this._A;
+			},
+			set: function (value) {
+				this._A=value;
+				_createSetPropertyAction(this.context, this, "AutoText", value, 0);
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(ChartDataLabel.prototype, "formula", {
+			get: function () {
+				_throwIfNotLoaded("formula", this._Fo, _typeChartDataLabel, this._isNull);
+				_throwIfApiNotSupported("ChartDataLabel.formula", _defaultApiSetName, "1.8", _hostName);
+				return this._Fo;
+			},
+			set: function (value) {
+				this._Fo=value;
+				_createSetPropertyAction(this.context, this, "Formula", value, 0);
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(ChartDataLabel.prototype, "height", {
+			get: function () {
+				_throwIfNotLoaded("height", this._H, _typeChartDataLabel, this._isNull);
+				_throwIfApiNotSupported("ChartDataLabel.height", _defaultApiSetName, "1.8", _hostName);
+				return this._H;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(ChartDataLabel.prototype, "horizontalAlignment", {
+			get: function () {
+				_throwIfNotLoaded("horizontalAlignment", this._Ho, _typeChartDataLabel, this._isNull);
+				_throwIfApiNotSupported("ChartDataLabel.horizontalAlignment", _defaultApiSetName, "1.8", _hostName);
+				return this._Ho;
+			},
+			set: function (value) {
+				this._Ho=value;
+				_createSetPropertyAction(this.context, this, "HorizontalAlignment", value, 0);
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(ChartDataLabel.prototype, "left", {
+			get: function () {
+				_throwIfNotLoaded("left", this._L, _typeChartDataLabel, this._isNull);
+				_throwIfApiNotSupported("ChartDataLabel.left", _defaultApiSetName, "1.8", _hostName);
+				return this._L;
+			},
+			set: function (value) {
+				this._L=value;
+				_createSetPropertyAction(this.context, this, "Left", value, 0);
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(ChartDataLabel.prototype, "numberFormat", {
+			get: function () {
+				_throwIfNotLoaded("numberFormat", this._N, _typeChartDataLabel, this._isNull);
+				_throwIfApiNotSupported("ChartDataLabel.numberFormat", _defaultApiSetName, "1.8", _hostName);
+				return this._N;
+			},
+			set: function (value) {
+				this._N=value;
+				_createSetPropertyAction(this.context, this, "NumberFormat", value, 0);
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(ChartDataLabel.prototype, "numberFormatLinked", {
+			get: function () {
+				_throwIfNotLoaded("numberFormatLinked", this._Nu, _typeChartDataLabel, this._isNull);
+				_throwIfApiNotSupported("ChartDataLabel.numberFormatLinked", _defaultApiSetName, "1.8", _hostName);
+				return this._Nu;
+			},
+			set: function (value) {
+				this._Nu=value;
+				_createSetPropertyAction(this.context, this, "NumberFormatLinked", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -22384,7 +24421,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._P=value;
-				_createSetPropertyAction(this.context, this, "Position", value);
+				_createSetPropertyAction(this.context, this, "Position", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -22396,7 +24433,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._S=value;
-				_createSetPropertyAction(this.context, this, "Separator", value);
+				_createSetPropertyAction(this.context, this, "Separator", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -22408,7 +24445,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._Sh=value;
-				_createSetPropertyAction(this.context, this, "ShowBubbleSize", value);
+				_createSetPropertyAction(this.context, this, "ShowBubbleSize", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -22420,7 +24457,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._Sho=value;
-				_createSetPropertyAction(this.context, this, "ShowCategoryName", value);
+				_createSetPropertyAction(this.context, this, "ShowCategoryName", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -22432,7 +24469,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._Show=value;
-				_createSetPropertyAction(this.context, this, "ShowLegendKey", value);
+				_createSetPropertyAction(this.context, this, "ShowLegendKey", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -22444,7 +24481,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._ShowP=value;
-				_createSetPropertyAction(this.context, this, "ShowPercentage", value);
+				_createSetPropertyAction(this.context, this, "ShowPercentage", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -22456,7 +24493,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._ShowS=value;
-				_createSetPropertyAction(this.context, this, "ShowSeriesName", value);
+				_createSetPropertyAction(this.context, this, "ShowSeriesName", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -22468,13 +24505,74 @@ var Excel;
 			},
 			set: function (value) {
 				this._ShowV=value;
-				_createSetPropertyAction(this.context, this, "ShowValue", value);
+				_createSetPropertyAction(this.context, this, "ShowValue", value, 0);
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(ChartDataLabel.prototype, "text", {
+			get: function () {
+				_throwIfNotLoaded("text", this._T, _typeChartDataLabel, this._isNull);
+				_throwIfApiNotSupported("ChartDataLabel.text", _defaultApiSetName, "1.8", _hostName);
+				return this._T;
+			},
+			set: function (value) {
+				this._T=value;
+				_createSetPropertyAction(this.context, this, "Text", value, 0);
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(ChartDataLabel.prototype, "textOrientation", {
+			get: function () {
+				_throwIfNotLoaded("textOrientation", this._Te, _typeChartDataLabel, this._isNull);
+				_throwIfApiNotSupported("ChartDataLabel.textOrientation", _defaultApiSetName, "1.8", _hostName);
+				return this._Te;
+			},
+			set: function (value) {
+				this._Te=value;
+				_createSetPropertyAction(this.context, this, "TextOrientation", value, 0);
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(ChartDataLabel.prototype, "top", {
+			get: function () {
+				_throwIfNotLoaded("top", this._To, _typeChartDataLabel, this._isNull);
+				_throwIfApiNotSupported("ChartDataLabel.top", _defaultApiSetName, "1.8", _hostName);
+				return this._To;
+			},
+			set: function (value) {
+				this._To=value;
+				_createSetPropertyAction(this.context, this, "Top", value, 0);
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(ChartDataLabel.prototype, "verticalAlignment", {
+			get: function () {
+				_throwIfNotLoaded("verticalAlignment", this._V, _typeChartDataLabel, this._isNull);
+				_throwIfApiNotSupported("ChartDataLabel.verticalAlignment", _defaultApiSetName, "1.8", _hostName);
+				return this._V;
+			},
+			set: function (value) {
+				this._V=value;
+				_createSetPropertyAction(this.context, this, "VerticalAlignment", value, 0);
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(ChartDataLabel.prototype, "width", {
+			get: function () {
+				_throwIfNotLoaded("width", this._W, _typeChartDataLabel, this._isNull);
+				_throwIfApiNotSupported("ChartDataLabel.width", _defaultApiSetName, "1.8", _hostName);
+				return this._W;
 			},
 			enumerable: true,
 			configurable: true
 		});
 		ChartDataLabel.prototype.set=function (properties, options) {
-			this._recursivelySet(properties, options, ["position", "showValue", "showSeriesName", "showCategoryName", "showLegendKey", "showPercentage", "showBubbleSize", "separator"], [], []);
+			this._recursivelySet(properties, options, ["position", "showValue", "showSeriesName", "showCategoryName", "showLegendKey", "showPercentage", "showBubbleSize", "separator", "top", "left", "formula", "textOrientation", "horizontalAlignment", "verticalAlignment", "text", "autoText", "numberFormat", "numberFormatLinked"], ["format"], []);
 		};
 		ChartDataLabel.prototype.update=function (properties) {
 			this._recursivelyUpdate(properties);
@@ -22485,6 +24583,27 @@ var Excel;
 				return;
 			var obj=value;
 			_fixObjectPathIfNecessary(this, obj);
+			if (!_isUndefined(obj["AutoText"])) {
+				this._A=obj["AutoText"];
+			}
+			if (!_isUndefined(obj["Formula"])) {
+				this._Fo=obj["Formula"];
+			}
+			if (!_isUndefined(obj["Height"])) {
+				this._H=obj["Height"];
+			}
+			if (!_isUndefined(obj["HorizontalAlignment"])) {
+				this._Ho=obj["HorizontalAlignment"];
+			}
+			if (!_isUndefined(obj["Left"])) {
+				this._L=obj["Left"];
+			}
+			if (!_isUndefined(obj["NumberFormat"])) {
+				this._N=obj["NumberFormat"];
+			}
+			if (!_isUndefined(obj["NumberFormatLinked"])) {
+				this._Nu=obj["NumberFormatLinked"];
+			}
 			if (!_isUndefined(obj["Position"])) {
 				this._P=obj["Position"];
 			}
@@ -22509,6 +24628,22 @@ var Excel;
 			if (!_isUndefined(obj["ShowValue"])) {
 				this._ShowV=obj["ShowValue"];
 			}
+			if (!_isUndefined(obj["Text"])) {
+				this._T=obj["Text"];
+			}
+			if (!_isUndefined(obj["TextOrientation"])) {
+				this._Te=obj["TextOrientation"];
+			}
+			if (!_isUndefined(obj["Top"])) {
+				this._To=obj["Top"];
+			}
+			if (!_isUndefined(obj["VerticalAlignment"])) {
+				this._V=obj["VerticalAlignment"];
+			}
+			if (!_isUndefined(obj["Width"])) {
+				this._W=obj["Width"];
+			}
+			_handleNavigationPropertyResults(this, obj, ["format", "Format"]);
 		};
 		ChartDataLabel.prototype.load=function (option) {
 			return _load(this, option);
@@ -22522,6 +24657,13 @@ var Excel;
 		};
 		ChartDataLabel.prototype.toJSON=function () {
 			return _toJson(this, {
+				"autoText": this._A,
+				"formula": this._Fo,
+				"height": this._H,
+				"horizontalAlignment": this._Ho,
+				"left": this._L,
+				"numberFormat": this._N,
+				"numberFormatLinked": this._Nu,
 				"position": this._P,
 				"separator": this._S,
 				"showBubbleSize": this._Sh,
@@ -22530,7 +24672,14 @@ var Excel;
 				"showPercentage": this._ShowP,
 				"showSeriesName": this._ShowS,
 				"showValue": this._ShowV,
-			}, {});
+				"text": this._T,
+				"textOrientation": this._Te,
+				"top": this._To,
+				"verticalAlignment": this._V,
+				"width": this._W,
+			}, {
+				"format": this._F,
+			});
 		};
 		ChartDataLabel.prototype.ensureUnchanged=function (data) {
 			_createEnsureUnchangedAction(this.context, this, data);
@@ -22554,7 +24703,18 @@ var Excel;
 		});
 		Object.defineProperty(ChartDataLabelFormat.prototype, "_navigationPropertyNames", {
 			get: function () {
-				return ["font", "fill"];
+				return ["font", "fill", "border"];
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(ChartDataLabelFormat.prototype, "border", {
+			get: function () {
+				_throwIfApiNotSupported("ChartDataLabelFormat.border", _defaultApiSetName, "1.8", _hostName);
+				if (!this._B) {
+					this._B=new Excel.ChartBorder(this.context, _createPropertyObjectPath(this.context, this, "Border", false, false, 4));
+				}
+				return this._B;
 			},
 			enumerable: true,
 			configurable: true
@@ -22562,7 +24722,7 @@ var Excel;
 		Object.defineProperty(ChartDataLabelFormat.prototype, "fill", {
 			get: function () {
 				if (!this._F) {
-					this._F=new Excel.ChartFill(this.context, _createPropertyObjectPath(this.context, this, "Fill", false, false, false));
+					this._F=new Excel.ChartFill(this.context, _createPropertyObjectPath(this.context, this, "Fill", false, false, 4));
 				}
 				return this._F;
 			},
@@ -22572,7 +24732,7 @@ var Excel;
 		Object.defineProperty(ChartDataLabelFormat.prototype, "font", {
 			get: function () {
 				if (!this._Fo) {
-					this._Fo=new Excel.ChartFont(this.context, _createPropertyObjectPath(this.context, this, "Font", false, false, false));
+					this._Fo=new Excel.ChartFont(this.context, _createPropertyObjectPath(this.context, this, "Font", false, false, 4));
 				}
 				return this._Fo;
 			},
@@ -22580,7 +24740,7 @@ var Excel;
 			configurable: true
 		});
 		ChartDataLabelFormat.prototype.set=function (properties, options) {
-			this._recursivelySet(properties, options, [], ["font"], [
+			this._recursivelySet(properties, options, [], ["font", "border"], [
 				"fill"
 			]);
 		};
@@ -22593,7 +24753,7 @@ var Excel;
 				return;
 			var obj=value;
 			_fixObjectPathIfNecessary(this, obj);
-			_handleNavigationPropertyResults(this, obj, ["fill", "Fill", "font", "Font"]);
+			_handleNavigationPropertyResults(this, obj, ["border", "Border", "fill", "Fill", "font", "Font"]);
 		};
 		ChartDataLabelFormat.prototype.load=function (option) {
 			return _load(this, option);
@@ -22607,6 +24767,7 @@ var Excel;
 		};
 		ChartDataLabelFormat.prototype.toJSON=function () {
 			return _toJson(this, {}, {
+				"border": this._B,
 				"font": this._Fo,
 			});
 		};
@@ -22617,6 +24778,217 @@ var Excel;
 		return ChartDataLabelFormat;
 	}(OfficeExtension.ClientObject));
 	Excel.ChartDataLabelFormat=ChartDataLabelFormat;
+	var _typeChartErrorBars="ChartErrorBars";
+	var ChartErrorBars=(function (_super) {
+		__extends(ChartErrorBars, _super);
+		function ChartErrorBars() {
+			return _super !==null && _super.apply(this, arguments) || this;
+		}
+		Object.defineProperty(ChartErrorBars.prototype, "_className", {
+			get: function () {
+				return "ChartErrorBars";
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(ChartErrorBars.prototype, "_scalarPropertyNames", {
+			get: function () {
+				return ["endStyleCap", "include", "type", "visible"];
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(ChartErrorBars.prototype, "_scalarPropertyUpdateable", {
+			get: function () {
+				return [true, true, true, true];
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(ChartErrorBars.prototype, "_navigationPropertyNames", {
+			get: function () {
+				return ["format"];
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(ChartErrorBars.prototype, "format", {
+			get: function () {
+				if (!this._F) {
+					this._F=new Excel.ChartErrorBarsFormat(this.context, _createPropertyObjectPath(this.context, this, "Format", false, false, 4));
+				}
+				return this._F;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(ChartErrorBars.prototype, "endStyleCap", {
+			get: function () {
+				_throwIfNotLoaded("endStyleCap", this._E, _typeChartErrorBars, this._isNull);
+				return this._E;
+			},
+			set: function (value) {
+				this._E=value;
+				_createSetPropertyAction(this.context, this, "EndStyleCap", value, 0);
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(ChartErrorBars.prototype, "include", {
+			get: function () {
+				_throwIfNotLoaded("include", this._I, _typeChartErrorBars, this._isNull);
+				return this._I;
+			},
+			set: function (value) {
+				this._I=value;
+				_createSetPropertyAction(this.context, this, "Include", value, 0);
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(ChartErrorBars.prototype, "type", {
+			get: function () {
+				_throwIfNotLoaded("type", this._T, _typeChartErrorBars, this._isNull);
+				return this._T;
+			},
+			set: function (value) {
+				this._T=value;
+				_createSetPropertyAction(this.context, this, "Type", value, 0);
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(ChartErrorBars.prototype, "visible", {
+			get: function () {
+				_throwIfNotLoaded("visible", this._V, _typeChartErrorBars, this._isNull);
+				return this._V;
+			},
+			set: function (value) {
+				this._V=value;
+				_createSetPropertyAction(this.context, this, "Visible", value, 0);
+			},
+			enumerable: true,
+			configurable: true
+		});
+		ChartErrorBars.prototype.set=function (properties, options) {
+			this._recursivelySet(properties, options, ["endStyleCap", "include", "type", "visible"], ["format"], []);
+		};
+		ChartErrorBars.prototype.update=function (properties) {
+			this._recursivelyUpdate(properties);
+		};
+		ChartErrorBars.prototype._handleResult=function (value) {
+			_super.prototype._handleResult.call(this, value);
+			if (_isNullOrUndefined(value))
+				return;
+			var obj=value;
+			_fixObjectPathIfNecessary(this, obj);
+			if (!_isUndefined(obj["EndStyleCap"])) {
+				this._E=obj["EndStyleCap"];
+			}
+			if (!_isUndefined(obj["Include"])) {
+				this._I=obj["Include"];
+			}
+			if (!_isUndefined(obj["Type"])) {
+				this._T=obj["Type"];
+			}
+			if (!_isUndefined(obj["Visible"])) {
+				this._V=obj["Visible"];
+			}
+			_handleNavigationPropertyResults(this, obj, ["format", "Format"]);
+		};
+		ChartErrorBars.prototype.load=function (option) {
+			return _load(this, option);
+		};
+		ChartErrorBars.prototype.retrieve=function (option) {
+			return _retrieve(this, option);
+		};
+		ChartErrorBars.prototype._handleRetrieveResult=function (value, result) {
+			_super.prototype._handleRetrieveResult.call(this, value, result);
+			_processRetrieveResult(this, value, result);
+		};
+		ChartErrorBars.prototype.toJSON=function () {
+			return _toJson(this, {
+				"endStyleCap": this._E,
+				"include": this._I,
+				"type": this._T,
+				"visible": this._V,
+			}, {
+				"format": this._F,
+			});
+		};
+		ChartErrorBars.prototype.ensureUnchanged=function (data) {
+			_createEnsureUnchangedAction(this.context, this, data);
+			return;
+		};
+		return ChartErrorBars;
+	}(OfficeExtension.ClientObject));
+	Excel.ChartErrorBars=ChartErrorBars;
+	var _typeChartErrorBarsFormat="ChartErrorBarsFormat";
+	var ChartErrorBarsFormat=(function (_super) {
+		__extends(ChartErrorBarsFormat, _super);
+		function ChartErrorBarsFormat() {
+			return _super !==null && _super.apply(this, arguments) || this;
+		}
+		Object.defineProperty(ChartErrorBarsFormat.prototype, "_className", {
+			get: function () {
+				return "ChartErrorBarsFormat";
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(ChartErrorBarsFormat.prototype, "_navigationPropertyNames", {
+			get: function () {
+				return ["line"];
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(ChartErrorBarsFormat.prototype, "line", {
+			get: function () {
+				if (!this._L) {
+					this._L=new Excel.ChartLineFormat(this.context, _createPropertyObjectPath(this.context, this, "Line", false, false, 4));
+				}
+				return this._L;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		ChartErrorBarsFormat.prototype.set=function (properties, options) {
+			this._recursivelySet(properties, options, [], ["line"], []);
+		};
+		ChartErrorBarsFormat.prototype.update=function (properties) {
+			this._recursivelyUpdate(properties);
+		};
+		ChartErrorBarsFormat.prototype._handleResult=function (value) {
+			_super.prototype._handleResult.call(this, value);
+			if (_isNullOrUndefined(value))
+				return;
+			var obj=value;
+			_fixObjectPathIfNecessary(this, obj);
+			_handleNavigationPropertyResults(this, obj, ["line", "Line"]);
+		};
+		ChartErrorBarsFormat.prototype.load=function (option) {
+			return _load(this, option);
+		};
+		ChartErrorBarsFormat.prototype.retrieve=function (option) {
+			return _retrieve(this, option);
+		};
+		ChartErrorBarsFormat.prototype._handleRetrieveResult=function (value, result) {
+			_super.prototype._handleRetrieveResult.call(this, value, result);
+			_processRetrieveResult(this, value, result);
+		};
+		ChartErrorBarsFormat.prototype.toJSON=function () {
+			return _toJson(this, {}, {
+				"line": this._L,
+			});
+		};
+		ChartErrorBarsFormat.prototype.ensureUnchanged=function (data) {
+			_createEnsureUnchangedAction(this.context, this, data);
+			return;
+		};
+		return ChartErrorBarsFormat;
+	}(OfficeExtension.ClientObject));
+	Excel.ChartErrorBarsFormat=ChartErrorBarsFormat;
 	var _typeChartGridlines="ChartGridlines";
 	var ChartGridlines=(function (_super) {
 		__extends(ChartGridlines, _super);
@@ -22654,7 +25026,7 @@ var Excel;
 		Object.defineProperty(ChartGridlines.prototype, "format", {
 			get: function () {
 				if (!this._F) {
-					this._F=new Excel.ChartGridlinesFormat(this.context, _createPropertyObjectPath(this.context, this, "Format", false, false, false));
+					this._F=new Excel.ChartGridlinesFormat(this.context, _createPropertyObjectPath(this.context, this, "Format", false, false, 4));
 				}
 				return this._F;
 			},
@@ -22668,7 +25040,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._V=value;
-				_createSetPropertyAction(this.context, this, "Visible", value);
+				_createSetPropertyAction(this.context, this, "Visible", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -22737,7 +25109,7 @@ var Excel;
 		Object.defineProperty(ChartGridlinesFormat.prototype, "line", {
 			get: function () {
 				if (!this._L) {
-					this._L=new Excel.ChartLineFormat(this.context, _createPropertyObjectPath(this.context, this, "Line", false, false, false));
+					this._L=new Excel.ChartLineFormat(this.context, _createPropertyObjectPath(this.context, this, "Line", false, false, 4));
 				}
 				return this._L;
 			},
@@ -22817,7 +25189,7 @@ var Excel;
 		Object.defineProperty(ChartLegend.prototype, "format", {
 			get: function () {
 				if (!this._F) {
-					this._F=new Excel.ChartLegendFormat(this.context, _createPropertyObjectPath(this.context, this, "Format", false, false, false));
+					this._F=new Excel.ChartLegendFormat(this.context, _createPropertyObjectPath(this.context, this, "Format", false, false, 4));
 				}
 				return this._F;
 			},
@@ -22828,7 +25200,7 @@ var Excel;
 			get: function () {
 				_throwIfApiNotSupported("ChartLegend.legendEntries", _defaultApiSetName, "1.7", _hostName);
 				if (!this._Le) {
-					this._Le=new Excel.ChartLegendEntryCollection(this.context, _createPropertyObjectPath(this.context, this, "LegendEntries", true, false, false));
+					this._Le=new Excel.ChartLegendEntryCollection(this.context, _createPropertyObjectPath(this.context, this, "LegendEntries", true, false, 4));
 				}
 				return this._Le;
 			},
@@ -22838,12 +25210,12 @@ var Excel;
 		Object.defineProperty(ChartLegend.prototype, "height", {
 			get: function () {
 				_throwIfNotLoaded("height", this._H, _typeChartLegend, this._isNull);
-				_throwIfApiNotSupported("ChartLegend.height", _defaultApiSetName, "1.7", _hostName);
+				_throwIfApiNotSupported("ChartLegend.height", _defaultApiSetName, "1.8", _hostName);
 				return this._H;
 			},
 			set: function (value) {
 				this._H=value;
-				_createSetPropertyAction(this.context, this, "Height", value);
+				_createSetPropertyAction(this.context, this, "Height", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -22856,7 +25228,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._L=value;
-				_createSetPropertyAction(this.context, this, "Left", value);
+				_createSetPropertyAction(this.context, this, "Left", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -22868,7 +25240,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._O=value;
-				_createSetPropertyAction(this.context, this, "Overlay", value);
+				_createSetPropertyAction(this.context, this, "Overlay", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -22880,7 +25252,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._P=value;
-				_createSetPropertyAction(this.context, this, "Position", value);
+				_createSetPropertyAction(this.context, this, "Position", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -22893,7 +25265,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._S=value;
-				_createSetPropertyAction(this.context, this, "ShowShadow", value);
+				_createSetPropertyAction(this.context, this, "ShowShadow", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -22906,7 +25278,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._T=value;
-				_createSetPropertyAction(this.context, this, "Top", value);
+				_createSetPropertyAction(this.context, this, "Top", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -22918,7 +25290,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._V=value;
-				_createSetPropertyAction(this.context, this, "Visible", value);
+				_createSetPropertyAction(this.context, this, "Visible", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -22926,12 +25298,12 @@ var Excel;
 		Object.defineProperty(ChartLegend.prototype, "width", {
 			get: function () {
 				_throwIfNotLoaded("width", this._W, _typeChartLegend, this._isNull);
-				_throwIfApiNotSupported("ChartLegend.width", _defaultApiSetName, "1.7", _hostName);
+				_throwIfApiNotSupported("ChartLegend.width", _defaultApiSetName, "1.8", _hostName);
 				return this._W;
 			},
 			set: function (value) {
 				this._W=value;
-				_createSetPropertyAction(this.context, this, "Width", value);
+				_createSetPropertyAction(this.context, this, "Width", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -23023,14 +25395,50 @@ var Excel;
 		});
 		Object.defineProperty(ChartLegendEntry.prototype, "_scalarPropertyNames", {
 			get: function () {
-				return ["visible"];
+				return ["visible", "left", "top", "width", "height", "index"];
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(ChartLegendEntry.prototype, "_scalarPropertyUpdateable", {
 			get: function () {
-				return [true];
+				return [true, false, false, false, false, false];
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(ChartLegendEntry.prototype, "height", {
+			get: function () {
+				_throwIfNotLoaded("height", this._H, _typeChartLegendEntry, this._isNull);
+				_throwIfApiNotSupported("ChartLegendEntry.height", _defaultApiSetName, "1.8", _hostName);
+				return this._H;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(ChartLegendEntry.prototype, "index", {
+			get: function () {
+				_throwIfNotLoaded("index", this._I, _typeChartLegendEntry, this._isNull);
+				_throwIfApiNotSupported("ChartLegendEntry.index", _defaultApiSetName, "1.8", _hostName);
+				return this._I;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(ChartLegendEntry.prototype, "left", {
+			get: function () {
+				_throwIfNotLoaded("left", this._L, _typeChartLegendEntry, this._isNull);
+				_throwIfApiNotSupported("ChartLegendEntry.left", _defaultApiSetName, "1.8", _hostName);
+				return this._L;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(ChartLegendEntry.prototype, "top", {
+			get: function () {
+				_throwIfNotLoaded("top", this._T, _typeChartLegendEntry, this._isNull);
+				_throwIfApiNotSupported("ChartLegendEntry.top", _defaultApiSetName, "1.8", _hostName);
+				return this._T;
 			},
 			enumerable: true,
 			configurable: true
@@ -23042,7 +25450,16 @@ var Excel;
 			},
 			set: function (value) {
 				this._V=value;
-				_createSetPropertyAction(this.context, this, "Visible", value);
+				_createSetPropertyAction(this.context, this, "Visible", value, 0);
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(ChartLegendEntry.prototype, "width", {
+			get: function () {
+				_throwIfNotLoaded("width", this._W, _typeChartLegendEntry, this._isNull);
+				_throwIfApiNotSupported("ChartLegendEntry.width", _defaultApiSetName, "1.8", _hostName);
+				return this._W;
 			},
 			enumerable: true,
 			configurable: true
@@ -23059,8 +25476,23 @@ var Excel;
 				return;
 			var obj=value;
 			_fixObjectPathIfNecessary(this, obj);
+			if (!_isUndefined(obj["Height"])) {
+				this._H=obj["Height"];
+			}
+			if (!_isUndefined(obj["Index"])) {
+				this._I=obj["Index"];
+			}
+			if (!_isUndefined(obj["Left"])) {
+				this._L=obj["Left"];
+			}
+			if (!_isUndefined(obj["Top"])) {
+				this._T=obj["Top"];
+			}
 			if (!_isUndefined(obj["Visible"])) {
 				this._V=obj["Visible"];
+			}
+			if (!_isUndefined(obj["Width"])) {
+				this._W=obj["Width"];
 			}
 		};
 		ChartLegendEntry.prototype.load=function (option) {
@@ -23075,7 +25507,12 @@ var Excel;
 		};
 		ChartLegendEntry.prototype.toJSON=function () {
 			return _toJson(this, {
+				"height": this._H,
+				"index": this._I,
+				"left": this._L,
+				"top": this._T,
 				"visible": this._V,
+				"width": this._W,
 			}, {});
 		};
 		ChartLegendEntry.prototype.ensureUnchanged=function (data) {
@@ -23114,13 +25551,13 @@ var Excel;
 			configurable: true
 		});
 		ChartLegendEntryCollection.prototype.getCount=function () {
-			var action=_createMethodAction(this.context, this, "GetCount", 1, [], false);
+			var action=_createMethodAction(this.context, this, "GetCount", 1, [], 4);
 			var ret=new OfficeExtension.ClientResult();
 			_addActionResultHandler(this, action, ret);
 			return ret;
 		};
 		ChartLegendEntryCollection.prototype.getItemAt=function (index) {
-			return new Excel.ChartLegendEntry(this.context, _createMethodObjectPath(this.context, this, "GetItemAt", 1, [index], false, false, null, false));
+			return new Excel.ChartLegendEntry(this.context, _createMethodObjectPath(this.context, this, "GetItemAt", 1, [index], false, false, null, 4));
 		};
 		ChartLegendEntryCollection.prototype._handleResult=function (value) {
 			_super.prototype._handleResult.call(this, value);
@@ -23170,7 +25607,18 @@ var Excel;
 		});
 		Object.defineProperty(ChartLegendFormat.prototype, "_navigationPropertyNames", {
 			get: function () {
-				return ["font", "fill"];
+				return ["font", "fill", "border"];
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(ChartLegendFormat.prototype, "border", {
+			get: function () {
+				_throwIfApiNotSupported("ChartLegendFormat.border", _defaultApiSetName, "1.8", _hostName);
+				if (!this._B) {
+					this._B=new Excel.ChartBorder(this.context, _createPropertyObjectPath(this.context, this, "Border", false, false, 4));
+				}
+				return this._B;
 			},
 			enumerable: true,
 			configurable: true
@@ -23178,7 +25626,7 @@ var Excel;
 		Object.defineProperty(ChartLegendFormat.prototype, "fill", {
 			get: function () {
 				if (!this._F) {
-					this._F=new Excel.ChartFill(this.context, _createPropertyObjectPath(this.context, this, "Fill", false, false, false));
+					this._F=new Excel.ChartFill(this.context, _createPropertyObjectPath(this.context, this, "Fill", false, false, 4));
 				}
 				return this._F;
 			},
@@ -23188,7 +25636,7 @@ var Excel;
 		Object.defineProperty(ChartLegendFormat.prototype, "font", {
 			get: function () {
 				if (!this._Fo) {
-					this._Fo=new Excel.ChartFont(this.context, _createPropertyObjectPath(this.context, this, "Font", false, false, false));
+					this._Fo=new Excel.ChartFont(this.context, _createPropertyObjectPath(this.context, this, "Font", false, false, 4));
 				}
 				return this._Fo;
 			},
@@ -23196,7 +25644,7 @@ var Excel;
 			configurable: true
 		});
 		ChartLegendFormat.prototype.set=function (properties, options) {
-			this._recursivelySet(properties, options, [], ["font"], [
+			this._recursivelySet(properties, options, [], ["font", "border"], [
 				"fill"
 			]);
 		};
@@ -23209,7 +25657,7 @@ var Excel;
 				return;
 			var obj=value;
 			_fixObjectPathIfNecessary(this, obj);
-			_handleNavigationPropertyResults(this, obj, ["fill", "Fill", "font", "Font"]);
+			_handleNavigationPropertyResults(this, obj, ["border", "Border", "fill", "Fill", "font", "Font"]);
 		};
 		ChartLegendFormat.prototype.load=function (option) {
 			return _load(this, option);
@@ -23223,6 +25671,7 @@ var Excel;
 		};
 		ChartLegendFormat.prototype.toJSON=function () {
 			return _toJson(this, {}, {
+				"border": this._B,
 				"font": this._Fo,
 			});
 		};
@@ -23270,7 +25719,7 @@ var Excel;
 		Object.defineProperty(ChartTitle.prototype, "format", {
 			get: function () {
 				if (!this._F) {
-					this._F=new Excel.ChartTitleFormat(this.context, _createPropertyObjectPath(this.context, this, "Format", false, false, false));
+					this._F=new Excel.ChartTitleFormat(this.context, _createPropertyObjectPath(this.context, this, "Format", false, false, 4));
 				}
 				return this._F;
 			},
@@ -23294,7 +25743,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._Ho=value;
-				_createSetPropertyAction(this.context, this, "HorizontalAlignment", value);
+				_createSetPropertyAction(this.context, this, "HorizontalAlignment", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -23307,7 +25756,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._L=value;
-				_createSetPropertyAction(this.context, this, "Left", value);
+				_createSetPropertyAction(this.context, this, "Left", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -23319,7 +25768,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._O=value;
-				_createSetPropertyAction(this.context, this, "Overlay", value);
+				_createSetPropertyAction(this.context, this, "Overlay", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -23332,7 +25781,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._P=value;
-				_createSetPropertyAction(this.context, this, "Position", value);
+				_createSetPropertyAction(this.context, this, "Position", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -23345,7 +25794,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._S=value;
-				_createSetPropertyAction(this.context, this, "ShowShadow", value);
+				_createSetPropertyAction(this.context, this, "ShowShadow", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -23357,7 +25806,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._T=value;
-				_createSetPropertyAction(this.context, this, "Text", value);
+				_createSetPropertyAction(this.context, this, "Text", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -23370,7 +25819,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._Te=value;
-				_createSetPropertyAction(this.context, this, "TextOrientation", value);
+				_createSetPropertyAction(this.context, this, "TextOrientation", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -23383,7 +25832,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._To=value;
-				_createSetPropertyAction(this.context, this, "Top", value);
+				_createSetPropertyAction(this.context, this, "Top", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -23396,7 +25845,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._V=value;
-				_createSetPropertyAction(this.context, this, "VerticalAlignment", value);
+				_createSetPropertyAction(this.context, this, "VerticalAlignment", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -23408,7 +25857,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._Vi=value;
-				_createSetPropertyAction(this.context, this, "Visible", value);
+				_createSetPropertyAction(this.context, this, "Visible", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -23430,11 +25879,11 @@ var Excel;
 		};
 		ChartTitle.prototype.getSubstring=function (start, length) {
 			_throwIfApiNotSupported("ChartTitle.getSubstring", _defaultApiSetName, "1.8", _hostName);
-			return new Excel.ChartFormatString(this.context, _createMethodObjectPath(this.context, this, "GetSubstring", 1, [start, length], false, false, null, false));
+			return new Excel.ChartFormatString(this.context, _createMethodObjectPath(this.context, this, "GetSubstring", 1, [start, length], false, false, null, 4));
 		};
 		ChartTitle.prototype.setFormula=function (formula) {
-			_throwIfApiNotSupported("ChartTitle.setFormula", _defaultApiSetName, "1.7", _hostName);
-			_createMethodAction(this.context, this, "SetFormula", 0, [formula], false);
+			_throwIfApiNotSupported("ChartTitle.setFormula", _defaultApiSetName, "1.8", _hostName);
+			_createMethodAction(this.context, this, "SetFormula", 0, [formula], 0);
 		};
 		ChartTitle.prototype._handleResult=function (value) {
 			_super.prototype._handleResult.call(this, value);
@@ -23538,7 +25987,7 @@ var Excel;
 		Object.defineProperty(ChartFormatString.prototype, "font", {
 			get: function () {
 				if (!this._F) {
-					this._F=new Excel.ChartFont(this.context, _createPropertyObjectPath(this.context, this, "Font", false, false, false));
+					this._F=new Excel.ChartFont(this.context, _createPropertyObjectPath(this.context, this, "Font", false, false, 4));
 				}
 				return this._F;
 			},
@@ -23605,7 +26054,7 @@ var Excel;
 			get: function () {
 				_throwIfApiNotSupported("ChartTitleFormat.border", _defaultApiSetName, "1.7", _hostName);
 				if (!this._B) {
-					this._B=new Excel.ChartBorder(this.context, _createPropertyObjectPath(this.context, this, "Border", false, false, false));
+					this._B=new Excel.ChartBorder(this.context, _createPropertyObjectPath(this.context, this, "Border", false, false, 4));
 				}
 				return this._B;
 			},
@@ -23615,7 +26064,7 @@ var Excel;
 		Object.defineProperty(ChartTitleFormat.prototype, "fill", {
 			get: function () {
 				if (!this._F) {
-					this._F=new Excel.ChartFill(this.context, _createPropertyObjectPath(this.context, this, "Fill", false, false, false));
+					this._F=new Excel.ChartFill(this.context, _createPropertyObjectPath(this.context, this, "Fill", false, false, 4));
 				}
 				return this._F;
 			},
@@ -23625,7 +26074,7 @@ var Excel;
 		Object.defineProperty(ChartTitleFormat.prototype, "font", {
 			get: function () {
 				if (!this._Fo) {
-					this._Fo=new Excel.ChartFont(this.context, _createPropertyObjectPath(this.context, this, "Font", false, false, false));
+					this._Fo=new Excel.ChartFont(this.context, _createPropertyObjectPath(this.context, this, "Font", false, false, 4));
 				}
 				return this._Fo;
 			},
@@ -23689,10 +26138,10 @@ var Excel;
 			return this;
 		};
 		ChartFill.prototype.clear=function () {
-			_createMethodAction(this.context, this, "Clear", 0, [], false);
+			_createMethodAction(this.context, this, "Clear", 0, [], 0);
 		};
 		ChartFill.prototype.setSolidColor=function (color) {
-			_createMethodAction(this.context, this, "SetSolidColor", 0, [color], false);
+			_createMethodAction(this.context, this, "SetSolidColor", 0, [color], 0);
 		};
 		ChartFill.prototype._handleResult=function (value) {
 			_super.prototype._handleResult.call(this, value);
@@ -23745,7 +26194,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._C=value;
-				_createSetPropertyAction(this.context, this, "Color", value);
+				_createSetPropertyAction(this.context, this, "Color", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -23757,7 +26206,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._L=value;
-				_createSetPropertyAction(this.context, this, "LineStyle", value);
+				_createSetPropertyAction(this.context, this, "LineStyle", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -23769,7 +26218,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._W=value;
-				_createSetPropertyAction(this.context, this, "Weight", value);
+				_createSetPropertyAction(this.context, this, "Weight", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -23779,6 +26228,10 @@ var Excel;
 		};
 		ChartBorder.prototype.update=function (properties) {
 			this._recursivelyUpdate(properties);
+		};
+		ChartBorder.prototype.clear=function () {
+			_throwIfApiNotSupported("ChartBorder.clear", _defaultApiSetName, "1.8", _hostName);
+			_createMethodAction(this.context, this, "Clear", 0, [], 0);
 		};
 		ChartBorder.prototype._handleResult=function (value) {
 			_super.prototype._handleResult.call(this, value);
@@ -23854,7 +26307,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._C=value;
-				_createSetPropertyAction(this.context, this, "Color", value);
+				_createSetPropertyAction(this.context, this, "Color", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -23867,7 +26320,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._L=value;
-				_createSetPropertyAction(this.context, this, "LineStyle", value);
+				_createSetPropertyAction(this.context, this, "LineStyle", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -23880,7 +26333,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._W=value;
-				_createSetPropertyAction(this.context, this, "Weight", value);
+				_createSetPropertyAction(this.context, this, "Weight", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -23892,7 +26345,7 @@ var Excel;
 			this._recursivelyUpdate(properties);
 		};
 		ChartLineFormat.prototype.clear=function () {
-			_createMethodAction(this.context, this, "Clear", 0, [], false);
+			_createMethodAction(this.context, this, "Clear", 0, [], 0);
 		};
 		ChartLineFormat.prototype._handleResult=function (value) {
 			_super.prototype._handleResult.call(this, value);
@@ -23968,7 +26421,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._B=value;
-				_createSetPropertyAction(this.context, this, "Bold", value);
+				_createSetPropertyAction(this.context, this, "Bold", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -23980,7 +26433,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._C=value;
-				_createSetPropertyAction(this.context, this, "Color", value);
+				_createSetPropertyAction(this.context, this, "Color", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -23992,7 +26445,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._I=value;
-				_createSetPropertyAction(this.context, this, "Italic", value);
+				_createSetPropertyAction(this.context, this, "Italic", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -24004,7 +26457,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._N=value;
-				_createSetPropertyAction(this.context, this, "Name", value);
+				_createSetPropertyAction(this.context, this, "Name", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -24016,7 +26469,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._S=value;
-				_createSetPropertyAction(this.context, this, "Size", value);
+				_createSetPropertyAction(this.context, this, "Size", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -24028,7 +26481,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._U=value;
-				_createSetPropertyAction(this.context, this, "Underline", value);
+				_createSetPropertyAction(this.context, this, "Underline", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -24120,7 +26573,7 @@ var Excel;
 		});
 		Object.defineProperty(ChartTrendline.prototype, "_navigationPropertyNames", {
 			get: function () {
-				return ["format"];
+				return ["format", "label"];
 			},
 			enumerable: true,
 			configurable: true
@@ -24128,9 +26581,20 @@ var Excel;
 		Object.defineProperty(ChartTrendline.prototype, "format", {
 			get: function () {
 				if (!this._F) {
-					this._F=new Excel.ChartTrendlineFormat(this.context, _createPropertyObjectPath(this.context, this, "Format", false, false, false));
+					this._F=new Excel.ChartTrendlineFormat(this.context, _createPropertyObjectPath(this.context, this, "Format", false, false, 4));
 				}
 				return this._F;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(ChartTrendline.prototype, "label", {
+			get: function () {
+				_throwIfApiNotSupported("ChartTrendline.label", _defaultApiSetName, "1.8", _hostName);
+				if (!this._L) {
+					this._L=new Excel.ChartTrendlineLabel(this.context, _createPropertyObjectPath(this.context, this, "Label", false, false, 4));
+				}
+				return this._L;
 			},
 			enumerable: true,
 			configurable: true
@@ -24138,11 +26602,12 @@ var Excel;
 		Object.defineProperty(ChartTrendline.prototype, "backward", {
 			get: function () {
 				_throwIfNotLoaded("backward", this._B, _typeChartTrendline, this._isNull);
+				_throwIfApiNotSupported("ChartTrendline.backward", _defaultApiSetName, "1.8", _hostName);
 				return this._B;
 			},
 			set: function (value) {
 				this._B=value;
-				_createSetPropertyAction(this.context, this, "Backward", value);
+				_createSetPropertyAction(this.context, this, "Backward", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -24150,11 +26615,12 @@ var Excel;
 		Object.defineProperty(ChartTrendline.prototype, "displayEquation", {
 			get: function () {
 				_throwIfNotLoaded("displayEquation", this._D, _typeChartTrendline, this._isNull);
+				_throwIfApiNotSupported("ChartTrendline.displayEquation", _defaultApiSetName, "1.8", _hostName);
 				return this._D;
 			},
 			set: function (value) {
 				this._D=value;
-				_createSetPropertyAction(this.context, this, "DisplayEquation", value);
+				_createSetPropertyAction(this.context, this, "DisplayEquation", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -24166,7 +26632,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._Di=value;
-				_createSetPropertyAction(this.context, this, "DisplayRSquared", value);
+				_createSetPropertyAction(this.context, this, "DisplayRSquared", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -24174,11 +26640,12 @@ var Excel;
 		Object.defineProperty(ChartTrendline.prototype, "forward", {
 			get: function () {
 				_throwIfNotLoaded("forward", this._Fo, _typeChartTrendline, this._isNull);
+				_throwIfApiNotSupported("ChartTrendline.forward", _defaultApiSetName, "1.8", _hostName);
 				return this._Fo;
 			},
 			set: function (value) {
 				this._Fo=value;
-				_createSetPropertyAction(this.context, this, "Forward", value);
+				_createSetPropertyAction(this.context, this, "Forward", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -24190,7 +26657,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._I=value;
-				_createSetPropertyAction(this.context, this, "Intercept", value);
+				_createSetPropertyAction(this.context, this, "Intercept", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -24202,7 +26669,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._M=value;
-				_createSetPropertyAction(this.context, this, "MovingAveragePeriod", value);
+				_createSetPropertyAction(this.context, this, "MovingAveragePeriod", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -24214,7 +26681,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._N=value;
-				_createSetPropertyAction(this.context, this, "Name", value);
+				_createSetPropertyAction(this.context, this, "Name", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -24226,7 +26693,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._P=value;
-				_createSetPropertyAction(this.context, this, "PolynomialOrder", value);
+				_createSetPropertyAction(this.context, this, "PolynomialOrder", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -24234,11 +26701,12 @@ var Excel;
 		Object.defineProperty(ChartTrendline.prototype, "type", {
 			get: function () {
 				_throwIfNotLoaded("type", this._T, _typeChartTrendline, this._isNull);
+				_throwIfApiNotSupported("ChartTrendline.type", _defaultApiSetName, "1.8", _hostName);
 				return this._T;
 			},
 			set: function (value) {
 				this._T=value;
-				_createSetPropertyAction(this.context, this, "Type", value);
+				_createSetPropertyAction(this.context, this, "Type", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -24252,13 +26720,13 @@ var Excel;
 			configurable: true
 		});
 		ChartTrendline.prototype.set=function (properties, options) {
-			this._recursivelySet(properties, options, ["type", "polynomialOrder", "movingAveragePeriod", "displayEquation", "displayRSquared", "forward", "backward", "name", "intercept"], ["format"], []);
+			this._recursivelySet(properties, options, ["type", "polynomialOrder", "movingAveragePeriod", "displayEquation", "displayRSquared", "forward", "backward", "name", "intercept"], ["format", "label"], []);
 		};
 		ChartTrendline.prototype.update=function (properties) {
 			this._recursivelyUpdate(properties);
 		};
 		ChartTrendline.prototype.delete=function () {
-			_createMethodAction(this.context, this, "Delete", 0, [], false);
+			_createMethodAction(this.context, this, "Delete", 0, [], 0);
 		};
 		ChartTrendline.prototype._handleResult=function (value) {
 			_super.prototype._handleResult.call(this, value);
@@ -24296,7 +26764,7 @@ var Excel;
 			if (!_isUndefined(obj["_Id"])) {
 				this.__I=obj["_Id"];
 			}
-			_handleNavigationPropertyResults(this, obj, ["format", "Format"]);
+			_handleNavigationPropertyResults(this, obj, ["format", "Format", "label", "Label"]);
 		};
 		ChartTrendline.prototype.load=function (option) {
 			return _load(this, option);
@@ -24330,6 +26798,7 @@ var Excel;
 				"type": this._T,
 			}, {
 				"format": this._F,
+				"label": this._L,
 			});
 		};
 		ChartTrendline.prototype.ensureUnchanged=function (data) {
@@ -24368,10 +26837,11 @@ var Excel;
 			configurable: true
 		});
 		ChartTrendlineCollection.prototype.add=function (type) {
-			return new Excel.ChartTrendline(this.context, _createMethodObjectPath(this.context, this, "Add", 0, [type], false, true, null, false));
+			_throwIfApiNotSupported("ChartTrendlineCollection.add", _defaultApiSetName, "1.8", _hostName);
+			return new Excel.ChartTrendline(this.context, _createMethodObjectPath(this.context, this, "Add", 0, [type], false, true, null, 0));
 		};
 		ChartTrendlineCollection.prototype.getCount=function () {
-			var action=_createMethodAction(this.context, this, "GetCount", 1, [], false);
+			var action=_createMethodAction(this.context, this, "GetCount", 1, [], 4);
 			var ret=new OfficeExtension.ClientResult();
 			_addActionResultHandler(this, action, ret);
 			return ret;
@@ -24435,7 +26905,7 @@ var Excel;
 		Object.defineProperty(ChartTrendlineFormat.prototype, "line", {
 			get: function () {
 				if (!this._L) {
-					this._L=new Excel.ChartLineFormat(this.context, _createPropertyObjectPath(this.context, this, "Line", false, false, false));
+					this._L=new Excel.ChartLineFormat(this.context, _createPropertyObjectPath(this.context, this, "Line", false, false, 4));
 				}
 				return this._L;
 			},
@@ -24478,6 +26948,663 @@ var Excel;
 		return ChartTrendlineFormat;
 	}(OfficeExtension.ClientObject));
 	Excel.ChartTrendlineFormat=ChartTrendlineFormat;
+	var _typeChartTrendlineLabel="ChartTrendlineLabel";
+	var ChartTrendlineLabel=(function (_super) {
+		__extends(ChartTrendlineLabel, _super);
+		function ChartTrendlineLabel() {
+			return _super !==null && _super.apply(this, arguments) || this;
+		}
+		Object.defineProperty(ChartTrendlineLabel.prototype, "_className", {
+			get: function () {
+				return "ChartTrendlineLabel";
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(ChartTrendlineLabel.prototype, "_scalarPropertyNames", {
+			get: function () {
+				return ["top", "left", "width", "height", "formula", "textOrientation", "horizontalAlignment", "verticalAlignment", "text", "autoText", "numberFormat", "numberFormatLinked"];
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(ChartTrendlineLabel.prototype, "_scalarPropertyUpdateable", {
+			get: function () {
+				return [true, true, false, false, true, true, true, true, true, true, true, true];
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(ChartTrendlineLabel.prototype, "_navigationPropertyNames", {
+			get: function () {
+				return ["format"];
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(ChartTrendlineLabel.prototype, "format", {
+			get: function () {
+				if (!this._F) {
+					this._F=new Excel.ChartTrendlineLabelFormat(this.context, _createPropertyObjectPath(this.context, this, "Format", false, false, 4));
+				}
+				return this._F;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(ChartTrendlineLabel.prototype, "autoText", {
+			get: function () {
+				_throwIfNotLoaded("autoText", this._A, _typeChartTrendlineLabel, this._isNull);
+				return this._A;
+			},
+			set: function (value) {
+				this._A=value;
+				_createSetPropertyAction(this.context, this, "AutoText", value, 0);
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(ChartTrendlineLabel.prototype, "formula", {
+			get: function () {
+				_throwIfNotLoaded("formula", this._Fo, _typeChartTrendlineLabel, this._isNull);
+				return this._Fo;
+			},
+			set: function (value) {
+				this._Fo=value;
+				_createSetPropertyAction(this.context, this, "Formula", value, 0);
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(ChartTrendlineLabel.prototype, "height", {
+			get: function () {
+				_throwIfNotLoaded("height", this._H, _typeChartTrendlineLabel, this._isNull);
+				return this._H;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(ChartTrendlineLabel.prototype, "horizontalAlignment", {
+			get: function () {
+				_throwIfNotLoaded("horizontalAlignment", this._Ho, _typeChartTrendlineLabel, this._isNull);
+				return this._Ho;
+			},
+			set: function (value) {
+				this._Ho=value;
+				_createSetPropertyAction(this.context, this, "HorizontalAlignment", value, 0);
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(ChartTrendlineLabel.prototype, "left", {
+			get: function () {
+				_throwIfNotLoaded("left", this._L, _typeChartTrendlineLabel, this._isNull);
+				return this._L;
+			},
+			set: function (value) {
+				this._L=value;
+				_createSetPropertyAction(this.context, this, "Left", value, 0);
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(ChartTrendlineLabel.prototype, "numberFormat", {
+			get: function () {
+				_throwIfNotLoaded("numberFormat", this._N, _typeChartTrendlineLabel, this._isNull);
+				return this._N;
+			},
+			set: function (value) {
+				this._N=value;
+				_createSetPropertyAction(this.context, this, "NumberFormat", value, 0);
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(ChartTrendlineLabel.prototype, "numberFormatLinked", {
+			get: function () {
+				_throwIfNotLoaded("numberFormatLinked", this._Nu, _typeChartTrendlineLabel, this._isNull);
+				return this._Nu;
+			},
+			set: function (value) {
+				this._Nu=value;
+				_createSetPropertyAction(this.context, this, "NumberFormatLinked", value, 0);
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(ChartTrendlineLabel.prototype, "text", {
+			get: function () {
+				_throwIfNotLoaded("text", this._T, _typeChartTrendlineLabel, this._isNull);
+				return this._T;
+			},
+			set: function (value) {
+				this._T=value;
+				_createSetPropertyAction(this.context, this, "Text", value, 0);
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(ChartTrendlineLabel.prototype, "textOrientation", {
+			get: function () {
+				_throwIfNotLoaded("textOrientation", this._Te, _typeChartTrendlineLabel, this._isNull);
+				return this._Te;
+			},
+			set: function (value) {
+				this._Te=value;
+				_createSetPropertyAction(this.context, this, "TextOrientation", value, 0);
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(ChartTrendlineLabel.prototype, "top", {
+			get: function () {
+				_throwIfNotLoaded("top", this._To, _typeChartTrendlineLabel, this._isNull);
+				return this._To;
+			},
+			set: function (value) {
+				this._To=value;
+				_createSetPropertyAction(this.context, this, "Top", value, 0);
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(ChartTrendlineLabel.prototype, "verticalAlignment", {
+			get: function () {
+				_throwIfNotLoaded("verticalAlignment", this._V, _typeChartTrendlineLabel, this._isNull);
+				return this._V;
+			},
+			set: function (value) {
+				this._V=value;
+				_createSetPropertyAction(this.context, this, "VerticalAlignment", value, 0);
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(ChartTrendlineLabel.prototype, "width", {
+			get: function () {
+				_throwIfNotLoaded("width", this._W, _typeChartTrendlineLabel, this._isNull);
+				return this._W;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		ChartTrendlineLabel.prototype.set=function (properties, options) {
+			this._recursivelySet(properties, options, ["top", "left", "formula", "textOrientation", "horizontalAlignment", "verticalAlignment", "text", "autoText", "numberFormat", "numberFormatLinked"], ["format"], []);
+		};
+		ChartTrendlineLabel.prototype.update=function (properties) {
+			this._recursivelyUpdate(properties);
+		};
+		ChartTrendlineLabel.prototype._handleResult=function (value) {
+			_super.prototype._handleResult.call(this, value);
+			if (_isNullOrUndefined(value))
+				return;
+			var obj=value;
+			_fixObjectPathIfNecessary(this, obj);
+			if (!_isUndefined(obj["AutoText"])) {
+				this._A=obj["AutoText"];
+			}
+			if (!_isUndefined(obj["Formula"])) {
+				this._Fo=obj["Formula"];
+			}
+			if (!_isUndefined(obj["Height"])) {
+				this._H=obj["Height"];
+			}
+			if (!_isUndefined(obj["HorizontalAlignment"])) {
+				this._Ho=obj["HorizontalAlignment"];
+			}
+			if (!_isUndefined(obj["Left"])) {
+				this._L=obj["Left"];
+			}
+			if (!_isUndefined(obj["NumberFormat"])) {
+				this._N=obj["NumberFormat"];
+			}
+			if (!_isUndefined(obj["NumberFormatLinked"])) {
+				this._Nu=obj["NumberFormatLinked"];
+			}
+			if (!_isUndefined(obj["Text"])) {
+				this._T=obj["Text"];
+			}
+			if (!_isUndefined(obj["TextOrientation"])) {
+				this._Te=obj["TextOrientation"];
+			}
+			if (!_isUndefined(obj["Top"])) {
+				this._To=obj["Top"];
+			}
+			if (!_isUndefined(obj["VerticalAlignment"])) {
+				this._V=obj["VerticalAlignment"];
+			}
+			if (!_isUndefined(obj["Width"])) {
+				this._W=obj["Width"];
+			}
+			_handleNavigationPropertyResults(this, obj, ["format", "Format"]);
+		};
+		ChartTrendlineLabel.prototype.load=function (option) {
+			return _load(this, option);
+		};
+		ChartTrendlineLabel.prototype.retrieve=function (option) {
+			return _retrieve(this, option);
+		};
+		ChartTrendlineLabel.prototype._handleRetrieveResult=function (value, result) {
+			_super.prototype._handleRetrieveResult.call(this, value, result);
+			_processRetrieveResult(this, value, result);
+		};
+		ChartTrendlineLabel.prototype.toJSON=function () {
+			return _toJson(this, {
+				"autoText": this._A,
+				"formula": this._Fo,
+				"height": this._H,
+				"horizontalAlignment": this._Ho,
+				"left": this._L,
+				"numberFormat": this._N,
+				"numberFormatLinked": this._Nu,
+				"text": this._T,
+				"textOrientation": this._Te,
+				"top": this._To,
+				"verticalAlignment": this._V,
+				"width": this._W,
+			}, {
+				"format": this._F,
+			});
+		};
+		ChartTrendlineLabel.prototype.ensureUnchanged=function (data) {
+			_createEnsureUnchangedAction(this.context, this, data);
+			return;
+		};
+		return ChartTrendlineLabel;
+	}(OfficeExtension.ClientObject));
+	Excel.ChartTrendlineLabel=ChartTrendlineLabel;
+	var _typeChartTrendlineLabelFormat="ChartTrendlineLabelFormat";
+	var ChartTrendlineLabelFormat=(function (_super) {
+		__extends(ChartTrendlineLabelFormat, _super);
+		function ChartTrendlineLabelFormat() {
+			return _super !==null && _super.apply(this, arguments) || this;
+		}
+		Object.defineProperty(ChartTrendlineLabelFormat.prototype, "_className", {
+			get: function () {
+				return "ChartTrendlineLabelFormat";
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(ChartTrendlineLabelFormat.prototype, "_navigationPropertyNames", {
+			get: function () {
+				return ["fill", "border", "font"];
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(ChartTrendlineLabelFormat.prototype, "border", {
+			get: function () {
+				if (!this._B) {
+					this._B=new Excel.ChartBorder(this.context, _createPropertyObjectPath(this.context, this, "Border", false, false, 4));
+				}
+				return this._B;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(ChartTrendlineLabelFormat.prototype, "fill", {
+			get: function () {
+				if (!this._F) {
+					this._F=new Excel.ChartFill(this.context, _createPropertyObjectPath(this.context, this, "Fill", false, false, 4));
+				}
+				return this._F;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(ChartTrendlineLabelFormat.prototype, "font", {
+			get: function () {
+				if (!this._Fo) {
+					this._Fo=new Excel.ChartFont(this.context, _createPropertyObjectPath(this.context, this, "Font", false, false, 4));
+				}
+				return this._Fo;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		ChartTrendlineLabelFormat.prototype.set=function (properties, options) {
+			this._recursivelySet(properties, options, [], ["border", "font"], [
+				"fill"
+			]);
+		};
+		ChartTrendlineLabelFormat.prototype.update=function (properties) {
+			this._recursivelyUpdate(properties);
+		};
+		ChartTrendlineLabelFormat.prototype._handleResult=function (value) {
+			_super.prototype._handleResult.call(this, value);
+			if (_isNullOrUndefined(value))
+				return;
+			var obj=value;
+			_fixObjectPathIfNecessary(this, obj);
+			_handleNavigationPropertyResults(this, obj, ["border", "Border", "fill", "Fill", "font", "Font"]);
+		};
+		ChartTrendlineLabelFormat.prototype.load=function (option) {
+			return _load(this, option);
+		};
+		ChartTrendlineLabelFormat.prototype.retrieve=function (option) {
+			return _retrieve(this, option);
+		};
+		ChartTrendlineLabelFormat.prototype._handleRetrieveResult=function (value, result) {
+			_super.prototype._handleRetrieveResult.call(this, value, result);
+			_processRetrieveResult(this, value, result);
+		};
+		ChartTrendlineLabelFormat.prototype.toJSON=function () {
+			return _toJson(this, {}, {
+				"border": this._B,
+				"font": this._Fo,
+			});
+		};
+		ChartTrendlineLabelFormat.prototype.ensureUnchanged=function (data) {
+			_createEnsureUnchangedAction(this.context, this, data);
+			return;
+		};
+		return ChartTrendlineLabelFormat;
+	}(OfficeExtension.ClientObject));
+	Excel.ChartTrendlineLabelFormat=ChartTrendlineLabelFormat;
+	var _typeChartPlotArea="ChartPlotArea";
+	var ChartPlotArea=(function (_super) {
+		__extends(ChartPlotArea, _super);
+		function ChartPlotArea() {
+			return _super !==null && _super.apply(this, arguments) || this;
+		}
+		Object.defineProperty(ChartPlotArea.prototype, "_className", {
+			get: function () {
+				return "ChartPlotArea";
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(ChartPlotArea.prototype, "_scalarPropertyNames", {
+			get: function () {
+				return ["left", "top", "width", "height", "insideLeft", "insideTop", "insideWidth", "insideHeight", "position"];
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(ChartPlotArea.prototype, "_scalarPropertyUpdateable", {
+			get: function () {
+				return [true, true, true, true, true, true, true, true, true];
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(ChartPlotArea.prototype, "_navigationPropertyNames", {
+			get: function () {
+				return ["format"];
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(ChartPlotArea.prototype, "format", {
+			get: function () {
+				if (!this._F) {
+					this._F=new Excel.ChartPlotAreaFormat(this.context, _createPropertyObjectPath(this.context, this, "Format", false, false, 4));
+				}
+				return this._F;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(ChartPlotArea.prototype, "height", {
+			get: function () {
+				_throwIfNotLoaded("height", this._H, _typeChartPlotArea, this._isNull);
+				return this._H;
+			},
+			set: function (value) {
+				this._H=value;
+				_createSetPropertyAction(this.context, this, "Height", value, 0);
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(ChartPlotArea.prototype, "insideHeight", {
+			get: function () {
+				_throwIfNotLoaded("insideHeight", this._I, _typeChartPlotArea, this._isNull);
+				return this._I;
+			},
+			set: function (value) {
+				this._I=value;
+				_createSetPropertyAction(this.context, this, "InsideHeight", value, 0);
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(ChartPlotArea.prototype, "insideLeft", {
+			get: function () {
+				_throwIfNotLoaded("insideLeft", this._In, _typeChartPlotArea, this._isNull);
+				return this._In;
+			},
+			set: function (value) {
+				this._In=value;
+				_createSetPropertyAction(this.context, this, "InsideLeft", value, 0);
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(ChartPlotArea.prototype, "insideTop", {
+			get: function () {
+				_throwIfNotLoaded("insideTop", this._Ins, _typeChartPlotArea, this._isNull);
+				return this._Ins;
+			},
+			set: function (value) {
+				this._Ins=value;
+				_createSetPropertyAction(this.context, this, "InsideTop", value, 0);
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(ChartPlotArea.prototype, "insideWidth", {
+			get: function () {
+				_throwIfNotLoaded("insideWidth", this._Insi, _typeChartPlotArea, this._isNull);
+				return this._Insi;
+			},
+			set: function (value) {
+				this._Insi=value;
+				_createSetPropertyAction(this.context, this, "InsideWidth", value, 0);
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(ChartPlotArea.prototype, "left", {
+			get: function () {
+				_throwIfNotLoaded("left", this._L, _typeChartPlotArea, this._isNull);
+				return this._L;
+			},
+			set: function (value) {
+				this._L=value;
+				_createSetPropertyAction(this.context, this, "Left", value, 0);
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(ChartPlotArea.prototype, "position", {
+			get: function () {
+				_throwIfNotLoaded("position", this._P, _typeChartPlotArea, this._isNull);
+				return this._P;
+			},
+			set: function (value) {
+				this._P=value;
+				_createSetPropertyAction(this.context, this, "Position", value, 0);
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(ChartPlotArea.prototype, "top", {
+			get: function () {
+				_throwIfNotLoaded("top", this._T, _typeChartPlotArea, this._isNull);
+				return this._T;
+			},
+			set: function (value) {
+				this._T=value;
+				_createSetPropertyAction(this.context, this, "Top", value, 0);
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(ChartPlotArea.prototype, "width", {
+			get: function () {
+				_throwIfNotLoaded("width", this._W, _typeChartPlotArea, this._isNull);
+				return this._W;
+			},
+			set: function (value) {
+				this._W=value;
+				_createSetPropertyAction(this.context, this, "Width", value, 0);
+			},
+			enumerable: true,
+			configurable: true
+		});
+		ChartPlotArea.prototype.set=function (properties, options) {
+			this._recursivelySet(properties, options, ["left", "top", "width", "height", "insideLeft", "insideTop", "insideWidth", "insideHeight", "position"], ["format"], []);
+		};
+		ChartPlotArea.prototype.update=function (properties) {
+			this._recursivelyUpdate(properties);
+		};
+		ChartPlotArea.prototype._handleResult=function (value) {
+			_super.prototype._handleResult.call(this, value);
+			if (_isNullOrUndefined(value))
+				return;
+			var obj=value;
+			_fixObjectPathIfNecessary(this, obj);
+			if (!_isUndefined(obj["Height"])) {
+				this._H=obj["Height"];
+			}
+			if (!_isUndefined(obj["InsideHeight"])) {
+				this._I=obj["InsideHeight"];
+			}
+			if (!_isUndefined(obj["InsideLeft"])) {
+				this._In=obj["InsideLeft"];
+			}
+			if (!_isUndefined(obj["InsideTop"])) {
+				this._Ins=obj["InsideTop"];
+			}
+			if (!_isUndefined(obj["InsideWidth"])) {
+				this._Insi=obj["InsideWidth"];
+			}
+			if (!_isUndefined(obj["Left"])) {
+				this._L=obj["Left"];
+			}
+			if (!_isUndefined(obj["Position"])) {
+				this._P=obj["Position"];
+			}
+			if (!_isUndefined(obj["Top"])) {
+				this._T=obj["Top"];
+			}
+			if (!_isUndefined(obj["Width"])) {
+				this._W=obj["Width"];
+			}
+			_handleNavigationPropertyResults(this, obj, ["format", "Format"]);
+		};
+		ChartPlotArea.prototype.load=function (option) {
+			return _load(this, option);
+		};
+		ChartPlotArea.prototype.retrieve=function (option) {
+			return _retrieve(this, option);
+		};
+		ChartPlotArea.prototype._handleRetrieveResult=function (value, result) {
+			_super.prototype._handleRetrieveResult.call(this, value, result);
+			_processRetrieveResult(this, value, result);
+		};
+		ChartPlotArea.prototype.toJSON=function () {
+			return _toJson(this, {
+				"height": this._H,
+				"insideHeight": this._I,
+				"insideLeft": this._In,
+				"insideTop": this._Ins,
+				"insideWidth": this._Insi,
+				"left": this._L,
+				"position": this._P,
+				"top": this._T,
+				"width": this._W,
+			}, {
+				"format": this._F,
+			});
+		};
+		ChartPlotArea.prototype.ensureUnchanged=function (data) {
+			_createEnsureUnchangedAction(this.context, this, data);
+			return;
+		};
+		return ChartPlotArea;
+	}(OfficeExtension.ClientObject));
+	Excel.ChartPlotArea=ChartPlotArea;
+	var _typeChartPlotAreaFormat="ChartPlotAreaFormat";
+	var ChartPlotAreaFormat=(function (_super) {
+		__extends(ChartPlotAreaFormat, _super);
+		function ChartPlotAreaFormat() {
+			return _super !==null && _super.apply(this, arguments) || this;
+		}
+		Object.defineProperty(ChartPlotAreaFormat.prototype, "_className", {
+			get: function () {
+				return "ChartPlotAreaFormat";
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(ChartPlotAreaFormat.prototype, "_navigationPropertyNames", {
+			get: function () {
+				return ["border", "fill"];
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(ChartPlotAreaFormat.prototype, "border", {
+			get: function () {
+				if (!this._B) {
+					this._B=new Excel.ChartBorder(this.context, _createPropertyObjectPath(this.context, this, "Border", false, false, 4));
+				}
+				return this._B;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(ChartPlotAreaFormat.prototype, "fill", {
+			get: function () {
+				if (!this._F) {
+					this._F=new Excel.ChartFill(this.context, _createPropertyObjectPath(this.context, this, "Fill", false, false, 4));
+				}
+				return this._F;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		ChartPlotAreaFormat.prototype.set=function (properties, options) {
+			this._recursivelySet(properties, options, [], ["border"], [
+				"fill"
+			]);
+		};
+		ChartPlotAreaFormat.prototype.update=function (properties) {
+			this._recursivelyUpdate(properties);
+		};
+		ChartPlotAreaFormat.prototype._handleResult=function (value) {
+			_super.prototype._handleResult.call(this, value);
+			if (_isNullOrUndefined(value))
+				return;
+			var obj=value;
+			_fixObjectPathIfNecessary(this, obj);
+			_handleNavigationPropertyResults(this, obj, ["border", "Border", "fill", "Fill"]);
+		};
+		ChartPlotAreaFormat.prototype.load=function (option) {
+			return _load(this, option);
+		};
+		ChartPlotAreaFormat.prototype.retrieve=function (option) {
+			return _retrieve(this, option);
+		};
+		ChartPlotAreaFormat.prototype._handleRetrieveResult=function (value, result) {
+			_super.prototype._handleRetrieveResult.call(this, value, result);
+			_processRetrieveResult(this, value, result);
+		};
+		ChartPlotAreaFormat.prototype.toJSON=function () {
+			return _toJson(this, {}, {
+				"border": this._B,
+			});
+		};
+		ChartPlotAreaFormat.prototype.ensureUnchanged=function (data) {
+			_createEnsureUnchangedAction(this.context, this, data);
+			return;
+		};
+		return ChartPlotAreaFormat;
+	}(OfficeExtension.ClientObject));
+	Excel.ChartPlotAreaFormat=ChartPlotAreaFormat;
 	var _typeRangeSort="RangeSort";
 	var RangeSort=(function (_super) {
 		__extends(RangeSort, _super);
@@ -24492,7 +27619,7 @@ var Excel;
 			configurable: true
 		});
 		RangeSort.prototype.apply=function (fields, matchCase, hasHeaders, orientation, method) {
-			_createMethodAction(this.context, this, "Apply", 0, [fields, matchCase, hasHeaders, orientation, method], false);
+			_createMethodAction(this.context, this, "Apply", 0, [fields, matchCase, hasHeaders, orientation, method], 0);
 		};
 		RangeSort.prototype._handleResult=function (value) {
 			_super.prototype._handleResult.call(this, value);
@@ -24556,13 +27683,13 @@ var Excel;
 			configurable: true
 		});
 		TableSort.prototype.apply=function (fields, matchCase, method) {
-			_createMethodAction(this.context, this, "Apply", 0, [fields, matchCase, method], false);
+			_createMethodAction(this.context, this, "Apply", 0, [fields, matchCase, method], 0);
 		};
 		TableSort.prototype.clear=function () {
-			_createMethodAction(this.context, this, "Clear", 0, [], false);
+			_createMethodAction(this.context, this, "Clear", 0, [], 0);
 		};
 		TableSort.prototype.reapply=function () {
-			_createMethodAction(this.context, this, "Reapply", 0, [], false);
+			_createMethodAction(this.context, this, "Reapply", 0, [], 0);
 		};
 		TableSort.prototype._handleResult=function (value) {
 			_super.prototype._handleResult.call(this, value);
@@ -24633,40 +27760,40 @@ var Excel;
 			configurable: true
 		});
 		Filter.prototype.apply=function (criteria) {
-			_createMethodAction(this.context, this, "Apply", 0, [criteria], false);
+			_createMethodAction(this.context, this, "Apply", 0, [criteria], 0);
 		};
 		Filter.prototype.applyBottomItemsFilter=function (count) {
-			_createMethodAction(this.context, this, "ApplyBottomItemsFilter", 0, [count], false);
+			_createMethodAction(this.context, this, "ApplyBottomItemsFilter", 0, [count], 0);
 		};
 		Filter.prototype.applyBottomPercentFilter=function (percent) {
-			_createMethodAction(this.context, this, "ApplyBottomPercentFilter", 0, [percent], false);
+			_createMethodAction(this.context, this, "ApplyBottomPercentFilter", 0, [percent], 0);
 		};
 		Filter.prototype.applyCellColorFilter=function (color) {
-			_createMethodAction(this.context, this, "ApplyCellColorFilter", 0, [color], false);
+			_createMethodAction(this.context, this, "ApplyCellColorFilter", 0, [color], 0);
 		};
 		Filter.prototype.applyCustomFilter=function (criteria1, criteria2, oper) {
-			_createMethodAction(this.context, this, "ApplyCustomFilter", 0, [criteria1, criteria2, oper], false);
+			_createMethodAction(this.context, this, "ApplyCustomFilter", 0, [criteria1, criteria2, oper], 0);
 		};
 		Filter.prototype.applyDynamicFilter=function (criteria) {
-			_createMethodAction(this.context, this, "ApplyDynamicFilter", 0, [criteria], false);
+			_createMethodAction(this.context, this, "ApplyDynamicFilter", 0, [criteria], 0);
 		};
 		Filter.prototype.applyFontColorFilter=function (color) {
-			_createMethodAction(this.context, this, "ApplyFontColorFilter", 0, [color], false);
+			_createMethodAction(this.context, this, "ApplyFontColorFilter", 0, [color], 0);
 		};
 		Filter.prototype.applyIconFilter=function (icon) {
-			_createMethodAction(this.context, this, "ApplyIconFilter", 0, [icon], false);
+			_createMethodAction(this.context, this, "ApplyIconFilter", 0, [icon], 0);
 		};
 		Filter.prototype.applyTopItemsFilter=function (count) {
-			_createMethodAction(this.context, this, "ApplyTopItemsFilter", 0, [count], false);
+			_createMethodAction(this.context, this, "ApplyTopItemsFilter", 0, [count], 0);
 		};
 		Filter.prototype.applyTopPercentFilter=function (percent) {
-			_createMethodAction(this.context, this, "ApplyTopPercentFilter", 0, [percent], false);
+			_createMethodAction(this.context, this, "ApplyTopPercentFilter", 0, [percent], 0);
 		};
 		Filter.prototype.applyValuesFilter=function (values) {
-			_createMethodAction(this.context, this, "ApplyValuesFilter", 0, [values], false);
+			_createMethodAction(this.context, this, "ApplyValuesFilter", 0, [values], 0);
 		};
 		Filter.prototype.clear=function () {
-			_createMethodAction(this.context, this, "Clear", 0, [], false);
+			_createMethodAction(this.context, this, "Clear", 0, [], 0);
 		};
 		Filter.prototype._handleResult=function (value) {
 			_super.prototype._handleResult.call(this, value);
@@ -24729,7 +27856,7 @@ var Excel;
 			configurable: true
 		});
 		CustomXmlPartScopedCollection.prototype.getCount=function () {
-			var action=_createMethodAction(this.context, this, "GetCount", 1, [], false);
+			var action=_createMethodAction(this.context, this, "GetCount", 1, [], 4);
 			var ret=new OfficeExtension.ClientResult();
 			_addActionResultHandler(this, action, ret);
 			return ret;
@@ -24738,13 +27865,13 @@ var Excel;
 			return new Excel.CustomXmlPart(this.context, _createIndexerObjectPath(this.context, this, [id]));
 		};
 		CustomXmlPartScopedCollection.prototype.getItemOrNullObject=function (id) {
-			return new Excel.CustomXmlPart(this.context, _createMethodObjectPath(this.context, this, "GetItemOrNullObject", 1, [id], false, false, null, false));
+			return new Excel.CustomXmlPart(this.context, _createMethodObjectPath(this.context, this, "GetItemOrNullObject", 1, [id], false, false, null, 4));
 		};
 		CustomXmlPartScopedCollection.prototype.getOnlyItem=function () {
-			return new Excel.CustomXmlPart(this.context, _createMethodObjectPath(this.context, this, "GetOnlyItem", 1, [], false, false, null, false));
+			return new Excel.CustomXmlPart(this.context, _createMethodObjectPath(this.context, this, "GetOnlyItem", 1, [], false, false, null, 4));
 		};
 		CustomXmlPartScopedCollection.prototype.getOnlyItemOrNullObject=function () {
-			return new Excel.CustomXmlPart(this.context, _createMethodObjectPath(this.context, this, "GetOnlyItemOrNullObject", 1, [], false, false, null, false));
+			return new Excel.CustomXmlPart(this.context, _createMethodObjectPath(this.context, this, "GetOnlyItemOrNullObject", 1, [], false, false, null, 4));
 		};
 		CustomXmlPartScopedCollection.prototype._handleResult=function (value) {
 			_super.prototype._handleResult.call(this, value);
@@ -24808,13 +27935,13 @@ var Excel;
 			configurable: true
 		});
 		CustomXmlPartCollection.prototype.add=function (xml) {
-			return new Excel.CustomXmlPart(this.context, _createMethodObjectPath(this.context, this, "Add", 0, [xml], false, true, null, false));
+			return new Excel.CustomXmlPart(this.context, _createMethodObjectPath(this.context, this, "Add", 0, [xml], false, true, null, 0));
 		};
 		CustomXmlPartCollection.prototype.getByNamespace=function (namespaceUri) {
-			return new Excel.CustomXmlPartScopedCollection(this.context, _createMethodObjectPath(this.context, this, "GetByNamespace", 1, [namespaceUri], true, false, null, false));
+			return new Excel.CustomXmlPartScopedCollection(this.context, _createMethodObjectPath(this.context, this, "GetByNamespace", 1, [namespaceUri], true, false, null, 4));
 		};
 		CustomXmlPartCollection.prototype.getCount=function () {
-			var action=_createMethodAction(this.context, this, "GetCount", 1, [], false);
+			var action=_createMethodAction(this.context, this, "GetCount", 1, [], 4);
 			var ret=new OfficeExtension.ClientResult();
 			_addActionResultHandler(this, action, ret);
 			return ret;
@@ -24823,7 +27950,7 @@ var Excel;
 			return new Excel.CustomXmlPart(this.context, _createIndexerObjectPath(this.context, this, [id]));
 		};
 		CustomXmlPartCollection.prototype.getItemOrNullObject=function (id) {
-			return new Excel.CustomXmlPart(this.context, _createMethodObjectPath(this.context, this, "GetItemOrNullObject", 1, [id], false, false, null, false));
+			return new Excel.CustomXmlPart(this.context, _createMethodObjectPath(this.context, this, "GetItemOrNullObject", 1, [id], false, false, null, 4));
 		};
 		CustomXmlPartCollection.prototype._handleResult=function (value) {
 			_super.prototype._handleResult.call(this, value);
@@ -24895,16 +28022,16 @@ var Excel;
 			configurable: true
 		});
 		CustomXmlPart.prototype.delete=function () {
-			_createMethodAction(this.context, this, "Delete", 0, [], false);
+			_createMethodAction(this.context, this, "Delete", 0, [], 0);
 		};
 		CustomXmlPart.prototype.getXml=function () {
-			var action=_createMethodAction(this.context, this, "GetXml", 1, [], false);
+			var action=_createMethodAction(this.context, this, "GetXml", 1, [], 4);
 			var ret=new OfficeExtension.ClientResult();
 			_addActionResultHandler(this, action, ret);
 			return ret;
 		};
 		CustomXmlPart.prototype.setXml=function (xml) {
-			_createMethodAction(this.context, this, "SetXml", 0, [xml], false);
+			_createMethodAction(this.context, this, "SetXml", 0, [xml], 0);
 		};
 		CustomXmlPart.prototype._handleResult=function (value) {
 			_super.prototype._handleResult.call(this, value);
@@ -24965,110 +28092,110 @@ var Excel;
 			configurable: true
 		});
 		_V1Api.prototype.bindingAddColumns=function (input) {
-			var action=_createMethodAction(this.context, this, "BindingAddColumns", 0, [input], false);
+			var action=_createMethodAction(this.context, this, "BindingAddColumns", 0, [input], 0);
 			var ret=new OfficeExtension.ClientResult();
 			_addActionResultHandler(this, action, ret);
 			return ret;
 		};
 		_V1Api.prototype.bindingAddFromNamedItem=function (input) {
-			var action=_createMethodAction(this.context, this, "BindingAddFromNamedItem", 1, [input], false);
+			var action=_createMethodAction(this.context, this, "BindingAddFromNamedItem", 1, [input], 0);
 			var ret=new OfficeExtension.ClientResult();
 			_addActionResultHandler(this, action, ret);
 			return ret;
 		};
 		_V1Api.prototype.bindingAddFromPrompt=function (input) {
-			var action=_createMethodAction(this.context, this, "BindingAddFromPrompt", 1, [input], false);
+			var action=_createMethodAction(this.context, this, "BindingAddFromPrompt", 1, [input], 0);
 			var ret=new OfficeExtension.ClientResult();
 			_addActionResultHandler(this, action, ret);
 			return ret;
 		};
 		_V1Api.prototype.bindingAddFromSelection=function (input) {
-			var action=_createMethodAction(this.context, this, "BindingAddFromSelection", 1, [input], false);
+			var action=_createMethodAction(this.context, this, "BindingAddFromSelection", 1, [input], 0);
 			var ret=new OfficeExtension.ClientResult();
 			_addActionResultHandler(this, action, ret);
 			return ret;
 		};
 		_V1Api.prototype.bindingAddRows=function (input) {
-			var action=_createMethodAction(this.context, this, "BindingAddRows", 0, [input], false);
+			var action=_createMethodAction(this.context, this, "BindingAddRows", 0, [input], 0);
 			var ret=new OfficeExtension.ClientResult();
 			_addActionResultHandler(this, action, ret);
 			return ret;
 		};
 		_V1Api.prototype.bindingClearFormats=function (input) {
-			var action=_createMethodAction(this.context, this, "BindingClearFormats", 0, [input], false);
+			var action=_createMethodAction(this.context, this, "BindingClearFormats", 0, [input], 0);
 			var ret=new OfficeExtension.ClientResult();
 			_addActionResultHandler(this, action, ret);
 			return ret;
 		};
 		_V1Api.prototype.bindingDeleteAllDataValues=function (input) {
-			var action=_createMethodAction(this.context, this, "BindingDeleteAllDataValues", 0, [input], false);
+			var action=_createMethodAction(this.context, this, "BindingDeleteAllDataValues", 0, [input], 0);
 			var ret=new OfficeExtension.ClientResult();
 			_addActionResultHandler(this, action, ret);
 			return ret;
 		};
 		_V1Api.prototype.bindingGetAll=function () {
-			var action=_createMethodAction(this.context, this, "BindingGetAll", 1, [], false);
+			var action=_createMethodAction(this.context, this, "BindingGetAll", 1, [], 4);
 			var ret=new OfficeExtension.ClientResult();
 			_addActionResultHandler(this, action, ret);
 			return ret;
 		};
 		_V1Api.prototype.bindingGetById=function (input) {
-			var action=_createMethodAction(this.context, this, "BindingGetById", 1, [input], false);
+			var action=_createMethodAction(this.context, this, "BindingGetById", 1, [input], 4);
 			var ret=new OfficeExtension.ClientResult();
 			_addActionResultHandler(this, action, ret);
 			return ret;
 		};
 		_V1Api.prototype.bindingGetData=function (input) {
-			var action=_createMethodAction(this.context, this, "BindingGetData", 1, [input], false);
+			var action=_createMethodAction(this.context, this, "BindingGetData", 1, [input], 4);
 			var ret=new OfficeExtension.ClientResult();
 			_addActionResultHandler(this, action, ret);
 			return ret;
 		};
 		_V1Api.prototype.bindingReleaseById=function (input) {
-			var action=_createMethodAction(this.context, this, "BindingReleaseById", 1, [input], false);
+			var action=_createMethodAction(this.context, this, "BindingReleaseById", 1, [input], 0);
 			var ret=new OfficeExtension.ClientResult();
 			_addActionResultHandler(this, action, ret);
 			return ret;
 		};
 		_V1Api.prototype.bindingSetData=function (input) {
-			var action=_createMethodAction(this.context, this, "BindingSetData", 0, [input], false);
+			var action=_createMethodAction(this.context, this, "BindingSetData", 0, [input], 0);
 			var ret=new OfficeExtension.ClientResult();
 			_addActionResultHandler(this, action, ret);
 			return ret;
 		};
 		_V1Api.prototype.bindingSetFormats=function (input) {
-			var action=_createMethodAction(this.context, this, "BindingSetFormats", 0, [input], false);
+			var action=_createMethodAction(this.context, this, "BindingSetFormats", 0, [input], 0);
 			var ret=new OfficeExtension.ClientResult();
 			_addActionResultHandler(this, action, ret);
 			return ret;
 		};
 		_V1Api.prototype.bindingSetTableOptions=function (input) {
-			var action=_createMethodAction(this.context, this, "BindingSetTableOptions", 0, [input], false);
+			var action=_createMethodAction(this.context, this, "BindingSetTableOptions", 0, [input], 0);
 			var ret=new OfficeExtension.ClientResult();
 			_addActionResultHandler(this, action, ret);
 			return ret;
 		};
 		_V1Api.prototype.getFilePropertiesAsync=function () {
 			_throwIfApiNotSupported("_V1Api.getFilePropertiesAsync", _defaultApiSetName, "1.6", _hostName);
-			var action=_createMethodAction(this.context, this, "GetFilePropertiesAsync", 1, [], false);
+			var action=_createMethodAction(this.context, this, "GetFilePropertiesAsync", 1, [], 4);
 			var ret=new OfficeExtension.ClientResult();
 			_addActionResultHandler(this, action, ret);
 			return ret;
 		};
 		_V1Api.prototype.getSelectedData=function (input) {
-			var action=_createMethodAction(this.context, this, "GetSelectedData", 1, [input], false);
+			var action=_createMethodAction(this.context, this, "GetSelectedData", 1, [input], 4);
 			var ret=new OfficeExtension.ClientResult();
 			_addActionResultHandler(this, action, ret);
 			return ret;
 		};
 		_V1Api.prototype.gotoById=function (input) {
-			var action=_createMethodAction(this.context, this, "GotoById", 1, [input], false);
+			var action=_createMethodAction(this.context, this, "GotoById", 1, [input], 4);
 			var ret=new OfficeExtension.ClientResult();
 			_addActionResultHandler(this, action, ret);
 			return ret;
 		};
 		_V1Api.prototype.setSelectedData=function (input) {
-			var action=_createMethodAction(this.context, this, "SetSelectedData", 0, [input], false);
+			var action=_createMethodAction(this.context, this, "SetSelectedData", 0, [input], 0);
 			var ret=new OfficeExtension.ClientResult();
 			_addActionResultHandler(this, action, ret);
 			return ret;
@@ -25118,9 +28245,13 @@ var Excel;
 			enumerable: true,
 			configurable: true
 		});
+		PivotTableCollection.prototype.add=function (name, source, destination) {
+			_throwIfApiNotSupported("PivotTableCollection.add", _defaultApiSetName, "1.8", _hostName);
+			return new Excel.PivotTable(this.context, _createMethodObjectPath(this.context, this, "Add", 0, [name, source, destination], false, true, null, 0));
+		};
 		PivotTableCollection.prototype.getCount=function () {
 			_throwIfApiNotSupported("PivotTableCollection.getCount", _defaultApiSetName, "1.4", _hostName);
-			var action=_createMethodAction(this.context, this, "GetCount", 1, [], false);
+			var action=_createMethodAction(this.context, this, "GetCount", 1, [], 4);
 			var ret=new OfficeExtension.ClientResult();
 			_addActionResultHandler(this, action, ret);
 			return ret;
@@ -25130,14 +28261,10 @@ var Excel;
 		};
 		PivotTableCollection.prototype.getItemOrNullObject=function (name) {
 			_throwIfApiNotSupported("PivotTableCollection.getItemOrNullObject", _defaultApiSetName, "1.4", _hostName);
-			return new Excel.PivotTable(this.context, _createMethodObjectPath(this.context, this, "GetItemOrNullObject", 1, [name], false, false, null, false));
+			return new Excel.PivotTable(this.context, _createMethodObjectPath(this.context, this, "GetItemOrNullObject", 1, [name], false, false, null, 4));
 		};
 		PivotTableCollection.prototype.refreshAll=function () {
-			_createMethodAction(this.context, this, "RefreshAll", 0, [], false);
-		};
-		PivotTableCollection.prototype.add=function (name, address, pivotCache) {
-			_throwIfApiNotSupported("PivotTableCollection.add", "Pivot", "1.1", _hostName);
-			return new Excel.PivotTable(this.context, _createMethodObjectPath(this.context, this, "Add", 0, [name, address, pivotCache], false, true, null, false));
+			_createMethodAction(this.context, this, "RefreshAll", 0, [], 0);
 		};
 		PivotTableCollection.prototype._handleResult=function (value) {
 			_super.prototype._handleResult.call(this, value);
@@ -25187,21 +28314,76 @@ var Excel;
 		});
 		Object.defineProperty(PivotTable.prototype, "_scalarPropertyNames", {
 			get: function () {
-				return ["name", "id", "columnGrandTotals", "value", "rowGrandTotals", "hidden", "summary", "version", "saveData", "hasAutoFormat", "refreshDate", "refreshName", "innerDetail", "displayErrorString", "displayNullString", "enableDrilldown", "enableFieldDialog", "enableWizard", "errorString", "manualUpdate", "nullString", "subtotalHiddenPageItems", "preserveFormatting", "tag", "vacatedStyle", "printTitles", "grandTotalName", "smallGrid", "repeatItemsOnEachPrintedPage", "totalsAnnotation", "alternativeText", "enableDataValueEditing", "enableFieldList", "showPageMultipleItemLabel", "displayEmptyRow", "displayEmptyColumn", "showDrillIndicators", "printDrillIndicators", "displayContextTooltips", "compactRowIndent", "displayFieldCaptions", "inGridDropZones", "showTableStyleLastColumn", "showTableStyleRowStripes", "showTableStyleColumnStripes", "showTableStyleRowHeaders", "showTableStyleColumnHeaders", "allowMultipleFilters", "compactLayoutRowHeader", "compactLayoutColumnHeader", "fieldListSortAscending", "sortUsingCustomLists", "showValuesRow"];
+				return ["name", "id", "columnGrandTotals", "rowGrandTotals", "enableFieldList"];
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(PivotTable.prototype, "_scalarPropertyUpdateable", {
 			get: function () {
-				return [true, false, true, true, true, false, true, false, true, true, false, false, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true];
+				return [true, false, true, true, true];
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(PivotTable.prototype, "_navigationPropertyNames", {
 			get: function () {
-				return ["worksheet", "dataLabelRange", "dataBodyRange", "pivotFields", "calculatedFields"];
+				return ["worksheet", "hierarchies", "rowHierarchies", "columnHierarchies", "dataHierarchies", "filterHierarchies"];
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(PivotTable.prototype, "columnHierarchies", {
+			get: function () {
+				_throwIfApiNotSupported("PivotTable.columnHierarchies", _defaultApiSetName, "1.8", _hostName);
+				if (!this._Co) {
+					this._Co=new Excel.RowColumnPivotHierarchyCollection(this.context, _createPropertyObjectPath(this.context, this, "ColumnHierarchies", true, false, 4));
+				}
+				return this._Co;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(PivotTable.prototype, "dataHierarchies", {
+			get: function () {
+				_throwIfApiNotSupported("PivotTable.dataHierarchies", _defaultApiSetName, "1.8", _hostName);
+				if (!this._D) {
+					this._D=new Excel.DataPivotHierarchyCollection(this.context, _createPropertyObjectPath(this.context, this, "DataHierarchies", true, false, 4));
+				}
+				return this._D;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(PivotTable.prototype, "filterHierarchies", {
+			get: function () {
+				_throwIfApiNotSupported("PivotTable.filterHierarchies", _defaultApiSetName, "1.8", _hostName);
+				if (!this._F) {
+					this._F=new Excel.FilterPivotHierarchyCollection(this.context, _createPropertyObjectPath(this.context, this, "FilterHierarchies", true, false, 4));
+				}
+				return this._F;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(PivotTable.prototype, "hierarchies", {
+			get: function () {
+				_throwIfApiNotSupported("PivotTable.hierarchies", _defaultApiSetName, "1.8", _hostName);
+				if (!this._H) {
+					this._H=new Excel.PivotHierarchyCollection(this.context, _createPropertyObjectPath(this.context, this, "Hierarchies", true, false, 4));
+				}
+				return this._H;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(PivotTable.prototype, "rowHierarchies", {
+			get: function () {
+				_throwIfApiNotSupported("PivotTable.rowHierarchies", _defaultApiSetName, "1.8", _hostName);
+				if (!this._Ro) {
+					this._Ro=new Excel.RowColumnPivotHierarchyCollection(this.context, _createPropertyObjectPath(this.context, this, "RowHierarchies", true, false, 4));
+				}
+				return this._Ro;
 			},
 			enumerable: true,
 			configurable: true
@@ -25209,66 +28391,35 @@ var Excel;
 		Object.defineProperty(PivotTable.prototype, "worksheet", {
 			get: function () {
 				if (!this._W) {
-					this._W=new Excel.Worksheet(this.context, _createPropertyObjectPath(this.context, this, "Worksheet", false, false, false));
+					this._W=new Excel.Worksheet(this.context, _createPropertyObjectPath(this.context, this, "Worksheet", false, false, 4));
 				}
 				return this._W;
 			},
 			enumerable: true,
 			configurable: true
 		});
-		Object.defineProperty(PivotTable.prototype, "calculatedFields", {
-			get: function () {
-				_throwIfApiNotSupported("PivotTable.calculatedFields", "Pivot", "1.1", _hostName);
-				if (!this._C) {
-					this._C=new Excel.CalculatedFieldCollection(this.context, _createPropertyObjectPath(this.context, this, "CalculatedFields", true, false, false));
-				}
-				return this._C;
-			},
-			enumerable: true,
-			configurable: true
-		});
-		Object.defineProperty(PivotTable.prototype, "dataBodyRange", {
-			get: function () {
-				_throwIfApiNotSupported("PivotTable.dataBodyRange", "Pivot", "1.1", _hostName);
-				if (!this._D) {
-					this._D=new Excel.Range(this.context, _createPropertyObjectPath(this.context, this, "DataBodyRange", false, false, false));
-				}
-				return this._D;
-			},
-			enumerable: true,
-			configurable: true
-		});
-		Object.defineProperty(PivotTable.prototype, "dataLabelRange", {
-			get: function () {
-				_throwIfApiNotSupported("PivotTable.dataLabelRange", "Pivot", "1.1", _hostName);
-				if (!this._Da) {
-					this._Da=new Excel.Range(this.context, _createPropertyObjectPath(this.context, this, "DataLabelRange", false, false, false));
-				}
-				return this._Da;
-			},
-			enumerable: true,
-			configurable: true
-		});
-		Object.defineProperty(PivotTable.prototype, "pivotFields", {
-			get: function () {
-				_throwIfApiNotSupported("PivotTable.pivotFields", "Pivot", "1.1", _hostName);
-				if (!this._P) {
-					this._P=new Excel.PivotFieldCollection(this.context, _createPropertyObjectPath(this.context, this, "PivotFields", true, false, false));
-				}
-				return this._P;
-			},
-			enumerable: true,
-			configurable: true
-		});
 		Object.defineProperty(PivotTable.prototype, "columnGrandTotals", {
 			get: function () {
-				_throwIfNotLoaded("columnGrandTotals", this._Co, _typePivotTable, this._isNull);
+				_throwIfNotLoaded("columnGrandTotals", this._C, _typePivotTable, this._isNull);
 				_throwIfApiNotSupported("PivotTable.columnGrandTotals", _defaultApiSetName, "1.8", _hostName);
-				return this._Co;
+				return this._C;
 			},
 			set: function (value) {
-				this._Co=value;
-				_createSetPropertyAction(this.context, this, "ColumnGrandTotals", value);
+				this._C=value;
+				_createSetPropertyAction(this.context, this, "ColumnGrandTotals", value, 0);
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(PivotTable.prototype, "enableFieldList", {
+			get: function () {
+				_throwIfNotLoaded("enableFieldList", this._E, _typePivotTable, this._isNull);
+				_throwIfApiNotSupported("PivotTable.enableFieldList", _defaultApiSetName, "1.8", _hostName);
+				return this._E;
+			},
+			set: function (value) {
+				this._E=value;
+				_createSetPropertyAction(this.context, this, "EnableFieldList", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -25289,737 +28440,51 @@ var Excel;
 			},
 			set: function (value) {
 				this._N=value;
-				_createSetPropertyAction(this.context, this, "Name", value);
+				_createSetPropertyAction(this.context, this, "Name", value, 0);
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(PivotTable.prototype, "rowGrandTotals", {
 			get: function () {
-				_throwIfNotLoaded("rowGrandTotals", this._Ro, _typePivotTable, this._isNull);
+				_throwIfNotLoaded("rowGrandTotals", this._R, _typePivotTable, this._isNull);
 				_throwIfApiNotSupported("PivotTable.rowGrandTotals", _defaultApiSetName, "1.8", _hostName);
-				return this._Ro;
-			},
-			set: function (value) {
-				this._Ro=value;
-				_createSetPropertyAction(this.context, this, "RowGrandTotals", value);
-			},
-			enumerable: true,
-			configurable: true
-		});
-		Object.defineProperty(PivotTable.prototype, "allowMultipleFilters", {
-			get: function () {
-				_throwIfNotLoaded("allowMultipleFilters", this._A, _typePivotTable, this._isNull);
-				_throwIfApiNotSupported("PivotTable.allowMultipleFilters", "Pivot", "1.1", _hostName);
-				return this._A;
-			},
-			set: function (value) {
-				this._A=value;
-				_createSetPropertyAction(this.context, this, "AllowMultipleFilters", value);
-			},
-			enumerable: true,
-			configurable: true
-		});
-		Object.defineProperty(PivotTable.prototype, "alternativeText", {
-			get: function () {
-				_throwIfNotLoaded("alternativeText", this._Al, _typePivotTable, this._isNull);
-				_throwIfApiNotSupported("PivotTable.alternativeText", "Pivot", "1.1", _hostName);
-				return this._Al;
-			},
-			set: function (value) {
-				this._Al=value;
-				_createSetPropertyAction(this.context, this, "AlternativeText", value);
-			},
-			enumerable: true,
-			configurable: true
-		});
-		Object.defineProperty(PivotTable.prototype, "compactLayoutColumnHeader", {
-			get: function () {
-				_throwIfNotLoaded("compactLayoutColumnHeader", this._Com, _typePivotTable, this._isNull);
-				_throwIfApiNotSupported("PivotTable.compactLayoutColumnHeader", "Pivot", "1.1", _hostName);
-				return this._Com;
-			},
-			set: function (value) {
-				this._Com=value;
-				_createSetPropertyAction(this.context, this, "CompactLayoutColumnHeader", value);
-			},
-			enumerable: true,
-			configurable: true
-		});
-		Object.defineProperty(PivotTable.prototype, "compactLayoutRowHeader", {
-			get: function () {
-				_throwIfNotLoaded("compactLayoutRowHeader", this._Comp, _typePivotTable, this._isNull);
-				_throwIfApiNotSupported("PivotTable.compactLayoutRowHeader", "Pivot", "1.1", _hostName);
-				return this._Comp;
-			},
-			set: function (value) {
-				this._Comp=value;
-				_createSetPropertyAction(this.context, this, "CompactLayoutRowHeader", value);
-			},
-			enumerable: true,
-			configurable: true
-		});
-		Object.defineProperty(PivotTable.prototype, "compactRowIndent", {
-			get: function () {
-				_throwIfNotLoaded("compactRowIndent", this._Compa, _typePivotTable, this._isNull);
-				_throwIfApiNotSupported("PivotTable.compactRowIndent", "Pivot", "1.1", _hostName);
-				return this._Compa;
-			},
-			set: function (value) {
-				this._Compa=value;
-				_createSetPropertyAction(this.context, this, "CompactRowIndent", value);
-			},
-			enumerable: true,
-			configurable: true
-		});
-		Object.defineProperty(PivotTable.prototype, "displayContextTooltips", {
-			get: function () {
-				_throwIfNotLoaded("displayContextTooltips", this._Di, _typePivotTable, this._isNull);
-				_throwIfApiNotSupported("PivotTable.displayContextTooltips", "Pivot", "1.1", _hostName);
-				return this._Di;
-			},
-			set: function (value) {
-				this._Di=value;
-				_createSetPropertyAction(this.context, this, "DisplayContextTooltips", value);
-			},
-			enumerable: true,
-			configurable: true
-		});
-		Object.defineProperty(PivotTable.prototype, "displayEmptyColumn", {
-			get: function () {
-				_throwIfNotLoaded("displayEmptyColumn", this._Dis, _typePivotTable, this._isNull);
-				_throwIfApiNotSupported("PivotTable.displayEmptyColumn", "Pivot", "1.1", _hostName);
-				return this._Dis;
-			},
-			set: function (value) {
-				this._Dis=value;
-				_createSetPropertyAction(this.context, this, "DisplayEmptyColumn", value);
-			},
-			enumerable: true,
-			configurable: true
-		});
-		Object.defineProperty(PivotTable.prototype, "displayEmptyRow", {
-			get: function () {
-				_throwIfNotLoaded("displayEmptyRow", this._Disp, _typePivotTable, this._isNull);
-				_throwIfApiNotSupported("PivotTable.displayEmptyRow", "Pivot", "1.1", _hostName);
-				return this._Disp;
-			},
-			set: function (value) {
-				this._Disp=value;
-				_createSetPropertyAction(this.context, this, "DisplayEmptyRow", value);
-			},
-			enumerable: true,
-			configurable: true
-		});
-		Object.defineProperty(PivotTable.prototype, "displayErrorString", {
-			get: function () {
-				_throwIfNotLoaded("displayErrorString", this._Displ, _typePivotTable, this._isNull);
-				_throwIfApiNotSupported("PivotTable.displayErrorString", "Pivot", "1.1", _hostName);
-				return this._Displ;
-			},
-			set: function (value) {
-				this._Displ=value;
-				_createSetPropertyAction(this.context, this, "DisplayErrorString", value);
-			},
-			enumerable: true,
-			configurable: true
-		});
-		Object.defineProperty(PivotTable.prototype, "displayFieldCaptions", {
-			get: function () {
-				_throwIfNotLoaded("displayFieldCaptions", this._Displa, _typePivotTable, this._isNull);
-				_throwIfApiNotSupported("PivotTable.displayFieldCaptions", "Pivot", "1.1", _hostName);
-				return this._Displa;
-			},
-			set: function (value) {
-				this._Displa=value;
-				_createSetPropertyAction(this.context, this, "DisplayFieldCaptions", value);
-			},
-			enumerable: true,
-			configurable: true
-		});
-		Object.defineProperty(PivotTable.prototype, "displayNullString", {
-			get: function () {
-				_throwIfNotLoaded("displayNullString", this._Display, _typePivotTable, this._isNull);
-				_throwIfApiNotSupported("PivotTable.displayNullString", "Pivot", "1.1", _hostName);
-				return this._Display;
-			},
-			set: function (value) {
-				this._Display=value;
-				_createSetPropertyAction(this.context, this, "DisplayNullString", value);
-			},
-			enumerable: true,
-			configurable: true
-		});
-		Object.defineProperty(PivotTable.prototype, "enableDataValueEditing", {
-			get: function () {
-				_throwIfNotLoaded("enableDataValueEditing", this._E, _typePivotTable, this._isNull);
-				_throwIfApiNotSupported("PivotTable.enableDataValueEditing", "Pivot", "1.1", _hostName);
-				return this._E;
-			},
-			set: function (value) {
-				this._E=value;
-				_createSetPropertyAction(this.context, this, "EnableDataValueEditing", value);
-			},
-			enumerable: true,
-			configurable: true
-		});
-		Object.defineProperty(PivotTable.prototype, "enableDrilldown", {
-			get: function () {
-				_throwIfNotLoaded("enableDrilldown", this._En, _typePivotTable, this._isNull);
-				_throwIfApiNotSupported("PivotTable.enableDrilldown", "Pivot", "1.1", _hostName);
-				return this._En;
-			},
-			set: function (value) {
-				this._En=value;
-				_createSetPropertyAction(this.context, this, "EnableDrilldown", value);
-			},
-			enumerable: true,
-			configurable: true
-		});
-		Object.defineProperty(PivotTable.prototype, "enableFieldDialog", {
-			get: function () {
-				_throwIfNotLoaded("enableFieldDialog", this._Ena, _typePivotTable, this._isNull);
-				_throwIfApiNotSupported("PivotTable.enableFieldDialog", "Pivot", "1.1", _hostName);
-				return this._Ena;
-			},
-			set: function (value) {
-				this._Ena=value;
-				_createSetPropertyAction(this.context, this, "EnableFieldDialog", value);
-			},
-			enumerable: true,
-			configurable: true
-		});
-		Object.defineProperty(PivotTable.prototype, "enableFieldList", {
-			get: function () {
-				_throwIfNotLoaded("enableFieldList", this._Enab, _typePivotTable, this._isNull);
-				_throwIfApiNotSupported("PivotTable.enableFieldList", "Pivot", "1.1", _hostName);
-				return this._Enab;
-			},
-			set: function (value) {
-				this._Enab=value;
-				_createSetPropertyAction(this.context, this, "EnableFieldList", value);
-			},
-			enumerable: true,
-			configurable: true
-		});
-		Object.defineProperty(PivotTable.prototype, "enableWizard", {
-			get: function () {
-				_throwIfNotLoaded("enableWizard", this._Enabl, _typePivotTable, this._isNull);
-				_throwIfApiNotSupported("PivotTable.enableWizard", "Pivot", "1.1", _hostName);
-				return this._Enabl;
-			},
-			set: function (value) {
-				this._Enabl=value;
-				_createSetPropertyAction(this.context, this, "EnableWizard", value);
-			},
-			enumerable: true,
-			configurable: true
-		});
-		Object.defineProperty(PivotTable.prototype, "errorString", {
-			get: function () {
-				_throwIfNotLoaded("errorString", this._Er, _typePivotTable, this._isNull);
-				_throwIfApiNotSupported("PivotTable.errorString", "Pivot", "1.1", _hostName);
-				return this._Er;
-			},
-			set: function (value) {
-				this._Er=value;
-				_createSetPropertyAction(this.context, this, "ErrorString", value);
-			},
-			enumerable: true,
-			configurable: true
-		});
-		Object.defineProperty(PivotTable.prototype, "fieldListSortAscending", {
-			get: function () {
-				_throwIfNotLoaded("fieldListSortAscending", this._F, _typePivotTable, this._isNull);
-				_throwIfApiNotSupported("PivotTable.fieldListSortAscending", "Pivot", "1.1", _hostName);
-				return this._F;
-			},
-			set: function (value) {
-				this._F=value;
-				_createSetPropertyAction(this.context, this, "FieldListSortAscending", value);
-			},
-			enumerable: true,
-			configurable: true
-		});
-		Object.defineProperty(PivotTable.prototype, "grandTotalName", {
-			get: function () {
-				_throwIfNotLoaded("grandTotalName", this._G, _typePivotTable, this._isNull);
-				_throwIfApiNotSupported("PivotTable.grandTotalName", "Pivot", "1.1", _hostName);
-				return this._G;
-			},
-			set: function (value) {
-				this._G=value;
-				_createSetPropertyAction(this.context, this, "GrandTotalName", value);
-			},
-			enumerable: true,
-			configurable: true
-		});
-		Object.defineProperty(PivotTable.prototype, "hasAutoFormat", {
-			get: function () {
-				_throwIfNotLoaded("hasAutoFormat", this._H, _typePivotTable, this._isNull);
-				_throwIfApiNotSupported("PivotTable.hasAutoFormat", "Pivot", "1.1", _hostName);
-				return this._H;
-			},
-			set: function (value) {
-				this._H=value;
-				_createSetPropertyAction(this.context, this, "HasAutoFormat", value);
-			},
-			enumerable: true,
-			configurable: true
-		});
-		Object.defineProperty(PivotTable.prototype, "hidden", {
-			get: function () {
-				_throwIfNotLoaded("hidden", this._Hi, _typePivotTable, this._isNull);
-				_throwIfApiNotSupported("PivotTable.hidden", "Pivot", "1.1", _hostName);
-				return this._Hi;
-			},
-			enumerable: true,
-			configurable: true
-		});
-		Object.defineProperty(PivotTable.prototype, "inGridDropZones", {
-			get: function () {
-				_throwIfNotLoaded("inGridDropZones", this._In, _typePivotTable, this._isNull);
-				_throwIfApiNotSupported("PivotTable.inGridDropZones", "Pivot", "1.1", _hostName);
-				return this._In;
-			},
-			set: function (value) {
-				this._In=value;
-				_createSetPropertyAction(this.context, this, "InGridDropZones", value);
-			},
-			enumerable: true,
-			configurable: true
-		});
-		Object.defineProperty(PivotTable.prototype, "innerDetail", {
-			get: function () {
-				_throwIfNotLoaded("innerDetail", this._Inn, _typePivotTable, this._isNull);
-				_throwIfApiNotSupported("PivotTable.innerDetail", "Pivot", "1.1", _hostName);
-				return this._Inn;
-			},
-			set: function (value) {
-				this._Inn=value;
-				_createSetPropertyAction(this.context, this, "InnerDetail", value);
-			},
-			enumerable: true,
-			configurable: true
-		});
-		Object.defineProperty(PivotTable.prototype, "manualUpdate", {
-			get: function () {
-				_throwIfNotLoaded("manualUpdate", this._M, _typePivotTable, this._isNull);
-				_throwIfApiNotSupported("PivotTable.manualUpdate", "Pivot", "1.1", _hostName);
-				return this._M;
-			},
-			set: function (value) {
-				this._M=value;
-				_createSetPropertyAction(this.context, this, "ManualUpdate", value);
-			},
-			enumerable: true,
-			configurable: true
-		});
-		Object.defineProperty(PivotTable.prototype, "nullString", {
-			get: function () {
-				_throwIfNotLoaded("nullString", this._Nu, _typePivotTable, this._isNull);
-				_throwIfApiNotSupported("PivotTable.nullString", "Pivot", "1.1", _hostName);
-				return this._Nu;
-			},
-			set: function (value) {
-				this._Nu=value;
-				_createSetPropertyAction(this.context, this, "NullString", value);
-			},
-			enumerable: true,
-			configurable: true
-		});
-		Object.defineProperty(PivotTable.prototype, "preserveFormatting", {
-			get: function () {
-				_throwIfNotLoaded("preserveFormatting", this._Pr, _typePivotTable, this._isNull);
-				_throwIfApiNotSupported("PivotTable.preserveFormatting", "Pivot", "1.1", _hostName);
-				return this._Pr;
-			},
-			set: function (value) {
-				this._Pr=value;
-				_createSetPropertyAction(this.context, this, "PreserveFormatting", value);
-			},
-			enumerable: true,
-			configurable: true
-		});
-		Object.defineProperty(PivotTable.prototype, "printDrillIndicators", {
-			get: function () {
-				_throwIfNotLoaded("printDrillIndicators", this._Pri, _typePivotTable, this._isNull);
-				_throwIfApiNotSupported("PivotTable.printDrillIndicators", "Pivot", "1.1", _hostName);
-				return this._Pri;
-			},
-			set: function (value) {
-				this._Pri=value;
-				_createSetPropertyAction(this.context, this, "PrintDrillIndicators", value);
-			},
-			enumerable: true,
-			configurable: true
-		});
-		Object.defineProperty(PivotTable.prototype, "printTitles", {
-			get: function () {
-				_throwIfNotLoaded("printTitles", this._Prin, _typePivotTable, this._isNull);
-				_throwIfApiNotSupported("PivotTable.printTitles", "Pivot", "1.1", _hostName);
-				return this._Prin;
-			},
-			set: function (value) {
-				this._Prin=value;
-				_createSetPropertyAction(this.context, this, "PrintTitles", value);
-			},
-			enumerable: true,
-			configurable: true
-		});
-		Object.defineProperty(PivotTable.prototype, "refreshDate", {
-			get: function () {
-				_throwIfNotLoaded("refreshDate", this._R, _typePivotTable, this._isNull);
-				_throwIfApiNotSupported("PivotTable.refreshDate", "Pivot", "1.1", _hostName);
 				return this._R;
 			},
-			enumerable: true,
-			configurable: true
-		});
-		Object.defineProperty(PivotTable.prototype, "refreshName", {
-			get: function () {
-				_throwIfNotLoaded("refreshName", this._Re, _typePivotTable, this._isNull);
-				_throwIfApiNotSupported("PivotTable.refreshName", "Pivot", "1.1", _hostName);
-				return this._Re;
-			},
-			enumerable: true,
-			configurable: true
-		});
-		Object.defineProperty(PivotTable.prototype, "repeatItemsOnEachPrintedPage", {
-			get: function () {
-				_throwIfNotLoaded("repeatItemsOnEachPrintedPage", this._Rep, _typePivotTable, this._isNull);
-				_throwIfApiNotSupported("PivotTable.repeatItemsOnEachPrintedPage", "Pivot", "1.1", _hostName);
-				return this._Rep;
-			},
 			set: function (value) {
-				this._Rep=value;
-				_createSetPropertyAction(this.context, this, "RepeatItemsOnEachPrintedPage", value);
-			},
-			enumerable: true,
-			configurable: true
-		});
-		Object.defineProperty(PivotTable.prototype, "saveData", {
-			get: function () {
-				_throwIfNotLoaded("saveData", this._S, _typePivotTable, this._isNull);
-				_throwIfApiNotSupported("PivotTable.saveData", "Pivot", "1.1", _hostName);
-				return this._S;
-			},
-			set: function (value) {
-				this._S=value;
-				_createSetPropertyAction(this.context, this, "SaveData", value);
-			},
-			enumerable: true,
-			configurable: true
-		});
-		Object.defineProperty(PivotTable.prototype, "showDrillIndicators", {
-			get: function () {
-				_throwIfNotLoaded("showDrillIndicators", this._Sh, _typePivotTable, this._isNull);
-				_throwIfApiNotSupported("PivotTable.showDrillIndicators", "Pivot", "1.1", _hostName);
-				return this._Sh;
-			},
-			set: function (value) {
-				this._Sh=value;
-				_createSetPropertyAction(this.context, this, "ShowDrillIndicators", value);
-			},
-			enumerable: true,
-			configurable: true
-		});
-		Object.defineProperty(PivotTable.prototype, "showPageMultipleItemLabel", {
-			get: function () {
-				_throwIfNotLoaded("showPageMultipleItemLabel", this._Sho, _typePivotTable, this._isNull);
-				_throwIfApiNotSupported("PivotTable.showPageMultipleItemLabel", "Pivot", "1.1", _hostName);
-				return this._Sho;
-			},
-			set: function (value) {
-				this._Sho=value;
-				_createSetPropertyAction(this.context, this, "ShowPageMultipleItemLabel", value);
-			},
-			enumerable: true,
-			configurable: true
-		});
-		Object.defineProperty(PivotTable.prototype, "showTableStyleColumnHeaders", {
-			get: function () {
-				_throwIfNotLoaded("showTableStyleColumnHeaders", this._Show, _typePivotTable, this._isNull);
-				_throwIfApiNotSupported("PivotTable.showTableStyleColumnHeaders", "Pivot", "1.1", _hostName);
-				return this._Show;
-			},
-			set: function (value) {
-				this._Show=value;
-				_createSetPropertyAction(this.context, this, "ShowTableStyleColumnHeaders", value);
-			},
-			enumerable: true,
-			configurable: true
-		});
-		Object.defineProperty(PivotTable.prototype, "showTableStyleColumnStripes", {
-			get: function () {
-				_throwIfNotLoaded("showTableStyleColumnStripes", this._ShowT, _typePivotTable, this._isNull);
-				_throwIfApiNotSupported("PivotTable.showTableStyleColumnStripes", "Pivot", "1.1", _hostName);
-				return this._ShowT;
-			},
-			set: function (value) {
-				this._ShowT=value;
-				_createSetPropertyAction(this.context, this, "ShowTableStyleColumnStripes", value);
-			},
-			enumerable: true,
-			configurable: true
-		});
-		Object.defineProperty(PivotTable.prototype, "showTableStyleLastColumn", {
-			get: function () {
-				_throwIfNotLoaded("showTableStyleLastColumn", this._ShowTa, _typePivotTable, this._isNull);
-				_throwIfApiNotSupported("PivotTable.showTableStyleLastColumn", "Pivot", "1.1", _hostName);
-				return this._ShowTa;
-			},
-			set: function (value) {
-				this._ShowTa=value;
-				_createSetPropertyAction(this.context, this, "ShowTableStyleLastColumn", value);
-			},
-			enumerable: true,
-			configurable: true
-		});
-		Object.defineProperty(PivotTable.prototype, "showTableStyleRowHeaders", {
-			get: function () {
-				_throwIfNotLoaded("showTableStyleRowHeaders", this._ShowTab, _typePivotTable, this._isNull);
-				_throwIfApiNotSupported("PivotTable.showTableStyleRowHeaders", "Pivot", "1.1", _hostName);
-				return this._ShowTab;
-			},
-			set: function (value) {
-				this._ShowTab=value;
-				_createSetPropertyAction(this.context, this, "ShowTableStyleRowHeaders", value);
-			},
-			enumerable: true,
-			configurable: true
-		});
-		Object.defineProperty(PivotTable.prototype, "showTableStyleRowStripes", {
-			get: function () {
-				_throwIfNotLoaded("showTableStyleRowStripes", this._ShowTabl, _typePivotTable, this._isNull);
-				_throwIfApiNotSupported("PivotTable.showTableStyleRowStripes", "Pivot", "1.1", _hostName);
-				return this._ShowTabl;
-			},
-			set: function (value) {
-				this._ShowTabl=value;
-				_createSetPropertyAction(this.context, this, "ShowTableStyleRowStripes", value);
-			},
-			enumerable: true,
-			configurable: true
-		});
-		Object.defineProperty(PivotTable.prototype, "showValuesRow", {
-			get: function () {
-				_throwIfNotLoaded("showValuesRow", this._ShowV, _typePivotTable, this._isNull);
-				_throwIfApiNotSupported("PivotTable.showValuesRow", "Pivot", "1.1", _hostName);
-				return this._ShowV;
-			},
-			set: function (value) {
-				this._ShowV=value;
-				_createSetPropertyAction(this.context, this, "ShowValuesRow", value);
-			},
-			enumerable: true,
-			configurable: true
-		});
-		Object.defineProperty(PivotTable.prototype, "smallGrid", {
-			get: function () {
-				_throwIfNotLoaded("smallGrid", this._Sm, _typePivotTable, this._isNull);
-				_throwIfApiNotSupported("PivotTable.smallGrid", "Pivot", "1.1", _hostName);
-				return this._Sm;
-			},
-			set: function (value) {
-				this._Sm=value;
-				_createSetPropertyAction(this.context, this, "SmallGrid", value);
-			},
-			enumerable: true,
-			configurable: true
-		});
-		Object.defineProperty(PivotTable.prototype, "sortUsingCustomLists", {
-			get: function () {
-				_throwIfNotLoaded("sortUsingCustomLists", this._So, _typePivotTable, this._isNull);
-				_throwIfApiNotSupported("PivotTable.sortUsingCustomLists", "Pivot", "1.1", _hostName);
-				return this._So;
-			},
-			set: function (value) {
-				this._So=value;
-				_createSetPropertyAction(this.context, this, "SortUsingCustomLists", value);
-			},
-			enumerable: true,
-			configurable: true
-		});
-		Object.defineProperty(PivotTable.prototype, "subtotalHiddenPageItems", {
-			get: function () {
-				_throwIfNotLoaded("subtotalHiddenPageItems", this._Su, _typePivotTable, this._isNull);
-				_throwIfApiNotSupported("PivotTable.subtotalHiddenPageItems", "Pivot", "1.1", _hostName);
-				return this._Su;
-			},
-			set: function (value) {
-				this._Su=value;
-				_createSetPropertyAction(this.context, this, "SubtotalHiddenPageItems", value);
-			},
-			enumerable: true,
-			configurable: true
-		});
-		Object.defineProperty(PivotTable.prototype, "summary", {
-			get: function () {
-				_throwIfNotLoaded("summary", this._Sum, _typePivotTable, this._isNull);
-				_throwIfApiNotSupported("PivotTable.summary", "Pivot", "1.1", _hostName);
-				return this._Sum;
-			},
-			set: function (value) {
-				this._Sum=value;
-				_createSetPropertyAction(this.context, this, "Summary", value);
-			},
-			enumerable: true,
-			configurable: true
-		});
-		Object.defineProperty(PivotTable.prototype, "tag", {
-			get: function () {
-				_throwIfNotLoaded("tag", this._T, _typePivotTable, this._isNull);
-				_throwIfApiNotSupported("PivotTable.tag", "Pivot", "1.1", _hostName);
-				return this._T;
-			},
-			set: function (value) {
-				this._T=value;
-				_createSetPropertyAction(this.context, this, "Tag", value);
-			},
-			enumerable: true,
-			configurable: true
-		});
-		Object.defineProperty(PivotTable.prototype, "totalsAnnotation", {
-			get: function () {
-				_throwIfNotLoaded("totalsAnnotation", this._To, _typePivotTable, this._isNull);
-				_throwIfApiNotSupported("PivotTable.totalsAnnotation", "Pivot", "1.1", _hostName);
-				return this._To;
-			},
-			set: function (value) {
-				this._To=value;
-				_createSetPropertyAction(this.context, this, "TotalsAnnotation", value);
-			},
-			enumerable: true,
-			configurable: true
-		});
-		Object.defineProperty(PivotTable.prototype, "vacatedStyle", {
-			get: function () {
-				_throwIfNotLoaded("vacatedStyle", this._V, _typePivotTable, this._isNull);
-				_throwIfApiNotSupported("PivotTable.vacatedStyle", "Pivot", "1.1", _hostName);
-				return this._V;
-			},
-			set: function (value) {
-				this._V=value;
-				_createSetPropertyAction(this.context, this, "VacatedStyle", value);
-			},
-			enumerable: true,
-			configurable: true
-		});
-		Object.defineProperty(PivotTable.prototype, "value", {
-			get: function () {
-				_throwIfNotLoaded("value", this._Va, _typePivotTable, this._isNull);
-				_throwIfApiNotSupported("PivotTable.value", "Pivot", "1.1", _hostName);
-				return this._Va;
-			},
-			set: function (value) {
-				this._Va=value;
-				_createSetPropertyAction(this.context, this, "Value", value);
-			},
-			enumerable: true,
-			configurable: true
-		});
-		Object.defineProperty(PivotTable.prototype, "version", {
-			get: function () {
-				_throwIfNotLoaded("version", this._Ve, _typePivotTable, this._isNull);
-				_throwIfApiNotSupported("PivotTable.version", "Pivot", "1.1", _hostName);
-				return this._Ve;
+				this._R=value;
+				_createSetPropertyAction(this.context, this, "RowGrandTotals", value, 0);
 			},
 			enumerable: true,
 			configurable: true
 		});
 		PivotTable.prototype.set=function (properties, options) {
-			this._recursivelySet(properties, options, ["name", "columnGrandTotals", "value", "rowGrandTotals", "summary", "saveData", "hasAutoFormat", "innerDetail", "displayErrorString", "displayNullString", "enableDrilldown", "enableFieldDialog", "enableWizard", "errorString", "manualUpdate", "nullString", "subtotalHiddenPageItems", "preserveFormatting", "tag", "vacatedStyle", "printTitles", "grandTotalName", "smallGrid", "repeatItemsOnEachPrintedPage", "totalsAnnotation", "alternativeText", "enableDataValueEditing", "enableFieldList", "showPageMultipleItemLabel", "displayEmptyRow", "displayEmptyColumn", "showDrillIndicators", "printDrillIndicators", "displayContextTooltips", "compactRowIndent", "displayFieldCaptions", "inGridDropZones", "showTableStyleLastColumn", "showTableStyleRowStripes", "showTableStyleColumnStripes", "showTableStyleRowHeaders", "showTableStyleColumnHeaders", "allowMultipleFilters", "compactLayoutRowHeader", "compactLayoutColumnHeader", "fieldListSortAscending", "sortUsingCustomLists", "showValuesRow"], ["dataLabelRange", "dataBodyRange"], [
-				"calculatedFields",
-				"pivotFields",
+			this._recursivelySet(properties, options, ["name", "columnGrandTotals", "rowGrandTotals", "enableFieldList"], [], [
+				"columnHierarchies",
+				"dataHierarchies",
+				"filterHierarchies",
+				"hierarchies",
+				"rowHierarchies",
 				"worksheet"
 			]);
 		};
+		PivotTable.prototype.update=function (properties) {
+			this._recursivelyUpdate(properties);
+		};
+		PivotTable.prototype.delete=function () {
+			_throwIfApiNotSupported("PivotTable.delete", _defaultApiSetName, "1.8", _hostName);
+			_createMethodAction(this.context, this, "Delete", 0, [], 0);
+		};
 		PivotTable.prototype.refresh=function () {
-			_createMethodAction(this.context, this, "Refresh", 0, [], false);
+			_createMethodAction(this.context, this, "Refresh", 0, [], 0);
 		};
 		PivotTable.prototype.rowAxisLayout=function (RowLayout) {
 			_throwIfApiNotSupported("PivotTable.rowAxisLayout", _defaultApiSetName, "1.8", _hostName);
-			_createMethodAction(this.context, this, "RowAxisLayout", 0, [RowLayout], false);
+			_createMethodAction(this.context, this, "RowAxisLayout", 0, [RowLayout], 0);
 		};
 		PivotTable.prototype.subtotalLocation=function (Location) {
 			_throwIfApiNotSupported("PivotTable.subtotalLocation", _defaultApiSetName, "1.8", _hostName);
-			_createMethodAction(this.context, this, "SubtotalLocation", 0, [Location], false);
-		};
-		PivotTable.prototype.addChart=function (chartType, seriesBy) {
-			_throwIfApiNotSupported("PivotTable.addChart", "Pivot", "1.1", _hostName);
-			return new Excel.Chart(this.context, _createMethodObjectPath(this.context, this, "AddChart", 0, [chartType, seriesBy], false, false, null, false));
-		};
-		PivotTable.prototype.addDataField=function (field, caption, func) {
-			_throwIfApiNotSupported("PivotTable.addDataField", "Pivot", "1.1", _hostName);
-			return new Excel.PivotField(this.context, _createMethodObjectPath(this.context, this, "AddDataField", 0, [field, caption, func], false, false, null, false));
-		};
-		PivotTable.prototype.clearTable=function () {
-			_throwIfApiNotSupported("PivotTable.clearTable", "Pivot", "1.1", _hostName);
-			_createMethodAction(this.context, this, "ClearTable", 0, [], false);
-		};
-		PivotTable.prototype.getColumnField=function (Index) {
-			_throwIfApiNotSupported("PivotTable.getColumnField", "Pivot", "1.1", _hostName);
-			return new Excel.PivotField(this.context, _createMethodObjectPath(this.context, this, "GetColumnField", 1, [Index], false, false, null, false));
-		};
-		PivotTable.prototype.getColumnRange=function () {
-			_throwIfApiNotSupported("PivotTable.getColumnRange", "Pivot", "1.1", _hostName);
-			return new Excel.Range(this.context, _createMethodObjectPath(this.context, this, "GetColumnRange", 1, [], false, true, null, false));
-		};
-		PivotTable.prototype.getDataField=function (Index) {
-			_throwIfApiNotSupported("PivotTable.getDataField", "Pivot", "1.1", _hostName);
-			return new Excel.PivotField(this.context, _createMethodObjectPath(this.context, this, "GetDataField", 1, [Index], false, false, null, false));
-		};
-		PivotTable.prototype.getDataPivotField=function () {
-			_throwIfApiNotSupported("PivotTable.getDataPivotField", "Pivot", "1.1", _hostName);
-			return new Excel.PivotField(this.context, _createMethodObjectPath(this.context, this, "GetDataPivotField", 1, [], false, false, null, false));
-		};
-		PivotTable.prototype.getEntireRange=function () {
-			_throwIfApiNotSupported("PivotTable.getEntireRange", "Pivot", "1.1", _hostName);
-			return new Excel.Range(this.context, _createMethodObjectPath(this.context, this, "GetEntireRange", 1, [], false, true, null, false));
-		};
-		PivotTable.prototype.getHiddenField=function (Index) {
-			_throwIfApiNotSupported("PivotTable.getHiddenField", "Pivot", "1.1", _hostName);
-			return new Excel.PivotField(this.context, _createMethodObjectPath(this.context, this, "GetHiddenField", 1, [Index], false, false, null, false));
-		};
-		PivotTable.prototype.getPageRange=function () {
-			_throwIfApiNotSupported("PivotTable.getPageRange", "Pivot", "1.1", _hostName);
-			return new Excel.Range(this.context, _createMethodObjectPath(this.context, this, "GetPageRange", 1, [], false, true, null, false));
-		};
-		PivotTable.prototype.getRowField=function (Index) {
-			_throwIfApiNotSupported("PivotTable.getRowField", "Pivot", "1.1", _hostName);
-			return new Excel.PivotField(this.context, _createMethodObjectPath(this.context, this, "GetRowField", 1, [Index], false, false, null, false));
-		};
-		PivotTable.prototype.getRowRange=function () {
-			_throwIfApiNotSupported("PivotTable.getRowRange", "Pivot", "1.1", _hostName);
-			return new Excel.Range(this.context, _createMethodObjectPath(this.context, this, "GetRowRange", 1, [], false, true, null, false));
-		};
-		PivotTable.prototype.getVisibleFields=function () {
-			_throwIfApiNotSupported("PivotTable.getVisibleFields", "Pivot", "1.1", _hostName);
-			return new Excel.PivotFieldCollection(this.context, _createMethodObjectPath(this.context, this, "GetVisibleFields", 1, [], true, false, null, false));
-		};
-		PivotTable.prototype.listFormulas=function () {
-			_throwIfApiNotSupported("PivotTable.listFormulas", "Pivot", "1.1", _hostName);
-			_createMethodAction(this.context, this, "ListFormulas", 0, [], false);
-		};
-		PivotTable.prototype.pivotSelect=function (Name, Mode, UseStandardName) {
-			_throwIfApiNotSupported("PivotTable.pivotSelect", "Pivot", "1.1", _hostName);
-			_createMethodAction(this.context, this, "PivotSelect", 0, [Name, Mode, UseStandardName], false);
-		};
-		PivotTable.prototype.refreshTable=function () {
-			_throwIfApiNotSupported("PivotTable.refreshTable", "Pivot", "1.1", _hostName);
-			var action=_createMethodAction(this.context, this, "RefreshTable", 0, [], false);
-			var ret=new OfficeExtension.ClientResult();
-			_addActionResultHandler(this, action, ret);
-			return ret;
-		};
-		PivotTable.prototype.repeatAllLabels=function (Repeat) {
-			_throwIfApiNotSupported("PivotTable.repeatAllLabels", "Pivot", "1.1", _hostName);
-			_createMethodAction(this.context, this, "RepeatAllLabels", 0, [Repeat], false);
-		};
-		PivotTable.prototype.update=function () {
-			_throwIfApiNotSupported("PivotTable.update", "Pivot", "1.1", _hostName);
-			_createMethodAction(this.context, this, "Update", 0, [], false);
+			_createMethodAction(this.context, this, "SubtotalLocation", 0, [Location], 0);
 		};
 		PivotTable.prototype._handleResult=function (value) {
 			_super.prototype._handleResult.call(this, value);
@@ -26028,7 +28493,10 @@ var Excel;
 			var obj=value;
 			_fixObjectPathIfNecessary(this, obj);
 			if (!_isUndefined(obj["ColumnGrandTotals"])) {
-				this._Co=obj["ColumnGrandTotals"];
+				this._C=obj["ColumnGrandTotals"];
+			}
+			if (!_isUndefined(obj["EnableFieldList"])) {
+				this._E=obj["EnableFieldList"];
 			}
 			if (!_isUndefined(obj["Id"])) {
 				this._I=obj["Id"];
@@ -26037,156 +28505,9 @@ var Excel;
 				this._N=obj["Name"];
 			}
 			if (!_isUndefined(obj["RowGrandTotals"])) {
-				this._Ro=obj["RowGrandTotals"];
+				this._R=obj["RowGrandTotals"];
 			}
-			if (!_isUndefined(obj["AllowMultipleFilters"])) {
-				this._A=obj["AllowMultipleFilters"];
-			}
-			if (!_isUndefined(obj["AlternativeText"])) {
-				this._Al=obj["AlternativeText"];
-			}
-			if (!_isUndefined(obj["CompactLayoutColumnHeader"])) {
-				this._Com=obj["CompactLayoutColumnHeader"];
-			}
-			if (!_isUndefined(obj["CompactLayoutRowHeader"])) {
-				this._Comp=obj["CompactLayoutRowHeader"];
-			}
-			if (!_isUndefined(obj["CompactRowIndent"])) {
-				this._Compa=obj["CompactRowIndent"];
-			}
-			if (!_isUndefined(obj["DisplayContextTooltips"])) {
-				this._Di=obj["DisplayContextTooltips"];
-			}
-			if (!_isUndefined(obj["DisplayEmptyColumn"])) {
-				this._Dis=obj["DisplayEmptyColumn"];
-			}
-			if (!_isUndefined(obj["DisplayEmptyRow"])) {
-				this._Disp=obj["DisplayEmptyRow"];
-			}
-			if (!_isUndefined(obj["DisplayErrorString"])) {
-				this._Displ=obj["DisplayErrorString"];
-			}
-			if (!_isUndefined(obj["DisplayFieldCaptions"])) {
-				this._Displa=obj["DisplayFieldCaptions"];
-			}
-			if (!_isUndefined(obj["DisplayNullString"])) {
-				this._Display=obj["DisplayNullString"];
-			}
-			if (!_isUndefined(obj["EnableDataValueEditing"])) {
-				this._E=obj["EnableDataValueEditing"];
-			}
-			if (!_isUndefined(obj["EnableDrilldown"])) {
-				this._En=obj["EnableDrilldown"];
-			}
-			if (!_isUndefined(obj["EnableFieldDialog"])) {
-				this._Ena=obj["EnableFieldDialog"];
-			}
-			if (!_isUndefined(obj["EnableFieldList"])) {
-				this._Enab=obj["EnableFieldList"];
-			}
-			if (!_isUndefined(obj["EnableWizard"])) {
-				this._Enabl=obj["EnableWizard"];
-			}
-			if (!_isUndefined(obj["ErrorString"])) {
-				this._Er=obj["ErrorString"];
-			}
-			if (!_isUndefined(obj["FieldListSortAscending"])) {
-				this._F=obj["FieldListSortAscending"];
-			}
-			if (!_isUndefined(obj["GrandTotalName"])) {
-				this._G=obj["GrandTotalName"];
-			}
-			if (!_isUndefined(obj["HasAutoFormat"])) {
-				this._H=obj["HasAutoFormat"];
-			}
-			if (!_isUndefined(obj["Hidden"])) {
-				this._Hi=obj["Hidden"];
-			}
-			if (!_isUndefined(obj["InGridDropZones"])) {
-				this._In=obj["InGridDropZones"];
-			}
-			if (!_isUndefined(obj["InnerDetail"])) {
-				this._Inn=obj["InnerDetail"];
-			}
-			if (!_isUndefined(obj["ManualUpdate"])) {
-				this._M=obj["ManualUpdate"];
-			}
-			if (!_isUndefined(obj["NullString"])) {
-				this._Nu=obj["NullString"];
-			}
-			if (!_isUndefined(obj["PreserveFormatting"])) {
-				this._Pr=obj["PreserveFormatting"];
-			}
-			if (!_isUndefined(obj["PrintDrillIndicators"])) {
-				this._Pri=obj["PrintDrillIndicators"];
-			}
-			if (!_isUndefined(obj["PrintTitles"])) {
-				this._Prin=obj["PrintTitles"];
-			}
-			if (!_isUndefined(obj["RefreshDate"])) {
-				this._R=_adjustToDateTime(obj["RefreshDate"]);
-			}
-			if (!_isUndefined(obj["RefreshName"])) {
-				this._Re=obj["RefreshName"];
-			}
-			if (!_isUndefined(obj["RepeatItemsOnEachPrintedPage"])) {
-				this._Rep=obj["RepeatItemsOnEachPrintedPage"];
-			}
-			if (!_isUndefined(obj["SaveData"])) {
-				this._S=obj["SaveData"];
-			}
-			if (!_isUndefined(obj["ShowDrillIndicators"])) {
-				this._Sh=obj["ShowDrillIndicators"];
-			}
-			if (!_isUndefined(obj["ShowPageMultipleItemLabel"])) {
-				this._Sho=obj["ShowPageMultipleItemLabel"];
-			}
-			if (!_isUndefined(obj["ShowTableStyleColumnHeaders"])) {
-				this._Show=obj["ShowTableStyleColumnHeaders"];
-			}
-			if (!_isUndefined(obj["ShowTableStyleColumnStripes"])) {
-				this._ShowT=obj["ShowTableStyleColumnStripes"];
-			}
-			if (!_isUndefined(obj["ShowTableStyleLastColumn"])) {
-				this._ShowTa=obj["ShowTableStyleLastColumn"];
-			}
-			if (!_isUndefined(obj["ShowTableStyleRowHeaders"])) {
-				this._ShowTab=obj["ShowTableStyleRowHeaders"];
-			}
-			if (!_isUndefined(obj["ShowTableStyleRowStripes"])) {
-				this._ShowTabl=obj["ShowTableStyleRowStripes"];
-			}
-			if (!_isUndefined(obj["ShowValuesRow"])) {
-				this._ShowV=obj["ShowValuesRow"];
-			}
-			if (!_isUndefined(obj["SmallGrid"])) {
-				this._Sm=obj["SmallGrid"];
-			}
-			if (!_isUndefined(obj["SortUsingCustomLists"])) {
-				this._So=obj["SortUsingCustomLists"];
-			}
-			if (!_isUndefined(obj["SubtotalHiddenPageItems"])) {
-				this._Su=obj["SubtotalHiddenPageItems"];
-			}
-			if (!_isUndefined(obj["Summary"])) {
-				this._Sum=obj["Summary"];
-			}
-			if (!_isUndefined(obj["Tag"])) {
-				this._T=obj["Tag"];
-			}
-			if (!_isUndefined(obj["TotalsAnnotation"])) {
-				this._To=obj["TotalsAnnotation"];
-			}
-			if (!_isUndefined(obj["VacatedStyle"])) {
-				this._V=obj["VacatedStyle"];
-			}
-			if (!_isUndefined(obj["Value"])) {
-				this._Va=obj["Value"];
-			}
-			if (!_isUndefined(obj["Version"])) {
-				this._Ve=obj["Version"];
-			}
-			_handleNavigationPropertyResults(this, obj, ["worksheet", "Worksheet", "calculatedFields", "CalculatedFields", "dataBodyRange", "DataBodyRange", "dataLabelRange", "DataLabelRange", "pivotFields", "PivotFields"]);
+			_handleNavigationPropertyResults(this, obj, ["columnHierarchies", "ColumnHierarchies", "dataHierarchies", "DataHierarchies", "filterHierarchies", "FilterHierarchies", "hierarchies", "Hierarchies", "rowHierarchies", "RowHierarchies", "worksheet", "Worksheet"]);
 		};
 		PivotTable.prototype.load=function (option) {
 			return _load(this, option);
@@ -26205,74 +28526,21 @@ var Excel;
 		};
 		PivotTable.prototype._handleRetrieveResult=function (value, result) {
 			_super.prototype._handleRetrieveResult.call(this, value, result);
-			if (_isNullOrUndefined(value))
-				return;
-			var obj=value;
-			if (!_isUndefined(obj["RefreshDate"])) {
-				obj["refreshDate"]=_adjustToDateTime(obj["refreshDate"]);
-			}
 			_processRetrieveResult(this, value, result);
 		};
 		PivotTable.prototype.toJSON=function () {
 			return _toJson(this, {
-				"allowMultipleFilters": this._A,
-				"alternativeText": this._Al,
-				"columnGrandTotals": this._Co,
-				"compactLayoutColumnHeader": this._Com,
-				"compactLayoutRowHeader": this._Comp,
-				"compactRowIndent": this._Compa,
-				"displayContextTooltips": this._Di,
-				"displayEmptyColumn": this._Dis,
-				"displayEmptyRow": this._Disp,
-				"displayErrorString": this._Displ,
-				"displayFieldCaptions": this._Displa,
-				"displayNullString": this._Display,
-				"enableDataValueEditing": this._E,
-				"enableDrilldown": this._En,
-				"enableFieldDialog": this._Ena,
-				"enableFieldList": this._Enab,
-				"enableWizard": this._Enabl,
-				"errorString": this._Er,
-				"fieldListSortAscending": this._F,
-				"grandTotalName": this._G,
-				"hasAutoFormat": this._H,
-				"hidden": this._Hi,
+				"columnGrandTotals": this._C,
+				"enableFieldList": this._E,
 				"id": this._I,
-				"inGridDropZones": this._In,
-				"innerDetail": this._Inn,
-				"manualUpdate": this._M,
 				"name": this._N,
-				"nullString": this._Nu,
-				"preserveFormatting": this._Pr,
-				"printDrillIndicators": this._Pri,
-				"printTitles": this._Prin,
-				"refreshDate": this._R,
-				"refreshName": this._Re,
-				"repeatItemsOnEachPrintedPage": this._Rep,
-				"rowGrandTotals": this._Ro,
-				"saveData": this._S,
-				"showDrillIndicators": this._Sh,
-				"showPageMultipleItemLabel": this._Sho,
-				"showTableStyleColumnHeaders": this._Show,
-				"showTableStyleColumnStripes": this._ShowT,
-				"showTableStyleLastColumn": this._ShowTa,
-				"showTableStyleRowHeaders": this._ShowTab,
-				"showTableStyleRowStripes": this._ShowTabl,
-				"showValuesRow": this._ShowV,
-				"smallGrid": this._Sm,
-				"sortUsingCustomLists": this._So,
-				"subtotalHiddenPageItems": this._Su,
-				"summary": this._Sum,
-				"tag": this._T,
-				"totalsAnnotation": this._To,
-				"vacatedStyle": this._V,
-				"value": this._Va,
-				"version": this._Ve,
+				"rowGrandTotals": this._R,
 			}, {
-				"calculatedFields": this._C,
-				"dataBodyRange": this._D,
-				"dataLabelRange": this._Da,
-				"pivotFields": this._P,
+				"columnHierarchies": this._Co,
+				"dataHierarchies": this._D,
+				"filterHierarchies": this._F,
+				"hierarchies": this._H,
+				"rowHierarchies": this._Ro,
 			});
 		};
 		PivotTable.prototype.ensureUnchanged=function (data) {
@@ -26282,6 +28550,1508 @@ var Excel;
 		return PivotTable;
 	}(OfficeExtension.ClientObject));
 	Excel.PivotTable=PivotTable;
+	var _typePivotHierarchyCollection="PivotHierarchyCollection";
+	var PivotHierarchyCollection=(function (_super) {
+		__extends(PivotHierarchyCollection, _super);
+		function PivotHierarchyCollection() {
+			return _super !==null && _super.apply(this, arguments) || this;
+		}
+		Object.defineProperty(PivotHierarchyCollection.prototype, "_className", {
+			get: function () {
+				return "PivotHierarchyCollection";
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(PivotHierarchyCollection.prototype, "_isCollection", {
+			get: function () {
+				return true;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(PivotHierarchyCollection.prototype, "items", {
+			get: function () {
+				_throwIfNotLoaded("items", this.m__items, _typePivotHierarchyCollection, this._isNull);
+				return this.m__items;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		PivotHierarchyCollection.prototype.getCount=function () {
+			var action=_createMethodAction(this.context, this, "GetCount", 1, [], 4);
+			var ret=new OfficeExtension.ClientResult();
+			_addActionResultHandler(this, action, ret);
+			return ret;
+		};
+		PivotHierarchyCollection.prototype.getItem=function (name) {
+			return new Excel.PivotHierarchy(this.context, _createIndexerObjectPath(this.context, this, [name]));
+		};
+		PivotHierarchyCollection.prototype.getItemOrNullObject=function (name) {
+			return new Excel.PivotHierarchy(this.context, _createMethodObjectPath(this.context, this, "GetItemOrNullObject", 1, [name], false, false, null, 4));
+		};
+		PivotHierarchyCollection.prototype._handleResult=function (value) {
+			_super.prototype._handleResult.call(this, value);
+			if (_isNullOrUndefined(value))
+				return;
+			var obj=value;
+			_fixObjectPathIfNecessary(this, obj);
+			if (!_isNullOrUndefined(obj[OfficeExtension.Constants.items])) {
+				this.m__items=[];
+				var _data=obj[OfficeExtension.Constants.items];
+				for (var i=0; i < _data.length; i++) {
+					var _item=new Excel.PivotHierarchy(this.context, _createChildItemObjectPathUsingIndexerOrGetItemAt(true, this.context, this, _data[i], i));
+					_item._handleResult(_data[i]);
+					this.m__items.push(_item);
+				}
+			}
+		};
+		PivotHierarchyCollection.prototype.load=function (option) {
+			return _load(this, option);
+		};
+		PivotHierarchyCollection.prototype.retrieve=function (option) {
+			return _retrieve(this, option);
+		};
+		PivotHierarchyCollection.prototype._handleRetrieveResult=function (value, result) {
+			var _this=this;
+			_super.prototype._handleRetrieveResult.call(this, value, result);
+			_processRetrieveResult(this, value, result, function (childItemData, index) { return new Excel.PivotHierarchy(_this.context, _createChildItemObjectPathUsingIndexerOrGetItemAt(true, _this.context, _this, childItemData, index)); });
+		};
+		PivotHierarchyCollection.prototype.toJSON=function () {
+			return _toJson(this, {}, {}, this.m__items);
+		};
+		return PivotHierarchyCollection;
+	}(OfficeExtension.ClientObject));
+	Excel.PivotHierarchyCollection=PivotHierarchyCollection;
+	var _typePivotHierarchy="PivotHierarchy";
+	var PivotHierarchy=(function (_super) {
+		__extends(PivotHierarchy, _super);
+		function PivotHierarchy() {
+			return _super !==null && _super.apply(this, arguments) || this;
+		}
+		Object.defineProperty(PivotHierarchy.prototype, "_className", {
+			get: function () {
+				return "PivotHierarchy";
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(PivotHierarchy.prototype, "_scalarPropertyNames", {
+			get: function () {
+				return ["id", "name"];
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(PivotHierarchy.prototype, "_scalarPropertyUpdateable", {
+			get: function () {
+				return [false, true];
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(PivotHierarchy.prototype, "_navigationPropertyNames", {
+			get: function () {
+				return ["fields"];
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(PivotHierarchy.prototype, "fields", {
+			get: function () {
+				if (!this._F) {
+					this._F=new Excel.PivotFieldCollection(this.context, _createPropertyObjectPath(this.context, this, "Fields", true, false, 4));
+				}
+				return this._F;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(PivotHierarchy.prototype, "id", {
+			get: function () {
+				_throwIfNotLoaded("id", this._I, _typePivotHierarchy, this._isNull);
+				return this._I;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(PivotHierarchy.prototype, "name", {
+			get: function () {
+				_throwIfNotLoaded("name", this._N, _typePivotHierarchy, this._isNull);
+				return this._N;
+			},
+			set: function (value) {
+				this._N=value;
+				_createSetPropertyAction(this.context, this, "Name", value, 0);
+			},
+			enumerable: true,
+			configurable: true
+		});
+		PivotHierarchy.prototype.set=function (properties, options) {
+			this._recursivelySet(properties, options, ["name"], [], [
+				"fields"
+			]);
+		};
+		PivotHierarchy.prototype.update=function (properties) {
+			this._recursivelyUpdate(properties);
+		};
+		PivotHierarchy.prototype._handleResult=function (value) {
+			_super.prototype._handleResult.call(this, value);
+			if (_isNullOrUndefined(value))
+				return;
+			var obj=value;
+			_fixObjectPathIfNecessary(this, obj);
+			if (!_isUndefined(obj["Id"])) {
+				this._I=obj["Id"];
+			}
+			if (!_isUndefined(obj["Name"])) {
+				this._N=obj["Name"];
+			}
+			_handleNavigationPropertyResults(this, obj, ["fields", "Fields"]);
+		};
+		PivotHierarchy.prototype.load=function (option) {
+			return _load(this, option);
+		};
+		PivotHierarchy.prototype.retrieve=function (option) {
+			return _retrieve(this, option);
+		};
+		PivotHierarchy.prototype._handleIdResult=function (value) {
+			_super.prototype._handleIdResult.call(this, value);
+			if (_isNullOrUndefined(value)) {
+				return;
+			}
+			if (!_isUndefined(value["Id"])) {
+				this._I=value["Id"];
+			}
+		};
+		PivotHierarchy.prototype._handleRetrieveResult=function (value, result) {
+			_super.prototype._handleRetrieveResult.call(this, value, result);
+			_processRetrieveResult(this, value, result);
+		};
+		PivotHierarchy.prototype.toJSON=function () {
+			return _toJson(this, {
+				"id": this._I,
+				"name": this._N,
+			}, {
+				"fields": this._F,
+			});
+		};
+		PivotHierarchy.prototype.ensureUnchanged=function (data) {
+			_createEnsureUnchangedAction(this.context, this, data);
+			return;
+		};
+		return PivotHierarchy;
+	}(OfficeExtension.ClientObject));
+	Excel.PivotHierarchy=PivotHierarchy;
+	var _typeRowColumnPivotHierarchyCollection="RowColumnPivotHierarchyCollection";
+	var RowColumnPivotHierarchyCollection=(function (_super) {
+		__extends(RowColumnPivotHierarchyCollection, _super);
+		function RowColumnPivotHierarchyCollection() {
+			return _super !==null && _super.apply(this, arguments) || this;
+		}
+		Object.defineProperty(RowColumnPivotHierarchyCollection.prototype, "_className", {
+			get: function () {
+				return "RowColumnPivotHierarchyCollection";
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(RowColumnPivotHierarchyCollection.prototype, "_isCollection", {
+			get: function () {
+				return true;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(RowColumnPivotHierarchyCollection.prototype, "_scalarPropertyNames", {
+			get: function () {
+				return ["builtInValuesPosition"];
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(RowColumnPivotHierarchyCollection.prototype, "_scalarPropertyUpdateable", {
+			get: function () {
+				return [true];
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(RowColumnPivotHierarchyCollection.prototype, "items", {
+			get: function () {
+				_throwIfNotLoaded("items", this.m__items, _typeRowColumnPivotHierarchyCollection, this._isNull);
+				return this.m__items;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(RowColumnPivotHierarchyCollection.prototype, "builtInValuesPosition", {
+			get: function () {
+				_throwIfNotLoaded("builtInValuesPosition", this._B, _typeRowColumnPivotHierarchyCollection, this._isNull);
+				return this._B;
+			},
+			set: function (value) {
+				this._B=value;
+				_createSetPropertyAction(this.context, this, "BuiltInValuesPosition", value, 0);
+			},
+			enumerable: true,
+			configurable: true
+		});
+		RowColumnPivotHierarchyCollection.prototype.add=function (pivotHierarchy) {
+			return new Excel.RowColumnPivotHierarchy(this.context, _createMethodObjectPath(this.context, this, "Add", 0, [pivotHierarchy], false, true, null, 0));
+		};
+		RowColumnPivotHierarchyCollection.prototype.getCount=function () {
+			var action=_createMethodAction(this.context, this, "GetCount", 1, [], 4);
+			var ret=new OfficeExtension.ClientResult();
+			_addActionResultHandler(this, action, ret);
+			return ret;
+		};
+		RowColumnPivotHierarchyCollection.prototype.getItem=function (name) {
+			return new Excel.RowColumnPivotHierarchy(this.context, _createIndexerObjectPath(this.context, this, [name]));
+		};
+		RowColumnPivotHierarchyCollection.prototype.getItemOrNullObject=function (name) {
+			return new Excel.RowColumnPivotHierarchy(this.context, _createMethodObjectPath(this.context, this, "GetItemOrNullObject", 1, [name], false, false, null, 4));
+		};
+		RowColumnPivotHierarchyCollection.prototype.remove=function (rowColumnPivotHierarchy) {
+			_createMethodAction(this.context, this, "Remove", 0, [rowColumnPivotHierarchy], 0);
+		};
+		RowColumnPivotHierarchyCollection.prototype._handleResult=function (value) {
+			_super.prototype._handleResult.call(this, value);
+			if (_isNullOrUndefined(value))
+				return;
+			var obj=value;
+			_fixObjectPathIfNecessary(this, obj);
+			if (!_isUndefined(obj["BuiltInValuesPosition"])) {
+				this._B=obj["BuiltInValuesPosition"];
+			}
+			if (!_isNullOrUndefined(obj[OfficeExtension.Constants.items])) {
+				this.m__items=[];
+				var _data=obj[OfficeExtension.Constants.items];
+				for (var i=0; i < _data.length; i++) {
+					var _item=new Excel.RowColumnPivotHierarchy(this.context, _createChildItemObjectPathUsingIndexerOrGetItemAt(true, this.context, this, _data[i], i));
+					_item._handleResult(_data[i]);
+					this.m__items.push(_item);
+				}
+			}
+		};
+		RowColumnPivotHierarchyCollection.prototype.load=function (option) {
+			return _load(this, option);
+		};
+		RowColumnPivotHierarchyCollection.prototype.retrieve=function (option) {
+			return _retrieve(this, option);
+		};
+		RowColumnPivotHierarchyCollection.prototype._handleRetrieveResult=function (value, result) {
+			var _this=this;
+			_super.prototype._handleRetrieveResult.call(this, value, result);
+			_processRetrieveResult(this, value, result, function (childItemData, index) { return new Excel.RowColumnPivotHierarchy(_this.context, _createChildItemObjectPathUsingIndexerOrGetItemAt(true, _this.context, _this, childItemData, index)); });
+		};
+		RowColumnPivotHierarchyCollection.prototype.toJSON=function () {
+			return _toJson(this, {
+				"builtInValuesPosition": this._B,
+			}, {}, this.m__items);
+		};
+		return RowColumnPivotHierarchyCollection;
+	}(OfficeExtension.ClientObject));
+	Excel.RowColumnPivotHierarchyCollection=RowColumnPivotHierarchyCollection;
+	var _typeRowColumnPivotHierarchy="RowColumnPivotHierarchy";
+	var RowColumnPivotHierarchy=(function (_super) {
+		__extends(RowColumnPivotHierarchy, _super);
+		function RowColumnPivotHierarchy() {
+			return _super !==null && _super.apply(this, arguments) || this;
+		}
+		Object.defineProperty(RowColumnPivotHierarchy.prototype, "_className", {
+			get: function () {
+				return "RowColumnPivotHierarchy";
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(RowColumnPivotHierarchy.prototype, "_scalarPropertyNames", {
+			get: function () {
+				return ["id", "name", "position", "numberFormat", "subtotals", "showAllItems"];
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(RowColumnPivotHierarchy.prototype, "_scalarPropertyUpdateable", {
+			get: function () {
+				return [false, true, true, true, true, true];
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(RowColumnPivotHierarchy.prototype, "_navigationPropertyNames", {
+			get: function () {
+				return ["fields"];
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(RowColumnPivotHierarchy.prototype, "fields", {
+			get: function () {
+				if (!this._F) {
+					this._F=new Excel.PivotFieldCollection(this.context, _createPropertyObjectPath(this.context, this, "Fields", true, false, 4));
+				}
+				return this._F;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(RowColumnPivotHierarchy.prototype, "id", {
+			get: function () {
+				_throwIfNotLoaded("id", this._I, _typeRowColumnPivotHierarchy, this._isNull);
+				return this._I;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(RowColumnPivotHierarchy.prototype, "name", {
+			get: function () {
+				_throwIfNotLoaded("name", this._N, _typeRowColumnPivotHierarchy, this._isNull);
+				return this._N;
+			},
+			set: function (value) {
+				this._N=value;
+				_createSetPropertyAction(this.context, this, "Name", value, 0);
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(RowColumnPivotHierarchy.prototype, "numberFormat", {
+			get: function () {
+				_throwIfNotLoaded("numberFormat", this._Nu, _typeRowColumnPivotHierarchy, this._isNull);
+				return this._Nu;
+			},
+			set: function (value) {
+				this._Nu=value;
+				_createSetPropertyAction(this.context, this, "NumberFormat", value, 0);
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(RowColumnPivotHierarchy.prototype, "position", {
+			get: function () {
+				_throwIfNotLoaded("position", this._P, _typeRowColumnPivotHierarchy, this._isNull);
+				return this._P;
+			},
+			set: function (value) {
+				this._P=value;
+				_createSetPropertyAction(this.context, this, "Position", value, 0);
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(RowColumnPivotHierarchy.prototype, "showAllItems", {
+			get: function () {
+				_throwIfNotLoaded("showAllItems", this._S, _typeRowColumnPivotHierarchy, this._isNull);
+				return this._S;
+			},
+			set: function (value) {
+				this._S=value;
+				_createSetPropertyAction(this.context, this, "ShowAllItems", value, 0);
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(RowColumnPivotHierarchy.prototype, "subtotals", {
+			get: function () {
+				_throwIfNotLoaded("subtotals", this._Su, _typeRowColumnPivotHierarchy, this._isNull);
+				return this._Su;
+			},
+			set: function (value) {
+				this._Su=value;
+				_createSetPropertyAction(this.context, this, "Subtotals", value, 0);
+			},
+			enumerable: true,
+			configurable: true
+		});
+		RowColumnPivotHierarchy.prototype.set=function (properties, options) {
+			this._recursivelySet(properties, options, ["name", "position", "numberFormat", "subtotals", "showAllItems"], [], [
+				"fields"
+			]);
+		};
+		RowColumnPivotHierarchy.prototype.update=function (properties) {
+			this._recursivelyUpdate(properties);
+		};
+		RowColumnPivotHierarchy.prototype.setToDefault=function () {
+			_createMethodAction(this.context, this, "SetToDefault", 0, [], 0);
+		};
+		RowColumnPivotHierarchy.prototype.setTopBottomValueFilter=function (criteriontype, rank, dataPivotHierarchy) {
+			_createMethodAction(this.context, this, "SetTopBottomValueFilter", 0, [criteriontype, rank, dataPivotHierarchy], 0);
+		};
+		RowColumnPivotHierarchy.prototype.sort=function (ascending, dataPivotHierarchy) {
+			_createMethodAction(this.context, this, "Sort", 0, [ascending, dataPivotHierarchy], 0);
+		};
+		RowColumnPivotHierarchy.prototype._handleResult=function (value) {
+			_super.prototype._handleResult.call(this, value);
+			if (_isNullOrUndefined(value))
+				return;
+			var obj=value;
+			_fixObjectPathIfNecessary(this, obj);
+			if (!_isUndefined(obj["Id"])) {
+				this._I=obj["Id"];
+			}
+			if (!_isUndefined(obj["Name"])) {
+				this._N=obj["Name"];
+			}
+			if (!_isUndefined(obj["NumberFormat"])) {
+				this._Nu=obj["NumberFormat"];
+			}
+			if (!_isUndefined(obj["Position"])) {
+				this._P=obj["Position"];
+			}
+			if (!_isUndefined(obj["ShowAllItems"])) {
+				this._S=obj["ShowAllItems"];
+			}
+			if (!_isUndefined(obj["Subtotals"])) {
+				this._Su=obj["Subtotals"];
+			}
+			_handleNavigationPropertyResults(this, obj, ["fields", "Fields"]);
+		};
+		RowColumnPivotHierarchy.prototype.load=function (option) {
+			return _load(this, option);
+		};
+		RowColumnPivotHierarchy.prototype.retrieve=function (option) {
+			return _retrieve(this, option);
+		};
+		RowColumnPivotHierarchy.prototype._handleIdResult=function (value) {
+			_super.prototype._handleIdResult.call(this, value);
+			if (_isNullOrUndefined(value)) {
+				return;
+			}
+			if (!_isUndefined(value["Id"])) {
+				this._I=value["Id"];
+			}
+		};
+		RowColumnPivotHierarchy.prototype._handleRetrieveResult=function (value, result) {
+			_super.prototype._handleRetrieveResult.call(this, value, result);
+			_processRetrieveResult(this, value, result);
+		};
+		RowColumnPivotHierarchy.prototype.toJSON=function () {
+			return _toJson(this, {
+				"id": this._I,
+				"name": this._N,
+				"numberFormat": this._Nu,
+				"position": this._P,
+				"showAllItems": this._S,
+				"subtotals": this._Su,
+			}, {
+				"fields": this._F,
+			});
+		};
+		RowColumnPivotHierarchy.prototype.ensureUnchanged=function (data) {
+			_createEnsureUnchangedAction(this.context, this, data);
+			return;
+		};
+		return RowColumnPivotHierarchy;
+	}(OfficeExtension.ClientObject));
+	Excel.RowColumnPivotHierarchy=RowColumnPivotHierarchy;
+	var _typeFilterPivotHierarchyCollection="FilterPivotHierarchyCollection";
+	var FilterPivotHierarchyCollection=(function (_super) {
+		__extends(FilterPivotHierarchyCollection, _super);
+		function FilterPivotHierarchyCollection() {
+			return _super !==null && _super.apply(this, arguments) || this;
+		}
+		Object.defineProperty(FilterPivotHierarchyCollection.prototype, "_className", {
+			get: function () {
+				return "FilterPivotHierarchyCollection";
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(FilterPivotHierarchyCollection.prototype, "_isCollection", {
+			get: function () {
+				return true;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(FilterPivotHierarchyCollection.prototype, "items", {
+			get: function () {
+				_throwIfNotLoaded("items", this.m__items, _typeFilterPivotHierarchyCollection, this._isNull);
+				return this.m__items;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		FilterPivotHierarchyCollection.prototype.add=function (pivotHierarchy) {
+			return new Excel.FilterPivotHierarchy(this.context, _createMethodObjectPath(this.context, this, "Add", 0, [pivotHierarchy], false, true, null, 0));
+		};
+		FilterPivotHierarchyCollection.prototype.getCount=function () {
+			var action=_createMethodAction(this.context, this, "GetCount", 1, [], 4);
+			var ret=new OfficeExtension.ClientResult();
+			_addActionResultHandler(this, action, ret);
+			return ret;
+		};
+		FilterPivotHierarchyCollection.prototype.getItem=function (name) {
+			return new Excel.FilterPivotHierarchy(this.context, _createIndexerObjectPath(this.context, this, [name]));
+		};
+		FilterPivotHierarchyCollection.prototype.getItemOrNullObject=function (name) {
+			return new Excel.FilterPivotHierarchy(this.context, _createMethodObjectPath(this.context, this, "GetItemOrNullObject", 1, [name], false, false, null, 4));
+		};
+		FilterPivotHierarchyCollection.prototype.remove=function (FilterPivotHierarchy) {
+			_createMethodAction(this.context, this, "Remove", 0, [FilterPivotHierarchy], 0);
+		};
+		FilterPivotHierarchyCollection.prototype._handleResult=function (value) {
+			_super.prototype._handleResult.call(this, value);
+			if (_isNullOrUndefined(value))
+				return;
+			var obj=value;
+			_fixObjectPathIfNecessary(this, obj);
+			if (!_isNullOrUndefined(obj[OfficeExtension.Constants.items])) {
+				this.m__items=[];
+				var _data=obj[OfficeExtension.Constants.items];
+				for (var i=0; i < _data.length; i++) {
+					var _item=new Excel.FilterPivotHierarchy(this.context, _createChildItemObjectPathUsingIndexerOrGetItemAt(true, this.context, this, _data[i], i));
+					_item._handleResult(_data[i]);
+					this.m__items.push(_item);
+				}
+			}
+		};
+		FilterPivotHierarchyCollection.prototype.load=function (option) {
+			return _load(this, option);
+		};
+		FilterPivotHierarchyCollection.prototype.retrieve=function (option) {
+			return _retrieve(this, option);
+		};
+		FilterPivotHierarchyCollection.prototype._handleRetrieveResult=function (value, result) {
+			var _this=this;
+			_super.prototype._handleRetrieveResult.call(this, value, result);
+			_processRetrieveResult(this, value, result, function (childItemData, index) { return new Excel.FilterPivotHierarchy(_this.context, _createChildItemObjectPathUsingIndexerOrGetItemAt(true, _this.context, _this, childItemData, index)); });
+		};
+		FilterPivotHierarchyCollection.prototype.toJSON=function () {
+			return _toJson(this, {}, {}, this.m__items);
+		};
+		return FilterPivotHierarchyCollection;
+	}(OfficeExtension.ClientObject));
+	Excel.FilterPivotHierarchyCollection=FilterPivotHierarchyCollection;
+	var _typeFilterPivotHierarchy="FilterPivotHierarchy";
+	var FilterPivotHierarchy=(function (_super) {
+		__extends(FilterPivotHierarchy, _super);
+		function FilterPivotHierarchy() {
+			return _super !==null && _super.apply(this, arguments) || this;
+		}
+		Object.defineProperty(FilterPivotHierarchy.prototype, "_className", {
+			get: function () {
+				return "FilterPivotHierarchy";
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(FilterPivotHierarchy.prototype, "_scalarPropertyNames", {
+			get: function () {
+				return ["id", "name", "position", "numberFormat", "subtotals", "showAllItems", "enableMultipleFilterItems"];
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(FilterPivotHierarchy.prototype, "_scalarPropertyUpdateable", {
+			get: function () {
+				return [false, true, true, true, true, true, true];
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(FilterPivotHierarchy.prototype, "_navigationPropertyNames", {
+			get: function () {
+				return ["fields", "currentFilter"];
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(FilterPivotHierarchy.prototype, "currentFilter", {
+			get: function () {
+				if (!this._C) {
+					this._C=new Excel.PivotItem(this.context, _createPropertyObjectPath(this.context, this, "CurrentFilter", false, false, 4));
+				}
+				return this._C;
+			},
+			set: function (value) {
+				this._C=value;
+				_createSetPropertyAction(this.context, this, "CurrentFilter", value, 0);
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(FilterPivotHierarchy.prototype, "fields", {
+			get: function () {
+				if (!this._F) {
+					this._F=new Excel.PivotFieldCollection(this.context, _createPropertyObjectPath(this.context, this, "Fields", true, false, 4));
+				}
+				return this._F;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(FilterPivotHierarchy.prototype, "enableMultipleFilterItems", {
+			get: function () {
+				_throwIfNotLoaded("enableMultipleFilterItems", this._E, _typeFilterPivotHierarchy, this._isNull);
+				return this._E;
+			},
+			set: function (value) {
+				this._E=value;
+				_createSetPropertyAction(this.context, this, "EnableMultipleFilterItems", value, 0);
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(FilterPivotHierarchy.prototype, "id", {
+			get: function () {
+				_throwIfNotLoaded("id", this._I, _typeFilterPivotHierarchy, this._isNull);
+				return this._I;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(FilterPivotHierarchy.prototype, "name", {
+			get: function () {
+				_throwIfNotLoaded("name", this._N, _typeFilterPivotHierarchy, this._isNull);
+				return this._N;
+			},
+			set: function (value) {
+				this._N=value;
+				_createSetPropertyAction(this.context, this, "Name", value, 0);
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(FilterPivotHierarchy.prototype, "numberFormat", {
+			get: function () {
+				_throwIfNotLoaded("numberFormat", this._Nu, _typeFilterPivotHierarchy, this._isNull);
+				return this._Nu;
+			},
+			set: function (value) {
+				this._Nu=value;
+				_createSetPropertyAction(this.context, this, "NumberFormat", value, 0);
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(FilterPivotHierarchy.prototype, "position", {
+			get: function () {
+				_throwIfNotLoaded("position", this._P, _typeFilterPivotHierarchy, this._isNull);
+				return this._P;
+			},
+			set: function (value) {
+				this._P=value;
+				_createSetPropertyAction(this.context, this, "Position", value, 0);
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(FilterPivotHierarchy.prototype, "showAllItems", {
+			get: function () {
+				_throwIfNotLoaded("showAllItems", this._S, _typeFilterPivotHierarchy, this._isNull);
+				return this._S;
+			},
+			set: function (value) {
+				this._S=value;
+				_createSetPropertyAction(this.context, this, "ShowAllItems", value, 0);
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(FilterPivotHierarchy.prototype, "subtotals", {
+			get: function () {
+				_throwIfNotLoaded("subtotals", this._Su, _typeFilterPivotHierarchy, this._isNull);
+				return this._Su;
+			},
+			set: function (value) {
+				this._Su=value;
+				_createSetPropertyAction(this.context, this, "Subtotals", value, 0);
+			},
+			enumerable: true,
+			configurable: true
+		});
+		FilterPivotHierarchy.prototype.set=function (properties, options) {
+			this._recursivelySet(properties, options, ["name", "position", "numberFormat", "subtotals", "showAllItems", "enableMultipleFilterItems"], ["currentFilter"], [
+				"fields"
+			]);
+		};
+		FilterPivotHierarchy.prototype.update=function (properties) {
+			this._recursivelyUpdate(properties);
+		};
+		FilterPivotHierarchy.prototype.setToDefault=function () {
+			_createMethodAction(this.context, this, "SetToDefault", 0, [], 0);
+		};
+		FilterPivotHierarchy.prototype._handleResult=function (value) {
+			_super.prototype._handleResult.call(this, value);
+			if (_isNullOrUndefined(value))
+				return;
+			var obj=value;
+			_fixObjectPathIfNecessary(this, obj);
+			if (!_isUndefined(obj["EnableMultipleFilterItems"])) {
+				this._E=obj["EnableMultipleFilterItems"];
+			}
+			if (!_isUndefined(obj["Id"])) {
+				this._I=obj["Id"];
+			}
+			if (!_isUndefined(obj["Name"])) {
+				this._N=obj["Name"];
+			}
+			if (!_isUndefined(obj["NumberFormat"])) {
+				this._Nu=obj["NumberFormat"];
+			}
+			if (!_isUndefined(obj["Position"])) {
+				this._P=obj["Position"];
+			}
+			if (!_isUndefined(obj["ShowAllItems"])) {
+				this._S=obj["ShowAllItems"];
+			}
+			if (!_isUndefined(obj["Subtotals"])) {
+				this._Su=obj["Subtotals"];
+			}
+			_handleNavigationPropertyResults(this, obj, ["currentFilter", "CurrentFilter", "fields", "Fields"]);
+		};
+		FilterPivotHierarchy.prototype.load=function (option) {
+			return _load(this, option);
+		};
+		FilterPivotHierarchy.prototype.retrieve=function (option) {
+			return _retrieve(this, option);
+		};
+		FilterPivotHierarchy.prototype._handleIdResult=function (value) {
+			_super.prototype._handleIdResult.call(this, value);
+			if (_isNullOrUndefined(value)) {
+				return;
+			}
+			if (!_isUndefined(value["Id"])) {
+				this._I=value["Id"];
+			}
+		};
+		FilterPivotHierarchy.prototype._handleRetrieveResult=function (value, result) {
+			_super.prototype._handleRetrieveResult.call(this, value, result);
+			_processRetrieveResult(this, value, result);
+		};
+		FilterPivotHierarchy.prototype.toJSON=function () {
+			return _toJson(this, {
+				"enableMultipleFilterItems": this._E,
+				"id": this._I,
+				"name": this._N,
+				"numberFormat": this._Nu,
+				"position": this._P,
+				"showAllItems": this._S,
+				"subtotals": this._Su,
+			}, {
+				"currentFilter": this._C,
+				"fields": this._F,
+			});
+		};
+		FilterPivotHierarchy.prototype.ensureUnchanged=function (data) {
+			_createEnsureUnchangedAction(this.context, this, data);
+			return;
+		};
+		return FilterPivotHierarchy;
+	}(OfficeExtension.ClientObject));
+	Excel.FilterPivotHierarchy=FilterPivotHierarchy;
+	var _typeDataPivotHierarchyCollection="DataPivotHierarchyCollection";
+	var DataPivotHierarchyCollection=(function (_super) {
+		__extends(DataPivotHierarchyCollection, _super);
+		function DataPivotHierarchyCollection() {
+			return _super !==null && _super.apply(this, arguments) || this;
+		}
+		Object.defineProperty(DataPivotHierarchyCollection.prototype, "_className", {
+			get: function () {
+				return "DataPivotHierarchyCollection";
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(DataPivotHierarchyCollection.prototype, "_isCollection", {
+			get: function () {
+				return true;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(DataPivotHierarchyCollection.prototype, "items", {
+			get: function () {
+				_throwIfNotLoaded("items", this.m__items, _typeDataPivotHierarchyCollection, this._isNull);
+				return this.m__items;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		DataPivotHierarchyCollection.prototype.add=function (pivotHierarchy) {
+			return new Excel.DataPivotHierarchy(this.context, _createMethodObjectPath(this.context, this, "Add", 0, [pivotHierarchy], false, true, null, 0));
+		};
+		DataPivotHierarchyCollection.prototype.getCount=function () {
+			var action=_createMethodAction(this.context, this, "GetCount", 1, [], 4);
+			var ret=new OfficeExtension.ClientResult();
+			_addActionResultHandler(this, action, ret);
+			return ret;
+		};
+		DataPivotHierarchyCollection.prototype.getItem=function (name) {
+			return new Excel.DataPivotHierarchy(this.context, _createIndexerObjectPath(this.context, this, [name]));
+		};
+		DataPivotHierarchyCollection.prototype.getItemOrNullObject=function (name) {
+			return new Excel.DataPivotHierarchy(this.context, _createMethodObjectPath(this.context, this, "GetItemOrNullObject", 1, [name], false, false, null, 4));
+		};
+		DataPivotHierarchyCollection.prototype.remove=function (DataPivotHierarchy) {
+			_createMethodAction(this.context, this, "Remove", 0, [DataPivotHierarchy], 0);
+		};
+		DataPivotHierarchyCollection.prototype._handleResult=function (value) {
+			_super.prototype._handleResult.call(this, value);
+			if (_isNullOrUndefined(value))
+				return;
+			var obj=value;
+			_fixObjectPathIfNecessary(this, obj);
+			if (!_isNullOrUndefined(obj[OfficeExtension.Constants.items])) {
+				this.m__items=[];
+				var _data=obj[OfficeExtension.Constants.items];
+				for (var i=0; i < _data.length; i++) {
+					var _item=new Excel.DataPivotHierarchy(this.context, _createChildItemObjectPathUsingIndexerOrGetItemAt(true, this.context, this, _data[i], i));
+					_item._handleResult(_data[i]);
+					this.m__items.push(_item);
+				}
+			}
+		};
+		DataPivotHierarchyCollection.prototype.load=function (option) {
+			return _load(this, option);
+		};
+		DataPivotHierarchyCollection.prototype.retrieve=function (option) {
+			return _retrieve(this, option);
+		};
+		DataPivotHierarchyCollection.prototype._handleRetrieveResult=function (value, result) {
+			var _this=this;
+			_super.prototype._handleRetrieveResult.call(this, value, result);
+			_processRetrieveResult(this, value, result, function (childItemData, index) { return new Excel.DataPivotHierarchy(_this.context, _createChildItemObjectPathUsingIndexerOrGetItemAt(true, _this.context, _this, childItemData, index)); });
+		};
+		DataPivotHierarchyCollection.prototype.toJSON=function () {
+			return _toJson(this, {}, {}, this.m__items);
+		};
+		return DataPivotHierarchyCollection;
+	}(OfficeExtension.ClientObject));
+	Excel.DataPivotHierarchyCollection=DataPivotHierarchyCollection;
+	var _typeDataPivotHierarchy="DataPivotHierarchy";
+	var DataPivotHierarchy=(function (_super) {
+		__extends(DataPivotHierarchy, _super);
+		function DataPivotHierarchy() {
+			return _super !==null && _super.apply(this, arguments) || this;
+		}
+		Object.defineProperty(DataPivotHierarchy.prototype, "_className", {
+			get: function () {
+				return "DataPivotHierarchy";
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(DataPivotHierarchy.prototype, "_scalarPropertyNames", {
+			get: function () {
+				return ["id", "name", "position", "numberFormat", "summarizeBy", "showAs"];
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(DataPivotHierarchy.prototype, "_scalarPropertyUpdateable", {
+			get: function () {
+				return [false, true, true, true, true, true];
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(DataPivotHierarchy.prototype, "_navigationPropertyNames", {
+			get: function () {
+				return ["field"];
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(DataPivotHierarchy.prototype, "field", {
+			get: function () {
+				if (!this._F) {
+					this._F=new Excel.PivotField(this.context, _createPropertyObjectPath(this.context, this, "Field", false, false, 4));
+				}
+				return this._F;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(DataPivotHierarchy.prototype, "id", {
+			get: function () {
+				_throwIfNotLoaded("id", this._I, _typeDataPivotHierarchy, this._isNull);
+				return this._I;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(DataPivotHierarchy.prototype, "name", {
+			get: function () {
+				_throwIfNotLoaded("name", this._N, _typeDataPivotHierarchy, this._isNull);
+				return this._N;
+			},
+			set: function (value) {
+				this._N=value;
+				_createSetPropertyAction(this.context, this, "Name", value, 0);
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(DataPivotHierarchy.prototype, "numberFormat", {
+			get: function () {
+				_throwIfNotLoaded("numberFormat", this._Nu, _typeDataPivotHierarchy, this._isNull);
+				return this._Nu;
+			},
+			set: function (value) {
+				this._Nu=value;
+				_createSetPropertyAction(this.context, this, "NumberFormat", value, 0);
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(DataPivotHierarchy.prototype, "position", {
+			get: function () {
+				_throwIfNotLoaded("position", this._P, _typeDataPivotHierarchy, this._isNull);
+				return this._P;
+			},
+			set: function (value) {
+				this._P=value;
+				_createSetPropertyAction(this.context, this, "Position", value, 0);
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(DataPivotHierarchy.prototype, "showAs", {
+			get: function () {
+				_throwIfNotLoaded("showAs", this._S, _typeDataPivotHierarchy, this._isNull);
+				return this._S;
+			},
+			set: function (value) {
+				this._S=value;
+				_createSetPropertyAction(this.context, this, "ShowAs", value, 0);
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(DataPivotHierarchy.prototype, "summarizeBy", {
+			get: function () {
+				_throwIfNotLoaded("summarizeBy", this._Su, _typeDataPivotHierarchy, this._isNull);
+				return this._Su;
+			},
+			set: function (value) {
+				this._Su=value;
+				_createSetPropertyAction(this.context, this, "SummarizeBy", value, 0);
+			},
+			enumerable: true,
+			configurable: true
+		});
+		DataPivotHierarchy.prototype.set=function (properties, options) {
+			this._recursivelySet(properties, options, ["name", "position", "numberFormat", "summarizeBy", "showAs"], ["field"], []);
+		};
+		DataPivotHierarchy.prototype.update=function (properties) {
+			this._recursivelyUpdate(properties);
+		};
+		DataPivotHierarchy.prototype.setToDefault=function () {
+			_createMethodAction(this.context, this, "SetToDefault", 0, [], 0);
+		};
+		DataPivotHierarchy.prototype._handleResult=function (value) {
+			_super.prototype._handleResult.call(this, value);
+			if (_isNullOrUndefined(value))
+				return;
+			var obj=value;
+			_fixObjectPathIfNecessary(this, obj);
+			if (!_isUndefined(obj["Id"])) {
+				this._I=obj["Id"];
+			}
+			if (!_isUndefined(obj["Name"])) {
+				this._N=obj["Name"];
+			}
+			if (!_isUndefined(obj["NumberFormat"])) {
+				this._Nu=obj["NumberFormat"];
+			}
+			if (!_isUndefined(obj["Position"])) {
+				this._P=obj["Position"];
+			}
+			if (!_isUndefined(obj["ShowAs"])) {
+				this._S=obj["ShowAs"];
+			}
+			if (!_isUndefined(obj["SummarizeBy"])) {
+				this._Su=obj["SummarizeBy"];
+			}
+			_handleNavigationPropertyResults(this, obj, ["field", "Field"]);
+		};
+		DataPivotHierarchy.prototype.load=function (option) {
+			return _load(this, option);
+		};
+		DataPivotHierarchy.prototype.retrieve=function (option) {
+			return _retrieve(this, option);
+		};
+		DataPivotHierarchy.prototype._handleIdResult=function (value) {
+			_super.prototype._handleIdResult.call(this, value);
+			if (_isNullOrUndefined(value)) {
+				return;
+			}
+			if (!_isUndefined(value["Id"])) {
+				this._I=value["Id"];
+			}
+		};
+		DataPivotHierarchy.prototype._handleRetrieveResult=function (value, result) {
+			_super.prototype._handleRetrieveResult.call(this, value, result);
+			_processRetrieveResult(this, value, result);
+		};
+		DataPivotHierarchy.prototype.toJSON=function () {
+			return _toJson(this, {
+				"id": this._I,
+				"name": this._N,
+				"numberFormat": this._Nu,
+				"position": this._P,
+				"showAs": this._S,
+				"summarizeBy": this._Su,
+			}, {
+				"field": this._F,
+			});
+		};
+		DataPivotHierarchy.prototype.ensureUnchanged=function (data) {
+			_createEnsureUnchangedAction(this.context, this, data);
+			return;
+		};
+		return DataPivotHierarchy;
+	}(OfficeExtension.ClientObject));
+	Excel.DataPivotHierarchy=DataPivotHierarchy;
+	var _typePivotFieldCollection="PivotFieldCollection";
+	var PivotFieldCollection=(function (_super) {
+		__extends(PivotFieldCollection, _super);
+		function PivotFieldCollection() {
+			return _super !==null && _super.apply(this, arguments) || this;
+		}
+		Object.defineProperty(PivotFieldCollection.prototype, "_className", {
+			get: function () {
+				return "PivotFieldCollection";
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(PivotFieldCollection.prototype, "_isCollection", {
+			get: function () {
+				return true;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(PivotFieldCollection.prototype, "items", {
+			get: function () {
+				_throwIfNotLoaded("items", this.m__items, _typePivotFieldCollection, this._isNull);
+				return this.m__items;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		PivotFieldCollection.prototype.getCount=function () {
+			var action=_createMethodAction(this.context, this, "GetCount", 1, [], 4);
+			var ret=new OfficeExtension.ClientResult();
+			_addActionResultHandler(this, action, ret);
+			return ret;
+		};
+		PivotFieldCollection.prototype.getItem=function (name) {
+			return new Excel.PivotField(this.context, _createIndexerObjectPath(this.context, this, [name]));
+		};
+		PivotFieldCollection.prototype.getItemOrNullObject=function (name) {
+			return new Excel.PivotField(this.context, _createMethodObjectPath(this.context, this, "GetItemOrNullObject", 1, [name], false, false, null, 4));
+		};
+		PivotFieldCollection.prototype._handleResult=function (value) {
+			_super.prototype._handleResult.call(this, value);
+			if (_isNullOrUndefined(value))
+				return;
+			var obj=value;
+			_fixObjectPathIfNecessary(this, obj);
+			if (!_isNullOrUndefined(obj[OfficeExtension.Constants.items])) {
+				this.m__items=[];
+				var _data=obj[OfficeExtension.Constants.items];
+				for (var i=0; i < _data.length; i++) {
+					var _item=new Excel.PivotField(this.context, _createChildItemObjectPathUsingIndexerOrGetItemAt(true, this.context, this, _data[i], i));
+					_item._handleResult(_data[i]);
+					this.m__items.push(_item);
+				}
+			}
+		};
+		PivotFieldCollection.prototype.load=function (option) {
+			return _load(this, option);
+		};
+		PivotFieldCollection.prototype.retrieve=function (option) {
+			return _retrieve(this, option);
+		};
+		PivotFieldCollection.prototype._handleRetrieveResult=function (value, result) {
+			var _this=this;
+			_super.prototype._handleRetrieveResult.call(this, value, result);
+			_processRetrieveResult(this, value, result, function (childItemData, index) { return new Excel.PivotField(_this.context, _createChildItemObjectPathUsingIndexerOrGetItemAt(true, _this.context, _this, childItemData, index)); });
+		};
+		PivotFieldCollection.prototype.toJSON=function () {
+			return _toJson(this, {}, {}, this.m__items);
+		};
+		return PivotFieldCollection;
+	}(OfficeExtension.ClientObject));
+	Excel.PivotFieldCollection=PivotFieldCollection;
+	var _typePivotField="PivotField";
+	var PivotField=(function (_super) {
+		__extends(PivotField, _super);
+		function PivotField() {
+			return _super !==null && _super.apply(this, arguments) || this;
+		}
+		Object.defineProperty(PivotField.prototype, "_className", {
+			get: function () {
+				return "PivotField";
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(PivotField.prototype, "_scalarPropertyNames", {
+			get: function () {
+				return ["id", "name"];
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(PivotField.prototype, "_scalarPropertyUpdateable", {
+			get: function () {
+				return [false, true];
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(PivotField.prototype, "_navigationPropertyNames", {
+			get: function () {
+				return ["items"];
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(PivotField.prototype, "items", {
+			get: function () {
+				if (!this._It) {
+					this._It=new Excel.PivotItemCollection(this.context, _createPropertyObjectPath(this.context, this, "Items", true, false, 4));
+				}
+				return this._It;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(PivotField.prototype, "id", {
+			get: function () {
+				_throwIfNotLoaded("id", this._I, _typePivotField, this._isNull);
+				return this._I;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(PivotField.prototype, "name", {
+			get: function () {
+				_throwIfNotLoaded("name", this._N, _typePivotField, this._isNull);
+				return this._N;
+			},
+			set: function (value) {
+				this._N=value;
+				_createSetPropertyAction(this.context, this, "Name", value, 0);
+			},
+			enumerable: true,
+			configurable: true
+		});
+		PivotField.prototype.set=function (properties, options) {
+			this._recursivelySet(properties, options, ["name"], [], [
+				"items"
+			]);
+		};
+		PivotField.prototype.update=function (properties) {
+			this._recursivelyUpdate(properties);
+		};
+		PivotField.prototype.getRange=function () {
+			return new Excel.Range(this.context, _createMethodObjectPath(this.context, this, "GetRange", 1, [], false, true, null, 4));
+		};
+		PivotField.prototype._handleResult=function (value) {
+			_super.prototype._handleResult.call(this, value);
+			if (_isNullOrUndefined(value))
+				return;
+			var obj=value;
+			_fixObjectPathIfNecessary(this, obj);
+			if (!_isUndefined(obj["Id"])) {
+				this._I=obj["Id"];
+			}
+			if (!_isUndefined(obj["Name"])) {
+				this._N=obj["Name"];
+			}
+			_handleNavigationPropertyResults(this, obj, ["items", "Items"]);
+		};
+		PivotField.prototype.load=function (option) {
+			return _load(this, option);
+		};
+		PivotField.prototype.retrieve=function (option) {
+			return _retrieve(this, option);
+		};
+		PivotField.prototype._handleIdResult=function (value) {
+			_super.prototype._handleIdResult.call(this, value);
+			if (_isNullOrUndefined(value)) {
+				return;
+			}
+			if (!_isUndefined(value["Id"])) {
+				this._I=value["Id"];
+			}
+		};
+		PivotField.prototype._handleRetrieveResult=function (value, result) {
+			_super.prototype._handleRetrieveResult.call(this, value, result);
+			_processRetrieveResult(this, value, result);
+		};
+		PivotField.prototype.toJSON=function () {
+			return _toJson(this, {
+				"id": this._I,
+				"name": this._N,
+			}, {
+				"items": this._It,
+			});
+		};
+		PivotField.prototype.ensureUnchanged=function (data) {
+			_createEnsureUnchangedAction(this.context, this, data);
+			return;
+		};
+		return PivotField;
+	}(OfficeExtension.ClientObject));
+	Excel.PivotField=PivotField;
+	var _typePivotItemCollection="PivotItemCollection";
+	var PivotItemCollection=(function (_super) {
+		__extends(PivotItemCollection, _super);
+		function PivotItemCollection() {
+			return _super !==null && _super.apply(this, arguments) || this;
+		}
+		Object.defineProperty(PivotItemCollection.prototype, "_className", {
+			get: function () {
+				return "PivotItemCollection";
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(PivotItemCollection.prototype, "_isCollection", {
+			get: function () {
+				return true;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(PivotItemCollection.prototype, "items", {
+			get: function () {
+				_throwIfNotLoaded("items", this.m__items, _typePivotItemCollection, this._isNull);
+				return this.m__items;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		PivotItemCollection.prototype.getCount=function () {
+			var action=_createMethodAction(this.context, this, "GetCount", 1, [], 4);
+			var ret=new OfficeExtension.ClientResult();
+			_addActionResultHandler(this, action, ret);
+			return ret;
+		};
+		PivotItemCollection.prototype.getItem=function (name) {
+			return new Excel.PivotItem(this.context, _createIndexerObjectPath(this.context, this, [name]));
+		};
+		PivotItemCollection.prototype.getItemOrNullObject=function (name) {
+			return new Excel.PivotItem(this.context, _createMethodObjectPath(this.context, this, "GetItemOrNullObject", 1, [name], false, false, null, 4));
+		};
+		PivotItemCollection.prototype._handleResult=function (value) {
+			_super.prototype._handleResult.call(this, value);
+			if (_isNullOrUndefined(value))
+				return;
+			var obj=value;
+			_fixObjectPathIfNecessary(this, obj);
+			if (!_isNullOrUndefined(obj[OfficeExtension.Constants.items])) {
+				this.m__items=[];
+				var _data=obj[OfficeExtension.Constants.items];
+				for (var i=0; i < _data.length; i++) {
+					var _item=new Excel.PivotItem(this.context, _createChildItemObjectPathUsingIndexerOrGetItemAt(true, this.context, this, _data[i], i));
+					_item._handleResult(_data[i]);
+					this.m__items.push(_item);
+				}
+			}
+		};
+		PivotItemCollection.prototype.load=function (option) {
+			return _load(this, option);
+		};
+		PivotItemCollection.prototype.retrieve=function (option) {
+			return _retrieve(this, option);
+		};
+		PivotItemCollection.prototype._handleRetrieveResult=function (value, result) {
+			var _this=this;
+			_super.prototype._handleRetrieveResult.call(this, value, result);
+			_processRetrieveResult(this, value, result, function (childItemData, index) { return new Excel.PivotItem(_this.context, _createChildItemObjectPathUsingIndexerOrGetItemAt(true, _this.context, _this, childItemData, index)); });
+		};
+		PivotItemCollection.prototype.toJSON=function () {
+			return _toJson(this, {}, {}, this.m__items);
+		};
+		return PivotItemCollection;
+	}(OfficeExtension.ClientObject));
+	Excel.PivotItemCollection=PivotItemCollection;
+	var _typePivotItem="PivotItem";
+	var PivotItem=(function (_super) {
+		__extends(PivotItem, _super);
+		function PivotItem() {
+			return _super !==null && _super.apply(this, arguments) || this;
+		}
+		Object.defineProperty(PivotItem.prototype, "_className", {
+			get: function () {
+				return "PivotItem";
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(PivotItem.prototype, "_scalarPropertyNames", {
+			get: function () {
+				return ["id", "name", "showDetail", "visible"];
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(PivotItem.prototype, "_scalarPropertyUpdateable", {
+			get: function () {
+				return [false, true, true, true];
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(PivotItem.prototype, "id", {
+			get: function () {
+				_throwIfNotLoaded("id", this._I, _typePivotItem, this._isNull);
+				return this._I;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(PivotItem.prototype, "name", {
+			get: function () {
+				_throwIfNotLoaded("name", this._N, _typePivotItem, this._isNull);
+				return this._N;
+			},
+			set: function (value) {
+				this._N=value;
+				_createSetPropertyAction(this.context, this, "Name", value, 0);
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(PivotItem.prototype, "showDetail", {
+			get: function () {
+				_throwIfNotLoaded("showDetail", this._S, _typePivotItem, this._isNull);
+				return this._S;
+			},
+			set: function (value) {
+				this._S=value;
+				_createSetPropertyAction(this.context, this, "ShowDetail", value, 0);
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(PivotItem.prototype, "visible", {
+			get: function () {
+				_throwIfNotLoaded("visible", this._V, _typePivotItem, this._isNull);
+				return this._V;
+			},
+			set: function (value) {
+				this._V=value;
+				_createSetPropertyAction(this.context, this, "Visible", value, 0);
+			},
+			enumerable: true,
+			configurable: true
+		});
+		PivotItem.prototype.set=function (properties, options) {
+			this._recursivelySet(properties, options, ["name", "showDetail", "visible"], [], []);
+		};
+		PivotItem.prototype.update=function (properties) {
+			this._recursivelyUpdate(properties);
+		};
+		PivotItem.prototype.getRange=function () {
+			return new Excel.Range(this.context, _createMethodObjectPath(this.context, this, "GetRange", 1, [], false, true, null, 4));
+		};
+		PivotItem.prototype._handleResult=function (value) {
+			_super.prototype._handleResult.call(this, value);
+			if (_isNullOrUndefined(value))
+				return;
+			var obj=value;
+			_fixObjectPathIfNecessary(this, obj);
+			if (!_isUndefined(obj["Id"])) {
+				this._I=obj["Id"];
+			}
+			if (!_isUndefined(obj["Name"])) {
+				this._N=obj["Name"];
+			}
+			if (!_isUndefined(obj["ShowDetail"])) {
+				this._S=obj["ShowDetail"];
+			}
+			if (!_isUndefined(obj["Visible"])) {
+				this._V=obj["Visible"];
+			}
+		};
+		PivotItem.prototype.load=function (option) {
+			return _load(this, option);
+		};
+		PivotItem.prototype.retrieve=function (option) {
+			return _retrieve(this, option);
+		};
+		PivotItem.prototype._handleIdResult=function (value) {
+			_super.prototype._handleIdResult.call(this, value);
+			if (_isNullOrUndefined(value)) {
+				return;
+			}
+			if (!_isUndefined(value["Id"])) {
+				this._I=value["Id"];
+			}
+		};
+		PivotItem.prototype._handleRetrieveResult=function (value, result) {
+			_super.prototype._handleRetrieveResult.call(this, value, result);
+			_processRetrieveResult(this, value, result);
+		};
+		PivotItem.prototype.toJSON=function () {
+			return _toJson(this, {
+				"id": this._I,
+				"name": this._N,
+				"showDetail": this._S,
+				"visible": this._V,
+			}, {});
+		};
+		PivotItem.prototype.ensureUnchanged=function (data) {
+			_createEnsureUnchangedAction(this.context, this, data);
+			return;
+		};
+		return PivotItem;
+	}(OfficeExtension.ClientObject));
+	Excel.PivotItem=PivotItem;
+	var PivotFilterTopBottomCriterion;
+	(function (PivotFilterTopBottomCriterion) {
+		PivotFilterTopBottomCriterion["invalid"]="Invalid";
+		PivotFilterTopBottomCriterion["topItems"]="TopItems";
+		PivotFilterTopBottomCriterion["topPercent"]="TopPercent";
+		PivotFilterTopBottomCriterion["topSum"]="TopSum";
+		PivotFilterTopBottomCriterion["bottomItems"]="BottomItems";
+		PivotFilterTopBottomCriterion["bottomPercent"]="BottomPercent";
+		PivotFilterTopBottomCriterion["bottomSum"]="BottomSum";
+	})(PivotFilterTopBottomCriterion=Excel.PivotFilterTopBottomCriterion || (Excel.PivotFilterTopBottomCriterion={}));
+	var AggregationFunction;
+	(function (AggregationFunction) {
+		AggregationFunction["automatic"]="Automatic";
+		AggregationFunction["sum"]="Sum";
+		AggregationFunction["count"]="Count";
+		AggregationFunction["average"]="Average";
+		AggregationFunction["max"]="Max";
+		AggregationFunction["min"]="Min";
+		AggregationFunction["product"]="Product";
+		AggregationFunction["countNumbers"]="CountNumbers";
+		AggregationFunction["standardDeviation"]="StandardDeviation";
+		AggregationFunction["standardDeviationP"]="StandardDeviationP";
+		AggregationFunction["variation"]="Variation";
+		AggregationFunction["variationP"]="VariationP";
+	})(AggregationFunction=Excel.AggregationFunction || (Excel.AggregationFunction={}));
+	var ShowAsCalculation;
+	(function (ShowAsCalculation) {
+		ShowAsCalculation["none"]="None";
+		ShowAsCalculation["percentOfGrandTotal"]="PercentOfGrandTotal";
+		ShowAsCalculation["percentOfRowTotal"]="PercentOfRowTotal";
+		ShowAsCalculation["percentOfColumnTotal"]="PercentOfColumnTotal";
+		ShowAsCalculation["percentOfParentRowTotal"]="PercentOfParentRowTotal";
+		ShowAsCalculation["percentOfParentColumnTotal"]="PercentOfParentColumnTotal";
+		ShowAsCalculation["percentOfParentTotal"]="PercentOfParentTotal";
+		ShowAsCalculation["percentOf"]="PercentOf";
+		ShowAsCalculation["runningTotal"]="RunningTotal";
+		ShowAsCalculation["percentRunningTotal"]="PercentRunningTotal";
+		ShowAsCalculation["differenceFrom"]="DifferenceFrom";
+		ShowAsCalculation["percentDifferenceFrom"]="PercentDifferenceFrom";
+		ShowAsCalculation["rankAscending"]="RankAscending";
+		ShowAsCalculation["rankDecending"]="RankDecending";
+		ShowAsCalculation["index"]="Index";
+	})(ShowAsCalculation=Excel.ShowAsCalculation || (Excel.ShowAsCalculation={}));
 	var _typeDocumentProperties="DocumentProperties";
 	var DocumentProperties=(function (_super) {
 		__extends(DocumentProperties, _super);
@@ -26319,7 +30089,7 @@ var Excel;
 		Object.defineProperty(DocumentProperties.prototype, "custom", {
 			get: function () {
 				if (!this._Cu) {
-					this._Cu=new Excel.CustomPropertyCollection(this.context, _createPropertyObjectPath(this.context, this, "Custom", true, false, false));
+					this._Cu=new Excel.CustomPropertyCollection(this.context, _createPropertyObjectPath(this.context, this, "Custom", true, false, 4));
 				}
 				return this._Cu;
 			},
@@ -26333,7 +30103,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._A=value;
-				_createSetPropertyAction(this.context, this, "Author", value);
+				_createSetPropertyAction(this.context, this, "Author", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -26345,7 +30115,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._C=value;
-				_createSetPropertyAction(this.context, this, "Category", value);
+				_createSetPropertyAction(this.context, this, "Category", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -26357,7 +30127,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._Co=value;
-				_createSetPropertyAction(this.context, this, "Comments", value);
+				_createSetPropertyAction(this.context, this, "Comments", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -26369,7 +30139,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._Com=value;
-				_createSetPropertyAction(this.context, this, "Company", value);
+				_createSetPropertyAction(this.context, this, "Company", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -26389,7 +30159,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._K=value;
-				_createSetPropertyAction(this.context, this, "Keywords", value);
+				_createSetPropertyAction(this.context, this, "Keywords", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -26409,7 +30179,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._M=value;
-				_createSetPropertyAction(this.context, this, "Manager", value);
+				_createSetPropertyAction(this.context, this, "Manager", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -26421,7 +30191,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._R=value;
-				_createSetPropertyAction(this.context, this, "RevisionNumber", value);
+				_createSetPropertyAction(this.context, this, "RevisionNumber", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -26433,7 +30203,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._S=value;
-				_createSetPropertyAction(this.context, this, "Subject", value);
+				_createSetPropertyAction(this.context, this, "Subject", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -26445,7 +30215,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._T=value;
-				_createSetPropertyAction(this.context, this, "Title", value);
+				_createSetPropertyAction(this.context, this, "Title", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -26589,7 +30359,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._V=value;
-				_createSetPropertyAction(this.context, this, "Value", value);
+				_createSetPropertyAction(this.context, this, "Value", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -26601,7 +30371,7 @@ var Excel;
 			this._recursivelyUpdate(properties);
 		};
 		CustomProperty.prototype.delete=function () {
-			_createMethodAction(this.context, this, "Delete", 0, [], false);
+			_createMethodAction(this.context, this, "Delete", 0, [], 0);
 		};
 		CustomProperty.prototype._handleResult=function (value) {
 			_super.prototype._handleResult.call(this, value);
@@ -26672,13 +30442,13 @@ var Excel;
 			configurable: true
 		});
 		CustomPropertyCollection.prototype.add=function (key, value) {
-			return new Excel.CustomProperty(this.context, _createMethodObjectPath(this.context, this, "Add", 0, [key, value], false, true, null, false));
+			return new Excel.CustomProperty(this.context, _createMethodObjectPath(this.context, this, "Add", 0, [key, value], false, true, null, 0));
 		};
 		CustomPropertyCollection.prototype.deleteAll=function () {
-			_createMethodAction(this.context, this, "DeleteAll", 0, [], false);
+			_createMethodAction(this.context, this, "DeleteAll", 0, [], 0);
 		};
 		CustomPropertyCollection.prototype.getCount=function () {
-			var action=_createMethodAction(this.context, this, "GetCount", 1, [], false);
+			var action=_createMethodAction(this.context, this, "GetCount", 1, [], 4);
 			var ret=new OfficeExtension.ClientResult();
 			_addActionResultHandler(this, action, ret);
 			return ret;
@@ -26687,7 +30457,7 @@ var Excel;
 			return new Excel.CustomProperty(this.context, _createIndexerObjectPath(this.context, this, [key]));
 		};
 		CustomPropertyCollection.prototype.getItemOrNullObject=function (key) {
-			return new Excel.CustomProperty(this.context, _createMethodObjectPath(this.context, this, "GetItemOrNullObject", 1, [key], false, false, null, false));
+			return new Excel.CustomProperty(this.context, _createMethodObjectPath(this.context, this, "GetItemOrNullObject", 1, [key], false, false, null, 4));
 		};
 		CustomPropertyCollection.prototype._handleResult=function (value) {
 			_super.prototype._handleResult.call(this, value);
@@ -26751,13 +30521,13 @@ var Excel;
 			configurable: true
 		});
 		ConditionalFormatCollection.prototype.add=function (type) {
-			return new Excel.ConditionalFormat(this.context, _createMethodObjectPath(this.context, this, "Add", 0, [type], false, true, null, false));
+			return new Excel.ConditionalFormat(this.context, _createMethodObjectPath(this.context, this, "Add", 0, [type], false, true, null, 0));
 		};
 		ConditionalFormatCollection.prototype.clearAll=function () {
-			_createMethodAction(this.context, this, "ClearAll", 0, [], false);
+			_createMethodAction(this.context, this, "ClearAll", 0, [], 0);
 		};
 		ConditionalFormatCollection.prototype.getCount=function () {
-			var action=_createMethodAction(this.context, this, "GetCount", 1, [], false);
+			var action=_createMethodAction(this.context, this, "GetCount", 1, [], 4);
 			var ret=new OfficeExtension.ClientResult();
 			_addActionResultHandler(this, action, ret);
 			return ret;
@@ -26766,7 +30536,7 @@ var Excel;
 			return new Excel.ConditionalFormat(this.context, _createIndexerObjectPath(this.context, this, [id]));
 		};
 		ConditionalFormatCollection.prototype.getItemAt=function (index) {
-			return new Excel.ConditionalFormat(this.context, _createMethodObjectPath(this.context, this, "GetItemAt", 1, [index], false, false, null, false));
+			return new Excel.ConditionalFormat(this.context, _createMethodObjectPath(this.context, this, "GetItemAt", 1, [index], false, false, null, 4));
 		};
 		ConditionalFormatCollection.prototype._handleResult=function (value) {
 			_super.prototype._handleResult.call(this, value);
@@ -26838,7 +30608,7 @@ var Excel;
 		Object.defineProperty(ConditionalFormat.prototype, "cellValue", {
 			get: function () {
 				if (!this._C) {
-					this._C=new Excel.CellValueConditionalFormat(this.context, _createPropertyObjectPath(this.context, this, "CellValue", false, false, false));
+					this._C=new Excel.CellValueConditionalFormat(this.context, _createPropertyObjectPath(this.context, this, "CellValue", false, false, 4));
 				}
 				return this._C;
 			},
@@ -26848,7 +30618,7 @@ var Excel;
 		Object.defineProperty(ConditionalFormat.prototype, "cellValueOrNullObject", {
 			get: function () {
 				if (!this._Ce) {
-					this._Ce=new Excel.CellValueConditionalFormat(this.context, _createPropertyObjectPath(this.context, this, "CellValueOrNullObject", false, false, false));
+					this._Ce=new Excel.CellValueConditionalFormat(this.context, _createPropertyObjectPath(this.context, this, "CellValueOrNullObject", false, false, 4));
 				}
 				return this._Ce;
 			},
@@ -26858,7 +30628,7 @@ var Excel;
 		Object.defineProperty(ConditionalFormat.prototype, "colorScale", {
 			get: function () {
 				if (!this._Co) {
-					this._Co=new Excel.ColorScaleConditionalFormat(this.context, _createPropertyObjectPath(this.context, this, "ColorScale", false, false, false));
+					this._Co=new Excel.ColorScaleConditionalFormat(this.context, _createPropertyObjectPath(this.context, this, "ColorScale", false, false, 4));
 				}
 				return this._Co;
 			},
@@ -26868,7 +30638,7 @@ var Excel;
 		Object.defineProperty(ConditionalFormat.prototype, "colorScaleOrNullObject", {
 			get: function () {
 				if (!this._Col) {
-					this._Col=new Excel.ColorScaleConditionalFormat(this.context, _createPropertyObjectPath(this.context, this, "ColorScaleOrNullObject", false, false, false));
+					this._Col=new Excel.ColorScaleConditionalFormat(this.context, _createPropertyObjectPath(this.context, this, "ColorScaleOrNullObject", false, false, 4));
 				}
 				return this._Col;
 			},
@@ -26878,7 +30648,7 @@ var Excel;
 		Object.defineProperty(ConditionalFormat.prototype, "custom", {
 			get: function () {
 				if (!this._Cu) {
-					this._Cu=new Excel.CustomConditionalFormat(this.context, _createPropertyObjectPath(this.context, this, "Custom", false, false, false));
+					this._Cu=new Excel.CustomConditionalFormat(this.context, _createPropertyObjectPath(this.context, this, "Custom", false, false, 4));
 				}
 				return this._Cu;
 			},
@@ -26888,7 +30658,7 @@ var Excel;
 		Object.defineProperty(ConditionalFormat.prototype, "customOrNullObject", {
 			get: function () {
 				if (!this._Cus) {
-					this._Cus=new Excel.CustomConditionalFormat(this.context, _createPropertyObjectPath(this.context, this, "CustomOrNullObject", false, false, false));
+					this._Cus=new Excel.CustomConditionalFormat(this.context, _createPropertyObjectPath(this.context, this, "CustomOrNullObject", false, false, 4));
 				}
 				return this._Cus;
 			},
@@ -26898,7 +30668,7 @@ var Excel;
 		Object.defineProperty(ConditionalFormat.prototype, "dataBar", {
 			get: function () {
 				if (!this._D) {
-					this._D=new Excel.DataBarConditionalFormat(this.context, _createPropertyObjectPath(this.context, this, "DataBar", false, false, false));
+					this._D=new Excel.DataBarConditionalFormat(this.context, _createPropertyObjectPath(this.context, this, "DataBar", false, false, 4));
 				}
 				return this._D;
 			},
@@ -26908,7 +30678,7 @@ var Excel;
 		Object.defineProperty(ConditionalFormat.prototype, "dataBarOrNullObject", {
 			get: function () {
 				if (!this._Da) {
-					this._Da=new Excel.DataBarConditionalFormat(this.context, _createPropertyObjectPath(this.context, this, "DataBarOrNullObject", false, false, false));
+					this._Da=new Excel.DataBarConditionalFormat(this.context, _createPropertyObjectPath(this.context, this, "DataBarOrNullObject", false, false, 4));
 				}
 				return this._Da;
 			},
@@ -26918,7 +30688,7 @@ var Excel;
 		Object.defineProperty(ConditionalFormat.prototype, "iconSet", {
 			get: function () {
 				if (!this._I) {
-					this._I=new Excel.IconSetConditionalFormat(this.context, _createPropertyObjectPath(this.context, this, "IconSet", false, false, false));
+					this._I=new Excel.IconSetConditionalFormat(this.context, _createPropertyObjectPath(this.context, this, "IconSet", false, false, 4));
 				}
 				return this._I;
 			},
@@ -26928,7 +30698,7 @@ var Excel;
 		Object.defineProperty(ConditionalFormat.prototype, "iconSetOrNullObject", {
 			get: function () {
 				if (!this._Ic) {
-					this._Ic=new Excel.IconSetConditionalFormat(this.context, _createPropertyObjectPath(this.context, this, "IconSetOrNullObject", false, false, false));
+					this._Ic=new Excel.IconSetConditionalFormat(this.context, _createPropertyObjectPath(this.context, this, "IconSetOrNullObject", false, false, 4));
 				}
 				return this._Ic;
 			},
@@ -26938,7 +30708,7 @@ var Excel;
 		Object.defineProperty(ConditionalFormat.prototype, "preset", {
 			get: function () {
 				if (!this._P) {
-					this._P=new Excel.PresetCriteriaConditionalFormat(this.context, _createPropertyObjectPath(this.context, this, "Preset", false, false, false));
+					this._P=new Excel.PresetCriteriaConditionalFormat(this.context, _createPropertyObjectPath(this.context, this, "Preset", false, false, 4));
 				}
 				return this._P;
 			},
@@ -26948,7 +30718,7 @@ var Excel;
 		Object.defineProperty(ConditionalFormat.prototype, "presetOrNullObject", {
 			get: function () {
 				if (!this._Pr) {
-					this._Pr=new Excel.PresetCriteriaConditionalFormat(this.context, _createPropertyObjectPath(this.context, this, "PresetOrNullObject", false, false, false));
+					this._Pr=new Excel.PresetCriteriaConditionalFormat(this.context, _createPropertyObjectPath(this.context, this, "PresetOrNullObject", false, false, 4));
 				}
 				return this._Pr;
 			},
@@ -26958,7 +30728,7 @@ var Excel;
 		Object.defineProperty(ConditionalFormat.prototype, "textComparison", {
 			get: function () {
 				if (!this._T) {
-					this._T=new Excel.TextConditionalFormat(this.context, _createPropertyObjectPath(this.context, this, "TextComparison", false, false, false));
+					this._T=new Excel.TextConditionalFormat(this.context, _createPropertyObjectPath(this.context, this, "TextComparison", false, false, 4));
 				}
 				return this._T;
 			},
@@ -26968,7 +30738,7 @@ var Excel;
 		Object.defineProperty(ConditionalFormat.prototype, "textComparisonOrNullObject", {
 			get: function () {
 				if (!this._Te) {
-					this._Te=new Excel.TextConditionalFormat(this.context, _createPropertyObjectPath(this.context, this, "TextComparisonOrNullObject", false, false, false));
+					this._Te=new Excel.TextConditionalFormat(this.context, _createPropertyObjectPath(this.context, this, "TextComparisonOrNullObject", false, false, 4));
 				}
 				return this._Te;
 			},
@@ -26978,7 +30748,7 @@ var Excel;
 		Object.defineProperty(ConditionalFormat.prototype, "topBottom", {
 			get: function () {
 				if (!this._To) {
-					this._To=new Excel.TopBottomConditionalFormat(this.context, _createPropertyObjectPath(this.context, this, "TopBottom", false, false, false));
+					this._To=new Excel.TopBottomConditionalFormat(this.context, _createPropertyObjectPath(this.context, this, "TopBottom", false, false, 4));
 				}
 				return this._To;
 			},
@@ -26988,7 +30758,7 @@ var Excel;
 		Object.defineProperty(ConditionalFormat.prototype, "topBottomOrNullObject", {
 			get: function () {
 				if (!this._Top) {
-					this._Top=new Excel.TopBottomConditionalFormat(this.context, _createPropertyObjectPath(this.context, this, "TopBottomOrNullObject", false, false, false));
+					this._Top=new Excel.TopBottomConditionalFormat(this.context, _createPropertyObjectPath(this.context, this, "TopBottomOrNullObject", false, false, 4));
 				}
 				return this._Top;
 			},
@@ -27010,7 +30780,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._Pri=value;
-				_createSetPropertyAction(this.context, this, "Priority", value);
+				_createSetPropertyAction(this.context, this, "Priority", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -27022,7 +30792,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._S=value;
-				_createSetPropertyAction(this.context, this, "StopIfTrue", value);
+				_createSetPropertyAction(this.context, this, "StopIfTrue", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -27042,13 +30812,13 @@ var Excel;
 			this._recursivelyUpdate(properties);
 		};
 		ConditionalFormat.prototype.delete=function () {
-			_createMethodAction(this.context, this, "Delete", 0, [], false);
+			_createMethodAction(this.context, this, "Delete", 0, [], 0);
 		};
 		ConditionalFormat.prototype.getRange=function () {
-			return new Excel.Range(this.context, _createMethodObjectPath(this.context, this, "GetRange", 1, [], false, true, null, false));
+			return new Excel.Range(this.context, _createMethodObjectPath(this.context, this, "GetRange", 1, [], false, true, null, 4));
 		};
 		ConditionalFormat.prototype.getRangeOrNullObject=function () {
-			return new Excel.Range(this.context, _createMethodObjectPath(this.context, this, "GetRangeOrNullObject", 1, [], false, true, null, false));
+			return new Excel.Range(this.context, _createMethodObjectPath(this.context, this, "GetRangeOrNullObject", 1, [], false, true, null, 4));
 		};
 		ConditionalFormat.prototype._handleResult=function (value) {
 			_super.prototype._handleResult.call(this, value);
@@ -27158,7 +30928,7 @@ var Excel;
 		Object.defineProperty(DataBarConditionalFormat.prototype, "negativeFormat", {
 			get: function () {
 				if (!this._N) {
-					this._N=new Excel.ConditionalDataBarNegativeFormat(this.context, _createPropertyObjectPath(this.context, this, "NegativeFormat", false, false, false));
+					this._N=new Excel.ConditionalDataBarNegativeFormat(this.context, _createPropertyObjectPath(this.context, this, "NegativeFormat", false, false, 4));
 				}
 				return this._N;
 			},
@@ -27168,7 +30938,7 @@ var Excel;
 		Object.defineProperty(DataBarConditionalFormat.prototype, "positiveFormat", {
 			get: function () {
 				if (!this._P) {
-					this._P=new Excel.ConditionalDataBarPositiveFormat(this.context, _createPropertyObjectPath(this.context, this, "PositiveFormat", false, false, false));
+					this._P=new Excel.ConditionalDataBarPositiveFormat(this.context, _createPropertyObjectPath(this.context, this, "PositiveFormat", false, false, 4));
 				}
 				return this._P;
 			},
@@ -27182,7 +30952,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._A=value;
-				_createSetPropertyAction(this.context, this, "AxisColor", value);
+				_createSetPropertyAction(this.context, this, "AxisColor", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -27194,7 +30964,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._Ax=value;
-				_createSetPropertyAction(this.context, this, "AxisFormat", value);
+				_createSetPropertyAction(this.context, this, "AxisFormat", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -27206,7 +30976,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._B=value;
-				_createSetPropertyAction(this.context, this, "BarDirection", value);
+				_createSetPropertyAction(this.context, this, "BarDirection", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -27218,7 +30988,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._L=value;
-				_createSetPropertyAction(this.context, this, "LowerBoundRule", value);
+				_createSetPropertyAction(this.context, this, "LowerBoundRule", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -27230,7 +31000,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._S=value;
-				_createSetPropertyAction(this.context, this, "ShowDataBarOnly", value);
+				_createSetPropertyAction(this.context, this, "ShowDataBarOnly", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -27242,7 +31012,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._U=value;
-				_createSetPropertyAction(this.context, this, "UpperBoundRule", value);
+				_createSetPropertyAction(this.context, this, "UpperBoundRule", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -27343,7 +31113,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._B=value;
-				_createSetPropertyAction(this.context, this, "BorderColor", value);
+				_createSetPropertyAction(this.context, this, "BorderColor", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -27355,7 +31125,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._F=value;
-				_createSetPropertyAction(this.context, this, "FillColor", value);
+				_createSetPropertyAction(this.context, this, "FillColor", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -27367,7 +31137,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._G=value;
-				_createSetPropertyAction(this.context, this, "GradientFill", value);
+				_createSetPropertyAction(this.context, this, "GradientFill", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -27452,7 +31222,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._B=value;
-				_createSetPropertyAction(this.context, this, "BorderColor", value);
+				_createSetPropertyAction(this.context, this, "BorderColor", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -27464,7 +31234,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._F=value;
-				_createSetPropertyAction(this.context, this, "FillColor", value);
+				_createSetPropertyAction(this.context, this, "FillColor", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -27476,7 +31246,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._M=value;
-				_createSetPropertyAction(this.context, this, "MatchPositiveBorderColor", value);
+				_createSetPropertyAction(this.context, this, "MatchPositiveBorderColor", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -27488,7 +31258,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._Ma=value;
-				_createSetPropertyAction(this.context, this, "MatchPositiveFillColor", value);
+				_createSetPropertyAction(this.context, this, "MatchPositiveFillColor", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -27566,7 +31336,7 @@ var Excel;
 		Object.defineProperty(CustomConditionalFormat.prototype, "format", {
 			get: function () {
 				if (!this._F) {
-					this._F=new Excel.ConditionalRangeFormat(this.context, _createPropertyObjectPath(this.context, this, "Format", false, false, false));
+					this._F=new Excel.ConditionalRangeFormat(this.context, _createPropertyObjectPath(this.context, this, "Format", false, false, 4));
 				}
 				return this._F;
 			},
@@ -27576,7 +31346,7 @@ var Excel;
 		Object.defineProperty(CustomConditionalFormat.prototype, "rule", {
 			get: function () {
 				if (!this._R) {
-					this._R=new Excel.ConditionalFormatRule(this.context, _createPropertyObjectPath(this.context, this, "Rule", false, false, false));
+					this._R=new Excel.ConditionalFormatRule(this.context, _createPropertyObjectPath(this.context, this, "Rule", false, false, 4));
 				}
 				return this._R;
 			},
@@ -27654,7 +31424,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._F=value;
-				_createSetPropertyAction(this.context, this, "Formula", value);
+				_createSetPropertyAction(this.context, this, "Formula", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -27666,7 +31436,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._Fo=value;
-				_createSetPropertyAction(this.context, this, "FormulaLocal", value);
+				_createSetPropertyAction(this.context, this, "FormulaLocal", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -27678,7 +31448,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._For=value;
-				_createSetPropertyAction(this.context, this, "FormulaR1C1", value);
+				_createSetPropertyAction(this.context, this, "FormulaR1C1", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -27763,7 +31533,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._C=value;
-				_createSetPropertyAction(this.context, this, "Criteria", value);
+				_createSetPropertyAction(this.context, this, "Criteria", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -27775,7 +31545,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._R=value;
-				_createSetPropertyAction(this.context, this, "ReverseIconOrder", value);
+				_createSetPropertyAction(this.context, this, "ReverseIconOrder", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -27787,7 +31557,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._S=value;
-				_createSetPropertyAction(this.context, this, "ShowIconOnly", value);
+				_createSetPropertyAction(this.context, this, "ShowIconOnly", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -27799,7 +31569,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._St=value;
-				_createSetPropertyAction(this.context, this, "Style", value);
+				_createSetPropertyAction(this.context, this, "Style", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -27888,7 +31658,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._C=value;
-				_createSetPropertyAction(this.context, this, "Criteria", value);
+				_createSetPropertyAction(this.context, this, "Criteria", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -27980,7 +31750,7 @@ var Excel;
 		Object.defineProperty(TopBottomConditionalFormat.prototype, "format", {
 			get: function () {
 				if (!this._F) {
-					this._F=new Excel.ConditionalRangeFormat(this.context, _createPropertyObjectPath(this.context, this, "Format", false, false, false));
+					this._F=new Excel.ConditionalRangeFormat(this.context, _createPropertyObjectPath(this.context, this, "Format", false, false, 4));
 				}
 				return this._F;
 			},
@@ -27994,7 +31764,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._R=value;
-				_createSetPropertyAction(this.context, this, "Rule", value);
+				_createSetPropertyAction(this.context, this, "Rule", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -28077,7 +31847,7 @@ var Excel;
 		Object.defineProperty(PresetCriteriaConditionalFormat.prototype, "format", {
 			get: function () {
 				if (!this._F) {
-					this._F=new Excel.ConditionalRangeFormat(this.context, _createPropertyObjectPath(this.context, this, "Format", false, false, false));
+					this._F=new Excel.ConditionalRangeFormat(this.context, _createPropertyObjectPath(this.context, this, "Format", false, false, 4));
 				}
 				return this._F;
 			},
@@ -28091,7 +31861,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._R=value;
-				_createSetPropertyAction(this.context, this, "Rule", value);
+				_createSetPropertyAction(this.context, this, "Rule", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -28174,7 +31944,7 @@ var Excel;
 		Object.defineProperty(TextConditionalFormat.prototype, "format", {
 			get: function () {
 				if (!this._F) {
-					this._F=new Excel.ConditionalRangeFormat(this.context, _createPropertyObjectPath(this.context, this, "Format", false, false, false));
+					this._F=new Excel.ConditionalRangeFormat(this.context, _createPropertyObjectPath(this.context, this, "Format", false, false, 4));
 				}
 				return this._F;
 			},
@@ -28188,7 +31958,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._R=value;
-				_createSetPropertyAction(this.context, this, "Rule", value);
+				_createSetPropertyAction(this.context, this, "Rule", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -28271,7 +32041,7 @@ var Excel;
 		Object.defineProperty(CellValueConditionalFormat.prototype, "format", {
 			get: function () {
 				if (!this._F) {
-					this._F=new Excel.ConditionalRangeFormat(this.context, _createPropertyObjectPath(this.context, this, "Format", false, false, false));
+					this._F=new Excel.ConditionalRangeFormat(this.context, _createPropertyObjectPath(this.context, this, "Format", false, false, 4));
 				}
 				return this._F;
 			},
@@ -28285,7 +32055,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._R=value;
-				_createSetPropertyAction(this.context, this, "Rule", value);
+				_createSetPropertyAction(this.context, this, "Rule", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -28368,7 +32138,7 @@ var Excel;
 		Object.defineProperty(ConditionalRangeFormat.prototype, "borders", {
 			get: function () {
 				if (!this._B) {
-					this._B=new Excel.ConditionalRangeBorderCollection(this.context, _createPropertyObjectPath(this.context, this, "Borders", true, false, false));
+					this._B=new Excel.ConditionalRangeBorderCollection(this.context, _createPropertyObjectPath(this.context, this, "Borders", true, false, 4));
 				}
 				return this._B;
 			},
@@ -28378,7 +32148,7 @@ var Excel;
 		Object.defineProperty(ConditionalRangeFormat.prototype, "fill", {
 			get: function () {
 				if (!this._F) {
-					this._F=new Excel.ConditionalRangeFill(this.context, _createPropertyObjectPath(this.context, this, "Fill", false, false, false));
+					this._F=new Excel.ConditionalRangeFill(this.context, _createPropertyObjectPath(this.context, this, "Fill", false, false, 4));
 				}
 				return this._F;
 			},
@@ -28388,7 +32158,7 @@ var Excel;
 		Object.defineProperty(ConditionalRangeFormat.prototype, "font", {
 			get: function () {
 				if (!this._Fo) {
-					this._Fo=new Excel.ConditionalRangeFont(this.context, _createPropertyObjectPath(this.context, this, "Font", false, false, false));
+					this._Fo=new Excel.ConditionalRangeFont(this.context, _createPropertyObjectPath(this.context, this, "Font", false, false, 4));
 				}
 				return this._Fo;
 			},
@@ -28402,7 +32172,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._N=value;
-				_createSetPropertyAction(this.context, this, "NumberFormat", value);
+				_createSetPropertyAction(this.context, this, "NumberFormat", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -28486,7 +32256,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._B=value;
-				_createSetPropertyAction(this.context, this, "Bold", value);
+				_createSetPropertyAction(this.context, this, "Bold", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -28498,7 +32268,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._C=value;
-				_createSetPropertyAction(this.context, this, "Color", value);
+				_createSetPropertyAction(this.context, this, "Color", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -28510,7 +32280,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._I=value;
-				_createSetPropertyAction(this.context, this, "Italic", value);
+				_createSetPropertyAction(this.context, this, "Italic", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -28522,7 +32292,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._S=value;
-				_createSetPropertyAction(this.context, this, "Strikethrough", value);
+				_createSetPropertyAction(this.context, this, "Strikethrough", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -28534,7 +32304,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._U=value;
-				_createSetPropertyAction(this.context, this, "Underline", value);
+				_createSetPropertyAction(this.context, this, "Underline", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -28546,7 +32316,7 @@ var Excel;
 			this._recursivelyUpdate(properties);
 		};
 		ConditionalRangeFont.prototype.clear=function () {
-			_createMethodAction(this.context, this, "Clear", 0, [], false);
+			_createMethodAction(this.context, this, "Clear", 0, [], 0);
 		};
 		ConditionalRangeFont.prototype._handleResult=function (value) {
 			_super.prototype._handleResult.call(this, value);
@@ -28630,7 +32400,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._C=value;
-				_createSetPropertyAction(this.context, this, "Color", value);
+				_createSetPropertyAction(this.context, this, "Color", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -28642,7 +32412,7 @@ var Excel;
 			this._recursivelyUpdate(properties);
 		};
 		ConditionalRangeFill.prototype.clear=function () {
-			_createMethodAction(this.context, this, "Clear", 0, [], false);
+			_createMethodAction(this.context, this, "Clear", 0, [], 0);
 		};
 		ConditionalRangeFill.prototype._handleResult=function (value) {
 			_super.prototype._handleResult.call(this, value);
@@ -28710,7 +32480,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._C=value;
-				_createSetPropertyAction(this.context, this, "Color", value);
+				_createSetPropertyAction(this.context, this, "Color", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -28730,7 +32500,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._St=value;
-				_createSetPropertyAction(this.context, this, "Style", value);
+				_createSetPropertyAction(this.context, this, "Style", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -28818,7 +32588,7 @@ var Excel;
 		Object.defineProperty(ConditionalRangeBorderCollection.prototype, "bottom", {
 			get: function () {
 				if (!this._B) {
-					this._B=new Excel.ConditionalRangeBorder(this.context, _createPropertyObjectPath(this.context, this, "Bottom", false, false, false));
+					this._B=new Excel.ConditionalRangeBorder(this.context, _createPropertyObjectPath(this.context, this, "Bottom", false, false, 4));
 				}
 				return this._B;
 			},
@@ -28828,7 +32598,7 @@ var Excel;
 		Object.defineProperty(ConditionalRangeBorderCollection.prototype, "left", {
 			get: function () {
 				if (!this._L) {
-					this._L=new Excel.ConditionalRangeBorder(this.context, _createPropertyObjectPath(this.context, this, "Left", false, false, false));
+					this._L=new Excel.ConditionalRangeBorder(this.context, _createPropertyObjectPath(this.context, this, "Left", false, false, 4));
 				}
 				return this._L;
 			},
@@ -28838,7 +32608,7 @@ var Excel;
 		Object.defineProperty(ConditionalRangeBorderCollection.prototype, "right", {
 			get: function () {
 				if (!this._R) {
-					this._R=new Excel.ConditionalRangeBorder(this.context, _createPropertyObjectPath(this.context, this, "Right", false, false, false));
+					this._R=new Excel.ConditionalRangeBorder(this.context, _createPropertyObjectPath(this.context, this, "Right", false, false, 4));
 				}
 				return this._R;
 			},
@@ -28848,7 +32618,7 @@ var Excel;
 		Object.defineProperty(ConditionalRangeBorderCollection.prototype, "top", {
 			get: function () {
 				if (!this._T) {
-					this._T=new Excel.ConditionalRangeBorder(this.context, _createPropertyObjectPath(this.context, this, "Top", false, false, false));
+					this._T=new Excel.ConditionalRangeBorder(this.context, _createPropertyObjectPath(this.context, this, "Top", false, false, 4));
 				}
 				return this._T;
 			},
@@ -28875,7 +32645,7 @@ var Excel;
 			return new Excel.ConditionalRangeBorder(this.context, _createIndexerObjectPath(this.context, this, [index]));
 		};
 		ConditionalRangeBorderCollection.prototype.getItemAt=function (index) {
-			return new Excel.ConditionalRangeBorder(this.context, _createMethodObjectPath(this.context, this, "GetItemAt", 1, [index], false, false, null, false));
+			return new Excel.ConditionalRangeBorder(this.context, _createMethodObjectPath(this.context, this, "GetItemAt", 1, [index], false, false, null, 4));
 		};
 		ConditionalRangeBorderCollection.prototype._handleResult=function (value) {
 			_super.prototype._handleResult.call(this, value);
@@ -29025,7 +32795,7 @@ var Excel;
 			configurable: true
 		});
 		CustomFunction.prototype.delete=function () {
-			_createMethodAction(this.context, this, "Delete", 0, [], false);
+			_createMethodAction(this.context, this, "Delete", 0, [], 0);
 		};
 		CustomFunction.prototype._handleResult=function (value) {
 			_super.prototype._handleResult.call(this, value);
@@ -29114,7 +32884,7 @@ var Excel;
 				if (!_isNullOrUndefined(this._onCanceled) && typeof (this._onCanceled)==="function") {
 					return this._onCanceled;
 				}
-				return null;
+				return undefined;
 			},
 			set: function (handler) {
 				this._onCanceled=handler;
@@ -29162,8 +32932,8 @@ var Excel;
 			if (_isNullOrUndefined(definition)) {
 				throw OfficeExtension.Utility.createRuntimeError(ErrorCodes.invalidOperation, OfficeExtension.Utility._getResourceString(OfficeExtension.ResourceStrings.customFunctionDefintionMissing), "CustomFunctionProxy.add");
 			}
-			this._ensureInit(context);
-			var apiCustomFunction=context.workbook.customFunctions._Add(Excel.CustomFunctionType.script, name, definition.description, definition.result.resultType, definition.result.resultDimensionality ? definition.result.resultDimensionality : Excel.CustomFunctionDimensionality.scalar, definition.options && definition.options.stream ? definition.options.stream : false, definition.options && definition.options.batch ? definition.options.batch : false, definition.options && definition.options.cancelable ? definition.options.cancelable : false, definition.parameters);
+			this.ensureInit(context);
+			var apiCustomFunction=context.workbook.customFunctions._Add(Excel.CustomFunctionType.script, name, definition.description, definition.result.resultType, (definition.result.resultDimensionality ? definition.result.resultDimensionality : Excel.CustomFunctionDimensionality.scalar), definition.options && definition.options.stream ? definition.options.stream : false, definition.options && definition.options.batch ? definition.options.batch : false, definition.options && definition.options.cancelable ? definition.options.cancelable : false, definition.parameters);
 			return apiCustomFunction;
 		};
 		CustomFunctionProxy.splitName=function (name) {
@@ -29181,7 +32951,7 @@ var Excel;
 			};
 			return nameSplit;
 		};
-		CustomFunctionProxy.prototype._ensureInit=function (context) {
+		CustomFunctionProxy.prototype.ensureInit=function (context) {
 			var _this=this;
 			if (typeof (Excel.Script)==="object" && typeof (Excel.Script._CustomFunctionSettings)==="object") {
 				if (typeof (Excel.Script._CustomFunctionSettings.resultSetterDelayMillis)==="number") {
@@ -29217,6 +32987,7 @@ var Excel;
 			if (!this._isInit) {
 				context._pendingRequest._addPreSyncPromise(this._whenInit);
 			}
+			return this._whenInit;
 		};
 		CustomFunctionProxy.prototype._handleMessage=function (args) {
 			OfficeExtension.Utility.checkArgumentNull(args, "args");
@@ -29227,11 +32998,11 @@ var Excel;
 				if (entryArray[i].messageCategory !==1) {
 					continue;
 				}
-				var majorVersionNumber=16;
-				var minorVersionNumber=0;
-				var buildNumberWithCancellationSupport=8816;
-				var processAsInvocationMessage=versionNumberIsEarlierThan(majorVersionNumber, minorVersionNumber, buildNumberWithCancellationSupport) ||
-					entryArray[i].messageType===1000;
+				var processAsInvocationMessage=versionNumberIsEarlierThan({
+					mac: { desiredMajor: 16, desiredMinor: 8, desiredBuild: 1116 },
+					ios: { desiredMajor: 2, desiredMinor: 8, desiredBuild: 1116 },
+					general: { desiredMajor: 16, desiredMinor: 0, desiredBuild: 8816 }
+				}) || entryArray[i].messageType===1000;
 				if (processAsInvocationMessage) {
 					invocationArray.push(entryArray[i]);
 				}
@@ -29289,40 +33060,46 @@ var Excel;
 				if (_isNullOrUndefined(message.functionName)) {
 					throw OfficeExtension.Utility.createRuntimeError(ErrorCodes.generalException, "functionName", "CustomFunctionProxy._batchInvocationEntries");
 				}
+				var definition={};
+				var batchIndex=-1;
+				var isStreaming=false;
+				var isBatching=false;
 				var nameSplit=CustomFunctionProxy.splitName(message.functionName);
 				var definitionCollection=Excel.Script.CustomFunctions[nameSplit.namespace];
 				if (_isNullOrUndefined(definitionCollection)) {
-					throw OfficeExtension.Utility.createRuntimeError(ErrorCodes.invalidOperation, OfficeExtension.Utility._getResourceString(OfficeExtension.ResourceStrings.customFunctionDefintionMissing), "CustomFunctionProxy._batchInvocationEntries");
-				}
-				var definition=definitionCollection[nameSplit.name];
-				if (_isNullOrUndefined(definition)) {
-					throw OfficeExtension.Utility.createRuntimeError(ErrorCodes.invalidOperation, OfficeExtension.Utility._getResourceString(OfficeExtension.ResourceStrings.customFunctionDefintionMissing), "CustomFunctionProxy._batchInvocationEntries");
-				}
-				if (_isNullOrUndefined(definition.call)) {
-					throw OfficeExtension.Utility.createRuntimeError(ErrorCodes.invalidOperation, OfficeExtension.Utility._getResourceString(OfficeExtension.ResourceStrings.customFunctionImplementationMissing), "CustomFunctionProxy._batchInvocationEntries");
-				}
-				var isStreaming=false;
-				if (!_isNullOrUndefined(definition.options) && (definition.options.stream || definition.options.cancelable)) {
-					var setResult=null;
-					if (definition.options.stream) {
-						isStreaming=true;
-						setResult=(function (result) {
-							_this._setResult(message.invocationId, result);
-						});
+					if (_isNullOrUndefined(window[nameSplit.name]) || typeof (window[nameSplit.name]) !="function") {
+						throw OfficeExtension.Utility.createRuntimeError(ErrorCodes.invalidOperation, OfficeExtension.Utility._getResourceString(OfficeExtension.ResourceStrings.customFunctionDefintionMissing), "CustomFunctionProxy._batchInvocationEntries");
 					}
-					var invocationContext=void 0;
-					invocationContext=new InvocationContext(setResult);
-					this_1._invocationContextMap[message.invocationId]=invocationContext;
-					message.parameterValues.push(invocationContext);
+					definition.call=window[nameSplit.name];
 				}
-				var batchIndex=-1;
-				var isBatching=false;
-				if (!_isNullOrUndefined(definition.options) && definition.options.batch) {
-					isBatching=true;
-					for (var i_1=0; i_1 < batchArray.length; i_1++) {
-						if (batchArray[i_1].call===definition.call) {
-							batchIndex=i_1;
-							break;
+				else {
+					definition=definitionCollection[nameSplit.name];
+					if (_isNullOrUndefined(definition)) {
+						throw OfficeExtension.Utility.createRuntimeError(ErrorCodes.invalidOperation, OfficeExtension.Utility._getResourceString(OfficeExtension.ResourceStrings.customFunctionDefintionMissing), "CustomFunctionProxy._batchInvocationEntries");
+					}
+					if (_isNullOrUndefined(definition.call)) {
+						throw OfficeExtension.Utility.createRuntimeError(ErrorCodes.invalidOperation, OfficeExtension.Utility._getResourceString(OfficeExtension.ResourceStrings.customFunctionImplementationMissing), "CustomFunctionProxy._batchInvocationEntries");
+					}
+					if (!_isNullOrUndefined(definition.options) && (definition.options.stream || definition.options.cancelable)) {
+						var setResult=undefined;
+						if (definition.options.stream) {
+							isStreaming=true;
+							setResult=(function (result) {
+								_this._setResult(message.invocationId, result);
+							});
+						}
+						var invocationContext=void 0;
+						invocationContext=new InvocationContext(setResult);
+						this_1._invocationContextMap[message.invocationId]=invocationContext;
+						message.parameterValues.push(invocationContext);
+					}
+					if (!_isNullOrUndefined(definition.options) && definition.options.batch) {
+						isBatching=true;
+						for (var i_1=0; i_1 < batchArray.length; i_1++) {
+							if (batchArray[i_1].call===definition.call) {
+								batchIndex=i_1;
+								break;
+							}
 						}
 					}
 				}
@@ -29463,6 +33240,22 @@ var Excel;
 	}());
 	Excel.CustomFunctionProxy=CustomFunctionProxy;
 	Excel.customFunctionProxy=new CustomFunctionProxy();
+	var CustomFunctions=(function () {
+		function CustomFunctions() {
+		}
+		CustomFunctions.initialize=function () {
+			var context=new Excel.RequestContext();
+			return Excel.customFunctionProxy.ensureInit(context)
+				.then(function () {
+				var apiDummyCustomFunction=context.workbook.customFunctions._Add(Excel.CustomFunctionType.script, "", "", Excel.CustomFunctionType.invalid, Excel.CustomFunctionDimensionality.invalid, false, false, false, []);
+				return context.sync()
+					.catch(function (error) {
+				});
+			});
+		};
+		return CustomFunctions;
+	}());
+	Excel.CustomFunctions=CustomFunctions;
 	var CustomFunctionCollection=(function (_super) {
 		__extends(CustomFunctionCollection, _super);
 		function CustomFunctionCollection() {
@@ -29501,10 +33294,10 @@ var Excel;
 			configurable: true
 		});
 		CustomFunctionCollection.prototype.deleteAll=function () {
-			_createMethodAction(this.context, this, "DeleteAll", 0, [], false);
+			_createMethodAction(this.context, this, "DeleteAll", 0, [], 0);
 		};
 		CustomFunctionCollection.prototype.getCount=function () {
-			var action=_createMethodAction(this.context, this, "GetCount", 1, [], false);
+			var action=_createMethodAction(this.context, this, "GetCount", 1, [], 4);
 			var ret=new OfficeExtension.ClientResult();
 			_addActionResultHandler(this, action, ret);
 			return ret;
@@ -29513,32 +33306,59 @@ var Excel;
 			return new Excel.CustomFunction(this.context, _createIndexerObjectPath(this.context, this, [name]));
 		};
 		CustomFunctionCollection.prototype.getItemOrNullObject=function (name) {
-			return new Excel.CustomFunction(this.context, _createMethodObjectPath(this.context, this, "GetItemOrNullObject", 1, [name], false, false, null, false));
+			return new Excel.CustomFunction(this.context, _createMethodObjectPath(this.context, this, "GetItemOrNullObject", 1, [name], false, false, null, 4));
 		};
 		CustomFunctionCollection.prototype.importFromWeb=function (metadataFormat, metadataUrl, name) {
-			return new Excel.CustomFunction(this.context, _createMethodObjectPath(this.context, this, "ImportFromWeb", 0, [metadataFormat, metadataUrl, name], false, false, null, false));
+			return new Excel.CustomFunction(this.context, _createMethodObjectPath(this.context, this, "ImportFromWeb", 0, [metadataFormat, metadataUrl, name], false, false, null, 0));
 		};
 		CustomFunctionCollection.prototype._Add=function (type, name, description, resultType, resultDimensionality, streaming, batching, cancelable, parameters) {
-			var majorVersionNumber=16;
-			var minorVersionNumber=0;
-			var buildNumberWithBatchingSupport=8809;
-			var buildNumberWithCancellationSupport=8816;
-			if (versionNumberIsEarlierThan(majorVersionNumber, minorVersionNumber, buildNumberWithBatchingSupport)) {
+			if (versionNumberIsEarlierThan({
+				mac: { desiredMajor: 16, desiredMinor: 8, desiredBuild: 1109 },
+				ios: { desiredMajor: 2, desiredMinor: 8, desiredBuild: 1109 },
+				general: { desiredMajor: 16, desiredMinor: 0, desiredBuild: 8809 }
+			})) {
 				return new Excel.CustomFunction(this.context, _createMethodObjectPath(this.context, this, "_Add", 0, [type, name, description, resultType, resultDimensionality, streaming, parameters], false, false, null, false));
 			}
-			else if (versionNumberIsEarlierThan(majorVersionNumber, minorVersionNumber, buildNumberWithCancellationSupport)) {
+			else if (versionNumberIsEarlierThan({
+				mac: { desiredMajor: 16, desiredMinor: 8, desiredBuild: 1116 },
+				ios: { desiredMajor: 2, desiredMinor: 8, desiredBuild: 1116 },
+				general: { desiredMajor: 16, desiredMinor: 0, desiredBuild: 8816 }
+			})) {
 				return new Excel.CustomFunction(this.context, _createMethodObjectPath(this.context, this, "_Add", 0, [type, name, description, resultType, resultDimensionality, streaming, batching, parameters], false, false, null, false));
 			}
-			return new Excel.CustomFunction(this.context, _createMethodObjectPath(this.context, this, "_Add", 0, [type, name, description, resultType, resultDimensionality, streaming, batching, cancelable, parameters], false, false, null, false));
+			return new Excel.CustomFunction(this.context, _createMethodObjectPath(this.context, this, "_Add", 0, [type, name, description, resultType, resultDimensionality, streaming, batching, cancelable, parameters], false, false, null, 0));
 		};
 		CustomFunctionCollection.prototype._SetInvocationError=function (invocationId, message) {
-			_createMethodAction(this.context, this, "_SetInvocationError", 0, [invocationId, message], false);
+			if (versionNumberIsEarlierThan({
+				mac: { desiredMajor: 16, desiredMinor: 12, desiredBuild: 326 },
+				ios: { desiredMajor: 2, desiredMinor: 12, desiredBuild: 326 },
+				general: { desiredMajor: 16, desiredMinor: 0, desiredBuild: 9226 }
+			})) {
+				_createMethodAction(this.context, this, "_SetInvocationError", 0, [invocationId, message], false);
+				return;
+			}
+			_createMethodAction(this.context, this, "_SetInvocationError", 1, [invocationId, message], 0);
 		};
 		CustomFunctionCollection.prototype._SetInvocationResult=function (invocationId, result) {
-			_createMethodAction(this.context, this, "_SetInvocationResult", 0, [invocationId, result], false);
+			if (versionNumberIsEarlierThan({
+				mac: { desiredMajor: 16, desiredMinor: 12, desiredBuild: 326 },
+				ios: { desiredMajor: 2, desiredMinor: 12, desiredBuild: 326 },
+				general: { desiredMajor: 16, desiredMinor: 0, desiredBuild: 9226 }
+			})) {
+				_createMethodAction(this.context, this, "_SetInvocationResult", 0, [invocationId, result], false);
+				return;
+			}
+			_createMethodAction(this.context, this, "_SetInvocationResult", 1, [invocationId, result], 0);
 		};
 		CustomFunctionCollection.prototype._UpdateAutoCompleteList=function (filtered) {
-			_createMethodAction(this.context, this, "_UpdateAutoCompleteList", 0, [filtered], false);
+			if (versionNumberIsEarlierThan({
+				mac: { desiredMajor: 16, desiredMinor: 10, desiredBuild: 210 },
+				ios: { desiredMajor: 2, desiredMinor: 10, desiredBuild: 206 },
+				general: { desiredMajor: 16, desiredMinor: 0, desiredBuild: 9012 }
+			})) {
+				return;
+			}
+			_createMethodAction(this.context, this, "_UpdateAutoCompleteList", 0, [filtered], 0);
 		};
 		CustomFunctionCollection.prototype._handleResult=function (value) {
 			_super.prototype._handleResult.call(this, value);
@@ -29588,14 +33408,14 @@ var Excel;
 		});
 		Object.defineProperty(Style.prototype, "_scalarPropertyNames", {
 			get: function () {
-				return ["addIndent", "builtIn", "formulaHidden", "horizontalAlignment", "includeAlignment", "includeBorder", "includeFont", "includeNumber", "includePatterns", "includeProtection", "indentLevel", "locked", "name", "numberFormat", "numberFormatLocal", "orientation", "readingOrder", "shrinkToFit", "verticalAlignment", "wrapText"];
+				return ["builtIn", "formulaHidden", "horizontalAlignment", "includeAlignment", "includeBorder", "includeFont", "includeNumber", "includePatterns", "includeProtection", "indentLevel", "locked", "name", "numberFormat", "numberFormatLocal", "readingOrder", "shrinkToFit", "verticalAlignment", "wrapText", "textOrientation", "autoIndent"];
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(Style.prototype, "_scalarPropertyUpdateable", {
 			get: function () {
-				return [true, false, true, true, true, true, true, true, true, true, true, true, false, true, true, true, true, true, true, true];
+				return [false, true, true, true, true, true, true, true, true, true, true, false, true, true, true, true, true, true, true, true];
 			},
 			enumerable: true,
 			configurable: true
@@ -29610,7 +33430,7 @@ var Excel;
 		Object.defineProperty(Style.prototype, "borders", {
 			get: function () {
 				if (!this._B) {
-					this._B=new Excel.RangeBorderCollection(this.context, _createPropertyObjectPath(this.context, this, "Borders", true, false, false));
+					this._B=new Excel.RangeBorderCollection(this.context, _createPropertyObjectPath(this.context, this, "Borders", true, false, 4));
 				}
 				return this._B;
 			},
@@ -29620,7 +33440,7 @@ var Excel;
 		Object.defineProperty(Style.prototype, "fill", {
 			get: function () {
 				if (!this._F) {
-					this._F=new Excel.RangeFill(this.context, _createPropertyObjectPath(this.context, this, "Fill", false, false, false));
+					this._F=new Excel.RangeFill(this.context, _createPropertyObjectPath(this.context, this, "Fill", false, false, 4));
 				}
 				return this._F;
 			},
@@ -29630,21 +33450,21 @@ var Excel;
 		Object.defineProperty(Style.prototype, "font", {
 			get: function () {
 				if (!this._Fo) {
-					this._Fo=new Excel.RangeFont(this.context, _createPropertyObjectPath(this.context, this, "Font", false, false, false));
+					this._Fo=new Excel.RangeFont(this.context, _createPropertyObjectPath(this.context, this, "Font", false, false, 4));
 				}
 				return this._Fo;
 			},
 			enumerable: true,
 			configurable: true
 		});
-		Object.defineProperty(Style.prototype, "addIndent", {
+		Object.defineProperty(Style.prototype, "autoIndent", {
 			get: function () {
-				_throwIfNotLoaded("addIndent", this._A, _typeStyle, this._isNull);
-				return this._A;
+				_throwIfNotLoaded("autoIndent", this.m_autoIndent, _typeStyle, this._isNull);
+				return this.m_autoIndent;
 			},
 			set: function (value) {
-				this._A=value;
-				_createSetPropertyAction(this.context, this, "AddIndent", value);
+				this.m_autoIndent=value;
+				_createSetPropertyAction(this.context, this, "AutoIndent", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -29664,7 +33484,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._For=value;
-				_createSetPropertyAction(this.context, this, "FormulaHidden", value);
+				_createSetPropertyAction(this.context, this, "FormulaHidden", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -29676,7 +33496,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._H=value;
-				_createSetPropertyAction(this.context, this, "HorizontalAlignment", value);
+				_createSetPropertyAction(this.context, this, "HorizontalAlignment", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -29688,7 +33508,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._I=value;
-				_createSetPropertyAction(this.context, this, "IncludeAlignment", value);
+				_createSetPropertyAction(this.context, this, "IncludeAlignment", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -29700,7 +33520,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._In=value;
-				_createSetPropertyAction(this.context, this, "IncludeBorder", value);
+				_createSetPropertyAction(this.context, this, "IncludeBorder", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -29712,7 +33532,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._Inc=value;
-				_createSetPropertyAction(this.context, this, "IncludeFont", value);
+				_createSetPropertyAction(this.context, this, "IncludeFont", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -29724,7 +33544,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._Incl=value;
-				_createSetPropertyAction(this.context, this, "IncludeNumber", value);
+				_createSetPropertyAction(this.context, this, "IncludeNumber", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -29736,7 +33556,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._Inclu=value;
-				_createSetPropertyAction(this.context, this, "IncludePatterns", value);
+				_createSetPropertyAction(this.context, this, "IncludePatterns", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -29748,7 +33568,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._Includ=value;
-				_createSetPropertyAction(this.context, this, "IncludeProtection", value);
+				_createSetPropertyAction(this.context, this, "IncludeProtection", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -29760,7 +33580,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._Ind=value;
-				_createSetPropertyAction(this.context, this, "IndentLevel", value);
+				_createSetPropertyAction(this.context, this, "IndentLevel", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -29772,7 +33592,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._L=value;
-				_createSetPropertyAction(this.context, this, "Locked", value);
+				_createSetPropertyAction(this.context, this, "Locked", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -29792,7 +33612,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._Nu=value;
-				_createSetPropertyAction(this.context, this, "NumberFormat", value);
+				_createSetPropertyAction(this.context, this, "NumberFormat", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -29804,19 +33624,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._Num=value;
-				_createSetPropertyAction(this.context, this, "NumberFormatLocal", value);
-			},
-			enumerable: true,
-			configurable: true
-		});
-		Object.defineProperty(Style.prototype, "orientation", {
-			get: function () {
-				_throwIfNotLoaded("orientation", this._O, _typeStyle, this._isNull);
-				return this._O;
-			},
-			set: function (value) {
-				this._O=value;
-				_createSetPropertyAction(this.context, this, "Orientation", value);
+				_createSetPropertyAction(this.context, this, "NumberFormatLocal", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -29828,7 +33636,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._R=value;
-				_createSetPropertyAction(this.context, this, "ReadingOrder", value);
+				_createSetPropertyAction(this.context, this, "ReadingOrder", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -29840,7 +33648,24 @@ var Excel;
 			},
 			set: function (value) {
 				this._S=value;
-				_createSetPropertyAction(this.context, this, "ShrinkToFit", value);
+				_createSetPropertyAction(this.context, this, "ShrinkToFit", value, 0);
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(Style.prototype, "textOrientation", {
+			get: function () {
+				_throwIfNotLoaded("textOrientation", this.m_textOrientation, _typeStyle, this._isNull);
+				return this.m_textOrientation;
+			},
+			set: function (value) {
+				if (ALWAYS_TRUE_PLACEHOLDER_OVERRIDE) {
+					this.m_textOrientation=value;
+					_createSetPropertyAction(this.context, this, "Orientation", value);
+					return;
+				}
+				this.m_textOrientation=value;
+				_createSetPropertyAction(this.context, this, "TextOrientation", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -29852,7 +33677,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._V=value;
-				_createSetPropertyAction(this.context, this, "VerticalAlignment", value);
+				_createSetPropertyAction(this.context, this, "VerticalAlignment", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -29864,21 +33689,23 @@ var Excel;
 			},
 			set: function (value) {
 				this._W=value;
-				_createSetPropertyAction(this.context, this, "WrapText", value);
+				_createSetPropertyAction(this.context, this, "WrapText", value, 0);
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Style.prototype.set=function (properties, options) {
-			this._recursivelySet(properties, options, ["addIndent", "formulaHidden", "horizontalAlignment", "includeAlignment", "includeBorder", "includeFont", "includeNumber", "includePatterns", "includeProtection", "indentLevel", "locked", "numberFormat", "numberFormatLocal", "orientation", "readingOrder", "shrinkToFit", "verticalAlignment", "wrapText"], ["font", "fill"], [
-				"borders"
+			this._recursivelySet(properties, options, ["formulaHidden", "horizontalAlignment", "includeAlignment", "includeBorder", "includeFont", "includeNumber", "includePatterns", "includeProtection", "indentLevel", "locked", "numberFormat", "numberFormatLocal", "readingOrder", "shrinkToFit", "verticalAlignment", "wrapText", "textOrientation", "autoIndent"], ["font", "fill"], [
+				"addIndent",
+				"borders",
+				"orientation"
 			]);
 		};
 		Style.prototype.update=function (properties) {
 			this._recursivelyUpdate(properties);
 		};
 		Style.prototype.delete=function () {
-			_createMethodAction(this.context, this, "Delete", 0, [], false);
+			_createMethodAction(this.context, this, "Delete", 0, [], 0);
 		};
 		Style.prototype._handleResult=function (value) {
 			_super.prototype._handleResult.call(this, value);
@@ -29887,7 +33714,13 @@ var Excel;
 			var obj=value;
 			_fixObjectPathIfNecessary(this, obj);
 			if (!_isUndefined(obj["AddIndent"])) {
-				this._A=obj["AddIndent"];
+				this.m_autoIndent=obj["AddIndent"];
+			}
+			if (!_isUndefined(obj["Orientation"])) {
+				this.m_textOrientation=obj["Orientation"];
+			}
+			if (!_isUndefined(obj["AutoIndent"])) {
+				this.m_autoIndent=obj["AutoIndent"];
 			}
 			if (!_isUndefined(obj["BuiltIn"])) {
 				this._Bu=obj["BuiltIn"];
@@ -29931,14 +33764,14 @@ var Excel;
 			if (!_isUndefined(obj["NumberFormatLocal"])) {
 				this._Num=obj["NumberFormatLocal"];
 			}
-			if (!_isUndefined(obj["Orientation"])) {
-				this._O=obj["Orientation"];
-			}
 			if (!_isUndefined(obj["ReadingOrder"])) {
 				this._R=obj["ReadingOrder"];
 			}
 			if (!_isUndefined(obj["ShrinkToFit"])) {
 				this._S=obj["ShrinkToFit"];
+			}
+			if (!_isUndefined(obj["TextOrientation"])) {
+				this.m_textOrientation=obj["TextOrientation"];
 			}
 			if (!_isUndefined(obj["VerticalAlignment"])) {
 				this._V=obj["VerticalAlignment"];
@@ -29960,7 +33793,7 @@ var Excel;
 		};
 		Style.prototype.toJSON=function () {
 			return _toJson(this, {
-				"addIndent": this._A,
+				"autoIndent": this.m_autoIndent,
 				"builtIn": this._Bu,
 				"formulaHidden": this._For,
 				"horizontalAlignment": this._H,
@@ -29975,9 +33808,9 @@ var Excel;
 				"name": this._N,
 				"numberFormat": this._Nu,
 				"numberFormatLocal": this._Num,
-				"orientation": this._O,
 				"readingOrder": this._R,
 				"shrinkToFit": this._S,
+				"textOrientation": this.m_textOrientation,
 				"verticalAlignment": this._V,
 				"wrapText": this._W,
 			}, {
@@ -30022,7 +33855,7 @@ var Excel;
 			configurable: true
 		});
 		StyleCollection.prototype.add=function (name) {
-			_createMethodAction(this.context, this, "Add", 0, [name], false);
+			_createMethodAction(this.context, this, "Add", 0, [name], 0);
 		};
 		StyleCollection.prototype.getItem=function (name) {
 			return new Excel.Style(this.context, _createIndexerObjectPath(this.context, this, [name]));
@@ -30075,87 +33908,87 @@ var Excel;
 		});
 		InternalTest.prototype.compareTempFilesAreIdentical=function (filename1, filename2) {
 			_throwIfApiNotSupported("InternalTest.compareTempFilesAreIdentical", _defaultApiSetName, "1.8", _hostName);
-			var action=_createMethodAction(this.context, this, "CompareTempFilesAreIdentical", 0, [filename1, filename2], false);
+			var action=_createMethodAction(this.context, this, "CompareTempFilesAreIdentical", 0, [filename1, filename2], 0);
 			var ret=new OfficeExtension.ClientResult();
 			_addActionResultHandler(this, action, ret);
 			return ret;
 		};
 		InternalTest.prototype.delay=function (seconds) {
-			var action=_createMethodAction(this.context, this, "Delay", 0, [seconds], false);
+			var action=_createMethodAction(this.context, this, "Delay", 0, [seconds], 0);
 			var ret=new OfficeExtension.ClientResult();
 			_addActionResultHandler(this, action, ret);
 			return ret;
 		};
 		InternalTest.prototype.deserializeCustomFunctions=function (serializedString) {
 			_throwIfApiNotSupported("InternalTest.deserializeCustomFunctions", "CustomFunctions", "1.1", _hostName);
-			_createMethodAction(this.context, this, "DeserializeCustomFunctions", 0, [serializedString], false);
+			_createMethodAction(this.context, this, "DeserializeCustomFunctions", 0, [serializedString], 0);
 		};
 		InternalTest.prototype.firstPartyMethod=function () {
 			_throwIfApiNotSupported("InternalTest.firstPartyMethod", _defaultApiSetName, "1.7", _hostName);
-			_createMethodAction(this.context, this, "FirstPartyMethod", 1, [], true);
+			_createMethodAction(this.context, this, "FirstPartyMethod", 1, [], 4 | 1);
 		};
 		InternalTest.prototype.saveWorkbookToTempFile=function (filename) {
 			_throwIfApiNotSupported("InternalTest.saveWorkbookToTempFile", _defaultApiSetName, "1.8", _hostName);
-			_createMethodAction(this.context, this, "SaveWorkbookToTempFile", 0, [filename], false);
+			_createMethodAction(this.context, this, "SaveWorkbookToTempFile", 0, [filename], 0);
 		};
 		InternalTest.prototype.serializeCustomFunctions=function () {
 			_throwIfApiNotSupported("InternalTest.serializeCustomFunctions", "CustomFunctions", "1.1", _hostName);
-			var action=_createMethodAction(this.context, this, "SerializeCustomFunctions", 0, [], false);
+			var action=_createMethodAction(this.context, this, "SerializeCustomFunctions", 0, [], 0);
 			var ret=new OfficeExtension.ClientResult();
 			_addActionResultHandler(this, action, ret);
 			return ret;
 		};
 		InternalTest.prototype.triggerMessage=function (messageCategory, messageType, targetId, message) {
 			_throwIfApiNotSupported("InternalTest.triggerMessage", _defaultApiSetName, "1.7", _hostName);
-			_createMethodAction(this.context, this, "TriggerMessage", 0, [messageCategory, messageType, targetId, message], false);
+			_createMethodAction(this.context, this, "TriggerMessage", 0, [messageCategory, messageType, targetId, message], 0);
 		};
 		InternalTest.prototype.triggerPostProcess=function () {
 			_throwIfApiNotSupported("InternalTest.triggerPostProcess", _defaultApiSetName, "1.7", _hostName);
-			_createMethodAction(this.context, this, "TriggerPostProcess", 0, [], false);
+			_createMethodAction(this.context, this, "TriggerPostProcess", 0, [], 0);
 		};
 		InternalTest.prototype.triggerTestEvent=function (prop1, worksheet) {
 			_throwIfApiNotSupported("InternalTest.triggerTestEvent", _defaultApiSetName, "1.7", _hostName);
-			_createMethodAction(this.context, this, "TriggerTestEvent", 0, [prop1, worksheet], false);
+			_createMethodAction(this.context, this, "TriggerTestEvent", 0, [prop1, worksheet], 0);
 		};
 		InternalTest.prototype.triggerTestEventWithFilter=function (prop1, msgType, worksheet) {
 			_throwIfApiNotSupported("InternalTest.triggerTestEventWithFilter", _defaultApiSetName, "1.7", _hostName);
-			_createMethodAction(this.context, this, "TriggerTestEventWithFilter", 0, [prop1, msgType, worksheet], false);
+			_createMethodAction(this.context, this, "TriggerTestEventWithFilter", 0, [prop1, msgType, worksheet], 0);
 		};
 		InternalTest.prototype.unregisterAllCustomFunctionExecutionEvents=function () {
 			_throwIfApiNotSupported("InternalTest.unregisterAllCustomFunctionExecutionEvents", "CustomFunctions", "1.1", _hostName);
-			_createMethodAction(this.context, this, "UnregisterAllCustomFunctionExecutionEvents", 0, [], false);
+			_createMethodAction(this.context, this, "UnregisterAllCustomFunctionExecutionEvents", 0, [], 0);
 		};
 		InternalTest.prototype._RegisterCustomFunctionExecutionBeginEvent=function () {
 			_throwIfApiNotSupported("InternalTest._RegisterCustomFunctionExecutionBeginEvent", "CustomFunctions", "1.1", _hostName);
-			_createMethodAction(this.context, this, "_RegisterCustomFunctionExecutionBeginEvent", 0, [], false);
+			_createMethodAction(this.context, this, "_RegisterCustomFunctionExecutionBeginEvent", 0, [], 0);
 		};
 		InternalTest.prototype._RegisterCustomFunctionExecutionEndEvent=function () {
 			_throwIfApiNotSupported("InternalTest._RegisterCustomFunctionExecutionEndEvent", "CustomFunctions", "1.1", _hostName);
-			_createMethodAction(this.context, this, "_RegisterCustomFunctionExecutionEndEvent", 0, [], false);
+			_createMethodAction(this.context, this, "_RegisterCustomFunctionExecutionEndEvent", 0, [], 0);
 		};
 		InternalTest.prototype._RegisterTest1Event=function () {
 			_throwIfApiNotSupported("InternalTest._RegisterTest1Event", _defaultApiSetName, "1.7", _hostName);
-			_createMethodAction(this.context, this, "_RegisterTest1Event", 0, [], false);
+			_createMethodAction(this.context, this, "_RegisterTest1Event", 0, [], 0);
 		};
 		InternalTest.prototype._RegisterTestEvent=function () {
 			_throwIfApiNotSupported("InternalTest._RegisterTestEvent", _defaultApiSetName, "1.7", _hostName);
-			_createMethodAction(this.context, this, "_RegisterTestEvent", 0, [], false);
+			_createMethodAction(this.context, this, "_RegisterTestEvent", 0, [], 0);
 		};
 		InternalTest.prototype._UnregisterCustomFunctionExecutionBeginEvent=function () {
 			_throwIfApiNotSupported("InternalTest._UnregisterCustomFunctionExecutionBeginEvent", "CustomFunctions", "1.1", _hostName);
-			_createMethodAction(this.context, this, "_UnregisterCustomFunctionExecutionBeginEvent", 0, [], false);
+			_createMethodAction(this.context, this, "_UnregisterCustomFunctionExecutionBeginEvent", 0, [], 0);
 		};
 		InternalTest.prototype._UnregisterCustomFunctionExecutionEndEvent=function () {
 			_throwIfApiNotSupported("InternalTest._UnregisterCustomFunctionExecutionEndEvent", "CustomFunctions", "1.1", _hostName);
-			_createMethodAction(this.context, this, "_UnregisterCustomFunctionExecutionEndEvent", 0, [], false);
+			_createMethodAction(this.context, this, "_UnregisterCustomFunctionExecutionEndEvent", 0, [], 0);
 		};
 		InternalTest.prototype._UnregisterTest1Event=function () {
 			_throwIfApiNotSupported("InternalTest._UnregisterTest1Event", _defaultApiSetName, "1.7", _hostName);
-			_createMethodAction(this.context, this, "_UnregisterTest1Event", 0, [], false);
+			_createMethodAction(this.context, this, "_UnregisterTest1Event", 0, [], 0);
 		};
 		InternalTest.prototype._UnregisterTestEvent=function () {
 			_throwIfApiNotSupported("InternalTest._UnregisterTestEvent", _defaultApiSetName, "1.7", _hostName);
-			_createMethodAction(this.context, this, "_UnregisterTestEvent", 0, [], false);
+			_createMethodAction(this.context, this, "_UnregisterTestEvent", 0, [], 0);
 		};
 		InternalTest.prototype._handleResult=function (value) {
 			_super.prototype._handleResult.call(this, value);
@@ -30304,7 +34137,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._B=value;
-				_createSetPropertyAction(this.context, this, "BlackAndWhite", value);
+				_createSetPropertyAction(this.context, this, "BlackAndWhite", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -30316,7 +34149,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._O=value;
-				_createSetPropertyAction(this.context, this, "Orientation", value);
+				_createSetPropertyAction(this.context, this, "Orientation", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -30328,7 +34161,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._P=value;
-				_createSetPropertyAction(this.context, this, "PaperSize", value);
+				_createSetPropertyAction(this.context, this, "PaperSize", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -30340,7 +34173,7 @@ var Excel;
 			},
 			set: function (value) {
 				this._Pr=value;
-				_createSetPropertyAction(this.context, this, "PrintErrors", value);
+				_createSetPropertyAction(this.context, this, "PrintErrors", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -30409,7 +34242,7 @@ var Excel;
 			configurable: true
 		});
 		DataConnectionCollection.prototype.refreshAll=function () {
-			_createMethodAction(this.context, this, "RefreshAll", 0, [], false);
+			_createMethodAction(this.context, this, "RefreshAll", 0, [], 0);
 		};
 		DataConnectionCollection.prototype._handleResult=function (value) {
 			_super.prototype._handleResult.call(this, value);
@@ -30457,10 +34290,13 @@ var Excel;
 			configurable: true
 		});
 		AreaCollection.prototype.getCount=function () {
-			var action=_createMethodAction(this.context, this, "GetCount", 1, [], false);
+			var action=_createMethodAction(this.context, this, "GetCount", 1, [], 4);
 			var ret=new OfficeExtension.ClientResult();
 			_addActionResultHandler(this, action, ret);
 			return ret;
+		};
+		AreaCollection.prototype.getItemAt=function (index) {
+			return new Excel.Range(this.context, _createMethodObjectPath(this.context, this, "GetItemAt", 1, [index], false, false, null, 4));
 		};
 		AreaCollection.prototype._handleResult=function (value) {
 			_super.prototype._handleResult.call(this, value);
@@ -30497,885 +34333,946 @@ var Excel;
 	Excel.AreaCollection=AreaCollection;
 	var AxisType;
 	(function (AxisType) {
-		AxisType.invalid="Invalid";
-		AxisType.category="Category";
-		AxisType.value="Value";
-		AxisType.series="Series";
+		AxisType["invalid"]="Invalid";
+		AxisType["category"]="Category";
+		AxisType["value"]="Value";
+		AxisType["series"]="Series";
 	})(AxisType=Excel.AxisType || (Excel.AxisType={}));
 	var AxisGroup;
 	(function (AxisGroup) {
-		AxisGroup.primary="Primary";
-		AxisGroup.secondary="Secondary";
+		AxisGroup["primary"]="Primary";
+		AxisGroup["secondary"]="Secondary";
 	})(AxisGroup=Excel.AxisGroup || (Excel.AxisGroup={}));
 	var AxisScaleType;
 	(function (AxisScaleType) {
-		AxisScaleType.linear="Linear";
-		AxisScaleType.logarithmic="Logarithmic";
+		AxisScaleType["linear"]="Linear";
+		AxisScaleType["logarithmic"]="Logarithmic";
 	})(AxisScaleType=Excel.AxisScaleType || (Excel.AxisScaleType={}));
 	var AxisCrosses;
 	(function (AxisCrosses) {
-		AxisCrosses.automatic="Automatic";
-		AxisCrosses.maximum="Maximum";
-		AxisCrosses.minimum="Minimum";
-		AxisCrosses.custom="Custom";
+		AxisCrosses["automatic"]="Automatic";
+		AxisCrosses["maximum"]="Maximum";
+		AxisCrosses["minimum"]="Minimum";
+		AxisCrosses["custom"]="Custom";
 	})(AxisCrosses=Excel.AxisCrosses || (Excel.AxisCrosses={}));
 	var AxisTickMark;
 	(function (AxisTickMark) {
-		AxisTickMark.none="None";
-		AxisTickMark.cross="Cross";
-		AxisTickMark.inside="Inside";
-		AxisTickMark.outside="Outside";
+		AxisTickMark["none"]="None";
+		AxisTickMark["cross"]="Cross";
+		AxisTickMark["inside"]="Inside";
+		AxisTickMark["outside"]="Outside";
 	})(AxisTickMark=Excel.AxisTickMark || (Excel.AxisTickMark={}));
 	var AxisTickLabelPosition;
 	(function (AxisTickLabelPosition) {
-		AxisTickLabelPosition.nextToAxis="NextToAxis";
-		AxisTickLabelPosition.high="High";
-		AxisTickLabelPosition.low="Low";
-		AxisTickLabelPosition.none="None";
+		AxisTickLabelPosition["nextToAxis"]="NextToAxis";
+		AxisTickLabelPosition["high"]="High";
+		AxisTickLabelPosition["low"]="Low";
+		AxisTickLabelPosition["none"]="None";
 	})(AxisTickLabelPosition=Excel.AxisTickLabelPosition || (Excel.AxisTickLabelPosition={}));
 	var BindingType;
 	(function (BindingType) {
-		BindingType.range="Range";
-		BindingType.table="Table";
-		BindingType.text="Text";
+		BindingType["range"]="Range";
+		BindingType["table"]="Table";
+		BindingType["text"]="Text";
 	})(BindingType=Excel.BindingType || (Excel.BindingType={}));
 	var BorderIndex;
 	(function (BorderIndex) {
-		BorderIndex.edgeTop="EdgeTop";
-		BorderIndex.edgeBottom="EdgeBottom";
-		BorderIndex.edgeLeft="EdgeLeft";
-		BorderIndex.edgeRight="EdgeRight";
-		BorderIndex.insideVertical="InsideVertical";
-		BorderIndex.insideHorizontal="InsideHorizontal";
-		BorderIndex.diagonalDown="DiagonalDown";
-		BorderIndex.diagonalUp="DiagonalUp";
+		BorderIndex["edgeTop"]="EdgeTop";
+		BorderIndex["edgeBottom"]="EdgeBottom";
+		BorderIndex["edgeLeft"]="EdgeLeft";
+		BorderIndex["edgeRight"]="EdgeRight";
+		BorderIndex["insideVertical"]="InsideVertical";
+		BorderIndex["insideHorizontal"]="InsideHorizontal";
+		BorderIndex["diagonalDown"]="DiagonalDown";
+		BorderIndex["diagonalUp"]="DiagonalUp";
 	})(BorderIndex=Excel.BorderIndex || (Excel.BorderIndex={}));
 	var BorderLineStyle;
 	(function (BorderLineStyle) {
-		BorderLineStyle.none="None";
-		BorderLineStyle.continuous="Continuous";
-		BorderLineStyle.dash="Dash";
-		BorderLineStyle.dashDot="DashDot";
-		BorderLineStyle.dashDotDot="DashDotDot";
-		BorderLineStyle.dot="Dot";
-		BorderLineStyle.double="Double";
-		BorderLineStyle.slantDashDot="SlantDashDot";
+		BorderLineStyle["none"]="None";
+		BorderLineStyle["continuous"]="Continuous";
+		BorderLineStyle["dash"]="Dash";
+		BorderLineStyle["dashDot"]="DashDot";
+		BorderLineStyle["dashDotDot"]="DashDotDot";
+		BorderLineStyle["dot"]="Dot";
+		BorderLineStyle["double"]="Double";
+		BorderLineStyle["slantDashDot"]="SlantDashDot";
 	})(BorderLineStyle=Excel.BorderLineStyle || (Excel.BorderLineStyle={}));
 	var BorderWeight;
 	(function (BorderWeight) {
-		BorderWeight.hairline="Hairline";
-		BorderWeight.thin="Thin";
-		BorderWeight.medium="Medium";
-		BorderWeight.thick="Thick";
+		BorderWeight["hairline"]="Hairline";
+		BorderWeight["thin"]="Thin";
+		BorderWeight["medium"]="Medium";
+		BorderWeight["thick"]="Thick";
 	})(BorderWeight=Excel.BorderWeight || (Excel.BorderWeight={}));
 	var CalculationMode;
 	(function (CalculationMode) {
-		CalculationMode.automatic="Automatic";
-		CalculationMode.automaticExceptTables="AutomaticExceptTables";
-		CalculationMode.manual="Manual";
+		CalculationMode["automatic"]="Automatic";
+		CalculationMode["automaticExceptTables"]="AutomaticExceptTables";
+		CalculationMode["manual"]="Manual";
 	})(CalculationMode=Excel.CalculationMode || (Excel.CalculationMode={}));
 	var CalculationType;
 	(function (CalculationType) {
-		CalculationType.recalculate="Recalculate";
-		CalculationType.full="Full";
-		CalculationType.fullRebuild="FullRebuild";
+		CalculationType["recalculate"]="Recalculate";
+		CalculationType["full"]="Full";
+		CalculationType["fullRebuild"]="FullRebuild";
 	})(CalculationType=Excel.CalculationType || (Excel.CalculationType={}));
 	var ClearApplyTo;
 	(function (ClearApplyTo) {
-		ClearApplyTo.all="All";
-		ClearApplyTo.formats="Formats";
-		ClearApplyTo.contents="Contents";
-		ClearApplyTo.hyperlinks="Hyperlinks";
-		ClearApplyTo.removeHyperlinks="RemoveHyperlinks";
+		ClearApplyTo["all"]="All";
+		ClearApplyTo["formats"]="Formats";
+		ClearApplyTo["contents"]="Contents";
+		ClearApplyTo["hyperlinks"]="Hyperlinks";
+		ClearApplyTo["removeHyperlinks"]="RemoveHyperlinks";
 	})(ClearApplyTo=Excel.ClearApplyTo || (Excel.ClearApplyTo={}));
 	var ChartAxisDisplayUnit;
 	(function (ChartAxisDisplayUnit) {
-		ChartAxisDisplayUnit.none="None";
-		ChartAxisDisplayUnit.hundreds="Hundreds";
-		ChartAxisDisplayUnit.thousands="Thousands";
-		ChartAxisDisplayUnit.tenThousands="TenThousands";
-		ChartAxisDisplayUnit.hundredThousands="HundredThousands";
-		ChartAxisDisplayUnit.millions="Millions";
-		ChartAxisDisplayUnit.tenMillions="TenMillions";
-		ChartAxisDisplayUnit.hundredMillions="HundredMillions";
-		ChartAxisDisplayUnit.billions="Billions";
-		ChartAxisDisplayUnit.trillions="Trillions";
-		ChartAxisDisplayUnit.custom="Custom";
+		ChartAxisDisplayUnit["none"]="None";
+		ChartAxisDisplayUnit["hundreds"]="Hundreds";
+		ChartAxisDisplayUnit["thousands"]="Thousands";
+		ChartAxisDisplayUnit["tenThousands"]="TenThousands";
+		ChartAxisDisplayUnit["hundredThousands"]="HundredThousands";
+		ChartAxisDisplayUnit["millions"]="Millions";
+		ChartAxisDisplayUnit["tenMillions"]="TenMillions";
+		ChartAxisDisplayUnit["hundredMillions"]="HundredMillions";
+		ChartAxisDisplayUnit["billions"]="Billions";
+		ChartAxisDisplayUnit["trillions"]="Trillions";
+		ChartAxisDisplayUnit["custom"]="Custom";
 	})(ChartAxisDisplayUnit=Excel.ChartAxisDisplayUnit || (Excel.ChartAxisDisplayUnit={}));
 	var ChartAxisTimeUnit;
 	(function (ChartAxisTimeUnit) {
-		ChartAxisTimeUnit.days="Days";
-		ChartAxisTimeUnit.months="Months";
-		ChartAxisTimeUnit.years="Years";
+		ChartAxisTimeUnit["days"]="Days";
+		ChartAxisTimeUnit["months"]="Months";
+		ChartAxisTimeUnit["years"]="Years";
 	})(ChartAxisTimeUnit=Excel.ChartAxisTimeUnit || (Excel.ChartAxisTimeUnit={}));
 	var ChartAxisCategoryType;
 	(function (ChartAxisCategoryType) {
-		ChartAxisCategoryType.automatic="Automatic";
-		ChartAxisCategoryType.textAxis="TextAxis";
-		ChartAxisCategoryType.dateAxis="DateAxis";
+		ChartAxisCategoryType["automatic"]="Automatic";
+		ChartAxisCategoryType["textAxis"]="TextAxis";
+		ChartAxisCategoryType["dateAxis"]="DateAxis";
 	})(ChartAxisCategoryType=Excel.ChartAxisCategoryType || (Excel.ChartAxisCategoryType={}));
 	var ChartLineStyle;
 	(function (ChartLineStyle) {
-		ChartLineStyle.none="None";
-		ChartLineStyle.continuous="Continuous";
-		ChartLineStyle.dash="Dash";
-		ChartLineStyle.dashDot="DashDot";
-		ChartLineStyle.dashDotDot="DashDotDot";
-		ChartLineStyle.dot="Dot";
-		ChartLineStyle.grey25="Grey25";
-		ChartLineStyle.grey50="Grey50";
-		ChartLineStyle.grey75="Grey75";
-		ChartLineStyle.automatic="Automatic";
+		ChartLineStyle["none"]="None";
+		ChartLineStyle["continuous"]="Continuous";
+		ChartLineStyle["dash"]="Dash";
+		ChartLineStyle["dashDot"]="DashDot";
+		ChartLineStyle["dashDotDot"]="DashDotDot";
+		ChartLineStyle["dot"]="Dot";
+		ChartLineStyle["grey25"]="Grey25";
+		ChartLineStyle["grey50"]="Grey50";
+		ChartLineStyle["grey75"]="Grey75";
+		ChartLineStyle["automatic"]="Automatic";
+		ChartLineStyle["roundDot"]="RoundDot";
 	})(ChartLineStyle=Excel.ChartLineStyle || (Excel.ChartLineStyle={}));
 	var ChartDataLabelPosition;
 	(function (ChartDataLabelPosition) {
-		ChartDataLabelPosition.invalid="Invalid";
-		ChartDataLabelPosition.none="None";
-		ChartDataLabelPosition.center="Center";
-		ChartDataLabelPosition.insideEnd="InsideEnd";
-		ChartDataLabelPosition.insideBase="InsideBase";
-		ChartDataLabelPosition.outsideEnd="OutsideEnd";
-		ChartDataLabelPosition.left="Left";
-		ChartDataLabelPosition.right="Right";
-		ChartDataLabelPosition.top="Top";
-		ChartDataLabelPosition.bottom="Bottom";
-		ChartDataLabelPosition.bestFit="BestFit";
-		ChartDataLabelPosition.callout="Callout";
+		ChartDataLabelPosition["invalid"]="Invalid";
+		ChartDataLabelPosition["none"]="None";
+		ChartDataLabelPosition["center"]="Center";
+		ChartDataLabelPosition["insideEnd"]="InsideEnd";
+		ChartDataLabelPosition["insideBase"]="InsideBase";
+		ChartDataLabelPosition["outsideEnd"]="OutsideEnd";
+		ChartDataLabelPosition["left"]="Left";
+		ChartDataLabelPosition["right"]="Right";
+		ChartDataLabelPosition["top"]="Top";
+		ChartDataLabelPosition["bottom"]="Bottom";
+		ChartDataLabelPosition["bestFit"]="BestFit";
+		ChartDataLabelPosition["callout"]="Callout";
 	})(ChartDataLabelPosition=Excel.ChartDataLabelPosition || (Excel.ChartDataLabelPosition={}));
+	var ChartErrorBarsInclude;
+	(function (ChartErrorBarsInclude) {
+		ChartErrorBarsInclude["both"]="Both";
+		ChartErrorBarsInclude["minusValues"]="MinusValues";
+		ChartErrorBarsInclude["plusValues"]="PlusValues";
+	})(ChartErrorBarsInclude=Excel.ChartErrorBarsInclude || (Excel.ChartErrorBarsInclude={}));
+	var ChartErrorBarsType;
+	(function (ChartErrorBarsType) {
+		ChartErrorBarsType["fixedValue"]="FixedValue";
+		ChartErrorBarsType["percent"]="Percent";
+		ChartErrorBarsType["stDev"]="StDev";
+		ChartErrorBarsType["stError"]="StError";
+		ChartErrorBarsType["custom"]="Custom";
+	})(ChartErrorBarsType=Excel.ChartErrorBarsType || (Excel.ChartErrorBarsType={}));
 	var ChartTitlePosition;
 	(function (ChartTitlePosition) {
-		ChartTitlePosition.automatic="Automatic";
-		ChartTitlePosition.top="Top";
-		ChartTitlePosition.bottom="Bottom";
-		ChartTitlePosition.left="Left";
-		ChartTitlePosition.right="Right";
+		ChartTitlePosition["automatic"]="Automatic";
+		ChartTitlePosition["top"]="Top";
+		ChartTitlePosition["bottom"]="Bottom";
+		ChartTitlePosition["left"]="Left";
+		ChartTitlePosition["right"]="Right";
 	})(ChartTitlePosition=Excel.ChartTitlePosition || (Excel.ChartTitlePosition={}));
 	var ChartLegendPosition;
 	(function (ChartLegendPosition) {
-		ChartLegendPosition.invalid="Invalid";
-		ChartLegendPosition.top="Top";
-		ChartLegendPosition.bottom="Bottom";
-		ChartLegendPosition.left="Left";
-		ChartLegendPosition.right="Right";
-		ChartLegendPosition.corner="Corner";
-		ChartLegendPosition.custom="Custom";
+		ChartLegendPosition["invalid"]="Invalid";
+		ChartLegendPosition["top"]="Top";
+		ChartLegendPosition["bottom"]="Bottom";
+		ChartLegendPosition["left"]="Left";
+		ChartLegendPosition["right"]="Right";
+		ChartLegendPosition["corner"]="Corner";
+		ChartLegendPosition["custom"]="Custom";
 	})(ChartLegendPosition=Excel.ChartLegendPosition || (Excel.ChartLegendPosition={}));
 	var ChartMarkerStyle;
 	(function (ChartMarkerStyle) {
-		ChartMarkerStyle.invalid="Invalid";
-		ChartMarkerStyle.automatic="Automatic";
-		ChartMarkerStyle.none="None";
-		ChartMarkerStyle.square="Square";
-		ChartMarkerStyle.diamond="Diamond";
-		ChartMarkerStyle.triangle="Triangle";
-		ChartMarkerStyle.x="X";
-		ChartMarkerStyle.star="Star";
-		ChartMarkerStyle.dot="Dot";
-		ChartMarkerStyle.dash="Dash";
-		ChartMarkerStyle.circle="Circle";
-		ChartMarkerStyle.plus="Plus";
-		ChartMarkerStyle.picture="Picture";
+		ChartMarkerStyle["invalid"]="Invalid";
+		ChartMarkerStyle["automatic"]="Automatic";
+		ChartMarkerStyle["none"]="None";
+		ChartMarkerStyle["square"]="Square";
+		ChartMarkerStyle["diamond"]="Diamond";
+		ChartMarkerStyle["triangle"]="Triangle";
+		ChartMarkerStyle["x"]="X";
+		ChartMarkerStyle["star"]="Star";
+		ChartMarkerStyle["dot"]="Dot";
+		ChartMarkerStyle["dash"]="Dash";
+		ChartMarkerStyle["circle"]="Circle";
+		ChartMarkerStyle["plus"]="Plus";
+		ChartMarkerStyle["picture"]="Picture";
 	})(ChartMarkerStyle=Excel.ChartMarkerStyle || (Excel.ChartMarkerStyle={}));
+	var ChartPlotAreaPosition;
+	(function (ChartPlotAreaPosition) {
+		ChartPlotAreaPosition["automatic"]="Automatic";
+		ChartPlotAreaPosition["custom"]="Custom";
+	})(ChartPlotAreaPosition=Excel.ChartPlotAreaPosition || (Excel.ChartPlotAreaPosition={}));
 	var ChartSeriesBy;
 	(function (ChartSeriesBy) {
-		ChartSeriesBy.auto="Auto";
-		ChartSeriesBy.columns="Columns";
-		ChartSeriesBy.rows="Rows";
+		ChartSeriesBy["auto"]="Auto";
+		ChartSeriesBy["columns"]="Columns";
+		ChartSeriesBy["rows"]="Rows";
 	})(ChartSeriesBy=Excel.ChartSeriesBy || (Excel.ChartSeriesBy={}));
 	var ChartTextHorizontalAlignment;
 	(function (ChartTextHorizontalAlignment) {
-		ChartTextHorizontalAlignment.center="Center";
-		ChartTextHorizontalAlignment.left="Left";
-		ChartTextHorizontalAlignment.right="Right";
-		ChartTextHorizontalAlignment.justify="Justify";
-		ChartTextHorizontalAlignment.distributed="Distributed";
+		ChartTextHorizontalAlignment["center"]="Center";
+		ChartTextHorizontalAlignment["left"]="Left";
+		ChartTextHorizontalAlignment["right"]="Right";
+		ChartTextHorizontalAlignment["justify"]="Justify";
+		ChartTextHorizontalAlignment["distributed"]="Distributed";
 	})(ChartTextHorizontalAlignment=Excel.ChartTextHorizontalAlignment || (Excel.ChartTextHorizontalAlignment={}));
 	var ChartTextVerticalAlignment;
 	(function (ChartTextVerticalAlignment) {
-		ChartTextVerticalAlignment.center="Center";
-		ChartTextVerticalAlignment.bottom="Bottom";
-		ChartTextVerticalAlignment.top="Top";
-		ChartTextVerticalAlignment.justify="Justify";
-		ChartTextVerticalAlignment.distributed="Distributed";
+		ChartTextVerticalAlignment["center"]="Center";
+		ChartTextVerticalAlignment["bottom"]="Bottom";
+		ChartTextVerticalAlignment["top"]="Top";
+		ChartTextVerticalAlignment["justify"]="Justify";
+		ChartTextVerticalAlignment["distributed"]="Distributed";
 	})(ChartTextVerticalAlignment=Excel.ChartTextVerticalAlignment || (Excel.ChartTextVerticalAlignment={}));
+	var ChartTickLabelAlignment;
+	(function (ChartTickLabelAlignment) {
+		ChartTickLabelAlignment["center"]="Center";
+		ChartTickLabelAlignment["left"]="Left";
+		ChartTickLabelAlignment["right"]="Right";
+	})(ChartTickLabelAlignment=Excel.ChartTickLabelAlignment || (Excel.ChartTickLabelAlignment={}));
 	var ChartType;
 	(function (ChartType) {
-		ChartType.invalid="Invalid";
-		ChartType.columnClustered="ColumnClustered";
-		ChartType.columnStacked="ColumnStacked";
-		ChartType.columnStacked100="ColumnStacked100";
-		ChartType._3DColumnClustered="3DColumnClustered";
-		ChartType._3DColumnStacked="3DColumnStacked";
-		ChartType._3DColumnStacked100="3DColumnStacked100";
-		ChartType.barClustered="BarClustered";
-		ChartType.barStacked="BarStacked";
-		ChartType.barStacked100="BarStacked100";
-		ChartType._3DBarClustered="3DBarClustered";
-		ChartType._3DBarStacked="3DBarStacked";
-		ChartType._3DBarStacked100="3DBarStacked100";
-		ChartType.lineStacked="LineStacked";
-		ChartType.lineStacked100="LineStacked100";
-		ChartType.lineMarkers="LineMarkers";
-		ChartType.lineMarkersStacked="LineMarkersStacked";
-		ChartType.lineMarkersStacked100="LineMarkersStacked100";
-		ChartType.pieOfPie="PieOfPie";
-		ChartType.pieExploded="PieExploded";
-		ChartType._3DPieExploded="3DPieExploded";
-		ChartType.barOfPie="BarOfPie";
-		ChartType.xyscatterSmooth="XYScatterSmooth";
-		ChartType.xyscatterSmoothNoMarkers="XYScatterSmoothNoMarkers";
-		ChartType.xyscatterLines="XYScatterLines";
-		ChartType.xyscatterLinesNoMarkers="XYScatterLinesNoMarkers";
-		ChartType.areaStacked="AreaStacked";
-		ChartType.areaStacked100="AreaStacked100";
-		ChartType._3DAreaStacked="3DAreaStacked";
-		ChartType._3DAreaStacked100="3DAreaStacked100";
-		ChartType.doughnutExploded="DoughnutExploded";
-		ChartType.radarMarkers="RadarMarkers";
-		ChartType.radarFilled="RadarFilled";
-		ChartType.surface="Surface";
-		ChartType.surfaceWireframe="SurfaceWireframe";
-		ChartType.surfaceTopView="SurfaceTopView";
-		ChartType.surfaceTopViewWireframe="SurfaceTopViewWireframe";
-		ChartType.bubble="Bubble";
-		ChartType.bubble3DEffect="Bubble3DEffect";
-		ChartType.stockHLC="StockHLC";
-		ChartType.stockOHLC="StockOHLC";
-		ChartType.stockVHLC="StockVHLC";
-		ChartType.stockVOHLC="StockVOHLC";
-		ChartType.cylinderColClustered="CylinderColClustered";
-		ChartType.cylinderColStacked="CylinderColStacked";
-		ChartType.cylinderColStacked100="CylinderColStacked100";
-		ChartType.cylinderBarClustered="CylinderBarClustered";
-		ChartType.cylinderBarStacked="CylinderBarStacked";
-		ChartType.cylinderBarStacked100="CylinderBarStacked100";
-		ChartType.cylinderCol="CylinderCol";
-		ChartType.coneColClustered="ConeColClustered";
-		ChartType.coneColStacked="ConeColStacked";
-		ChartType.coneColStacked100="ConeColStacked100";
-		ChartType.coneBarClustered="ConeBarClustered";
-		ChartType.coneBarStacked="ConeBarStacked";
-		ChartType.coneBarStacked100="ConeBarStacked100";
-		ChartType.coneCol="ConeCol";
-		ChartType.pyramidColClustered="PyramidColClustered";
-		ChartType.pyramidColStacked="PyramidColStacked";
-		ChartType.pyramidColStacked100="PyramidColStacked100";
-		ChartType.pyramidBarClustered="PyramidBarClustered";
-		ChartType.pyramidBarStacked="PyramidBarStacked";
-		ChartType.pyramidBarStacked100="PyramidBarStacked100";
-		ChartType.pyramidCol="PyramidCol";
-		ChartType._3DColumn="3DColumn";
-		ChartType.line="Line";
-		ChartType._3DLine="3DLine";
-		ChartType._3DPie="3DPie";
-		ChartType.pie="Pie";
-		ChartType.xyscatter="XYScatter";
-		ChartType._3DArea="3DArea";
-		ChartType.area="Area";
-		ChartType.doughnut="Doughnut";
-		ChartType.radar="Radar";
+		ChartType["invalid"]="Invalid";
+		ChartType["columnClustered"]="ColumnClustered";
+		ChartType["columnStacked"]="ColumnStacked";
+		ChartType["columnStacked100"]="ColumnStacked100";
+		ChartType["_3DColumnClustered"]="3DColumnClustered";
+		ChartType["_3DColumnStacked"]="3DColumnStacked";
+		ChartType["_3DColumnStacked100"]="3DColumnStacked100";
+		ChartType["barClustered"]="BarClustered";
+		ChartType["barStacked"]="BarStacked";
+		ChartType["barStacked100"]="BarStacked100";
+		ChartType["_3DBarClustered"]="3DBarClustered";
+		ChartType["_3DBarStacked"]="3DBarStacked";
+		ChartType["_3DBarStacked100"]="3DBarStacked100";
+		ChartType["lineStacked"]="LineStacked";
+		ChartType["lineStacked100"]="LineStacked100";
+		ChartType["lineMarkers"]="LineMarkers";
+		ChartType["lineMarkersStacked"]="LineMarkersStacked";
+		ChartType["lineMarkersStacked100"]="LineMarkersStacked100";
+		ChartType["pieOfPie"]="PieOfPie";
+		ChartType["pieExploded"]="PieExploded";
+		ChartType["_3DPieExploded"]="3DPieExploded";
+		ChartType["barOfPie"]="BarOfPie";
+		ChartType["xyscatterSmooth"]="XYScatterSmooth";
+		ChartType["xyscatterSmoothNoMarkers"]="XYScatterSmoothNoMarkers";
+		ChartType["xyscatterLines"]="XYScatterLines";
+		ChartType["xyscatterLinesNoMarkers"]="XYScatterLinesNoMarkers";
+		ChartType["areaStacked"]="AreaStacked";
+		ChartType["areaStacked100"]="AreaStacked100";
+		ChartType["_3DAreaStacked"]="3DAreaStacked";
+		ChartType["_3DAreaStacked100"]="3DAreaStacked100";
+		ChartType["doughnutExploded"]="DoughnutExploded";
+		ChartType["radarMarkers"]="RadarMarkers";
+		ChartType["radarFilled"]="RadarFilled";
+		ChartType["surface"]="Surface";
+		ChartType["surfaceWireframe"]="SurfaceWireframe";
+		ChartType["surfaceTopView"]="SurfaceTopView";
+		ChartType["surfaceTopViewWireframe"]="SurfaceTopViewWireframe";
+		ChartType["bubble"]="Bubble";
+		ChartType["bubble3DEffect"]="Bubble3DEffect";
+		ChartType["stockHLC"]="StockHLC";
+		ChartType["stockOHLC"]="StockOHLC";
+		ChartType["stockVHLC"]="StockVHLC";
+		ChartType["stockVOHLC"]="StockVOHLC";
+		ChartType["cylinderColClustered"]="CylinderColClustered";
+		ChartType["cylinderColStacked"]="CylinderColStacked";
+		ChartType["cylinderColStacked100"]="CylinderColStacked100";
+		ChartType["cylinderBarClustered"]="CylinderBarClustered";
+		ChartType["cylinderBarStacked"]="CylinderBarStacked";
+		ChartType["cylinderBarStacked100"]="CylinderBarStacked100";
+		ChartType["cylinderCol"]="CylinderCol";
+		ChartType["coneColClustered"]="ConeColClustered";
+		ChartType["coneColStacked"]="ConeColStacked";
+		ChartType["coneColStacked100"]="ConeColStacked100";
+		ChartType["coneBarClustered"]="ConeBarClustered";
+		ChartType["coneBarStacked"]="ConeBarStacked";
+		ChartType["coneBarStacked100"]="ConeBarStacked100";
+		ChartType["coneCol"]="ConeCol";
+		ChartType["pyramidColClustered"]="PyramidColClustered";
+		ChartType["pyramidColStacked"]="PyramidColStacked";
+		ChartType["pyramidColStacked100"]="PyramidColStacked100";
+		ChartType["pyramidBarClustered"]="PyramidBarClustered";
+		ChartType["pyramidBarStacked"]="PyramidBarStacked";
+		ChartType["pyramidBarStacked100"]="PyramidBarStacked100";
+		ChartType["pyramidCol"]="PyramidCol";
+		ChartType["_3DColumn"]="3DColumn";
+		ChartType["line"]="Line";
+		ChartType["_3DLine"]="3DLine";
+		ChartType["_3DPie"]="3DPie";
+		ChartType["pie"]="Pie";
+		ChartType["xyscatter"]="XYScatter";
+		ChartType["_3DArea"]="3DArea";
+		ChartType["area"]="Area";
+		ChartType["doughnut"]="Doughnut";
+		ChartType["radar"]="Radar";
 	})(ChartType=Excel.ChartType || (Excel.ChartType={}));
 	var ChartUnderlineStyle;
 	(function (ChartUnderlineStyle) {
-		ChartUnderlineStyle.none="None";
-		ChartUnderlineStyle.single="Single";
+		ChartUnderlineStyle["none"]="None";
+		ChartUnderlineStyle["single"]="Single";
 	})(ChartUnderlineStyle=Excel.ChartUnderlineStyle || (Excel.ChartUnderlineStyle={}));
+	var ChartDisplayBlanksAs;
+	(function (ChartDisplayBlanksAs) {
+		ChartDisplayBlanksAs["notPlotted"]="NotPlotted";
+		ChartDisplayBlanksAs["zero"]="Zero";
+		ChartDisplayBlanksAs["interplotted"]="Interplotted";
+	})(ChartDisplayBlanksAs=Excel.ChartDisplayBlanksAs || (Excel.ChartDisplayBlanksAs={}));
+	var ChartPlotBy;
+	(function (ChartPlotBy) {
+		ChartPlotBy["rows"]="Rows";
+		ChartPlotBy["columns"]="Columns";
+	})(ChartPlotBy=Excel.ChartPlotBy || (Excel.ChartPlotBy={}));
+	var ChartSplitStype;
+	(function (ChartSplitStype) {
+		ChartSplitStype["splitByPosition"]="SplitByPosition";
+		ChartSplitStype["splitByValue"]="SplitByValue";
+		ChartSplitStype["splitByPercentValue"]="SplitByPercentValue";
+		ChartSplitStype["splitByCustomSplit"]="SplitByCustomSplit";
+	})(ChartSplitStype=Excel.ChartSplitStype || (Excel.ChartSplitStype={}));
+	var ChartSeriesType;
+	(function (ChartSeriesType) {
+		ChartSeriesType["column"]="Column";
+		ChartSeriesType["bar"]="Bar";
+		ChartSeriesType["bar3D"]="Bar3D";
+		ChartSeriesType["line"]="Line";
+		ChartSeriesType["pie"]="Pie";
+		ChartSeriesType["xyscatter"]="XYScatter";
+		ChartSeriesType["area"]="Area";
+		ChartSeriesType["area3D"]="Area3D";
+		ChartSeriesType["doughnut"]="Doughnut";
+		ChartSeriesType["radar"]="Radar";
+		ChartSeriesType["surface3D"]="Surface3D";
+		ChartSeriesType["column3D"]="Column3D";
+	})(ChartSeriesType=Excel.ChartSeriesType || (Excel.ChartSeriesType={}));
 	var ConditionalDataBarAxisFormat;
 	(function (ConditionalDataBarAxisFormat) {
-		ConditionalDataBarAxisFormat.automatic="Automatic";
-		ConditionalDataBarAxisFormat.none="None";
-		ConditionalDataBarAxisFormat.cellMidPoint="CellMidPoint";
+		ConditionalDataBarAxisFormat["automatic"]="Automatic";
+		ConditionalDataBarAxisFormat["none"]="None";
+		ConditionalDataBarAxisFormat["cellMidPoint"]="CellMidPoint";
 	})(ConditionalDataBarAxisFormat=Excel.ConditionalDataBarAxisFormat || (Excel.ConditionalDataBarAxisFormat={}));
 	var ConditionalDataBarDirection;
 	(function (ConditionalDataBarDirection) {
-		ConditionalDataBarDirection.context="Context";
-		ConditionalDataBarDirection.leftToRight="LeftToRight";
-		ConditionalDataBarDirection.rightToLeft="RightToLeft";
+		ConditionalDataBarDirection["context"]="Context";
+		ConditionalDataBarDirection["leftToRight"]="LeftToRight";
+		ConditionalDataBarDirection["rightToLeft"]="RightToLeft";
 	})(ConditionalDataBarDirection=Excel.ConditionalDataBarDirection || (Excel.ConditionalDataBarDirection={}));
 	var ConditionalFormatDirection;
 	(function (ConditionalFormatDirection) {
-		ConditionalFormatDirection.top="Top";
-		ConditionalFormatDirection.bottom="Bottom";
+		ConditionalFormatDirection["top"]="Top";
+		ConditionalFormatDirection["bottom"]="Bottom";
 	})(ConditionalFormatDirection=Excel.ConditionalFormatDirection || (Excel.ConditionalFormatDirection={}));
 	var ConditionalFormatType;
 	(function (ConditionalFormatType) {
-		ConditionalFormatType.custom="Custom";
-		ConditionalFormatType.dataBar="DataBar";
-		ConditionalFormatType.colorScale="ColorScale";
-		ConditionalFormatType.iconSet="IconSet";
-		ConditionalFormatType.topBottom="TopBottom";
-		ConditionalFormatType.presetCriteria="PresetCriteria";
-		ConditionalFormatType.containsText="ContainsText";
-		ConditionalFormatType.cellValue="CellValue";
+		ConditionalFormatType["custom"]="Custom";
+		ConditionalFormatType["dataBar"]="DataBar";
+		ConditionalFormatType["colorScale"]="ColorScale";
+		ConditionalFormatType["iconSet"]="IconSet";
+		ConditionalFormatType["topBottom"]="TopBottom";
+		ConditionalFormatType["presetCriteria"]="PresetCriteria";
+		ConditionalFormatType["containsText"]="ContainsText";
+		ConditionalFormatType["cellValue"]="CellValue";
 	})(ConditionalFormatType=Excel.ConditionalFormatType || (Excel.ConditionalFormatType={}));
 	var ConditionalFormatRuleType;
 	(function (ConditionalFormatRuleType) {
-		ConditionalFormatRuleType.invalid="Invalid";
-		ConditionalFormatRuleType.automatic="Automatic";
-		ConditionalFormatRuleType.lowestValue="LowestValue";
-		ConditionalFormatRuleType.highestValue="HighestValue";
-		ConditionalFormatRuleType.number="Number";
-		ConditionalFormatRuleType.percent="Percent";
-		ConditionalFormatRuleType.formula="Formula";
-		ConditionalFormatRuleType.percentile="Percentile";
+		ConditionalFormatRuleType["invalid"]="Invalid";
+		ConditionalFormatRuleType["automatic"]="Automatic";
+		ConditionalFormatRuleType["lowestValue"]="LowestValue";
+		ConditionalFormatRuleType["highestValue"]="HighestValue";
+		ConditionalFormatRuleType["number"]="Number";
+		ConditionalFormatRuleType["percent"]="Percent";
+		ConditionalFormatRuleType["formula"]="Formula";
+		ConditionalFormatRuleType["percentile"]="Percentile";
 	})(ConditionalFormatRuleType=Excel.ConditionalFormatRuleType || (Excel.ConditionalFormatRuleType={}));
 	var ConditionalFormatIconRuleType;
 	(function (ConditionalFormatIconRuleType) {
-		ConditionalFormatIconRuleType.invalid="Invalid";
-		ConditionalFormatIconRuleType.number="Number";
-		ConditionalFormatIconRuleType.percent="Percent";
-		ConditionalFormatIconRuleType.formula="Formula";
-		ConditionalFormatIconRuleType.percentile="Percentile";
+		ConditionalFormatIconRuleType["invalid"]="Invalid";
+		ConditionalFormatIconRuleType["number"]="Number";
+		ConditionalFormatIconRuleType["percent"]="Percent";
+		ConditionalFormatIconRuleType["formula"]="Formula";
+		ConditionalFormatIconRuleType["percentile"]="Percentile";
 	})(ConditionalFormatIconRuleType=Excel.ConditionalFormatIconRuleType || (Excel.ConditionalFormatIconRuleType={}));
 	var ConditionalFormatColorCriterionType;
 	(function (ConditionalFormatColorCriterionType) {
-		ConditionalFormatColorCriterionType.invalid="Invalid";
-		ConditionalFormatColorCriterionType.lowestValue="LowestValue";
-		ConditionalFormatColorCriterionType.highestValue="HighestValue";
-		ConditionalFormatColorCriterionType.number="Number";
-		ConditionalFormatColorCriterionType.percent="Percent";
-		ConditionalFormatColorCriterionType.formula="Formula";
-		ConditionalFormatColorCriterionType.percentile="Percentile";
+		ConditionalFormatColorCriterionType["invalid"]="Invalid";
+		ConditionalFormatColorCriterionType["lowestValue"]="LowestValue";
+		ConditionalFormatColorCriterionType["highestValue"]="HighestValue";
+		ConditionalFormatColorCriterionType["number"]="Number";
+		ConditionalFormatColorCriterionType["percent"]="Percent";
+		ConditionalFormatColorCriterionType["formula"]="Formula";
+		ConditionalFormatColorCriterionType["percentile"]="Percentile";
 	})(ConditionalFormatColorCriterionType=Excel.ConditionalFormatColorCriterionType || (Excel.ConditionalFormatColorCriterionType={}));
 	var ConditionalTopBottomCriterionType;
 	(function (ConditionalTopBottomCriterionType) {
-		ConditionalTopBottomCriterionType.invalid="Invalid";
-		ConditionalTopBottomCriterionType.topItems="TopItems";
-		ConditionalTopBottomCriterionType.topPercent="TopPercent";
-		ConditionalTopBottomCriterionType.bottomItems="BottomItems";
-		ConditionalTopBottomCriterionType.bottomPercent="BottomPercent";
+		ConditionalTopBottomCriterionType["invalid"]="Invalid";
+		ConditionalTopBottomCriterionType["topItems"]="TopItems";
+		ConditionalTopBottomCriterionType["topPercent"]="TopPercent";
+		ConditionalTopBottomCriterionType["bottomItems"]="BottomItems";
+		ConditionalTopBottomCriterionType["bottomPercent"]="BottomPercent";
 	})(ConditionalTopBottomCriterionType=Excel.ConditionalTopBottomCriterionType || (Excel.ConditionalTopBottomCriterionType={}));
 	var ConditionalFormatPresetCriterion;
 	(function (ConditionalFormatPresetCriterion) {
-		ConditionalFormatPresetCriterion.invalid="Invalid";
-		ConditionalFormatPresetCriterion.blanks="Blanks";
-		ConditionalFormatPresetCriterion.nonBlanks="NonBlanks";
-		ConditionalFormatPresetCriterion.errors="Errors";
-		ConditionalFormatPresetCriterion.nonErrors="NonErrors";
-		ConditionalFormatPresetCriterion.yesterday="Yesterday";
-		ConditionalFormatPresetCriterion.today="Today";
-		ConditionalFormatPresetCriterion.tomorrow="Tomorrow";
-		ConditionalFormatPresetCriterion.lastSevenDays="LastSevenDays";
-		ConditionalFormatPresetCriterion.lastWeek="LastWeek";
-		ConditionalFormatPresetCriterion.thisWeek="ThisWeek";
-		ConditionalFormatPresetCriterion.nextWeek="NextWeek";
-		ConditionalFormatPresetCriterion.lastMonth="LastMonth";
-		ConditionalFormatPresetCriterion.thisMonth="ThisMonth";
-		ConditionalFormatPresetCriterion.nextMonth="NextMonth";
-		ConditionalFormatPresetCriterion.aboveAverage="AboveAverage";
-		ConditionalFormatPresetCriterion.belowAverage="BelowAverage";
-		ConditionalFormatPresetCriterion.equalOrAboveAverage="EqualOrAboveAverage";
-		ConditionalFormatPresetCriterion.equalOrBelowAverage="EqualOrBelowAverage";
-		ConditionalFormatPresetCriterion.oneStdDevAboveAverage="OneStdDevAboveAverage";
-		ConditionalFormatPresetCriterion.oneStdDevBelowAverage="OneStdDevBelowAverage";
-		ConditionalFormatPresetCriterion.twoStdDevAboveAverage="TwoStdDevAboveAverage";
-		ConditionalFormatPresetCriterion.twoStdDevBelowAverage="TwoStdDevBelowAverage";
-		ConditionalFormatPresetCriterion.threeStdDevAboveAverage="ThreeStdDevAboveAverage";
-		ConditionalFormatPresetCriterion.threeStdDevBelowAverage="ThreeStdDevBelowAverage";
-		ConditionalFormatPresetCriterion.uniqueValues="UniqueValues";
-		ConditionalFormatPresetCriterion.duplicateValues="DuplicateValues";
+		ConditionalFormatPresetCriterion["invalid"]="Invalid";
+		ConditionalFormatPresetCriterion["blanks"]="Blanks";
+		ConditionalFormatPresetCriterion["nonBlanks"]="NonBlanks";
+		ConditionalFormatPresetCriterion["errors"]="Errors";
+		ConditionalFormatPresetCriterion["nonErrors"]="NonErrors";
+		ConditionalFormatPresetCriterion["yesterday"]="Yesterday";
+		ConditionalFormatPresetCriterion["today"]="Today";
+		ConditionalFormatPresetCriterion["tomorrow"]="Tomorrow";
+		ConditionalFormatPresetCriterion["lastSevenDays"]="LastSevenDays";
+		ConditionalFormatPresetCriterion["lastWeek"]="LastWeek";
+		ConditionalFormatPresetCriterion["thisWeek"]="ThisWeek";
+		ConditionalFormatPresetCriterion["nextWeek"]="NextWeek";
+		ConditionalFormatPresetCriterion["lastMonth"]="LastMonth";
+		ConditionalFormatPresetCriterion["thisMonth"]="ThisMonth";
+		ConditionalFormatPresetCriterion["nextMonth"]="NextMonth";
+		ConditionalFormatPresetCriterion["aboveAverage"]="AboveAverage";
+		ConditionalFormatPresetCriterion["belowAverage"]="BelowAverage";
+		ConditionalFormatPresetCriterion["equalOrAboveAverage"]="EqualOrAboveAverage";
+		ConditionalFormatPresetCriterion["equalOrBelowAverage"]="EqualOrBelowAverage";
+		ConditionalFormatPresetCriterion["oneStdDevAboveAverage"]="OneStdDevAboveAverage";
+		ConditionalFormatPresetCriterion["oneStdDevBelowAverage"]="OneStdDevBelowAverage";
+		ConditionalFormatPresetCriterion["twoStdDevAboveAverage"]="TwoStdDevAboveAverage";
+		ConditionalFormatPresetCriterion["twoStdDevBelowAverage"]="TwoStdDevBelowAverage";
+		ConditionalFormatPresetCriterion["threeStdDevAboveAverage"]="ThreeStdDevAboveAverage";
+		ConditionalFormatPresetCriterion["threeStdDevBelowAverage"]="ThreeStdDevBelowAverage";
+		ConditionalFormatPresetCriterion["uniqueValues"]="UniqueValues";
+		ConditionalFormatPresetCriterion["duplicateValues"]="DuplicateValues";
 	})(ConditionalFormatPresetCriterion=Excel.ConditionalFormatPresetCriterion || (Excel.ConditionalFormatPresetCriterion={}));
 	var ConditionalTextOperator;
 	(function (ConditionalTextOperator) {
-		ConditionalTextOperator.invalid="Invalid";
-		ConditionalTextOperator.contains="Contains";
-		ConditionalTextOperator.notContains="NotContains";
-		ConditionalTextOperator.beginsWith="BeginsWith";
-		ConditionalTextOperator.endsWith="EndsWith";
+		ConditionalTextOperator["invalid"]="Invalid";
+		ConditionalTextOperator["contains"]="Contains";
+		ConditionalTextOperator["notContains"]="NotContains";
+		ConditionalTextOperator["beginsWith"]="BeginsWith";
+		ConditionalTextOperator["endsWith"]="EndsWith";
 	})(ConditionalTextOperator=Excel.ConditionalTextOperator || (Excel.ConditionalTextOperator={}));
 	var ConditionalCellValueOperator;
 	(function (ConditionalCellValueOperator) {
-		ConditionalCellValueOperator.invalid="Invalid";
-		ConditionalCellValueOperator.between="Between";
-		ConditionalCellValueOperator.notBetween="NotBetween";
-		ConditionalCellValueOperator.equalTo="EqualTo";
-		ConditionalCellValueOperator.notEqualTo="NotEqualTo";
-		ConditionalCellValueOperator.greaterThan="GreaterThan";
-		ConditionalCellValueOperator.lessThan="LessThan";
-		ConditionalCellValueOperator.greaterThanOrEqual="GreaterThanOrEqual";
-		ConditionalCellValueOperator.lessThanOrEqual="LessThanOrEqual";
+		ConditionalCellValueOperator["invalid"]="Invalid";
+		ConditionalCellValueOperator["between"]="Between";
+		ConditionalCellValueOperator["notBetween"]="NotBetween";
+		ConditionalCellValueOperator["equalTo"]="EqualTo";
+		ConditionalCellValueOperator["notEqualTo"]="NotEqualTo";
+		ConditionalCellValueOperator["greaterThan"]="GreaterThan";
+		ConditionalCellValueOperator["lessThan"]="LessThan";
+		ConditionalCellValueOperator["greaterThanOrEqual"]="GreaterThanOrEqual";
+		ConditionalCellValueOperator["lessThanOrEqual"]="LessThanOrEqual";
 	})(ConditionalCellValueOperator=Excel.ConditionalCellValueOperator || (Excel.ConditionalCellValueOperator={}));
 	var ConditionalIconCriterionOperator;
 	(function (ConditionalIconCriterionOperator) {
-		ConditionalIconCriterionOperator.invalid="Invalid";
-		ConditionalIconCriterionOperator.greaterThan="GreaterThan";
-		ConditionalIconCriterionOperator.greaterThanOrEqual="GreaterThanOrEqual";
+		ConditionalIconCriterionOperator["invalid"]="Invalid";
+		ConditionalIconCriterionOperator["greaterThan"]="GreaterThan";
+		ConditionalIconCriterionOperator["greaterThanOrEqual"]="GreaterThanOrEqual";
 	})(ConditionalIconCriterionOperator=Excel.ConditionalIconCriterionOperator || (Excel.ConditionalIconCriterionOperator={}));
 	var ConditionalRangeBorderIndex;
 	(function (ConditionalRangeBorderIndex) {
-		ConditionalRangeBorderIndex.edgeTop="EdgeTop";
-		ConditionalRangeBorderIndex.edgeBottom="EdgeBottom";
-		ConditionalRangeBorderIndex.edgeLeft="EdgeLeft";
-		ConditionalRangeBorderIndex.edgeRight="EdgeRight";
+		ConditionalRangeBorderIndex["edgeTop"]="EdgeTop";
+		ConditionalRangeBorderIndex["edgeBottom"]="EdgeBottom";
+		ConditionalRangeBorderIndex["edgeLeft"]="EdgeLeft";
+		ConditionalRangeBorderIndex["edgeRight"]="EdgeRight";
 	})(ConditionalRangeBorderIndex=Excel.ConditionalRangeBorderIndex || (Excel.ConditionalRangeBorderIndex={}));
 	var ConditionalRangeBorderLineStyle;
 	(function (ConditionalRangeBorderLineStyle) {
-		ConditionalRangeBorderLineStyle.none="None";
-		ConditionalRangeBorderLineStyle.continuous="Continuous";
-		ConditionalRangeBorderLineStyle.dash="Dash";
-		ConditionalRangeBorderLineStyle.dashDot="DashDot";
-		ConditionalRangeBorderLineStyle.dashDotDot="DashDotDot";
-		ConditionalRangeBorderLineStyle.dot="Dot";
+		ConditionalRangeBorderLineStyle["none"]="None";
+		ConditionalRangeBorderLineStyle["continuous"]="Continuous";
+		ConditionalRangeBorderLineStyle["dash"]="Dash";
+		ConditionalRangeBorderLineStyle["dashDot"]="DashDot";
+		ConditionalRangeBorderLineStyle["dashDotDot"]="DashDotDot";
+		ConditionalRangeBorderLineStyle["dot"]="Dot";
 	})(ConditionalRangeBorderLineStyle=Excel.ConditionalRangeBorderLineStyle || (Excel.ConditionalRangeBorderLineStyle={}));
 	var ConditionalRangeFontUnderlineStyle;
 	(function (ConditionalRangeFontUnderlineStyle) {
-		ConditionalRangeFontUnderlineStyle.none="None";
-		ConditionalRangeFontUnderlineStyle.single="Single";
-		ConditionalRangeFontUnderlineStyle.double="Double";
+		ConditionalRangeFontUnderlineStyle["none"]="None";
+		ConditionalRangeFontUnderlineStyle["single"]="Single";
+		ConditionalRangeFontUnderlineStyle["double"]="Double";
 	})(ConditionalRangeFontUnderlineStyle=Excel.ConditionalRangeFontUnderlineStyle || (Excel.ConditionalRangeFontUnderlineStyle={}));
 	var CustomFunctionType;
 	(function (CustomFunctionType) {
-		CustomFunctionType.invalid="Invalid";
-		CustomFunctionType.script="Script";
-		CustomFunctionType.webService="WebService";
+		CustomFunctionType["invalid"]="Invalid";
+		CustomFunctionType["script"]="Script";
+		CustomFunctionType["webService"]="WebService";
 	})(CustomFunctionType=Excel.CustomFunctionType || (Excel.CustomFunctionType={}));
 	var CustomFunctionMetadataFormat;
 	(function (CustomFunctionMetadataFormat) {
-		CustomFunctionMetadataFormat.invalid="Invalid";
-		CustomFunctionMetadataFormat.openApi="OpenApi";
+		CustomFunctionMetadataFormat["invalid"]="Invalid";
+		CustomFunctionMetadataFormat["openApi"]="OpenApi";
 	})(CustomFunctionMetadataFormat=Excel.CustomFunctionMetadataFormat || (Excel.CustomFunctionMetadataFormat={}));
 	var CustomFunctionValueType;
 	(function (CustomFunctionValueType) {
-		CustomFunctionValueType.invalid="Invalid";
-		CustomFunctionValueType.boolean="Boolean";
-		CustomFunctionValueType.number="Number";
-		CustomFunctionValueType.string="String";
-		CustomFunctionValueType.isodate="ISODate";
+		CustomFunctionValueType["invalid"]="Invalid";
+		CustomFunctionValueType["boolean"]="Boolean";
+		CustomFunctionValueType["number"]="Number";
+		CustomFunctionValueType["string"]="String";
+		CustomFunctionValueType["isodate"]="ISODate";
 	})(CustomFunctionValueType=Excel.CustomFunctionValueType || (Excel.CustomFunctionValueType={}));
 	var CustomFunctionDimensionality;
 	(function (CustomFunctionDimensionality) {
-		CustomFunctionDimensionality.invalid="Invalid";
-		CustomFunctionDimensionality.scalar="Scalar";
-		CustomFunctionDimensionality.matrix="Matrix";
+		CustomFunctionDimensionality["invalid"]="Invalid";
+		CustomFunctionDimensionality["scalar"]="Scalar";
+		CustomFunctionDimensionality["matrix"]="Matrix";
 	})(CustomFunctionDimensionality=Excel.CustomFunctionDimensionality || (Excel.CustomFunctionDimensionality={}));
 	var DataValidationType;
 	(function (DataValidationType) {
-		DataValidationType.invalid="Invalid";
-		DataValidationType.none="None";
-		DataValidationType.wholeNumber="WholeNumber";
-		DataValidationType.decimal="Decimal";
-		DataValidationType.list="List";
-		DataValidationType.date="Date";
-		DataValidationType.time="Time";
-		DataValidationType.textLength="TextLength";
-		DataValidationType.custom="Custom";
-		DataValidationType.inconsistent="Inconsistent";
-		DataValidationType.mixedCriteria="MixedCriteria";
+		DataValidationType["none"]="None";
+		DataValidationType["wholeNumber"]="WholeNumber";
+		DataValidationType["decimal"]="Decimal";
+		DataValidationType["list"]="List";
+		DataValidationType["date"]="Date";
+		DataValidationType["time"]="Time";
+		DataValidationType["textLength"]="TextLength";
+		DataValidationType["custom"]="Custom";
+		DataValidationType["inconsistent"]="Inconsistent";
+		DataValidationType["mixedCriteria"]="MixedCriteria";
 	})(DataValidationType=Excel.DataValidationType || (Excel.DataValidationType={}));
 	var DataValidationOperator;
 	(function (DataValidationOperator) {
-		DataValidationOperator.invalid="Invalid";
-		DataValidationOperator.between="Between";
-		DataValidationOperator.notBetween="NotBetween";
-		DataValidationOperator.equalTo="EqualTo";
-		DataValidationOperator.notEqualTo="NotEqualTo";
-		DataValidationOperator.greaterThan="GreaterThan";
-		DataValidationOperator.lessThan="LessThan";
-		DataValidationOperator.greaterThanOrEqualTo="GreaterThanOrEqualTo";
-		DataValidationOperator.lessThanOrEqualTo="LessThanOrEqualTo";
+		DataValidationOperator["between"]="Between";
+		DataValidationOperator["notBetween"]="NotBetween";
+		DataValidationOperator["equalTo"]="EqualTo";
+		DataValidationOperator["notEqualTo"]="NotEqualTo";
+		DataValidationOperator["greaterThan"]="GreaterThan";
+		DataValidationOperator["lessThan"]="LessThan";
+		DataValidationOperator["greaterThanOrEqualTo"]="GreaterThanOrEqualTo";
+		DataValidationOperator["lessThanOrEqualTo"]="LessThanOrEqualTo";
 	})(DataValidationOperator=Excel.DataValidationOperator || (Excel.DataValidationOperator={}));
 	var DataValidationAlertStyle;
 	(function (DataValidationAlertStyle) {
-		DataValidationAlertStyle.invalid="Invalid";
-		DataValidationAlertStyle.stop="Stop";
-		DataValidationAlertStyle.warning="Warning";
-		DataValidationAlertStyle.information="Information";
+		DataValidationAlertStyle["stop"]="Stop";
+		DataValidationAlertStyle["warning"]="Warning";
+		DataValidationAlertStyle["information"]="Information";
 	})(DataValidationAlertStyle=Excel.DataValidationAlertStyle || (Excel.DataValidationAlertStyle={}));
 	var DeleteShiftDirection;
 	(function (DeleteShiftDirection) {
-		DeleteShiftDirection.up="Up";
-		DeleteShiftDirection.left="Left";
+		DeleteShiftDirection["up"]="Up";
+		DeleteShiftDirection["left"]="Left";
 	})(DeleteShiftDirection=Excel.DeleteShiftDirection || (Excel.DeleteShiftDirection={}));
 	var DynamicFilterCriteria;
 	(function (DynamicFilterCriteria) {
-		DynamicFilterCriteria.unknown="Unknown";
-		DynamicFilterCriteria.aboveAverage="AboveAverage";
-		DynamicFilterCriteria.allDatesInPeriodApril="AllDatesInPeriodApril";
-		DynamicFilterCriteria.allDatesInPeriodAugust="AllDatesInPeriodAugust";
-		DynamicFilterCriteria.allDatesInPeriodDecember="AllDatesInPeriodDecember";
-		DynamicFilterCriteria.allDatesInPeriodFebruray="AllDatesInPeriodFebruray";
-		DynamicFilterCriteria.allDatesInPeriodJanuary="AllDatesInPeriodJanuary";
-		DynamicFilterCriteria.allDatesInPeriodJuly="AllDatesInPeriodJuly";
-		DynamicFilterCriteria.allDatesInPeriodJune="AllDatesInPeriodJune";
-		DynamicFilterCriteria.allDatesInPeriodMarch="AllDatesInPeriodMarch";
-		DynamicFilterCriteria.allDatesInPeriodMay="AllDatesInPeriodMay";
-		DynamicFilterCriteria.allDatesInPeriodNovember="AllDatesInPeriodNovember";
-		DynamicFilterCriteria.allDatesInPeriodOctober="AllDatesInPeriodOctober";
-		DynamicFilterCriteria.allDatesInPeriodQuarter1="AllDatesInPeriodQuarter1";
-		DynamicFilterCriteria.allDatesInPeriodQuarter2="AllDatesInPeriodQuarter2";
-		DynamicFilterCriteria.allDatesInPeriodQuarter3="AllDatesInPeriodQuarter3";
-		DynamicFilterCriteria.allDatesInPeriodQuarter4="AllDatesInPeriodQuarter4";
-		DynamicFilterCriteria.allDatesInPeriodSeptember="AllDatesInPeriodSeptember";
-		DynamicFilterCriteria.belowAverage="BelowAverage";
-		DynamicFilterCriteria.lastMonth="LastMonth";
-		DynamicFilterCriteria.lastQuarter="LastQuarter";
-		DynamicFilterCriteria.lastWeek="LastWeek";
-		DynamicFilterCriteria.lastYear="LastYear";
-		DynamicFilterCriteria.nextMonth="NextMonth";
-		DynamicFilterCriteria.nextQuarter="NextQuarter";
-		DynamicFilterCriteria.nextWeek="NextWeek";
-		DynamicFilterCriteria.nextYear="NextYear";
-		DynamicFilterCriteria.thisMonth="ThisMonth";
-		DynamicFilterCriteria.thisQuarter="ThisQuarter";
-		DynamicFilterCriteria.thisWeek="ThisWeek";
-		DynamicFilterCriteria.thisYear="ThisYear";
-		DynamicFilterCriteria.today="Today";
-		DynamicFilterCriteria.tomorrow="Tomorrow";
-		DynamicFilterCriteria.yearToDate="YearToDate";
-		DynamicFilterCriteria.yesterday="Yesterday";
+		DynamicFilterCriteria["unknown"]="Unknown";
+		DynamicFilterCriteria["aboveAverage"]="AboveAverage";
+		DynamicFilterCriteria["allDatesInPeriodApril"]="AllDatesInPeriodApril";
+		DynamicFilterCriteria["allDatesInPeriodAugust"]="AllDatesInPeriodAugust";
+		DynamicFilterCriteria["allDatesInPeriodDecember"]="AllDatesInPeriodDecember";
+		DynamicFilterCriteria["allDatesInPeriodFebruray"]="AllDatesInPeriodFebruray";
+		DynamicFilterCriteria["allDatesInPeriodJanuary"]="AllDatesInPeriodJanuary";
+		DynamicFilterCriteria["allDatesInPeriodJuly"]="AllDatesInPeriodJuly";
+		DynamicFilterCriteria["allDatesInPeriodJune"]="AllDatesInPeriodJune";
+		DynamicFilterCriteria["allDatesInPeriodMarch"]="AllDatesInPeriodMarch";
+		DynamicFilterCriteria["allDatesInPeriodMay"]="AllDatesInPeriodMay";
+		DynamicFilterCriteria["allDatesInPeriodNovember"]="AllDatesInPeriodNovember";
+		DynamicFilterCriteria["allDatesInPeriodOctober"]="AllDatesInPeriodOctober";
+		DynamicFilterCriteria["allDatesInPeriodQuarter1"]="AllDatesInPeriodQuarter1";
+		DynamicFilterCriteria["allDatesInPeriodQuarter2"]="AllDatesInPeriodQuarter2";
+		DynamicFilterCriteria["allDatesInPeriodQuarter3"]="AllDatesInPeriodQuarter3";
+		DynamicFilterCriteria["allDatesInPeriodQuarter4"]="AllDatesInPeriodQuarter4";
+		DynamicFilterCriteria["allDatesInPeriodSeptember"]="AllDatesInPeriodSeptember";
+		DynamicFilterCriteria["belowAverage"]="BelowAverage";
+		DynamicFilterCriteria["lastMonth"]="LastMonth";
+		DynamicFilterCriteria["lastQuarter"]="LastQuarter";
+		DynamicFilterCriteria["lastWeek"]="LastWeek";
+		DynamicFilterCriteria["lastYear"]="LastYear";
+		DynamicFilterCriteria["nextMonth"]="NextMonth";
+		DynamicFilterCriteria["nextQuarter"]="NextQuarter";
+		DynamicFilterCriteria["nextWeek"]="NextWeek";
+		DynamicFilterCriteria["nextYear"]="NextYear";
+		DynamicFilterCriteria["thisMonth"]="ThisMonth";
+		DynamicFilterCriteria["thisQuarter"]="ThisQuarter";
+		DynamicFilterCriteria["thisWeek"]="ThisWeek";
+		DynamicFilterCriteria["thisYear"]="ThisYear";
+		DynamicFilterCriteria["today"]="Today";
+		DynamicFilterCriteria["tomorrow"]="Tomorrow";
+		DynamicFilterCriteria["yearToDate"]="YearToDate";
+		DynamicFilterCriteria["yesterday"]="Yesterday";
 	})(DynamicFilterCriteria=Excel.DynamicFilterCriteria || (Excel.DynamicFilterCriteria={}));
 	var FilterDatetimeSpecificity;
 	(function (FilterDatetimeSpecificity) {
-		FilterDatetimeSpecificity.year="Year";
-		FilterDatetimeSpecificity.month="Month";
-		FilterDatetimeSpecificity.day="Day";
-		FilterDatetimeSpecificity.hour="Hour";
-		FilterDatetimeSpecificity.minute="Minute";
-		FilterDatetimeSpecificity.second="Second";
+		FilterDatetimeSpecificity["year"]="Year";
+		FilterDatetimeSpecificity["month"]="Month";
+		FilterDatetimeSpecificity["day"]="Day";
+		FilterDatetimeSpecificity["hour"]="Hour";
+		FilterDatetimeSpecificity["minute"]="Minute";
+		FilterDatetimeSpecificity["second"]="Second";
 	})(FilterDatetimeSpecificity=Excel.FilterDatetimeSpecificity || (Excel.FilterDatetimeSpecificity={}));
 	var FilterOn;
 	(function (FilterOn) {
-		FilterOn.bottomItems="BottomItems";
-		FilterOn.bottomPercent="BottomPercent";
-		FilterOn.cellColor="CellColor";
-		FilterOn.dynamic="Dynamic";
-		FilterOn.fontColor="FontColor";
-		FilterOn.values="Values";
-		FilterOn.topItems="TopItems";
-		FilterOn.topPercent="TopPercent";
-		FilterOn.icon="Icon";
-		FilterOn.custom="Custom";
+		FilterOn["bottomItems"]="BottomItems";
+		FilterOn["bottomPercent"]="BottomPercent";
+		FilterOn["cellColor"]="CellColor";
+		FilterOn["dynamic"]="Dynamic";
+		FilterOn["fontColor"]="FontColor";
+		FilterOn["values"]="Values";
+		FilterOn["topItems"]="TopItems";
+		FilterOn["topPercent"]="TopPercent";
+		FilterOn["icon"]="Icon";
+		FilterOn["custom"]="Custom";
 	})(FilterOn=Excel.FilterOn || (Excel.FilterOn={}));
 	var FilterOperator;
 	(function (FilterOperator) {
-		FilterOperator.and="And";
-		FilterOperator.or="Or";
+		FilterOperator["and"]="And";
+		FilterOperator["or"]="Or";
 	})(FilterOperator=Excel.FilterOperator || (Excel.FilterOperator={}));
 	var HorizontalAlignment;
 	(function (HorizontalAlignment) {
-		HorizontalAlignment.general="General";
-		HorizontalAlignment.left="Left";
-		HorizontalAlignment.center="Center";
-		HorizontalAlignment.right="Right";
-		HorizontalAlignment.fill="Fill";
-		HorizontalAlignment.justify="Justify";
-		HorizontalAlignment.centerAcrossSelection="CenterAcrossSelection";
-		HorizontalAlignment.distributed="Distributed";
+		HorizontalAlignment["general"]="General";
+		HorizontalAlignment["left"]="Left";
+		HorizontalAlignment["center"]="Center";
+		HorizontalAlignment["right"]="Right";
+		HorizontalAlignment["fill"]="Fill";
+		HorizontalAlignment["justify"]="Justify";
+		HorizontalAlignment["centerAcrossSelection"]="CenterAcrossSelection";
+		HorizontalAlignment["distributed"]="Distributed";
 	})(HorizontalAlignment=Excel.HorizontalAlignment || (Excel.HorizontalAlignment={}));
 	var IconSet;
 	(function (IconSet) {
-		IconSet.invalid="Invalid";
-		IconSet.threeArrows="ThreeArrows";
-		IconSet.threeArrowsGray="ThreeArrowsGray";
-		IconSet.threeFlags="ThreeFlags";
-		IconSet.threeTrafficLights1="ThreeTrafficLights1";
-		IconSet.threeTrafficLights2="ThreeTrafficLights2";
-		IconSet.threeSigns="ThreeSigns";
-		IconSet.threeSymbols="ThreeSymbols";
-		IconSet.threeSymbols2="ThreeSymbols2";
-		IconSet.fourArrows="FourArrows";
-		IconSet.fourArrowsGray="FourArrowsGray";
-		IconSet.fourRedToBlack="FourRedToBlack";
-		IconSet.fourRating="FourRating";
-		IconSet.fourTrafficLights="FourTrafficLights";
-		IconSet.fiveArrows="FiveArrows";
-		IconSet.fiveArrowsGray="FiveArrowsGray";
-		IconSet.fiveRating="FiveRating";
-		IconSet.fiveQuarters="FiveQuarters";
-		IconSet.threeStars="ThreeStars";
-		IconSet.threeTriangles="ThreeTriangles";
-		IconSet.fiveBoxes="FiveBoxes";
+		IconSet["invalid"]="Invalid";
+		IconSet["threeArrows"]="ThreeArrows";
+		IconSet["threeArrowsGray"]="ThreeArrowsGray";
+		IconSet["threeFlags"]="ThreeFlags";
+		IconSet["threeTrafficLights1"]="ThreeTrafficLights1";
+		IconSet["threeTrafficLights2"]="ThreeTrafficLights2";
+		IconSet["threeSigns"]="ThreeSigns";
+		IconSet["threeSymbols"]="ThreeSymbols";
+		IconSet["threeSymbols2"]="ThreeSymbols2";
+		IconSet["fourArrows"]="FourArrows";
+		IconSet["fourArrowsGray"]="FourArrowsGray";
+		IconSet["fourRedToBlack"]="FourRedToBlack";
+		IconSet["fourRating"]="FourRating";
+		IconSet["fourTrafficLights"]="FourTrafficLights";
+		IconSet["fiveArrows"]="FiveArrows";
+		IconSet["fiveArrowsGray"]="FiveArrowsGray";
+		IconSet["fiveRating"]="FiveRating";
+		IconSet["fiveQuarters"]="FiveQuarters";
+		IconSet["threeStars"]="ThreeStars";
+		IconSet["threeTriangles"]="ThreeTriangles";
+		IconSet["fiveBoxes"]="FiveBoxes";
 	})(IconSet=Excel.IconSet || (Excel.IconSet={}));
 	var ImageFittingMode;
 	(function (ImageFittingMode) {
-		ImageFittingMode.fit="Fit";
-		ImageFittingMode.fitAndCenter="FitAndCenter";
-		ImageFittingMode.fill="Fill";
+		ImageFittingMode["fit"]="Fit";
+		ImageFittingMode["fitAndCenter"]="FitAndCenter";
+		ImageFittingMode["fill"]="Fill";
 	})(ImageFittingMode=Excel.ImageFittingMode || (Excel.ImageFittingMode={}));
 	var InsertShiftDirection;
 	(function (InsertShiftDirection) {
-		InsertShiftDirection.down="Down";
-		InsertShiftDirection.right="Right";
+		InsertShiftDirection["down"]="Down";
+		InsertShiftDirection["right"]="Right";
 	})(InsertShiftDirection=Excel.InsertShiftDirection || (Excel.InsertShiftDirection={}));
 	var NamedItemScope;
 	(function (NamedItemScope) {
-		NamedItemScope.worksheet="Worksheet";
-		NamedItemScope.workbook="Workbook";
+		NamedItemScope["worksheet"]="Worksheet";
+		NamedItemScope["workbook"]="Workbook";
 	})(NamedItemScope=Excel.NamedItemScope || (Excel.NamedItemScope={}));
 	var NamedItemType;
 	(function (NamedItemType) {
-		NamedItemType.string="String";
-		NamedItemType.integer="Integer";
-		NamedItemType.double="Double";
-		NamedItemType.boolean="Boolean";
-		NamedItemType.range="Range";
-		NamedItemType.error="Error";
-		NamedItemType.array="Array";
+		NamedItemType["string"]="String";
+		NamedItemType["integer"]="Integer";
+		NamedItemType["double"]="Double";
+		NamedItemType["boolean"]="Boolean";
+		NamedItemType["range"]="Range";
+		NamedItemType["error"]="Error";
+		NamedItemType["array"]="Array";
 	})(NamedItemType=Excel.NamedItemType || (Excel.NamedItemType={}));
 	var RangeUnderlineStyle;
 	(function (RangeUnderlineStyle) {
-		RangeUnderlineStyle.none="None";
-		RangeUnderlineStyle.single="Single";
-		RangeUnderlineStyle.double="Double";
-		RangeUnderlineStyle.singleAccountant="SingleAccountant";
-		RangeUnderlineStyle.doubleAccountant="DoubleAccountant";
+		RangeUnderlineStyle["none"]="None";
+		RangeUnderlineStyle["single"]="Single";
+		RangeUnderlineStyle["double"]="Double";
+		RangeUnderlineStyle["singleAccountant"]="SingleAccountant";
+		RangeUnderlineStyle["doubleAccountant"]="DoubleAccountant";
 	})(RangeUnderlineStyle=Excel.RangeUnderlineStyle || (Excel.RangeUnderlineStyle={}));
 	var SheetVisibility;
 	(function (SheetVisibility) {
-		SheetVisibility.visible="Visible";
-		SheetVisibility.hidden="Hidden";
-		SheetVisibility.veryHidden="VeryHidden";
+		SheetVisibility["visible"]="Visible";
+		SheetVisibility["hidden"]="Hidden";
+		SheetVisibility["veryHidden"]="VeryHidden";
 	})(SheetVisibility=Excel.SheetVisibility || (Excel.SheetVisibility={}));
 	var RangeValueType;
 	(function (RangeValueType) {
-		RangeValueType.unknown="Unknown";
-		RangeValueType.empty="Empty";
-		RangeValueType.string="String";
-		RangeValueType.integer="Integer";
-		RangeValueType.double="Double";
-		RangeValueType.boolean="Boolean";
-		RangeValueType.error="Error";
-		RangeValueType.richValue="RichValue";
+		RangeValueType["unknown"]="Unknown";
+		RangeValueType["empty"]="Empty";
+		RangeValueType["string"]="String";
+		RangeValueType["integer"]="Integer";
+		RangeValueType["double"]="Double";
+		RangeValueType["boolean"]="Boolean";
+		RangeValueType["error"]="Error";
+		RangeValueType["richValue"]="RichValue";
 	})(RangeValueType=Excel.RangeValueType || (Excel.RangeValueType={}));
+	var SearchDirection;
+	(function (SearchDirection) {
+		SearchDirection["forward"]="Forward";
+		SearchDirection["backwards"]="Backwards";
+	})(SearchDirection=Excel.SearchDirection || (Excel.SearchDirection={}));
 	var SortOrientation;
 	(function (SortOrientation) {
-		SortOrientation.rows="Rows";
-		SortOrientation.columns="Columns";
+		SortOrientation["rows"]="Rows";
+		SortOrientation["columns"]="Columns";
 	})(SortOrientation=Excel.SortOrientation || (Excel.SortOrientation={}));
 	var SortOn;
 	(function (SortOn) {
-		SortOn.value="Value";
-		SortOn.cellColor="CellColor";
-		SortOn.fontColor="FontColor";
-		SortOn.icon="Icon";
+		SortOn["value"]="Value";
+		SortOn["cellColor"]="CellColor";
+		SortOn["fontColor"]="FontColor";
+		SortOn["icon"]="Icon";
 	})(SortOn=Excel.SortOn || (Excel.SortOn={}));
 	var SortDataOption;
 	(function (SortDataOption) {
-		SortDataOption.normal="Normal";
-		SortDataOption.textAsNumber="TextAsNumber";
+		SortDataOption["normal"]="Normal";
+		SortDataOption["textAsNumber"]="TextAsNumber";
 	})(SortDataOption=Excel.SortDataOption || (Excel.SortDataOption={}));
 	var SortMethod;
 	(function (SortMethod) {
-		SortMethod.pinYin="PinYin";
-		SortMethod.strokeCount="StrokeCount";
+		SortMethod["pinYin"]="PinYin";
+		SortMethod["strokeCount"]="StrokeCount";
 	})(SortMethod=Excel.SortMethod || (Excel.SortMethod={}));
 	var VerticalAlignment;
 	(function (VerticalAlignment) {
-		VerticalAlignment.top="Top";
-		VerticalAlignment.center="Center";
-		VerticalAlignment.bottom="Bottom";
-		VerticalAlignment.justify="Justify";
-		VerticalAlignment.distributed="Distributed";
+		VerticalAlignment["top"]="Top";
+		VerticalAlignment["center"]="Center";
+		VerticalAlignment["bottom"]="Bottom";
+		VerticalAlignment["justify"]="Justify";
+		VerticalAlignment["distributed"]="Distributed";
 	})(VerticalAlignment=Excel.VerticalAlignment || (Excel.VerticalAlignment={}));
 	var DocumentPropertyType;
 	(function (DocumentPropertyType) {
-		DocumentPropertyType.number="Number";
-		DocumentPropertyType.boolean="Boolean";
-		DocumentPropertyType.date="Date";
-		DocumentPropertyType.string="String";
-		DocumentPropertyType.float="Float";
+		DocumentPropertyType["number"]="Number";
+		DocumentPropertyType["boolean"]="Boolean";
+		DocumentPropertyType["date"]="Date";
+		DocumentPropertyType["string"]="String";
+		DocumentPropertyType["float"]="Float";
 	})(DocumentPropertyType=Excel.DocumentPropertyType || (Excel.DocumentPropertyType={}));
 	var EventSource;
 	(function (EventSource) {
-		EventSource.local="Local";
-		EventSource.remote="Remote";
+		EventSource["local"]="Local";
+		EventSource["remote"]="Remote";
 	})(EventSource=Excel.EventSource || (Excel.EventSource={}));
 	var DataChangeType;
 	(function (DataChangeType) {
-		DataChangeType.others="Others";
-		DataChangeType.rangeEdited="RangeEdited";
-		DataChangeType.rowInserted="RowInserted";
-		DataChangeType.rowDeleted="RowDeleted";
-		DataChangeType.columnInserted="ColumnInserted";
-		DataChangeType.columnDeleted="ColumnDeleted";
-		DataChangeType.cellInserted="CellInserted";
-		DataChangeType.cellDeleted="CellDeleted";
+		DataChangeType["others"]="Others";
+		DataChangeType["rangeEdited"]="RangeEdited";
+		DataChangeType["rowInserted"]="RowInserted";
+		DataChangeType["rowDeleted"]="RowDeleted";
+		DataChangeType["columnInserted"]="ColumnInserted";
+		DataChangeType["columnDeleted"]="ColumnDeleted";
+		DataChangeType["cellInserted"]="CellInserted";
+		DataChangeType["cellDeleted"]="CellDeleted";
 	})(DataChangeType=Excel.DataChangeType || (Excel.DataChangeType={}));
 	var EventType;
 	(function (EventType) {
-		EventType.worksheetDataChanged="WorksheetDataChanged";
-		EventType.worksheetSelectionChanged="WorksheetSelectionChanged";
-		EventType.worksheetAdded="WorksheetAdded";
-		EventType.worksheetActivated="WorksheetActivated";
-		EventType.worksheetDeactivated="WorksheetDeactivated";
-		EventType.tableDataChanged="TableDataChanged";
-		EventType.tableSelectionChanged="TableSelectionChanged";
-		EventType.worksheetDeleted="WorksheetDeleted";
-		EventType.chartAdded="ChartAdded";
-		EventType.chartActivated="ChartActivated";
-		EventType.chartDeactivated="ChartDeactivated";
-		EventType.chartDeleted="ChartDeleted";
-		EventType.worksheetCalculated="WorksheetCalculated";
+		EventType["worksheetChanged"]="WorksheetChanged";
+		EventType["worksheetSelectionChanged"]="WorksheetSelectionChanged";
+		EventType["worksheetAdded"]="WorksheetAdded";
+		EventType["worksheetActivated"]="WorksheetActivated";
+		EventType["worksheetDeactivated"]="WorksheetDeactivated";
+		EventType["tableChanged"]="TableChanged";
+		EventType["tableSelectionChanged"]="TableSelectionChanged";
+		EventType["worksheetDeleted"]="WorksheetDeleted";
+		EventType["chartAdded"]="ChartAdded";
+		EventType["chartActivated"]="ChartActivated";
+		EventType["chartDeactivated"]="ChartDeactivated";
+		EventType["chartDeleted"]="ChartDeleted";
+		EventType["worksheetCalculated"]="WorksheetCalculated";
 	})(EventType=Excel.EventType || (Excel.EventType={}));
 	var DocumentPropertyItem;
 	(function (DocumentPropertyItem) {
-		DocumentPropertyItem.title="Title";
-		DocumentPropertyItem.subject="Subject";
-		DocumentPropertyItem.author="Author";
-		DocumentPropertyItem.keywords="Keywords";
-		DocumentPropertyItem.comments="Comments";
-		DocumentPropertyItem.template="Template";
-		DocumentPropertyItem.lastAuth="LastAuth";
-		DocumentPropertyItem.revision="Revision";
-		DocumentPropertyItem.appName="AppName";
-		DocumentPropertyItem.lastPrint="LastPrint";
-		DocumentPropertyItem.creation="Creation";
-		DocumentPropertyItem.lastSave="LastSave";
-		DocumentPropertyItem.category="Category";
-		DocumentPropertyItem.format="Format";
-		DocumentPropertyItem.manager="Manager";
-		DocumentPropertyItem.company="Company";
+		DocumentPropertyItem["title"]="Title";
+		DocumentPropertyItem["subject"]="Subject";
+		DocumentPropertyItem["author"]="Author";
+		DocumentPropertyItem["keywords"]="Keywords";
+		DocumentPropertyItem["comments"]="Comments";
+		DocumentPropertyItem["template"]="Template";
+		DocumentPropertyItem["lastAuth"]="LastAuth";
+		DocumentPropertyItem["revision"]="Revision";
+		DocumentPropertyItem["appName"]="AppName";
+		DocumentPropertyItem["lastPrint"]="LastPrint";
+		DocumentPropertyItem["creation"]="Creation";
+		DocumentPropertyItem["lastSave"]="LastSave";
+		DocumentPropertyItem["category"]="Category";
+		DocumentPropertyItem["format"]="Format";
+		DocumentPropertyItem["manager"]="Manager";
+		DocumentPropertyItem["company"]="Company";
 	})(DocumentPropertyItem=Excel.DocumentPropertyItem || (Excel.DocumentPropertyItem={}));
 	var TrendlineType;
 	(function (TrendlineType) {
-		TrendlineType.linear="Linear";
-		TrendlineType.exponential="Exponential";
-		TrendlineType.logarithmic="Logarithmic";
-		TrendlineType.movingAverage="MovingAverage";
-		TrendlineType.polynomial="Polynomial";
-		TrendlineType.power="Power";
+		TrendlineType["linear"]="Linear";
+		TrendlineType["exponential"]="Exponential";
+		TrendlineType["logarithmic"]="Logarithmic";
+		TrendlineType["movingAverage"]="MovingAverage";
+		TrendlineType["polynomial"]="Polynomial";
+		TrendlineType["power"]="Power";
 	})(TrendlineType=Excel.TrendlineType || (Excel.TrendlineType={}));
 	var SubtotalLocationType;
 	(function (SubtotalLocationType) {
-		SubtotalLocationType.atTop="AtTop";
-		SubtotalLocationType.atBottom="AtBottom";
+		SubtotalLocationType["atTop"]="AtTop";
+		SubtotalLocationType["atBottom"]="AtBottom";
 	})(SubtotalLocationType=Excel.SubtotalLocationType || (Excel.SubtotalLocationType={}));
 	var LayoutRowType;
 	(function (LayoutRowType) {
-		LayoutRowType.compactRow="CompactRow";
-		LayoutRowType.tabularRow="TabularRow";
-		LayoutRowType.outlineRow="OutlineRow";
+		LayoutRowType["compactRow"]="CompactRow";
+		LayoutRowType["tabularRow"]="TabularRow";
+		LayoutRowType["outlineRow"]="OutlineRow";
 	})(LayoutRowType=Excel.LayoutRowType || (Excel.LayoutRowType={}));
 	var ProtectionSelectionMode;
 	(function (ProtectionSelectionMode) {
-		ProtectionSelectionMode.normal="Normal";
-		ProtectionSelectionMode.unlocked="Unlocked";
-		ProtectionSelectionMode.none="None";
+		ProtectionSelectionMode["normal"]="Normal";
+		ProtectionSelectionMode["unlocked"]="Unlocked";
+		ProtectionSelectionMode["none"]="None";
 	})(ProtectionSelectionMode=Excel.ProtectionSelectionMode || (Excel.ProtectionSelectionMode={}));
 	var PageOrientation;
 	(function (PageOrientation) {
-		PageOrientation.portrait="Portrait";
-		PageOrientation.landscape="Landscape";
+		PageOrientation["portrait"]="Portrait";
+		PageOrientation["landscape"]="Landscape";
 	})(PageOrientation=Excel.PageOrientation || (Excel.PageOrientation={}));
 	var PaperType;
 	(function (PaperType) {
-		PaperType.letter="Letter";
-		PaperType.letterSmall="LetterSmall";
-		PaperType.tabloid="Tabloid";
-		PaperType.ledger="Ledger";
-		PaperType.legal="Legal";
-		PaperType.statement="Statement";
-		PaperType.executive="Executive";
-		PaperType.a3="A3";
-		PaperType.a4="A4";
-		PaperType.a4Small="A4Small";
-		PaperType.a5="A5";
-		PaperType.b4="B4";
-		PaperType.b5="B5";
-		PaperType.folio="Folio";
-		PaperType.quatro="Quatro";
-		PaperType.paper10x14="Paper10x14";
-		PaperType.paper11x17="Paper11x17";
-		PaperType.note="Note";
-		PaperType.envelope9="Envelope9";
-		PaperType.envelope10="Envelope10";
-		PaperType.envelope11="Envelope11";
-		PaperType.envelope12="Envelope12";
-		PaperType.envelope14="Envelope14";
-		PaperType.csheet="Csheet";
-		PaperType.dsheet="Dsheet";
-		PaperType.esheet="Esheet";
-		PaperType.envelopeDL="EnvelopeDL";
-		PaperType.envelopeC5="EnvelopeC5";
-		PaperType.envelopeC3="EnvelopeC3";
-		PaperType.envelopeC4="EnvelopeC4";
-		PaperType.envelopeC6="EnvelopeC6";
-		PaperType.envelopeC65="EnvelopeC65";
-		PaperType.envelopeB4="EnvelopeB4";
-		PaperType.envelopeB5="EnvelopeB5";
-		PaperType.envelopeB6="EnvelopeB6";
-		PaperType.envelopeItaly="EnvelopeItaly";
-		PaperType.envelopeMonarch="EnvelopeMonarch";
-		PaperType.envelopePersonal="EnvelopePersonal";
-		PaperType.fanfoldUS="FanfoldUS";
-		PaperType.fanfoldStdGerman="FanfoldStdGerman";
-		PaperType.fanfoldLegalGerman="FanfoldLegalGerman";
+		PaperType["letter"]="Letter";
+		PaperType["letterSmall"]="LetterSmall";
+		PaperType["tabloid"]="Tabloid";
+		PaperType["ledger"]="Ledger";
+		PaperType["legal"]="Legal";
+		PaperType["statement"]="Statement";
+		PaperType["executive"]="Executive";
+		PaperType["a3"]="A3";
+		PaperType["a4"]="A4";
+		PaperType["a4Small"]="A4Small";
+		PaperType["a5"]="A5";
+		PaperType["b4"]="B4";
+		PaperType["b5"]="B5";
+		PaperType["folio"]="Folio";
+		PaperType["quatro"]="Quatro";
+		PaperType["paper10x14"]="Paper10x14";
+		PaperType["paper11x17"]="Paper11x17";
+		PaperType["note"]="Note";
+		PaperType["envelope9"]="Envelope9";
+		PaperType["envelope10"]="Envelope10";
+		PaperType["envelope11"]="Envelope11";
+		PaperType["envelope12"]="Envelope12";
+		PaperType["envelope14"]="Envelope14";
+		PaperType["csheet"]="Csheet";
+		PaperType["dsheet"]="Dsheet";
+		PaperType["esheet"]="Esheet";
+		PaperType["envelopeDL"]="EnvelopeDL";
+		PaperType["envelopeC5"]="EnvelopeC5";
+		PaperType["envelopeC3"]="EnvelopeC3";
+		PaperType["envelopeC4"]="EnvelopeC4";
+		PaperType["envelopeC6"]="EnvelopeC6";
+		PaperType["envelopeC65"]="EnvelopeC65";
+		PaperType["envelopeB4"]="EnvelopeB4";
+		PaperType["envelopeB5"]="EnvelopeB5";
+		PaperType["envelopeB6"]="EnvelopeB6";
+		PaperType["envelopeItaly"]="EnvelopeItaly";
+		PaperType["envelopeMonarch"]="EnvelopeMonarch";
+		PaperType["envelopePersonal"]="EnvelopePersonal";
+		PaperType["fanfoldUS"]="FanfoldUS";
+		PaperType["fanfoldStdGerman"]="FanfoldStdGerman";
+		PaperType["fanfoldLegalGerman"]="FanfoldLegalGerman";
 	})(PaperType=Excel.PaperType || (Excel.PaperType={}));
 	var ReadingOrder;
 	(function (ReadingOrder) {
-		ReadingOrder.context="Context";
-		ReadingOrder.leftToRight="LeftToRight";
-		ReadingOrder.rightToLeft="RightToLeft";
+		ReadingOrder["context"]="Context";
+		ReadingOrder["leftToRight"]="LeftToRight";
+		ReadingOrder["rightToLeft"]="RightToLeft";
 	})(ReadingOrder=Excel.ReadingOrder || (Excel.ReadingOrder={}));
 	var BuiltInStyle;
 	(function (BuiltInStyle) {
-		BuiltInStyle.normal="Normal";
-		BuiltInStyle.comma="Comma";
-		BuiltInStyle.currency="Currency";
-		BuiltInStyle.percent="Percent";
-		BuiltInStyle.wholeComma="WholeComma";
-		BuiltInStyle.wholeDollar="WholeDollar";
-		BuiltInStyle.hlink="Hlink";
-		BuiltInStyle.hlinkTrav="HlinkTrav";
-		BuiltInStyle.note="Note";
-		BuiltInStyle.warningText="WarningText";
-		BuiltInStyle.emphasis1="Emphasis1";
-		BuiltInStyle.emphasis2="Emphasis2";
-		BuiltInStyle.emphasis3="Emphasis3";
-		BuiltInStyle.sheetTitle="SheetTitle";
-		BuiltInStyle.heading1="Heading1";
-		BuiltInStyle.heading2="Heading2";
-		BuiltInStyle.heading3="Heading3";
-		BuiltInStyle.heading4="Heading4";
-		BuiltInStyle.input="Input";
-		BuiltInStyle.output="Output";
-		BuiltInStyle.calculation="Calculation";
-		BuiltInStyle.checkCell="CheckCell";
-		BuiltInStyle.linkedCell="LinkedCell";
-		BuiltInStyle.total="Total";
-		BuiltInStyle.good="Good";
-		BuiltInStyle.bad="Bad";
-		BuiltInStyle.neutral="Neutral";
-		BuiltInStyle.accent1="Accent1";
-		BuiltInStyle.accent1_20="Accent1_20";
-		BuiltInStyle.accent1_40="Accent1_40";
-		BuiltInStyle.accent1_60="Accent1_60";
-		BuiltInStyle.accent2="Accent2";
-		BuiltInStyle.accent2_20="Accent2_20";
-		BuiltInStyle.accent2_40="Accent2_40";
-		BuiltInStyle.accent2_60="Accent2_60";
-		BuiltInStyle.accent3="Accent3";
-		BuiltInStyle.accent3_20="Accent3_20";
-		BuiltInStyle.accent3_40="Accent3_40";
-		BuiltInStyle.accent3_60="Accent3_60";
-		BuiltInStyle.accent4="Accent4";
-		BuiltInStyle.accent4_20="Accent4_20";
-		BuiltInStyle.accent4_40="Accent4_40";
-		BuiltInStyle.accent4_60="Accent4_60";
-		BuiltInStyle.accent5="Accent5";
-		BuiltInStyle.accent5_20="Accent5_20";
-		BuiltInStyle.accent5_40="Accent5_40";
-		BuiltInStyle.accent5_60="Accent5_60";
-		BuiltInStyle.accent6="Accent6";
-		BuiltInStyle.accent6_20="Accent6_20";
-		BuiltInStyle.accent6_40="Accent6_40";
-		BuiltInStyle.accent6_60="Accent6_60";
-		BuiltInStyle.explanatoryText="ExplanatoryText";
+		BuiltInStyle["normal"]="Normal";
+		BuiltInStyle["comma"]="Comma";
+		BuiltInStyle["currency"]="Currency";
+		BuiltInStyle["percent"]="Percent";
+		BuiltInStyle["wholeComma"]="WholeComma";
+		BuiltInStyle["wholeDollar"]="WholeDollar";
+		BuiltInStyle["hlink"]="Hlink";
+		BuiltInStyle["hlinkTrav"]="HlinkTrav";
+		BuiltInStyle["note"]="Note";
+		BuiltInStyle["warningText"]="WarningText";
+		BuiltInStyle["emphasis1"]="Emphasis1";
+		BuiltInStyle["emphasis2"]="Emphasis2";
+		BuiltInStyle["emphasis3"]="Emphasis3";
+		BuiltInStyle["sheetTitle"]="SheetTitle";
+		BuiltInStyle["heading1"]="Heading1";
+		BuiltInStyle["heading2"]="Heading2";
+		BuiltInStyle["heading3"]="Heading3";
+		BuiltInStyle["heading4"]="Heading4";
+		BuiltInStyle["input"]="Input";
+		BuiltInStyle["output"]="Output";
+		BuiltInStyle["calculation"]="Calculation";
+		BuiltInStyle["checkCell"]="CheckCell";
+		BuiltInStyle["linkedCell"]="LinkedCell";
+		BuiltInStyle["total"]="Total";
+		BuiltInStyle["good"]="Good";
+		BuiltInStyle["bad"]="Bad";
+		BuiltInStyle["neutral"]="Neutral";
+		BuiltInStyle["accent1"]="Accent1";
+		BuiltInStyle["accent1_20"]="Accent1_20";
+		BuiltInStyle["accent1_40"]="Accent1_40";
+		BuiltInStyle["accent1_60"]="Accent1_60";
+		BuiltInStyle["accent2"]="Accent2";
+		BuiltInStyle["accent2_20"]="Accent2_20";
+		BuiltInStyle["accent2_40"]="Accent2_40";
+		BuiltInStyle["accent2_60"]="Accent2_60";
+		BuiltInStyle["accent3"]="Accent3";
+		BuiltInStyle["accent3_20"]="Accent3_20";
+		BuiltInStyle["accent3_40"]="Accent3_40";
+		BuiltInStyle["accent3_60"]="Accent3_60";
+		BuiltInStyle["accent4"]="Accent4";
+		BuiltInStyle["accent4_20"]="Accent4_20";
+		BuiltInStyle["accent4_40"]="Accent4_40";
+		BuiltInStyle["accent4_60"]="Accent4_60";
+		BuiltInStyle["accent5"]="Accent5";
+		BuiltInStyle["accent5_20"]="Accent5_20";
+		BuiltInStyle["accent5_40"]="Accent5_40";
+		BuiltInStyle["accent5_60"]="Accent5_60";
+		BuiltInStyle["accent6"]="Accent6";
+		BuiltInStyle["accent6_20"]="Accent6_20";
+		BuiltInStyle["accent6_40"]="Accent6_40";
+		BuiltInStyle["accent6_60"]="Accent6_60";
+		BuiltInStyle["explanatoryText"]="ExplanatoryText";
 	})(BuiltInStyle=Excel.BuiltInStyle || (Excel.BuiltInStyle={}));
 	var PrintErrorType;
 	(function (PrintErrorType) {
-		PrintErrorType.errorsDisplayed="ErrorsDisplayed";
-		PrintErrorType.errorsBlank="ErrorsBlank";
-		PrintErrorType.errorsDash="ErrorsDash";
-		PrintErrorType.errorsNotAvailable="ErrorsNotAvailable";
+		PrintErrorType["errorsDisplayed"]="ErrorsDisplayed";
+		PrintErrorType["errorsBlank"]="ErrorsBlank";
+		PrintErrorType["errorsDash"]="ErrorsDash";
+		PrintErrorType["errorsNotAvailable"]="ErrorsNotAvailable";
 	})(PrintErrorType=Excel.PrintErrorType || (Excel.PrintErrorType={}));
 	var WorksheetPositionType;
 	(function (WorksheetPositionType) {
-		WorksheetPositionType.none="None";
-		WorksheetPositionType.before="Before";
-		WorksheetPositionType.after="After";
-		WorksheetPositionType.beginning="Beginning";
-		WorksheetPositionType.end="End";
+		WorksheetPositionType["none"]="None";
+		WorksheetPositionType["before"]="Before";
+		WorksheetPositionType["after"]="After";
+		WorksheetPositionType["beginning"]="Beginning";
+		WorksheetPositionType["end"]="End";
 	})(WorksheetPositionType=Excel.WorksheetPositionType || (Excel.WorksheetPositionType={}));
 	var _typeFunctionResult="FunctionResult";
 	var FunctionResult=(function (_super) {
@@ -31463,1270 +35360,1270 @@ var Excel;
 			configurable: true
 		});
 		Functions.prototype.abs=function (number) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Abs", 0, [number], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Abs", 0, [number], false, true, null, 0));
 		};
 		Functions.prototype.accrInt=function (issue, firstInterest, settlement, rate, par, frequency, basis, calcMethod) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "AccrInt", 0, [issue, firstInterest, settlement, rate, par, frequency, basis, calcMethod], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "AccrInt", 0, [issue, firstInterest, settlement, rate, par, frequency, basis, calcMethod], false, true, null, 0));
 		};
 		Functions.prototype.accrIntM=function (issue, settlement, rate, par, basis) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "AccrIntM", 0, [issue, settlement, rate, par, basis], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "AccrIntM", 0, [issue, settlement, rate, par, basis], false, true, null, 0));
 		};
 		Functions.prototype.acos=function (number) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Acos", 0, [number], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Acos", 0, [number], false, true, null, 0));
 		};
 		Functions.prototype.acosh=function (number) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Acosh", 0, [number], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Acosh", 0, [number], false, true, null, 0));
 		};
 		Functions.prototype.acot=function (number) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Acot", 0, [number], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Acot", 0, [number], false, true, null, 0));
 		};
 		Functions.prototype.acoth=function (number) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Acoth", 0, [number], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Acoth", 0, [number], false, true, null, 0));
 		};
 		Functions.prototype.amorDegrc=function (cost, datePurchased, firstPeriod, salvage, period, rate, basis) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "AmorDegrc", 0, [cost, datePurchased, firstPeriod, salvage, period, rate, basis], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "AmorDegrc", 0, [cost, datePurchased, firstPeriod, salvage, period, rate, basis], false, true, null, 0));
 		};
 		Functions.prototype.amorLinc=function (cost, datePurchased, firstPeriod, salvage, period, rate, basis) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "AmorLinc", 0, [cost, datePurchased, firstPeriod, salvage, period, rate, basis], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "AmorLinc", 0, [cost, datePurchased, firstPeriod, salvage, period, rate, basis], false, true, null, 0));
 		};
 		Functions.prototype.and=function () {
 			var values=[];
-			for (var _a=0; _a < arguments.length; _a++) {
-				values[_a]=arguments[_a];
+			for (var _i=0; _i < arguments.length; _i++) {
+				values[_i]=arguments[_i];
 			}
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "And", 0, [values], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "And", 0, [values], false, true, null, 0));
 		};
 		Functions.prototype.arabic=function (text) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Arabic", 0, [text], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Arabic", 0, [text], false, true, null, 0));
 		};
 		Functions.prototype.areas=function (reference) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Areas", 0, [reference], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Areas", 0, [reference], false, true, null, 0));
 		};
 		Functions.prototype.asc=function (text) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Asc", 0, [text], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Asc", 0, [text], false, true, null, 0));
 		};
 		Functions.prototype.asin=function (number) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Asin", 0, [number], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Asin", 0, [number], false, true, null, 0));
 		};
 		Functions.prototype.asinh=function (number) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Asinh", 0, [number], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Asinh", 0, [number], false, true, null, 0));
 		};
 		Functions.prototype.atan=function (number) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Atan", 0, [number], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Atan", 0, [number], false, true, null, 0));
 		};
 		Functions.prototype.atan2=function (xNum, yNum) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Atan2", 0, [xNum, yNum], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Atan2", 0, [xNum, yNum], false, true, null, 0));
 		};
 		Functions.prototype.atanh=function (number) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Atanh", 0, [number], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Atanh", 0, [number], false, true, null, 0));
 		};
 		Functions.prototype.aveDev=function () {
 			var values=[];
-			for (var _a=0; _a < arguments.length; _a++) {
-				values[_a]=arguments[_a];
+			for (var _i=0; _i < arguments.length; _i++) {
+				values[_i]=arguments[_i];
 			}
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "AveDev", 0, [values], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "AveDev", 0, [values], false, true, null, 0));
 		};
 		Functions.prototype.average=function () {
 			var values=[];
-			for (var _a=0; _a < arguments.length; _a++) {
-				values[_a]=arguments[_a];
+			for (var _i=0; _i < arguments.length; _i++) {
+				values[_i]=arguments[_i];
 			}
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Average", 0, [values], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Average", 0, [values], false, true, null, 0));
 		};
 		Functions.prototype.averageA=function () {
 			var values=[];
-			for (var _a=0; _a < arguments.length; _a++) {
-				values[_a]=arguments[_a];
+			for (var _i=0; _i < arguments.length; _i++) {
+				values[_i]=arguments[_i];
 			}
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "AverageA", 0, [values], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "AverageA", 0, [values], false, true, null, 0));
 		};
 		Functions.prototype.averageIf=function (range, criteria, averageRange) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "AverageIf", 0, [range, criteria, averageRange], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "AverageIf", 0, [range, criteria, averageRange], false, true, null, 0));
 		};
 		Functions.prototype.averageIfs=function (averageRange) {
 			var values=[];
-			for (var _a=1; _a < arguments.length; _a++) {
-				values[_a - 1]=arguments[_a];
+			for (var _i=1; _i < arguments.length; _i++) {
+				values[_i - 1]=arguments[_i];
 			}
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "AverageIfs", 0, [averageRange, values], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "AverageIfs", 0, [averageRange, values], false, true, null, 0));
 		};
 		Functions.prototype.bahtText=function (number) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "BahtText", 0, [number], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "BahtText", 0, [number], false, true, null, 0));
 		};
 		Functions.prototype.base=function (number, radix, minLength) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Base", 0, [number, radix, minLength], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Base", 0, [number, radix, minLength], false, true, null, 0));
 		};
 		Functions.prototype.besselI=function (x, n) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "BesselI", 0, [x, n], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "BesselI", 0, [x, n], false, true, null, 0));
 		};
 		Functions.prototype.besselJ=function (x, n) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "BesselJ", 0, [x, n], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "BesselJ", 0, [x, n], false, true, null, 0));
 		};
 		Functions.prototype.besselK=function (x, n) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "BesselK", 0, [x, n], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "BesselK", 0, [x, n], false, true, null, 0));
 		};
 		Functions.prototype.besselY=function (x, n) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "BesselY", 0, [x, n], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "BesselY", 0, [x, n], false, true, null, 0));
 		};
 		Functions.prototype.beta_Dist=function (x, alpha, beta, cumulative, A, B) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Beta_Dist", 0, [x, alpha, beta, cumulative, A, B], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Beta_Dist", 0, [x, alpha, beta, cumulative, A, B], false, true, null, 0));
 		};
 		Functions.prototype.beta_Inv=function (probability, alpha, beta, A, B) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Beta_Inv", 0, [probability, alpha, beta, A, B], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Beta_Inv", 0, [probability, alpha, beta, A, B], false, true, null, 0));
 		};
 		Functions.prototype.bin2Dec=function (number) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Bin2Dec", 0, [number], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Bin2Dec", 0, [number], false, true, null, 0));
 		};
 		Functions.prototype.bin2Hex=function (number, places) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Bin2Hex", 0, [number, places], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Bin2Hex", 0, [number, places], false, true, null, 0));
 		};
 		Functions.prototype.bin2Oct=function (number, places) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Bin2Oct", 0, [number, places], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Bin2Oct", 0, [number, places], false, true, null, 0));
 		};
 		Functions.prototype.binom_Dist=function (numberS, trials, probabilityS, cumulative) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Binom_Dist", 0, [numberS, trials, probabilityS, cumulative], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Binom_Dist", 0, [numberS, trials, probabilityS, cumulative], false, true, null, 0));
 		};
 		Functions.prototype.binom_Dist_Range=function (trials, probabilityS, numberS, numberS2) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Binom_Dist_Range", 0, [trials, probabilityS, numberS, numberS2], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Binom_Dist_Range", 0, [trials, probabilityS, numberS, numberS2], false, true, null, 0));
 		};
 		Functions.prototype.binom_Inv=function (trials, probabilityS, alpha) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Binom_Inv", 0, [trials, probabilityS, alpha], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Binom_Inv", 0, [trials, probabilityS, alpha], false, true, null, 0));
 		};
 		Functions.prototype.bitand=function (number1, number2) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Bitand", 0, [number1, number2], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Bitand", 0, [number1, number2], false, true, null, 0));
 		};
 		Functions.prototype.bitlshift=function (number, shiftAmount) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Bitlshift", 0, [number, shiftAmount], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Bitlshift", 0, [number, shiftAmount], false, true, null, 0));
 		};
 		Functions.prototype.bitor=function (number1, number2) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Bitor", 0, [number1, number2], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Bitor", 0, [number1, number2], false, true, null, 0));
 		};
 		Functions.prototype.bitrshift=function (number, shiftAmount) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Bitrshift", 0, [number, shiftAmount], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Bitrshift", 0, [number, shiftAmount], false, true, null, 0));
 		};
 		Functions.prototype.bitxor=function (number1, number2) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Bitxor", 0, [number1, number2], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Bitxor", 0, [number1, number2], false, true, null, 0));
 		};
 		Functions.prototype.ceiling_Math=function (number, significance, mode) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Ceiling_Math", 0, [number, significance, mode], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Ceiling_Math", 0, [number, significance, mode], false, true, null, 0));
 		};
 		Functions.prototype.ceiling_Precise=function (number, significance) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Ceiling_Precise", 0, [number, significance], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Ceiling_Precise", 0, [number, significance], false, true, null, 0));
 		};
 		Functions.prototype.char=function (number) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Char", 0, [number], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Char", 0, [number], false, true, null, 0));
 		};
 		Functions.prototype.chiSq_Dist=function (x, degFreedom, cumulative) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "ChiSq_Dist", 0, [x, degFreedom, cumulative], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "ChiSq_Dist", 0, [x, degFreedom, cumulative], false, true, null, 0));
 		};
 		Functions.prototype.chiSq_Dist_RT=function (x, degFreedom) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "ChiSq_Dist_RT", 0, [x, degFreedom], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "ChiSq_Dist_RT", 0, [x, degFreedom], false, true, null, 0));
 		};
 		Functions.prototype.chiSq_Inv=function (probability, degFreedom) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "ChiSq_Inv", 0, [probability, degFreedom], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "ChiSq_Inv", 0, [probability, degFreedom], false, true, null, 0));
 		};
 		Functions.prototype.chiSq_Inv_RT=function (probability, degFreedom) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "ChiSq_Inv_RT", 0, [probability, degFreedom], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "ChiSq_Inv_RT", 0, [probability, degFreedom], false, true, null, 0));
 		};
 		Functions.prototype.choose=function (indexNum) {
 			var values=[];
-			for (var _a=1; _a < arguments.length; _a++) {
-				values[_a - 1]=arguments[_a];
+			for (var _i=1; _i < arguments.length; _i++) {
+				values[_i - 1]=arguments[_i];
 			}
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Choose", 0, [indexNum, values], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Choose", 0, [indexNum, values], false, true, null, 0));
 		};
 		Functions.prototype.clean=function (text) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Clean", 0, [text], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Clean", 0, [text], false, true, null, 0));
 		};
 		Functions.prototype.code=function (text) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Code", 0, [text], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Code", 0, [text], false, true, null, 0));
 		};
 		Functions.prototype.columns=function (array) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Columns", 0, [array], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Columns", 0, [array], false, true, null, 0));
 		};
 		Functions.prototype.combin=function (number, numberChosen) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Combin", 0, [number, numberChosen], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Combin", 0, [number, numberChosen], false, true, null, 0));
 		};
 		Functions.prototype.combina=function (number, numberChosen) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Combina", 0, [number, numberChosen], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Combina", 0, [number, numberChosen], false, true, null, 0));
 		};
 		Functions.prototype.complex=function (realNum, iNum, suffix) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Complex", 0, [realNum, iNum, suffix], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Complex", 0, [realNum, iNum, suffix], false, true, null, 0));
 		};
 		Functions.prototype.concatenate=function () {
 			var values=[];
-			for (var _a=0; _a < arguments.length; _a++) {
-				values[_a]=arguments[_a];
+			for (var _i=0; _i < arguments.length; _i++) {
+				values[_i]=arguments[_i];
 			}
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Concatenate", 0, [values], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Concatenate", 0, [values], false, true, null, 0));
 		};
 		Functions.prototype.confidence_Norm=function (alpha, standardDev, size) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Confidence_Norm", 0, [alpha, standardDev, size], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Confidence_Norm", 0, [alpha, standardDev, size], false, true, null, 0));
 		};
 		Functions.prototype.confidence_T=function (alpha, standardDev, size) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Confidence_T", 0, [alpha, standardDev, size], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Confidence_T", 0, [alpha, standardDev, size], false, true, null, 0));
 		};
 		Functions.prototype.convert=function (number, fromUnit, toUnit) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Convert", 0, [number, fromUnit, toUnit], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Convert", 0, [number, fromUnit, toUnit], false, true, null, 0));
 		};
 		Functions.prototype.cos=function (number) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Cos", 0, [number], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Cos", 0, [number], false, true, null, 0));
 		};
 		Functions.prototype.cosh=function (number) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Cosh", 0, [number], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Cosh", 0, [number], false, true, null, 0));
 		};
 		Functions.prototype.cot=function (number) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Cot", 0, [number], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Cot", 0, [number], false, true, null, 0));
 		};
 		Functions.prototype.coth=function (number) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Coth", 0, [number], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Coth", 0, [number], false, true, null, 0));
 		};
 		Functions.prototype.count=function () {
 			var values=[];
-			for (var _a=0; _a < arguments.length; _a++) {
-				values[_a]=arguments[_a];
+			for (var _i=0; _i < arguments.length; _i++) {
+				values[_i]=arguments[_i];
 			}
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Count", 0, [values], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Count", 0, [values], false, true, null, 0));
 		};
 		Functions.prototype.countA=function () {
 			var values=[];
-			for (var _a=0; _a < arguments.length; _a++) {
-				values[_a]=arguments[_a];
+			for (var _i=0; _i < arguments.length; _i++) {
+				values[_i]=arguments[_i];
 			}
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "CountA", 0, [values], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "CountA", 0, [values], false, true, null, 0));
 		};
 		Functions.prototype.countBlank=function (range) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "CountBlank", 0, [range], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "CountBlank", 0, [range], false, true, null, 0));
 		};
 		Functions.prototype.countIf=function (range, criteria) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "CountIf", 0, [range, criteria], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "CountIf", 0, [range, criteria], false, true, null, 0));
 		};
 		Functions.prototype.countIfs=function () {
 			var values=[];
-			for (var _a=0; _a < arguments.length; _a++) {
-				values[_a]=arguments[_a];
+			for (var _i=0; _i < arguments.length; _i++) {
+				values[_i]=arguments[_i];
 			}
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "CountIfs", 0, [values], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "CountIfs", 0, [values], false, true, null, 0));
 		};
 		Functions.prototype.coupDayBs=function (settlement, maturity, frequency, basis) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "CoupDayBs", 0, [settlement, maturity, frequency, basis], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "CoupDayBs", 0, [settlement, maturity, frequency, basis], false, true, null, 0));
 		};
 		Functions.prototype.coupDays=function (settlement, maturity, frequency, basis) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "CoupDays", 0, [settlement, maturity, frequency, basis], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "CoupDays", 0, [settlement, maturity, frequency, basis], false, true, null, 0));
 		};
 		Functions.prototype.coupDaysNc=function (settlement, maturity, frequency, basis) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "CoupDaysNc", 0, [settlement, maturity, frequency, basis], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "CoupDaysNc", 0, [settlement, maturity, frequency, basis], false, true, null, 0));
 		};
 		Functions.prototype.coupNcd=function (settlement, maturity, frequency, basis) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "CoupNcd", 0, [settlement, maturity, frequency, basis], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "CoupNcd", 0, [settlement, maturity, frequency, basis], false, true, null, 0));
 		};
 		Functions.prototype.coupNum=function (settlement, maturity, frequency, basis) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "CoupNum", 0, [settlement, maturity, frequency, basis], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "CoupNum", 0, [settlement, maturity, frequency, basis], false, true, null, 0));
 		};
 		Functions.prototype.coupPcd=function (settlement, maturity, frequency, basis) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "CoupPcd", 0, [settlement, maturity, frequency, basis], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "CoupPcd", 0, [settlement, maturity, frequency, basis], false, true, null, 0));
 		};
 		Functions.prototype.csc=function (number) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Csc", 0, [number], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Csc", 0, [number], false, true, null, 0));
 		};
 		Functions.prototype.csch=function (number) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Csch", 0, [number], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Csch", 0, [number], false, true, null, 0));
 		};
 		Functions.prototype.cumIPmt=function (rate, nper, pv, startPeriod, endPeriod, type) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "CumIPmt", 0, [rate, nper, pv, startPeriod, endPeriod, type], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "CumIPmt", 0, [rate, nper, pv, startPeriod, endPeriod, type], false, true, null, 0));
 		};
 		Functions.prototype.cumPrinc=function (rate, nper, pv, startPeriod, endPeriod, type) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "CumPrinc", 0, [rate, nper, pv, startPeriod, endPeriod, type], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "CumPrinc", 0, [rate, nper, pv, startPeriod, endPeriod, type], false, true, null, 0));
 		};
 		Functions.prototype.daverage=function (database, field, criteria) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "DAverage", 0, [database, field, criteria], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "DAverage", 0, [database, field, criteria], false, true, null, 0));
 		};
 		Functions.prototype.dcount=function (database, field, criteria) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "DCount", 0, [database, field, criteria], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "DCount", 0, [database, field, criteria], false, true, null, 0));
 		};
 		Functions.prototype.dcountA=function (database, field, criteria) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "DCountA", 0, [database, field, criteria], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "DCountA", 0, [database, field, criteria], false, true, null, 0));
 		};
 		Functions.prototype.dget=function (database, field, criteria) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "DGet", 0, [database, field, criteria], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "DGet", 0, [database, field, criteria], false, true, null, 0));
 		};
 		Functions.prototype.dmax=function (database, field, criteria) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "DMax", 0, [database, field, criteria], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "DMax", 0, [database, field, criteria], false, true, null, 0));
 		};
 		Functions.prototype.dmin=function (database, field, criteria) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "DMin", 0, [database, field, criteria], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "DMin", 0, [database, field, criteria], false, true, null, 0));
 		};
 		Functions.prototype.dproduct=function (database, field, criteria) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "DProduct", 0, [database, field, criteria], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "DProduct", 0, [database, field, criteria], false, true, null, 0));
 		};
 		Functions.prototype.dstDev=function (database, field, criteria) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "DStDev", 0, [database, field, criteria], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "DStDev", 0, [database, field, criteria], false, true, null, 0));
 		};
 		Functions.prototype.dstDevP=function (database, field, criteria) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "DStDevP", 0, [database, field, criteria], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "DStDevP", 0, [database, field, criteria], false, true, null, 0));
 		};
 		Functions.prototype.dsum=function (database, field, criteria) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "DSum", 0, [database, field, criteria], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "DSum", 0, [database, field, criteria], false, true, null, 0));
 		};
 		Functions.prototype.dvar=function (database, field, criteria) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "DVar", 0, [database, field, criteria], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "DVar", 0, [database, field, criteria], false, true, null, 0));
 		};
 		Functions.prototype.dvarP=function (database, field, criteria) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "DVarP", 0, [database, field, criteria], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "DVarP", 0, [database, field, criteria], false, true, null, 0));
 		};
 		Functions.prototype.date=function (year, month, day) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Date", 0, [year, month, day], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Date", 0, [year, month, day], false, true, null, 0));
 		};
 		Functions.prototype.datevalue=function (dateText) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Datevalue", 0, [dateText], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Datevalue", 0, [dateText], false, true, null, 0));
 		};
 		Functions.prototype.day=function (serialNumber) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Day", 0, [serialNumber], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Day", 0, [serialNumber], false, true, null, 0));
 		};
 		Functions.prototype.days=function (endDate, startDate) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Days", 0, [endDate, startDate], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Days", 0, [endDate, startDate], false, true, null, 0));
 		};
 		Functions.prototype.days360=function (startDate, endDate, method) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Days360", 0, [startDate, endDate, method], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Days360", 0, [startDate, endDate, method], false, true, null, 0));
 		};
 		Functions.prototype.db=function (cost, salvage, life, period, month) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Db", 0, [cost, salvage, life, period, month], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Db", 0, [cost, salvage, life, period, month], false, true, null, 0));
 		};
 		Functions.prototype.dbcs=function (text) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Dbcs", 0, [text], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Dbcs", 0, [text], false, true, null, 0));
 		};
 		Functions.prototype.ddb=function (cost, salvage, life, period, factor) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Ddb", 0, [cost, salvage, life, period, factor], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Ddb", 0, [cost, salvage, life, period, factor], false, true, null, 0));
 		};
 		Functions.prototype.dec2Bin=function (number, places) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Dec2Bin", 0, [number, places], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Dec2Bin", 0, [number, places], false, true, null, 0));
 		};
 		Functions.prototype.dec2Hex=function (number, places) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Dec2Hex", 0, [number, places], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Dec2Hex", 0, [number, places], false, true, null, 0));
 		};
 		Functions.prototype.dec2Oct=function (number, places) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Dec2Oct", 0, [number, places], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Dec2Oct", 0, [number, places], false, true, null, 0));
 		};
 		Functions.prototype.decimal=function (number, radix) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Decimal", 0, [number, radix], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Decimal", 0, [number, radix], false, true, null, 0));
 		};
 		Functions.prototype.degrees=function (angle) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Degrees", 0, [angle], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Degrees", 0, [angle], false, true, null, 0));
 		};
 		Functions.prototype.delta=function (number1, number2) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Delta", 0, [number1, number2], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Delta", 0, [number1, number2], false, true, null, 0));
 		};
 		Functions.prototype.devSq=function () {
 			var values=[];
-			for (var _a=0; _a < arguments.length; _a++) {
-				values[_a]=arguments[_a];
+			for (var _i=0; _i < arguments.length; _i++) {
+				values[_i]=arguments[_i];
 			}
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "DevSq", 0, [values], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "DevSq", 0, [values], false, true, null, 0));
 		};
 		Functions.prototype.disc=function (settlement, maturity, pr, redemption, basis) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Disc", 0, [settlement, maturity, pr, redemption, basis], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Disc", 0, [settlement, maturity, pr, redemption, basis], false, true, null, 0));
 		};
 		Functions.prototype.dollar=function (number, decimals) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Dollar", 0, [number, decimals], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Dollar", 0, [number, decimals], false, true, null, 0));
 		};
 		Functions.prototype.dollarDe=function (fractionalDollar, fraction) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "DollarDe", 0, [fractionalDollar, fraction], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "DollarDe", 0, [fractionalDollar, fraction], false, true, null, 0));
 		};
 		Functions.prototype.dollarFr=function (decimalDollar, fraction) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "DollarFr", 0, [decimalDollar, fraction], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "DollarFr", 0, [decimalDollar, fraction], false, true, null, 0));
 		};
 		Functions.prototype.duration=function (settlement, maturity, coupon, yld, frequency, basis) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Duration", 0, [settlement, maturity, coupon, yld, frequency, basis], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Duration", 0, [settlement, maturity, coupon, yld, frequency, basis], false, true, null, 0));
 		};
 		Functions.prototype.ecma_Ceiling=function (number, significance) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "ECMA_Ceiling", 0, [number, significance], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "ECMA_Ceiling", 0, [number, significance], false, true, null, 0));
 		};
 		Functions.prototype.edate=function (startDate, months) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "EDate", 0, [startDate, months], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "EDate", 0, [startDate, months], false, true, null, 0));
 		};
 		Functions.prototype.effect=function (nominalRate, npery) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Effect", 0, [nominalRate, npery], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Effect", 0, [nominalRate, npery], false, true, null, 0));
 		};
 		Functions.prototype.eoMonth=function (startDate, months) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "EoMonth", 0, [startDate, months], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "EoMonth", 0, [startDate, months], false, true, null, 0));
 		};
 		Functions.prototype.erf=function (lowerLimit, upperLimit) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Erf", 0, [lowerLimit, upperLimit], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Erf", 0, [lowerLimit, upperLimit], false, true, null, 0));
 		};
 		Functions.prototype.erfC=function (x) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "ErfC", 0, [x], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "ErfC", 0, [x], false, true, null, 0));
 		};
 		Functions.prototype.erfC_Precise=function (X) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "ErfC_Precise", 0, [X], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "ErfC_Precise", 0, [X], false, true, null, 0));
 		};
 		Functions.prototype.erf_Precise=function (X) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Erf_Precise", 0, [X], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Erf_Precise", 0, [X], false, true, null, 0));
 		};
 		Functions.prototype.error_Type=function (errorVal) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Error_Type", 0, [errorVal], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Error_Type", 0, [errorVal], false, true, null, 0));
 		};
 		Functions.prototype.even=function (number) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Even", 0, [number], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Even", 0, [number], false, true, null, 0));
 		};
 		Functions.prototype.exact=function (text1, text2) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Exact", 0, [text1, text2], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Exact", 0, [text1, text2], false, true, null, 0));
 		};
 		Functions.prototype.exp=function (number) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Exp", 0, [number], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Exp", 0, [number], false, true, null, 0));
 		};
 		Functions.prototype.expon_Dist=function (x, lambda, cumulative) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Expon_Dist", 0, [x, lambda, cumulative], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Expon_Dist", 0, [x, lambda, cumulative], false, true, null, 0));
 		};
 		Functions.prototype.fvschedule=function (principal, schedule) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "FVSchedule", 0, [principal, schedule], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "FVSchedule", 0, [principal, schedule], false, true, null, 0));
 		};
 		Functions.prototype.f_Dist=function (x, degFreedom1, degFreedom2, cumulative) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "F_Dist", 0, [x, degFreedom1, degFreedom2, cumulative], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "F_Dist", 0, [x, degFreedom1, degFreedom2, cumulative], false, true, null, 0));
 		};
 		Functions.prototype.f_Dist_RT=function (x, degFreedom1, degFreedom2) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "F_Dist_RT", 0, [x, degFreedom1, degFreedom2], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "F_Dist_RT", 0, [x, degFreedom1, degFreedom2], false, true, null, 0));
 		};
 		Functions.prototype.f_Inv=function (probability, degFreedom1, degFreedom2) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "F_Inv", 0, [probability, degFreedom1, degFreedom2], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "F_Inv", 0, [probability, degFreedom1, degFreedom2], false, true, null, 0));
 		};
 		Functions.prototype.f_Inv_RT=function (probability, degFreedom1, degFreedom2) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "F_Inv_RT", 0, [probability, degFreedom1, degFreedom2], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "F_Inv_RT", 0, [probability, degFreedom1, degFreedom2], false, true, null, 0));
 		};
 		Functions.prototype.fact=function (number) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Fact", 0, [number], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Fact", 0, [number], false, true, null, 0));
 		};
 		Functions.prototype.factDouble=function (number) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "FactDouble", 0, [number], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "FactDouble", 0, [number], false, true, null, 0));
 		};
 		Functions.prototype.false=function () {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "False", 0, [], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "False", 0, [], false, true, null, 0));
 		};
 		Functions.prototype.find=function (findText, withinText, startNum) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Find", 0, [findText, withinText, startNum], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Find", 0, [findText, withinText, startNum], false, true, null, 0));
 		};
 		Functions.prototype.findB=function (findText, withinText, startNum) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "FindB", 0, [findText, withinText, startNum], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "FindB", 0, [findText, withinText, startNum], false, true, null, 0));
 		};
 		Functions.prototype.fisher=function (x) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Fisher", 0, [x], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Fisher", 0, [x], false, true, null, 0));
 		};
 		Functions.prototype.fisherInv=function (y) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "FisherInv", 0, [y], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "FisherInv", 0, [y], false, true, null, 0));
 		};
 		Functions.prototype.fixed=function (number, decimals, noCommas) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Fixed", 0, [number, decimals, noCommas], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Fixed", 0, [number, decimals, noCommas], false, true, null, 0));
 		};
 		Functions.prototype.floor_Math=function (number, significance, mode) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Floor_Math", 0, [number, significance, mode], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Floor_Math", 0, [number, significance, mode], false, true, null, 0));
 		};
 		Functions.prototype.floor_Precise=function (number, significance) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Floor_Precise", 0, [number, significance], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Floor_Precise", 0, [number, significance], false, true, null, 0));
 		};
 		Functions.prototype.fv=function (rate, nper, pmt, pv, type) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Fv", 0, [rate, nper, pmt, pv, type], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Fv", 0, [rate, nper, pmt, pv, type], false, true, null, 0));
 		};
 		Functions.prototype.gamma=function (x) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Gamma", 0, [x], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Gamma", 0, [x], false, true, null, 0));
 		};
 		Functions.prototype.gammaLn=function (x) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "GammaLn", 0, [x], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "GammaLn", 0, [x], false, true, null, 0));
 		};
 		Functions.prototype.gammaLn_Precise=function (x) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "GammaLn_Precise", 0, [x], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "GammaLn_Precise", 0, [x], false, true, null, 0));
 		};
 		Functions.prototype.gamma_Dist=function (x, alpha, beta, cumulative) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Gamma_Dist", 0, [x, alpha, beta, cumulative], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Gamma_Dist", 0, [x, alpha, beta, cumulative], false, true, null, 0));
 		};
 		Functions.prototype.gamma_Inv=function (probability, alpha, beta) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Gamma_Inv", 0, [probability, alpha, beta], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Gamma_Inv", 0, [probability, alpha, beta], false, true, null, 0));
 		};
 		Functions.prototype.gauss=function (x) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Gauss", 0, [x], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Gauss", 0, [x], false, true, null, 0));
 		};
 		Functions.prototype.gcd=function () {
 			var values=[];
-			for (var _a=0; _a < arguments.length; _a++) {
-				values[_a]=arguments[_a];
+			for (var _i=0; _i < arguments.length; _i++) {
+				values[_i]=arguments[_i];
 			}
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Gcd", 0, [values], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Gcd", 0, [values], false, true, null, 0));
 		};
 		Functions.prototype.geStep=function (number, step) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "GeStep", 0, [number, step], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "GeStep", 0, [number, step], false, true, null, 0));
 		};
 		Functions.prototype.geoMean=function () {
 			var values=[];
-			for (var _a=0; _a < arguments.length; _a++) {
-				values[_a]=arguments[_a];
+			for (var _i=0; _i < arguments.length; _i++) {
+				values[_i]=arguments[_i];
 			}
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "GeoMean", 0, [values], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "GeoMean", 0, [values], false, true, null, 0));
 		};
 		Functions.prototype.hlookup=function (lookupValue, tableArray, rowIndexNum, rangeLookup) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "HLookup", 0, [lookupValue, tableArray, rowIndexNum, rangeLookup], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "HLookup", 0, [lookupValue, tableArray, rowIndexNum, rangeLookup], false, true, null, 0));
 		};
 		Functions.prototype.harMean=function () {
 			var values=[];
-			for (var _a=0; _a < arguments.length; _a++) {
-				values[_a]=arguments[_a];
+			for (var _i=0; _i < arguments.length; _i++) {
+				values[_i]=arguments[_i];
 			}
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "HarMean", 0, [values], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "HarMean", 0, [values], false, true, null, 0));
 		};
 		Functions.prototype.hex2Bin=function (number, places) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Hex2Bin", 0, [number, places], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Hex2Bin", 0, [number, places], false, true, null, 0));
 		};
 		Functions.prototype.hex2Dec=function (number) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Hex2Dec", 0, [number], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Hex2Dec", 0, [number], false, true, null, 0));
 		};
 		Functions.prototype.hex2Oct=function (number, places) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Hex2Oct", 0, [number, places], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Hex2Oct", 0, [number, places], false, true, null, 0));
 		};
 		Functions.prototype.hour=function (serialNumber) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Hour", 0, [serialNumber], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Hour", 0, [serialNumber], false, true, null, 0));
 		};
 		Functions.prototype.hypGeom_Dist=function (sampleS, numberSample, populationS, numberPop, cumulative) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "HypGeom_Dist", 0, [sampleS, numberSample, populationS, numberPop, cumulative], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "HypGeom_Dist", 0, [sampleS, numberSample, populationS, numberPop, cumulative], false, true, null, 0));
 		};
 		Functions.prototype.hyperlink=function (linkLocation, friendlyName) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Hyperlink", 0, [linkLocation, friendlyName], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Hyperlink", 0, [linkLocation, friendlyName], false, true, null, 0));
 		};
 		Functions.prototype.iso_Ceiling=function (number, significance) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "ISO_Ceiling", 0, [number, significance], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "ISO_Ceiling", 0, [number, significance], false, true, null, 0));
 		};
 		Functions.prototype.if=function (logicalTest, valueIfTrue, valueIfFalse) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "If", 0, [logicalTest, valueIfTrue, valueIfFalse], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "If", 0, [logicalTest, valueIfTrue, valueIfFalse], false, true, null, 0));
 		};
 		Functions.prototype.imAbs=function (inumber) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "ImAbs", 0, [inumber], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "ImAbs", 0, [inumber], false, true, null, 0));
 		};
 		Functions.prototype.imArgument=function (inumber) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "ImArgument", 0, [inumber], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "ImArgument", 0, [inumber], false, true, null, 0));
 		};
 		Functions.prototype.imConjugate=function (inumber) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "ImConjugate", 0, [inumber], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "ImConjugate", 0, [inumber], false, true, null, 0));
 		};
 		Functions.prototype.imCos=function (inumber) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "ImCos", 0, [inumber], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "ImCos", 0, [inumber], false, true, null, 0));
 		};
 		Functions.prototype.imCosh=function (inumber) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "ImCosh", 0, [inumber], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "ImCosh", 0, [inumber], false, true, null, 0));
 		};
 		Functions.prototype.imCot=function (inumber) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "ImCot", 0, [inumber], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "ImCot", 0, [inumber], false, true, null, 0));
 		};
 		Functions.prototype.imCsc=function (inumber) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "ImCsc", 0, [inumber], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "ImCsc", 0, [inumber], false, true, null, 0));
 		};
 		Functions.prototype.imCsch=function (inumber) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "ImCsch", 0, [inumber], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "ImCsch", 0, [inumber], false, true, null, 0));
 		};
 		Functions.prototype.imDiv=function (inumber1, inumber2) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "ImDiv", 0, [inumber1, inumber2], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "ImDiv", 0, [inumber1, inumber2], false, true, null, 0));
 		};
 		Functions.prototype.imExp=function (inumber) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "ImExp", 0, [inumber], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "ImExp", 0, [inumber], false, true, null, 0));
 		};
 		Functions.prototype.imLn=function (inumber) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "ImLn", 0, [inumber], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "ImLn", 0, [inumber], false, true, null, 0));
 		};
 		Functions.prototype.imLog10=function (inumber) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "ImLog10", 0, [inumber], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "ImLog10", 0, [inumber], false, true, null, 0));
 		};
 		Functions.prototype.imLog2=function (inumber) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "ImLog2", 0, [inumber], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "ImLog2", 0, [inumber], false, true, null, 0));
 		};
 		Functions.prototype.imPower=function (inumber, number) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "ImPower", 0, [inumber, number], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "ImPower", 0, [inumber, number], false, true, null, 0));
 		};
 		Functions.prototype.imProduct=function () {
 			var values=[];
-			for (var _a=0; _a < arguments.length; _a++) {
-				values[_a]=arguments[_a];
+			for (var _i=0; _i < arguments.length; _i++) {
+				values[_i]=arguments[_i];
 			}
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "ImProduct", 0, [values], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "ImProduct", 0, [values], false, true, null, 0));
 		};
 		Functions.prototype.imReal=function (inumber) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "ImReal", 0, [inumber], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "ImReal", 0, [inumber], false, true, null, 0));
 		};
 		Functions.prototype.imSec=function (inumber) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "ImSec", 0, [inumber], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "ImSec", 0, [inumber], false, true, null, 0));
 		};
 		Functions.prototype.imSech=function (inumber) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "ImSech", 0, [inumber], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "ImSech", 0, [inumber], false, true, null, 0));
 		};
 		Functions.prototype.imSin=function (inumber) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "ImSin", 0, [inumber], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "ImSin", 0, [inumber], false, true, null, 0));
 		};
 		Functions.prototype.imSinh=function (inumber) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "ImSinh", 0, [inumber], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "ImSinh", 0, [inumber], false, true, null, 0));
 		};
 		Functions.prototype.imSqrt=function (inumber) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "ImSqrt", 0, [inumber], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "ImSqrt", 0, [inumber], false, true, null, 0));
 		};
 		Functions.prototype.imSub=function (inumber1, inumber2) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "ImSub", 0, [inumber1, inumber2], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "ImSub", 0, [inumber1, inumber2], false, true, null, 0));
 		};
 		Functions.prototype.imSum=function () {
 			var values=[];
-			for (var _a=0; _a < arguments.length; _a++) {
-				values[_a]=arguments[_a];
+			for (var _i=0; _i < arguments.length; _i++) {
+				values[_i]=arguments[_i];
 			}
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "ImSum", 0, [values], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "ImSum", 0, [values], false, true, null, 0));
 		};
 		Functions.prototype.imTan=function (inumber) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "ImTan", 0, [inumber], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "ImTan", 0, [inumber], false, true, null, 0));
 		};
 		Functions.prototype.imaginary=function (inumber) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Imaginary", 0, [inumber], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Imaginary", 0, [inumber], false, true, null, 0));
 		};
 		Functions.prototype.int=function (number) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Int", 0, [number], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Int", 0, [number], false, true, null, 0));
 		};
 		Functions.prototype.intRate=function (settlement, maturity, investment, redemption, basis) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "IntRate", 0, [settlement, maturity, investment, redemption, basis], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "IntRate", 0, [settlement, maturity, investment, redemption, basis], false, true, null, 0));
 		};
 		Functions.prototype.ipmt=function (rate, per, nper, pv, fv, type) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Ipmt", 0, [rate, per, nper, pv, fv, type], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Ipmt", 0, [rate, per, nper, pv, fv, type], false, true, null, 0));
 		};
 		Functions.prototype.irr=function (values, guess) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Irr", 0, [values, guess], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Irr", 0, [values, guess], false, true, null, 0));
 		};
 		Functions.prototype.isErr=function (value) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "IsErr", 0, [value], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "IsErr", 0, [value], false, true, null, 0));
 		};
 		Functions.prototype.isError=function (value) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "IsError", 0, [value], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "IsError", 0, [value], false, true, null, 0));
 		};
 		Functions.prototype.isEven=function (number) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "IsEven", 0, [number], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "IsEven", 0, [number], false, true, null, 0));
 		};
 		Functions.prototype.isFormula=function (reference) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "IsFormula", 0, [reference], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "IsFormula", 0, [reference], false, true, null, 0));
 		};
 		Functions.prototype.isLogical=function (value) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "IsLogical", 0, [value], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "IsLogical", 0, [value], false, true, null, 0));
 		};
 		Functions.prototype.isNA=function (value) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "IsNA", 0, [value], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "IsNA", 0, [value], false, true, null, 0));
 		};
 		Functions.prototype.isNonText=function (value) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "IsNonText", 0, [value], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "IsNonText", 0, [value], false, true, null, 0));
 		};
 		Functions.prototype.isNumber=function (value) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "IsNumber", 0, [value], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "IsNumber", 0, [value], false, true, null, 0));
 		};
 		Functions.prototype.isOdd=function (number) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "IsOdd", 0, [number], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "IsOdd", 0, [number], false, true, null, 0));
 		};
 		Functions.prototype.isText=function (value) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "IsText", 0, [value], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "IsText", 0, [value], false, true, null, 0));
 		};
 		Functions.prototype.isoWeekNum=function (date) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "IsoWeekNum", 0, [date], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "IsoWeekNum", 0, [date], false, true, null, 0));
 		};
 		Functions.prototype.ispmt=function (rate, per, nper, pv) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Ispmt", 0, [rate, per, nper, pv], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Ispmt", 0, [rate, per, nper, pv], false, true, null, 0));
 		};
 		Functions.prototype.isref=function (value) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Isref", 0, [value], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Isref", 0, [value], false, true, null, 0));
 		};
 		Functions.prototype.kurt=function () {
 			var values=[];
-			for (var _a=0; _a < arguments.length; _a++) {
-				values[_a]=arguments[_a];
+			for (var _i=0; _i < arguments.length; _i++) {
+				values[_i]=arguments[_i];
 			}
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Kurt", 0, [values], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Kurt", 0, [values], false, true, null, 0));
 		};
 		Functions.prototype.large=function (array, k) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Large", 0, [array, k], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Large", 0, [array, k], false, true, null, 0));
 		};
 		Functions.prototype.lcm=function () {
 			var values=[];
-			for (var _a=0; _a < arguments.length; _a++) {
-				values[_a]=arguments[_a];
+			for (var _i=0; _i < arguments.length; _i++) {
+				values[_i]=arguments[_i];
 			}
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Lcm", 0, [values], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Lcm", 0, [values], false, true, null, 0));
 		};
 		Functions.prototype.left=function (text, numChars) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Left", 0, [text, numChars], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Left", 0, [text, numChars], false, true, null, 0));
 		};
 		Functions.prototype.leftb=function (text, numBytes) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Leftb", 0, [text, numBytes], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Leftb", 0, [text, numBytes], false, true, null, 0));
 		};
 		Functions.prototype.len=function (text) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Len", 0, [text], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Len", 0, [text], false, true, null, 0));
 		};
 		Functions.prototype.lenb=function (text) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Lenb", 0, [text], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Lenb", 0, [text], false, true, null, 0));
 		};
 		Functions.prototype.ln=function (number) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Ln", 0, [number], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Ln", 0, [number], false, true, null, 0));
 		};
 		Functions.prototype.log=function (number, base) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Log", 0, [number, base], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Log", 0, [number, base], false, true, null, 0));
 		};
 		Functions.prototype.log10=function (number) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Log10", 0, [number], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Log10", 0, [number], false, true, null, 0));
 		};
 		Functions.prototype.logNorm_Dist=function (x, mean, standardDev, cumulative) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "LogNorm_Dist", 0, [x, mean, standardDev, cumulative], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "LogNorm_Dist", 0, [x, mean, standardDev, cumulative], false, true, null, 0));
 		};
 		Functions.prototype.logNorm_Inv=function (probability, mean, standardDev) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "LogNorm_Inv", 0, [probability, mean, standardDev], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "LogNorm_Inv", 0, [probability, mean, standardDev], false, true, null, 0));
 		};
 		Functions.prototype.lookup=function (lookupValue, lookupVector, resultVector) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Lookup", 0, [lookupValue, lookupVector, resultVector], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Lookup", 0, [lookupValue, lookupVector, resultVector], false, true, null, 0));
 		};
 		Functions.prototype.lower=function (text) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Lower", 0, [text], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Lower", 0, [text], false, true, null, 0));
 		};
 		Functions.prototype.mduration=function (settlement, maturity, coupon, yld, frequency, basis) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "MDuration", 0, [settlement, maturity, coupon, yld, frequency, basis], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "MDuration", 0, [settlement, maturity, coupon, yld, frequency, basis], false, true, null, 0));
 		};
 		Functions.prototype.mirr=function (values, financeRate, reinvestRate) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "MIrr", 0, [values, financeRate, reinvestRate], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "MIrr", 0, [values, financeRate, reinvestRate], false, true, null, 0));
 		};
 		Functions.prototype.mround=function (number, multiple) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "MRound", 0, [number, multiple], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "MRound", 0, [number, multiple], false, true, null, 0));
 		};
 		Functions.prototype.match=function (lookupValue, lookupArray, matchType) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Match", 0, [lookupValue, lookupArray, matchType], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Match", 0, [lookupValue, lookupArray, matchType], false, true, null, 0));
 		};
 		Functions.prototype.max=function () {
 			var values=[];
-			for (var _a=0; _a < arguments.length; _a++) {
-				values[_a]=arguments[_a];
+			for (var _i=0; _i < arguments.length; _i++) {
+				values[_i]=arguments[_i];
 			}
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Max", 0, [values], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Max", 0, [values], false, true, null, 0));
 		};
 		Functions.prototype.maxA=function () {
 			var values=[];
-			for (var _a=0; _a < arguments.length; _a++) {
-				values[_a]=arguments[_a];
+			for (var _i=0; _i < arguments.length; _i++) {
+				values[_i]=arguments[_i];
 			}
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "MaxA", 0, [values], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "MaxA", 0, [values], false, true, null, 0));
 		};
 		Functions.prototype.median=function () {
 			var values=[];
-			for (var _a=0; _a < arguments.length; _a++) {
-				values[_a]=arguments[_a];
+			for (var _i=0; _i < arguments.length; _i++) {
+				values[_i]=arguments[_i];
 			}
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Median", 0, [values], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Median", 0, [values], false, true, null, 0));
 		};
 		Functions.prototype.mid=function (text, startNum, numChars) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Mid", 0, [text, startNum, numChars], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Mid", 0, [text, startNum, numChars], false, true, null, 0));
 		};
 		Functions.prototype.midb=function (text, startNum, numBytes) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Midb", 0, [text, startNum, numBytes], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Midb", 0, [text, startNum, numBytes], false, true, null, 0));
 		};
 		Functions.prototype.min=function () {
 			var values=[];
-			for (var _a=0; _a < arguments.length; _a++) {
-				values[_a]=arguments[_a];
+			for (var _i=0; _i < arguments.length; _i++) {
+				values[_i]=arguments[_i];
 			}
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Min", 0, [values], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Min", 0, [values], false, true, null, 0));
 		};
 		Functions.prototype.minA=function () {
 			var values=[];
-			for (var _a=0; _a < arguments.length; _a++) {
-				values[_a]=arguments[_a];
+			for (var _i=0; _i < arguments.length; _i++) {
+				values[_i]=arguments[_i];
 			}
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "MinA", 0, [values], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "MinA", 0, [values], false, true, null, 0));
 		};
 		Functions.prototype.minute=function (serialNumber) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Minute", 0, [serialNumber], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Minute", 0, [serialNumber], false, true, null, 0));
 		};
 		Functions.prototype.mod=function (number, divisor) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Mod", 0, [number, divisor], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Mod", 0, [number, divisor], false, true, null, 0));
 		};
 		Functions.prototype.month=function (serialNumber) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Month", 0, [serialNumber], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Month", 0, [serialNumber], false, true, null, 0));
 		};
 		Functions.prototype.multiNomial=function () {
 			var values=[];
-			for (var _a=0; _a < arguments.length; _a++) {
-				values[_a]=arguments[_a];
+			for (var _i=0; _i < arguments.length; _i++) {
+				values[_i]=arguments[_i];
 			}
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "MultiNomial", 0, [values], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "MultiNomial", 0, [values], false, true, null, 0));
 		};
 		Functions.prototype.n=function (value) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "N", 0, [value], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "N", 0, [value], false, true, null, 0));
 		};
 		Functions.prototype.nper=function (rate, pmt, pv, fv, type) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "NPer", 0, [rate, pmt, pv, fv, type], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "NPer", 0, [rate, pmt, pv, fv, type], false, true, null, 0));
 		};
 		Functions.prototype.na=function () {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Na", 0, [], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Na", 0, [], false, true, null, 0));
 		};
 		Functions.prototype.negBinom_Dist=function (numberF, numberS, probabilityS, cumulative) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "NegBinom_Dist", 0, [numberF, numberS, probabilityS, cumulative], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "NegBinom_Dist", 0, [numberF, numberS, probabilityS, cumulative], false, true, null, 0));
 		};
 		Functions.prototype.networkDays=function (startDate, endDate, holidays) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "NetworkDays", 0, [startDate, endDate, holidays], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "NetworkDays", 0, [startDate, endDate, holidays], false, true, null, 0));
 		};
 		Functions.prototype.networkDays_Intl=function (startDate, endDate, weekend, holidays) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "NetworkDays_Intl", 0, [startDate, endDate, weekend, holidays], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "NetworkDays_Intl", 0, [startDate, endDate, weekend, holidays], false, true, null, 0));
 		};
 		Functions.prototype.nominal=function (effectRate, npery) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Nominal", 0, [effectRate, npery], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Nominal", 0, [effectRate, npery], false, true, null, 0));
 		};
 		Functions.prototype.norm_Dist=function (x, mean, standardDev, cumulative) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Norm_Dist", 0, [x, mean, standardDev, cumulative], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Norm_Dist", 0, [x, mean, standardDev, cumulative], false, true, null, 0));
 		};
 		Functions.prototype.norm_Inv=function (probability, mean, standardDev) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Norm_Inv", 0, [probability, mean, standardDev], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Norm_Inv", 0, [probability, mean, standardDev], false, true, null, 0));
 		};
 		Functions.prototype.norm_S_Dist=function (z, cumulative) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Norm_S_Dist", 0, [z, cumulative], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Norm_S_Dist", 0, [z, cumulative], false, true, null, 0));
 		};
 		Functions.prototype.norm_S_Inv=function (probability) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Norm_S_Inv", 0, [probability], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Norm_S_Inv", 0, [probability], false, true, null, 0));
 		};
 		Functions.prototype.not=function (logical) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Not", 0, [logical], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Not", 0, [logical], false, true, null, 0));
 		};
 		Functions.prototype.now=function () {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Now", 0, [], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Now", 0, [], false, true, null, 0));
 		};
 		Functions.prototype.npv=function (rate) {
 			var values=[];
-			for (var _a=1; _a < arguments.length; _a++) {
-				values[_a - 1]=arguments[_a];
+			for (var _i=1; _i < arguments.length; _i++) {
+				values[_i - 1]=arguments[_i];
 			}
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Npv", 0, [rate, values], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Npv", 0, [rate, values], false, true, null, 0));
 		};
 		Functions.prototype.numberValue=function (text, decimalSeparator, groupSeparator) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "NumberValue", 0, [text, decimalSeparator, groupSeparator], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "NumberValue", 0, [text, decimalSeparator, groupSeparator], false, true, null, 0));
 		};
 		Functions.prototype.oct2Bin=function (number, places) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Oct2Bin", 0, [number, places], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Oct2Bin", 0, [number, places], false, true, null, 0));
 		};
 		Functions.prototype.oct2Dec=function (number) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Oct2Dec", 0, [number], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Oct2Dec", 0, [number], false, true, null, 0));
 		};
 		Functions.prototype.oct2Hex=function (number, places) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Oct2Hex", 0, [number, places], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Oct2Hex", 0, [number, places], false, true, null, 0));
 		};
 		Functions.prototype.odd=function (number) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Odd", 0, [number], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Odd", 0, [number], false, true, null, 0));
 		};
 		Functions.prototype.oddFPrice=function (settlement, maturity, issue, firstCoupon, rate, yld, redemption, frequency, basis) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "OddFPrice", 0, [settlement, maturity, issue, firstCoupon, rate, yld, redemption, frequency, basis], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "OddFPrice", 0, [settlement, maturity, issue, firstCoupon, rate, yld, redemption, frequency, basis], false, true, null, 0));
 		};
 		Functions.prototype.oddFYield=function (settlement, maturity, issue, firstCoupon, rate, pr, redemption, frequency, basis) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "OddFYield", 0, [settlement, maturity, issue, firstCoupon, rate, pr, redemption, frequency, basis], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "OddFYield", 0, [settlement, maturity, issue, firstCoupon, rate, pr, redemption, frequency, basis], false, true, null, 0));
 		};
 		Functions.prototype.oddLPrice=function (settlement, maturity, lastInterest, rate, yld, redemption, frequency, basis) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "OddLPrice", 0, [settlement, maturity, lastInterest, rate, yld, redemption, frequency, basis], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "OddLPrice", 0, [settlement, maturity, lastInterest, rate, yld, redemption, frequency, basis], false, true, null, 0));
 		};
 		Functions.prototype.oddLYield=function (settlement, maturity, lastInterest, rate, pr, redemption, frequency, basis) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "OddLYield", 0, [settlement, maturity, lastInterest, rate, pr, redemption, frequency, basis], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "OddLYield", 0, [settlement, maturity, lastInterest, rate, pr, redemption, frequency, basis], false, true, null, 0));
 		};
 		Functions.prototype.or=function () {
 			var values=[];
-			for (var _a=0; _a < arguments.length; _a++) {
-				values[_a]=arguments[_a];
+			for (var _i=0; _i < arguments.length; _i++) {
+				values[_i]=arguments[_i];
 			}
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Or", 0, [values], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Or", 0, [values], false, true, null, 0));
 		};
 		Functions.prototype.pduration=function (rate, pv, fv) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "PDuration", 0, [rate, pv, fv], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "PDuration", 0, [rate, pv, fv], false, true, null, 0));
 		};
 		Functions.prototype.percentRank_Exc=function (array, x, significance) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "PercentRank_Exc", 0, [array, x, significance], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "PercentRank_Exc", 0, [array, x, significance], false, true, null, 0));
 		};
 		Functions.prototype.percentRank_Inc=function (array, x, significance) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "PercentRank_Inc", 0, [array, x, significance], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "PercentRank_Inc", 0, [array, x, significance], false, true, null, 0));
 		};
 		Functions.prototype.percentile_Exc=function (array, k) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Percentile_Exc", 0, [array, k], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Percentile_Exc", 0, [array, k], false, true, null, 0));
 		};
 		Functions.prototype.percentile_Inc=function (array, k) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Percentile_Inc", 0, [array, k], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Percentile_Inc", 0, [array, k], false, true, null, 0));
 		};
 		Functions.prototype.permut=function (number, numberChosen) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Permut", 0, [number, numberChosen], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Permut", 0, [number, numberChosen], false, true, null, 0));
 		};
 		Functions.prototype.permutationa=function (number, numberChosen) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Permutationa", 0, [number, numberChosen], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Permutationa", 0, [number, numberChosen], false, true, null, 0));
 		};
 		Functions.prototype.phi=function (x) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Phi", 0, [x], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Phi", 0, [x], false, true, null, 0));
 		};
 		Functions.prototype.pi=function () {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Pi", 0, [], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Pi", 0, [], false, true, null, 0));
 		};
 		Functions.prototype.pmt=function (rate, nper, pv, fv, type) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Pmt", 0, [rate, nper, pv, fv, type], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Pmt", 0, [rate, nper, pv, fv, type], false, true, null, 0));
 		};
 		Functions.prototype.poisson_Dist=function (x, mean, cumulative) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Poisson_Dist", 0, [x, mean, cumulative], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Poisson_Dist", 0, [x, mean, cumulative], false, true, null, 0));
 		};
 		Functions.prototype.power=function (number, power) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Power", 0, [number, power], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Power", 0, [number, power], false, true, null, 0));
 		};
 		Functions.prototype.ppmt=function (rate, per, nper, pv, fv, type) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Ppmt", 0, [rate, per, nper, pv, fv, type], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Ppmt", 0, [rate, per, nper, pv, fv, type], false, true, null, 0));
 		};
 		Functions.prototype.price=function (settlement, maturity, rate, yld, redemption, frequency, basis) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Price", 0, [settlement, maturity, rate, yld, redemption, frequency, basis], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Price", 0, [settlement, maturity, rate, yld, redemption, frequency, basis], false, true, null, 0));
 		};
 		Functions.prototype.priceDisc=function (settlement, maturity, discount, redemption, basis) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "PriceDisc", 0, [settlement, maturity, discount, redemption, basis], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "PriceDisc", 0, [settlement, maturity, discount, redemption, basis], false, true, null, 0));
 		};
 		Functions.prototype.priceMat=function (settlement, maturity, issue, rate, yld, basis) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "PriceMat", 0, [settlement, maturity, issue, rate, yld, basis], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "PriceMat", 0, [settlement, maturity, issue, rate, yld, basis], false, true, null, 0));
 		};
 		Functions.prototype.product=function () {
 			var values=[];
-			for (var _a=0; _a < arguments.length; _a++) {
-				values[_a]=arguments[_a];
+			for (var _i=0; _i < arguments.length; _i++) {
+				values[_i]=arguments[_i];
 			}
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Product", 0, [values], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Product", 0, [values], false, true, null, 0));
 		};
 		Functions.prototype.proper=function (text) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Proper", 0, [text], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Proper", 0, [text], false, true, null, 0));
 		};
 		Functions.prototype.pv=function (rate, nper, pmt, fv, type) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Pv", 0, [rate, nper, pmt, fv, type], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Pv", 0, [rate, nper, pmt, fv, type], false, true, null, 0));
 		};
 		Functions.prototype.quartile_Exc=function (array, quart) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Quartile_Exc", 0, [array, quart], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Quartile_Exc", 0, [array, quart], false, true, null, 0));
 		};
 		Functions.prototype.quartile_Inc=function (array, quart) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Quartile_Inc", 0, [array, quart], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Quartile_Inc", 0, [array, quart], false, true, null, 0));
 		};
 		Functions.prototype.quotient=function (numerator, denominator) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Quotient", 0, [numerator, denominator], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Quotient", 0, [numerator, denominator], false, true, null, 0));
 		};
 		Functions.prototype.radians=function (angle) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Radians", 0, [angle], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Radians", 0, [angle], false, true, null, 0));
 		};
 		Functions.prototype.rand=function () {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Rand", 0, [], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Rand", 0, [], false, true, null, 0));
 		};
 		Functions.prototype.randBetween=function (bottom, top) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "RandBetween", 0, [bottom, top], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "RandBetween", 0, [bottom, top], false, true, null, 0));
 		};
 		Functions.prototype.rank_Avg=function (number, ref, order) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Rank_Avg", 0, [number, ref, order], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Rank_Avg", 0, [number, ref, order], false, true, null, 0));
 		};
 		Functions.prototype.rank_Eq=function (number, ref, order) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Rank_Eq", 0, [number, ref, order], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Rank_Eq", 0, [number, ref, order], false, true, null, 0));
 		};
 		Functions.prototype.rate=function (nper, pmt, pv, fv, type, guess) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Rate", 0, [nper, pmt, pv, fv, type, guess], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Rate", 0, [nper, pmt, pv, fv, type, guess], false, true, null, 0));
 		};
 		Functions.prototype.received=function (settlement, maturity, investment, discount, basis) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Received", 0, [settlement, maturity, investment, discount, basis], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Received", 0, [settlement, maturity, investment, discount, basis], false, true, null, 0));
 		};
 		Functions.prototype.replace=function (oldText, startNum, numChars, newText) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Replace", 0, [oldText, startNum, numChars, newText], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Replace", 0, [oldText, startNum, numChars, newText], false, true, null, 0));
 		};
 		Functions.prototype.replaceB=function (oldText, startNum, numBytes, newText) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "ReplaceB", 0, [oldText, startNum, numBytes, newText], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "ReplaceB", 0, [oldText, startNum, numBytes, newText], false, true, null, 0));
 		};
 		Functions.prototype.rept=function (text, numberTimes) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Rept", 0, [text, numberTimes], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Rept", 0, [text, numberTimes], false, true, null, 0));
 		};
 		Functions.prototype.right=function (text, numChars) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Right", 0, [text, numChars], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Right", 0, [text, numChars], false, true, null, 0));
 		};
 		Functions.prototype.rightb=function (text, numBytes) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Rightb", 0, [text, numBytes], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Rightb", 0, [text, numBytes], false, true, null, 0));
 		};
 		Functions.prototype.roman=function (number, form) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Roman", 0, [number, form], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Roman", 0, [number, form], false, true, null, 0));
 		};
 		Functions.prototype.round=function (number, numDigits) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Round", 0, [number, numDigits], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Round", 0, [number, numDigits], false, true, null, 0));
 		};
 		Functions.prototype.roundDown=function (number, numDigits) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "RoundDown", 0, [number, numDigits], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "RoundDown", 0, [number, numDigits], false, true, null, 0));
 		};
 		Functions.prototype.roundUp=function (number, numDigits) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "RoundUp", 0, [number, numDigits], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "RoundUp", 0, [number, numDigits], false, true, null, 0));
 		};
 		Functions.prototype.rows=function (array) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Rows", 0, [array], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Rows", 0, [array], false, true, null, 0));
 		};
 		Functions.prototype.rri=function (nper, pv, fv) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Rri", 0, [nper, pv, fv], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Rri", 0, [nper, pv, fv], false, true, null, 0));
 		};
 		Functions.prototype.sec=function (number) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Sec", 0, [number], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Sec", 0, [number], false, true, null, 0));
 		};
 		Functions.prototype.sech=function (number) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Sech", 0, [number], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Sech", 0, [number], false, true, null, 0));
 		};
 		Functions.prototype.second=function (serialNumber) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Second", 0, [serialNumber], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Second", 0, [serialNumber], false, true, null, 0));
 		};
 		Functions.prototype.seriesSum=function (x, n, m, coefficients) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "SeriesSum", 0, [x, n, m, coefficients], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "SeriesSum", 0, [x, n, m, coefficients], false, true, null, 0));
 		};
 		Functions.prototype.sheet=function (value) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Sheet", 0, [value], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Sheet", 0, [value], false, true, null, 0));
 		};
 		Functions.prototype.sheets=function (reference) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Sheets", 0, [reference], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Sheets", 0, [reference], false, true, null, 0));
 		};
 		Functions.prototype.sign=function (number) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Sign", 0, [number], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Sign", 0, [number], false, true, null, 0));
 		};
 		Functions.prototype.sin=function (number) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Sin", 0, [number], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Sin", 0, [number], false, true, null, 0));
 		};
 		Functions.prototype.sinh=function (number) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Sinh", 0, [number], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Sinh", 0, [number], false, true, null, 0));
 		};
 		Functions.prototype.skew=function () {
 			var values=[];
-			for (var _a=0; _a < arguments.length; _a++) {
-				values[_a]=arguments[_a];
+			for (var _i=0; _i < arguments.length; _i++) {
+				values[_i]=arguments[_i];
 			}
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Skew", 0, [values], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Skew", 0, [values], false, true, null, 0));
 		};
 		Functions.prototype.skew_p=function () {
 			var values=[];
-			for (var _a=0; _a < arguments.length; _a++) {
-				values[_a]=arguments[_a];
+			for (var _i=0; _i < arguments.length; _i++) {
+				values[_i]=arguments[_i];
 			}
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Skew_p", 0, [values], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Skew_p", 0, [values], false, true, null, 0));
 		};
 		Functions.prototype.sln=function (cost, salvage, life) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Sln", 0, [cost, salvage, life], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Sln", 0, [cost, salvage, life], false, true, null, 0));
 		};
 		Functions.prototype.small=function (array, k) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Small", 0, [array, k], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Small", 0, [array, k], false, true, null, 0));
 		};
 		Functions.prototype.sqrt=function (number) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Sqrt", 0, [number], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Sqrt", 0, [number], false, true, null, 0));
 		};
 		Functions.prototype.sqrtPi=function (number) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "SqrtPi", 0, [number], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "SqrtPi", 0, [number], false, true, null, 0));
 		};
 		Functions.prototype.stDevA=function () {
 			var values=[];
-			for (var _a=0; _a < arguments.length; _a++) {
-				values[_a]=arguments[_a];
+			for (var _i=0; _i < arguments.length; _i++) {
+				values[_i]=arguments[_i];
 			}
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "StDevA", 0, [values], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "StDevA", 0, [values], false, true, null, 0));
 		};
 		Functions.prototype.stDevPA=function () {
 			var values=[];
-			for (var _a=0; _a < arguments.length; _a++) {
-				values[_a]=arguments[_a];
+			for (var _i=0; _i < arguments.length; _i++) {
+				values[_i]=arguments[_i];
 			}
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "StDevPA", 0, [values], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "StDevPA", 0, [values], false, true, null, 0));
 		};
 		Functions.prototype.stDev_P=function () {
 			var values=[];
-			for (var _a=0; _a < arguments.length; _a++) {
-				values[_a]=arguments[_a];
+			for (var _i=0; _i < arguments.length; _i++) {
+				values[_i]=arguments[_i];
 			}
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "StDev_P", 0, [values], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "StDev_P", 0, [values], false, true, null, 0));
 		};
 		Functions.prototype.stDev_S=function () {
 			var values=[];
-			for (var _a=0; _a < arguments.length; _a++) {
-				values[_a]=arguments[_a];
+			for (var _i=0; _i < arguments.length; _i++) {
+				values[_i]=arguments[_i];
 			}
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "StDev_S", 0, [values], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "StDev_S", 0, [values], false, true, null, 0));
 		};
 		Functions.prototype.standardize=function (x, mean, standardDev) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Standardize", 0, [x, mean, standardDev], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Standardize", 0, [x, mean, standardDev], false, true, null, 0));
 		};
 		Functions.prototype.substitute=function (text, oldText, newText, instanceNum) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Substitute", 0, [text, oldText, newText, instanceNum], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Substitute", 0, [text, oldText, newText, instanceNum], false, true, null, 0));
 		};
 		Functions.prototype.subtotal=function (functionNum) {
 			var values=[];
-			for (var _a=1; _a < arguments.length; _a++) {
-				values[_a - 1]=arguments[_a];
+			for (var _i=1; _i < arguments.length; _i++) {
+				values[_i - 1]=arguments[_i];
 			}
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Subtotal", 0, [functionNum, values], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Subtotal", 0, [functionNum, values], false, true, null, 0));
 		};
 		Functions.prototype.sum=function () {
 			var values=[];
-			for (var _a=0; _a < arguments.length; _a++) {
-				values[_a]=arguments[_a];
+			for (var _i=0; _i < arguments.length; _i++) {
+				values[_i]=arguments[_i];
 			}
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Sum", 0, [values], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Sum", 0, [values], false, true, null, 0));
 		};
 		Functions.prototype.sumIf=function (range, criteria, sumRange) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "SumIf", 0, [range, criteria, sumRange], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "SumIf", 0, [range, criteria, sumRange], false, true, null, 0));
 		};
 		Functions.prototype.sumIfs=function (sumRange) {
 			var values=[];
-			for (var _a=1; _a < arguments.length; _a++) {
-				values[_a - 1]=arguments[_a];
+			for (var _i=1; _i < arguments.length; _i++) {
+				values[_i - 1]=arguments[_i];
 			}
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "SumIfs", 0, [sumRange, values], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "SumIfs", 0, [sumRange, values], false, true, null, 0));
 		};
 		Functions.prototype.sumSq=function () {
 			var values=[];
-			for (var _a=0; _a < arguments.length; _a++) {
-				values[_a]=arguments[_a];
+			for (var _i=0; _i < arguments.length; _i++) {
+				values[_i]=arguments[_i];
 			}
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "SumSq", 0, [values], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "SumSq", 0, [values], false, true, null, 0));
 		};
 		Functions.prototype.syd=function (cost, salvage, life, per) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Syd", 0, [cost, salvage, life, per], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Syd", 0, [cost, salvage, life, per], false, true, null, 0));
 		};
 		Functions.prototype.t=function (value) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "T", 0, [value], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "T", 0, [value], false, true, null, 0));
 		};
 		Functions.prototype.tbillEq=function (settlement, maturity, discount) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "TBillEq", 0, [settlement, maturity, discount], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "TBillEq", 0, [settlement, maturity, discount], false, true, null, 0));
 		};
 		Functions.prototype.tbillPrice=function (settlement, maturity, discount) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "TBillPrice", 0, [settlement, maturity, discount], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "TBillPrice", 0, [settlement, maturity, discount], false, true, null, 0));
 		};
 		Functions.prototype.tbillYield=function (settlement, maturity, pr) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "TBillYield", 0, [settlement, maturity, pr], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "TBillYield", 0, [settlement, maturity, pr], false, true, null, 0));
 		};
 		Functions.prototype.t_Dist=function (x, degFreedom, cumulative) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "T_Dist", 0, [x, degFreedom, cumulative], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "T_Dist", 0, [x, degFreedom, cumulative], false, true, null, 0));
 		};
 		Functions.prototype.t_Dist_2T=function (x, degFreedom) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "T_Dist_2T", 0, [x, degFreedom], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "T_Dist_2T", 0, [x, degFreedom], false, true, null, 0));
 		};
 		Functions.prototype.t_Dist_RT=function (x, degFreedom) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "T_Dist_RT", 0, [x, degFreedom], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "T_Dist_RT", 0, [x, degFreedom], false, true, null, 0));
 		};
 		Functions.prototype.t_Inv=function (probability, degFreedom) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "T_Inv", 0, [probability, degFreedom], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "T_Inv", 0, [probability, degFreedom], false, true, null, 0));
 		};
 		Functions.prototype.t_Inv_2T=function (probability, degFreedom) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "T_Inv_2T", 0, [probability, degFreedom], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "T_Inv_2T", 0, [probability, degFreedom], false, true, null, 0));
 		};
 		Functions.prototype.tan=function (number) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Tan", 0, [number], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Tan", 0, [number], false, true, null, 0));
 		};
 		Functions.prototype.tanh=function (number) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Tanh", 0, [number], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Tanh", 0, [number], false, true, null, 0));
 		};
 		Functions.prototype.text=function (value, formatText) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Text", 0, [value, formatText], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Text", 0, [value, formatText], false, true, null, 0));
 		};
 		Functions.prototype.time=function (hour, minute, second) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Time", 0, [hour, minute, second], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Time", 0, [hour, minute, second], false, true, null, 0));
 		};
 		Functions.prototype.timevalue=function (timeText) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Timevalue", 0, [timeText], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Timevalue", 0, [timeText], false, true, null, 0));
 		};
 		Functions.prototype.today=function () {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Today", 0, [], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Today", 0, [], false, true, null, 0));
 		};
 		Functions.prototype.trim=function (text) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Trim", 0, [text], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Trim", 0, [text], false, true, null, 0));
 		};
 		Functions.prototype.trimMean=function (array, percent) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "TrimMean", 0, [array, percent], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "TrimMean", 0, [array, percent], false, true, null, 0));
 		};
 		Functions.prototype.true=function () {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "True", 0, [], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "True", 0, [], false, true, null, 0));
 		};
 		Functions.prototype.trunc=function (number, numDigits) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Trunc", 0, [number, numDigits], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Trunc", 0, [number, numDigits], false, true, null, 0));
 		};
 		Functions.prototype.type=function (value) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Type", 0, [value], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Type", 0, [value], false, true, null, 0));
 		};
 		Functions.prototype.usdollar=function (number, decimals) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "USDollar", 0, [number, decimals], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "USDollar", 0, [number, decimals], false, true, null, 0));
 		};
 		Functions.prototype.unichar=function (number) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Unichar", 0, [number], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Unichar", 0, [number], false, true, null, 0));
 		};
 		Functions.prototype.unicode=function (text) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Unicode", 0, [text], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Unicode", 0, [text], false, true, null, 0));
 		};
 		Functions.prototype.upper=function (text) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Upper", 0, [text], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Upper", 0, [text], false, true, null, 0));
 		};
 		Functions.prototype.vlookup=function (lookupValue, tableArray, colIndexNum, rangeLookup) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "VLookup", 0, [lookupValue, tableArray, colIndexNum, rangeLookup], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "VLookup", 0, [lookupValue, tableArray, colIndexNum, rangeLookup], false, true, null, 0));
 		};
 		Functions.prototype.value=function (text) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Value", 0, [text], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Value", 0, [text], false, true, null, 0));
 		};
 		Functions.prototype.varA=function () {
 			var values=[];
-			for (var _a=0; _a < arguments.length; _a++) {
-				values[_a]=arguments[_a];
+			for (var _i=0; _i < arguments.length; _i++) {
+				values[_i]=arguments[_i];
 			}
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "VarA", 0, [values], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "VarA", 0, [values], false, true, null, 0));
 		};
 		Functions.prototype.varPA=function () {
 			var values=[];
-			for (var _a=0; _a < arguments.length; _a++) {
-				values[_a]=arguments[_a];
+			for (var _i=0; _i < arguments.length; _i++) {
+				values[_i]=arguments[_i];
 			}
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "VarPA", 0, [values], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "VarPA", 0, [values], false, true, null, 0));
 		};
 		Functions.prototype.var_P=function () {
 			var values=[];
-			for (var _a=0; _a < arguments.length; _a++) {
-				values[_a]=arguments[_a];
+			for (var _i=0; _i < arguments.length; _i++) {
+				values[_i]=arguments[_i];
 			}
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Var_P", 0, [values], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Var_P", 0, [values], false, true, null, 0));
 		};
 		Functions.prototype.var_S=function () {
 			var values=[];
-			for (var _a=0; _a < arguments.length; _a++) {
-				values[_a]=arguments[_a];
+			for (var _i=0; _i < arguments.length; _i++) {
+				values[_i]=arguments[_i];
 			}
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Var_S", 0, [values], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Var_S", 0, [values], false, true, null, 0));
 		};
 		Functions.prototype.vdb=function (cost, salvage, life, startPeriod, endPeriod, factor, noSwitch) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Vdb", 0, [cost, salvage, life, startPeriod, endPeriod, factor, noSwitch], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Vdb", 0, [cost, salvage, life, startPeriod, endPeriod, factor, noSwitch], false, true, null, 0));
 		};
 		Functions.prototype.weekNum=function (serialNumber, returnType) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "WeekNum", 0, [serialNumber, returnType], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "WeekNum", 0, [serialNumber, returnType], false, true, null, 0));
 		};
 		Functions.prototype.weekday=function (serialNumber, returnType) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Weekday", 0, [serialNumber, returnType], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Weekday", 0, [serialNumber, returnType], false, true, null, 0));
 		};
 		Functions.prototype.weibull_Dist=function (x, alpha, beta, cumulative) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Weibull_Dist", 0, [x, alpha, beta, cumulative], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Weibull_Dist", 0, [x, alpha, beta, cumulative], false, true, null, 0));
 		};
 		Functions.prototype.workDay=function (startDate, days, holidays) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "WorkDay", 0, [startDate, days, holidays], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "WorkDay", 0, [startDate, days, holidays], false, true, null, 0));
 		};
 		Functions.prototype.workDay_Intl=function (startDate, days, weekend, holidays) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "WorkDay_Intl", 0, [startDate, days, weekend, holidays], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "WorkDay_Intl", 0, [startDate, days, weekend, holidays], false, true, null, 0));
 		};
 		Functions.prototype.xirr=function (values, dates, guess) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Xirr", 0, [values, dates, guess], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Xirr", 0, [values, dates, guess], false, true, null, 0));
 		};
 		Functions.prototype.xnpv=function (rate, values, dates) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Xnpv", 0, [rate, values, dates], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Xnpv", 0, [rate, values, dates], false, true, null, 0));
 		};
 		Functions.prototype.xor=function () {
 			var values=[];
-			for (var _a=0; _a < arguments.length; _a++) {
-				values[_a]=arguments[_a];
+			for (var _i=0; _i < arguments.length; _i++) {
+				values[_i]=arguments[_i];
 			}
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Xor", 0, [values], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Xor", 0, [values], false, true, null, 0));
 		};
 		Functions.prototype.year=function (serialNumber) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Year", 0, [serialNumber], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Year", 0, [serialNumber], false, true, null, 0));
 		};
 		Functions.prototype.yearFrac=function (startDate, endDate, basis) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "YearFrac", 0, [startDate, endDate, basis], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "YearFrac", 0, [startDate, endDate, basis], false, true, null, 0));
 		};
 		Functions.prototype.yield=function (settlement, maturity, rate, pr, redemption, frequency, basis) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Yield", 0, [settlement, maturity, rate, pr, redemption, frequency, basis], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Yield", 0, [settlement, maturity, rate, pr, redemption, frequency, basis], false, true, null, 0));
 		};
 		Functions.prototype.yieldDisc=function (settlement, maturity, pr, redemption, basis) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "YieldDisc", 0, [settlement, maturity, pr, redemption, basis], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "YieldDisc", 0, [settlement, maturity, pr, redemption, basis], false, true, null, 0));
 		};
 		Functions.prototype.yieldMat=function (settlement, maturity, issue, rate, pr, basis) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "YieldMat", 0, [settlement, maturity, issue, rate, pr, basis], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "YieldMat", 0, [settlement, maturity, issue, rate, pr, basis], false, true, null, 0));
 		};
 		Functions.prototype.z_Test=function (array, x, sigma) {
-			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Z_Test", 0, [array, x, sigma], false, true, null, false));
+			return new FunctionResult(this.context, _createMethodObjectPath(this.context, this, "Z_Test", 0, [array, x, sigma], false, true, null, 0));
 		};
 		Functions.prototype._handleResult=function (value) {
 			_super.prototype._handleResult.call(this, value);
@@ -32745,1135 +36642,23 @@ var Excel;
 		return Functions;
 	}(OfficeExtension.ClientObject));
 	Excel.Functions=Functions;
-	var _typeCalculatedFieldCollection="CalculatedFieldCollection";
-	var CalculatedFieldCollection=(function (_super) {
-		__extends(CalculatedFieldCollection, _super);
-		function CalculatedFieldCollection() {
-			return _super !==null && _super.apply(this, arguments) || this;
-		}
-		Object.defineProperty(CalculatedFieldCollection.prototype, "_className", {
-			get: function () {
-				return "CalculatedFieldCollection";
-			},
-			enumerable: true,
-			configurable: true
-		});
-		Object.defineProperty(CalculatedFieldCollection.prototype, "_isCollection", {
-			get: function () {
-				return true;
-			},
-			enumerable: true,
-			configurable: true
-		});
-		Object.defineProperty(CalculatedFieldCollection.prototype, "items", {
-			get: function () {
-				_throwIfNotLoaded("items", this.m__items, _typeCalculatedFieldCollection, this._isNull);
-				return this.m__items;
-			},
-			enumerable: true,
-			configurable: true
-		});
-		CalculatedFieldCollection.prototype.add=function (Name, Formula, UseStandardFormula) {
-			return new Excel.PivotField(this.context, _createMethodObjectPath(this.context, this, "Add", 0, [Name, Formula, UseStandardFormula], false, true, null, false));
-		};
-		CalculatedFieldCollection.prototype.getCount=function () {
-			var action=_createMethodAction(this.context, this, "GetCount", 1, [], false);
-			var ret=new OfficeExtension.ClientResult();
-			_addActionResultHandler(this, action, ret);
-			return ret;
-		};
-		CalculatedFieldCollection.prototype.getItem=function (nameOrIndex) {
-			return new Excel.PivotField(this.context, _createIndexerObjectPath(this.context, this, [nameOrIndex]));
-		};
-		CalculatedFieldCollection.prototype.getItemAt=function (index) {
-			return new Excel.PivotField(this.context, _createMethodObjectPath(this.context, this, "GetItemAt", 1, [index], false, false, null, false));
-		};
-		CalculatedFieldCollection.prototype._handleResult=function (value) {
-			_super.prototype._handleResult.call(this, value);
-			if (_isNullOrUndefined(value))
-				return;
-			var obj=value;
-			_fixObjectPathIfNecessary(this, obj);
-			if (!_isNullOrUndefined(obj[OfficeExtension.Constants.items])) {
-				this.m__items=[];
-				var _data=obj[OfficeExtension.Constants.items];
-				for (var i=0; i < _data.length; i++) {
-					var _item=new Excel.PivotField(this.context, _createChildItemObjectPathUsingIndexerOrGetItemAt(true, this.context, this, _data[i], i));
-					_item._handleResult(_data[i]);
-					this.m__items.push(_item);
-				}
-			}
-		};
-		CalculatedFieldCollection.prototype.load=function (option) {
-			return _load(this, option);
-		};
-		CalculatedFieldCollection.prototype.retrieve=function (option) {
-			return _retrieve(this, option);
-		};
-		CalculatedFieldCollection.prototype._handleRetrieveResult=function (value, result) {
-			var _this=this;
-			_super.prototype._handleRetrieveResult.call(this, value, result);
-			_processRetrieveResult(this, value, result, function (childItemData, index) { return new Excel.PivotField(_this.context, _createChildItemObjectPathUsingIndexerOrGetItemAt(true, _this.context, _this, childItemData, index)); });
-		};
-		CalculatedFieldCollection.prototype.toJSON=function () {
-			return _toJson(this, {}, {}, this.m__items);
-		};
-		return CalculatedFieldCollection;
-	}(OfficeExtension.ClientObject));
-	Excel.CalculatedFieldCollection=CalculatedFieldCollection;
-	var _typePivotCache="PivotCache";
-	var PivotCache=(function (_super) {
-		__extends(PivotCache, _super);
-		function PivotCache() {
-			return _super !==null && _super.apply(this, arguments) || this;
-		}
-		Object.defineProperty(PivotCache.prototype, "_className", {
-			get: function () {
-				return "PivotCache";
-			},
-			enumerable: true,
-			configurable: true
-		});
-		Object.defineProperty(PivotCache.prototype, "_scalarPropertyNames", {
-			get: function () {
-				return ["version", "id", "index", "sourceData"];
-			},
-			enumerable: true,
-			configurable: true
-		});
-		Object.defineProperty(PivotCache.prototype, "id", {
-			get: function () {
-				_throwIfNotLoaded("id", this._I, _typePivotCache, this._isNull);
-				return this._I;
-			},
-			enumerable: true,
-			configurable: true
-		});
-		Object.defineProperty(PivotCache.prototype, "index", {
-			get: function () {
-				_throwIfNotLoaded("index", this._In, _typePivotCache, this._isNull);
-				return this._In;
-			},
-			enumerable: true,
-			configurable: true
-		});
-		Object.defineProperty(PivotCache.prototype, "sourceData", {
-			get: function () {
-				_throwIfNotLoaded("sourceData", this._S, _typePivotCache, this._isNull);
-				_throwIfApiNotSupported("PivotCache.sourceData", "Pivot", "1.2", _hostName);
-				return this._S;
-			},
-			enumerable: true,
-			configurable: true
-		});
-		Object.defineProperty(PivotCache.prototype, "version", {
-			get: function () {
-				_throwIfNotLoaded("version", this._V, _typePivotCache, this._isNull);
-				return this._V;
-			},
-			enumerable: true,
-			configurable: true
-		});
-		PivotCache.prototype.refresh=function () {
-			_createMethodAction(this.context, this, "Refresh", 0, [], false);
-		};
-		PivotCache.prototype._handleResult=function (value) {
-			_super.prototype._handleResult.call(this, value);
-			if (_isNullOrUndefined(value))
-				return;
-			var obj=value;
-			_fixObjectPathIfNecessary(this, obj);
-			if (!_isUndefined(obj["Id"])) {
-				this._I=obj["Id"];
-			}
-			if (!_isUndefined(obj["Index"])) {
-				this._In=obj["Index"];
-			}
-			if (!_isUndefined(obj["SourceData"])) {
-				this._S=obj["SourceData"];
-			}
-			if (!_isUndefined(obj["Version"])) {
-				this._V=obj["Version"];
-			}
-		};
-		PivotCache.prototype.load=function (option) {
-			return _load(this, option);
-		};
-		PivotCache.prototype.retrieve=function (option) {
-			return _retrieve(this, option);
-		};
-		PivotCache.prototype._handleIdResult=function (value) {
-			_super.prototype._handleIdResult.call(this, value);
-			if (_isNullOrUndefined(value)) {
-				return;
-			}
-			if (!_isUndefined(value["Id"])) {
-				this._I=value["Id"];
-			}
-		};
-		PivotCache.prototype._handleRetrieveResult=function (value, result) {
-			_super.prototype._handleRetrieveResult.call(this, value, result);
-			_processRetrieveResult(this, value, result);
-		};
-		PivotCache.prototype.toJSON=function () {
-			return _toJson(this, {
-				"id": this._I,
-				"index": this._In,
-				"sourceData": this._S,
-				"version": this._V,
-			}, {});
-		};
-		PivotCache.prototype.ensureUnchanged=function (data) {
-			_createEnsureUnchangedAction(this.context, this, data);
-			return;
-		};
-		return PivotCache;
-	}(OfficeExtension.ClientObject));
-	Excel.PivotCache=PivotCache;
-	var _typePivotCacheCollection="PivotCacheCollection";
-	var PivotCacheCollection=(function (_super) {
-		__extends(PivotCacheCollection, _super);
-		function PivotCacheCollection() {
-			return _super !==null && _super.apply(this, arguments) || this;
-		}
-		Object.defineProperty(PivotCacheCollection.prototype, "_className", {
-			get: function () {
-				return "PivotCacheCollection";
-			},
-			enumerable: true,
-			configurable: true
-		});
-		Object.defineProperty(PivotCacheCollection.prototype, "_isCollection", {
-			get: function () {
-				return true;
-			},
-			enumerable: true,
-			configurable: true
-		});
-		Object.defineProperty(PivotCacheCollection.prototype, "items", {
-			get: function () {
-				_throwIfNotLoaded("items", this.m__items, _typePivotCacheCollection, this._isNull);
-				return this.m__items;
-			},
-			enumerable: true,
-			configurable: true
-		});
-		PivotCacheCollection.prototype.add=function (sourceType, address) {
-			return new Excel.PivotCache(this.context, _createMethodObjectPath(this.context, this, "Add", 0, [sourceType, address], false, true, null, false));
-		};
-		PivotCacheCollection.prototype.getCount=function () {
-			var action=_createMethodAction(this.context, this, "GetCount", 1, [], false);
-			var ret=new OfficeExtension.ClientResult();
-			_addActionResultHandler(this, action, ret);
-			return ret;
-		};
-		PivotCacheCollection.prototype.getItem=function (index) {
-			return new Excel.PivotCache(this.context, _createIndexerObjectPath(this.context, this, [index]));
-		};
-		PivotCacheCollection.prototype.getItemAt=function (index) {
-			return new Excel.PivotCache(this.context, _createMethodObjectPath(this.context, this, "GetItemAt", 1, [index], false, false, null, false));
-		};
-		PivotCacheCollection.prototype._handleResult=function (value) {
-			_super.prototype._handleResult.call(this, value);
-			if (_isNullOrUndefined(value))
-				return;
-			var obj=value;
-			_fixObjectPathIfNecessary(this, obj);
-			if (!_isNullOrUndefined(obj[OfficeExtension.Constants.items])) {
-				this.m__items=[];
-				var _data=obj[OfficeExtension.Constants.items];
-				for (var i=0; i < _data.length; i++) {
-					var _item=new Excel.PivotCache(this.context, _createChildItemObjectPathUsingIndexerOrGetItemAt(true, this.context, this, _data[i], i));
-					_item._handleResult(_data[i]);
-					this.m__items.push(_item);
-				}
-			}
-		};
-		PivotCacheCollection.prototype.load=function (option) {
-			return _load(this, option);
-		};
-		PivotCacheCollection.prototype.retrieve=function (option) {
-			return _retrieve(this, option);
-		};
-		PivotCacheCollection.prototype._handleRetrieveResult=function (value, result) {
-			var _this=this;
-			_super.prototype._handleRetrieveResult.call(this, value, result);
-			_processRetrieveResult(this, value, result, function (childItemData, index) { return new Excel.PivotCache(_this.context, _createChildItemObjectPathUsingIndexerOrGetItemAt(true, _this.context, _this, childItemData, index)); });
-		};
-		PivotCacheCollection.prototype.toJSON=function () {
-			return _toJson(this, {}, {}, this.m__items);
-		};
-		return PivotCacheCollection;
-	}(OfficeExtension.ClientObject));
-	Excel.PivotCacheCollection=PivotCacheCollection;
-	var _typePivotField="PivotField";
-	var PivotField=(function (_super) {
-		__extends(PivotField, _super);
-		function PivotField() {
-			return _super !==null && _super.apply(this, arguments) || this;
-		}
-		Object.defineProperty(PivotField.prototype, "_className", {
-			get: function () {
-				return "PivotField";
-			},
-			enumerable: true,
-			configurable: true
-		});
-		Object.defineProperty(PivotField.prototype, "_scalarPropertyNames", {
-			get: function () {
-				return ["name", "position", "orientation", "caption", "numberFormat", "formula", "calculation", "showDetail", "sourceName", "dataType", "aggregationFunction", "calculated", "autoSortOrder", "autoSortField", "drilledDown", "enableMultiplePageItems", "allItemsVisible", "subtotals"];
-			},
-			enumerable: true,
-			configurable: true
-		});
-		Object.defineProperty(PivotField.prototype, "_scalarPropertyUpdateable", {
-			get: function () {
-				return [true, true, true, true, true, true, true, true, false, false, true, false, false, false, true, true, false, true];
-			},
-			enumerable: true,
-			configurable: true
-		});
-		Object.defineProperty(PivotField.prototype, "_navigationPropertyNames", {
-			get: function () {
-				return ["visiblePivotItems", "hiddenItems", "pivotItems", "currentPage"];
-			},
-			enumerable: true,
-			configurable: true
-		});
-		Object.defineProperty(PivotField.prototype, "currentPage", {
-			get: function () {
-				if (!this._Cu) {
-					this._Cu=new Excel.PivotItem(this.context, _createPropertyObjectPath(this.context, this, "CurrentPage", false, false, false));
-				}
-				return this._Cu;
-			},
-			set: function (value) {
-				this._Cu=value;
-				_createSetPropertyAction(this.context, this, "CurrentPage", value);
-			},
-			enumerable: true,
-			configurable: true
-		});
-		Object.defineProperty(PivotField.prototype, "hiddenItems", {
-			get: function () {
-				if (!this._H) {
-					this._H=new Excel.PivotItemCollection(this.context, _createPropertyObjectPath(this.context, this, "HiddenItems", true, false, false));
-				}
-				return this._H;
-			},
-			enumerable: true,
-			configurable: true
-		});
-		Object.defineProperty(PivotField.prototype, "pivotItems", {
-			get: function () {
-				if (!this._P) {
-					this._P=new Excel.PivotItemCollection(this.context, _createPropertyObjectPath(this.context, this, "PivotItems", true, false, false));
-				}
-				return this._P;
-			},
-			enumerable: true,
-			configurable: true
-		});
-		Object.defineProperty(PivotField.prototype, "visiblePivotItems", {
-			get: function () {
-				if (!this._V) {
-					this._V=new Excel.PivotItemCollection(this.context, _createPropertyObjectPath(this.context, this, "VisiblePivotItems", true, false, false));
-				}
-				return this._V;
-			},
-			enumerable: true,
-			configurable: true
-		});
-		Object.defineProperty(PivotField.prototype, "aggregationFunction", {
-			get: function () {
-				_throwIfNotLoaded("aggregationFunction", this._A, _typePivotField, this._isNull);
-				return this._A;
-			},
-			set: function (value) {
-				this._A=value;
-				_createSetPropertyAction(this.context, this, "AggregationFunction", value);
-			},
-			enumerable: true,
-			configurable: true
-		});
-		Object.defineProperty(PivotField.prototype, "allItemsVisible", {
-			get: function () {
-				_throwIfNotLoaded("allItemsVisible", this._Al, _typePivotField, this._isNull);
-				return this._Al;
-			},
-			enumerable: true,
-			configurable: true
-		});
-		Object.defineProperty(PivotField.prototype, "autoSortField", {
-			get: function () {
-				_throwIfNotLoaded("autoSortField", this._Au, _typePivotField, this._isNull);
-				return this._Au;
-			},
-			enumerable: true,
-			configurable: true
-		});
-		Object.defineProperty(PivotField.prototype, "autoSortOrder", {
-			get: function () {
-				_throwIfNotLoaded("autoSortOrder", this._Aut, _typePivotField, this._isNull);
-				return this._Aut;
-			},
-			enumerable: true,
-			configurable: true
-		});
-		Object.defineProperty(PivotField.prototype, "calculated", {
-			get: function () {
-				_throwIfNotLoaded("calculated", this._C, _typePivotField, this._isNull);
-				return this._C;
-			},
-			enumerable: true,
-			configurable: true
-		});
-		Object.defineProperty(PivotField.prototype, "calculation", {
-			get: function () {
-				_throwIfNotLoaded("calculation", this._Ca, _typePivotField, this._isNull);
-				return this._Ca;
-			},
-			set: function (value) {
-				this._Ca=value;
-				_createSetPropertyAction(this.context, this, "Calculation", value);
-			},
-			enumerable: true,
-			configurable: true
-		});
-		Object.defineProperty(PivotField.prototype, "caption", {
-			get: function () {
-				_throwIfNotLoaded("caption", this._Cap, _typePivotField, this._isNull);
-				return this._Cap;
-			},
-			set: function (value) {
-				this._Cap=value;
-				_createSetPropertyAction(this.context, this, "Caption", value);
-			},
-			enumerable: true,
-			configurable: true
-		});
-		Object.defineProperty(PivotField.prototype, "dataType", {
-			get: function () {
-				_throwIfNotLoaded("dataType", this._D, _typePivotField, this._isNull);
-				return this._D;
-			},
-			enumerable: true,
-			configurable: true
-		});
-		Object.defineProperty(PivotField.prototype, "drilledDown", {
-			get: function () {
-				_throwIfNotLoaded("drilledDown", this._Dr, _typePivotField, this._isNull);
-				return this._Dr;
-			},
-			set: function (value) {
-				this._Dr=value;
-				_createSetPropertyAction(this.context, this, "DrilledDown", value);
-			},
-			enumerable: true,
-			configurable: true
-		});
-		Object.defineProperty(PivotField.prototype, "enableMultiplePageItems", {
-			get: function () {
-				_throwIfNotLoaded("enableMultiplePageItems", this._E, _typePivotField, this._isNull);
-				return this._E;
-			},
-			set: function (value) {
-				this._E=value;
-				_createSetPropertyAction(this.context, this, "EnableMultiplePageItems", value);
-			},
-			enumerable: true,
-			configurable: true
-		});
-		Object.defineProperty(PivotField.prototype, "formula", {
-			get: function () {
-				_throwIfNotLoaded("formula", this._F, _typePivotField, this._isNull);
-				return this._F;
-			},
-			set: function (value) {
-				this._F=value;
-				_createSetPropertyAction(this.context, this, "Formula", value);
-			},
-			enumerable: true,
-			configurable: true
-		});
-		Object.defineProperty(PivotField.prototype, "name", {
-			get: function () {
-				_throwIfNotLoaded("name", this._N, _typePivotField, this._isNull);
-				return this._N;
-			},
-			set: function (value) {
-				this._N=value;
-				_createSetPropertyAction(this.context, this, "Name", value);
-			},
-			enumerable: true,
-			configurable: true
-		});
-		Object.defineProperty(PivotField.prototype, "numberFormat", {
-			get: function () {
-				_throwIfNotLoaded("numberFormat", this._Nu, _typePivotField, this._isNull);
-				return this._Nu;
-			},
-			set: function (value) {
-				this._Nu=value;
-				_createSetPropertyAction(this.context, this, "NumberFormat", value);
-			},
-			enumerable: true,
-			configurable: true
-		});
-		Object.defineProperty(PivotField.prototype, "orientation", {
-			get: function () {
-				_throwIfNotLoaded("orientation", this._O, _typePivotField, this._isNull);
-				return this._O;
-			},
-			set: function (value) {
-				this._O=value;
-				_createSetPropertyAction(this.context, this, "Orientation", value);
-			},
-			enumerable: true,
-			configurable: true
-		});
-		Object.defineProperty(PivotField.prototype, "position", {
-			get: function () {
-				_throwIfNotLoaded("position", this._Po, _typePivotField, this._isNull);
-				return this._Po;
-			},
-			set: function (value) {
-				this._Po=value;
-				_createSetPropertyAction(this.context, this, "Position", value);
-			},
-			enumerable: true,
-			configurable: true
-		});
-		Object.defineProperty(PivotField.prototype, "showDetail", {
-			get: function () {
-				_throwIfNotLoaded("showDetail", this._S, _typePivotField, this._isNull);
-				return this._S;
-			},
-			set: function (value) {
-				this._S=value;
-				_createSetPropertyAction(this.context, this, "ShowDetail", value);
-			},
-			enumerable: true,
-			configurable: true
-		});
-		Object.defineProperty(PivotField.prototype, "sourceName", {
-			get: function () {
-				_throwIfNotLoaded("sourceName", this._So, _typePivotField, this._isNull);
-				return this._So;
-			},
-			enumerable: true,
-			configurable: true
-		});
-		Object.defineProperty(PivotField.prototype, "subtotals", {
-			get: function () {
-				_throwIfNotLoaded("subtotals", this._Su, _typePivotField, this._isNull);
-				return this._Su;
-			},
-			set: function (value) {
-				this._Su=value;
-				_createSetPropertyAction(this.context, this, "Subtotals", value);
-			},
-			enumerable: true,
-			configurable: true
-		});
-		PivotField.prototype.set=function (properties, options) {
-			this._recursivelySet(properties, options, ["name", "position", "orientation", "caption", "numberFormat", "formula", "calculation", "showDetail", "aggregationFunction", "drilledDown", "enableMultiplePageItems", "subtotals"], ["currentPage"], [
-				"hiddenItems",
-				"pivotItems",
-				"visiblePivotItems"
-			]);
-		};
-		PivotField.prototype.update=function (properties) {
-			this._recursivelyUpdate(properties);
-		};
-		PivotField.prototype.autoGroup=function () {
-			_createMethodAction(this.context, this, "AutoGroup", 0, [], false);
-		};
-		PivotField.prototype.autoSort=function (sortOrder, Field) {
-			_createMethodAction(this.context, this, "AutoSort", 0, [sortOrder, Field], false);
-		};
-		PivotField.prototype.clearAllFilters=function () {
-			_createMethodAction(this.context, this, "ClearAllFilters", 0, [], false);
-		};
-		PivotField.prototype.getChildField=function () {
-			return new Excel.PivotField(this.context, _createMethodObjectPath(this.context, this, "GetChildField", 1, [], false, false, null, false));
-		};
-		PivotField.prototype.getChildItems=function () {
-			return new Excel.PivotItemCollection(this.context, _createMethodObjectPath(this.context, this, "GetChildItems", 1, [], true, false, null, false));
-		};
-		PivotField.prototype.getDataRange=function () {
-			return new Excel.Range(this.context, _createMethodObjectPath(this.context, this, "GetDataRange", 1, [], false, true, null, false));
-		};
-		PivotField.prototype._handleResult=function (value) {
-			_super.prototype._handleResult.call(this, value);
-			if (_isNullOrUndefined(value))
-				return;
-			var obj=value;
-			_fixObjectPathIfNecessary(this, obj);
-			if (!_isUndefined(obj["AggregationFunction"])) {
-				this._A=obj["AggregationFunction"];
-			}
-			if (!_isUndefined(obj["AllItemsVisible"])) {
-				this._Al=obj["AllItemsVisible"];
-			}
-			if (!_isUndefined(obj["AutoSortField"])) {
-				this._Au=obj["AutoSortField"];
-			}
-			if (!_isUndefined(obj["AutoSortOrder"])) {
-				this._Aut=obj["AutoSortOrder"];
-			}
-			if (!_isUndefined(obj["Calculated"])) {
-				this._C=obj["Calculated"];
-			}
-			if (!_isUndefined(obj["Calculation"])) {
-				this._Ca=obj["Calculation"];
-			}
-			if (!_isUndefined(obj["Caption"])) {
-				this._Cap=obj["Caption"];
-			}
-			if (!_isUndefined(obj["DataType"])) {
-				this._D=obj["DataType"];
-			}
-			if (!_isUndefined(obj["DrilledDown"])) {
-				this._Dr=obj["DrilledDown"];
-			}
-			if (!_isUndefined(obj["EnableMultiplePageItems"])) {
-				this._E=obj["EnableMultiplePageItems"];
-			}
-			if (!_isUndefined(obj["Formula"])) {
-				this._F=obj["Formula"];
-			}
-			if (!_isUndefined(obj["Name"])) {
-				this._N=obj["Name"];
-			}
-			if (!_isUndefined(obj["NumberFormat"])) {
-				this._Nu=obj["NumberFormat"];
-			}
-			if (!_isUndefined(obj["Orientation"])) {
-				this._O=obj["Orientation"];
-			}
-			if (!_isUndefined(obj["Position"])) {
-				this._Po=obj["Position"];
-			}
-			if (!_isUndefined(obj["ShowDetail"])) {
-				this._S=obj["ShowDetail"];
-			}
-			if (!_isUndefined(obj["SourceName"])) {
-				this._So=obj["SourceName"];
-			}
-			if (!_isUndefined(obj["Subtotals"])) {
-				this._Su=obj["Subtotals"];
-			}
-			_handleNavigationPropertyResults(this, obj, ["currentPage", "CurrentPage", "hiddenItems", "HiddenItems", "pivotItems", "PivotItems", "visiblePivotItems", "VisiblePivotItems"]);
-		};
-		PivotField.prototype.load=function (option) {
-			return _load(this, option);
-		};
-		PivotField.prototype.retrieve=function (option) {
-			return _retrieve(this, option);
-		};
-		PivotField.prototype._handleRetrieveResult=function (value, result) {
-			_super.prototype._handleRetrieveResult.call(this, value, result);
-			_processRetrieveResult(this, value, result);
-		};
-		PivotField.prototype.toJSON=function () {
-			return _toJson(this, {
-				"aggregationFunction": this._A,
-				"allItemsVisible": this._Al,
-				"autoSortField": this._Au,
-				"autoSortOrder": this._Aut,
-				"calculated": this._C,
-				"calculation": this._Ca,
-				"caption": this._Cap,
-				"dataType": this._D,
-				"drilledDown": this._Dr,
-				"enableMultiplePageItems": this._E,
-				"formula": this._F,
-				"name": this._N,
-				"numberFormat": this._Nu,
-				"orientation": this._O,
-				"position": this._Po,
-				"showDetail": this._S,
-				"sourceName": this._So,
-				"subtotals": this._Su,
-			}, {
-				"currentPage": this._Cu,
-				"hiddenItems": this._H,
-				"pivotItems": this._P,
-				"visiblePivotItems": this._V,
-			});
-		};
-		PivotField.prototype.ensureUnchanged=function (data) {
-			_createEnsureUnchangedAction(this.context, this, data);
-			return;
-		};
-		return PivotField;
-	}(OfficeExtension.ClientObject));
-	Excel.PivotField=PivotField;
-	var _typePivotFieldCollection="PivotFieldCollection";
-	var PivotFieldCollection=(function (_super) {
-		__extends(PivotFieldCollection, _super);
-		function PivotFieldCollection() {
-			return _super !==null && _super.apply(this, arguments) || this;
-		}
-		Object.defineProperty(PivotFieldCollection.prototype, "_className", {
-			get: function () {
-				return "PivotFieldCollection";
-			},
-			enumerable: true,
-			configurable: true
-		});
-		Object.defineProperty(PivotFieldCollection.prototype, "_isCollection", {
-			get: function () {
-				return true;
-			},
-			enumerable: true,
-			configurable: true
-		});
-		Object.defineProperty(PivotFieldCollection.prototype, "items", {
-			get: function () {
-				_throwIfNotLoaded("items", this.m__items, _typePivotFieldCollection, this._isNull);
-				return this.m__items;
-			},
-			enumerable: true,
-			configurable: true
-		});
-		PivotFieldCollection.prototype.getCount=function () {
-			var action=_createMethodAction(this.context, this, "GetCount", 1, [], false);
-			var ret=new OfficeExtension.ClientResult();
-			_addActionResultHandler(this, action, ret);
-			return ret;
-		};
-		PivotFieldCollection.prototype.getItem=function (nameOrIndex) {
-			return new Excel.PivotField(this.context, _createIndexerObjectPath(this.context, this, [nameOrIndex]));
-		};
-		PivotFieldCollection.prototype.getItemAt=function (index) {
-			return new Excel.PivotField(this.context, _createMethodObjectPath(this.context, this, "GetItemAt", 1, [index], false, false, null, false));
-		};
-		PivotFieldCollection.prototype._handleResult=function (value) {
-			_super.prototype._handleResult.call(this, value);
-			if (_isNullOrUndefined(value))
-				return;
-			var obj=value;
-			_fixObjectPathIfNecessary(this, obj);
-			if (!_isNullOrUndefined(obj[OfficeExtension.Constants.items])) {
-				this.m__items=[];
-				var _data=obj[OfficeExtension.Constants.items];
-				for (var i=0; i < _data.length; i++) {
-					var _item=new Excel.PivotField(this.context, _createChildItemObjectPathUsingIndexerOrGetItemAt(true, this.context, this, _data[i], i));
-					_item._handleResult(_data[i]);
-					this.m__items.push(_item);
-				}
-			}
-		};
-		PivotFieldCollection.prototype.load=function (option) {
-			return _load(this, option);
-		};
-		PivotFieldCollection.prototype.retrieve=function (option) {
-			return _retrieve(this, option);
-		};
-		PivotFieldCollection.prototype._handleRetrieveResult=function (value, result) {
-			var _this=this;
-			_super.prototype._handleRetrieveResult.call(this, value, result);
-			_processRetrieveResult(this, value, result, function (childItemData, index) { return new Excel.PivotField(_this.context, _createChildItemObjectPathUsingIndexerOrGetItemAt(true, _this.context, _this, childItemData, index)); });
-		};
-		PivotFieldCollection.prototype.toJSON=function () {
-			return _toJson(this, {}, {}, this.m__items);
-		};
-		return PivotFieldCollection;
-	}(OfficeExtension.ClientObject));
-	Excel.PivotFieldCollection=PivotFieldCollection;
-	var _typePivotItem="PivotItem";
-	var PivotItem=(function (_super) {
-		__extends(PivotItem, _super);
-		function PivotItem() {
-			return _super !==null && _super.apply(this, arguments) || this;
-		}
-		Object.defineProperty(PivotItem.prototype, "_className", {
-			get: function () {
-				return "PivotItem";
-			},
-			enumerable: true,
-			configurable: true
-		});
-		Object.defineProperty(PivotItem.prototype, "_scalarPropertyNames", {
-			get: function () {
-				return ["value", "name", "position", "visible", "showDetail", "sourceName", "recordCount", "calculated", "drilledDown"];
-			},
-			enumerable: true,
-			configurable: true
-		});
-		Object.defineProperty(PivotItem.prototype, "_scalarPropertyUpdateable", {
-			get: function () {
-				return [true, true, true, true, true, false, false, false, true];
-			},
-			enumerable: true,
-			configurable: true
-		});
-		Object.defineProperty(PivotItem.prototype, "_navigationPropertyNames", {
-			get: function () {
-				return ["pivotField"];
-			},
-			enumerable: true,
-			configurable: true
-		});
-		Object.defineProperty(PivotItem.prototype, "pivotField", {
-			get: function () {
-				if (!this._P) {
-					this._P=new Excel.PivotField(this.context, _createPropertyObjectPath(this.context, this, "PivotField", false, false, false));
-				}
-				return this._P;
-			},
-			enumerable: true,
-			configurable: true
-		});
-		Object.defineProperty(PivotItem.prototype, "calculated", {
-			get: function () {
-				_throwIfNotLoaded("calculated", this._C, _typePivotItem, this._isNull);
-				return this._C;
-			},
-			enumerable: true,
-			configurable: true
-		});
-		Object.defineProperty(PivotItem.prototype, "drilledDown", {
-			get: function () {
-				_throwIfNotLoaded("drilledDown", this._D, _typePivotItem, this._isNull);
-				return this._D;
-			},
-			set: function (value) {
-				this._D=value;
-				_createSetPropertyAction(this.context, this, "DrilledDown", value);
-			},
-			enumerable: true,
-			configurable: true
-		});
-		Object.defineProperty(PivotItem.prototype, "name", {
-			get: function () {
-				_throwIfNotLoaded("name", this._N, _typePivotItem, this._isNull);
-				return this._N;
-			},
-			set: function (value) {
-				this._N=value;
-				_createSetPropertyAction(this.context, this, "Name", value);
-			},
-			enumerable: true,
-			configurable: true
-		});
-		Object.defineProperty(PivotItem.prototype, "position", {
-			get: function () {
-				_throwIfNotLoaded("position", this._Po, _typePivotItem, this._isNull);
-				return this._Po;
-			},
-			set: function (value) {
-				this._Po=value;
-				_createSetPropertyAction(this.context, this, "Position", value);
-			},
-			enumerable: true,
-			configurable: true
-		});
-		Object.defineProperty(PivotItem.prototype, "recordCount", {
-			get: function () {
-				_throwIfNotLoaded("recordCount", this._R, _typePivotItem, this._isNull);
-				return this._R;
-			},
-			enumerable: true,
-			configurable: true
-		});
-		Object.defineProperty(PivotItem.prototype, "showDetail", {
-			get: function () {
-				_throwIfNotLoaded("showDetail", this._S, _typePivotItem, this._isNull);
-				return this._S;
-			},
-			set: function (value) {
-				this._S=value;
-				_createSetPropertyAction(this.context, this, "ShowDetail", value);
-			},
-			enumerable: true,
-			configurable: true
-		});
-		Object.defineProperty(PivotItem.prototype, "sourceName", {
-			get: function () {
-				_throwIfNotLoaded("sourceName", this._So, _typePivotItem, this._isNull);
-				return this._So;
-			},
-			enumerable: true,
-			configurable: true
-		});
-		Object.defineProperty(PivotItem.prototype, "value", {
-			get: function () {
-				_throwIfNotLoaded("value", this._V, _typePivotItem, this._isNull);
-				return this._V;
-			},
-			set: function (value) {
-				this._V=value;
-				_createSetPropertyAction(this.context, this, "Value", value);
-			},
-			enumerable: true,
-			configurable: true
-		});
-		Object.defineProperty(PivotItem.prototype, "visible", {
-			get: function () {
-				_throwIfNotLoaded("visible", this._Vi, _typePivotItem, this._isNull);
-				return this._Vi;
-			},
-			set: function (value) {
-				this._Vi=value;
-				_createSetPropertyAction(this.context, this, "Visible", value);
-			},
-			enumerable: true,
-			configurable: true
-		});
-		PivotItem.prototype.set=function (properties, options) {
-			this._recursivelySet(properties, options, ["value", "name", "position", "visible", "showDetail", "drilledDown"], ["pivotField"], []);
-		};
-		PivotItem.prototype.update=function (properties) {
-			this._recursivelyUpdate(properties);
-		};
-		PivotItem.prototype.getDataRange=function () {
-			return new Excel.Range(this.context, _createMethodObjectPath(this.context, this, "GetDataRange", 1, [], false, true, null, false));
-		};
-		PivotItem.prototype._handleResult=function (value) {
-			_super.prototype._handleResult.call(this, value);
-			if (_isNullOrUndefined(value))
-				return;
-			var obj=value;
-			_fixObjectPathIfNecessary(this, obj);
-			if (!_isUndefined(obj["Calculated"])) {
-				this._C=obj["Calculated"];
-			}
-			if (!_isUndefined(obj["DrilledDown"])) {
-				this._D=obj["DrilledDown"];
-			}
-			if (!_isUndefined(obj["Name"])) {
-				this._N=obj["Name"];
-			}
-			if (!_isUndefined(obj["Position"])) {
-				this._Po=obj["Position"];
-			}
-			if (!_isUndefined(obj["RecordCount"])) {
-				this._R=obj["RecordCount"];
-			}
-			if (!_isUndefined(obj["ShowDetail"])) {
-				this._S=obj["ShowDetail"];
-			}
-			if (!_isUndefined(obj["SourceName"])) {
-				this._So=obj["SourceName"];
-			}
-			if (!_isUndefined(obj["Value"])) {
-				this._V=obj["Value"];
-			}
-			if (!_isUndefined(obj["Visible"])) {
-				this._Vi=obj["Visible"];
-			}
-			_handleNavigationPropertyResults(this, obj, ["pivotField", "PivotField"]);
-		};
-		PivotItem.prototype.load=function (option) {
-			return _load(this, option);
-		};
-		PivotItem.prototype.retrieve=function (option) {
-			return _retrieve(this, option);
-		};
-		PivotItem.prototype._handleRetrieveResult=function (value, result) {
-			_super.prototype._handleRetrieveResult.call(this, value, result);
-			_processRetrieveResult(this, value, result);
-		};
-		PivotItem.prototype.toJSON=function () {
-			return _toJson(this, {
-				"calculated": this._C,
-				"drilledDown": this._D,
-				"name": this._N,
-				"position": this._Po,
-				"recordCount": this._R,
-				"showDetail": this._S,
-				"sourceName": this._So,
-				"value": this._V,
-				"visible": this._Vi,
-			}, {
-				"pivotField": this._P,
-			});
-		};
-		PivotItem.prototype.ensureUnchanged=function (data) {
-			_createEnsureUnchangedAction(this.context, this, data);
-			return;
-		};
-		return PivotItem;
-	}(OfficeExtension.ClientObject));
-	Excel.PivotItem=PivotItem;
-	var _typePivotItemCollection="PivotItemCollection";
-	var PivotItemCollection=(function (_super) {
-		__extends(PivotItemCollection, _super);
-		function PivotItemCollection() {
-			return _super !==null && _super.apply(this, arguments) || this;
-		}
-		Object.defineProperty(PivotItemCollection.prototype, "_className", {
-			get: function () {
-				return "PivotItemCollection";
-			},
-			enumerable: true,
-			configurable: true
-		});
-		Object.defineProperty(PivotItemCollection.prototype, "_isCollection", {
-			get: function () {
-				return true;
-			},
-			enumerable: true,
-			configurable: true
-		});
-		Object.defineProperty(PivotItemCollection.prototype, "items", {
-			get: function () {
-				_throwIfNotLoaded("items", this.m__items, _typePivotItemCollection, this._isNull);
-				return this.m__items;
-			},
-			enumerable: true,
-			configurable: true
-		});
-		PivotItemCollection.prototype.getCount=function () {
-			var action=_createMethodAction(this.context, this, "GetCount", 1, [], false);
-			var ret=new OfficeExtension.ClientResult();
-			_addActionResultHandler(this, action, ret);
-			return ret;
-		};
-		PivotItemCollection.prototype.getItem=function (nameOrIndex) {
-			return new Excel.PivotItem(this.context, _createIndexerObjectPath(this.context, this, [nameOrIndex]));
-		};
-		PivotItemCollection.prototype.getItemAt=function (index) {
-			return new Excel.PivotItem(this.context, _createMethodObjectPath(this.context, this, "GetItemAt", 1, [index], false, false, null, false));
-		};
-		PivotItemCollection.prototype._handleResult=function (value) {
-			_super.prototype._handleResult.call(this, value);
-			if (_isNullOrUndefined(value))
-				return;
-			var obj=value;
-			_fixObjectPathIfNecessary(this, obj);
-			if (!_isNullOrUndefined(obj[OfficeExtension.Constants.items])) {
-				this.m__items=[];
-				var _data=obj[OfficeExtension.Constants.items];
-				for (var i=0; i < _data.length; i++) {
-					var _item=new Excel.PivotItem(this.context, _createChildItemObjectPathUsingIndexerOrGetItemAt(true, this.context, this, _data[i], i));
-					_item._handleResult(_data[i]);
-					this.m__items.push(_item);
-				}
-			}
-		};
-		PivotItemCollection.prototype.load=function (option) {
-			return _load(this, option);
-		};
-		PivotItemCollection.prototype.retrieve=function (option) {
-			return _retrieve(this, option);
-		};
-		PivotItemCollection.prototype._handleRetrieveResult=function (value, result) {
-			var _this=this;
-			_super.prototype._handleRetrieveResult.call(this, value, result);
-			_processRetrieveResult(this, value, result, function (childItemData, index) { return new Excel.PivotItem(_this.context, _createChildItemObjectPathUsingIndexerOrGetItemAt(true, _this.context, _this, childItemData, index)); });
-		};
-		PivotItemCollection.prototype.toJSON=function () {
-			return _toJson(this, {}, {}, this.m__items);
-		};
-		return PivotItemCollection;
-	}(OfficeExtension.ClientObject));
-	Excel.PivotItemCollection=PivotItemCollection;
-	var ConsolidationFunction;
-	(function (ConsolidationFunction) {
-		ConsolidationFunction.varP="VarP";
-		ConsolidationFunction._Var="Var";
-		ConsolidationFunction.sum="Sum";
-		ConsolidationFunction.stDevP="StDevP";
-		ConsolidationFunction.stDev="StDev";
-		ConsolidationFunction.product="Product";
-		ConsolidationFunction.min="Min";
-		ConsolidationFunction.max="Max";
-		ConsolidationFunction.countNums="CountNums";
-		ConsolidationFunction.count="Count";
-		ConsolidationFunction.average="Average";
-		ConsolidationFunction.distinctCount="DistinctCount";
-		ConsolidationFunction.unknown="Unknown";
-	})(ConsolidationFunction=Excel.ConsolidationFunction || (Excel.ConsolidationFunction={}));
-	var PivotFieldCalculation;
-	(function (PivotFieldCalculation) {
-		PivotFieldCalculation.noAdditionalCalculation="NoAdditionalCalculation";
-		PivotFieldCalculation.differenceFrom="DifferenceFrom";
-		PivotFieldCalculation.percentOf="PercentOf";
-		PivotFieldCalculation.percentDifferenceFrom="PercentDifferenceFrom";
-		PivotFieldCalculation.runningTotal="RunningTotal";
-		PivotFieldCalculation.percentOfRow="PercentOfRow";
-		PivotFieldCalculation.percentOfColumn="PercentOfColumn";
-		PivotFieldCalculation.percentOfTotal="PercentOfTotal";
-		PivotFieldCalculation.index="Index";
-		PivotFieldCalculation.percentOfParentRow="PercentOfParentRow";
-		PivotFieldCalculation.percentOfParentColumn="PercentOfParentColumn";
-		PivotFieldCalculation.percentOfParent="PercentOfParent";
-		PivotFieldCalculation.percentRunningTotal="PercentRunningTotal";
-		PivotFieldCalculation.rankAscending="RankAscending";
-		PivotFieldCalculation.rankDecending="RankDecending";
-	})(PivotFieldCalculation=Excel.PivotFieldCalculation || (Excel.PivotFieldCalculation={}));
-	var PivotFieldDataType;
-	(function (PivotFieldDataType) {
-		PivotFieldDataType.text="Text";
-		PivotFieldDataType.number="Number";
-		PivotFieldDataType.date="Date";
-	})(PivotFieldDataType=Excel.PivotFieldDataType || (Excel.PivotFieldDataType={}));
-	var PivotFieldOrientation;
-	(function (PivotFieldOrientation) {
-		PivotFieldOrientation.hidden="Hidden";
-		PivotFieldOrientation.rowField="RowField";
-		PivotFieldOrientation.columnField="ColumnField";
-		PivotFieldOrientation.pageField="PageField";
-		PivotFieldOrientation.dataField="DataField";
-	})(PivotFieldOrientation=Excel.PivotFieldOrientation || (Excel.PivotFieldOrientation={}));
-	var PivotFieldRepeatLabels;
-	(function (PivotFieldRepeatLabels) {
-		PivotFieldRepeatLabels.doNotRepeatLabels="DoNotRepeatLabels";
-		PivotFieldRepeatLabels.repeatLabels="RepeatLabels";
-	})(PivotFieldRepeatLabels=Excel.PivotFieldRepeatLabels || (Excel.PivotFieldRepeatLabels={}));
-	var PivotTableSourceType;
-	(function (PivotTableSourceType) {
-		PivotTableSourceType.database="Database";
-		PivotTableSourceType.external="External";
-		PivotTableSourceType.consolidation="Consolidation";
-		PivotTableSourceType.scenario="Scenario";
-	})(PivotTableSourceType=Excel.PivotTableSourceType || (Excel.PivotTableSourceType={}));
-	var PivotTableVersion;
-	(function (PivotTableVersion) {
-		PivotTableVersion.pivotTableVersionCurrent="PivotTableVersionCurrent";
-		PivotTableVersion.pivotTableVersion2000="PivotTableVersion2000";
-		PivotTableVersion.pivotTableVersion10="PivotTableVersion10";
-		PivotTableVersion.pivotTableVersion11="PivotTableVersion11";
-		PivotTableVersion.pivotTableVersion12="PivotTableVersion12";
-		PivotTableVersion.pivotTableVersion14="PivotTableVersion14";
-		PivotTableVersion.pivotTableVersion15="PivotTableVersion15";
-	})(PivotTableVersion=Excel.PivotTableVersion || (Excel.PivotTableVersion={}));
-	var PivotTableSelectionMode;
-	(function (PivotTableSelectionMode) {
-		PivotTableSelectionMode.dataAndLabel="DataAndLabel";
-		PivotTableSelectionMode.labelOnly="LabelOnly";
-		PivotTableSelectionMode.dataOnly="DataOnly";
-		PivotTableSelectionMode.origin="Origin";
-		PivotTableSelectionMode.blanks="Blanks";
-		PivotTableSelectionMode.button="Button";
-		PivotTableSelectionMode.firstRow="FirstRow";
-	})(PivotTableSelectionMode=Excel.PivotTableSelectionMode || (Excel.PivotTableSelectionMode={}));
-	var SortOrder;
-	(function (SortOrder) {
-		SortOrder.ascending="Ascending";
-		SortOrder.descending="Descending";
-	})(SortOrder=Excel.SortOrder || (Excel.SortOrder={}));
 	var ErrorCodes;
 	(function (ErrorCodes) {
-		ErrorCodes.accessDenied="AccessDenied";
-		ErrorCodes.apiNotFound="ApiNotFound";
-		ErrorCodes.conflict="Conflict";
-		ErrorCodes.generalException="GeneralException";
-		ErrorCodes.insertDeleteConflict="InsertDeleteConflict";
-		ErrorCodes.invalidArgument="InvalidArgument";
-		ErrorCodes.invalidBinding="InvalidBinding";
-		ErrorCodes.invalidOperation="InvalidOperation";
-		ErrorCodes.invalidReference="InvalidReference";
-		ErrorCodes.invalidSelection="InvalidSelection";
-		ErrorCodes.itemAlreadyExists="ItemAlreadyExists";
-		ErrorCodes.itemNotFound="ItemNotFound";
-		ErrorCodes.notImplemented="NotImplemented";
-		ErrorCodes.unsupportedOperation="UnsupportedOperation";
-		ErrorCodes.invalidOperationInCellEditMode="InvalidOperationInCellEditMode";
+		ErrorCodes["accessDenied"]="AccessDenied";
+		ErrorCodes["apiNotFound"]="ApiNotFound";
+		ErrorCodes["conflict"]="Conflict";
+		ErrorCodes["generalException"]="GeneralException";
+		ErrorCodes["insertDeleteConflict"]="InsertDeleteConflict";
+		ErrorCodes["invalidArgument"]="InvalidArgument";
+		ErrorCodes["invalidBinding"]="InvalidBinding";
+		ErrorCodes["invalidOperation"]="InvalidOperation";
+		ErrorCodes["invalidReference"]="InvalidReference";
+		ErrorCodes["invalidSelection"]="InvalidSelection";
+		ErrorCodes["itemAlreadyExists"]="ItemAlreadyExists";
+		ErrorCodes["itemNotFound"]="ItemNotFound";
+		ErrorCodes["notImplemented"]="NotImplemented";
+		ErrorCodes["unsupportedOperation"]="UnsupportedOperation";
+		ErrorCodes["invalidOperationInCellEditMode"]="InvalidOperationInCellEditMode";
 	})(ErrorCodes=Excel.ErrorCodes || (Excel.ErrorCodes={}));
 })(Excel || (Excel={}));
 

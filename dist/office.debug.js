@@ -1,5 +1,5 @@
 /* Office JavaScript API library */
-/* Version: 16.0.9010.1000 */
+/* Version: 16.0.9230.1000 */
 /*
 	Copyright (c) Microsoft Corporation.  All rights reserved.
 */
@@ -382,6 +382,9 @@ var ScriptLoading;
                         if (OSF._OfficeAppFactory.getHostInfo().hostType == "onenote" && (typeof OSF.AppTelemetry !== 'undefined') && (typeof OSF.AppTelemetry.enableTelemetry !== 'undefined')) {
                             OSF.AppTelemetry.enableTelemetry = false;
                         }
+                        if (!OSF._OfficeAppFactory.getLoggingAllowed() && (typeof OSF.AppTelemetry !== 'undefined')) {
+                            OSF.AppTelemetry.enableTelemetry = false;
+                        }
                         logTelemetry(true);
                         loadedScriptEntry.isReady = true;
                         if (loadedScriptEntry.timer != null) {
@@ -469,7 +472,7 @@ var ScriptLoading;
     ScriptLoading.LoadScriptHelper = LoadScriptHelper;
 })(ScriptLoading || (ScriptLoading = {}));
 OSF.ConstantNames = {
-    FileVersion: "16.0.9010.1000",
+    FileVersion: "16.0.9230.1000",
     OfficeJS: "office.js",
     OfficeDebugJS: "office.debug.js",
     DefaultLocale: "en-us",
@@ -518,7 +521,8 @@ OSF._OfficeAppFactory = (function OSF__OfficeAppFactory() {
     var _settings = {};
     var _hostFacade = {};
     var _WebAppState = { id: null, webAppUrl: null, conversationID: null, clientEndPoint: null, wnd: window.parent, focused: false };
-    var _hostInfo = { isO15: true, isRichClient: true, hostType: "", hostPlatform: "", hostSpecificFileVersion: "", hostLocale: "", osfControlAppCorrelationId: "", isDialog: false };
+    var _hostInfo = { isO15: true, isRichClient: true, hostType: "", hostPlatform: "", hostSpecificFileVersion: "", hostLocale: "", osfControlAppCorrelationId: "", isDialog: false, disableLogging: false };
+    var _isLoggingAllowed = true;
     var _initializationHelper = {};
     var _appInstanceId = null;
     var _loadScriptHelper = new ScriptLoading.LoadScriptHelper();
@@ -562,6 +566,24 @@ OSF._OfficeAppFactory = (function OSF__OfficeAppFactory() {
         var versionToUseNewJS = "15.30.1128.0";
         var currentHostVersion = window.external.GetContext().GetHostFullVersion();
         return !!compareVersions(versionToUseNewJS, currentHostVersion);
+    };
+    var _retrieveLoggingAllowed = function OSF__OfficeAppFactory$_retrieveLoggingAllowed() {
+        _isLoggingAllowed = true;
+        try {
+            if (_hostInfo.disableLogging) {
+                _isLoggingAllowed = false;
+                return;
+            }
+            window.external = window.external || {};
+            if (typeof window.external.GetLoggingAllowed === 'undefined') {
+                _isLoggingAllowed = true;
+            }
+            else {
+                _isLoggingAllowed = window.external.GetLoggingAllowed();
+            }
+        }
+        catch (Exception) {
+        }
     };
     var _retrieveHostInfo = function OSF__OfficeAppFactory$_retrieveHostInfo() {
         var hostInfoParaName = "_host_Info";
@@ -635,6 +657,7 @@ OSF._OfficeAppFactory = (function OSF__OfficeAppFactory() {
                 _hostInfo.osfControlAppCorrelationId = "";
             }
             _hostInfo.isDialog = (((typeof items[5]) != "undefined") && items[5] == "isDialog") ? true : false;
+            _hostInfo.disableLogging = (((typeof items[6]) != "undefined") && items[6] == "disableLogging") ? true : false;
             var hostSpecificFileVersionValue = parseFloat(_hostInfo.hostSpecificFileVersion);
             var fallbackVersion = OSF.HostSpecificFileVersionDefault;
             if (OSF.HostSpecificFileVersionMap[_hostInfo.hostType] && OSF.HostSpecificFileVersionMap[_hostInfo.hostType][_hostInfo.hostPlatform]) {
@@ -664,6 +687,7 @@ OSF._OfficeAppFactory = (function OSF__OfficeAppFactory() {
     };
     var initialize = function OSF__OfficeAppFactory$initialize() {
         _retrieveHostInfo();
+        _retrieveLoggingAllowed();
         if (_hostInfo.hostPlatform == "web" && _hostInfo.isDialog && window == window.top && window.opener == null) {
             window.open('', '_self', '');
             window.close();
@@ -833,6 +857,7 @@ OSF._OfficeAppFactory = (function OSF__OfficeAppFactory() {
         getContext: function OSF__OfficeAppFactory$getContext() { return _context; },
         setContext: function OSF__OfficeAppFactory$setContext(context) { _context = context; },
         getHostInfo: function OSF_OfficeAppFactory$getHostInfo() { return _hostInfo; },
+        getLoggingAllowed: function OSF_OfficeAppFactory$getLoggingAllowed() { return _isLoggingAllowed; },
         getHostFacade: function OSF__OfficeAppFactory$getHostFacade() { return _hostFacade; },
         setHostFacade: function setHostFacade(hostFacade) { _hostFacade = hostFacade; },
         getInitializationHelper: function OSF__OfficeAppFactory$getInitializationHelper() { return _initializationHelper; },

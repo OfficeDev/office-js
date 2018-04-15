@@ -1,5 +1,5 @@
 /* Outlook rich client specific API library */
-/* Version: 16.0.9020.1000 */
+/* Version: 16.0.9203.1000 */
 /*
     Copyright (c) Microsoft Corporation.  All rights reserved.
 */
@@ -1482,6 +1482,7 @@ OSF.DDA.MethodDispId = {
     dispidOpenBrowserWindow: 102,
     dispidCreateDocumentMethod: 105,
     dispidInsertFormMethod: 106,
+    dispidDisplayRibbonCalloutAsyncMethod: 109,
     dispidGetSelectedTaskMethod: 110,
     dispidGetSelectedResourceMethod: 111,
     dispidGetTaskMethod: 112,
@@ -6224,26 +6225,9 @@ var Logger;
         SendFlag[SendFlag["flush"] = 1] = "flush"
     })(Logger.SendFlag || (Logger.SendFlag = {}));
     var SendFlag = Logger.SendFlag;
-    function allowUploadingData()
-    {
-        if(OSF.Logger && OSF.Logger.ulsEndpoint)
-            OSF.Logger.ulsEndpoint.loadProxyFrame()
-    }
+    function allowUploadingData(){}
     Logger.allowUploadingData = allowUploadingData;
-    function sendLog(traceLevel, message, flag)
-    {
-        if(OSF.Logger && OSF.Logger.ulsEndpoint)
-        {
-            var jsonObj = {
-                    traceLevel: traceLevel,
-                    message: message,
-                    flag: flag,
-                    internalLog: true
-                };
-            var logs = JSON.stringify(jsonObj);
-            OSF.Logger.ulsEndpoint.writeLog(logs)
-        }
-    }
+    function sendLog(traceLevel, message, flag){}
     Logger.sendLog = sendLog;
     function creatULSEndpoint()
     {
@@ -6258,64 +6242,9 @@ var Logger;
     }
     var ULSEndpointProxy = function()
         {
-            function ULSEndpointProxy()
-            {
-                var _this = this;
-                this.proxyFrame = null;
-                this.telemetryEndPoint = "https://telemetryservice.firstpartyapps.oaspapps.com/telemetryservice/telemetryproxy.html";
-                this.buffer = [];
-                this.proxyFrameReady = false;
-                OSF.OUtil.addEventListener(window,"message",function(e)
-                {
-                    return _this.tellProxyFrameReady(e)
-                });
-                setTimeout(function()
-                {
-                    _this.loadProxyFrame()
-                },3e3)
-            }
-            ULSEndpointProxy.prototype.writeLog = function(log)
-            {
-                if(this.proxyFrameReady === true)
-                    this.proxyFrame.contentWindow.postMessage(log,ULSEndpointProxy.telemetryOrigin);
-                else if(this.buffer.length < 128)
-                    this.buffer.push(log)
-            };
-            ULSEndpointProxy.prototype.loadProxyFrame = function()
-            {
-                if(this.proxyFrame == null)
-                {
-                    this.proxyFrame = document.createElement("iframe");
-                    this.proxyFrame.setAttribute("style","display:none");
-                    this.proxyFrame.setAttribute("src",this.telemetryEndPoint);
-                    document.head.appendChild(this.proxyFrame)
-                }
-            };
-            ULSEndpointProxy.prototype.tellProxyFrameReady = function(e)
-            {
-                var _this = this;
-                if(e.data === "ProxyFrameReadyToLog")
-                {
-                    this.proxyFrameReady = true;
-                    for(var i = 0; i < this.buffer.length; i++)
-                        this.writeLog(this.buffer[i]);
-                    this.buffer.length = 0;
-                    OSF.OUtil.removeEventListener(window,"message",function(e)
-                    {
-                        return _this.tellProxyFrameReady(e)
-                    })
-                }
-                else if(e.data === "ProxyFrameReadyToInit")
-                {
-                    var initJson = {
-                            appName: "Office APPs",
-                            sessionId: OSF.OUtil.Guid.generateNewGuid()
-                        };
-                    var initStr = JSON.stringify(initJson);
-                    this.proxyFrame.contentWindow.postMessage(initStr,ULSEndpointProxy.telemetryOrigin)
-                }
-            };
-            ULSEndpointProxy.telemetryOrigin = "https://telemetryservice.firstpartyapps.oaspapps.com";
+            function ULSEndpointProxy(){}
+            ULSEndpointProxy.prototype.writeLog = function(log){};
+            ULSEndpointProxy.prototype.loadProxyFrame = function(){};
             return ULSEndpointProxy
         }();
     if(!OSF.Logger)
@@ -6477,7 +6406,7 @@ var OSFAppTelemetry;
             function AppLogger(){}
             AppLogger.prototype.LogData = function(data)
             {
-                if(!OSF.Logger || !OSFAppTelemetry.enableTelemetry)
+                if(!OSFAppTelemetry.enableTelemetry)
                     return;
                 try
                 {
@@ -6487,7 +6416,7 @@ var OSFAppTelemetry;
             };
             AppLogger.prototype.LogRawData = function(log)
             {
-                if(!OSF.Logger || !OSFAppTelemetry.enableTelemetry)
+                if(!OSFAppTelemetry.enableTelemetry)
                     return;
                 try
                 {
@@ -6505,7 +6434,7 @@ var OSFAppTelemetry;
     }
     function initialize(context)
     {
-        if(!OSF.Logger)
+        if(!OSFAppTelemetry.enableTelemetry)
             return;
         if(appInfo)
             return;
@@ -6524,7 +6453,7 @@ var OSFAppTelemetry;
             appInfo.appInstanceId = appInfo.appInstanceId.replace(/[{}]/g,"").toLowerCase();
         appInfo.message = context.get_hostCustomMessage();
         appInfo.officeJSVersion = OSF.ConstantNames.FileVersion;
-        appInfo.hostJSVersion = "16.0.9020.1000";
+        appInfo.hostJSVersion = "16.0.9203.1000";
         if(context._wacHostEnvironment)
             appInfo.wacHostEnvironment = context._wacHostEnvironment;
         if(context._isFromWacAutomation !== undefined && context._isFromWacAutomation !== null)
@@ -6642,13 +6571,7 @@ var OSFAppTelemetry;
             data.WacHostEnvironment = appInfo.wacHostEnvironment;
         if(appInfo.isFromWacAutomation !== undefined && appInfo.isFromWacAutomation !== null)
             data.IsFromWacAutomation = appInfo.isFromWacAutomation;
-        (new AppLogger).LogData(data);
-        setTimeout(function()
-        {
-            if(!OSF.Logger)
-                return;
-            OSF.Logger.allowUploadingData()
-        },100)
+        (new AppLogger).LogData(data)
     }
     OSFAppTelemetry.onAppActivated = onAppActivated;
     function onScriptDone(scriptId, msStartTime, msResponseTime, appCorrelationId)
@@ -7316,11 +7239,158 @@ OSF.InitializationHelper.prototype.loadAppSpecificScriptAndCreateOM = function O
         Nov: "nov",
         Dec: "dec"
     };
+    Microsoft.Office.WebExtension.MailboxEnums.DelegatePermissions = {
+        Read: 1,
+        Write: 2,
+        DeleteOwn: 4,
+        DeleteAll: 8,
+        EditOwn: 16,
+        EditAll: 32
+    };
+    Microsoft.Office.WebExtension.MailboxEnums.TimeZone = {
+        AfghanistanStandardTime: "Afghanistan Standard Time",
+        AlaskanStandardTime: "Alaskan Standard Time",
+        AleutianStandardTime: "Aleutian Standard Time",
+        AltaiStandardTime: "Altai Standard Time",
+        ArabStandardTime: "Arab Standard Time",
+        ArabianStandardTime: "Arabian Standard Time",
+        ArabicStandardTime: "Arabic Standard Time",
+        ArgentinaStandardTime: "Argentina Standard Time",
+        AstrakhanStandardTime: "Astrakhan Standard Time",
+        AtlanticStandardTime: "Atlantic Standard Time",
+        AUSCentralStandardTime: "AUS Central Standard Time",
+        AusCentralWStandardTime: "Aus Central W. Standard Time",
+        AUSEasternStandardTime: "AUS Eastern Standard Time",
+        AzerbaijanStandardTime: "Azerbaijan Standard Time",
+        AzoresStandardTime: "Azores Standard Time",
+        BahiaStandardTime: "Bahia Standard Time",
+        BangladeshStandardTime: "Bangladesh Standard Time",
+        BelarusStandardTime: "Belarus Standard Time",
+        BougainvilleStandardTime: "Bougainville Standard Time",
+        CanadaCentralStandardTime: "Canada Central Standard Time",
+        CapeVerdeStandardTime: "Cape Verde Standard Time",
+        CaucasusStandardTime: "Caucasus Standard Time",
+        CenAustraliaStandardTime: "Cen. Australia Standard Time",
+        CentralAmericaStandardTime: "Central America Standard Time",
+        CentralAsiaStandardTime: "Central Asia Standard Time",
+        CentralBrazilianStandardTime: "Central Brazilian Standard Time",
+        CentralEuropeStandardTime: "Central Europe Standard Time",
+        CentralEuropeanStandardTime: "Central European Standard Time",
+        CentralPacificStandardTime: "Central Pacific Standard Time",
+        CentralStandardTime: "Central Standard Time",
+        CentralStandardTime_Mexico: "Central Standard Time (Mexico)",
+        ChathamIslandsStandardTime: "Chatham Islands Standard Time",
+        ChinaStandardTime: "China Standard Time",
+        CubaStandardTime: "Cuba Standard Time",
+        DatelineStandardTime: "Dateline Standard Time",
+        EAfricaStandardTime: "E. Africa Standard Time",
+        EAustraliaStandardTime: "E. Australia Standard Time",
+        EEuropeStandardTime: "E. Europe Standard Time",
+        ESouthAmericaStandardTime: "E. South America Standard Time",
+        EasterIslandStandardTime: "Easter Island Standard Time",
+        EasternStandardTime: "Eastern Standard Time",
+        EasternStandardTime_Mexico: "Eastern Standard Time (Mexico)",
+        EgyptStandardTime: "Egypt Standard Time",
+        EkaterinburgStandardTime: "Ekaterinburg Standard Time",
+        FijiStandardTime: "Fiji Standard Time",
+        FLEStandardTime: "FLE Standard Time",
+        GeorgianStandardTime: "Georgian Standard Time",
+        GMTStandardTime: "GMT Standard Time",
+        GreenlandStandardTime: "Greenland Standard Time",
+        GreenwichStandardTime: "Greenwich Standard Time",
+        GTBStandardTime: "GTB Standard Time",
+        HaitiStandardTime: "Haiti Standard Time",
+        HawaiianStandardTime: "Hawaiian Standard Time",
+        IndiaStandardTime: "India Standard Time",
+        IranStandardTime: "Iran Standard Time",
+        IsraelStandardTime: "Israel Standard Time",
+        JordanStandardTime: "Jordan Standard Time",
+        KaliningradStandardTime: "Kaliningrad Standard Time",
+        KamchatkaStandardTime: "Kamchatka Standard Time",
+        KoreaStandardTime: "Korea Standard Time",
+        LibyaStandardTime: "Libya Standard Time",
+        LineIslandsStandardTime: "Line Islands Standard Time",
+        LordHoweStandardTime: "Lord Howe Standard Time",
+        MagadanStandardTime: "Magadan Standard Time",
+        MagallanesStandardTime: "Magallanes Standard Time",
+        MarquesasStandardTime: "Marquesas Standard Time",
+        MauritiusStandardTime: "Mauritius Standard Time",
+        MidAtlanticStandardTime: "Mid-Atlantic Standard Time",
+        MiddleEastStandardTime: "Middle East Standard Time",
+        MontevideoStandardTime: "Montevideo Standard Time",
+        MoroccoStandardTime: "Morocco Standard Time",
+        MountainStandardTime: "Mountain Standard Time",
+        MountainStandardTime_Mexico: "Mountain Standard Time (Mexico)",
+        MyanmarStandardTime: "Myanmar Standard Time",
+        NCentralAsiaStandardTime: "N. Central Asia Standard Time",
+        NamibiaStandardTime: "Namibia Standard Time",
+        NepalStandardTime: "Nepal Standard Time",
+        NewZealandStandardTime: "New Zealand Standard Time",
+        NewfoundlandStandardTime: "Newfoundland Standard Time",
+        NorfolkStandardTime: "Norfolk Standard Time",
+        NorthAsiaEastStandardTime: "North Asia East Standard Time",
+        NorthAsiaStandardTime: "North Asia Standard Time",
+        NorthKoreaStandardTime: "North Korea Standard Time",
+        OmskStandardTime: "Omsk Standard Time",
+        PacificSAStandardTime: "Pacific SA Standard Time",
+        PacificStandardTime: "Pacific Standard Time",
+        PacificStandardTime_Mexico: "Pacific Standard Time (Mexico)",
+        PakistanStandardTime: "Pakistan Standard Time",
+        ParaguayStandardTime: "Paraguay Standard Time",
+        RomanceStandardTime: "Romance Standard Time",
+        RussiaTimeZone10: "Russia Time Zone 10",
+        RussiaTimeZone11: "Russia Time Zone 11",
+        RussiaTimeZone3: "Russia Time Zone 3",
+        RussianStandardTime: "Russian Standard Time",
+        SAEasternStandardTime: "SA Eastern Standard Time",
+        SAPacificStandardTime: "SA Pacific Standard Time",
+        SAWesternStandardTime: "SA Western Standard Time",
+        SaintPierreStandardTime: "Saint Pierre Standard Time",
+        SakhalinStandardTime: "Sakhalin Standard Time",
+        SamoaStandardTime: "Samoa Standard Time",
+        SaratovStandardTime: "Saratov Standard Time",
+        SEAsiaStandardTime: "SE Asia Standard Time",
+        SingaporeStandardTime: "Singapore Standard Time",
+        SouthAfricaStandardTime: "South Africa Standard Time",
+        SriLankaStandardTime: "Sri Lanka Standard Time",
+        SudanStandardTime: "Sudan Standard Time",
+        SyriaStandardTime: "Syria Standard Time",
+        TaipeiStandardTime: "Taipei Standard Time",
+        TasmaniaStandardTime: "Tasmania Standard Time",
+        TocantinsStandardTime: "Tocantins Standard Time",
+        TokyoStandardTime: "Tokyo Standard Time",
+        TomskStandardTime: "Tomsk Standard Time",
+        TongaStandardTime: "Tonga Standard Time",
+        TransbaikalStandardTime: "Transbaikal Standard Time",
+        TurkeyStandardTime: "Turkey Standard Time",
+        TurksAndCaicosStandardTime: "Turks And Caicos Standard Time",
+        UlaanbaatarStandardTime: "Ulaanbaatar Standard Time",
+        USEasternStandardTime: "US Eastern Standard Time",
+        USMountainStandardTime: "US Mountain Standard Time",
+        UTC: "UTC",
+        UTCPLUS12: "UTC+12",
+        UTCPLUS13: "UTC+13",
+        UTCMINUS02: "UTC-02",
+        UTCMINUS08: "UTC-08",
+        UTCMINUS09: "UTC-09",
+        UTCMINUS11: "UTC-11",
+        VenezuelaStandardTime: "Venezuela Standard Time",
+        VladivostokStandardTime: "Vladivostok Standard Time",
+        WAustraliaStandardTime: "W. Australia Standard Time",
+        WCentralAfricaStandardTime: "W. Central Africa Standard Time",
+        WEuropeStandardTime: "W. Europe Standard Time",
+        WMongoliaStandardTime: "W. Mongolia Standard Time",
+        WestAsiaStandardTime: "West Asia Standard Time",
+        WestBankStandardTime: "West Bank Standard Time",
+        WestPacificStandardTime: "West Pacific Standard Time",
+        YakutskStandardTime: "Yakutsk Standard Time"
+    };
     Type.registerNamespace("OSF.DDA");
     var OSF = window["OSF"] || {};
     OSF.DDA = OSF.DDA || {};
     window["OSF"]["DDA"]["OutlookAppOm"] = OSF.DDA.OutlookAppOm = function(officeAppContext, targetWindow, appReadyCallback)
     {
+        this.$$d__getSharedPropertiesAsyncApi$p$0 = Function.createDelegate(this,this._getSharedPropertiesAsyncApi$p$0);
         this.$$d_navigateToModuleAsync = Function.createDelegate(this,this.navigateToModuleAsync);
         this.$$d_displayPersonaCardAsync = Function.createDelegate(this,this.displayPersonaCardAsync);
         this.$$d_displayNewMessageFormApi = Function.createDelegate(this,this.displayNewMessageFormApi);
@@ -7840,6 +7910,10 @@ OSF.InitializationHelper.prototype.loadAppSpecificScriptAndCreateOM = function O
                     return false
             }
         },
+        shouldRunNewCode: function(functionFlagToExecute)
+        {
+            return(this._initialData$p$0.get__shouldRunNewCodeForFlags$i$0() & functionFlagToExecute) === functionFlagToExecute
+        },
         isOutlook16OrGreater: function()
         {
             var hostVersion = this._initialData$p$0.get__hostVersion$i$0();
@@ -7885,6 +7959,7 @@ OSF.InitializationHelper.prototype.loadAppSpecificScriptAndCreateOM = function O
                 case 99:
                 case 103:
                 case 107:
+                case 108:
                     break;
                 case 12:
                     optionalParameters["isRest"] = data["isRest"];
@@ -8089,6 +8164,15 @@ OSF.InitializationHelper.prototype.loadAppSpecificScriptAndCreateOM = function O
             updatedParameters["module"] = module;
             this._standardInvokeHostMethod$i$0(45,updatedParameters,null,parameters._asyncContext$p$0,parameters._callback$p$0)
         },
+        _getSharedPropertiesAsyncApi$p$0: function()
+        {
+            var args = [];
+            for(var $$pai_2 = 0; $$pai_2 < arguments["length"]; ++$$pai_2)
+                args[$$pai_2] = arguments[$$pai_2];
+            window["OSF"]["DDA"]["OutlookAppOm"]._instance$p._throwOnMethodCallForInsufficientPermission$i$0(1,"getSharedPropertiesAsync");
+            var parameters = $h.CommonParameters.parse(args,true);
+            window["OSF"]["DDA"]["OutlookAppOm"]._instance$p._standardInvokeHostMethod$i$0(108,null,null,parameters._asyncContext$p$0,parameters._callback$p$0)
+        },
         _initializeMethods$p$0: function()
         {
             var currentInstance = this;
@@ -8099,6 +8183,8 @@ OSF.InitializationHelper.prototype.loadAppSpecificScriptAndCreateOM = function O
                 currentInstance["displayPersonaCardAsync"] = this.$$d_displayPersonaCardAsync;
                 currentInstance["navigateToModuleAsync"] = this.$$d_navigateToModuleAsync
             }
+            if(this._item$p$0 && this._item$p$0.get__isFromSharedFolder$i$0() && this._hostItemType$p$0 !== 6)
+                this._item$p$0["getSharedPropertiesAsync"] = this.$$d__getSharedPropertiesAsyncApi$p$0
         },
         _getInitialDataResponseHandler$p$0: function(resultCode, data)
         {
@@ -9304,6 +9390,10 @@ OSF.InitializationHelper.prototype.loadAppSpecificScriptAndCreateOM = function O
         else
             recurrenceCopy["recurrenceProperties"] = $h.ScriptHelpers.deepClone(recurrenceDictionary["recurrenceProperties"]);
         recurrenceCopy["recurrenceType"] = recurrenceDictionary["recurrenceType"];
+        if($h.ScriptHelpers.isNullOrUndefined(recurrenceDictionary["recurrenceTimeZone"]))
+            recurrenceCopy["recurrenceTimeZone"] = null;
+        else
+            recurrenceCopy["recurrenceTimeZone"] = $h.ScriptHelpers.deepClone(recurrenceDictionary["recurrenceTimeZone"]);
         seriesTime.importFromSeriesTimeJsonObject(recurrenceDictionary["seriesTimeJson"]);
         recurrenceCopy["seriesTime"] = seriesTime;
         return recurrenceCopy
@@ -9348,7 +9438,13 @@ OSF.InitializationHelper.prototype.loadAppSpecificScriptAndCreateOM = function O
         window["OSF"]["DDA"]["OutlookAppOm"].throwOnArgumentType(recurrenceDictionary["interval"],Number,"interval");
         $h.ComposeRecurrence._throwOnNullParameter$p(recurrenceProperties,"days");
         window["OSF"]["DDA"]["OutlookAppOm"].throwOnArgumentType(recurrenceDictionary["days"],Array,"days");
-        $h.ComposeRecurrence._throwOnInvalidDaysArray$p(recurrenceDictionary["days"])
+        $h.ComposeRecurrence._throwOnInvalidDaysArray$p(recurrenceDictionary["days"]);
+        if(recurrenceDictionary["firstDayOfWeek"])
+        {
+            window["OSF"]["DDA"]["OutlookAppOm"].throwOnArgumentType(recurrenceDictionary["firstDayOfWeek"],String,"firstDayOfWeek");
+            if(!$h.ComposeRecurrence._verifyDays$p(recurrenceDictionary["firstDayOfWeek"],false))
+                throw Error.argument("firstDayOfWeek");
+        }
     };
     $h.ComposeRecurrence._throwOnInvalidWeekNumber$p = function(weekNumber)
     {
@@ -9424,6 +9520,13 @@ OSF.InitializationHelper.prototype.loadAppSpecificScriptAndCreateOM = function O
         $h.ComposeRecurrence._throwOnInvalidRecurrenceType$p(recurrenceDictionary["recurrenceType"]);
         if(recurrenceDictionary["recurrenceType"] !== window["Microsoft"]["Office"]["WebExtension"]["MailboxEnums"]["RecurrenceType"]["Weekday"])
             $h.ComposeRecurrence._throwOnNullParameter$p(recurrenceObject,"recurrenceProperties");
+        if(recurrenceDictionary["recurrenceTimeZone"])
+        {
+            window["OSF"]["DDA"]["OutlookAppOm"].throwOnArgumentType(recurrenceDictionary["recurrenceTimeZone"],Object,"recurrenceTimeZone");
+            var recurrenceTimeZone = recurrenceDictionary["recurrenceTimeZone"];
+            $h.ComposeRecurrence._throwOnNullParameter$p(recurrenceTimeZone,"name");
+            window["OSF"]["DDA"]["OutlookAppOm"].throwOnArgumentType(recurrenceTimeZone["name"],String,"name")
+        }
         if(recurrenceDictionary["recurrenceType"] === window["Microsoft"]["Office"]["WebExtension"]["MailboxEnums"]["RecurrenceType"]["Daily"])
             $h.ComposeRecurrence._throwOnInvalidDailyRecurrence$p(recurrenceDictionary["recurrenceProperties"]);
         else if(recurrenceDictionary["recurrenceType"] === window["Microsoft"]["Office"]["WebExtension"]["MailboxEnums"]["RecurrenceType"]["Weekly"])
@@ -9447,6 +9550,10 @@ OSF.InitializationHelper.prototype.loadAppSpecificScriptAndCreateOM = function O
                     else
                         recurrenceCopy["recurrenceProperties"] = $h.ScriptHelpers.deepClone(recurrenceDictionary["recurrenceProperties"]);
                     recurrenceCopy["recurrenceType"] = recurrenceDictionary["recurrenceType"];
+                    if($h.ScriptHelpers.isNullOrUndefined(recurrenceDictionary["recurrenceTimeZone"]))
+                        recurrenceCopy["recurrenceTimeZone"] = null;
+                    else
+                        recurrenceCopy["recurrenceTimeZone"] = $h.ScriptHelpers.deepClone(recurrenceDictionary["recurrenceTimeZone"]);
                     recurrenceCopy["seriesTimeJson"] = recurrenceDictionary["seriesTime"].exportToSeriesTimeJsonDictionary();
                     return recurrenceCopy
                 }
@@ -9679,8 +9786,13 @@ OSF.InitializationHelper.prototype.loadAppSpecificScriptAndCreateOM = function O
         if(window["JSON"]["stringify"](this._data$p$0).length > MaxCustomPropertiesLength)
             throw Error.argument();
         var parameters = $h.CommonParameters.parse(args,false,true);
-        var saveCustomProperties = new $h.SaveDictionaryRequest(parameters._callback$p$0,parameters._asyncContext$p$0);
-        saveCustomProperties._sendRequest$i$0(4,"SaveCustomProperties",{customProperties: this._data$p$0})
+        if(window["OSF"]["DDA"]["OutlookAppOm"]._instance$p.shouldRunNewCode($h.ShouldRunNewCodeForFlags.saveCustomProperties))
+            window["OSF"]["DDA"]["OutlookAppOm"]._instance$p._standardInvokeHostMethod$i$0(4,{customProperties: this._data$p$0},null,parameters._asyncContext$p$0,parameters._callback$p$0);
+        else
+        {
+            var saveCustomProperties = new $h.SaveDictionaryRequest(parameters._callback$p$0,parameters._asyncContext$p$0);
+            saveCustomProperties._sendRequest$i$0(4,"SaveCustomProperties",{customProperties: this._data$p$0})
+        }
     };
     $h.Diagnostics = function(data, appName)
     {
@@ -10100,13 +10212,13 @@ OSF.InitializationHelper.prototype.loadAppSpecificScriptAndCreateOM = function O
             if(!this._endYear$p$0 && !this._endMonth$p$0 && !this._endDay$p$0)
                 return true;
             var startDateTime = new Date;
-            startDateTime["setUTCFullYear"](this._startYear$p$0);
-            startDateTime["setUTCMonth"](this._startMonth$p$0 - 1);
-            startDateTime["setUTCDate"](this._startDay$p$0);
+            startDateTime["setFullYear"](this._startYear$p$0);
+            startDateTime["setMonth"](this._startMonth$p$0 - 1);
+            startDateTime["setDate"](this._startDay$p$0);
             var endDateTime = new Date;
-            endDateTime["setUTCFullYear"](this._endYear$p$0);
-            endDateTime["setUTCMonth"](this._endMonth$p$0 - 1);
-            endDateTime["setUTCDate"](this._endDay$p$0);
+            endDateTime["setFullYear"](this._endYear$p$0);
+            endDateTime["setMonth"](this._endMonth$p$0 - 1);
+            endDateTime["setDate"](this._endDay$p$0);
             return endDateTime >= startDateTime
         },
         _prependZeroToString$p$0: function(number)
@@ -10133,30 +10245,53 @@ OSF.InitializationHelper.prototype.loadAppSpecificScriptAndCreateOM = function O
             if(year < 1601 || month < 1 || month > 12 || day < 1 || day > 31)
                 return false;
             return true
+        },
+        _setDateHelper$p$0: function(isStart, yearOrDateString, month, day)
+        {
+            var yearCalculated = 0;
+            var monthCalculated = 0;
+            var dayCalculated = 0;
+            if(yearOrDateString && !$h.ScriptHelpers.isNullOrUndefined(month) && day)
+            {
+                this._throwOnInvalidDate$p$0(yearOrDateString,month + 1,day);
+                yearCalculated = yearOrDateString;
+                monthCalculated = month + 1;
+                dayCalculated = day
+            }
+            else if(yearOrDateString)
+            {
+                var dateString = yearOrDateString;
+                this._throwOnInvalidDateString$p$0(dateString);
+                var dateObject = new Date(dateString);
+                if(dateObject && !window["isNaN"](dateObject["getUTCFullYear"]()) && !window["isNaN"](dateObject["getUTCMonth"]()) && !window["isNaN"](dateObject["getUTCDate"]()))
+                {
+                    this._throwOnInvalidDate$p$0(dateObject["getUTCFullYear"](),dateObject["getUTCMonth"]() + 1,dateObject["getUTCDate"]());
+                    yearCalculated = dateObject["getUTCFullYear"]();
+                    monthCalculated = dateObject["getUTCMonth"]() + 1;
+                    dayCalculated = dateObject["getUTCDate"]()
+                }
+            }
+            if(yearCalculated && monthCalculated && dayCalculated)
+                if(isStart)
+                {
+                    this._startYear$p$0 = yearCalculated;
+                    this._startMonth$p$0 = monthCalculated;
+                    this._startDay$p$0 = dayCalculated
+                }
+                else
+                {
+                    this._endYear$p$0 = yearCalculated;
+                    this._endMonth$p$0 = monthCalculated;
+                    this._endDay$p$0 = dayCalculated
+                }
         }
     };
     Microsoft.Office.WebExtension.SeriesTime.prototype.setStartDate = function(yearOrDateString, month, day)
     {
-        if(yearOrDateString && month && day)
-        {
-            this._throwOnInvalidDate$p$0(yearOrDateString,month,day);
-            this._startYear$p$0 = yearOrDateString;
-            this._startMonth$p$0 = month;
-            this._startDay$p$0 = day
-        }
+        if(yearOrDateString && !$h.ScriptHelpers.isNullOrUndefined(month) && day)
+            this._setDateHelper$p$0(true,yearOrDateString,month,day);
         else if(yearOrDateString)
-        {
-            var dateString = yearOrDateString;
-            this._throwOnInvalidDateString$p$0(dateString);
-            var dateObject = new Date(dateString);
-            if(dateObject && !window["isNaN"](dateObject["getUTCFullYear"]()) && !window["isNaN"](dateObject["getUTCMonth"]()) && !window["isNaN"](dateObject["getUTCDate"]()))
-            {
-                this._throwOnInvalidDate$p$0(dateObject["getUTCFullYear"](),dateObject["getUTCMonth"]() + 1,dateObject["getUTCDate"]());
-                this._startYear$p$0 = dateObject["getUTCFullYear"]();
-                this._startMonth$p$0 = dateObject["getUTCMonth"]() + 1;
-                this._startDay$p$0 = dateObject["getUTCDate"]()
-            }
-        }
+            this._setDateHelper$p$0(true,yearOrDateString,null,null)
     };
     Microsoft.Office.WebExtension.SeriesTime.prototype.getStartDate = function()
     {
@@ -10164,26 +10299,10 @@ OSF.InitializationHelper.prototype.loadAppSpecificScriptAndCreateOM = function O
     };
     Microsoft.Office.WebExtension.SeriesTime.prototype.setEndDate = function(yearOrDateString, month, day)
     {
-        if(yearOrDateString && month && day)
-        {
-            this._throwOnInvalidDate$p$0(yearOrDateString,month,day);
-            this._endYear$p$0 = yearOrDateString;
-            this._endMonth$p$0 = month;
-            this._endDay$p$0 = day
-        }
+        if(yearOrDateString && !$h.ScriptHelpers.isNullOrUndefined(month) && day)
+            this._setDateHelper$p$0(false,yearOrDateString,month,day);
         else if(yearOrDateString)
-        {
-            var dateString = yearOrDateString;
-            this._throwOnInvalidDateString$p$0(dateString);
-            var dateObject = new Date(dateString);
-            if(dateObject && !window["isNaN"](dateObject["getUTCFullYear"]()) && !window["isNaN"](dateObject["getUTCMonth"]()) && !window["isNaN"](dateObject["getUTCDate"]()))
-            {
-                this._throwOnInvalidDate$p$0(dateObject["getUTCFullYear"](),dateObject["getUTCMonth"]() + 1,dateObject["getUTCDate"]());
-                this._endYear$p$0 = dateObject["getUTCFullYear"]();
-                this._endMonth$p$0 = dateObject["getUTCMonth"]() + 1;
-                this._endDay$p$0 = dateObject["getUTCDate"]()
-            }
-        }
+            this._setDateHelper$p$0(false,yearOrDateString,null,null);
         else if(!yearOrDateString)
         {
             this._endYear$p$0 = 0;
@@ -10210,8 +10329,8 @@ OSF.InitializationHelper.prototype.loadAppSpecificScriptAndCreateOM = function O
         else if(!$h.ScriptHelpers.isNullOrUndefined(hoursOrTimeString))
         {
             var timeString = hoursOrTimeString;
-            var newDateString = "2017-01-15" + timeString;
-            var RegEx = new RegExp("^T[0-2]\\d:[0-5]\\d:[0-5]\\d\\.\\d{3}Z$");
+            var newDateString = "2017-01-15" + timeString + "Z";
+            var RegEx = new RegExp("^T[0-2]\\d:[0-5]\\d:[0-5]\\d\\.\\d{3}$");
             if(!RegEx["test"](timeString))
                 throw Error.create(window["_u"]["ExtensibilityStrings"]["l_InvalidTime_Text"]);
             var dateObject = new Date(newDateString);
@@ -10225,14 +10344,14 @@ OSF.InitializationHelper.prototype.loadAppSpecificScriptAndCreateOM = function O
     {
         var minutes = this._startTimeMinutes$p$0 % 60;
         var hours = Math["floor"](this._startTimeMinutes$p$0 / 60);
-        return"T" + this._prependZeroToString$p$0(hours) + ":" + this._prependZeroToString$p$0(minutes) + ":00.000Z"
+        return"T" + this._prependZeroToString$p$0(hours) + ":" + this._prependZeroToString$p$0(minutes) + ":00.000"
     };
     Microsoft.Office.WebExtension.SeriesTime.prototype.getEndTime = function()
     {
         var endTimeMinutes = this._startTimeMinutes$p$0 + this._durationMinutes$p$0;
         var minutes = endTimeMinutes % 60;
-        var hours = Math["floor"](endTimeMinutes / 60);
-        return"T" + this._prependZeroToString$p$0(hours) + ":" + this._prependZeroToString$p$0(minutes) + ":00.000Z"
+        var hours = Math["floor"](endTimeMinutes / 60) % 24;
+        return"T" + this._prependZeroToString$p$0(hours) + ":" + this._prependZeroToString$p$0(minutes) + ":00.000"
     };
     Microsoft.Office.WebExtension.SeriesTime.prototype.setDuration = function(minutes)
     {
@@ -10369,6 +10488,10 @@ OSF.InitializationHelper.prototype.loadAppSpecificScriptAndCreateOM = function O
         $h.InitialData._defineReadOnlyProperty$i(this,"notificationMessages",this.$$d__getNotificationMessages$p$0)
     };
     $h.ItemBase.prototype = {
+        get__isFromSharedFolder$i$0: function()
+        {
+            return this._data$p$0.get__isFromSharedFolder$i$0()
+        },
         _data$p$0: null,
         _notificationMessages$p$0: null,
         get_data: function()
@@ -10400,7 +10523,7 @@ OSF.InitializationHelper.prototype.loadAppSpecificScriptAndCreateOM = function O
         var args = [];
         for(var $$pai_2 = 0; $$pai_2 < arguments["length"]; ++$$pai_2)
             args[$$pai_2] = arguments[$$pai_2];
-        window["OSF"]["DDA"]["OutlookAppOm"]._instance$p._throwOnMethodCallForInsufficientPermission$i$0(1,"item.getInitializationContextAsync");
+        window["OSF"]["DDA"]["OutlookAppOm"]._instance$p._throwOnMethodCallForInsufficientPermission$i$0(1,"getInitializationContextAsync");
         var parameters = $h.CommonParameters.parse(args,true);
         window["OSF"]["DDA"]["OutlookAppOm"]._instance$p._standardInvokeHostMethod$i$0(99,null,null,parameters._asyncContext$p$0,parameters._callback$p$0)
     };
@@ -11226,6 +11349,11 @@ OSF.InitializationHelper.prototype.loadAppSpecificScriptAndCreateOM = function O
         $h.OutlookErrorManager._addErrorMessage$p(9031,"InvalidParameterValueError",window["_u"]["ExtensibilityStrings"]["l_InvalidParameterValueError_Text"]);
         $h.OutlookErrorManager._addErrorMessage$p(9033,"SetRecurrenceOnInstanceError",window["_u"]["ExtensibilityStrings"]["l_Recurrence_Error_Instance_SetAsync_Text"]);
         $h.OutlookErrorManager._addErrorMessage$p(9034,"InvalidRecurrenceError",window["_u"]["ExtensibilityStrings"]["l_Recurrence_Error_Properties_Invalid_Text"]);
+        $h.OutlookErrorManager._addErrorMessage$p(9035,"RecurrenceZeroOccurrences",window["_u"]["ExtensibilityStrings"]["l_RecurrenceErrorZeroOccurrences_Text"]);
+        $h.OutlookErrorManager._addErrorMessage$p(9036,"RecurrenceMaxOccurrences",window["_u"]["ExtensibilityStrings"]["l_RecurrenceErrorMaxOccurrences_Text"]);
+        $h.OutlookErrorManager._addErrorMessage$p(9037,"RecurrenceInvalidTimeZone",window["_u"]["ExtensibilityStrings"]["l_RecurrenceInvalidTimeZone_Text"]);
+        $h.OutlookErrorManager._addErrorMessage$p(9038,"InsufficientItemPermissionsError",window["_u"]["ExtensibilityStrings"]["l_Insufficient_Item_Permissions_Text"]);
+        $h.OutlookErrorManager._addErrorMessage$p(9039,"RecurrenceUnsupportedAlternateCalendar",window["_u"]["ExtensibilityStrings"]["l_RecurrenceUnsupportedAlternateCalendar_Text"]);
         $h.OutlookErrorManager._isInitialized$p = true
     };
     $h.OutlookErrorManager._addErrorMessage$p = function(errorCode, errorName, errorMessage)
@@ -11376,6 +11504,7 @@ OSF.InitializationHelper.prototype.loadAppSpecificScriptAndCreateOM = function O
         getRecurrenceAsync: 103,
         setRecurrenceAsync: 104,
         getFromAsync: 107,
+        getSharedPropertiesAsync: 108,
         messageParent: 144,
         trackCtq: 400,
         recordTrace: 401,
@@ -11471,6 +11600,7 @@ OSF.InitializationHelper.prototype.loadAppSpecificScriptAndCreateOM = function O
             return this._asyncContext$p$0
         }
     };
+    $h.ShouldRunNewCodeForFlags = function(){};
     $h.EwsRequest = function(userContext)
     {
         $h.EwsRequest["initializeBase"](this,[userContext])
@@ -11660,6 +11790,16 @@ OSF.InitializationHelper.prototype.loadAppSpecificScriptAndCreateOM = function O
         get__isRead$i$0: function()
         {
             return this._data$p$0["isRead"]
+        },
+        get__isFromSharedFolder$i$0: function()
+        {
+            return!!this._data$p$0["isFromSharedFolder"] && this._data$p$0["isFromSharedFolder"]
+        },
+        get__shouldRunNewCodeForFlags$i$0: function()
+        {
+            if(this._data$p$0["shouldRunNewCodeForFlags"])
+                return this._data$p$0["shouldRunNewCodeForFlags"];
+            return 0
         },
         get__endNodeUrl$i$0: function()
         {
@@ -12085,6 +12225,8 @@ OSF.InitializationHelper.prototype.loadAppSpecificScriptAndCreateOM = function O
     $h.ComposeRecurrence.recurrenceTypeKey = "recurrenceType";
     $h.ComposeRecurrence.seriesTimeKey = "seriesTime";
     $h.ComposeRecurrence.seriesTimeJsonKey = "seriesTimeJson";
+    $h.ComposeRecurrence.recurrenceTimeZoneKey = "recurrenceTimeZone";
+    $h.ComposeRecurrence.recurrenceTimeZoneName = "name";
     $h.ComposeRecurrence.recurrencePropertiesKey = "recurrenceProperties";
     $h.ComposeRecurrence.intervalKey = "interval";
     $h.ComposeRecurrence.daysKey = "days";
@@ -12092,6 +12234,7 @@ OSF.InitializationHelper.prototype.loadAppSpecificScriptAndCreateOM = function O
     $h.ComposeRecurrence.dayOfWeekKey = "dayOfWeek";
     $h.ComposeRecurrence.weekNumberKey = "weekNumber";
     $h.ComposeRecurrence.monthKey = "month";
+    $h.ComposeRecurrence.firstDayOfWeekKey = "firstDayOfWeek";
     $h.ComposeLocation.locationKey = "location";
     $h.ComposeLocation.maximumLocationLength = 255;
     $h.ComposeSubject.maximumSubjectLength = 255;
@@ -12171,9 +12314,15 @@ OSF.InitializationHelper.prototype.loadAppSpecificScriptAndCreateOM = function O
     $h.OutlookErrorManager.OutlookErrorCodes.invalidParameterValueError = 9031;
     $h.OutlookErrorManager.OutlookErrorCodes.setRecurrenceOnInstance = 9033;
     $h.OutlookErrorManager.OutlookErrorCodes.invalidRecurrence = 9034;
+    $h.OutlookErrorManager.OutlookErrorCodes.recurrenceZeroOccurrences = 9035;
+    $h.OutlookErrorManager.OutlookErrorCodes.recurrenceMaxOccurrences = 9036;
+    $h.OutlookErrorManager.OutlookErrorCodes.recurrenceInvalidTimeZone = 9037;
+    $h.OutlookErrorManager.OutlookErrorCodes.insufficientItemPermissions = 9038;
+    $h.OutlookErrorManager.OutlookErrorCodes.recurrenceUnsupportedAlternateCalendar = 9039;
     $h.OutlookErrorManager.OutlookErrorCodes.ooeInvalidDataFormat = 2006;
     $h.OutlookErrorManager.OsfDdaErrorCodes.ooeCoercionTypeNotSupported = 1e3;
     $h.CommonParameters.asyncContextKeyName = "asyncContext";
+    $h.ShouldRunNewCodeForFlags.saveCustomProperties = 1;
     $h.InitialData.userProfileTypeKey = "userProfileType";
     $h.ScriptHelpers.emptyString = "";
     OSF.DDA.ErrorCodeManager.initializeErrorMessages(Strings.OfficeOM);
@@ -12182,6 +12331,6 @@ OSF.InitializationHelper.prototype.loadAppSpecificScriptAndCreateOM = function O
     else
         this._settings = this._initializeSettings(false);
     appContext.appOM = new OSF.DDA.OutlookAppOm(appContext,this._webAppState.wnd,appReady);
-    if(appContext.get_appName() == OSF.AppName.Outlook || appContext.get_appName() == OSF.AppName.OutlookWebApp || appContext.get_appName() == OSF.AppName.OutlookIOS)
+    if(appContext.get_appName() == OSF.AppName.Outlook || appContext.get_appName() == OSF.AppName.OutlookWebApp || appContext.get_appName() == OSF.AppName.OutlookIOS || appContext.get_appName() == OSF.AppName.OutlookAndroid)
         OSF.DDA.DispIdHost.addEventSupport(appContext.appOM,new OSF.EventDispatch([Microsoft.Office.WebExtension.EventType.ItemChanged]))
 }
