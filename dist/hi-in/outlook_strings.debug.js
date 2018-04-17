@@ -1,4 +1,4 @@
-/* Version: 16.0.9227.1000 */
+/* Version: 16.0.9309.1000 */
 
 Type.registerNamespace("_u");
 _u.ExtensibilityStrings = function()
@@ -31,6 +31,7 @@ _u.ExtensibilityStrings.l_EmailAddressTooLong_Text = "एक या अधिक
 _u.ExtensibilityStrings.l_EwsRequestOversized_Text = "अनुरोध 1 MB की आकार सीमा से पार हो गया है. कृपया अपना EWS अनुरोध संपादित करें.";
 _u.ExtensibilityStrings.l_ExceededMaxNumberOfAttachments_Text = "संदेश में पहले से ही अनुलग्नकों की अधिकतम संख्या होने के कारण अनुलग्नक जोड़े नहीं जा सकते";
 _u.ExtensibilityStrings.l_HtmlSanitizationFailure_Text = "HTML सुरक्षा साधन विफल हो गया.";
+_u.ExtensibilityStrings.l_Insufficient_Item_Permissions_Text = "The user doesn't have the permissions required to perform this operation.";
 _u.ExtensibilityStrings.l_InternalFormatError_Text = "आंतरिक स्वरूप त्रुटि उत्पन्न हुई.";
 _u.ExtensibilityStrings.l_InternalProtocolError_Text = "आंतरिक प्रोटोकॉल त्रुटि: '{0}'.";
 _u.ExtensibilityStrings.l_InvalidActionType_Text = "'actionType' पैरामीटर का मान अमान्य है. स्वीकृत मान \"showTaskPane\" है."

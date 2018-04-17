@@ -1,4 +1,4 @@
-/* Version: 16.0.9227.1000 */
+/* Version: 16.0.9309.1000 */
 
 Type.registerNamespace("_u");
 _u.ExtensibilityStrings = function()
@@ -31,6 +31,7 @@ _u.ExtensibilityStrings.l_EmailAddressTooLong_Text = "ที่อยู่อ�
 _u.ExtensibilityStrings.l_EwsRequestOversized_Text = "ขนาดการร้องขอเกินขีดจำกัดที่ 1 เมกะไบต์ โปรดปรับเปลี่ยนการร้องขอ EWS ของคุณ";
 _u.ExtensibilityStrings.l_ExceededMaxNumberOfAttachments_Text = "ไม่สามารถเพิ่มสิ่งที่แนบมาได้ เนื่องจากข้อความมีจำนวนสิ่งที่แนบมาถึงขีดจำกัดสูงสุดแล้ว";
 _u.ExtensibilityStrings.l_HtmlSanitizationFailure_Text = "การรักษาให้ HTML ปลอดภัยล้มเหลว";
+_u.ExtensibilityStrings.l_Insufficient_Item_Permissions_Text = "The user doesn't have the permissions required to perform this operation.";
 _u.ExtensibilityStrings.l_InternalFormatError_Text = "มีข้อผิดพลาดรูปแบบภายใน";
 _u.ExtensibilityStrings.l_InternalProtocolError_Text = "ข้อผิดพลาดของโพรโทคอลภายใน: '{0}'";
 _u.ExtensibilityStrings.l_InvalidActionType_Text = "ค่าของพารามิเตอร์ 'actionType' ไม่ถูกต้อง ค่าที่ยอมรับได้คือ \"showTaskPane\""

@@ -1,4 +1,4 @@
-/* Version: 16.0.9227.1000 */
+/* Version: 16.0.9309.1000 */
 
 Type.registerNamespace("_u");
 _u.ExtensibilityStrings = function()
@@ -31,6 +31,7 @@ _u.ExtensibilityStrings.l_EmailAddressTooLong_Text = "Принаймні одн�
 _u.ExtensibilityStrings.l_EwsRequestOversized_Text = "Розмір запиту перевищує максимально дозволений – 1 МБ. Змініть свій запит EWS.";
 _u.ExtensibilityStrings.l_ExceededMaxNumberOfAttachments_Text = "Вкладення не можна додати, оскільки повідомлення вже містить максимальну кількість вкладень";
 _u.ExtensibilityStrings.l_HtmlSanitizationFailure_Text = "Не вдалося очистити HTML.";
+_u.ExtensibilityStrings.l_Insufficient_Item_Permissions_Text = "The user doesn't have the permissions required to perform this operation.";
 _u.ExtensibilityStrings.l_InternalFormatError_Text = "Сталася помилка, пов’язана із внутрішнім форматом.";
 _u.ExtensibilityStrings.l_InternalProtocolError_Text = "Помилка внутрішнього протоколу: {0}.";
 _u.ExtensibilityStrings.l_InvalidActionType_Text = 'Значення параметра "actionType" неприпустиме. Припустиме значення ─ "showTaskPane".'

@@ -1,4 +1,4 @@
-/* Version: 16.0.9227.1000 */
+/* Version: 16.0.9309.1000 */
 
 Type.registerNamespace("_u");
 _u.ExtensibilityStrings = function()
@@ -31,6 +31,7 @@ _u.ExtensibilityStrings.l_EmailAddressTooLong_Text = "Satu atau beberapa alamat 
 _u.ExtensibilityStrings.l_EwsRequestOversized_Text = "Permintaan tersebut melebihi batas ukuran 1 MB. Harap ubah permintaan EWS Anda.";
 _u.ExtensibilityStrings.l_ExceededMaxNumberOfAttachments_Text = "Lampiran tidak dapat ditambahkan karena pesan sudah mencapai jumlah maksimum lampiran";
 _u.ExtensibilityStrings.l_HtmlSanitizationFailure_Text = "Sanitasi HTML telah gagal.";
+_u.ExtensibilityStrings.l_Insufficient_Item_Permissions_Text = "The user doesn't have the permissions required to perform this operation.";
 _u.ExtensibilityStrings.l_InternalFormatError_Text = "Terjadi kesalahan format internal.";
 _u.ExtensibilityStrings.l_InternalProtocolError_Text = "Kesalahan protokol internal: '{0}'.";
 _u.ExtensibilityStrings.l_InvalidActionType_Text = "Nilai parameter 'actionType' tidak valid. Nilai yang diterima adalah \"showTaskPane\"."

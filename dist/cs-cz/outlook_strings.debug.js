@@ -1,4 +1,4 @@
-/* Version: 16.0.9227.1000 */
+/* Version: 16.0.9309.1000 */
 
 Type.registerNamespace("_u");
 _u.ExtensibilityStrings = function()
@@ -31,6 +31,7 @@ _u.ExtensibilityStrings.l_EmailAddressTooLong_Text = "Minimálně jedna ze zadan
 _u.ExtensibilityStrings.l_EwsRequestOversized_Text = "Požadavek nesmí být větší než 1 MB. Upravte svou žádost Webových služeb Exchange (EWS).";
 _u.ExtensibilityStrings.l_ExceededMaxNumberOfAttachments_Text = "Přílohy se nedají přidat, protože zpráva už má maximální možný počet příloh.";
 _u.ExtensibilityStrings.l_HtmlSanitizationFailure_Text = "Sanitace HTML se nepovedla.";
+_u.ExtensibilityStrings.l_Insufficient_Item_Permissions_Text = "The user doesn't have the permissions required to perform this operation.";
 _u.ExtensibilityStrings.l_InternalFormatError_Text = "Došlo k chybě vnitřního formátu.";
 _u.ExtensibilityStrings.l_InternalProtocolError_Text = "Vnitřní chyba protokolu: {0}.";
 _u.ExtensibilityStrings.l_InvalidActionType_Text = "Hodnota parametru actionType je neplatná. Platná je hodnota showTaskPane."

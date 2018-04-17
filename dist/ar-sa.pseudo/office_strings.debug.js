@@ -1,4 +1,4 @@
-/* Version: 16.0.9227.1000 */
+/* Version: 16.0.9309.1000 */
 
 Type.registerNamespace("Strings");
 Strings.OfficeOM = function()
@@ -33,8 +33,8 @@ Strings.OfficeOM.L_CoercionTypeNotSupported = "［0MWOX］‏‏أبع[The speci
 Strings.OfficeOM.L_ColIndexOutOfRange = "［uM06f］‏‏أبع[The column index value is out of the allowed range. Use a value (0 or higher) that's less than the number of columns.]לף";
 Strings.OfficeOM.L_ConnectionFailureWithDetails = "［y3r7A］‏‏أبع[The request failed with status code of {0}, error code {1} and the following error message: {2}]לף";
 Strings.OfficeOM.L_ConnectionFailureWithStatus = "［Lwa49］‏‏أبع[The request failed with status code of {0}.]לף";
-Strings.OfficeOM.L_CustomFunctionDefinitionMissing = "［WVXyy］‏‏أبع[A property with this name that represents the function's definition must exist on Excel.CustomFunctions.]לף";
-Strings.OfficeOM.L_CustomFunctionImplementationMissing = "［DhY5m］‏‏أبع[The property with this name on Excel.CustomFunctions that represents the function's definition must contain a 'call' property that implements the function.]לף";
+Strings.OfficeOM.L_CustomFunctionDefinitionMissing = "［WVXyy］‏‏أبع[A property with this name that represents the function's definition must exist on Excel.Script.CustomFunctions.]לף";
+Strings.OfficeOM.L_CustomFunctionImplementationMissing = "［DhY5m］‏‏أبع[The property with this name on Excel.Script.CustomFunctions that represents the function's definition must contain a 'call' property that implements the function.]לף";
 Strings.OfficeOM.L_CustomFunctionNameCannotSplit = "［1DC6K］‏‏أبع[The function name must contain a non-empty namespace and a non-empty short name.]לף";
 Strings.OfficeOM.L_CustomFunctionNameContainsBadChars = "［D57c3］‏‏أبع[The function name may only contain letters, digits, underscores, and periods.]לף";
 Strings.OfficeOM.L_CustomXmlError = "［ot553］‏‏أبع[Custom XML Error.]לף";

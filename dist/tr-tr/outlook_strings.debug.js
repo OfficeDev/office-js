@@ -1,4 +1,4 @@
-/* Version: 16.0.9227.1000 */
+/* Version: 16.0.9309.1000 */
 
 Type.registerNamespace("_u");
 _u.ExtensibilityStrings = function()
@@ -31,6 +31,7 @@ _u.ExtensibilityStrings.l_EmailAddressTooLong_Text = "Sağlanan bir veya daha fa
 _u.ExtensibilityStrings.l_EwsRequestOversized_Text = "İstek, 1 MB'lık boyut sınırını aşıyor. Lütfen EWS isteğinizi değiştirin.";
 _u.ExtensibilityStrings.l_ExceededMaxNumberOfAttachments_Text = "İletide izin verilen en fazla ek sayısına ulaşıldığı için ek eklenemez";
 _u.ExtensibilityStrings.l_HtmlSanitizationFailure_Text = "HTML temizlemesi başarısız oldu.";
+_u.ExtensibilityStrings.l_Insufficient_Item_Permissions_Text = "The user doesn't have the permissions required to perform this operation.";
 _u.ExtensibilityStrings.l_InternalFormatError_Text = "Dahili biçim hatası oluştu.";
 _u.ExtensibilityStrings.l_InternalProtocolError_Text = "İç protokol hatası: '{0}'.";
 _u.ExtensibilityStrings.l_InvalidActionType_Text = "'actionType' parametresinin değeri geçersiz. Kabul edilen değer: \"showTaskPane\"."
