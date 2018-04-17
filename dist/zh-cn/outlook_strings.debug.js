@@ -1,4 +1,4 @@
-/* Version: 16.0.9227.1000 */
+/* Version: 16.0.9307.1000 */
 
 Type.registerNamespace("_u");
 _u.ExtensibilityStrings = function()
@@ -31,6 +31,7 @@ _u.ExtensibilityStrings.l_EmailAddressTooLong_Text = "提供的一个或多个�
 _u.ExtensibilityStrings.l_EwsRequestOversized_Text = "此请求超过了 1 MB 的大小限制。请修改您的 EWS 请求。";
 _u.ExtensibilityStrings.l_ExceededMaxNumberOfAttachments_Text = "无法添加附件，因为邮件的附件数已达到最大数目";
 _u.ExtensibilityStrings.l_HtmlSanitizationFailure_Text = "HTML 清理失败。";
+_u.ExtensibilityStrings.l_Insufficient_Item_Permissions_Text = "The user doesn't have the permissions required to perform this operation.";
 _u.ExtensibilityStrings.l_InternalFormatError_Text = "存在内部格式错误。";
 _u.ExtensibilityStrings.l_InternalProtocolError_Text = "内部协议错误:“{0}”。";
 _u.ExtensibilityStrings.l_InvalidActionType_Text = '参数 "actionType" 的值无效。接受的值为 "showTaskPane"。'

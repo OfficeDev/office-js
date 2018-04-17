@@ -1,4 +1,4 @@
-/* Version: 16.0.9227.1000 */
+/* Version: 16.0.9307.1000 */
 
 Type.registerNamespace("_u");
 _u.ExtensibilityStrings = function()
@@ -31,6 +31,7 @@ _u.ExtensibilityStrings.l_EmailAddressTooLong_Text = "Een of meer van de opgegev
 _u.ExtensibilityStrings.l_EwsRequestOversized_Text = "De aanvraag overschrijdt de limiet van 1 MB. Pas uw EWS-aanvraag aan.";
 _u.ExtensibilityStrings.l_ExceededMaxNumberOfAttachments_Text = "U kunt geen bijlagen toevoegen omdat het bericht al het maximum aantal bijlagen bevat";
 _u.ExtensibilityStrings.l_HtmlSanitizationFailure_Text = "De HTML-opschoning is mislukt.";
+_u.ExtensibilityStrings.l_Insufficient_Item_Permissions_Text = "The user doesn't have the permissions required to perform this operation.";
 _u.ExtensibilityStrings.l_InternalFormatError_Text = "Er is een interne indelingsfout opgetreden.";
 _u.ExtensibilityStrings.l_InternalProtocolError_Text = "Interne protocolfout: '{0}'.";
 _u.ExtensibilityStrings.l_InvalidActionType_Text = "De waarde van de parameter actionType is ongeldig. De geaccepteerde waarde is showTaskPane."

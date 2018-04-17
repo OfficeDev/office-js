@@ -1,4 +1,4 @@
-/* Version: 16.0.9227.1000 */
+/* Version: 16.0.9307.1000 */
 
 Type.registerNamespace("_u");
 _u.ExtensibilityStrings = function()
@@ -31,6 +31,7 @@ _u.ExtensibilityStrings.l_EmailAddressTooLong_Text = "Eno ali več vnesenih e-po
 _u.ExtensibilityStrings.l_EwsRequestOversized_Text = "Zahteva presega omejitev velikosti 1 MB. Spremenite zahtevo EWS.";
 _u.ExtensibilityStrings.l_ExceededMaxNumberOfAttachments_Text = "Prilog ni mogoče dodati, ker sporočilo že ima največje dovoljeno število prilog";
 _u.ExtensibilityStrings.l_HtmlSanitizationFailure_Text = "Kode HTML ni bilo mogoče sanirati.";
+_u.ExtensibilityStrings.l_Insufficient_Item_Permissions_Text = "The user doesn't have the permissions required to perform this operation.";
 _u.ExtensibilityStrings.l_InternalFormatError_Text = "Prišlo je do napake notranje oblike zapisa.";
 _u.ExtensibilityStrings.l_InternalProtocolError_Text = "Notranja napaka protokola: »{0}«.";
 _u.ExtensibilityStrings.l_InvalidActionType_Text = "Vrednost parametra »actionType« ni veljavna. Sprejeta vrednost je »showTaskPane«."

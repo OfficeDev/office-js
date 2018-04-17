@@ -1,4 +1,4 @@
-/* Version: 16.0.9227.1000 */
+/* Version: 16.0.9307.1000 */
 
 Type.registerNamespace("_u");
 _u.ExtensibilityStrings = function()
@@ -31,6 +31,7 @@ _u.ExtensibilityStrings.l_EmailAddressTooLong_Text = "Une ou plusieurs des adres
 _u.ExtensibilityStrings.l_EwsRequestOversized_Text = "La demande dépasse la limite de taille de 1 Mo. Veuillez modifier votre demande EWS.";
 _u.ExtensibilityStrings.l_ExceededMaxNumberOfAttachments_Text = "Les pièces jointes ne peuvent pas être ajoutées, car le nombre maximal de pièces jointes est déjà atteint";
 _u.ExtensibilityStrings.l_HtmlSanitizationFailure_Text = "Le nettoyage HTML a échoué.";
+_u.ExtensibilityStrings.l_Insufficient_Item_Permissions_Text = "The user doesn't have the permissions required to perform this operation.";
 _u.ExtensibilityStrings.l_InternalFormatError_Text = "Une erreur de format interne s’est produite.";
 _u.ExtensibilityStrings.l_InternalProtocolError_Text = "Désolé... Nous avons rencontré l’erreur de protocole interne « {0} ».";
 _u.ExtensibilityStrings.l_InvalidActionType_Text = "La valeur du paramètre « actionType » n’est pas valide. La valeur admise est « showTaskPane »."

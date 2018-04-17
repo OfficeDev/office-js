@@ -1,4 +1,4 @@
-/* Version: 16.0.9227.1000 */
+/* Version: 16.0.9307.1000 */
 
 Type.registerNamespace("_u");
 _u.ExtensibilityStrings = function()
@@ -31,6 +31,7 @@ _u.ExtensibilityStrings.l_EmailAddressTooLong_Text = "ໜຶ່ງ ຫຼື ຫ
 _u.ExtensibilityStrings.l_EwsRequestOversized_Text = "ຄຳຮ້ອງຂໍມີຂະໜາດເກີນທີ່ຈຳກັດໄວ້ 1 MB. ກະລຸນາແກ້ໄຂຄຳຮ້ອງ EWS ຂອງທ່ານ.";
 _u.ExtensibilityStrings.l_ExceededMaxNumberOfAttachments_Text = "ບໍ່ສາມາດເພີ່ມໄຟລ໌ແນບໄດ້ເນື່ອງຈາກຂໍ້ຄວາມມີໄຟລ໌ແນບຮອດຈຳນວນສູງສຸດແລ້ວ";
 _u.ExtensibilityStrings.l_HtmlSanitizationFailure_Text = "ຂັ້ນຕອນ HTML santization ບໍ່ສຳເລັດ.";
+_u.ExtensibilityStrings.l_Insufficient_Item_Permissions_Text = "The user doesn't have the permissions required to perform this operation.";
 _u.ExtensibilityStrings.l_InternalFormatError_Text = "ເກີດຂໍ້ຜິດພາດໃນການຈັດຮູບແບບພາຍໃນ.";
 _u.ExtensibilityStrings.l_InternalProtocolError_Text = "ໂປຣໂຕຄໍພາຍໃນຜິດພາດ: '{0}'.";
 _u.ExtensibilityStrings.l_InvalidActionType_Text = "ຄ່າພາຣາມິເຕີ 'actionType' ບໍ່ຖືກຕ້ອງ. ຄ່າທີ່ຍອມຮັບແມ່ນ \"showTaskPane\"."

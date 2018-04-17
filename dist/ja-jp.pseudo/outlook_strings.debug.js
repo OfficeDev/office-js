@@ -1,4 +1,4 @@
-/* Version: 16.0.9227.1000 */
+/* Version: 16.0.9307.1000 */
 
 Type.registerNamespace("_u");
 _u.ExtensibilityStrings = function()
@@ -31,6 +31,7 @@ _u.ExtensibilityStrings.l_EmailAddressTooLong_Text = "[OG:Õñè òr mørè øf 
 _u.ExtensibilityStrings.l_EwsRequestOversized_Text = "[:Thê rèqùèst ëx¢èëðs thè 1 Mß sízë lìmìt. Pléæsë møðïfÿ ÿõúr ÉW§ réqüëst.瑞갂偁略 яšæẤßソ瑞갂偁略 яథ్క لإَّ'Ii.]";
 _u.ExtensibilityStrings.l_ExceededMaxNumberOfAttachments_Text = "[OG:Ãttäçhmêñts çªññót þë åððêð þê¢âúsê thê méssãgê ãlrèãðý hàs thê màxìmµm ñúmþêr øf åttäçhmèñts瑞갂偁略 яšæẤßソ瑞갂偁略 яšæẤßథ్క لإَّ'Ii.]";
 _u.ExtensibilityStrings.l_HtmlSanitizationFailure_Text = "[OG:Thë HTM£ sãñtïzâtìôñ hås fåîlèð.瑞갂偁略 яšæథ్క لإَّ'Ii.]";
+_u.ExtensibilityStrings.l_Insufficient_Item_Permissions_Text = "[OG:Thê ûsër ðôësñ't håvê thé pérmíssïòñs rêqûìrèð tó pérförm thïs ópérätìõñ.瑞갂偁略 яšæẤßソ瑞갂偁略 яథ్క لإَّ'Ii.]";
 _u.ExtensibilityStrings.l_InternalFormatError_Text = "[OG:Thêré wâs àñ îñtérñäl førmæt ërrør.瑞갂偁略 яšæẤథ్క لإَّ'Ii.]";
 _u.ExtensibilityStrings.l_InternalProtocolError_Text = "[:Íñtêrñäl pròtõçõl ërrør: '{0}'.瑞갂偁略 яšæథ్క لإَّ'Ii.]";
 _u.ExtensibilityStrings.l_InvalidActionType_Text = "[OG:Thê vælúé øf thë pæræmëtër 'ãçtîôñTýpè' ís ìñvàlïð. Thê â¢¢éptèð vªlúè ís \"shöwTåskPæñè\".瑞갂偁略 яšæẤßソ瑞갂偁略 яšæẤథ్క لإَّ'Ii.]"

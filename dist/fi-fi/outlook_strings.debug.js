@@ -1,4 +1,4 @@
-/* Version: 16.0.9227.1000 */
+/* Version: 16.0.9307.1000 */
 
 Type.registerNamespace("_u");
 _u.ExtensibilityStrings = function()
@@ -31,6 +31,7 @@ _u.ExtensibilityStrings.l_EmailAddressTooLong_Text = "Vähintään yksi annettu 
 _u.ExtensibilityStrings.l_EwsRequestOversized_Text = "Pyyntö ylittää yhden megatavun kokorajoituksen. Muokkaa EWS-pyyntöä.";
 _u.ExtensibilityStrings.l_ExceededMaxNumberOfAttachments_Text = "Liitteitä ei voi lisätä, koska viestissä on jo suurin sallittu määrä liitteitä";
 _u.ExtensibilityStrings.l_HtmlSanitizationFailure_Text = "HTML-koodin puhdistaminen epäonnistui.";
+_u.ExtensibilityStrings.l_Insufficient_Item_Permissions_Text = "The user doesn't have the permissions required to perform this operation.";
 _u.ExtensibilityStrings.l_InternalFormatError_Text = "Virhe sisäisessä muodossa.";
 _u.ExtensibilityStrings.l_InternalProtocolError_Text = "Sisäinen protokollavirhe: {0}.";
 _u.ExtensibilityStrings.l_InvalidActionType_Text = "Parametrin actionType arvo on virheellinen. Hyväksytty arvo on showTaskPane."

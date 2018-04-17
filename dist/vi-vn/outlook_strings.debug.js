@@ -1,4 +1,4 @@
-/* Version: 16.0.9227.1000 */
+/* Version: 16.0.9307.1000 */
 
 Type.registerNamespace("_u");
 _u.ExtensibilityStrings = function()
@@ -31,6 +31,7 @@ _u.ExtensibilityStrings.l_EmailAddressTooLong_Text = "Một hoặc nhiều đị
 _u.ExtensibilityStrings.l_EwsRequestOversized_Text = "Yêu cầu vượt quá giới hạn kích thước 1 MB. Vui lòng thay đổi yêu cầu EWS.";
 _u.ExtensibilityStrings.l_ExceededMaxNumberOfAttachments_Text = "Không thể thêm phần đính kèm do thư đã đạt lượng tệp đính kèm tối đa";
 _u.ExtensibilityStrings.l_HtmlSanitizationFailure_Text = "Làm sạch HTML đã thất bại.";
+_u.ExtensibilityStrings.l_Insufficient_Item_Permissions_Text = "The user doesn't have the permissions required to perform this operation.";
 _u.ExtensibilityStrings.l_InternalFormatError_Text = "Đã có lỗi định dạng nội bộ.";
 _u.ExtensibilityStrings.l_InternalProtocolError_Text = "Lỗi giao thức nội bộ: '{0}'.";
 _u.ExtensibilityStrings.l_InvalidActionType_Text = "Giá trị của tham số 'actionType' là không hợp lệ. Giá trị được chấp nhận là \"showTaskPane\"."
