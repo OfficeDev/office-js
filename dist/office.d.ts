@@ -2617,7 +2617,7 @@ declare namespace OfficeExtension {
 		trace(message: string): void;
 
 		/** Synchronizes the state between JavaScript proxy objects and the Office document, by executing instructions queued on the request context and retrieving properties of loaded Office objects for use in your code.�This method returns a promise, which is resolved when the synchronization is complete. */
-		sync<T>(passThroughValue?: T): IPromise<T>;
+		sync<T>(passThroughValue?: T): Promise<T>;
 
 		/** Debug information */
 		readonly debugInfo: RequestContextDebugInfo;
@@ -2700,178 +2700,11 @@ declare namespace OfficeExtension {
 	}
 }
 declare namespace OfficeExtension {
-	/** An IPromise object that represents a deferred interaction with the host Office application. */
-	interface IPromise<R> {
-		/**
-		 * This method will be called once the previous promise has been resolved.
-		 * Both the onFulfilled on onRejected callbacks are optional.
-		 * If either or both are omitted, the next onFulfilled/onRejected in the chain will be called called.
-
-		 * @returns A new promise for the value or error that was returned from onFulfilled/onRejected.
-		 */
-		then<U>(onFulfilled?: (value: R) => IPromise<U>, onRejected?: (error: any) => IPromise<U>): IPromise<U>;
-
-		/**
-		 * This method will be called once the previous promise has been resolved.
-		 * Both the onFulfilled on onRejected callbacks are optional.
-		 * If either or both are omitted, the next onFulfilled/onRejected in the chain will be called called.
-
-		 * @returns A new promise for the value or error that was returned from onFulfilled/onRejected.
-		 */
-		then<U>(onFulfilled?: (value: R) => IPromise<U>, onRejected?: (error: any) => U): IPromise<U>;
-
-		/**
-		 * This method will be called once the previous promise has been resolved.
-		 * Both the onFulfilled on onRejected callbacks are optional.
-		 * If either or both are omitted, the next onFulfilled/onRejected in the chain will be called called.
-
-		 * @returns A new promise for the value or error that was returned from onFulfilled/onRejected.
-		 */
-		then<U>(onFulfilled?: (value: R) => IPromise<U>, onRejected?: (error: any) => void): IPromise<U>;
-
-		/**
-		 * This method will be called once the previous promise has been resolved.
-		 * Both the onFulfilled on onRejected callbacks are optional.
-		 * If either or both are omitted, the next onFulfilled/onRejected in the chain will be called called.
-
-		 * @returns A new promise for the value or error that was returned from onFulfilled/onRejected.
-		 */
-		then<U>(onFulfilled?: (value: R) => U, onRejected?: (error: any) => IPromise<U>): IPromise<U>;
-
-		/**
-		 * This method will be called once the previous promise has been resolved.
-		 * Both the onFulfilled on onRejected callbacks are optional.
-		 * If either or both are omitted, the next onFulfilled/onRejected in the chain will be called called.
-
-		 * @returns A new promise for the value or error that was returned from onFulfilled/onRejected.
-		 */
-		then<U>(onFulfilled?: (value: R) => U, onRejected?: (error: any) => U): IPromise<U>;
-
-		/**
-		 * This method will be called once the previous promise has been resolved.
-		 * Both the onFulfilled on onRejected callbacks are optional.
-		 * If either or both are omitted, the next onFulfilled/onRejected in the chain will be called called.
-
-		 * @returns A new promise for the value or error that was returned from onFulfilled/onRejected.
-		 */
-		then<U>(onFulfilled?: (value: R) => U, onRejected?: (error: any) => void): IPromise<U>;
-
-
-		/**
-		 * Catches failures or exceptions from actions within the promise, or from an unhandled exception earlier in the call stack.
-		 * @param onRejected function to be called if or when the promise rejects.
-		 */
-		catch<U>(onRejected?: (error: any) => IPromise<U>): IPromise<U>;
-
-		/**
-		 * Catches failures or exceptions from actions within the promise, or from an unhandled exception earlier in the call stack.
-		 * @param onRejected function to be called if or when the promise rejects.
-		 */
-		catch<U>(onRejected?: (error: any) => U): IPromise<U>;
-
-		/**
-		 * Catches failures or exceptions from actions within the promise, or from an unhandled exception earlier in the call stack.
-		 * @param onRejected function to be called if or when the promise rejects.
-		 */
-		catch<U>(onRejected?: (error: any) => void): IPromise<U>;
-	}
-
 	/** An Promise object that represents a deferred interaction with the host Office application. The publically-consumable OfficeExtension.Promise is available starting in ExcelApi 1.2 and WordApi 1.2. Promises can be chained via ".then", and errors can be caught via ".catch". Remember to always use a ".catch" on the outer promise, and to return intermediary promises so as not to break the promise chain. When a "native" Promise implementation is available, OfficeExtension.Promise will switch to use the native Promise instead. */
-	export class Promise<R> implements IPromise<R>
-	{
-		/**
-		 * Creates a new promise based on a function that accepts resolve and reject handlers.
-		 */
-		constructor(func: (resolve: (value?: R | IPromise<R>) => void, reject: (error?: any) => void) => void);
-
-		/**
-		 * Creates a promise that resolves when all of the child promises resolve.
-		 */
-		static all<U>(promises: OfficeExtension.IPromise<U>[]): IPromise<U[]>;
-
-		/**
-		 * Creates a promise that is resolved.
-		 */
-		static resolve<U>(value: U): IPromise<U>;
-
-		/**
-		 * Creates a promise that is rejected.
-		 */
-		static reject<U>(error: any): IPromise<U>;
-
-		/* This method will be called once the previous promise has been resolved.
-		 * Both the onFulfilled on onRejected callbacks are optional.
-		 * If either or both are omitted, the next onFulfilled/onRejected in the chain will be called called.
-
-		 * @returns A new promise for the value or error that was returned from onFulfilled/onRejected.
-		 */
-		then<U>(onFulfilled?: (value: R) => IPromise<U>, onRejected?: (error: any) => IPromise<U>): IPromise<U>;
-
-		/**
-		 * This method will be called once the previous promise has been resolved.
-		 * Both the onFulfilled on onRejected callbacks are optional.
-		 * If either or both are omitted, the next onFulfilled/onRejected in the chain will be called called.
-
-		 * @returns A new promise for the value or error that was returned from onFulfilled/onRejected.
-		 */
-		then<U>(onFulfilled?: (value: R) => IPromise<U>, onRejected?: (error: any) => U): IPromise<U>;
-
-		/**
-		 * This method will be called once the previous promise has been resolved.
-		 * Both the onFulfilled on onRejected callbacks are optional.
-		 * If either or both are omitted, the next onFulfilled/onRejected in the chain will be called called.
-
-		 * @returns A new promise for the value or error that was returned from onFulfilled/onRejected.
-		 */
-		then<U>(onFulfilled?: (value: R) => IPromise<U>, onRejected?: (error: any) => void): IPromise<U>;
-
-		/**
-		 * This method will be called once the previous promise has been resolved.
-		 * Both the onFulfilled on onRejected callbacks are optional.
-		 * If either or both are omitted, the next onFulfilled/onRejected in the chain will be called called.
-
-		 * @returns A new promise for the value or error that was returned from onFulfilled/onRejected.
-		 */
-		then<U>(onFulfilled?: (value: R) => U, onRejected?: (error: any) => IPromise<U>): IPromise<U>;
-
-		/**
-		 * This method will be called once the previous promise has been resolved.
-		 * Both the onFulfilled on onRejected callbacks are optional.
-		 * If either or both are omitted, the next onFulfilled/onRejected in the chain will be called called.
-
-		 * @returns A new promise for the value or error that was returned from onFulfilled/onRejected.
-		 */
-		then<U>(onFulfilled?: (value: R) => U, onRejected?: (error: any) => U): IPromise<U>;
-
-		/**
-		 * This method will be called once the previous promise has been resolved.
-		 * Both the onFulfilled on onRejected callbacks are optional.
-		 * If either or both are omitted, the next onFulfilled/onRejected in the chain will be called called.
-
-		 * @returns A new promise for the value or error that was returned from onFulfilled/onRejected.
-		 */
-		then<U>(onFulfilled?: (value: R) => U, onRejected?: (error: any) => void): IPromise<U>;
-
-
-		/**
-		 * Catches failures or exceptions from actions within the promise, or from an unhandled exception earlier in the call stack.
-		 * @param onRejected function to be called if or when the promise rejects.
-		 */
-		catch<U>(onRejected?: (error: any) => IPromise<U>): IPromise<U>;
-
-		/**
-		 * Catches failures or exceptions from actions within the promise, or from an unhandled exception earlier in the call stack.
-		 * @param onRejected function to be called if or when the promise rejects.
-		 */
-		catch<U>(onRejected?: (error: any) => U): IPromise<U>;
-
-		/**
-		 * Catches failures or exceptions from actions within the promise, or from an unhandled exception earlier in the call stack.
-		 * @param onRejected function to be called if or when the promise rejects.
-		 */
-		catch<U>(onRejected?: (error: any) => void): IPromise<U>;
-	}
+	export const Promise: PromiseConstructor;
 }
+
+
 
 declare namespace OfficeExtension {
 	/** Collection of tracked objects, contained within a request context. See "context.trackedObjects" for more information. */
@@ -2890,21 +2723,21 @@ declare namespace OfficeExtension {
 declare namespace OfficeExtension {
 	export class EventHandlers<T> {
 		constructor(context: ClientRequestContext, parentObject: ClientObject, name: string, eventInfo: EventInfo<T>);
-		add(handler: (args: T) => IPromise<any>): EventHandlerResult<T>;
-		remove(handler: (args: T) => IPromise<any>): void;
+		add(handler: (args: T) => Promise<any>): EventHandlerResult<T>;
+		remove(handler: (args: T) => Promise<any>): void;
 	}
 
 	export class EventHandlerResult<T> {
-		constructor(context: ClientRequestContext, handlers: EventHandlers<T>, handler: (args: T) => IPromise<any>);
+		constructor(context: ClientRequestContext, handlers: EventHandlers<T>, handler: (args: T) => Promise<any>);
 		/** The request context associated with the object */
 		context: ClientRequestContext;
 		remove(): void;
 	}
 
 	export interface EventInfo<T> {
-		registerFunc: (callback: (args: any) => void) => IPromise<any>;
-		unregisterFunc: (callback: (args: any) => void) => IPromise<any>;
-		eventArgsTransformFunc: (args: any) => IPromise<T>;
+		registerFunc: (callback: (args: any) => void) => Promise<any>;
+		unregisterFunc: (callback: (args: any) => void) => Promise<any>;
+		eventArgsTransformFunc: (args: any) => Promise<T>;
 	}
 }
 declare namespace OfficeExtension {
@@ -3770,7 +3603,7 @@ declare namespace Excel {
         /**
          * Close the session.
          */
-        close(): OfficeExtension.IPromise<void>;
+        close(): Promise<void>;
     }
     /**
      * The RequestContext object facilitates requests to the Excel application. Since the Office add-in and the Excel application run in two different processes, the request context is required to get access to the Excel object model from the add-in.
@@ -3785,45 +3618,45 @@ declare namespace Excel {
      * Executes a batch script that performs actions on the Excel object model, using a new RequestContext. When the promise is resolved, any tracked objects that were automatically allocated during execution will be released.
      * @param batch - A function that takes in a RequestContext and returns a promise (typically, just the result of "context.sync()"). The context parameter facilitates requests to the Excel application. Since the Office add-in and the Excel application run in two different processes, the RequestContext is required to get access to the Excel object model from the add-in.
      */
-    function run<T>(batch: (context: Excel.RequestContext) => OfficeExtension.IPromise<T>): OfficeExtension.IPromise<T>;
+    function run<T>(batch: (context: Excel.RequestContext) => Promise<T>): Promise<T>;
     /**
      * Executes a batch script that performs actions on the Excel object model, using a new remote RequestContext. When the promise is resolved, any tracked objects that were automatically allocated during execution will be released.
      * @param requestInfo - The URL of the remote workbook and the request headers to be sent.
      * @param batch - A function that takes in a RequestContext and returns a promise (typically, just the result of "context.sync()"). The context parameter facilitates requests to the Excel application. Since the Office add-in and the Excel application run in two different processes, the RequestContext is required to get access to the Excel object model from the add-in.
      */
-    function run<T>(requestInfo: OfficeExtension.RequestUrlAndHeaderInfo | Session, batch: (context: Excel.RequestContext) => OfficeExtension.IPromise<T>): OfficeExtension.IPromise<T>;
+    function run<T>(requestInfo: OfficeExtension.RequestUrlAndHeaderInfo | Session, batch: (context: Excel.RequestContext) => Promise<T>): Promise<T>;
     /**
      * Executes a batch script that performs actions on the Excel object model, using the RequestContext of a previously-created object. When the promise is resolved, any tracked objects that were automatically allocated during execution will be released.
      * @param contextObject - A previously-created object. The batch will use the same RequestContext as the passed-in object, which means that any changes applied to the object will be picked up by "context.sync()".
      * @param batch - A function that takes in a RequestContext and returns a promise (typically, just the result of "context.sync()"). The context parameter facilitates requests to the Excel application. Since the Office add-in and the Excel application run in two different processes, the RequestContext is required to get access to the Excel object model from the add-in.
      */
-    function run<T>(contextObject: OfficeExtension.ClientRequestContext, batch: (context: Excel.RequestContext) => OfficeExtension.IPromise<T>): OfficeExtension.IPromise<T>;
+    function run<T>(contextObject: OfficeExtension.ClientRequestContext, batch: (context: Excel.RequestContext) => Promise<T>): Promise<T>;
     /**
      * Executes a batch script that performs actions on the Excel object model, using the RequestContext of a previously-created API object. When the promise is resolved, any tracked objects that were automatically allocated during execution will be released.
      * @param object - A previously-created API object. The batch will use the same RequestContext as the passed-in object, which means that any changes applied to the object will be picked up by "context.sync()".
      * @param batch - A function that takes in a RequestContext and returns a promise (typically, just the result of "context.sync()"). The context parameter facilitates requests to the Excel application. Since the Office add-in and the Excel application run in two different processes, the RequestContext is required to get access to the Excel object model from the add-in.
      */
-    function run<T>(object: OfficeExtension.ClientObject, batch: (context: Excel.RequestContext) => OfficeExtension.IPromise<T>): OfficeExtension.IPromise<T>;
+    function run<T>(object: OfficeExtension.ClientObject, batch: (context: Excel.RequestContext) => Promise<T>): Promise<T>;
     /**
      * Executes a batch script that performs actions on the Excel object model, using the remote RequestContext of a previously-created API object. When the promise is resolved, any tracked objects that were automatically allocated during execution will be released.
      * @param requestInfo - The URL of the remote workbook and the request headers to be sent.
      * @param object - A previously-created API object. The batch will use the same RequestContext as the passed-in object, which means that any changes applied to the object will be picked up by "context.sync()".
      * @param batch - A function that takes in a RequestContext and returns a promise (typically, just the result of "context.sync()"). The context parameter facilitates requests to the Excel application. Since the Office add-in and the Excel application run in two different processes, the RequestContext is required to get access to the Excel object model from the add-in.
      */
-    function run<T>(requestInfo: OfficeExtension.RequestUrlAndHeaderInfo | Session, object: OfficeExtension.ClientObject, batch: (context: Excel.RequestContext) => OfficeExtension.IPromise<T>): OfficeExtension.IPromise<T>;
+    function run<T>(requestInfo: OfficeExtension.RequestUrlAndHeaderInfo | Session, object: OfficeExtension.ClientObject, batch: (context: Excel.RequestContext) => Promise<T>): Promise<T>;
     /**
      * Executes a batch script that performs actions on the Excel object model, using the RequestContext of previously-created API objects.
      * @param objects - An array of previously-created API objects. The array will be validated to make sure that all of the objects share the same context. The batch will use this shared RequestContext, which means that any changes applied to these objects will be picked up by "context.sync()".
      * @param batch - A function that takes in a RequestContext and returns a promise (typically, just the result of "context.sync()"). The context parameter facilitates requests to the Excel application. Since the Office add-in and the Excel application run in two different processes, the RequestContext is required to get access to the Excel object model from the add-in.
      */
-    function run<T>(objects: OfficeExtension.ClientObject[], batch: (context: Excel.RequestContext) => OfficeExtension.IPromise<T>): OfficeExtension.IPromise<T>;
+    function run<T>(objects: OfficeExtension.ClientObject[], batch: (context: Excel.RequestContext) => Promise<T>): Promise<T>;
     /**
      * Executes a batch script that performs actions on the Excel object model, using the remote RequestContext of previously-created API objects.
      * @param requestInfo - The URL of the remote workbook and the request headers to be sent.
      * @param objects - An array of previously-created API objects. The array will be validated to make sure that all of the objects share the same context. The batch will use this shared RequestContext, which means that any changes applied to these objects will be picked up by "context.sync()".
      * @param batch - A function that takes in a RequestContext and returns a promise (typically, just the result of "context.sync()"). The context parameter facilitates requests to the Excel application. Since the Office add-in and the Excel application run in two different processes, the RequestContext is required to get access to the Excel object model from the add-in.
      */
-    function run<T>(requestInfo: OfficeExtension.RequestUrlAndHeaderInfo | Session, objects: OfficeExtension.ClientObject[], batch: (context: Excel.RequestContext) => OfficeExtension.IPromise<T>): OfficeExtension.IPromise<T>;
+    function run<T>(requestInfo: OfficeExtension.RequestUrlAndHeaderInfo | Session, objects: OfficeExtension.ClientObject[], batch: (context: Excel.RequestContext) => Promise<T>): Promise<T>;
     /**
      *
      * Provides information about the binding that raised the SelectionChanged event.
@@ -4809,7 +4642,7 @@ declare namespace Excel {
          * Gets or sets the worksheet's gridlines flag.
             This flag determines whether gridlines are visible to the user.
          *
-         * [Api set: ExcelApi 1.7]
+         * [Api set: ExcelApi BETA (PREVIEW ONLY)]
          */
         showGridlines: boolean;
         /**
@@ -4817,7 +4650,7 @@ declare namespace Excel {
          * Gets or sets the worksheet's headings flag.
             This flag determines whether headings are visible to the user.
          *
-         * [Api set: ExcelApi 1.7]
+         * [Api set: ExcelApi BETA (PREVIEW ONLY)]
          */
         showHeadings: boolean;
         /**
@@ -7765,6 +7598,13 @@ declare namespace Excel {
         indentLevel: number;
         /**
          *
+         * Returns the distance, in points, from left edge of the worksheet to left edge of the range. Read-only.
+         *
+         * [Api set: ExcelApi BETA (PREVIEW ONLY)]
+         */
+        readonly left: number;
+        /**
+         *
          * The reading order for the range.
          *
          * [Api set: ExcelApi BETA (PREVIEW ONLY)]
@@ -7772,7 +7612,7 @@ declare namespace Excel {
         readingOrder: Excel.ReadingOrder | "Context" | "LeftToRight" | "RightToLeft";
         /**
          *
-         * Gets or sets the height of all rows in the range. If the row heights are not uniform null will be returned.
+         * Gets or sets the height of all rows in the range. If the row heights are not uniform, null will be returned.
          *
          * [Api set: ExcelApi 1.2]
          */
@@ -7793,6 +7633,13 @@ declare namespace Excel {
          * [Api set: ExcelApi 1.7]
          */
         textOrientation: number;
+        /**
+         *
+         * Returns the distance, in points, from top edge of the worksheet to top edge of the range. Read-only.
+         *
+         * [Api set: ExcelApi BETA (PREVIEW ONLY)]
+         */
+        readonly top: number;
         /**
          *
          * Determines if the row height of the Range object equals the standard height of the sheet.
@@ -9326,7 +9173,7 @@ declare namespace Excel {
         numberFormatLinked: boolean;
         /**
          *
-         * Represents the distance between the levels of labels, and the distance between the first level and the axis line.
+         * Represents the distance between the levels of labels, and the distance between the first level and the axis line. The value should be an integer from 0 to 1000.
          *
          * [Api set: ExcelApi BETA (PREVIEW ONLY)]
          */
@@ -14453,11 +14300,11 @@ declare namespace Excel {
         addAll(context: Excel.RequestContext): void;
         add(context: Excel.RequestContext, name: string): Excel.CustomFunction;
         static splitName(name: string): CustomFunctionNameSplit;
-        ensureInit(context: Excel.RequestContext): OfficeExtension.IPromise<any>;
+        ensureInit(context: Excel.RequestContext): Promise<any>;
     }
     const customFunctionProxy: CustomFunctionProxy;
     class CustomFunctions {
-        static initialize(): OfficeExtension.IPromise<any>;
+        static initialize(): Promise<any>;
     }
     /**
      *
@@ -14674,7 +14521,7 @@ declare namespace Excel {
          *
          * Indicates if text is automatically indented when the text alignment in a cell is set to equal distribution.
          *
-         * [Api set: ExcelApi 1.7]
+         * [Api set: ExcelApi BETA (PREVIEW ONLY)]
          */
         autoIndent: boolean;
         /**
@@ -14793,7 +14640,7 @@ declare namespace Excel {
          *
          * The text orientation for the style.
          *
-         * [Api set: ExcelApi 1.7]
+         * [Api set: ExcelApi BETA (PREVIEW ONLY)]
          */
         textOrientation: number;
         /**
@@ -20398,7 +20245,7 @@ declare namespace Excel {
              * Gets or sets the worksheet's gridlines flag.
             This flag determines whether gridlines are visible to the user.
              *
-             * [Api set: ExcelApi 1.7]
+             * [Api set: ExcelApi BETA (PREVIEW ONLY)]
              */
             showGridlines?: boolean;
             /**
@@ -20406,7 +20253,7 @@ declare namespace Excel {
              * Gets or sets the worksheet's headings flag.
             This flag determines whether headings are visible to the user.
              *
-             * [Api set: ExcelApi 1.7]
+             * [Api set: ExcelApi BETA (PREVIEW ONLY)]
              */
             showHeadings?: boolean;
             /**
@@ -20821,7 +20668,7 @@ declare namespace Excel {
             readingOrder?: Excel.ReadingOrder | "Context" | "LeftToRight" | "RightToLeft";
             /**
              *
-             * Gets or sets the height of all rows in the range. If the row heights are not uniform null will be returned.
+             * Gets or sets the height of all rows in the range. If the row heights are not uniform, null will be returned.
              *
              * [Api set: ExcelApi 1.2]
              */
@@ -21651,7 +21498,7 @@ declare namespace Excel {
             numberFormatLinked?: boolean;
             /**
              *
-             * Represents the distance between the levels of labels, and the distance between the first level and the axis line.
+             * Represents the distance between the levels of labels, and the distance between the first level and the axis line. The value should be an integer from 0 to 1000.
              *
              * [Api set: ExcelApi BETA (PREVIEW ONLY)]
              */
@@ -23594,7 +23441,7 @@ declare namespace Excel {
              *
              * Indicates if text is automatically indented when the text alignment in a cell is set to equal distribution.
              *
-             * [Api set: ExcelApi 1.7]
+             * [Api set: ExcelApi BETA (PREVIEW ONLY)]
              */
             autoIndent?: boolean;
             /**
@@ -23699,7 +23546,7 @@ declare namespace Excel {
              *
              * The text orientation for the style.
              *
-             * [Api set: ExcelApi 1.7]
+             * [Api set: ExcelApi BETA (PREVIEW ONLY)]
              */
             textOrientation?: number;
             /**
@@ -23998,7 +23845,7 @@ declare namespace Excel {
              * Gets or sets the worksheet's gridlines flag.
             This flag determines whether gridlines are visible to the user.
              *
-             * [Api set: ExcelApi 1.7]
+             * [Api set: ExcelApi BETA (PREVIEW ONLY)]
              */
             showGridlines?: boolean;
             /**
@@ -24006,7 +23853,7 @@ declare namespace Excel {
              * Gets or sets the worksheet's headings flag.
             This flag determines whether headings are visible to the user.
              *
-             * [Api set: ExcelApi 1.7]
+             * [Api set: ExcelApi BETA (PREVIEW ONLY)]
              */
             showHeadings?: boolean;
             /**
@@ -24792,6 +24639,13 @@ declare namespace Excel {
             indentLevel?: number;
             /**
              *
+             * Returns the distance, in points, from left edge of the worksheet to left edge of the range. Read-only.
+             *
+             * [Api set: ExcelApi BETA (PREVIEW ONLY)]
+             */
+            left?: number;
+            /**
+             *
              * The reading order for the range.
              *
              * [Api set: ExcelApi BETA (PREVIEW ONLY)]
@@ -24799,7 +24653,7 @@ declare namespace Excel {
             readingOrder?: Excel.ReadingOrder | "Context" | "LeftToRight" | "RightToLeft";
             /**
              *
-             * Gets or sets the height of all rows in the range. If the row heights are not uniform null will be returned.
+             * Gets or sets the height of all rows in the range. If the row heights are not uniform, null will be returned.
              *
              * [Api set: ExcelApi 1.2]
              */
@@ -24820,6 +24674,13 @@ declare namespace Excel {
              * [Api set: ExcelApi 1.7]
              */
             textOrientation?: number;
+            /**
+             *
+             * Returns the distance, in points, from top edge of the worksheet to top edge of the range. Read-only.
+             *
+             * [Api set: ExcelApi BETA (PREVIEW ONLY)]
+             */
+            top?: number;
             /**
              *
              * Determines if the row height of the Range object equals the standard height of the sheet.
@@ -25720,7 +25581,7 @@ declare namespace Excel {
             numberFormatLinked?: boolean;
             /**
              *
-             * Represents the distance between the levels of labels, and the distance between the first level and the axis line.
+             * Represents the distance between the levels of labels, and the distance between the first level and the axis line. The value should be an integer from 0 to 1000.
              *
              * [Api set: ExcelApi BETA (PREVIEW ONLY)]
              */
@@ -28032,7 +27893,7 @@ declare namespace Excel {
              *
              * Indicates if text is automatically indented when the text alignment in a cell is set to equal distribution.
              *
-             * [Api set: ExcelApi 1.7]
+             * [Api set: ExcelApi BETA (PREVIEW ONLY)]
              */
             autoIndent?: boolean;
             /**
@@ -28151,7 +28012,7 @@ declare namespace Excel {
              *
              * The text orientation for the style.
              *
-             * [Api set: ExcelApi 1.7]
+             * [Api set: ExcelApi BETA (PREVIEW ONLY)]
              */
             textOrientation?: number;
             /**
@@ -28440,7 +28301,7 @@ declare namespace Excel {
              * Gets or sets the worksheet's gridlines flag.
             This flag determines whether gridlines are visible to the user.
              *
-             * [Api set: ExcelApi 1.7]
+             * [Api set: ExcelApi BETA (PREVIEW ONLY)]
              */
             showGridlines?: boolean;
             /**
@@ -28448,7 +28309,7 @@ declare namespace Excel {
              * Gets or sets the worksheet's headings flag.
             This flag determines whether headings are visible to the user.
              *
-             * [Api set: ExcelApi 1.7]
+             * [Api set: ExcelApi BETA (PREVIEW ONLY)]
              */
             showHeadings?: boolean;
             /**
@@ -28545,7 +28406,7 @@ declare namespace Excel {
              * For EACH ITEM in the collection: Gets or sets the worksheet's gridlines flag.
             This flag determines whether gridlines are visible to the user.
              *
-             * [Api set: ExcelApi 1.7]
+             * [Api set: ExcelApi BETA (PREVIEW ONLY)]
              */
             showGridlines?: boolean;
             /**
@@ -28553,7 +28414,7 @@ declare namespace Excel {
              * For EACH ITEM in the collection: Gets or sets the worksheet's headings flag.
             This flag determines whether headings are visible to the user.
              *
-             * [Api set: ExcelApi 1.7]
+             * [Api set: ExcelApi BETA (PREVIEW ONLY)]
              */
             showHeadings?: boolean;
             /**
@@ -29876,6 +29737,13 @@ declare namespace Excel {
             indentLevel?: boolean;
             /**
              *
+             * Returns the distance, in points, from left edge of the worksheet to left edge of the range. Read-only.
+             *
+             * [Api set: ExcelApi BETA (PREVIEW ONLY)]
+             */
+            left?: boolean;
+            /**
+             *
              * The reading order for the range.
              *
              * [Api set: ExcelApi BETA (PREVIEW ONLY)]
@@ -29883,7 +29751,7 @@ declare namespace Excel {
             readingOrder?: boolean;
             /**
              *
-             * Gets or sets the height of all rows in the range. If the row heights are not uniform null will be returned.
+             * Gets or sets the height of all rows in the range. If the row heights are not uniform, null will be returned.
              *
              * [Api set: ExcelApi 1.2]
              */
@@ -29904,6 +29772,13 @@ declare namespace Excel {
              * [Api set: ExcelApi 1.7]
              */
             textOrientation?: boolean;
+            /**
+             *
+             * Returns the distance, in points, from top edge of the worksheet to top edge of the range. Read-only.
+             *
+             * [Api set: ExcelApi BETA (PREVIEW ONLY)]
+             */
+            top?: boolean;
             /**
              *
              * Determines if the row height of the Range object equals the standard height of the sheet.
@@ -31393,7 +31268,7 @@ declare namespace Excel {
             numberFormatLinked?: boolean;
             /**
              *
-             * Represents the distance between the levels of labels, and the distance between the first level and the axis line.
+             * Represents the distance between the levels of labels, and the distance between the first level and the axis line. The value should be an integer from 0 to 1000.
              *
              * [Api set: ExcelApi BETA (PREVIEW ONLY)]
              */
@@ -34718,7 +34593,7 @@ declare namespace Excel {
              *
              * Indicates if text is automatically indented when the text alignment in a cell is set to equal distribution.
              *
-             * [Api set: ExcelApi 1.7]
+             * [Api set: ExcelApi BETA (PREVIEW ONLY)]
              */
             autoIndent?: boolean;
             /**
@@ -34837,7 +34712,7 @@ declare namespace Excel {
              *
              * The text orientation for the style.
              *
-             * [Api set: ExcelApi 1.7]
+             * [Api set: ExcelApi BETA (PREVIEW ONLY)]
              */
             textOrientation?: boolean;
             /**
@@ -34888,7 +34763,7 @@ declare namespace Excel {
              *
              * For EACH ITEM in the collection: Indicates if text is automatically indented when the text alignment in a cell is set to equal distribution.
              *
-             * [Api set: ExcelApi 1.7]
+             * [Api set: ExcelApi BETA (PREVIEW ONLY)]
              */
             autoIndent?: boolean;
             /**
@@ -35007,7 +34882,7 @@ declare namespace Excel {
              *
              * For EACH ITEM in the collection: The text orientation for the style.
              *
-             * [Api set: ExcelApi 1.7]
+             * [Api set: ExcelApi BETA (PREVIEW ONLY)]
              */
             textOrientation?: boolean;
             /**
