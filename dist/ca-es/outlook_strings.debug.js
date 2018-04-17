@@ -1,4 +1,4 @@
-/* Version: 16.0.9227.1000 */
+/* Version: 16.0.9309.1000 */
 
 Type.registerNamespace("_u");
 _u.ExtensibilityStrings = function()
@@ -31,6 +31,7 @@ _u.ExtensibilityStrings.l_EmailAddressTooLong_Text = "Una o més de les adreces 
 _u.ExtensibilityStrings.l_EwsRequestOversized_Text = "La sol·licitud supera la mida límit d'1 MB. Modifiqueu la sol·licitud de l'EWS.";
 _u.ExtensibilityStrings.l_ExceededMaxNumberOfAttachments_Text = "No s’han pogut afegir els fitxers adjunts perquè el missatge ja conté el nombre màxim de fitxers adjunts";
 _u.ExtensibilityStrings.l_HtmlSanitizationFailure_Text = "El sanejament d'HTML ha fallat.";
+_u.ExtensibilityStrings.l_Insufficient_Item_Permissions_Text = "The user doesn't have the permissions required to perform this operation.";
 _u.ExtensibilityStrings.l_InternalFormatError_Text = "S'ha produït un error de format intern.";
 _u.ExtensibilityStrings.l_InternalProtocolError_Text = "Error de protocol intern: '{0}'.";
 _u.ExtensibilityStrings.l_InvalidActionType_Text = 'El valor del paràmetre "actionType" no és vàlid. El valor acceptat és "showTaskPane".'

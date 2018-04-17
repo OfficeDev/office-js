@@ -1,4 +1,4 @@
-/* Version: 16.0.9227.1000 */
+/* Version: 16.0.9309.1000 */
 
 Type.registerNamespace("_u");
 _u.ExtensibilityStrings = function()
@@ -31,6 +31,7 @@ _u.ExtensibilityStrings.l_EmailAddressTooLong_Text = "Vismaz viena norādītā e
 _u.ExtensibilityStrings.l_EwsRequestOversized_Text = "Pieprasījums pārsniedz 1 MB lieluma ierobežojumu. Lūdzu, modificējiet savu EWS pieprasījumu.";
 _u.ExtensibilityStrings.l_ExceededMaxNumberOfAttachments_Text = "Pielikumus nevar pievienot, jo ziņojumam jau ir maksimālais pielikumu skaits";
 _u.ExtensibilityStrings.l_HtmlSanitizationFailure_Text = "HTML tīrīšana neizdevās.";
+_u.ExtensibilityStrings.l_Insufficient_Item_Permissions_Text = "The user doesn't have the permissions required to perform this operation.";
 _u.ExtensibilityStrings.l_InternalFormatError_Text = "Radās iekšēja formāta kļūda.";
 _u.ExtensibilityStrings.l_InternalProtocolError_Text = "Iekšēja protokola kļūda: '{0}'.";
 _u.ExtensibilityStrings.l_InvalidActionType_Text = "Parametra actionType vērtība nav derīga. Akceptētā vērtība ir showTaskPane."

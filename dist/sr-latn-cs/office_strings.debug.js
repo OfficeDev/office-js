@@ -1,4 +1,4 @@
-/* Version: 16.0.9227.1000 */
+/* Version: 16.0.9309.1000 */
 
 Type.registerNamespace("Strings");
 Strings.OfficeOM = function()
@@ -33,8 +33,8 @@ Strings.OfficeOM.L_CoercionTypeNotSupported = "Navedeni tip promene nije podrža
 Strings.OfficeOM.L_ColIndexOutOfRange = "Vrednost indeksa kolone je izvan dozvoljenog opsega. Koristite vrednost (0 ili veću) koja je manja od broja kolona.";
 Strings.OfficeOM.L_ConnectionFailureWithDetails = "The request failed with status code of {0}, error code {1} and the following error message: {2}";
 Strings.OfficeOM.L_ConnectionFailureWithStatus = "The request failed with status code of {0}.";
-Strings.OfficeOM.L_CustomFunctionDefinitionMissing = "A property with this name that represents the function's definition must exist on Excel.CustomFunctions.";
-Strings.OfficeOM.L_CustomFunctionImplementationMissing = "The property with this name on Excel.CustomFunctions that represents the function's definition must contain a 'call' property that implements the function.";
+Strings.OfficeOM.L_CustomFunctionDefinitionMissing = "A property with this name that represents the function's definition must exist on Excel.Script.CustomFunctions.";
+Strings.OfficeOM.L_CustomFunctionImplementationMissing = "The property with this name on Excel.Script.CustomFunctions that represents the function's definition must contain a 'call' property that implements the function.";
 Strings.OfficeOM.L_CustomFunctionNameCannotSplit = "The function name must contain a non-empty namespace and a non-empty short name.";
 Strings.OfficeOM.L_CustomFunctionNameContainsBadChars = "The function name may only contain letters, digits, underscores, and periods.";
 Strings.OfficeOM.L_CustomXmlError = "Greška u prilagođenim XML.";

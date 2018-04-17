@@ -1,4 +1,4 @@
-/* Version: 16.0.9227.1000 */
+/* Version: 16.0.9309.1000 */
 
 Type.registerNamespace("_u");
 _u.ExtensibilityStrings = function()
@@ -31,6 +31,7 @@ _u.ExtensibilityStrings.l_EmailAddressTooLong_Text = "Ұсынылған бір 
 _u.ExtensibilityStrings.l_EwsRequestOversized_Text = "Сұраудың өлшемі 1 мегабайт шектен асады. EWS сұрауын өзгертіңіз.";
 _u.ExtensibilityStrings.l_ExceededMaxNumberOfAttachments_Text = "Тіркемелерді қосу мүмкін емес, себебі хабарда тіркемелердің ең көп саны бұрыннан бар";
 _u.ExtensibilityStrings.l_HtmlSanitizationFailure_Text = "HTML тазалау әрекеті орындалмады.";
+_u.ExtensibilityStrings.l_Insufficient_Item_Permissions_Text = "The user doesn't have the permissions required to perform this operation.";
 _u.ExtensibilityStrings.l_InternalFormatError_Text = "Ішкі пішімдегі қате болды.";
 _u.ExtensibilityStrings.l_InternalProtocolError_Text = 'Ішкі протокол қатесі: "{0}".';
 _u.ExtensibilityStrings.l_InvalidActionType_Text = '"actionType" параметрінің мәні жарамсыз. Рұқсат етілген мән — "showTaskPane".'
