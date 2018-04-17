@@ -1,4 +1,4 @@
-/* Version: 16.0.9227.1000 */
+/* Version: 16.0.9307.1000 */
 
 Type.registerNamespace("_u");
 _u.ExtensibilityStrings = function()
@@ -31,6 +31,7 @@ _u.ExtensibilityStrings.l_EmailAddressTooLong_Text = "ከቀረቡት የኢሜ�
 _u.ExtensibilityStrings.l_EwsRequestOversized_Text = "ጥያቄው ከ 1 MB የመጠን ገደቡ በላይ ነው። እባክዎ የ EWSጥያቄዎ ያሻሽሉ።";
 _u.ExtensibilityStrings.l_ExceededMaxNumberOfAttachments_Text = "መልእክቱ ከፍተኛው የአባሪዎች መጠን ስለያዘ ሌሎች አባሪዎች መጨመር አይቻልም";
 _u.ExtensibilityStrings.l_HtmlSanitizationFailure_Text = "የ HTML ሳኒታይዜሽን አልተሳካም።";
+_u.ExtensibilityStrings.l_Insufficient_Item_Permissions_Text = "The user doesn't have the permissions required to perform this operation.";
 _u.ExtensibilityStrings.l_InternalFormatError_Text = "የውስጣዊ ቅርጽ ስህተት አጋጥሞ ነበር።";
 _u.ExtensibilityStrings.l_InternalProtocolError_Text = "የውስጣዊ ፕሮቶኮል ስህተት: '{0}'።";
 _u.ExtensibilityStrings.l_InvalidActionType_Text = "የልኬት 'actionType' እሴት ልክ አይደለም። ተቀባይነት ያለው እሴት \"showTaskPane\" ነው።"

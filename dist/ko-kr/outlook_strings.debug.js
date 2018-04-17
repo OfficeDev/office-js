@@ -1,4 +1,4 @@
-/* Version: 16.0.9227.1000 */
+/* Version: 16.0.9307.1000 */
 
 Type.registerNamespace("_u");
 _u.ExtensibilityStrings = function()
@@ -31,6 +31,7 @@ _u.ExtensibilityStrings.l_EmailAddressTooLong_Text = "하나 이상의 제공된
 _u.ExtensibilityStrings.l_EwsRequestOversized_Text = "요청이 제한 크기 1MB를 초과합니다. EWS 요청을 수정하십시오.";
 _u.ExtensibilityStrings.l_ExceededMaxNumberOfAttachments_Text = "메시지에 이미 최대 개수의 첨부 파일이 있으므로 첨부 파일을 추가할 수 없습니다.";
 _u.ExtensibilityStrings.l_HtmlSanitizationFailure_Text = "HTML 삭제가 실패했습니다.";
+_u.ExtensibilityStrings.l_Insufficient_Item_Permissions_Text = "The user doesn't have the permissions required to perform this operation.";
 _u.ExtensibilityStrings.l_InternalFormatError_Text = "내부 형식 오류가 발생했습니다.";
 _u.ExtensibilityStrings.l_InternalProtocolError_Text = "내부 프로토콜 오류입니다. {0}";
 _u.ExtensibilityStrings.l_InvalidActionType_Text = "'actionType' 매개 변수의 값이 잘못되었습니다. 허용되는 값은 \"showTaskPane\"입니다."

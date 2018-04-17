@@ -1,4 +1,4 @@
-/* Version: 16.0.9227.1000 */
+/* Version: 16.0.9307.1000 */
 
 Type.registerNamespace("_u");
 _u.ExtensibilityStrings = function()
@@ -31,6 +31,7 @@ _u.ExtensibilityStrings.l_EmailAddressTooLong_Text = "Vienas ar keli pateikti el
 _u.ExtensibilityStrings.l_EwsRequestOversized_Text = "Užklausa viršija 1 MB dydžio limitą. Modifikuokite EWS užklausą.";
 _u.ExtensibilityStrings.l_ExceededMaxNumberOfAttachments_Text = "Priedų negalima įtraukti, nes laiškas jau turi maksimalų priedų skaičių";
 _u.ExtensibilityStrings.l_HtmlSanitizationFailure_Text = "HTML valymas nepavyko.";
+_u.ExtensibilityStrings.l_Insufficient_Item_Permissions_Text = "The user doesn't have the permissions required to perform this operation.";
 _u.ExtensibilityStrings.l_InternalFormatError_Text = "Įvyko vidinio formato klaida.";
 _u.ExtensibilityStrings.l_InternalProtocolError_Text = "Vidinė protokolo klaida: '{0}'.";
 _u.ExtensibilityStrings.l_InvalidActionType_Text = "Parasmetro actionType reikšmė netinkama. Priimtina reikšmė yra showTaskPane."

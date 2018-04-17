@@ -1,4 +1,4 @@
-/* Version: 16.0.9227.1000 */
+/* Version: 16.0.9307.1000 */
 
 Type.registerNamespace("_u");
 _u.ExtensibilityStrings = function()
@@ -31,6 +31,7 @@ _u.ExtensibilityStrings.l_EmailAddressTooLong_Text = "Един или повеч
 _u.ExtensibilityStrings.l_EwsRequestOversized_Text = "Искането надвишава ограничението за максимален размер от 1 МБ. Променете вашето EWS искане.";
 _u.ExtensibilityStrings.l_ExceededMaxNumberOfAttachments_Text = "Прикачените файлове не могат да се добавят, тъй като съобщението вече има максималния брой прикачени файлове";
 _u.ExtensibilityStrings.l_HtmlSanitizationFailure_Text = "Неуспешно редактиране на HTML.";
+_u.ExtensibilityStrings.l_Insufficient_Item_Permissions_Text = "The user doesn't have the permissions required to perform this operation.";
 _u.ExtensibilityStrings.l_InternalFormatError_Text = "Възникна вътрешна грешка при форматиране.";
 _u.ExtensibilityStrings.l_InternalProtocolError_Text = 'Вътрешна грешка в протокола: "{0}".';
 _u.ExtensibilityStrings.l_InvalidActionType_Text = 'Стойността на параметъра "actionType" е невалидна. Приетата стойност е "showTaskPane".'

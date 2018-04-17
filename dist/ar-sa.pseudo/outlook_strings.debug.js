@@ -1,4 +1,4 @@
-/* Version: 16.0.9227.1000 */
+/* Version: 16.0.9307.1000 */
 
 Type.registerNamespace("_u");
 _u.ExtensibilityStrings = function()
@@ -31,6 +31,7 @@ _u.ExtensibilityStrings.l_EmailAddressTooLong_Text = "［LwH7z］‏‏أبع[On
 _u.ExtensibilityStrings.l_EwsRequestOversized_Text = "［uboan］‏‏أبع[The request exceeds the 1 MB size limit. Please modify your EWS request.]לף";
 _u.ExtensibilityStrings.l_ExceededMaxNumberOfAttachments_Text = "［PKXEO］‏‏أبع[Attachments cannot be added because the message already has the maximum number of attachments]לף";
 _u.ExtensibilityStrings.l_HtmlSanitizationFailure_Text = "［1o9wQ］‏‏أبع[The HTML santization has failed.]לף";
+_u.ExtensibilityStrings.l_Insufficient_Item_Permissions_Text = "［UnS7g］‏‏أبع[The user doesn't have the permissions required to perform this operation.]לף";
 _u.ExtensibilityStrings.l_InternalFormatError_Text = "［ex0FM］‏‏أبع[There was an internal format error.]לף";
 _u.ExtensibilityStrings.l_InternalProtocolError_Text = "［DZrmo］‏‏أبع[Internal protocol error: '{0}'.]לף";
 _u.ExtensibilityStrings.l_InvalidActionType_Text = "［5RL6t］‏‏أبع[The value of the parameter 'actionType' is invalid. The accepted value is \"showTaskPane\".]לף"

@@ -1,4 +1,4 @@
-/* Version: 16.0.9227.1000 */
+/* Version: 16.0.9307.1000 */
 
 Type.registerNamespace("_u");
 _u.ExtensibilityStrings = function()
@@ -31,6 +31,7 @@ _u.ExtensibilityStrings.l_EmailAddressTooLong_Text = "אחת או יותר מכ�
 _u.ExtensibilityStrings.l_EwsRequestOversized_Text = "הבקשה חורגת ממגבלת הגודל, ‎1 MB. שנה את בקשת EWS שלך.";
 _u.ExtensibilityStrings.l_ExceededMaxNumberOfAttachments_Text = "אין אפשרות להוסיף קבצים מצורפים מאחר שההודעה כוללת כבר את מספר הקבצים המצורפים המרבי";
 _u.ExtensibilityStrings.l_HtmlSanitizationFailure_Text = "יצירת HTML עם תגים בטוחים נכשלה.";
+_u.ExtensibilityStrings.l_Insufficient_Item_Permissions_Text = "The user doesn't have the permissions required to perform this operation.";
 _u.ExtensibilityStrings.l_InternalFormatError_Text = "אירעה שגיאת עיצוב פנימית.";
 _u.ExtensibilityStrings.l_InternalProtocolError_Text = "שגיאת פרוטוקול פנימית: '{0}'.";
 _u.ExtensibilityStrings.l_InvalidActionType_Text = "הערך של הפרמטר 'actionType' אינו חוקי. הערך המקובל הוא 'showTaskPane'."

@@ -1,4 +1,4 @@
-/* Version: 16.0.9227.1000 */
+/* Version: 16.0.9307.1000 */
 
 Type.registerNamespace("_u");
 _u.ExtensibilityStrings = function()
@@ -31,6 +31,7 @@ _u.ExtensibilityStrings.l_EmailAddressTooLong_Text = "En eller flere av e-postad
 _u.ExtensibilityStrings.l_EwsRequestOversized_Text = "Forespørselen overskrider grensen på 1 MB. Endre EWS-forespørselen.";
 _u.ExtensibilityStrings.l_ExceededMaxNumberOfAttachments_Text = "Vedlegg kan ikke legges til fordi meldingen allerede har maksimalt antall vedlegg";
 _u.ExtensibilityStrings.l_HtmlSanitizationFailure_Text = "HTML-santization mislyktes.";
+_u.ExtensibilityStrings.l_Insufficient_Item_Permissions_Text = "The user doesn't have the permissions required to perform this operation.";
 _u.ExtensibilityStrings.l_InternalFormatError_Text = "Det oppstod en intern formatfeil.";
 _u.ExtensibilityStrings.l_InternalProtocolError_Text = "Intern protokollfeil: {0}.";
 _u.ExtensibilityStrings.l_InvalidActionType_Text = "Verdien av parameteren actionType er ugyldig. Den godkjente verdien er showTaskPane."

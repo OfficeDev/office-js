@@ -1,4 +1,4 @@
-/* Version: 16.0.9227.1000 */
+/* Version: 16.0.9307.1000 */
 
 Type.registerNamespace("_u");
 _u.ExtensibilityStrings = function()
@@ -31,6 +31,7 @@ _u.ExtensibilityStrings.l_EmailAddressTooLong_Text = "En eller flera av de angiv
 _u.ExtensibilityStrings.l_EwsRequestOversized_Text = "Storleken på begäran överskrider gränsen på 1 MB. Ändra din EWS-begäran.";
 _u.ExtensibilityStrings.l_ExceededMaxNumberOfAttachments_Text = "Det går inte att bifoga filer, eftersom meddelandet redan har högsta möjliga antal bifogade filer";
 _u.ExtensibilityStrings.l_HtmlSanitizationFailure_Text = "HTML-rensningen misslyckades.";
+_u.ExtensibilityStrings.l_Insufficient_Item_Permissions_Text = "The user doesn't have the permissions required to perform this operation.";
 _u.ExtensibilityStrings.l_InternalFormatError_Text = "Ett internt formatfel uppstod.";
 _u.ExtensibilityStrings.l_InternalProtocolError_Text = "Internt protokollfel: {0}.";
 _u.ExtensibilityStrings.l_InvalidActionType_Text = 'Värdet för parametern "actionType" är ogiltigt. Accepterat värde är "showTaskPane".'

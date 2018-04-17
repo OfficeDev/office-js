@@ -1,4 +1,4 @@
-/* Version: 16.0.9230.1000 */
+/* Version: 16.0.9303.3000 */
 /*
 	Copyright (c) Microsoft Corporation.  All rights reserved.
 */
@@ -11310,7 +11310,7 @@ var Excel;
 			/// <field name="font" type="Excel.RangeFont">Returns the font object defined on the overall range. [Api set: ExcelApi 1.1]</field>
 			/// <field name="horizontalAlignment" type="String">Represents the horizontal alignment for the specified object. See Excel.HorizontalAlignment for details. [Api set: ExcelApi 1.1]</field>
 			/// <field name="protection" type="Excel.FormatProtection">Returns the format protection object for a range. [Api set: ExcelApi 1.2]</field>
-			/// <field name="rowHeight" type="Number">Gets or sets the height of all rows in the range. If the row heights are not uniform null will be returned. [Api set: ExcelApi 1.2]</field>
+			/// <field name="rowHeight" type="Number">Gets or sets the height of all rows in the range. If the row heights are not uniform, null will be returned. [Api set: ExcelApi 1.2]</field>
 			/// <field name="textOrientation" type="Number">Gets or sets the text orientation of all the cells within the range.              The text orientation should be an integer either from -90 to 90, or 180 for vertically-oriented text.              If the orientation within a range are not uniform, then null will be returned. [Api set: ExcelApi 1.7]</field>
 			/// <field name="useStandardHeight" type="Boolean">Determines if the row height of the Range object equals the standard height of the sheet.              Returns True if the row height of the Range object equals the standard height of the sheet.              Returns Null if the range contains more than one row and the rows aren&apos;t all the same height.               Returns False otherwise. [Api set: ExcelApi 1.7]</field>
 			/// <field name="useStandardWidth" type="Boolean">Indicates whether the columnwidth of the Range object equals the standard width of the sheet.              Returns True if the column width of the Range object equals the standard width of the sheet.              Returns Null if the range contains more than one column and the columns aren&apos;t all the same height.              Returns False otherwise. [Api set: ExcelApi 1.7]</field>
@@ -11826,7 +11826,6 @@ var Excel;
 			/// <summary> An object encapsulating a style&apos;s format and other properties. [Api set: ExcelApi 1.7] </summary>
 			/// <field name="context" type="Excel.RequestContext">The request context associated with this object.</field>
 			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
-			/// <field name="autoIndent" type="Boolean">Indicates if text is automatically indented when the text alignment in a cell is set to equal distribution. [Api set: ExcelApi 1.7]</field>
 			/// <field name="borders" type="Excel.RangeBorderCollection">A Border collection of four Border objects that represent the style of the four borders. [Api set: ExcelApi 1.7]</field>
 			/// <field name="builtIn" type="Boolean">Indicates if the style is a built-in style. [Api set: ExcelApi 1.7]</field>
 			/// <field name="fill" type="Excel.RangeFill">The Fill of the style. [Api set: ExcelApi 1.7]</field>
@@ -11846,7 +11845,6 @@ var Excel;
 			/// <field name="numberFormatLocal" type="String">The localized format code of the number format for the style. [Api set: ExcelApi 1.7]</field>
 			/// <field name="readingOrder" type="String">The reading order for the style. [Api set: ExcelApi 1.7]</field>
 			/// <field name="shrinkToFit" type="Boolean">Indicates if text automatically shrinks to fit in the available column width. [Api set: ExcelApi 1.7]</field>
-			/// <field name="textOrientation" type="Number">The text orientation for the style. [Api set: ExcelApi 1.7]</field>
 			/// <field name="verticalAlignment" type="String">Represents the vertical alignment for the style. See Excel.VerticalAlignment for details. [Api set: ExcelApi 1.7]</field>
 			/// <field name="wrapText" type="Boolean">Indicates if Microsoft Excel wraps the text in the object. [Api set: ExcelApi 1.7]</field>
 		}
@@ -12711,8 +12709,6 @@ var Excel;
 			/// <field name="pivotTables" type="Excel.PivotTableCollection">Collection of PivotTables that are part of the worksheet. [Api set: ExcelApi 1.3]</field>
 			/// <field name="position" type="Number">The zero-based position of the worksheet within the workbook. [Api set: ExcelApi 1.1]</field>
 			/// <field name="protection" type="Excel.WorksheetProtection">Returns sheet protection object for a worksheet. [Api set: ExcelApi 1.2]</field>
-			/// <field name="showGridlines" type="Boolean">Gets or sets the worksheet&apos;s gridlines flag.              This flag determines whether gridlines are visible to the user. [Api set: ExcelApi 1.7]</field>
-			/// <field name="showHeadings" type="Boolean">Gets or sets the worksheet&apos;s headings flag.              This flag determines whether headings are visible to the user. [Api set: ExcelApi 1.7]</field>
 			/// <field name="standardHeight" type="Number">Returns the standard (default) height of all the rows in the worksheet, in points. Read-only. [Api set: ExcelApi 1.7]</field>
 			/// <field name="standardWidth" type="Number">Returns or sets the standard (default) width of all the columns in the worksheet.              One unit of column width is equal to the width of one character in the Normal style. For proportional fonts, the width of the character 0 (zero) is used. [Api set: ExcelApi 1.7]</field>
 			/// <field name="tabColor" type="String">Gets or sets the worksheet tab color.              When retrieving the tab color, if the worksheet is invisible, the value will be null. If the worksheet is visible but the tab color is set to auto, an empty string will be returned. Otherwise, the property will be set to a color, in the form &quot;#123456&quot;              When setting the color, use an empty-string to set an &quot;auto&quot; color, or a real color otherwise. [Api set: ExcelApi 1.7]</field>
@@ -13326,8 +13322,6 @@ var Excel;
 				/// <summary>An interface for updating data on the Worksheet object, for use in "worksheet.set({ ... })".</summary>
 				/// <field name="name" type="String">The display name of the worksheet. [Api set: ExcelApi 1.1]</field>;
 				/// <field name="position" type="Number">The zero-based position of the worksheet within the workbook. [Api set: ExcelApi 1.1]</field>;
-				/// <field name="showGridlines" type="Boolean">Gets or sets the worksheet&apos;s gridlines flag.              This flag determines whether gridlines are visible to the user. [Api set: ExcelApi 1.7]</field>;
-				/// <field name="showHeadings" type="Boolean">Gets or sets the worksheet&apos;s headings flag.              This flag determines whether headings are visible to the user. [Api set: ExcelApi 1.7]</field>;
 				/// <field name="standardWidth" type="Number">Returns or sets the standard (default) width of all the columns in the worksheet.              One unit of column width is equal to the width of one character in the Normal style. For proportional fonts, the width of the character 0 (zero) is used. [Api set: ExcelApi 1.7]</field>;
 				/// <field name="tabColor" type="String">Gets or sets the worksheet tab color.              When retrieving the tab color, if the worksheet is invisible, the value will be null. If the worksheet is visible but the tab color is set to auto, an empty string will be returned. Otherwise, the property will be set to a color, in the form &quot;#123456&quot;              When setting the color, use an empty-string to set an &quot;auto&quot; color, or a real color otherwise. [Api set: ExcelApi 1.7]</field>;
 				/// <field name="visibility" type="String">The Visibility of the worksheet. [Api set: ExcelApi 1.1 for reading visibility; 1.2 for setting it.]</field>;
@@ -13488,7 +13482,7 @@ var Excel;
 				/// <field name="protection" type="Excel.Interfaces.FormatProtectionUpdateData">Returns the format protection object for a range. [Api set: ExcelApi 1.2]</field>
 				/// <field name="columnWidth" type="Number">Gets or sets the width of all colums within the range. If the column widths are not uniform, null will be returned. [Api set: ExcelApi 1.2]</field>;
 				/// <field name="horizontalAlignment" type="String">Represents the horizontal alignment for the specified object. See Excel.HorizontalAlignment for details. [Api set: ExcelApi 1.1]</field>;
-				/// <field name="rowHeight" type="Number">Gets or sets the height of all rows in the range. If the row heights are not uniform null will be returned. [Api set: ExcelApi 1.2]</field>;
+				/// <field name="rowHeight" type="Number">Gets or sets the height of all rows in the range. If the row heights are not uniform, null will be returned. [Api set: ExcelApi 1.2]</field>;
 				/// <field name="textOrientation" type="Number">Gets or sets the text orientation of all the cells within the range.              The text orientation should be an integer either from -90 to 90, or 180 for vertically-oriented text.              If the orientation within a range are not uniform, then null will be returned. [Api set: ExcelApi 1.7]</field>;
 				/// <field name="useStandardHeight" type="Boolean">Determines if the row height of the Range object equals the standard height of the sheet.              Returns True if the row height of the Range object equals the standard height of the sheet.              Returns Null if the range contains more than one row and the rows aren&apos;t all the same height.               Returns False otherwise. [Api set: ExcelApi 1.7]</field>;
 				/// <field name="useStandardWidth" type="Boolean">Indicates whether the columnwidth of the Range object equals the standard width of the sheet.              Returns True if the column width of the Range object equals the standard width of the sheet.              Returns Null if the range contains more than one column and the columns aren&apos;t all the same height.              Returns False otherwise. [Api set: ExcelApi 1.7]</field>;
@@ -14475,7 +14469,6 @@ var Excel;
 				/// <summary>An interface for updating data on the Style object, for use in "style.set({ ... })".</summary>
 				/// <field name="fill" type="Excel.Interfaces.RangeFillUpdateData">The Fill of the style. [Api set: ExcelApi 1.7]</field>
 				/// <field name="font" type="Excel.Interfaces.RangeFontUpdateData">A Font object that represents the font of the style. [Api set: ExcelApi 1.7]</field>
-				/// <field name="autoIndent" type="Boolean">Indicates if text is automatically indented when the text alignment in a cell is set to equal distribution. [Api set: ExcelApi 1.7]</field>;
 				/// <field name="formulaHidden" type="Boolean">Indicates if the formula will be hidden when the worksheet is protected. [Api set: ExcelApi 1.7]</field>;
 				/// <field name="horizontalAlignment" type="String">Represents the horizontal alignment for the style. See Excel.HorizontalAlignment for details. [Api set: ExcelApi 1.7]</field>;
 				/// <field name="includeAlignment" type="Boolean">Indicates if the style includes the AutoIndent, HorizontalAlignment, VerticalAlignment, WrapText, IndentLevel, and TextOrientation properties. [Api set: ExcelApi 1.7]</field>;
@@ -14490,7 +14483,6 @@ var Excel;
 				/// <field name="numberFormatLocal" type="String">The localized format code of the number format for the style. [Api set: ExcelApi 1.7]</field>;
 				/// <field name="readingOrder" type="String">The reading order for the style. [Api set: ExcelApi 1.7]</field>;
 				/// <field name="shrinkToFit" type="Boolean">Indicates if text automatically shrinks to fit in the available column width. [Api set: ExcelApi 1.7]</field>;
-				/// <field name="textOrientation" type="Number">The text orientation for the style. [Api set: ExcelApi 1.7]</field>;
 				/// <field name="verticalAlignment" type="String">Represents the vertical alignment for the style. See Excel.VerticalAlignment for details. [Api set: ExcelApi 1.7]</field>;
 				/// <field name="wrapText" type="Boolean">Indicates if Microsoft Excel wraps the text in the object. [Api set: ExcelApi 1.7]</field>;
 			}

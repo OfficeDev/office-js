@@ -1,4 +1,4 @@
-/* Version: 16.0.9227.1000 */
+/* Version: 16.0.9307.1000 */
 
 Type.registerNamespace("_u");
 _u.ExtensibilityStrings = function()
@@ -31,6 +31,7 @@ _u.ExtensibilityStrings.l_EmailAddressTooLong_Text = "Una sau mai multe adrese d
 _u.ExtensibilityStrings.l_EwsRequestOversized_Text = "Cererea depășește limita de 1 MB. Modificați cererea EWS.";
 _u.ExtensibilityStrings.l_ExceededMaxNumberOfAttachments_Text = "Atașările nu pot fi adăugate pentru că mesajul are deja numărul maxim de atașări";
 _u.ExtensibilityStrings.l_HtmlSanitizationFailure_Text = "Sterilizarea HTML nu a reușit.";
+_u.ExtensibilityStrings.l_Insufficient_Item_Permissions_Text = "The user doesn't have the permissions required to perform this operation.";
 _u.ExtensibilityStrings.l_InternalFormatError_Text = "A apărut o eroare internă de format.";
 _u.ExtensibilityStrings.l_InternalProtocolError_Text = "Eroare internă de protocol: „{0}”.";
 _u.ExtensibilityStrings.l_InvalidActionType_Text = "Valoarea parametrului „actionType” nu este validă. Valoarea acceptată este „showTaskPane”."

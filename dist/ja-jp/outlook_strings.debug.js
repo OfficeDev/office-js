@@ -1,4 +1,4 @@
-/* Version: 16.0.9227.1000 */
+/* Version: 16.0.9307.1000 */
 
 Type.registerNamespace("_u");
 _u.ExtensibilityStrings = function()
@@ -31,6 +31,7 @@ _u.ExtensibilityStrings.l_EmailAddressTooLong_Text = "指定したメール ア�
 _u.ExtensibilityStrings.l_EwsRequestOversized_Text = "要求がサイズの上限である 1 MB を超えています。EWS 要求を変更してください。";
 _u.ExtensibilityStrings.l_ExceededMaxNumberOfAttachments_Text = "メッセージの添付ファイル数が最大値に達しているため、添付ファイルを追加できません";
 _u.ExtensibilityStrings.l_HtmlSanitizationFailure_Text = "HTML サニタイズに失敗しました。";
+_u.ExtensibilityStrings.l_Insufficient_Item_Permissions_Text = "The user doesn't have the permissions required to perform this operation.";
 _u.ExtensibilityStrings.l_InternalFormatError_Text = "内部の形式エラーが発生しました。";
 _u.ExtensibilityStrings.l_InternalProtocolError_Text = "内部プロトコル エラー: '{0}'。";
 _u.ExtensibilityStrings.l_InvalidActionType_Text = "パラメーター 'actionType' の値が無効です。有効な値は \"showTaskPane\" です。"
