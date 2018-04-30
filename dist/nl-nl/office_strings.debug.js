@@ -1,4 +1,4 @@
-/* Version: 16.0.9309.1000 */
+/* Version: 16.0.9027.1000 */
 
 Type.registerNamespace("Strings");
 Strings.OfficeOM = function()
@@ -20,7 +20,7 @@ Strings.OfficeOM.L_BindingCreationError = "Fout bij het maken van binding";
 Strings.OfficeOM.L_BindingNotExist = "De opgegeven binding bestaat niet.";
 Strings.OfficeOM.L_BindingToMultipleSelection = "Niet-aaneengesloten selecties worden niet ondersteund.";
 Strings.OfficeOM.L_BrowserAPINotSupported = "Deze browser biedt geen ondersteuning voor de aangevraagde API.";
-Strings.OfficeOM.L_CallbackNotAFunction = "Terugbellen moet van het type functie is van het type {0}."
+Strings.OfficeOM.L_CallbackNotAFunction = "Terugbellen moet van het type functie is van het type {0}.";
 Strings.OfficeOM.L_CannotApplyPropertyThroughSetMethod = "Wijzigingen in eigenschap {0} kunnen niet worden toegepast via de methode object.set.";
 Strings.OfficeOM.L_CannotNavigateTo = "Het object bevindt zich op een plaats waar navigatie niet wordt ondersteund.";
 Strings.OfficeOM.L_CannotRegisterEvent = "De gebeurtenis-handler kan niet worden geregistreerd.";
@@ -188,5 +188,5 @@ Strings.OfficeOM.L_UnsupportedUserIdentityMessage = "Het identiteitstype van de 
 Strings.OfficeOM.L_UserAborted = "Gebruiker heeft de toestemmingsaanvraag afgebroken.";
 Strings.OfficeOM.L_UserAbortedMessage = "De gebruiker heeft geen toestemming gegeven voor de machtigingen voor de invoegtoepassing.";
 Strings.OfficeOM.L_UserClickIgnore = "De gebruiker heeft het dialoogvenster genegeerd.";
-Strings.OfficeOM.L_UserNotSignedIn = "Er is geen gebruiker aangemeld bij Office.";
+Strings.OfficeOM.L_UserNotSignedIn = "Er is geen gebruiker aangemeld bij Office."
 Strings.OfficeOM.L_ValueNotLoaded = "De waarde van het resultaatobject is nog niet geladen. Roep context.sync() in de context van de bijbehorende aanvraag aan voordat u de waarde-eigenschap leest.";

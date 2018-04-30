@@ -1,4 +1,4 @@
-/* Version: 16.0.9309.1000 */
+/* Version: 16.0.9027.1000 */
 
 Type.registerNamespace("Strings");
 Strings.OfficeOM = function()
@@ -20,7 +20,7 @@ Strings.OfficeOM.L_BindingCreationError = "Errorea lotura sortzean";
 Strings.OfficeOM.L_BindingNotExist = "Zehaztutako lotura ez dago.";
 Strings.OfficeOM.L_BindingToMultipleSelection = "Ez dira ondoz ondokoak ez diren hautapenak onartzen.";
 Strings.OfficeOM.L_BrowserAPINotSupported = "Eskatutako APIa ez da arakatzailearekin bateragarria.";
-Strings.OfficeOM.L_CallbackNotAFunction = "Atzeradeiak funtzio motakoa izan behar du; {0} motakoa da."
+Strings.OfficeOM.L_CallbackNotAFunction = "Atzeradeiak funtzio motakoa izan behar du; {0} motakoa da.";
 Strings.OfficeOM.L_CannotApplyPropertyThroughSetMethod = '"{0}" propietatean egindako aldaketak ezin dira aplikatu "object.set" metodoaren bidez.';
 Strings.OfficeOM.L_CannotNavigateTo = "Objektua nabigatu ezin den toki batean kokatuta dago.";
 Strings.OfficeOM.L_CannotRegisterEvent = "Ezin da erregistratu gertaera-maneatzailea.";
@@ -137,7 +137,7 @@ Strings.OfficeOM.L_NotSupportedEventType = "Ez da zehaztutako {0} gertaera mota 
 Strings.OfficeOM.L_OperationCancelledError = "Bertan behera utzi da eragiketa";
 Strings.OfficeOM.L_OperationCancelledErrorMessage = "Erabiltzaileak bertan behera utzi du eragiketa.";
 Strings.OfficeOM.L_OperationNotSupported = "Ez da eragiketa onartzen.";
-Strings.OfficeOM.L_OperationNotSupportedOnMatrixData = "Hautatutako edukiak taula-formatuan egon behar du. Formateatu datuak taula gisa eta saiatu berriro.";
+Strings.OfficeOM.L_OperationNotSupportedOnMatrixData = "Hautatutako edukiak taula-formatuan egon behar du. Formateatu datuak taula gisa eta saiatu berriro."
 Strings.OfficeOM.L_OperationNotSupportedOnThisBindingType = "Lotura mota honetan ez da eragiketa hori onartzen.";
 Strings.OfficeOM.L_OsfControlTypeNotSupported = "Ez da OsfControl mota onartzen.";
 Strings.OfficeOM.L_OutOfRange = "Barrutitik kanpo";

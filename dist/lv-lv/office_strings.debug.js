@@ -1,4 +1,4 @@
-/* Version: 16.0.9309.1000 */
+/* Version: 16.0.9027.1000 */
 
 Type.registerNamespace("Strings");
 Strings.OfficeOM = function()
@@ -20,7 +20,7 @@ Strings.OfficeOM.L_BindingCreationError = "Saistījuma izveides kļūda";
 Strings.OfficeOM.L_BindingNotExist = "Norādītais saistījums nepastāv.";
 Strings.OfficeOM.L_BindingToMultipleSelection = "Attālu vienumu atlase netiek atbalstīta.";
 Strings.OfficeOM.L_BrowserAPINotSupported = "Šī pārlūkprogramma neatbalsta pieprasīto API.";
-Strings.OfficeOM.L_CallbackNotAFunction = "Atzvanīšanai jābūt funkcijas tipa; bija {0} tipa."
+Strings.OfficeOM.L_CallbackNotAFunction = "Atzvanīšanai jābūt funkcijas tipa; bija {0} tipa.";
 Strings.OfficeOM.L_CannotApplyPropertyThroughSetMethod = 'Rekvizīta {0} izmaiņas nevar lietot, izmantojot metodi "object.set".';
 Strings.OfficeOM.L_CannotNavigateTo = "Objekts atrodas vietā, kur navigācija netiek atbalstīta.";
 Strings.OfficeOM.L_CannotRegisterEvent = "Nevar reģistrēt notikumu apdarinātāju.";
@@ -160,7 +160,7 @@ Strings.OfficeOM.L_SSOServerErrorMessage = "Serverī radās neparedzēta kļūda
 Strings.OfficeOM.L_SSOUserConsentNotSupportedByCurrentAddinCategory = "Šī pievienojumprogramma neatbalsta lietotāja piekrišanu.";
 Strings.OfficeOM.L_SSOUserConsentNotSupportedByCurrentAddinCategoryMessage = "Operācija neizdevās, jo šī pievienojumprogramma neatbalsta lietotāja piekrišanu šajā kategorijā";
 Strings.OfficeOM.L_SaveSettingsError = "Iestatījumu saglabāšanas kļūda";
-Strings.OfficeOM.L_SelectionCannotBound = "Nevar piesaistīt pašreizējai atlasei.";
+Strings.OfficeOM.L_SelectionCannotBound = "Nevar piesaistīt pašreizējai atlasei."
 Strings.OfficeOM.L_SelectionNotSupportCoercionType = "Pašreizējā atlase nav saderīga ar norādīto piespiedu pārvēršanas tipu.";
 Strings.OfficeOM.L_SetDataIsTooLarge = "Norādītais datu objekts ir pārāk liels.";
 Strings.OfficeOM.L_SetDataParametersConflict = "Norādītie parametri konfliktē.";

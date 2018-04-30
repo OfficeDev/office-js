@@ -1,4 +1,4 @@
-/* Version: 16.0.9309.1000 */
+/* Version: 16.0.9027.1000 */
 
 Type.registerNamespace("Strings");
 Strings.OfficeOM = function()
@@ -20,7 +20,7 @@ Strings.OfficeOM.L_BindingCreationError = "Ralat Penciptaan Pengikatan";
 Strings.OfficeOM.L_BindingNotExist = "Pengikatan yang ditentukan tidak wujud.";
 Strings.OfficeOM.L_BindingToMultipleSelection = "Pilihan tidak bersebelahan tidak disokong.";
 Strings.OfficeOM.L_BrowserAPINotSupported = "Pelayan ini tidak menyokong API yang diminta.";
-Strings.OfficeOM.L_CallbackNotAFunction = "Panggil balik mestilah fungsi jenis, sebelum ini jenis {0}."
+Strings.OfficeOM.L_CallbackNotAFunction = "Panggil balik mestilah fungsi jenis, sebelum ini jenis {0}.";
 Strings.OfficeOM.L_CannotApplyPropertyThroughSetMethod = "Perubahan kepada sifat '{0}' tidak boleh digunakan melalui kaedah \"set.objek\".";
 Strings.OfficeOM.L_CannotNavigateTo = "Objek terletak di lokasi yang tidak menyokong navigasi.";
 Strings.OfficeOM.L_CannotRegisterEvent = "Pengendali peristiwa tidak boleh didaftarkan.";
@@ -44,7 +44,7 @@ Strings.OfficeOM.L_CustomXmlNodeNotFound = "Nod yang ditentukan tidak ditemui.";
 Strings.OfficeOM.L_CustomXmlOutOfDateMessage = "Data tersebut sudah lapuk. Ambil objek semula.";
 Strings.OfficeOM.L_CustomXmlOutOfDateName = "Data Bukan Semasa";
 Strings.OfficeOM.L_DataNotMatchBindingSize = "Objek data yang dibekalkan tidak sepadan dengan saiz pilihan semasa.";
-Strings.OfficeOM.L_DataNotMatchBindingType = "Objek data yang ditentukan tidak serasi dengan jenis pengikatan.";
+Strings.OfficeOM.L_DataNotMatchBindingType = "Objek data yang ditentukan tidak serasi dengan jenis pengikatan."
 Strings.OfficeOM.L_DataNotMatchCoercionType = "Jenis objek data yang dibekalkan tidak serasi dengan pilihan semasa.";
 Strings.OfficeOM.L_DataNotMatchSelection = "Objek data yang dibekalkan tidak serasi dengan bentuk atau dimensi pilihan semasa.";
 Strings.OfficeOM.L_DataReadError = "Ralat Bacaan Data";

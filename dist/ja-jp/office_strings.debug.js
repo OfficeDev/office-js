@@ -1,4 +1,4 @@
-/* Version: 16.0.9309.1000 */
+/* Version: 16.0.9027.1000 */
 
 Type.registerNamespace("Strings");
 Strings.OfficeOM = function()
@@ -20,7 +20,7 @@ Strings.OfficeOM.L_BindingCreationError = "バインドの作成エラーが発�
 Strings.OfficeOM.L_BindingNotExist = "指定したバインドが存在しません。";
 Strings.OfficeOM.L_BindingToMultipleSelection = "不連続の選択はサポートされていません。";
 Strings.OfficeOM.L_BrowserAPINotSupported = "このブラウザーでは、要求された API はサポートされません。";
-Strings.OfficeOM.L_CallbackNotAFunction = "コールバックの型は関数である必要がありますが、{0} でした。"
+Strings.OfficeOM.L_CallbackNotAFunction = "コールバックの型は関数である必要がありますが、{0} でした。";
 Strings.OfficeOM.L_CannotApplyPropertyThroughSetMethod = "プロパティ '{0}' の変更を、\"object.set\" メソッドを使用して適用することはできません。";
 Strings.OfficeOM.L_CannotNavigateTo = "オブジェクトは、ナビゲーションがサポートされていない場所にあります。";
 Strings.OfficeOM.L_CannotRegisterEvent = "イベント ハンドラーは登録できません。";
@@ -87,7 +87,7 @@ Strings.OfficeOM.L_InvalidBindingError = "無効なバインド エラー";
 Strings.OfficeOM.L_InvalidBindingOperation = "無効なバインドの操作";
 Strings.OfficeOM.L_InvalidCellsValue = "1 つ以上の cells パラメーターに、許可されていない値が設定されています。値を再確認し、もう一度お試しください。";
 Strings.OfficeOM.L_InvalidCoercion = "強制変換タイプが無効です";
-Strings.OfficeOM.L_InvalidColumnsForBinding = "指定された列が無効です。";
+Strings.OfficeOM.L_InvalidColumnsForBinding = "指定された列が無効です。"
 Strings.OfficeOM.L_InvalidDataFormat = "指定したデータ オブジェクトの形式は無効です。";
 Strings.OfficeOM.L_InvalidDataObject = "データ オブジェクトが無効です";
 Strings.OfficeOM.L_InvalidFormat = "無効な形式のためにエラーが発生しました";

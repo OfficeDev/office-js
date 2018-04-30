@@ -1,4 +1,4 @@
-/* Version: 16.0.9309.1000 */
+/* Version: 16.0.9027.1000 */
 
 Type.registerNamespace("Strings");
 Strings.OfficeOM = function()
@@ -20,7 +20,7 @@ Strings.OfficeOM.L_BindingCreationError = "خطأ في إنشاء الربط";
 Strings.OfficeOM.L_BindingNotExist = "الربط المحدد غير موجود.";
 Strings.OfficeOM.L_BindingToMultipleSelection = "لا يتم اعتماد التحديدات المتقطعة.";
 Strings.OfficeOM.L_BrowserAPINotSupported = "لا يعتمد هذا المستعرض API المطلوبة.";
-Strings.OfficeOM.L_CallbackNotAFunction = "يجب أن يكون رد الاستدعاء من دالة النوع، وكان من النوع {0}."
+Strings.OfficeOM.L_CallbackNotAFunction = "يجب أن يكون رد الاستدعاء من دالة النوع، وكان من النوع {0}.";
 Strings.OfficeOM.L_CannotApplyPropertyThroughSetMethod = "يتعذر تطبيق التغييرات التي تم إجراؤها على خاصية '{0}' من خلال أسلوب \"object.set\".";
 Strings.OfficeOM.L_CannotNavigateTo = "إن العنصر موجود في موقع حيث التنقل غير معتمد.";
 Strings.OfficeOM.L_CannotRegisterEvent = "تعذر تسجيل معالج الأحداث.";
@@ -184,7 +184,7 @@ Strings.OfficeOM.L_UnsupportedDataObject = "نوع عنصر البيانات ا�
 Strings.OfficeOM.L_UnsupportedEnumeration = "قائمة تعداد غير معتمدة";
 Strings.OfficeOM.L_UnsupportedEnumerationMessage = "قائمة التعداد غير معتمدة في تطبيق المضيف الحالي.";
 Strings.OfficeOM.L_UnsupportedUserIdentity = "نوع هوية المستخدم غير مدعم.";
-Strings.OfficeOM.L_UnsupportedUserIdentityMessage = "نوع هوية المستخدم غير مدعم.";
+Strings.OfficeOM.L_UnsupportedUserIdentityMessage = "نوع هوية المستخدم غير مدعم."
 Strings.OfficeOM.L_UserAborted = "أوقف المستخدم طلب الموافقة قبل اكتماله.";
 Strings.OfficeOM.L_UserAbortedMessage = "لم يوافق المستخدم على أذونات الوظيفة الإضافية.";
 Strings.OfficeOM.L_UserClickIgnore = "اختار المستخدم تجاهل مربع الحوار.";

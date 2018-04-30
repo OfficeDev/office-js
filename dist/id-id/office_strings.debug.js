@@ -1,4 +1,4 @@
-/* Version: 16.0.9309.1000 */
+/* Version: 16.0.9027.1000 */
 
 Type.registerNamespace("Strings");
 Strings.OfficeOM = function()
@@ -20,7 +20,7 @@ Strings.OfficeOM.L_BindingCreationError = "Kesalahan Pembuatan Ikatan";
 Strings.OfficeOM.L_BindingNotExist = "Ikatan yang ditentukan ini tidak ada.";
 Strings.OfficeOM.L_BindingToMultipleSelection = "Pilihan yang tidak berdampingan tidak didukung.";
 Strings.OfficeOM.L_BrowserAPINotSupported = "Browser ini tidak mendukung API yang diminta.";
-Strings.OfficeOM.L_CallbackNotAFunction = "Panggilan balik harus berupa fungsi tipe, sebelumnya bertipe {0}."
+Strings.OfficeOM.L_CallbackNotAFunction = "Panggilan balik harus berupa fungsi tipe, sebelumnya bertipe {0}.";
 Strings.OfficeOM.L_CannotApplyPropertyThroughSetMethod = "Perubahan ke properti '{0}' tidak dapat diterapkan melalui metode \"object.set\".";
 Strings.OfficeOM.L_CannotNavigateTo = "Objek berada di tempat yang tidak mendukung navigasi.";
 Strings.OfficeOM.L_CannotRegisterEvent = "Penanganan aktivitas tidak dapat didaftarkan.";
@@ -169,7 +169,7 @@ Strings.OfficeOM.L_SettingsAreStale = "Pengaturan tidak bisa disimpan karena buk
 Strings.OfficeOM.L_SettingsCannotSave = "Pengaturan tidak dapat disimpan.";
 Strings.OfficeOM.L_SettingsStaleError = "Kesalahan Pengaturan Tidak Valid";
 Strings.OfficeOM.L_ShowWindowDialogNotification = "{0} ingin menampilkan jendela baru.";
-Strings.OfficeOM.L_ShowWindowDialogNotificationAllow = "Izinkan";
+Strings.OfficeOM.L_ShowWindowDialogNotificationAllow = "Izinkan"
 Strings.OfficeOM.L_ShowWindowDialogNotificationIgnore = "Abaikan";
 Strings.OfficeOM.L_ShuttingDown = "Operasi gagal karena data pada server bukan data saat ini.";
 Strings.OfficeOM.L_SliceSizeNotSupported = "Ukuran iris yang ditentukan tidak didukung.";

@@ -1,4 +1,4 @@
-/* Version: 16.0.9309.1000 */
+/* Version: 16.0.9027.1000 */
 
 Type.registerNamespace("Strings");
 Strings.OfficeOM = function()
@@ -20,7 +20,7 @@ Strings.OfficeOM.L_BindingCreationError = "Błąd tworzenia powiązania";
 Strings.OfficeOM.L_BindingNotExist = "Określone powiązanie nie istnieje.";
 Strings.OfficeOM.L_BindingToMultipleSelection = "Nieciągłe zaznaczenia nie są obsługiwane.";
 Strings.OfficeOM.L_BrowserAPINotSupported = "Ta przeglądarka nie obsługuje żądanego interfejsu API.";
-Strings.OfficeOM.L_CallbackNotAFunction = "Wywołanie zwrotne musi być typu funkcji. Było typu {0}."
+Strings.OfficeOM.L_CallbackNotAFunction = "Wywołanie zwrotne musi być typu funkcji. Było typu {0}.";
 Strings.OfficeOM.L_CannotApplyPropertyThroughSetMethod = "Nie można zastosować zmian do właściwości „{0}” za pomocą metody „object.set”.";
 Strings.OfficeOM.L_CannotNavigateTo = "Obiekt znajduje się w miejscu, gdzie nawigacja nie jest obsługiwana.";
 Strings.OfficeOM.L_CannotRegisterEvent = "Nie można zarejestrować programu obsługi zdarzeń.";
@@ -46,7 +46,7 @@ Strings.OfficeOM.L_CustomXmlOutOfDateName = "Nieaktualne dane";
 Strings.OfficeOM.L_DataNotMatchBindingSize = "Podany obiekt danych nie jest zgodny z rozmiarem bieżącego wyboru.";
 Strings.OfficeOM.L_DataNotMatchBindingType = "Określony obiekt danych jest niezgodny z typem powiązania.";
 Strings.OfficeOM.L_DataNotMatchCoercionType = "Typ określonego obiektu danych nie jest zgodny z bieżącym wyborem.";
-Strings.OfficeOM.L_DataNotMatchSelection = "Podany obiekt danych jest niezgodny z kształtem lub wymiarami bieżącego zaznaczenia.";
+Strings.OfficeOM.L_DataNotMatchSelection = "Podany obiekt danych jest niezgodny z kształtem lub wymiarami bieżącego zaznaczenia."
 Strings.OfficeOM.L_DataReadError = "Błąd odczytu danych";
 Strings.OfficeOM.L_DataStale = "Nieaktualne dane";
 Strings.OfficeOM.L_DataWriteError = "Błąd zapisu danych";

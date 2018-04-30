@@ -1,4 +1,4 @@
-/* Version: 16.0.9309.1000 */
+/* Version: 16.0.9027.1000 */
 
 Type.registerNamespace("Strings");
 Strings.OfficeOM = function()
@@ -13,14 +13,14 @@ Strings.OfficeOM.L_AddinIsAlreadyRequestingToken = "Надбудова вже з
 Strings.OfficeOM.L_AddinIsAlreadyRequestingTokenMessage = "Не вдалося виконати цю операцію, тому що ця надбудова вже запитує маркер доступу.";
 Strings.OfficeOM.L_ApiNotFoundDetails = 'Метод або властивість "{0}" належать до набору вимог {1}, недоступного у вашій версії {2}.';
 Strings.OfficeOM.L_AppNameNotExist = "Назва надбудови для {0} не існує.";
-Strings.OfficeOM.L_AppNotExistInitializeNotCalled = "Програма {0} не існує. Не вдалося викликати службу Microsoft.Office.WebExtension.initialize(reason).";
+Strings.OfficeOM.L_AppNotExistInitializeNotCalled = "Програма {0} не існує. Не вдалося викликати службу Microsoft.Office.WebExtension.initialize(reason)."
 Strings.OfficeOM.L_AttemptingToSetReadOnlyProperty = 'Триває спроба налаштувати доступну тільки для читання властивість "{0}".';
 Strings.OfficeOM.L_BadSelectorString = "Переданий у селектор рядок має неприпустимий формат або не підтримується.";
 Strings.OfficeOM.L_BindingCreationError = "Помилка створення зв’язування";
 Strings.OfficeOM.L_BindingNotExist = "Указане зв’язування не існує.";
 Strings.OfficeOM.L_BindingToMultipleSelection = "Переривчасті виділення не підтримуються.";
 Strings.OfficeOM.L_BrowserAPINotSupported = "Цей браузер не підтримує запитаний API.";
-Strings.OfficeOM.L_CallbackNotAFunction = "Зворотній виклик має бути функцією, а не {0}."
+Strings.OfficeOM.L_CallbackNotAFunction = "Зворотній виклик має бути функцією, а не {0}.";
 Strings.OfficeOM.L_CannotApplyPropertyThroughSetMethod = 'Не можна застосувати зміни властивості "{0}" за допомогою методу "object.set".';
 Strings.OfficeOM.L_CannotNavigateTo = "Об’єкт розташовано там, де не підтримується навігація.";
 Strings.OfficeOM.L_CannotRegisterEvent = "Не вдалося зареєструвати обробник подій.";
@@ -61,7 +61,7 @@ Strings.OfficeOM.L_DisplayDialogError = "Помилка відображення
 Strings.OfficeOM.L_DocumentReadOnly = "Операція, на яку створено запит, заборонена для поточного режиму документа.";
 Strings.OfficeOM.L_ElementMissing = "Не вдалося відформатувати клітинку таблиці, оскільки відсутні деякі значення параметрів. Перевірте параметри та спробуйте ще раз.";
 Strings.OfficeOM.L_EventHandlerAdditionFailed = "Не вдалося додати обробник подій.";
-Strings.OfficeOM.L_EventHandlerNotExist = "Указаний обробник подій не знайдено у цьому зв’язуванні.";
+Strings.OfficeOM.L_EventHandlerNotExist = "Вказаний обробник подій не знайдено у цьому зв\\'язуванні.";
 Strings.OfficeOM.L_EventHandlerRemovalFailed = "Не вдалося видалити обробник подій.";
 Strings.OfficeOM.L_EventRegistrationError = "Помилка реєстрації події";
 Strings.OfficeOM.L_FileTypeNotSupported = "Указаний тип файлу не підтримується.";

@@ -1,4 +1,4 @@
-/* Version: 16.0.9309.1000 */
+/* Version: 16.0.9027.1000 */
 
 Type.registerNamespace("Strings");
 Strings.OfficeOM = function()
@@ -12,7 +12,7 @@ Strings.OfficeOM.L_AddBindingFromPromptDefaultText = "Bitte treffen Sie eine Aus
 Strings.OfficeOM.L_AddinIsAlreadyRequestingToken = "Das Add-In fordert bereits ein Zugriffstoken an.";
 Strings.OfficeOM.L_AddinIsAlreadyRequestingTokenMessage = "Fehler beim Vorgang, da dieses Add-In bereits ein Zugriffstoken anfordert.";
 Strings.OfficeOM.L_ApiNotFoundDetails = 'Die Methode oder Eigenschaft "{0}" ist Teil des "{1}"-Anforderungssatzes, der in Ihrer Version von {2} nicht verfügbar ist.';
-Strings.OfficeOM.L_AppNameNotExist = "Add-In-Name für {0} ist nicht vorhanden.";
+Strings.OfficeOM.L_AppNameNotExist = "Add-In-Name für {0} ist nicht vorhanden."
 Strings.OfficeOM.L_AppNotExistInitializeNotCalled = "Die Anwendung {0} ist nicht vorhanden. Microsoft.Office.WebExtension.initialize(Ursache) wird nicht aufgerufen.";
 Strings.OfficeOM.L_AttemptingToSetReadOnlyProperty = 'Versuch, die schreibgeschützte Eigenschaft "{0}" festzulegen.';
 Strings.OfficeOM.L_BadSelectorString = "Die an den Selektor übergebene Zeichenfolge ist nicht ordnungsgemäß formatiert oder wird nicht unterstützt.";
@@ -20,7 +20,7 @@ Strings.OfficeOM.L_BindingCreationError = "Fehler beim Erstellen der Bindung.";
 Strings.OfficeOM.L_BindingNotExist = "Die angegebene Bindung ist nicht vorhanden.";
 Strings.OfficeOM.L_BindingToMultipleSelection = "Eine nicht zusammenhängende Auswahl wird nicht unterstützt.";
 Strings.OfficeOM.L_BrowserAPINotSupported = "Dieser Browser unterstützt die angeforderte API nicht.";
-Strings.OfficeOM.L_CallbackNotAFunction = 'Der Rückruf muss vom Typ "Funktion" sein, war aber vom Typ "{0}".'
+Strings.OfficeOM.L_CallbackNotAFunction = 'Der Rückruf muss vom Typ "Funktion" sein, war aber vom Typ "{0}".';
 Strings.OfficeOM.L_CannotApplyPropertyThroughSetMethod = 'Änderungen an der Eigenschaft "{0}" können nicht mit einer "object.set"-Methode angewendet werden.';
 Strings.OfficeOM.L_CannotNavigateTo = "Das Objekt befindet sich an einem Ort, wo keine Navigation unterstützt wird.";
 Strings.OfficeOM.L_CannotRegisterEvent = "Der Ereignishandler kann nicht registriert werden.";

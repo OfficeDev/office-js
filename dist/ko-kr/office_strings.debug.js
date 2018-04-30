@@ -1,4 +1,4 @@
-/* Version: 16.0.9309.1000 */
+/* Version: 16.0.9027.1000 */
 
 Type.registerNamespace("Strings");
 Strings.OfficeOM = function()
@@ -20,7 +20,7 @@ Strings.OfficeOM.L_BindingCreationError = "바인딩 만들기 오류";
 Strings.OfficeOM.L_BindingNotExist = "지정한 바인딩이 없습니다.";
 Strings.OfficeOM.L_BindingToMultipleSelection = "연속되지 않은 항목을 선택할 수 없습니다.";
 Strings.OfficeOM.L_BrowserAPINotSupported = "이 브라우저는 요청된 API를 지원하지 않습니다.";
-Strings.OfficeOM.L_CallbackNotAFunction = "콜백이 함수 유형이어야 하는데 {0} 유형입니다."
+Strings.OfficeOM.L_CallbackNotAFunction = "콜백이 함수 유형이어야 하는데 {0} 유형입니다.";
 Strings.OfficeOM.L_CannotApplyPropertyThroughSetMethod = "속성 '{0}'의 변경 내용을 \"object.set\" 메서드를 통해 적용할 수 없습니다.";
 Strings.OfficeOM.L_CannotNavigateTo = "개체가 탐색을 지원하지 않는 위치에 있습니다.";
 Strings.OfficeOM.L_CannotRegisterEvent = "이벤트 처리기를 등록할 수 없습니다.";
@@ -131,7 +131,7 @@ Strings.OfficeOM.L_NoCapability = "이 작업에 대해 충분한 권한이 없�
 Strings.OfficeOM.L_NonUniformPartialGetNotSupported = "테이블에 병합된 셀이 포함되어 있으면 좌표 매개 변수를 강제 변환 유형 테이블과 함께 사용할 수 없습니다.";
 Strings.OfficeOM.L_NonUniformPartialSetNotSupported = "테이블에 병합된 셀이 포함되어 있으면 좌표 매개 변수를 강제 변환 유형 테이블과 함께 사용할 수 없습니다.";
 Strings.OfficeOM.L_NotImplemented = "함수 {0}이(가) 구현되지 않았습니다.";
-Strings.OfficeOM.L_NotSupported = "함수 {0}은(는) 지원되지 않습니다.";
+Strings.OfficeOM.L_NotSupported = "함수 {0}은(는) 지원되지 않습니다."
 Strings.OfficeOM.L_NotSupportedBindingType = "지정한 바인딩 유형 {0}이(가) 지원되지 않습니다.";
 Strings.OfficeOM.L_NotSupportedEventType = "지정한 이벤트 종류 {0}이(가) 지원되지 않습니다.";
 Strings.OfficeOM.L_OperationCancelledError = "작업이 취소되었습니다.";
