@@ -7247,144 +7247,6 @@ OSF.InitializationHelper.prototype.loadAppSpecificScriptAndCreateOM = function O
         EditOwn: 16,
         EditAll: 32
     };
-    Microsoft.Office.WebExtension.MailboxEnums.TimeZone = {
-        AfghanistanStandardTime: "Afghanistan Standard Time",
-        AlaskanStandardTime: "Alaskan Standard Time",
-        AleutianStandardTime: "Aleutian Standard Time",
-        AltaiStandardTime: "Altai Standard Time",
-        ArabStandardTime: "Arab Standard Time",
-        ArabianStandardTime: "Arabian Standard Time",
-        ArabicStandardTime: "Arabic Standard Time",
-        ArgentinaStandardTime: "Argentina Standard Time",
-        AstrakhanStandardTime: "Astrakhan Standard Time",
-        AtlanticStandardTime: "Atlantic Standard Time",
-        AUSCentralStandardTime: "AUS Central Standard Time",
-        AusCentralWStandardTime: "Aus Central W. Standard Time",
-        AUSEasternStandardTime: "AUS Eastern Standard Time",
-        AzerbaijanStandardTime: "Azerbaijan Standard Time",
-        AzoresStandardTime: "Azores Standard Time",
-        BahiaStandardTime: "Bahia Standard Time",
-        BangladeshStandardTime: "Bangladesh Standard Time",
-        BelarusStandardTime: "Belarus Standard Time",
-        BougainvilleStandardTime: "Bougainville Standard Time",
-        CanadaCentralStandardTime: "Canada Central Standard Time",
-        CapeVerdeStandardTime: "Cape Verde Standard Time",
-        CaucasusStandardTime: "Caucasus Standard Time",
-        CenAustraliaStandardTime: "Cen. Australia Standard Time",
-        CentralAmericaStandardTime: "Central America Standard Time",
-        CentralAsiaStandardTime: "Central Asia Standard Time",
-        CentralBrazilianStandardTime: "Central Brazilian Standard Time",
-        CentralEuropeStandardTime: "Central Europe Standard Time",
-        CentralEuropeanStandardTime: "Central European Standard Time",
-        CentralPacificStandardTime: "Central Pacific Standard Time",
-        CentralStandardTime: "Central Standard Time",
-        CentralStandardTime_Mexico: "Central Standard Time (Mexico)",
-        ChathamIslandsStandardTime: "Chatham Islands Standard Time",
-        ChinaStandardTime: "China Standard Time",
-        CubaStandardTime: "Cuba Standard Time",
-        DatelineStandardTime: "Dateline Standard Time",
-        EAfricaStandardTime: "E. Africa Standard Time",
-        EAustraliaStandardTime: "E. Australia Standard Time",
-        EEuropeStandardTime: "E. Europe Standard Time",
-        ESouthAmericaStandardTime: "E. South America Standard Time",
-        EasterIslandStandardTime: "Easter Island Standard Time",
-        EasternStandardTime: "Eastern Standard Time",
-        EasternStandardTime_Mexico: "Eastern Standard Time (Mexico)",
-        EgyptStandardTime: "Egypt Standard Time",
-        EkaterinburgStandardTime: "Ekaterinburg Standard Time",
-        FijiStandardTime: "Fiji Standard Time",
-        FLEStandardTime: "FLE Standard Time",
-        GeorgianStandardTime: "Georgian Standard Time",
-        GMTStandardTime: "GMT Standard Time",
-        GreenlandStandardTime: "Greenland Standard Time",
-        GreenwichStandardTime: "Greenwich Standard Time",
-        GTBStandardTime: "GTB Standard Time",
-        HaitiStandardTime: "Haiti Standard Time",
-        HawaiianStandardTime: "Hawaiian Standard Time",
-        IndiaStandardTime: "India Standard Time",
-        IranStandardTime: "Iran Standard Time",
-        IsraelStandardTime: "Israel Standard Time",
-        JordanStandardTime: "Jordan Standard Time",
-        KaliningradStandardTime: "Kaliningrad Standard Time",
-        KamchatkaStandardTime: "Kamchatka Standard Time",
-        KoreaStandardTime: "Korea Standard Time",
-        LibyaStandardTime: "Libya Standard Time",
-        LineIslandsStandardTime: "Line Islands Standard Time",
-        LordHoweStandardTime: "Lord Howe Standard Time",
-        MagadanStandardTime: "Magadan Standard Time",
-        MagallanesStandardTime: "Magallanes Standard Time",
-        MarquesasStandardTime: "Marquesas Standard Time",
-        MauritiusStandardTime: "Mauritius Standard Time",
-        MidAtlanticStandardTime: "Mid-Atlantic Standard Time",
-        MiddleEastStandardTime: "Middle East Standard Time",
-        MontevideoStandardTime: "Montevideo Standard Time",
-        MoroccoStandardTime: "Morocco Standard Time",
-        MountainStandardTime: "Mountain Standard Time",
-        MountainStandardTime_Mexico: "Mountain Standard Time (Mexico)",
-        MyanmarStandardTime: "Myanmar Standard Time",
-        NCentralAsiaStandardTime: "N. Central Asia Standard Time",
-        NamibiaStandardTime: "Namibia Standard Time",
-        NepalStandardTime: "Nepal Standard Time",
-        NewZealandStandardTime: "New Zealand Standard Time",
-        NewfoundlandStandardTime: "Newfoundland Standard Time",
-        NorfolkStandardTime: "Norfolk Standard Time",
-        NorthAsiaEastStandardTime: "North Asia East Standard Time",
-        NorthAsiaStandardTime: "North Asia Standard Time",
-        NorthKoreaStandardTime: "North Korea Standard Time",
-        OmskStandardTime: "Omsk Standard Time",
-        PacificSAStandardTime: "Pacific SA Standard Time",
-        PacificStandardTime: "Pacific Standard Time",
-        PacificStandardTime_Mexico: "Pacific Standard Time (Mexico)",
-        PakistanStandardTime: "Pakistan Standard Time",
-        ParaguayStandardTime: "Paraguay Standard Time",
-        RomanceStandardTime: "Romance Standard Time",
-        RussiaTimeZone10: "Russia Time Zone 10",
-        RussiaTimeZone11: "Russia Time Zone 11",
-        RussiaTimeZone3: "Russia Time Zone 3",
-        RussianStandardTime: "Russian Standard Time",
-        SAEasternStandardTime: "SA Eastern Standard Time",
-        SAPacificStandardTime: "SA Pacific Standard Time",
-        SAWesternStandardTime: "SA Western Standard Time",
-        SaintPierreStandardTime: "Saint Pierre Standard Time",
-        SakhalinStandardTime: "Sakhalin Standard Time",
-        SamoaStandardTime: "Samoa Standard Time",
-        SaratovStandardTime: "Saratov Standard Time",
-        SEAsiaStandardTime: "SE Asia Standard Time",
-        SingaporeStandardTime: "Singapore Standard Time",
-        SouthAfricaStandardTime: "South Africa Standard Time",
-        SriLankaStandardTime: "Sri Lanka Standard Time",
-        SudanStandardTime: "Sudan Standard Time",
-        SyriaStandardTime: "Syria Standard Time",
-        TaipeiStandardTime: "Taipei Standard Time",
-        TasmaniaStandardTime: "Tasmania Standard Time",
-        TocantinsStandardTime: "Tocantins Standard Time",
-        TokyoStandardTime: "Tokyo Standard Time",
-        TomskStandardTime: "Tomsk Standard Time",
-        TongaStandardTime: "Tonga Standard Time",
-        TransbaikalStandardTime: "Transbaikal Standard Time",
-        TurkeyStandardTime: "Turkey Standard Time",
-        TurksAndCaicosStandardTime: "Turks And Caicos Standard Time",
-        UlaanbaatarStandardTime: "Ulaanbaatar Standard Time",
-        USEasternStandardTime: "US Eastern Standard Time",
-        USMountainStandardTime: "US Mountain Standard Time",
-        UTC: "UTC",
-        UTCPLUS12: "UTC+12",
-        UTCPLUS13: "UTC+13",
-        UTCMINUS02: "UTC-02",
-        UTCMINUS08: "UTC-08",
-        UTCMINUS09: "UTC-09",
-        UTCMINUS11: "UTC-11",
-        VenezuelaStandardTime: "Venezuela Standard Time",
-        VladivostokStandardTime: "Vladivostok Standard Time",
-        WAustraliaStandardTime: "W. Australia Standard Time",
-        WCentralAfricaStandardTime: "W. Central Africa Standard Time",
-        WEuropeStandardTime: "W. Europe Standard Time",
-        WMongoliaStandardTime: "W. Mongolia Standard Time",
-        WestAsiaStandardTime: "West Asia Standard Time",
-        WestBankStandardTime: "West Bank Standard Time",
-        WestPacificStandardTime: "West Pacific Standard Time",
-        YakutskStandardTime: "Yakutsk Standard Time"
-    };
     Type.registerNamespace("OSF.DDA");
     var OSF = window["OSF"] || {};
     OSF.DDA = OSF.DDA || {};
@@ -7909,10 +7771,6 @@ OSF.InitializationHelper.prototype.loadAppSpecificScriptAndCreateOM = function O
                 default:
                     return false
             }
-        },
-        shouldRunNewCode: function(functionFlagToExecute)
-        {
-            return(this._initialData$p$0.get__shouldRunNewCodeForFlags$i$0() & functionFlagToExecute) === functionFlagToExecute
         },
         isOutlook16OrGreater: function()
         {
@@ -9786,13 +9644,8 @@ OSF.InitializationHelper.prototype.loadAppSpecificScriptAndCreateOM = function O
         if(window["JSON"]["stringify"](this._data$p$0).length > MaxCustomPropertiesLength)
             throw Error.argument();
         var parameters = $h.CommonParameters.parse(args,false,true);
-        if(window["OSF"]["DDA"]["OutlookAppOm"]._instance$p.shouldRunNewCode($h.ShouldRunNewCodeForFlags.saveCustomProperties))
-            window["OSF"]["DDA"]["OutlookAppOm"]._instance$p._standardInvokeHostMethod$i$0(4,{customProperties: this._data$p$0},null,parameters._asyncContext$p$0,parameters._callback$p$0);
-        else
-        {
-            var saveCustomProperties = new $h.SaveDictionaryRequest(parameters._callback$p$0,parameters._asyncContext$p$0);
-            saveCustomProperties._sendRequest$i$0(4,"SaveCustomProperties",{customProperties: this._data$p$0})
-        }
+        var saveCustomProperties = new $h.SaveDictionaryRequest(parameters._callback$p$0,parameters._asyncContext$p$0);
+        saveCustomProperties._sendRequest$i$0(4,"SaveCustomProperties",{customProperties: this._data$p$0})
     };
     $h.Diagnostics = function(data, appName)
     {
@@ -11352,8 +11205,6 @@ OSF.InitializationHelper.prototype.loadAppSpecificScriptAndCreateOM = function O
         $h.OutlookErrorManager._addErrorMessage$p(9035,"RecurrenceZeroOccurrences",window["_u"]["ExtensibilityStrings"]["l_RecurrenceErrorZeroOccurrences_Text"]);
         $h.OutlookErrorManager._addErrorMessage$p(9036,"RecurrenceMaxOccurrences",window["_u"]["ExtensibilityStrings"]["l_RecurrenceErrorMaxOccurrences_Text"]);
         $h.OutlookErrorManager._addErrorMessage$p(9037,"RecurrenceInvalidTimeZone",window["_u"]["ExtensibilityStrings"]["l_RecurrenceInvalidTimeZone_Text"]);
-        $h.OutlookErrorManager._addErrorMessage$p(9038,"InsufficientItemPermissionsError",window["_u"]["ExtensibilityStrings"]["l_Insufficient_Item_Permissions_Text"]);
-        $h.OutlookErrorManager._addErrorMessage$p(9039,"RecurrenceUnsupportedAlternateCalendar",window["_u"]["ExtensibilityStrings"]["l_RecurrenceUnsupportedAlternateCalendar_Text"]);
         $h.OutlookErrorManager._isInitialized$p = true
     };
     $h.OutlookErrorManager._addErrorMessage$p = function(errorCode, errorName, errorMessage)
@@ -11600,7 +11451,6 @@ OSF.InitializationHelper.prototype.loadAppSpecificScriptAndCreateOM = function O
             return this._asyncContext$p$0
         }
     };
-    $h.ShouldRunNewCodeForFlags = function(){};
     $h.EwsRequest = function(userContext)
     {
         $h.EwsRequest["initializeBase"](this,[userContext])
@@ -11794,12 +11644,6 @@ OSF.InitializationHelper.prototype.loadAppSpecificScriptAndCreateOM = function O
         get__isFromSharedFolder$i$0: function()
         {
             return!!this._data$p$0["isFromSharedFolder"] && this._data$p$0["isFromSharedFolder"]
-        },
-        get__shouldRunNewCodeForFlags$i$0: function()
-        {
-            if(this._data$p$0["shouldRunNewCodeForFlags"])
-                return this._data$p$0["shouldRunNewCodeForFlags"];
-            return 0
         },
         get__endNodeUrl$i$0: function()
         {
@@ -12317,12 +12161,9 @@ OSF.InitializationHelper.prototype.loadAppSpecificScriptAndCreateOM = function O
     $h.OutlookErrorManager.OutlookErrorCodes.recurrenceZeroOccurrences = 9035;
     $h.OutlookErrorManager.OutlookErrorCodes.recurrenceMaxOccurrences = 9036;
     $h.OutlookErrorManager.OutlookErrorCodes.recurrenceInvalidTimeZone = 9037;
-    $h.OutlookErrorManager.OutlookErrorCodes.insufficientItemPermissions = 9038;
-    $h.OutlookErrorManager.OutlookErrorCodes.recurrenceUnsupportedAlternateCalendar = 9039;
     $h.OutlookErrorManager.OutlookErrorCodes.ooeInvalidDataFormat = 2006;
     $h.OutlookErrorManager.OsfDdaErrorCodes.ooeCoercionTypeNotSupported = 1e3;
     $h.CommonParameters.asyncContextKeyName = "asyncContext";
-    $h.ShouldRunNewCodeForFlags.saveCustomProperties = 1;
     $h.InitialData.userProfileTypeKey = "userProfileType";
     $h.ScriptHelpers.emptyString = "";
     OSF.DDA.ErrorCodeManager.initializeErrorMessages(Strings.OfficeOM);
