@@ -1,4 +1,4 @@
-/* Version: 16.0.9309.1000 */
+/* Version: 16.0.9027.1000 */
 
 Type.registerNamespace("Strings");
 Strings.OfficeOM = function()
@@ -20,7 +20,7 @@ Strings.OfficeOM.L_BindingCreationError = "Error de creació de vinculació";
 Strings.OfficeOM.L_BindingNotExist = "La vinculació especificada no existeix.";
 Strings.OfficeOM.L_BindingToMultipleSelection = "No s'admeten les seleccions no contigües.";
 Strings.OfficeOM.L_BrowserAPINotSupported = "Aquest navegador no admet l'API sol·licitada.";
-Strings.OfficeOM.L_CallbackNotAFunction = "La resposta ha de ser de la funció tipus i era del tipus {0}."
+Strings.OfficeOM.L_CallbackNotAFunction = "La resposta ha de ser de la funció tipus i era del tipus {0}.";
 Strings.OfficeOM.L_CannotApplyPropertyThroughSetMethod = 'Els canvis en la propietat "{0}" no es poden aplicar mitjançant un mètode "object.set".';
 Strings.OfficeOM.L_CannotNavigateTo = "L'objecte es troba situat a un lloc on no s'admet la navegació.";
 Strings.OfficeOM.L_CannotRegisterEvent = "El controlador d'incidències no es pot registrar.";
@@ -116,7 +116,7 @@ Strings.OfficeOM.L_InvalidSetRows = "Les files especificades no són vàlides.";
 Strings.OfficeOM.L_InvalidSetStartRowColumn = "Els valors startRow o startColumn especificats no són vàlids.";
 Strings.OfficeOM.L_InvalidTableOptionValue = "Hi ha un o més paràmetres de la taula Opcions que tenen valors no permesos. Comproveu-los i torneu-ho a provar.";
 Strings.OfficeOM.L_InvalidValue = "Valor no vàlid";
-Strings.OfficeOM.L_MemoryLimit = "S'ha superat el límit de memòria";
+Strings.OfficeOM.L_MemoryLimit = "S'ha superat el límit de memòria"
 Strings.OfficeOM.L_MissingParameter = "Falta un paràmetre";
 Strings.OfficeOM.L_MissingRequiredArguments = "falten alguns arguments obligatoris";
 Strings.OfficeOM.L_MultipleNamedItemFound = "S'han trobat múltiples objectes amb el mateix nom.";
@@ -160,7 +160,7 @@ Strings.OfficeOM.L_SSOServerErrorMessage = "S'ha produït un error inesperat al 
 Strings.OfficeOM.L_SSOUserConsentNotSupportedByCurrentAddinCategory = "Aquest complement no admet el consentiment de l'usuari.";
 Strings.OfficeOM.L_SSOUserConsentNotSupportedByCurrentAddinCategoryMessage = "L'operació ha fallat perquè aquest complement no admet el consentiment de l'usuari en aquesta categoria.";
 Strings.OfficeOM.L_SaveSettingsError = "Error de configuració de desar";
-Strings.OfficeOM.L_SelectionCannotBound = "No es pot enllaçar amb la selecció actual.";
+Strings.OfficeOM.L_SelectionCannotBound = "No es pot vincular amb la selecció actual.";
 Strings.OfficeOM.L_SelectionNotSupportCoercionType = "La selecció actual no és compatible amb el tipus de coerció especificat.";
 Strings.OfficeOM.L_SetDataIsTooLarge = "L'objecte de dades especificat és massa gran.";
 Strings.OfficeOM.L_SetDataParametersConflict = "Els paràmetres especificats estan en conflicte.";

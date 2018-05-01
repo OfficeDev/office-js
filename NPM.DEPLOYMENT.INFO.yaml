@@ -1,49 +1,49 @@
-version: 1.1.7-beta-next.0
+version: 1.1.7-beta-next.1
 tag: beta-next
-githubReleaseUrl: https://github.com/OfficeDev/office-js/releases/tag/v1.1.7-beta-next.0
-githubViewUrl: https://github.com/OfficeDev/office-js/tree/v1.1.7-beta-next.0
-deployedAt: 2018-04-17 11:06 pm UTC  (2018-04-17 4:06 pm Pacific Time)
+githubReleaseUrl: https://github.com/OfficeDev/office-js/releases/tag/v1.1.7-beta-next.1
+githubViewUrl: https://github.com/OfficeDev/office-js/tree/v1.1.7-beta-next.1
+deployedAt: 2018-05-01 12:00 am UTC  (2018-04-30 5:00 pm Pacific Time)
 
 history:
-    adhocBranchName: __for_merging--beta-next--16.0.9316.5452--2018-04-17--3.50pm
-    commitMessage: __for_merging--beta-next--16.0.9316.5452--2018-04-17--3.50pm
+    adhocBranchName: __for_merging--beta-next--16.0.9228.5452--2018-04-30--4.36pm
+    commitMessage: __for_merging--beta-next--16.0.9228.5452--2018-04-30--4.36pm
     fullCommitHistory:
         - 
             sha: >-
-                https://github.com/OfficeDev/office-js/commits/6334d39aa627071076c8c3e1f270d4b7fbba403f
+                https://github.com/OfficeDev/office-js/commits/6962c2de6416d20d1ac8f3ae49a2d6bca1913670
             message: >-
                 JS dist files --
-                __for_merging--beta-next--16.0.9316.5452--2018-04-17--3.50pm
+                __for_merging--beta-next--16.0.9228.5452--2018-04-30--4.36pm
         - 
             sha: >-
-                https://github.com/OfficeDev/office-js/commits/b784d56caa40130e70d7c98db0a236494e7d8cc5
+                https://github.com/OfficeDev/office-js/commits/f59c0c70f85833c93662f856d5dd76366198776b
             message: >-
                 Localized strings --
-                __for_merging--beta-next--16.0.9316.5452--2018-04-17--3.50pm
+                __for_merging--beta-next--16.0.9228.5452--2018-04-30--4.36pm
         - 
             sha: >-
-                https://github.com/OfficeDev/office-js/commits/75106a7722fabfbd63e37322fc59fcd35c79c801
+                https://github.com/OfficeDev/office-js/commits/b8d446c060d4328385d46f69f022d42d04e9eefa
             message: Copying other assets from the release branch of the repo
         - 
             sha: >-
-                https://github.com/OfficeDev/office-js/commits/a68186fc03bc4acf02eb6f6210512d7ec21732f2
+                https://github.com/OfficeDev/office-js/commits/d1a3ab0f695c517bc3810a0c5bc979f33b1a8d7a
             message: >-
                 [PUBLISH TOOL] Add deployment infrastructure for adhoc NPM
                 publish
         - 
             sha: >-
-                https://github.com/OfficeDev/office-js/commits/12cf468441a40422f649ef2b872b385500553c1a
+                https://github.com/OfficeDev/office-js/commits/a49270b05b313f4a10bedb3c0f7a0d6ea2a3f39a
             message: >-
                 [BEGIN PUBLISH UPDATES] --
-                __for_merging--beta-next--16.0.9316.5452--2018-04-17--3.50pm
+                __for_merging--beta-next--16.0.9228.5452--2018-04-30--4.36pm
 
 
 unpkgUrls: |-
     this specific build number:
-        https://unpkg.com/@microsoft/office-js@1.1.7-beta-next.0/dist/office.js
-        https://unpkg.com/@microsoft/office-js@1.1.7-beta-next.0/dist/office.d.ts
+        https://unpkg.com/@microsoft/office-js@1.1.7-beta-next.1/dist/office.js
+        https://unpkg.com/@microsoft/office-js@1.1.7-beta-next.1/dist/office.d.ts
     builds using this same tag ("beta-next"):
         https://unpkg.com/@microsoft/office-js@beta-next/dist/office.js
         https://unpkg.com/@microsoft/office-js@beta-next/dist/office.d.ts
 
-buildLog: https://travis-ci.org/OfficeDev/office-js/builds/367905253
+buildLog: https://travis-ci.org/OfficeDev/office-js/builds/373281955

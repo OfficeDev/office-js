@@ -1,4 +1,4 @@
-/* Version: 16.0.9309.1000 */
+/* Version: 16.0.9027.1000 */
 
 Type.registerNamespace("Strings");
 Strings.OfficeOM = function()
@@ -20,7 +20,7 @@ Strings.OfficeOM.L_BindingCreationError = "Feil under oppretting av binding";
 Strings.OfficeOM.L_BindingNotExist = "Den angitte bindingen finnes ikke.";
 Strings.OfficeOM.L_BindingToMultipleSelection = "Ikke-sammenhengende utvalg støttes ikke.";
 Strings.OfficeOM.L_BrowserAPINotSupported = "Denne nettleseren støtter ikke den forespurte APIen.";
-Strings.OfficeOM.L_CallbackNotAFunction = "Tilbakekall må være av typen function. Var av typen {0}."
+Strings.OfficeOM.L_CallbackNotAFunction = "Tilbakekall må være av typen function. Var av typen {0}.";
 Strings.OfficeOM.L_CannotApplyPropertyThroughSetMethod = "Endringer av egenskapen {0} kan ikke brukes med en object.set-metode.";
 Strings.OfficeOM.L_CannotNavigateTo = "Objektet er plassert på et sted der navigasjon ikke støttes.";
 Strings.OfficeOM.L_CannotRegisterEvent = "Kan ikke registrere hendelsesbehandling.";
@@ -141,7 +141,7 @@ Strings.OfficeOM.L_OperationNotSupportedOnMatrixData = "Merket innhold må være
 Strings.OfficeOM.L_OperationNotSupportedOnThisBindingType = "Operasjonen støttes ikke for denne bindingstypen.";
 Strings.OfficeOM.L_OsfControlTypeNotSupported = "OsfControl-typen støttes ikke.";
 Strings.OfficeOM.L_OutOfRange = "Utenfor området";
-Strings.OfficeOM.L_OverwriteWorksheetData = "Set-operasjonen mislyktes fordi det angitte dataobjektet vil overskrive eller flytte data.";
+Strings.OfficeOM.L_OverwriteWorksheetData = "Set-operasjonen mislyktes fordi det angitte dataobjektet vil overskrive eller flytte data."
 Strings.OfficeOM.L_PermissionDenied = "Ingen tilgang";
 Strings.OfficeOM.L_PropertyDoesNotExist = "Egenskapen {0} ikke finnes på objektet.";
 Strings.OfficeOM.L_PropertyNotLoaded = "Egenskapen {0} er ikke tilgjengelig. Kall load-metoden på det inneholdende objektet før du leser egenskapens verdi, og kaller «context.sync()» på den tilknyttede forespørselskonteksten.";

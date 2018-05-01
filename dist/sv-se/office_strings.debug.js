@@ -1,4 +1,4 @@
-/* Version: 16.0.9309.1000 */
+/* Version: 16.0.9027.1000 */
 
 Type.registerNamespace("Strings");
 Strings.OfficeOM = function()
@@ -20,7 +20,7 @@ Strings.OfficeOM.L_BindingCreationError = "Fel inträffade när bindningen skapa
 Strings.OfficeOM.L_BindingNotExist = "Den angivna bindningen finns inte.";
 Strings.OfficeOM.L_BindingToMultipleSelection = "Icke sammanhängande markeringar kan inte användas.";
 Strings.OfficeOM.L_BrowserAPINotSupported = "Den begärda API:n stöds inte i den här webbläsaren.";
-Strings.OfficeOM.L_CallbackNotAFunction = "Motringning måste vara av typen funktion, men var av typen {0}."
+Strings.OfficeOM.L_CallbackNotAFunction = "Motringning måste vara av typen funktion, men var av typen {0}.";
 Strings.OfficeOM.L_CannotApplyPropertyThroughSetMethod = "Ändringar av egenskapen {0} kan inte användas från en object.set-metod.";
 Strings.OfficeOM.L_CannotNavigateTo = "Objektet finns på en plats där navigering inte stöds.";
 Strings.OfficeOM.L_CannotRegisterEvent = "Det går inte att registrera händelsehanteraren.";
@@ -77,7 +77,7 @@ Strings.OfficeOM.L_IndexOutOfRange = "Index är utanför intervallet.";
 Strings.OfficeOM.L_InitializeNotReady = "Office.js har inte lästs in helt ännu. Försök igen senare eller lägg till din initieringskod för funktionen Office.initialize.";
 Strings.OfficeOM.L_InternalError = "Internt fel";
 Strings.OfficeOM.L_InternalErrorDescription = "Ett internt fel har uppstått.";
-Strings.OfficeOM.L_InvalidAPICall = "Ogiltigt API-anrop";
+Strings.OfficeOM.L_InvalidAPICall = "Ogiltigt API-anrop"
 Strings.OfficeOM.L_InvalidApiArgumentsMessage = "Ogiltiga indataargument.";
 Strings.OfficeOM.L_InvalidApiCallInContext = "Ogiltigt API-anrop i den aktuella kontexten.";
 Strings.OfficeOM.L_InvalidArgument = "Argumentet {0} fungerar inte för den här situationen, saknas eller har felaktigt format.";

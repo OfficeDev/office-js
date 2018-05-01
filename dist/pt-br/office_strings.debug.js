@@ -1,4 +1,4 @@
-/* Version: 16.0.9309.1000 */
+/* Version: 16.0.9027.1000 */
 
 Type.registerNamespace("Strings");
 Strings.OfficeOM = function()
@@ -20,7 +20,7 @@ Strings.OfficeOM.L_BindingCreationError = "Erro de criação de ligação";
 Strings.OfficeOM.L_BindingNotExist = "A ligação especificada não existe.";
 Strings.OfficeOM.L_BindingToMultipleSelection = "Não há suporte para várias seleções não contíguas.";
 Strings.OfficeOM.L_BrowserAPINotSupported = "Este navegador não oferece suporte para a API solicitada.";
-Strings.OfficeOM.L_CallbackNotAFunction = "O retorno de chamada deve ser do tipo função, era do tipo {0}."
+Strings.OfficeOM.L_CallbackNotAFunction = "O retorno de chamada deve ser do tipo função, era do tipo {0}.";
 Strings.OfficeOM.L_CannotApplyPropertyThroughSetMethod = "Altera a propriedade '{0}' que não pode ser aplicada por meio de um método \"object.set\".";
 Strings.OfficeOM.L_CannotNavigateTo = "O objeto está localizado em um local onde a navegação não é suportada.";
 Strings.OfficeOM.L_CannotRegisterEvent = "Não é possível registrar o manipulador de eventos.";
@@ -149,7 +149,7 @@ Strings.OfficeOM.L_ReadSettingsError = "Erro de leitura de configurações";
 Strings.OfficeOM.L_RedundantCallbackSpecification = "O retorno de chamada não pode ser especificado na lista de argumentos e no objeto opcional.";
 Strings.OfficeOM.L_RequestTimeout = "A chamada demorou muito tempo para executar.";
 Strings.OfficeOM.L_RequestTokenUnavailable = "Esta API foi limitada para reduzir a frequência de chamada.";
-Strings.OfficeOM.L_RowIndexOutOfRange = "O valor de índice de linha está fora do intervalo permitido. Use um valor (0 ou superior) que seja menor do que o número de linhas.";
+Strings.OfficeOM.L_RowIndexOutOfRange = "O valor de índice de linha está fora do intervalo permitido. Use um valor (0 ou superior) que seja menor do que o número de linhas."
 Strings.OfficeOM.L_RunMustReturnPromise = 'A função de lote passada para o método ".run" não retornou uma promessa. A função deve retornar uma promessa para que todos os objetos rastreados automaticamente possam ser liberados na conclusão da operação em lote. Normalmente, você deve retornar uma promessa enviando a resposta de "context.sync()".';
 Strings.OfficeOM.L_SSOClientError = "Ocorreu um erro na solicitação de autenticação do Office.";
 Strings.OfficeOM.L_SSOClientErrorMessage = "Ocorreu um erro inesperado no cliente.";

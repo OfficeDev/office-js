@@ -1,4 +1,4 @@
-/* Version: 16.0.9309.1000 */
+/* Version: 16.0.9027.1000 */
 
 Type.registerNamespace("Strings");
 Strings.OfficeOM = function()
@@ -20,7 +20,7 @@ Strings.OfficeOM.L_BindingCreationError = "绑定创建错误";
 Strings.OfficeOM.L_BindingNotExist = "指定的绑定不存在。";
 Strings.OfficeOM.L_BindingToMultipleSelection = "不支持非连续选择。";
 Strings.OfficeOM.L_BrowserAPINotSupported = "此浏览器不支持请求的 API。";
-Strings.OfficeOM.L_CallbackNotAFunction = "回调必须是函数类型，而其类型为 {0}。"
+Strings.OfficeOM.L_CallbackNotAFunction = "回调必须是函数类型，而其类型为 {0}。";
 Strings.OfficeOM.L_CannotApplyPropertyThroughSetMethod = '无法通过 "object.set" 方法应用对属性“{0}”的更改。';
 Strings.OfficeOM.L_CannotNavigateTo = "该对象位于不支持导航的位置。";
 Strings.OfficeOM.L_CannotRegisterEvent = "无法注册事件处理程序。";
@@ -73,7 +73,7 @@ Strings.OfficeOM.L_GetDataParametersConflict = "指定的参数发生冲突。";
 Strings.OfficeOM.L_GetSelectionNotSupported = "不支持当前所选内容。";
 Strings.OfficeOM.L_HostError = "主机错误";
 Strings.OfficeOM.L_InValidOptionalArgument = "可选参数无效";
-Strings.OfficeOM.L_IndexOutOfRange = "索引超出范围。";
+Strings.OfficeOM.L_IndexOutOfRange = "索引超出范围。"
 Strings.OfficeOM.L_InitializeNotReady = "Office.js 尚未完全加载。请稍后再试或者确保在 Office.initialize 函数上添加初始化代码。";
 Strings.OfficeOM.L_InternalError = "内部错误";
 Strings.OfficeOM.L_InternalErrorDescription = "发生了内部错误。";

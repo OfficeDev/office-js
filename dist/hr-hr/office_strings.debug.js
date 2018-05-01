@@ -1,4 +1,4 @@
-/* Version: 16.0.9309.1000 */
+/* Version: 16.0.9027.1000 */
 
 Type.registerNamespace("Strings");
 Strings.OfficeOM = function()
@@ -20,7 +20,7 @@ Strings.OfficeOM.L_BindingCreationError = "Pogreška pri stvaranju povezivanja";
 Strings.OfficeOM.L_BindingNotExist = "Navedeno povezivanje ne postoji.";
 Strings.OfficeOM.L_BindingToMultipleSelection = "Odabiri koji nisu susjedni nisu podržani.";
 Strings.OfficeOM.L_BrowserAPINotSupported = "Preglednik ne podržava zatraženi API.";
-Strings.OfficeOM.L_CallbackNotAFunction = "Povratni poziv mora biti vrste funkcija, a sada je vrsta {0}."
+Strings.OfficeOM.L_CallbackNotAFunction = "Povratni poziv mora biti vrste funkcija, a sada je vrsta {0}.";
 Strings.OfficeOM.L_CannotApplyPropertyThroughSetMethod = "Promjene svojstva '{0}' ne mogu se primijeniti kroz metodu \"object.set\".";
 Strings.OfficeOM.L_CannotNavigateTo = "Objekt se nalazi na mjestu na kojem nije podržana navigacija.";
 Strings.OfficeOM.L_CannotRegisterEvent = "Nije moguće registrirati rukovatelj događajima.";
@@ -44,7 +44,7 @@ Strings.OfficeOM.L_CustomXmlNodeNotFound = "Navedeni čvor nije pronađen.";
 Strings.OfficeOM.L_CustomXmlOutOfDateMessage = "Podaci su zastarjeli. Ponovno dohvatite objekt.";
 Strings.OfficeOM.L_CustomXmlOutOfDateName = "Zastarjeli podaci";
 Strings.OfficeOM.L_DataNotMatchBindingSize = "Priloženi podatkovni objekt ne odgovara veličini trenutnog odabira.";
-Strings.OfficeOM.L_DataNotMatchBindingType = "Navedeni podatkovni objekt nije kompatibilan s tom vrstom povezivanja.";
+Strings.OfficeOM.L_DataNotMatchBindingType = "Navedeni podatkovni objekt nije kompatibilan s tom vrstom prisile.";
 Strings.OfficeOM.L_DataNotMatchCoercionType = "Vrsta navedenog podatkovnog objekta nije kompatibilna s navedenim odabirom.";
 Strings.OfficeOM.L_DataNotMatchSelection = "Priloženi podatkovni objekt nije kompatibilan s tim oblikom ili dimenzijama trenutnog odabira.";
 Strings.OfficeOM.L_DataReadError = "Pogreška pri čitanju podataka";
@@ -144,7 +144,7 @@ Strings.OfficeOM.L_OutOfRange = "Izvan raspona";
 Strings.OfficeOM.L_OverwriteWorksheetData = "Operacija skupa nije uspjela jer će priloženi podatkovni objekt prebrisati ili pomaknuti podatke.";
 Strings.OfficeOM.L_PermissionDenied = "Dozvola je odbijena";
 Strings.OfficeOM.L_PropertyDoesNotExist = "Svojstvo '{0}' ne postoji za objekt.";
-Strings.OfficeOM.L_PropertyNotLoaded = "Svojstvo '{0}' nije dostupno. Prije čitanja vrijednosti svojstva pozovite metodu učitavanja na objektu koji sadrži to svojstvo te pozovite \"context.sync()\" u kontekstu pridruženog zahtjeva.";
+Strings.OfficeOM.L_PropertyNotLoaded = "Svojstvo '{0}' nije dostupno. Prije čitanja vrijednosti svojstva pozovite metodu učitavanja na objektu koji sadrži to svojstvo te pozovite \"context.sync()\" u kontekstu pridruženog zahtjeva."
 Strings.OfficeOM.L_ReadSettingsError = "Pogreška postavki čitanja";
 Strings.OfficeOM.L_RedundantCallbackSpecification = "Povratni poziv nije moguće navesti i na popisu argumenata i u neobaveznom objektu.";
 Strings.OfficeOM.L_RequestTimeout = "Izvršavanje poziva trajalo je predugo.";

@@ -1,4 +1,4 @@
-/* Version: 16.0.9309.1000 */
+/* Version: 16.0.9027.1000 */
 
 Type.registerNamespace("Strings");
 Strings.OfficeOM = function()
@@ -20,13 +20,13 @@ Strings.OfficeOM.L_BindingCreationError = "Errore di creazione associazione";
 Strings.OfficeOM.L_BindingNotExist = "L'associazione specificata non esiste.";
 Strings.OfficeOM.L_BindingToMultipleSelection = "Le selezioni non contigue non sono supportate.";
 Strings.OfficeOM.L_BrowserAPINotSupported = "Il browser non supporta l'API richiesta.";
-Strings.OfficeOM.L_CallbackNotAFunction = "Il callback deve essere di tipo funzione. Rilevato tipo {0}."
+Strings.OfficeOM.L_CallbackNotAFunction = "Il callback deve essere di tipo funzione. Rilevato tipo {0}.";
 Strings.OfficeOM.L_CannotApplyPropertyThroughSetMethod = "Non è possibile applicare le modifiche alla proprietà '{0}' tramite un metodo \"object.set\".";
 Strings.OfficeOM.L_CannotNavigateTo = "L'oggetto si trova in una posizione in cui non è supportato lo spostamento.";
 Strings.OfficeOM.L_CannotRegisterEvent = "Non è possibile registrare il gestore eventi.";
 Strings.OfficeOM.L_CannotWriteToSelection = "Non è possibile scrivere sulla selezione corrente.";
 Strings.OfficeOM.L_CellDataAmountBeyondLimits = "Nota: è consigliabile che il numero di celle di una tabella sia inferiore a 20.000.";
-Strings.OfficeOM.L_CellFormatAmountBeyondLimits = "Nota: è consigliabile che i set di formattazione impostati da una chiamata all'API Formatting siano inferiori a 100.";
+Strings.OfficeOM.L_CellFormatAmountBeyondLimits = "Nota: è consigliabile che i set di formattazione impostati da una chiamata all'API Formatting siano inferiori a 100."
 Strings.OfficeOM.L_CloseFileBeforeRetrieve = "Chiamare closeAsync nel file corrente prima di recuperarne un altro.";
 Strings.OfficeOM.L_CoercionTypeNotMatchBinding = "Il tipo di coercizione specificato non è compatibile con questo tipo di associazione.";
 Strings.OfficeOM.L_CoercionTypeNotSupported = "Il tipo di coercizione specificato non è supportato.";

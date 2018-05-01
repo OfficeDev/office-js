@@ -1,4 +1,4 @@
-/* Version: 16.0.9309.1000 */
+/* Version: 16.0.9027.1000 */
 
 Type.registerNamespace("Strings");
 Strings.OfficeOM = function()
@@ -20,7 +20,7 @@ Strings.OfficeOM.L_BindingCreationError = "Une erreur s'est produite lors de la 
 Strings.OfficeOM.L_BindingNotExist = "Désolé… La liaison spécifiée n’existe pas.";
 Strings.OfficeOM.L_BindingToMultipleSelection = "Les sélections non contiguës ne sont pas prises en charge.";
 Strings.OfficeOM.L_BrowserAPINotSupported = "Ce navigateur ne prend pas en charge l’API demandée.";
-Strings.OfficeOM.L_CallbackNotAFunction = "Le rappel était de type {0}, alors qu'il doit être de type fonction."
+Strings.OfficeOM.L_CallbackNotAFunction = "Le rappel était de type {0}, alors qu'il doit être de type fonction.";
 Strings.OfficeOM.L_CannotApplyPropertyThroughSetMethod = "Les modifications apportées à la propriété « {0} » ne peuvent pas être appliquées via une méthode « object.set ».";
 Strings.OfficeOM.L_CannotNavigateTo = "L’objet est situé dans un emplacement où la navigation n’est pas prise en charge.";
 Strings.OfficeOM.L_CannotRegisterEvent = "Le gestionnaire d’événements ne peut pas être inscrit.";
@@ -161,7 +161,7 @@ Strings.OfficeOM.L_SSOUserConsentNotSupportedByCurrentAddinCategory = "Ce compl�
 Strings.OfficeOM.L_SSOUserConsentNotSupportedByCurrentAddinCategoryMessage = "L’opération a échoué, car ce complément ne prend pas en charge le consentement de l’utilisateur dans cette catégorie";
 Strings.OfficeOM.L_SaveSettingsError = "Une erreur s'est produite lors de l'enregistrement des paramètres";
 Strings.OfficeOM.L_SelectionCannotBound = "Désolé... Nous ne pouvons pas effectuer de liaison avec la sélection actuelle.";
-Strings.OfficeOM.L_SelectionNotSupportCoercionType = "La sélection actuelle n’est pas compatible avec le type de forçage spécifié.";
+Strings.OfficeOM.L_SelectionNotSupportCoercionType = "La sélection actuelle n’est pas compatible avec le type de forçage spécifié."
 Strings.OfficeOM.L_SetDataIsTooLarge = "L’objet de données spécifié est trop volumineux.";
 Strings.OfficeOM.L_SetDataParametersConflict = "Les paramètres spécifiés sont en conflit.";
 Strings.OfficeOM.L_SettingNameNotExist = "Désolé… Le nom de paramètre spécifié n’existe pas.";

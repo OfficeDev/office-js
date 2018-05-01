@@ -1,4 +1,4 @@
-/* Version: 16.0.9309.1000 */
+/* Version: 16.0.9027.1000 */
 
 Type.registerNamespace("Strings");
 Strings.OfficeOM = function()
@@ -20,7 +20,7 @@ Strings.OfficeOM.L_BindingCreationError = "Eroare de creare a legării";
 Strings.OfficeOM.L_BindingNotExist = "Legarea specificată nu există.";
 Strings.OfficeOM.L_BindingToMultipleSelection = "Selecțiile neadiacente nu sunt acceptate.";
 Strings.OfficeOM.L_BrowserAPINotSupported = "Acest browser nu acceptă API solicitat.";
-Strings.OfficeOM.L_CallbackNotAFunction = "Apelul invers trebuie să fie de tipul funcție, a fost de tipul {0}."
+Strings.OfficeOM.L_CallbackNotAFunction = "Apelul invers trebuie să fie de tipul funcție, a fost de tipul {0}.";
 Strings.OfficeOM.L_CannotApplyPropertyThroughSetMethod = "Schimbările proprietății „{0}” nu pot fi aplicate printr-o metodă „object.set”.";
 Strings.OfficeOM.L_CannotNavigateTo = "Obiectul este situat într-un loc unde nu este acceptată navigarea.";
 Strings.OfficeOM.L_CannotRegisterEvent = "Rutina de tratare a evenimentelor nu poate fi înregistrată.";
@@ -81,7 +81,7 @@ Strings.OfficeOM.L_InvalidAPICall = "Apel API nevalid";
 Strings.OfficeOM.L_InvalidApiArgumentsMessage = "Argumente de intrare nevalide.";
 Strings.OfficeOM.L_InvalidApiCallInContext = "Apel API nevalid în contextul curent.";
 Strings.OfficeOM.L_InvalidArgument = "Argumentul „{0}” nu funcționează pentru această situație, lipsește sau nu este în formatul corect.";
-Strings.OfficeOM.L_InvalidArgumentGeneric = "Argumentele transmise funcției nu funcționează pentru această situație, lipsesc sau nu sunt în formatul corect.";
+Strings.OfficeOM.L_InvalidArgumentGeneric = "Argumentele transmise funcției nu funcționează pentru această situație, lipsesc sau nu sunt în formatul corect."
 Strings.OfficeOM.L_InvalidBinding = "Legare nevalidă";
 Strings.OfficeOM.L_InvalidBindingError = "Eroare de legare nevalidă";
 Strings.OfficeOM.L_InvalidBindingOperation = "Operația de legare nu este validă";
