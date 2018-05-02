@@ -1,4 +1,4 @@
-/* Version: 16.0.9027.1000 */
+/* Version: 16.0.9309.1000 */
 
 Type.registerNamespace("Strings");
 Strings.OfficeOM = function()
@@ -20,7 +20,7 @@ Strings.OfficeOM.L_BindingCreationError = "Erro de creación da vinculación";
 Strings.OfficeOM.L_BindingNotExist = "A vinculación especificada non existe.";
 Strings.OfficeOM.L_BindingToMultipleSelection = "As seleccións non contiguas non son compatibles.";
 Strings.OfficeOM.L_BrowserAPINotSupported = "Este explorador non é compatible coa API solicitada.";
-Strings.OfficeOM.L_CallbackNotAFunction = "A chamada de retorno debe ser de tipo función, pero era de tipo {0}.";
+Strings.OfficeOM.L_CallbackNotAFunction = "A chamada de retorno debe ser de tipo función, pero era de tipo {0}."
 Strings.OfficeOM.L_CannotApplyPropertyThroughSetMethod = 'Non se poden aplicar os cambios á propiedade "{0}" a través dun método "object.set".';
 Strings.OfficeOM.L_CannotNavigateTo = "O obxecto está situado nun lugar onde a navegación non é compatible.";
 Strings.OfficeOM.L_CannotRegisterEvent = "O indicador de eventos non se pode rexistrar.";
@@ -137,7 +137,7 @@ Strings.OfficeOM.L_NotSupportedEventType = "O tipo de evento especificado {0} no
 Strings.OfficeOM.L_OperationCancelledError = "Operación cancelada";
 Strings.OfficeOM.L_OperationCancelledErrorMessage = "O usuario cancelou a operación.";
 Strings.OfficeOM.L_OperationNotSupported = "A operación non é compatible.";
-Strings.OfficeOM.L_OperationNotSupportedOnMatrixData = "O contido seleccionado ten que estar en formato de táboa. Formata os datos como unha táboa e téntao de novo."
+Strings.OfficeOM.L_OperationNotSupportedOnMatrixData = "O contido seleccionado ten que estar en formato de táboa. Formata os datos como unha táboa e téntao de novo.";
 Strings.OfficeOM.L_OperationNotSupportedOnThisBindingType = "A operación non é compatible neste tipo de vinculación.";
 Strings.OfficeOM.L_OsfControlTypeNotSupported = "O tipo OsfControl non é compatible.";
 Strings.OfficeOM.L_OutOfRange = "Fóra do intervalo";
@@ -160,7 +160,7 @@ Strings.OfficeOM.L_SSOServerErrorMessage = "Ocorreu un erro inesperado no servid
 Strings.OfficeOM.L_SSOUserConsentNotSupportedByCurrentAddinCategory = "Este suplemento non admite o consentimento do usuario.";
 Strings.OfficeOM.L_SSOUserConsentNotSupportedByCurrentAddinCategoryMessage = "Produciuse un erro na operación porque este suplemento non admite o consentimento do usuario nesta categoría.";
 Strings.OfficeOM.L_SaveSettingsError = "Erro de configuración da función gardar";
-Strings.OfficeOM.L_SelectionCannotBound = "Non se pode ligar á selección actual.";
+Strings.OfficeOM.L_SelectionCannotBound = "Non se pode vincular á selección actual.";
 Strings.OfficeOM.L_SelectionNotSupportCoercionType = "A selección actual non é compatible co tipo de coerción especificada.";
 Strings.OfficeOM.L_SetDataIsTooLarge = "O obxecto de datos especificado é moi grande.";
 Strings.OfficeOM.L_SetDataParametersConflict = "Os parámetros especificados teñen conflitos.";

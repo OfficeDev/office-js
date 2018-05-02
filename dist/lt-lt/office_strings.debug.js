@@ -1,4 +1,4 @@
-/* Version: 16.0.9027.1000 */
+/* Version: 16.0.9309.1000 */
 
 Type.registerNamespace("Strings");
 Strings.OfficeOM = function()
@@ -20,7 +20,7 @@ Strings.OfficeOM.L_BindingCreationError = "Susiejimo kūrimo klaida";
 Strings.OfficeOM.L_BindingNotExist = "Nurodyto susiejimo nėra.";
 Strings.OfficeOM.L_BindingToMultipleSelection = "Negretimų elementų žymėjimas nepalaikomas.";
 Strings.OfficeOM.L_BrowserAPINotSupported = "Ši naršyklė nepalaiko užklaustos API.";
-Strings.OfficeOM.L_CallbackNotAFunction = "Atgalinis iškvietimas turi būti funkcijos tipo, o buvo tipo {0}.";
+Strings.OfficeOM.L_CallbackNotAFunction = "Atgalinis iškvietimas turi būti funkcijos tipo, o buvo tipo {0}."
 Strings.OfficeOM.L_CannotApplyPropertyThroughSetMethod = "Negalima taikyti ypatybės „{0}“ pakeitimų naudojant „object.set“ metodą.";
 Strings.OfficeOM.L_CannotNavigateTo = "Objektas yra vietoje, kurioje nepalaikomas naršymas.";
 Strings.OfficeOM.L_CannotRegisterEvent = "Įvykio apdorojimo programos užregistruoti nepavyko.";
@@ -135,7 +135,7 @@ Strings.OfficeOM.L_NotSupported = "Funkcija {0} nepalaikoma.";
 Strings.OfficeOM.L_NotSupportedBindingType = "Nurodytas susiejimo tipas {0} nepalaikomas.";
 Strings.OfficeOM.L_NotSupportedEventType = "Nurodytas įvykio tipas {0} nepalaikomas.";
 Strings.OfficeOM.L_OperationCancelledError = "Operacija atšaukta";
-Strings.OfficeOM.L_OperationCancelledErrorMessage = "Vartotojas atšaukė operaciją."
+Strings.OfficeOM.L_OperationCancelledErrorMessage = "Vartotojas atšaukė operaciją.";
 Strings.OfficeOM.L_OperationNotSupported = "Operacija nepalaikoma.";
 Strings.OfficeOM.L_OperationNotSupportedOnMatrixData = "Pasirinktas turinys turi būti lentelės formatu. Suformatuokite duomenis kaip lentelę ir bandykite dar kartą.";
 Strings.OfficeOM.L_OperationNotSupportedOnThisBindingType = "Operacija nepalaikoma šiam susiejimo tipui.";

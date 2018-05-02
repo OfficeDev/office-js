@@ -1,4 +1,4 @@
-/* Version: 16.0.9027.1000 */
+/* Version: 16.0.9309.1000 */
 
 Type.registerNamespace("Strings");
 Strings.OfficeOM = function()
@@ -20,7 +20,7 @@ Strings.OfficeOM.L_BindingCreationError = "Kötés-létrehozási hiba";
 Strings.OfficeOM.L_BindingNotExist = "A megadott kötés nem létezik.";
 Strings.OfficeOM.L_BindingToMultipleSelection = "A nem összefüggő kijelölések használata nem támogatott.";
 Strings.OfficeOM.L_BrowserAPINotSupported = "Böngészője nem támogatja a kért API-t.";
-Strings.OfficeOM.L_CallbackNotAFunction = "A visszahívás típusa csak függvény lehet, de ehelyett {0} típusú volt.";
+Strings.OfficeOM.L_CallbackNotAFunction = "A visszahívás típusa csak függvény lehet, de ehelyett {0} típusú volt."
 Strings.OfficeOM.L_CannotApplyPropertyThroughSetMethod = "A(z) {0} tulajdonság módosításai nem léptethetők érvénybe object.set metódussal.";
 Strings.OfficeOM.L_CannotNavigateTo = "Az objektum olyan helyen található, ahol a navigálás nem támogatott.";
 Strings.OfficeOM.L_CannotRegisterEvent = "Sikertelen volt az eseménykezelő regisztrálása.";
@@ -66,7 +66,7 @@ Strings.OfficeOM.L_EventHandlerRemovalFailed = "Nem sikerült eltávolítani az 
 Strings.OfficeOM.L_EventRegistrationError = "Eseményregisztrációs hiba";
 Strings.OfficeOM.L_FileTypeNotSupported = "A megadott fájltípus nem támogatott.";
 Strings.OfficeOM.L_FormatValueOutOfRange = "Az érték kívül esik a megengedett tartományon.";
-Strings.OfficeOM.L_FormattingReminder = "Formázási emlékeztető"
+Strings.OfficeOM.L_FormattingReminder = "Formázási emlékeztető";
 Strings.OfficeOM.L_FunctionCallFailed = "A(z) {0} függvény hívása sikertelen, hibakód: {1}.";
 Strings.OfficeOM.L_GetDataIsTooLarge = "A kért adatkészlet túl nagy.";
 Strings.OfficeOM.L_GetDataParametersConflict = "A megadott paraméterek ütköznek.";

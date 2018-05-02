@@ -1,4 +1,4 @@
-/* Version: 16.0.9027.1000 */
+/* Version: 16.0.9309.1000 */
 
 Type.registerNamespace("Strings");
 Strings.OfficeOM = function()
@@ -20,7 +20,7 @@ Strings.OfficeOM.L_BindingCreationError = "No se pudo crear el enlace";
 Strings.OfficeOM.L_BindingNotExist = "El enlace especificado no existe.";
 Strings.OfficeOM.L_BindingToMultipleSelection = "No se admiten las selecciones discontinuas.";
 Strings.OfficeOM.L_BrowserAPINotSupported = "Este explorador no es compatible con la API solicitada.";
-Strings.OfficeOM.L_CallbackNotAFunction = "La devolución de llamada debe ser de tipo función. Era de tipo {0}.";
+Strings.OfficeOM.L_CallbackNotAFunction = "La devolución de llamada debe ser de tipo función. Era de tipo {0}."
 Strings.OfficeOM.L_CannotApplyPropertyThroughSetMethod = 'Los cambios en la propiedad "{0}" no se puede aplicar a través de un método "object.set".';
 Strings.OfficeOM.L_CannotNavigateTo = "El objeto se encuentra en una ubicación donde no se admite la navegación.";
 Strings.OfficeOM.L_CannotRegisterEvent = "No se puede registrar el controlador de eventos.";
@@ -158,7 +158,7 @@ Strings.OfficeOM.L_SSOConnectionLostErrorMessage = "Se perdió una conexión dur
 Strings.OfficeOM.L_SSOServerError = "Se produjo un error en el proveedor de autenticación.";
 Strings.OfficeOM.L_SSOServerErrorMessage = "Se produjo un error inesperado en el servidor.";
 Strings.OfficeOM.L_SSOUserConsentNotSupportedByCurrentAddinCategory = "Este complemento no admite el consentimiento del usuario.";
-Strings.OfficeOM.L_SSOUserConsentNotSupportedByCurrentAddinCategoryMessage = "Se ha producido un error en la operación porque el complemento no admite el consentimiento del usuario en esta categoría"
+Strings.OfficeOM.L_SSOUserConsentNotSupportedByCurrentAddinCategoryMessage = "Se ha producido un error en la operación porque el complemento no admite el consentimiento del usuario en esta categoría";
 Strings.OfficeOM.L_SaveSettingsError = "Error de configuración de guardado";
 Strings.OfficeOM.L_SelectionCannotBound = "No se puede enlazar a la selección actual.";
 Strings.OfficeOM.L_SelectionNotSupportCoercionType = "La selección actual no es compatible con el tipo de conversión especificado.";
