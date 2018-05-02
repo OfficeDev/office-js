@@ -1,4 +1,4 @@
-/* Version: 16.0.9106.1000 */
+/* Version: 16.0.9314.1000 */
 
 Type.registerNamespace("Strings");
 Strings.OfficeOM = function()
@@ -20,7 +20,7 @@ Strings.OfficeOM.L_BindingCreationError = "Susiejimo kūrimo klaida";
 Strings.OfficeOM.L_BindingNotExist = "Nurodyto susiejimo nėra.";
 Strings.OfficeOM.L_BindingToMultipleSelection = "Negretimų elementų žymėjimas nepalaikomas.";
 Strings.OfficeOM.L_BrowserAPINotSupported = "Ši naršyklė nepalaiko užklaustos API.";
-Strings.OfficeOM.L_CallbackNotAFunction = "Atgalinis iškvietimas turi būti funkcijos tipo, o buvo tipo {0}.";
+Strings.OfficeOM.L_CallbackNotAFunction = "Atgalinis iškvietimas turi būti funkcijos tipo, o buvo tipo {0}."
 Strings.OfficeOM.L_CannotApplyPropertyThroughSetMethod = "Negalima taikyti ypatybės „{0}“ pakeitimų naudojant „object.set“ metodą.";
 Strings.OfficeOM.L_CannotNavigateTo = "Objektas yra vietoje, kurioje nepalaikomas naršymas.";
 Strings.OfficeOM.L_CannotRegisterEvent = "Įvykio apdorojimo programos užregistruoti nepavyko.";
@@ -31,7 +31,7 @@ Strings.OfficeOM.L_CloseFileBeforeRetrieve = "Kreiptis į „closeAsync“ dabar
 Strings.OfficeOM.L_CoercionTypeNotMatchBinding = "Nurodytas konvertavimo tipas nesuderinamas su šiuo susiejimo tipu.";
 Strings.OfficeOM.L_CoercionTypeNotSupported = "Nurodytas konvertavimo tipas nepalaikomas.";
 Strings.OfficeOM.L_ColIndexOutOfRange = "Stulpelių indekso reikšmė nepriklauso leidžiamam diapazonui. Naudokite reikšmę (0 arba didesnę), kuri būtų mažesnė už stulpelių skaičių.";
-Strings.OfficeOM.L_ConnectionFailureWithDetails = "Užklausa nepavyko, būsenos kodas {0}, klaidos kodas {1}, klaidos pranešimas: {2}"
+Strings.OfficeOM.L_ConnectionFailureWithDetails = "Užklausa nepavyko, būsenos kodas {0}, klaidos kodas {1}, klaidos pranešimas: {2}";
 Strings.OfficeOM.L_ConnectionFailureWithStatus = "Užklausa nepavyko, būsenos kodas {0}.";
 Strings.OfficeOM.L_CustomFunctionDefinitionMissing = "Excel.CustomFunctions klasėje turi būti ypatybė su šiuo pavadinimu, kuris nurodo funkcijos apibrėžimą.";
 Strings.OfficeOM.L_CustomFunctionImplementationMissing = "Excel.CustomFunctions klasės ypatybėje su šiuo pavadinimu, nurodančioje funkcijos apibrėžimą, turi būti ypatybė „call“, realizuojanti funkciją.";

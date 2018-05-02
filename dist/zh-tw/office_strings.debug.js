@@ -1,4 +1,4 @@
-/* Version: 16.0.9106.1000 */
+/* Version: 16.0.9314.1000 */
 
 Type.registerNamespace("Strings");
 Strings.OfficeOM = function()
@@ -20,7 +20,7 @@ Strings.OfficeOM.L_BindingCreationError = "繫結建立錯誤";
 Strings.OfficeOM.L_BindingNotExist = "指定的繫結不存在。";
 Strings.OfficeOM.L_BindingToMultipleSelection = "不支援選取多個非連續項目。";
 Strings.OfficeOM.L_BrowserAPINotSupported = "此瀏覽器不支援要求的 API。";
-Strings.OfficeOM.L_CallbackNotAFunction = "回撥必須是類型函數、曾是類型 {0}。";
+Strings.OfficeOM.L_CallbackNotAFunction = "回撥必須是類型函數、曾是類型 {0}。"
 Strings.OfficeOM.L_CannotApplyPropertyThroughSetMethod = "無法透過 \"object.set\" 方法套用對屬性 '{0}' 所做的變更。";
 Strings.OfficeOM.L_CannotNavigateTo = "物件位於不支援導覽的位置。";
 Strings.OfficeOM.L_CannotRegisterEvent = "無法登錄事件處理常式。";
@@ -87,7 +87,7 @@ Strings.OfficeOM.L_InvalidBindingError = "無效的繫結錯誤";
 Strings.OfficeOM.L_InvalidBindingOperation = "無效的繫結作業";
 Strings.OfficeOM.L_InvalidCellsValue = "一或多個儲存格參數有不允許使用的值。請再次檢查值，然後重試一次。";
 Strings.OfficeOM.L_InvalidCoercion = "無效的強制型轉類型";
-Strings.OfficeOM.L_InvalidColumnsForBinding = "指定的欄無效。"
+Strings.OfficeOM.L_InvalidColumnsForBinding = "指定的欄無效。";
 Strings.OfficeOM.L_InvalidDataFormat = "指定的資料物件格式無效。";
 Strings.OfficeOM.L_InvalidDataObject = "無效的資料物件";
 Strings.OfficeOM.L_InvalidFormat = "無效的格式錯誤";

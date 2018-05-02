@@ -1,4 +1,4 @@
-/* Version: 16.0.9106.1000 */
+/* Version: 16.0.9314.1000 */
 
 Type.registerNamespace("Strings");
 Strings.OfficeOM = function()
@@ -20,7 +20,7 @@ Strings.OfficeOM.L_BindingCreationError = "Грешка при създаван�
 Strings.OfficeOM.L_BindingNotExist = "Указаното обвързване не съществува.";
 Strings.OfficeOM.L_BindingToMultipleSelection = "Не се поддържат несъседни селекции.";
 Strings.OfficeOM.L_BrowserAPINotSupported = "Този браузър не поддържа искания API.";
-Strings.OfficeOM.L_CallbackNotAFunction = "Обратното повикване трябва да е от тип функция, а беше от тип {0}.";
+Strings.OfficeOM.L_CallbackNotAFunction = "Обратното повикване трябва да е от тип функция, а беше от тип {0}."
 Strings.OfficeOM.L_CannotApplyPropertyThroughSetMethod = 'Промените в свойство "{0}" не могат да бъдат приложени чрез метод "object.set".';
 Strings.OfficeOM.L_CannotNavigateTo = "Обектът се намира на място, където не се поддържа навигация.";
 Strings.OfficeOM.L_CannotRegisterEvent = "Манипулаторът на събитие не може да бъде регистриран.";
@@ -182,7 +182,7 @@ Strings.OfficeOM.L_TooManyOptionalObjects = "няколко опционални
 Strings.OfficeOM.L_UnknownBindingType = "Типът на обвързването не се поддържа.";
 Strings.OfficeOM.L_UnsupportedDataObject = "Подаденият тип на обект с данни не се поддържа.";
 Strings.OfficeOM.L_UnsupportedEnumeration = "Неподдържано номериране";
-Strings.OfficeOM.L_UnsupportedEnumerationMessage = "Това номериране не се поддържа в текущото приложение хост."
+Strings.OfficeOM.L_UnsupportedEnumerationMessage = "Това номериране не се поддържа в текущото приложение хост.";
 Strings.OfficeOM.L_UnsupportedUserIdentity = "Типът самоличност на потребителя не се поддържа.";
 Strings.OfficeOM.L_UnsupportedUserIdentityMessage = "Типът самоличност на потребителя не се поддържа.";
 Strings.OfficeOM.L_UserAborted = "Потребителят прекрати искането за съгласие.";

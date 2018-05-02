@@ -1,4 +1,4 @@
-/* Version: 16.0.9106.1000 */
+/* Version: 16.0.9314.1000 */
 
 Type.registerNamespace("Strings");
 Strings.OfficeOM = function()
@@ -20,7 +20,7 @@ Strings.OfficeOM.L_BindingCreationError = "Eroare de creare a legării";
 Strings.OfficeOM.L_BindingNotExist = "Legarea specificată nu există.";
 Strings.OfficeOM.L_BindingToMultipleSelection = "Selecțiile neadiacente nu sunt acceptate.";
 Strings.OfficeOM.L_BrowserAPINotSupported = "Acest browser nu acceptă API solicitat.";
-Strings.OfficeOM.L_CallbackNotAFunction = "Apelul invers trebuie să fie de tipul funcție, a fost de tipul {0}.";
+Strings.OfficeOM.L_CallbackNotAFunction = "Apelul invers trebuie să fie de tipul funcție, a fost de tipul {0}."
 Strings.OfficeOM.L_CannotApplyPropertyThroughSetMethod = "Schimbările proprietății „{0}” nu pot fi aplicate printr-o metodă „object.set”.";
 Strings.OfficeOM.L_CannotNavigateTo = "Obiectul este situat într-un loc unde nu este acceptată navigarea.";
 Strings.OfficeOM.L_CannotRegisterEvent = "Rutina de tratare a evenimentelor nu poate fi înregistrată.";
@@ -167,7 +167,7 @@ Strings.OfficeOM.L_SetDataParametersConflict = "Parametrii specificați sunt în
 Strings.OfficeOM.L_SettingNameNotExist = "Numele de setare specificat nu există.";
 Strings.OfficeOM.L_SettingsAreStale = "Setările nu au putut fi salvate pentru că nu sunt actuale.";
 Strings.OfficeOM.L_SettingsCannotSave = "Setările nu s-au putut salva.";
-Strings.OfficeOM.L_SettingsStaleError = "Eroare de setări învechite"
+Strings.OfficeOM.L_SettingsStaleError = "Eroare de setări învechite";
 Strings.OfficeOM.L_ShowWindowDialogNotification = "{0} dorește să afișeze o fereastră nouă.";
 Strings.OfficeOM.L_ShowWindowDialogNotificationAllow = "Se permite";
 Strings.OfficeOM.L_ShowWindowDialogNotificationIgnore = "Ignorare";

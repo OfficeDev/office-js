@@ -1,4 +1,4 @@
-/* Version: 16.0.9106.1000 */
+/* Version: 16.0.9314.1000 */
 
 Type.registerNamespace("Strings");
 Strings.OfficeOM = function()
@@ -20,7 +20,7 @@ Strings.OfficeOM.L_BindingCreationError = "Chyba vytváření vazby";
 Strings.OfficeOM.L_BindingNotExist = "Zadaná vazba neexistuje.";
 Strings.OfficeOM.L_BindingToMultipleSelection = "Nesouvislé výběry nejsou podporované.";
 Strings.OfficeOM.L_BrowserAPINotSupported = "Tento prohlížeč nepodporuje požadované rozhraní API.";
-Strings.OfficeOM.L_CallbackNotAFunction = "Zpětné volání musí být typu funkce. Bylo typu {0}.";
+Strings.OfficeOM.L_CallbackNotAFunction = "Zpětné volání musí být typu funkce. Bylo typu {0}."
 Strings.OfficeOM.L_CannotApplyPropertyThroughSetMethod = "Pro změny vlastnosti {0} nejde použít metodu object.set.";
 Strings.OfficeOM.L_CannotNavigateTo = "Objekt je v umístění, kde se nepodporuje navigace.";
 Strings.OfficeOM.L_CannotRegisterEvent = "Nedá se zaregistrovat obslužná rutina události.";
@@ -142,7 +142,7 @@ Strings.OfficeOM.L_OperationNotSupportedOnThisBindingType = "Operace není u toh
 Strings.OfficeOM.L_OsfControlTypeNotSupported = "Typ OsfControl není podporovaný.";
 Strings.OfficeOM.L_OutOfRange = "Mimo rozsah";
 Strings.OfficeOM.L_OverwriteWorksheetData = "Operace nastavení se nepovedla, protože zadaný datový objekt přepíše nebo posune data.";
-Strings.OfficeOM.L_PermissionDenied = "Oprávnění odepřena"
+Strings.OfficeOM.L_PermissionDenied = "Oprávnění odepřena";
 Strings.OfficeOM.L_PropertyDoesNotExist = "Vlastnost {0} u objektu neexistuje.";
 Strings.OfficeOM.L_PropertyNotLoaded = "Vlastnost {0} není k dispozici. Před přečtením hodnoty vlastnosti volejte metodu pro načtení nadřazeného objektu a potom volejte context.sync() pro přidružený kontext požadavku.";
 Strings.OfficeOM.L_ReadSettingsError = "Chyba čtení nastavení";

@@ -1,4 +1,4 @@
-/* Version: 16.0.9106.1000 */
+/* Version: 16.0.9314.1000 */
 
 Type.registerNamespace("Strings");
 Strings.OfficeOM = function()
@@ -20,7 +20,7 @@ Strings.OfficeOM.L_BindingCreationError = "Lỗi Tạo Ghép nối";
 Strings.OfficeOM.L_BindingNotExist = "Kết ghép đã xác định không tồn tại.";
 Strings.OfficeOM.L_BindingToMultipleSelection = "Không hỗ trợ lựa chọn không liền nhau.";
 Strings.OfficeOM.L_BrowserAPINotSupported = "Trình duyệt này không hỗ trợ API được yêu cầu.";
-Strings.OfficeOM.L_CallbackNotAFunction = "Gọi lại phải là chức năng kiểu, thuộc kiểu {0}.";
+Strings.OfficeOM.L_CallbackNotAFunction = "Gọi lại phải là chức năng kiểu, thuộc kiểu {0}."
 Strings.OfficeOM.L_CannotApplyPropertyThroughSetMethod = "Không thể áp dụng thay đổi với thuộc tính '{0}' thông qua phương pháp \"object.set\".";
 Strings.OfficeOM.L_CannotNavigateTo = "Đối tượng nằm ở vị trí không hỗ trợ dẫn hướng.";
 Strings.OfficeOM.L_CannotRegisterEvent = "Không thể đăng ký quy trình xử lý sự kiện.";
@@ -149,7 +149,7 @@ Strings.OfficeOM.L_ReadSettingsError = "Lỗi Thiết đặt Đọc";
 Strings.OfficeOM.L_RedundantCallbackSpecification = "Gọi lại không thể được xác định trong cả danh sách đối số và đối tượng tùy chọn.";
 Strings.OfficeOM.L_RequestTimeout = "Cuộc gọi mất quá lâu để thực hiện.";
 Strings.OfficeOM.L_RequestTokenUnavailable = "API này đã được giới hạn để làm chậm tần số cuộc gọi.";
-Strings.OfficeOM.L_RowIndexOutOfRange = "Giá trị chỉ mục dòng nằm ngoài phạm vi cho phép. Hãy sử dụng một giá trị (0 hoặc cao hơn) và nhỏ hơn số lượng hàng."
+Strings.OfficeOM.L_RowIndexOutOfRange = "Giá trị chỉ mục dòng nằm ngoài phạm vi cho phép. Hãy sử dụng một giá trị (0 hoặc cao hơn) và nhỏ hơn số lượng hàng.";
 Strings.OfficeOM.L_RunMustReturnPromise = 'Hàm lô chuyển qua phương pháp ".run" không trả về một lời hứa. Hàm phải trả về một lời hứa, để có thể công bố mọi đối tượng được tự động theo dõi khi hoàn tất hoạt động lô. Thông thường, bạn sẽ trả về một lời hứa bằng cách trả về phản hồi từ "context.sync()".';
 Strings.OfficeOM.L_SSOClientError = "Đã xảy ra lỗi trong yêu cầu xác thực từ Office.";
 Strings.OfficeOM.L_SSOClientErrorMessage = "Đã xảy ra lỗi ngoài dự kiến trong máy khách.";

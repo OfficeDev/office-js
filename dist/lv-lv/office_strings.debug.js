@@ -1,4 +1,4 @@
-/* Version: 16.0.9106.1000 */
+/* Version: 16.0.9314.1000 */
 
 Type.registerNamespace("Strings");
 Strings.OfficeOM = function()
@@ -20,7 +20,7 @@ Strings.OfficeOM.L_BindingCreationError = "Saistījuma izveides kļūda";
 Strings.OfficeOM.L_BindingNotExist = "Norādītais saistījums nepastāv.";
 Strings.OfficeOM.L_BindingToMultipleSelection = "Attālu vienumu atlase netiek atbalstīta.";
 Strings.OfficeOM.L_BrowserAPINotSupported = "Šī pārlūkprogramma neatbalsta pieprasīto API.";
-Strings.OfficeOM.L_CallbackNotAFunction = "Atzvanīšanai jābūt funkcijas tipa; bija {0} tipa.";
+Strings.OfficeOM.L_CallbackNotAFunction = "Atzvanīšanai jābūt funkcijas tipa; bija {0} tipa."
 Strings.OfficeOM.L_CannotApplyPropertyThroughSetMethod = 'Rekvizīta {0} izmaiņas nevar lietot, izmantojot metodi "object.set".';
 Strings.OfficeOM.L_CannotNavigateTo = "Objekts atrodas vietā, kur navigācija netiek atbalstīta.";
 Strings.OfficeOM.L_CannotRegisterEvent = "Nevar reģistrēt notikumu apdarinātāju.";
@@ -75,7 +75,7 @@ Strings.OfficeOM.L_HostError = "Resursdatora kļūda";
 Strings.OfficeOM.L_InValidOptionalArgument = "nederīgs neobligātais arguments";
 Strings.OfficeOM.L_IndexOutOfRange = "Indekss ir ārpus diapazona.";
 Strings.OfficeOM.L_InitializeNotReady = "Office.js vēl nav pilnībā ielādēts. Lūdzu, vēlāk mēģiniet vēlreiz vai nodrošiniet, lai jūsu inicializācijas kods būtu pievienots Office.initialize funkcijai.";
-Strings.OfficeOM.L_InternalError = "Iekšēja kļūda"
+Strings.OfficeOM.L_InternalError = "Iekšēja kļūda";
 Strings.OfficeOM.L_InternalErrorDescription = "Ir radusies iekšēja kļūda.";
 Strings.OfficeOM.L_InvalidAPICall = "Nederīgs API izsaukums";
 Strings.OfficeOM.L_InvalidApiArgumentsMessage = "Nederīgi ievades argumenti.";

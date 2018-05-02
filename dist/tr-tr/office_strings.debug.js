@@ -1,4 +1,4 @@
-/* Version: 16.0.9106.1000 */
+/* Version: 16.0.9314.1000 */
 
 Type.registerNamespace("Strings");
 Strings.OfficeOM = function()
@@ -9,7 +9,7 @@ Strings.OfficeOM.L_APICallFailed = "API Çağrısı Başarısız Oldu";
 Strings.OfficeOM.L_APINotSupported = "API Desteklenmiyor";
 Strings.OfficeOM.L_ActivityLimitReached = "Etkinlik sınırına ulaşıldı.";
 Strings.OfficeOM.L_AddBindingFromPromptDefaultText = "Lütfen seçim yapın.";
-Strings.OfficeOM.L_AddinIsAlreadyRequestingToken = "Eklenti zaten bir erişim belirteci istiyor."
+Strings.OfficeOM.L_AddinIsAlreadyRequestingToken = "Eklenti zaten bir erişim belirteci istiyor.";
 Strings.OfficeOM.L_AddinIsAlreadyRequestingTokenMessage = "Eklenti zaten bir erişim belirteci istediğinden işlem başarısız oldu.";
 Strings.OfficeOM.L_ApiNotFoundDetails = "{0} yöntemi veya özelliği, {2} sürümünüzde kullanılamayan {1} gereksinim kümesinin bir parçasıdır.";
 Strings.OfficeOM.L_AppNameNotExist = "{0} için Eklenti Adı yok.";
@@ -20,7 +20,7 @@ Strings.OfficeOM.L_BindingCreationError = "Bağlama Oluşturma Hatası";
 Strings.OfficeOM.L_BindingNotExist = "Belirtilen bağlama mevcut değil.";
 Strings.OfficeOM.L_BindingToMultipleSelection = "Bitişik olmayan seçimler desteklenmiyor.";
 Strings.OfficeOM.L_BrowserAPINotSupported = "Bu tarayıcı istenen API'yi desteklemiyor.";
-Strings.OfficeOM.L_CallbackNotAFunction = "{0} türünde olan geri arama, işlev türünde olmalıdır.";
+Strings.OfficeOM.L_CallbackNotAFunction = "{0} türünde olan geri arama, işlev türünde olmalıdır."
 Strings.OfficeOM.L_CannotApplyPropertyThroughSetMethod = "'{0}' özelliğine yapılan değişiklikler \"object.set\" metoduyla uygulanamaz.";
 Strings.OfficeOM.L_CannotNavigateTo = "Nesne, gezinmenin desteklenmediği bir yerde bulunuyor.";
 Strings.OfficeOM.L_CannotRegisterEvent = "Olay işleyicisi kaydedilemiyor.";

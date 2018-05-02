@@ -1,4 +1,4 @@
-/* Version: 16.0.9106.1000 */
+/* Version: 16.0.9314.1000 */
 
 Type.registerNamespace("Strings");
 Strings.OfficeOM = function()
@@ -20,7 +20,7 @@ Strings.OfficeOM.L_BindingCreationError = "Pogreška pri stvaranju povezivanja";
 Strings.OfficeOM.L_BindingNotExist = "Navedeno povezivanje ne postoji.";
 Strings.OfficeOM.L_BindingToMultipleSelection = "Odabiri koji nisu susjedni nisu podržani.";
 Strings.OfficeOM.L_BrowserAPINotSupported = "Preglednik ne podržava zatraženi API.";
-Strings.OfficeOM.L_CallbackNotAFunction = "Povratni poziv mora biti vrste funkcija, a sada je vrsta {0}.";
+Strings.OfficeOM.L_CallbackNotAFunction = "Povratni poziv mora biti vrste funkcija, a sada je vrsta {0}."
 Strings.OfficeOM.L_CannotApplyPropertyThroughSetMethod = "Promjene svojstva '{0}' ne mogu se primijeniti kroz metodu \"object.set\".";
 Strings.OfficeOM.L_CannotNavigateTo = "Objekt se nalazi na mjestu na kojem nije podržana navigacija.";
 Strings.OfficeOM.L_CannotRegisterEvent = "Nije moguće registrirati rukovatelj događajima.";
@@ -139,7 +139,7 @@ Strings.OfficeOM.L_OperationCancelledErrorMessage = "Korisnik je otkazao operaci
 Strings.OfficeOM.L_OperationNotSupported = "Ta operacija nije podržana.";
 Strings.OfficeOM.L_OperationNotSupportedOnMatrixData = "Odabrani sadržaj mora biti u obliku tablice. Oblikujte podatke kao tablicu pa pokušajte ponovno.";
 Strings.OfficeOM.L_OperationNotSupportedOnThisBindingType = "Radnja nije podržana na toj vrsti povezivanja.";
-Strings.OfficeOM.L_OsfControlTypeNotSupported = "Nje podržana vrsta OsfControl."
+Strings.OfficeOM.L_OsfControlTypeNotSupported = "Nje podržana vrsta OsfControl.";
 Strings.OfficeOM.L_OutOfRange = "Izvan raspona";
 Strings.OfficeOM.L_OverwriteWorksheetData = "Operacija skupa nije uspjela jer će priloženi podatkovni objekt prebrisati ili pomaknuti podatke.";
 Strings.OfficeOM.L_PermissionDenied = "Dozvola je odbijena";

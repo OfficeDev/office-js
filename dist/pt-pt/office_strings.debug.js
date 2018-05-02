@@ -1,4 +1,4 @@
-/* Version: 16.0.9106.1000 */
+/* Version: 16.0.9314.1000 */
 
 Type.registerNamespace("Strings");
 Strings.OfficeOM = function()
@@ -20,7 +20,7 @@ Strings.OfficeOM.L_BindingCreationError = "Erro de Criação de Vínculo";
 Strings.OfficeOM.L_BindingNotExist = "O vínculo especificado não existe.";
 Strings.OfficeOM.L_BindingToMultipleSelection = "As seleções não contíguas não são suportadas.";
 Strings.OfficeOM.L_BrowserAPINotSupported = "Este browser não suporta a API pedida.";
-Strings.OfficeOM.L_CallbackNotAFunction = "A chamada de retorno tem de ser do tipo função e era do tipo {0}.";
+Strings.OfficeOM.L_CallbackNotAFunction = "A chamada de retorno tem de ser do tipo função e era do tipo {0}."
 Strings.OfficeOM.L_CannotApplyPropertyThroughSetMethod = 'As alterações à propriedade "{0}" não podem ser aplicadas através de um método "object.set".';
 Strings.OfficeOM.L_CannotNavigateTo = "O objeto está localizado num lugar onde a navegação não é suportada.";
 Strings.OfficeOM.L_CannotRegisterEvent = "Não é possível registar o processador de eventos.";
@@ -38,7 +38,7 @@ Strings.OfficeOM.L_CustomFunctionImplementationMissing = 'A propriedade com este
 Strings.OfficeOM.L_CustomFunctionNameCannotSplit = "O nome da função tem de conter um espaço de nomes não vazio e um nome abreviado não vazio.";
 Strings.OfficeOM.L_CustomFunctionNameContainsBadChars = "O nome da função só pode conter letras, algarismos, carateres de sublinhado e pontos finais.";
 Strings.OfficeOM.L_CustomXmlError = "Erro de XML Personalizado.";
-Strings.OfficeOM.L_CustomXmlExceedQuotaMessage = "O XPath limita a seleção a 1 024 itens."
+Strings.OfficeOM.L_CustomXmlExceedQuotaMessage = "O XPath limita a seleção a 1 024 itens.";
 Strings.OfficeOM.L_CustomXmlExceedQuotaName = "Limite de Seleção Atingido";
 Strings.OfficeOM.L_CustomXmlNodeNotFound = "O nó especificado não foi encontrado.";
 Strings.OfficeOM.L_CustomXmlOutOfDateMessage = "Os dados estão desatualizados. Obtenha novamente o objeto.";

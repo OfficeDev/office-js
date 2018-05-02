@@ -1,4 +1,4 @@
-/* Version: 16.0.9106.1000 */
+/* Version: 16.0.9314.1000 */
 
 Type.registerNamespace("Strings");
 Strings.OfficeOM = function()
@@ -20,7 +20,7 @@ Strings.OfficeOM.L_BindingCreationError = "Ошибка при создании 
 Strings.OfficeOM.L_BindingNotExist = "Указанная привязка не существует.";
 Strings.OfficeOM.L_BindingToMultipleSelection = "Выделение несмежных фрагментов не поддерживается.";
 Strings.OfficeOM.L_BrowserAPINotSupported = "Браузер не поддерживает запрошенный API.";
-Strings.OfficeOM.L_CallbackNotAFunction = 'Необходимый тип обратного вызова — "Функция", но был тип {0}.';
+Strings.OfficeOM.L_CallbackNotAFunction = 'Необходимый тип обратного вызова — "Функция", но был тип {0}.'
 Strings.OfficeOM.L_CannotApplyPropertyThroughSetMethod = 'Вам не удастся применить изменения, внесенные в свойство "{0}", с помощью метода object.set.';
 Strings.OfficeOM.L_CannotNavigateTo = "Объект находится в расположении, где не поддерживается навигация.";
 Strings.OfficeOM.L_CannotRegisterEvent = "Не удается зарегистрировать обработчик событий.";
@@ -42,7 +42,7 @@ Strings.OfficeOM.L_CustomXmlExceedQuotaMessage = "Из-за XPath можно в�
 Strings.OfficeOM.L_CustomXmlExceedQuotaName = "Достигнут предел выбора";
 Strings.OfficeOM.L_CustomXmlNodeNotFound = "Указанный узел не найден.";
 Strings.OfficeOM.L_CustomXmlOutOfDateMessage = "Данные устарели. Получите объект еще раз.";
-Strings.OfficeOM.L_CustomXmlOutOfDateName = "Данные устарели"
+Strings.OfficeOM.L_CustomXmlOutOfDateName = "Данные устарели";
 Strings.OfficeOM.L_DataNotMatchBindingSize = "Заданный объект данных не соответствует размеру выделенного фрагмента.";
 Strings.OfficeOM.L_DataNotMatchBindingType = "Указанный объект данных несовместим с типом привязки.";
 Strings.OfficeOM.L_DataNotMatchCoercionType = "Тип указанного объекта данных несовместим с выделенным фрагментом.";

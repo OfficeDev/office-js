@@ -1,4 +1,4 @@
-/* Version: 16.0.9106.1000 */
+/* Version: 16.0.9314.1000 */
 
 Type.registerNamespace("Strings");
 Strings.OfficeOM = function()
@@ -20,7 +20,7 @@ Strings.OfficeOM.L_BindingCreationError = "Błąd tworzenia powiązania";
 Strings.OfficeOM.L_BindingNotExist = "Określone powiązanie nie istnieje.";
 Strings.OfficeOM.L_BindingToMultipleSelection = "Nieciągłe zaznaczenia nie są obsługiwane.";
 Strings.OfficeOM.L_BrowserAPINotSupported = "Ta przeglądarka nie obsługuje żądanego interfejsu API.";
-Strings.OfficeOM.L_CallbackNotAFunction = "Wywołanie zwrotne musi być typu funkcji. Było typu {0}.";
+Strings.OfficeOM.L_CallbackNotAFunction = "Wywołanie zwrotne musi być typu funkcji. Było typu {0}."
 Strings.OfficeOM.L_CannotApplyPropertyThroughSetMethod = "Nie można zastosować zmian do właściwości „{0}” za pomocą metody „object.set”.";
 Strings.OfficeOM.L_CannotNavigateTo = "Obiekt znajduje się w miejscu, gdzie nawigacja nie jest obsługiwana.";
 Strings.OfficeOM.L_CannotRegisterEvent = "Nie można zarejestrować programu obsługi zdarzeń.";
@@ -79,7 +79,7 @@ Strings.OfficeOM.L_InternalError = "Błąd wewnętrzny";
 Strings.OfficeOM.L_InternalErrorDescription = "Wystąpił błąd wewnętrzny.";
 Strings.OfficeOM.L_InvalidAPICall = "Nieprawidłowe wywołanie interfejsu API";
 Strings.OfficeOM.L_InvalidApiArgumentsMessage = "Nieprawidłowe argumenty wejściowe.";
-Strings.OfficeOM.L_InvalidApiCallInContext = "Nieprawidłowe wywołanie interfejsu API w bieżącym kontekście."
+Strings.OfficeOM.L_InvalidApiCallInContext = "Nieprawidłowe wywołanie interfejsu API w bieżącym kontekście.";
 Strings.OfficeOM.L_InvalidArgument = "Brakuje argumentu „{0}”, nie działa on w tej sytuacji lub ma niepoprawny format.";
 Strings.OfficeOM.L_InvalidArgumentGeneric = "Argumenty przekazane do funkcji nie działają w tej sytuacji, brakuje ich lub mają nieodpowiedni format.";
 Strings.OfficeOM.L_InvalidBinding = "Nieprawidłowe powiązanie";

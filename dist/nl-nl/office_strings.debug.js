@@ -1,4 +1,4 @@
-/* Version: 16.0.9106.1000 */
+/* Version: 16.0.9314.1000 */
 
 Type.registerNamespace("Strings");
 Strings.OfficeOM = function()
@@ -20,7 +20,7 @@ Strings.OfficeOM.L_BindingCreationError = "Fout bij het maken van binding";
 Strings.OfficeOM.L_BindingNotExist = "De opgegeven binding bestaat niet.";
 Strings.OfficeOM.L_BindingToMultipleSelection = "Niet-aaneengesloten selecties worden niet ondersteund.";
 Strings.OfficeOM.L_BrowserAPINotSupported = "Deze browser biedt geen ondersteuning voor de aangevraagde API.";
-Strings.OfficeOM.L_CallbackNotAFunction = "Terugbellen moet van het type functie is van het type {0}.";
+Strings.OfficeOM.L_CallbackNotAFunction = "Terugbellen moet van het type functie is van het type {0}."
 Strings.OfficeOM.L_CannotApplyPropertyThroughSetMethod = "Wijzigingen in eigenschap {0} kunnen niet worden toegepast via de methode object.set.";
 Strings.OfficeOM.L_CannotNavigateTo = "Het object bevindt zich op een plaats waar navigatie niet wordt ondersteund.";
 Strings.OfficeOM.L_CannotRegisterEvent = "De gebeurtenis-handler kan niet worden geregistreerd.";
@@ -138,7 +138,7 @@ Strings.OfficeOM.L_OperationCancelledError = "Bewerking is geannuleerd";
 Strings.OfficeOM.L_OperationCancelledErrorMessage = "De bewerking is geannuleerd door de gebruiker.";
 Strings.OfficeOM.L_OperationNotSupported = "De bewerking wordt niet ondersteund.";
 Strings.OfficeOM.L_OperationNotSupportedOnMatrixData = "Geselecteerde inhoud moet een tabelindeling hebben. Maak de gegevens op als een tabel en probeer het opnieuw.";
-Strings.OfficeOM.L_OperationNotSupportedOnThisBindingType = "De bewerking wordt niet ondersteund voor dit bindingstype."
+Strings.OfficeOM.L_OperationNotSupportedOnThisBindingType = "De bewerking wordt niet ondersteund voor dit bindingstype.";
 Strings.OfficeOM.L_OsfControlTypeNotSupported = "OsfControl type wordt niet ondersteund.";
 Strings.OfficeOM.L_OutOfRange = "Buiten bereik";
 Strings.OfficeOM.L_OverwriteWorksheetData = "De instelbewerking is mislukt omdat met het opgegeven gegevensobject gegevens worden overschreven of verschuiven.";

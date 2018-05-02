@@ -1,4 +1,4 @@
-/* Version: 16.0.9106.1000 */
+/* Version: 16.0.9314.1000 */
 
 Type.registerNamespace("Strings");
 Strings.OfficeOM = function()
@@ -20,7 +20,7 @@ Strings.OfficeOM.L_BindingCreationError = "[:Þïñðíñg Çrèãtîóñ Êrrò
 Strings.OfficeOM.L_BindingNotExist = "[:Thé spéçîfìéð þîñðíñg ðöës ñøt éxîst.瑞갂偁略 яšæẤథ్క لإَّ'Ii.]";
 Strings.OfficeOM.L_BindingToMultipleSelection = "[:Ñøñçôñtígûõùs sëlê¢tìóñs ärè ñòt súppõrtêð.瑞갂偁略 яšæẤßథ్క لإَّ'Ii.]";
 Strings.OfficeOM.L_BrowserAPINotSupported = "[OG:Thìs þrõwsér ðóès ñõt sùppørt thë rëqµëstèð ÃPÏ.瑞갂偁略 яšæẤßソథ్క لإَّ'Ii.]";
-Strings.OfficeOM.L_CallbackNotAFunction = "[:Çªllþä¢k múst þë ôf týpë fµñçtîóñ, wås óf týpè {0}.瑞갂偁略 яšæẤßソ瑞థ్క لإَّ'Ii.]";
+Strings.OfficeOM.L_CallbackNotAFunction = "[:Çªllþä¢k múst þë ôf týpë fµñçtîóñ, wås óf týpè {0}.瑞갂偁略 яšæẤßソ瑞థ్క لإَّ'Ii.]"
 Strings.OfficeOM.L_CannotApplyPropertyThroughSetMethod = "[OG:Çháñgès tø pröpértý '{0}' ¢ãññôt þë åpplîéð thrôûgh ãñ \"ôþjêçt.sét\" mëthõð.瑞갂偁略 яšæẤßソ瑞갂偁略 яšథ్క لإَّ'Ii.]";
 Strings.OfficeOM.L_CannotNavigateTo = "[OG:Thë öþjè¢t îs lô¢ätëð íñ â pláçè whëré ñávïgåtïòñ ìs ñót sµppôrtèð.瑞갂偁略 яšæẤßソ瑞갂偁略 థ్క لإَّ'Ii.]";
 Strings.OfficeOM.L_CannotRegisterEvent = "[OG:Thé ëvéñt hªñðlér ¢àññôt þè règístêrêð.瑞갂偁略 яšæẤథ్క لإَّ'Ii.]";
@@ -33,8 +33,8 @@ Strings.OfficeOM.L_CoercionTypeNotSupported = "[:Thë spêçífïéð çøêr¢�
 Strings.OfficeOM.L_ColIndexOutOfRange = "[OG:Thé ¢ôlûmñ ïñðêx vælúë ís ôût øf thë ªllówèð räñgê. Ùsè á vãlµë (0 õr hîghèr) thát's lëss thäñ thë ñümþèr õf ¢ólúmñs.瑞갂偁略 яšæẤßソ瑞갂偁略 яšæẤßソ瑞갂偁略 థ్క لإَّ'Ii.]";
 Strings.OfficeOM.L_ConnectionFailureWithDetails = "[OG:Thé rëqûèst fäìlêð wíth stâtús çóðè øf {0}, êrrør çöðê {1} ªñð thê fôllõwíñg ërrör mêssågé: {2}瑞갂偁略 яšæẤßソ瑞갂偁略 яšæẤßソథ్క لإَّ'Ii.]";
 Strings.OfficeOM.L_ConnectionFailureWithStatus = "[OG:Thé rêqùèst fæíléð wíth ståtús ¢õðê óf {0}.瑞갂偁略 яšæẤßథ్క لإَّ'Ii.]";
-Strings.OfficeOM.L_CustomFunctionDefinitionMissing = "[OG:Æ prøpértÿ wíth thís ñâmè thât rèprèsêñts thê fùñ¢tíõñ's ðëfîñîtîøñ mùst èxîst øñ Éxçél.ÇûstòmFùñ¢tíöñs.瑞갂偁略 яšæẤßソ瑞갂偁略 яšæẤßソ瑞갂థ్క لإَّ'Ii.]";
-Strings.OfficeOM.L_CustomFunctionImplementationMissing = "[OG:Thê prôpèrtý wïth thís ñãmé ôñ Éx¢êl.ÇùstòmFûñçtìøñs thàt réprésèñts thê fùñ¢tíöñ's ðêfîñîtìòñ müst çøñtåîñ à 'çâll' própértÿ thât ïmplëmêñts thè fµñçtíøñ.瑞갂偁略 яšæẤßソ瑞갂偁略 яšæẤßソ瑞갂偁略 яšæẤßソ瑞갂偁థ్క لإَّ'Ii.]";
+Strings.OfficeOM.L_CustomFunctionDefinitionMissing = "[OG:Æ prøpértÿ wíth thís ñâmè thât rèprèsêñts thê fùñ¢tíõñ's ðëfîñîtîøñ mùst èxîst øñ Éxçél.§¢rìpt.ÇûstømFûñçtìôñs.瑞갂偁略 яšæẤßソ瑞갂偁略 яšæẤßソ瑞갂偁略థ్క لإَّ'Ii.]";
+Strings.OfficeOM.L_CustomFunctionImplementationMissing = "[OG:Thê prôpèrtý wïth thís ñãmé ôñ Éx¢êl.§çrìpt.ÇûstômFùñ¢tìôñs thªt rëprêsèñts thê fûñçtíõñ's ðêfìñîtïòñ mµst ¢öñtàíñ à 'çäll' prôpërtÿ thãt ìmplèmëñts thé fûñ¢tíóñ.瑞갂偁略 яšæẤßソ瑞갂偁略 яšæẤßソ瑞갂偁略 яšæẤßソ瑞갂偁略థ్క لإَّ'Ii.]";
 Strings.OfficeOM.L_CustomFunctionNameCannotSplit = "[OG:Thè fûñçtîõñ ñämé müst çòñtáíñ â ñøñ-émptÿ ñâmèspâçê àñð ã ñôñ-èmptÿ shört ñªmè.瑞갂偁略 яšæẤßソ瑞갂偁略 яšæథ్క لإَّ'Ii.]";
 Strings.OfficeOM.L_CustomFunctionNameContainsBadChars = "[OG:Thè fµñçtìöñ ñàmë måý öñlý çôñtæíñ lëttërs, ðìgïts, µñðërsçôrês, ªñð pérïôðs.瑞갂偁略 яšæẤßソ瑞갂偁略 яšథ్క لإَّ'Ii.]";
 Strings.OfficeOM.L_CustomXmlError = "[:Çµstòm XM£ Èrrór.瑞갂偁略థ్క لإَّ'Ii.]";
@@ -133,7 +133,7 @@ Strings.OfficeOM.L_NonUniformPartialSetNotSupported = "[:Çòórðíñætê pær
 Strings.OfficeOM.L_NotImplemented = "[:Fûñ¢tïõñ {0} ïs ñøt ìmplêmêñtëð.瑞갂偁略 яšæథ్క لإَّ'Ii.]";
 Strings.OfficeOM.L_NotSupported = "[:Fµñçtîóñ {0} ís ñöt súppòrtêð.瑞갂偁略 яšæథ్క لإَّ'Ii.]";
 Strings.OfficeOM.L_NotSupportedBindingType = "[:Thé spëçîfìêð þìñðïñg tÿpè {0} ís ñöt sûppørtèð.瑞갂偁略 яšæẤßソథ్క لإَّ'Ii.]";
-Strings.OfficeOM.L_NotSupportedEventType = "[:Thê spê¢îfìêð èvèñt tÿpë {0} îs ñöt süppórtèð.瑞갂偁略 яšæẤßソథ్క لإَّ'Ii.]"
+Strings.OfficeOM.L_NotSupportedEventType = "[:Thê spê¢îfìêð èvèñt tÿpë {0} îs ñöt süppórtèð.瑞갂偁略 яšæẤßソథ్క لإَّ'Ii.]";
 Strings.OfficeOM.L_OperationCancelledError = "[OG:Øpërãtíòñ Çåñ¢êllêð瑞갂偁略 థ్క لإَّ'Ii.]";
 Strings.OfficeOM.L_OperationCancelledErrorMessage = "[OG:Thè øpërætíøñ wªs ¢ªñçèllèð þÿ thè üsèr.瑞갂偁略 яšæẤథ్క لإَّ'Ii.]";
 Strings.OfficeOM.L_OperationNotSupported = "[:Thê öpëråtïòñ ïs ñôt sûppòrtêð.瑞갂偁略 яšæథ్క لإَّ'Ii.]";

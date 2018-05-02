@@ -1,4 +1,4 @@
-/* Version: 16.0.9106.1000 */
+/* Version: 16.0.9314.1000 */
 
 Type.registerNamespace("Strings");
 Strings.OfficeOM = function()
@@ -20,7 +20,7 @@ Strings.OfficeOM.L_BindingCreationError = "Kesalahan Pembuatan Ikatan";
 Strings.OfficeOM.L_BindingNotExist = "Ikatan yang ditentukan ini tidak ada.";
 Strings.OfficeOM.L_BindingToMultipleSelection = "Pilihan yang tidak berdampingan tidak didukung.";
 Strings.OfficeOM.L_BrowserAPINotSupported = "Browser ini tidak mendukung API yang diminta.";
-Strings.OfficeOM.L_CallbackNotAFunction = "Panggilan balik harus berupa fungsi tipe, sebelumnya bertipe {0}.";
+Strings.OfficeOM.L_CallbackNotAFunction = "Panggilan balik harus berupa fungsi tipe, sebelumnya bertipe {0}."
 Strings.OfficeOM.L_CannotApplyPropertyThroughSetMethod = "Perubahan ke properti '{0}' tidak dapat diterapkan melalui metode \"object.set\".";
 Strings.OfficeOM.L_CannotNavigateTo = "Objek berada di tempat yang tidak mendukung navigasi.";
 Strings.OfficeOM.L_CannotRegisterEvent = "Penanganan aktivitas tidak dapat didaftarkan.";
@@ -140,7 +140,7 @@ Strings.OfficeOM.L_OperationNotSupported = "Operasi ini tidak didukung.";
 Strings.OfficeOM.L_OperationNotSupportedOnMatrixData = "Konten terpilih harus dalam format tabel. Format data sebagai tabel dan coba lagi.";
 Strings.OfficeOM.L_OperationNotSupportedOnThisBindingType = "Operasi tidak didukung pada tipe ikatan ini.";
 Strings.OfficeOM.L_OsfControlTypeNotSupported = "Tipe OsfControl tidak didukung.";
-Strings.OfficeOM.L_OutOfRange = "Di Luar Jangkauan"
+Strings.OfficeOM.L_OutOfRange = "Di Luar Jangkauan";
 Strings.OfficeOM.L_OverwriteWorksheetData = "Operasi yang ditetapkan gagal karena objek data yang tersedia akan menimpa atau atau memindah data.";
 Strings.OfficeOM.L_PermissionDenied = "Izin Ditolak";
 Strings.OfficeOM.L_PropertyDoesNotExist = "Properti '{0}' tidak ada pada objek.";

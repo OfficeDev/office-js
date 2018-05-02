@@ -1,4 +1,4 @@
-/* Version: 16.0.9106.1000 */
+/* Version: 16.0.9314.1000 */
 
 Type.registerNamespace("Strings");
 Strings.OfficeOM = function()
@@ -20,7 +20,7 @@ Strings.OfficeOM.L_BindingCreationError = "Fel inträffade när bindningen skapa
 Strings.OfficeOM.L_BindingNotExist = "Den angivna bindningen finns inte.";
 Strings.OfficeOM.L_BindingToMultipleSelection = "Icke sammanhängande markeringar kan inte användas.";
 Strings.OfficeOM.L_BrowserAPINotSupported = "Den begärda API:n stöds inte i den här webbläsaren.";
-Strings.OfficeOM.L_CallbackNotAFunction = "Motringning måste vara av typen funktion, men var av typen {0}.";
+Strings.OfficeOM.L_CallbackNotAFunction = "Motringning måste vara av typen funktion, men var av typen {0}."
 Strings.OfficeOM.L_CannotApplyPropertyThroughSetMethod = "Ändringar av egenskapen {0} kan inte användas från en object.set-metod.";
 Strings.OfficeOM.L_CannotNavigateTo = "Objektet finns på en plats där navigering inte stöds.";
 Strings.OfficeOM.L_CannotRegisterEvent = "Det går inte att registrera händelsehanteraren.";
@@ -172,7 +172,7 @@ Strings.OfficeOM.L_ShowWindowDialogNotification = "{0} vill visa ett nytt fönst
 Strings.OfficeOM.L_ShowWindowDialogNotificationAllow = "Tillåt";
 Strings.OfficeOM.L_ShowWindowDialogNotificationIgnore = "Ignorera";
 Strings.OfficeOM.L_ShuttingDown = "Åtgärden misslyckades eftersom data är inaktuella på servern.";
-Strings.OfficeOM.L_SliceSizeNotSupported = "Den angivna segmentstorleken stöds inte."
+Strings.OfficeOM.L_SliceSizeNotSupported = "Den angivna segmentstorleken stöds inte.";
 Strings.OfficeOM.L_SpecifiedIdNotExist = "Det angivna ID:t finns inte.";
 Strings.OfficeOM.L_Timeout = "Åtgärden överskred tidsgränsen.";
 Strings.OfficeOM.L_TooManyArguments = "för många argument";
