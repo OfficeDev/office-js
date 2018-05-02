@@ -9,7 +9,7 @@
 
 ## Steps to Reproduce, or Live Example
 <!--- Ideally, provide a link to a live example, created and shared using -->
-<!--- [Script Lab](https://aka.ms/script-lab). If relevant, create two buttons, -->
+<!--- [Script Lab](https://aka.ms/scriptlab). If relevant, create two buttons, -->
 <!--- one that sets up data in the document, and another that exemplifies the issue. -->
 * Link to live example: ______
 
