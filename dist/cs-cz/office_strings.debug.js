@@ -1,4 +1,4 @@
-/* Version: 16.0.9027.1000 */
+/* Version: 16.0.9309.1000 */
 
 Type.registerNamespace("Strings");
 Strings.OfficeOM = function()
@@ -20,7 +20,7 @@ Strings.OfficeOM.L_BindingCreationError = "Chyba vytváření vazby";
 Strings.OfficeOM.L_BindingNotExist = "Zadaná vazba neexistuje.";
 Strings.OfficeOM.L_BindingToMultipleSelection = "Nesouvislé výběry nejsou podporované.";
 Strings.OfficeOM.L_BrowserAPINotSupported = "Tento prohlížeč nepodporuje požadované rozhraní API.";
-Strings.OfficeOM.L_CallbackNotAFunction = "Zpětné volání musí být typu funkce. Bylo typu {0}.";
+Strings.OfficeOM.L_CallbackNotAFunction = "Zpětné volání musí být typu funkce. Bylo typu {0}."
 Strings.OfficeOM.L_CannotApplyPropertyThroughSetMethod = "Pro změny vlastnosti {0} nejde použít metodu object.set.";
 Strings.OfficeOM.L_CannotNavigateTo = "Objekt je v umístění, kde se nepodporuje navigace.";
 Strings.OfficeOM.L_CannotRegisterEvent = "Nedá se zaregistrovat obslužná rutina události.";
@@ -57,7 +57,7 @@ Strings.OfficeOM.L_DialogInvalidScheme = "Schéma adresy URL není podporované.
 Strings.OfficeOM.L_DialogNavigateError = "Chyba navigace v dialogovém okně";
 Strings.OfficeOM.L_DialogOK = "OK";
 Strings.OfficeOM.L_DialogRequireHTTPS = "Protokol HTTP se nepodporuje. Použijte prosím HTTPS.";
-Strings.OfficeOM.L_DisplayDialogError = "Chyba zobrazení dialogového okna"
+Strings.OfficeOM.L_DisplayDialogError = "Chyba zobrazení dialogového okna";
 Strings.OfficeOM.L_DocumentReadOnly = "Požadovaná operace není v aktuálním režimu dokumentu povolená.";
 Strings.OfficeOM.L_ElementMissing = "Nemohli jsme naformátovat buňku tabulky, protože chybí některé hodnoty parametrů. Ještě jednou zkontrolujte parametry a zkuste to znovu.";
 Strings.OfficeOM.L_EventHandlerAdditionFailed = "Nepovedlo se přidat obslužnou rutinu události.";

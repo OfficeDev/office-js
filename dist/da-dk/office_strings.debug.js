@@ -1,4 +1,4 @@
-/* Version: 16.0.9027.1000 */
+/* Version: 16.0.9309.1000 */
 
 Type.registerNamespace("Strings");
 Strings.OfficeOM = function()
@@ -20,7 +20,7 @@ Strings.OfficeOM.L_BindingCreationError = "Fejl ved oprettelse af binding";
 Strings.OfficeOM.L_BindingNotExist = "Den angivne binding findes ikke.";
 Strings.OfficeOM.L_BindingToMultipleSelection = "Ikke-sammenhængende markeringer understøttes ikke.";
 Strings.OfficeOM.L_BrowserAPINotSupported = "Denne browser understøtter ikke den anmodede API.";
-Strings.OfficeOM.L_CallbackNotAFunction = "Tilbagekald skal være af typen funktion, men var af typen {0}.";
+Strings.OfficeOM.L_CallbackNotAFunction = "Tilbagekald skal være af typen funktion, men var af typen {0}."
 Strings.OfficeOM.L_CannotApplyPropertyThroughSetMethod = 'Ændringer i egenskaben "{0}" kan ikke anvendes gennem en "object.set"-metode.';
 Strings.OfficeOM.L_CannotNavigateTo = "Objektet er placeret et sted, hvor navigation ikke understøttes.";
 Strings.OfficeOM.L_CannotRegisterEvent = "Hændelseshandleren kan ikke registreres.";
@@ -189,4 +189,4 @@ Strings.OfficeOM.L_UserAborted = "Brugeren afbrød samtykkeanmodningen.";
 Strings.OfficeOM.L_UserAbortedMessage = "Brugeren har ikke givet samtykke til tilføjelsesprogramtilladelserne.";
 Strings.OfficeOM.L_UserClickIgnore = "Brugeren valgte at ignorere dialogboksen.";
 Strings.OfficeOM.L_UserNotSignedIn = "Ingen bruger er logget på Office.";
-Strings.OfficeOM.L_ValueNotLoaded = 'Værdien af resultatobjektet er endnu ikke indlæst. Før du læser værdiegenskaben, skal du kalde "context.sync()" i den tilknyttede anmodningskontekst.'
+Strings.OfficeOM.L_ValueNotLoaded = 'Værdien af resultatobjektet er endnu ikke indlæst. Før du læser værdiegenskaben, skal du kalde "context.sync()" i den tilknyttede anmodningskontekst.';

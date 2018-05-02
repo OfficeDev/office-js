@@ -1,4 +1,4 @@
-/* Version: 16.0.9027.1000 */
+/* Version: 16.0.9309.1000 */
 
 Type.registerNamespace("Strings");
 Strings.OfficeOM = function()
@@ -20,7 +20,7 @@ Strings.OfficeOM.L_BindingCreationError = "Bağlama Oluşturma Hatası";
 Strings.OfficeOM.L_BindingNotExist = "Belirtilen bağlama mevcut değil.";
 Strings.OfficeOM.L_BindingToMultipleSelection = "Bitişik olmayan seçimler desteklenmiyor.";
 Strings.OfficeOM.L_BrowserAPINotSupported = "Bu tarayıcı istenen API'yi desteklemiyor.";
-Strings.OfficeOM.L_CallbackNotAFunction = "{0} türünde olan geri arama, işlev türünde olmalıdır.";
+Strings.OfficeOM.L_CallbackNotAFunction = "{0} türünde olan geri arama, işlev türünde olmalıdır."
 Strings.OfficeOM.L_CannotApplyPropertyThroughSetMethod = "'{0}' özelliğine yapılan değişiklikler \"object.set\" metoduyla uygulanamaz.";
 Strings.OfficeOM.L_CannotNavigateTo = "Nesne, gezinmenin desteklenmediği bir yerde bulunuyor.";
 Strings.OfficeOM.L_CannotRegisterEvent = "Olay işleyicisi kaydedilemiyor.";
@@ -95,7 +95,7 @@ Strings.OfficeOM.L_InvalidFormatValue = "Bir veya daha fazla biçim parametresi 
 Strings.OfficeOM.L_InvalidGetColumns = "Belirtilen sütunlar geçersiz.";
 Strings.OfficeOM.L_InvalidGetRowColumnCounts = "Belirtilen satırSayısı veya sütunSayısı değerleri geçersiz.";
 Strings.OfficeOM.L_InvalidGetRows = "Belirtilen satırlar geçersiz.";
-Strings.OfficeOM.L_InvalidGetStartRowColumn = "Belirtilen satırBaşlat veya sütunBaşlat değerleri geçersiz."
+Strings.OfficeOM.L_InvalidGetStartRowColumn = "Belirtilen satırBaşlat veya sütunBaşlat değerleri geçersiz.";
 Strings.OfficeOM.L_InvalidGrant = "Ön onay yok.";
 Strings.OfficeOM.L_InvalidGrantMessage = "Bu eklenti için izin verilmedi.";
 Strings.OfficeOM.L_InvalidNamedItemForBindingType = "Belirtilen bağlama türü sağlanan adlandırılmış öğe ile uyumlu değil.";

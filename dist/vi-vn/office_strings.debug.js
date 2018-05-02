@@ -1,4 +1,4 @@
-/* Version: 16.0.9027.1000 */
+/* Version: 16.0.9309.1000 */
 
 Type.registerNamespace("Strings");
 Strings.OfficeOM = function()
@@ -20,11 +20,11 @@ Strings.OfficeOM.L_BindingCreationError = "Lỗi Tạo Ghép nối";
 Strings.OfficeOM.L_BindingNotExist = "Kết ghép đã xác định không tồn tại.";
 Strings.OfficeOM.L_BindingToMultipleSelection = "Không hỗ trợ lựa chọn không liền nhau.";
 Strings.OfficeOM.L_BrowserAPINotSupported = "Trình duyệt này không hỗ trợ API được yêu cầu.";
-Strings.OfficeOM.L_CallbackNotAFunction = "Gọi lại phải là chức năng kiểu, thuộc kiểu {0}.";
+Strings.OfficeOM.L_CallbackNotAFunction = "Gọi lại phải là chức năng kiểu, thuộc kiểu {0}."
 Strings.OfficeOM.L_CannotApplyPropertyThroughSetMethod = "Không thể áp dụng thay đổi với thuộc tính '{0}' thông qua phương pháp \"object.set\".";
 Strings.OfficeOM.L_CannotNavigateTo = "Đối tượng nằm ở vị trí không hỗ trợ dẫn hướng.";
 Strings.OfficeOM.L_CannotRegisterEvent = "Không thể đăng ký quy trình xử lý sự kiện.";
-Strings.OfficeOM.L_CannotWriteToSelection = "Không thể ghi vào lựa chọn hiện tại."
+Strings.OfficeOM.L_CannotWriteToSelection = "Không thể ghi vào lựa chọn hiện tại.";
 Strings.OfficeOM.L_CellDataAmountBeyondLimits = "Lưu ý: Số lượng ô trong một bảng được đề nghị để dưới 20.000 ô.";
 Strings.OfficeOM.L_CellFormatAmountBeyondLimits = "Lưu ý: Bộ định dạng do lệnh gọi Định dạng API thiết lập được đề nghị để dưới 100.";
 Strings.OfficeOM.L_CloseFileBeforeRetrieve = "Gọi closeAsync trên Tệp hiện tại trước khi truy xuất tệp khác.";
@@ -61,7 +61,7 @@ Strings.OfficeOM.L_DisplayDialogError = "Lỗi Hiển thị Hộp thoại";
 Strings.OfficeOM.L_DocumentReadOnly = "Không cho phép thao tác yêu cầu ở chế độ tài liệu hiện tại.";
 Strings.OfficeOM.L_ElementMissing = "Chúng tôi không thể định dạng ô bảng bởi vì một vài giá trị tham số bị thiếu. Hãy kiểm tra kép các tham số rồi thử lại.";
 Strings.OfficeOM.L_EventHandlerAdditionFailed = "Không thể thêm trình xử lý sự kiện.";
-Strings.OfficeOM.L_EventHandlerNotExist = "Không tìm thấy bộ xử lý biến cố xác định cho gắn kết này.";
+Strings.OfficeOM.L_EventHandlerNotExist = "Không tìm thấy bộ xử lý biến cố xác định cho kết ghép này.";
 Strings.OfficeOM.L_EventHandlerRemovalFailed = "Không thể loại bỏ trình xử lý sự kiện.";
 Strings.OfficeOM.L_EventRegistrationError = "Lỗi Đăng ký Sự kiện";
 Strings.OfficeOM.L_FileTypeNotSupported = "Loại tệp đã chỉ định không được hỗ trợ.";

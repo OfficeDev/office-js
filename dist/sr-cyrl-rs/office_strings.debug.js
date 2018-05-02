@@ -1,4 +1,4 @@
-/* Version: 16.0.9027.1000 */
+/* Version: 16.0.9309.1000 */
 
 Type.registerNamespace("Strings");
 Strings.OfficeOM = function()
@@ -20,7 +20,7 @@ Strings.OfficeOM.L_BindingCreationError = "Грешка при креирању 
 Strings.OfficeOM.L_BindingNotExist = "Наведено повезивање не постоји.";
 Strings.OfficeOM.L_BindingToMultipleSelection = "Несуседни избори нису подржани.";
 Strings.OfficeOM.L_BrowserAPINotSupported = "Овај прегледач не подржава захтевани API.";
-Strings.OfficeOM.L_CallbackNotAFunction = "Повратни позив мора да буде типа функције, био је типа {0}.";
+Strings.OfficeOM.L_CallbackNotAFunction = "Повратни позив мора да буде типа функције, био је типа {0}."
 Strings.OfficeOM.L_CannotApplyPropertyThroughSetMethod = "Није могуће применити промене својства „{0}“ путем метода „object.set“.";
 Strings.OfficeOM.L_CannotNavigateTo = "Објекат се налази на месту на којем навигација није подржана.";
 Strings.OfficeOM.L_CannotRegisterEvent = "Није могуће регистровати руковалац догађајем.";
@@ -94,7 +94,7 @@ Strings.OfficeOM.L_InvalidFormat = "Грешка неважећег формат
 Strings.OfficeOM.L_InvalidFormatValue = "Неки параметри формата имају вредности које нису дозвољене. Двапут проверите вредности и покушајте поново.";
 Strings.OfficeOM.L_InvalidGetColumns = "Наведене колоне су неважеће.";
 Strings.OfficeOM.L_InvalidGetRowColumnCounts = "Наведене вредности за број редова или број колона нису важеће.";
-Strings.OfficeOM.L_InvalidGetRows = "Наведени редови су неважећи."
+Strings.OfficeOM.L_InvalidGetRows = "Наведени редови су неважећи.";
 Strings.OfficeOM.L_InvalidGetStartRowColumn = "Наведене вредности за почетни ред или почетну колону нису важеће.";
 Strings.OfficeOM.L_InvalidGrant = "Пред-ауторизација недостаје.";
 Strings.OfficeOM.L_InvalidGrantMessage = "Недостаје одобрење за овај програмски додатак.";

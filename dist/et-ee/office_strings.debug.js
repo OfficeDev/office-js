@@ -1,4 +1,4 @@
-/* Version: 16.0.9027.1000 */
+/* Version: 16.0.9309.1000 */
 
 Type.registerNamespace("Strings");
 Strings.OfficeOM = function()
@@ -20,7 +20,7 @@ Strings.OfficeOM.L_BindingCreationError = "Sidumise loomise tõrge";
 Strings.OfficeOM.L_BindingNotExist = "Määratud sidumist pole olemas.";
 Strings.OfficeOM.L_BindingToMultipleSelection = "Mittekülgnevaid valikuid ei toetata.";
 Strings.OfficeOM.L_BrowserAPINotSupported = "See brauser ei toeta taotletud API-t.";
-Strings.OfficeOM.L_CallbackNotAFunction = "Tagasikutse peab olema funktsioon-tüüpi, kuid on tüüpi {0}.";
+Strings.OfficeOM.L_CallbackNotAFunction = "Tagasikutse peab olema funktsioon-tüüpi, kuid on tüüpi {0}."
 Strings.OfficeOM.L_CannotApplyPropertyThroughSetMethod = 'Atribuudi "{0}" muudatusi ei saa rakendada meetodi "object.set" abil.';
 Strings.OfficeOM.L_CannotNavigateTo = "Objekt asub kohas, kus navigeerimist ei toetata.";
 Strings.OfficeOM.L_CannotRegisterEvent = "Sündmuseohjurit ei saa registreerida.";
@@ -160,7 +160,7 @@ Strings.OfficeOM.L_SSOServerErrorMessage = "Serveris ilmnes ootamatu tõrge.";
 Strings.OfficeOM.L_SSOUserConsentNotSupportedByCurrentAddinCategory = "See lisandmoodul ei toeta kasutaja nõusolekut.";
 Strings.OfficeOM.L_SSOUserConsentNotSupportedByCurrentAddinCategoryMessage = "Toiming nurjus, kuna see lisandmoodul ei toeta kasutaja nõusolekut selles kategoorias";
 Strings.OfficeOM.L_SaveSettingsError = "Sätete salvestamise tõrge";
-Strings.OfficeOM.L_SelectionCannotBound = "Praeguse valikuga ei saa siduda."
+Strings.OfficeOM.L_SelectionCannotBound = "Praeguse valikuga ei saa siduda.";
 Strings.OfficeOM.L_SelectionNotSupportCoercionType = "Praegune valik ei ühildu määratud kooshoidmistüübiga.";
 Strings.OfficeOM.L_SetDataIsTooLarge = "Määratud andmeobjekt on liiga suur.";
 Strings.OfficeOM.L_SetDataParametersConflict = "Määratud parameetrid on vastuolus.";

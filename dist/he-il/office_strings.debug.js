@@ -1,4 +1,4 @@
-/* Version: 16.0.9027.1000 */
+/* Version: 16.0.9309.1000 */
 
 Type.registerNamespace("Strings");
 Strings.OfficeOM = function()
@@ -20,7 +20,7 @@ Strings.OfficeOM.L_BindingCreationError = "שגיאה ביצירת איגוד";
 Strings.OfficeOM.L_BindingNotExist = "האיגוד שצוין לא קיים.";
 Strings.OfficeOM.L_BindingToMultipleSelection = "אין תמיכה בבחירות לא רציפות.";
 Strings.OfficeOM.L_BrowserAPINotSupported = "דפדפן זה אינו תומך ב- API המבוקש.";
-Strings.OfficeOM.L_CallbackNotAFunction = "סוג ההתקשרות חזרה חייב להיות פונקציה, הסוג היה {0}.";
+Strings.OfficeOM.L_CallbackNotAFunction = "סוג ההתקשרות חזרה חייב להיות פונקציה, הסוג היה {0}."
 Strings.OfficeOM.L_CannotApplyPropertyThroughSetMethod = "אין אפשרות להחיל שינויים על המאפיין '{0}' באמצעות פעולת שירות של \"object.set\".";
 Strings.OfficeOM.L_CannotNavigateTo = "האובייקט נמצא במקום שבו ניווט אינו נתמך.";
 Strings.OfficeOM.L_CannotRegisterEvent = "אין אפשרות לרשום את המטפל באירועים.";
@@ -38,7 +38,7 @@ Strings.OfficeOM.L_CustomFunctionImplementationMissing = "המאפיין בשם 
 Strings.OfficeOM.L_CustomFunctionNameCannotSplit = "שם הפונקציה חייב להכיל מרחב שמות שאינו ריק ושם קצר שאינו ריק.";
 Strings.OfficeOM.L_CustomFunctionNameContainsBadChars = "שם הפונקציה יכול להכיל רק אותיות, ספרות, מקפים תחתונים ונקודות.";
 Strings.OfficeOM.L_CustomXmlError = "שגיאת XML מותאם אישית.";
-Strings.OfficeOM.L_CustomXmlExceedQuotaMessage = "XPath מגביל את הבחירה ל- 1024 פריטים."
+Strings.OfficeOM.L_CustomXmlExceedQuotaMessage = "XPath מגביל את הבחירה ל- 1024 פריטים.";
 Strings.OfficeOM.L_CustomXmlExceedQuotaName = "הגעת למגבלת הבחירה";
 Strings.OfficeOM.L_CustomXmlNodeNotFound = "הצומת שצוין לא נמצא.";
 Strings.OfficeOM.L_CustomXmlOutOfDateMessage = "הנתונים אינם עדכניים. אחזר שוב את האובייקט.";
