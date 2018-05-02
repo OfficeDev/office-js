@@ -1,4 +1,4 @@
-/* Version: 16.0.9106.1000 */
+/* Version: 16.0.9314.1000 */
 
 Type.registerNamespace("Strings");
 Strings.OfficeOM = function()
@@ -20,7 +20,7 @@ Strings.OfficeOM.L_BindingCreationError = "绑定创建错误";
 Strings.OfficeOM.L_BindingNotExist = "指定的绑定不存在。";
 Strings.OfficeOM.L_BindingToMultipleSelection = "不支持非连续选择。";
 Strings.OfficeOM.L_BrowserAPINotSupported = "此浏览器不支持请求的 API。";
-Strings.OfficeOM.L_CallbackNotAFunction = "回调必须是函数类型，而其类型为 {0}。";
+Strings.OfficeOM.L_CallbackNotAFunction = "回调必须是函数类型，而其类型为 {0}。"
 Strings.OfficeOM.L_CannotApplyPropertyThroughSetMethod = '无法通过 "object.set" 方法应用对属性“{0}”的更改。';
 Strings.OfficeOM.L_CannotNavigateTo = "该对象位于不支持导航的位置。";
 Strings.OfficeOM.L_CannotRegisterEvent = "无法注册事件处理程序。";
@@ -79,7 +79,7 @@ Strings.OfficeOM.L_InternalError = "内部错误";
 Strings.OfficeOM.L_InternalErrorDescription = "发生了内部错误。";
 Strings.OfficeOM.L_InvalidAPICall = "无效的 API 调用";
 Strings.OfficeOM.L_InvalidApiArgumentsMessage = "输入参数无效。";
-Strings.OfficeOM.L_InvalidApiCallInContext = "当前环境下发生无效的 API 呼叫。"
+Strings.OfficeOM.L_InvalidApiCallInContext = "当前环境下发生无效的 API 呼叫。";
 Strings.OfficeOM.L_InvalidArgument = "参数“{0}”不适用于这种情况、丢失或者格式不正确。";
 Strings.OfficeOM.L_InvalidArgumentGeneric = "传递给函数的参数不适用于此情况、丢失或格式错误。";
 Strings.OfficeOM.L_InvalidBinding = "无效的绑定";

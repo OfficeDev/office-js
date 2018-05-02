@@ -1,4 +1,4 @@
-/* Version: 16.0.9106.1000 */
+/* Version: 16.0.9314.1000 */
 
 Type.registerNamespace("Strings");
 Strings.OfficeOM = function()
@@ -20,7 +20,7 @@ Strings.OfficeOM.L_BindingCreationError = "Sidonnan luontivirhe";
 Strings.OfficeOM.L_BindingNotExist = "Määritettyä sidontaa ei ole.";
 Strings.OfficeOM.L_BindingToMultipleSelection = "Epäyhtenäistä valintaa ei tueta.";
 Strings.OfficeOM.L_BrowserAPINotSupported = "Tämä selain ei tue pyydettyä ohjelmointirajapintaa.";
-Strings.OfficeOM.L_CallbackNotAFunction = "Takaisinkutsun on oltava tyyppiä toiminto, se oli tyyppiä {0}.";
+Strings.OfficeOM.L_CallbackNotAFunction = "Takaisinkutsun on oltava tyyppiä toiminto, se oli tyyppiä {0}."
 Strings.OfficeOM.L_CannotApplyPropertyThroughSetMethod = "Ominaisuuteen {0} tehtyjä muutoksia ei voi ottaa käyttöön object.set-menetelmällä.";
 Strings.OfficeOM.L_CannotNavigateTo = "Objekti on paikassa, joka ei tue siirtymistä.";
 Strings.OfficeOM.L_CannotRegisterEvent = "Tapahtumakäsittelijää ei voi rekisteröidä.";
@@ -157,7 +157,7 @@ Strings.OfficeOM.L_SSOConnectionLostError = "Yhteys katkesi kirjautumisen aikana
 Strings.OfficeOM.L_SSOConnectionLostErrorMessage = "Yhteys katkesi kirjautumisen aikana, eikä käyttäjää ehkä kirjattu sisään. Tämä johtui todennäköisesti käyttäjän selaimen määritysasetuksista, esimerkiksi suojausvyöhykkeistä.";
 Strings.OfficeOM.L_SSOServerError = "Virhe käyttöoikeuksien todentamispalvelun tarjoajassa.";
 Strings.OfficeOM.L_SSOServerErrorMessage = "Odottamaton palvelinvirhe.";
-Strings.OfficeOM.L_SSOUserConsentNotSupportedByCurrentAddinCategory = "Tämä apuohjelma ei tue käyttäjän suostumusta."
+Strings.OfficeOM.L_SSOUserConsentNotSupportedByCurrentAddinCategory = "Tämä apuohjelma ei tue käyttäjän suostumusta.";
 Strings.OfficeOM.L_SSOUserConsentNotSupportedByCurrentAddinCategoryMessage = "Toiminto epäonnistui, koska apuohjelma ei tue käyttäjän suostumusta tässä luokassa";
 Strings.OfficeOM.L_SaveSettingsError = "Asetuksien tallennusvirhe";
 Strings.OfficeOM.L_SelectionCannotBound = "Sitominen nykyiseen valintaan ei onnistu.";

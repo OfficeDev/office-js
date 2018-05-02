@@ -1,4 +1,4 @@
-/* Version: 16.0.9106.1000 */
+/* Version: 16.0.9314.1000 */
 
 Type.registerNamespace("Strings");
 Strings.OfficeOM = function()
@@ -20,8 +20,8 @@ Strings.OfficeOM.L_BindingCreationError = "Ralat Penciptaan Pengikatan";
 Strings.OfficeOM.L_BindingNotExist = "Pengikatan yang ditentukan tidak wujud.";
 Strings.OfficeOM.L_BindingToMultipleSelection = "Pilihan tidak bersebelahan tidak disokong.";
 Strings.OfficeOM.L_BrowserAPINotSupported = "Pelayan ini tidak menyokong API yang diminta.";
-Strings.OfficeOM.L_CallbackNotAFunction = "Panggil balik mestilah fungsi jenis, sebelum ini jenis {0}.";
-Strings.OfficeOM.L_CannotApplyPropertyThroughSetMethod = "Perubahan kepada sifat '{0}' tidak boleh digunakan melalui kaedah \"set.objek\"."
+Strings.OfficeOM.L_CallbackNotAFunction = "Panggil balik mestilah fungsi jenis, sebelum ini jenis {0}."
+Strings.OfficeOM.L_CannotApplyPropertyThroughSetMethod = "Perubahan kepada sifat '{0}' tidak boleh digunakan melalui kaedah \"set.objek\".";
 Strings.OfficeOM.L_CannotNavigateTo = "Objek terletak di lokasi yang tidak menyokong navigasi.";
 Strings.OfficeOM.L_CannotRegisterEvent = "Pengendali peristiwa tidak boleh didaftarkan.";
 Strings.OfficeOM.L_CannotWriteToSelection = "Tidak dapat menulis kepada pilihan semasa.";

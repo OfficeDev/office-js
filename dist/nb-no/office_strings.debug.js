@@ -1,4 +1,4 @@
-/* Version: 16.0.9106.1000 */
+/* Version: 16.0.9314.1000 */
 
 Type.registerNamespace("Strings");
 Strings.OfficeOM = function()
@@ -20,11 +20,11 @@ Strings.OfficeOM.L_BindingCreationError = "Feil under oppretting av binding";
 Strings.OfficeOM.L_BindingNotExist = "Den angitte bindingen finnes ikke.";
 Strings.OfficeOM.L_BindingToMultipleSelection = "Ikke-sammenhengende utvalg støttes ikke.";
 Strings.OfficeOM.L_BrowserAPINotSupported = "Denne nettleseren støtter ikke den forespurte APIen.";
-Strings.OfficeOM.L_CallbackNotAFunction = "Tilbakekall må være av typen function. Var av typen {0}.";
+Strings.OfficeOM.L_CallbackNotAFunction = "Tilbakekall må være av typen function. Var av typen {0}."
 Strings.OfficeOM.L_CannotApplyPropertyThroughSetMethod = "Endringer av egenskapen {0} kan ikke brukes med en object.set-metode.";
 Strings.OfficeOM.L_CannotNavigateTo = "Objektet er plassert på et sted der navigasjon ikke støttes.";
 Strings.OfficeOM.L_CannotRegisterEvent = "Kan ikke registrere hendelsesbehandling.";
-Strings.OfficeOM.L_CannotWriteToSelection = "Kan ikke skrive til gjeldende utvalg."
+Strings.OfficeOM.L_CannotWriteToSelection = "Kan ikke skrive til gjeldende utvalg.";
 Strings.OfficeOM.L_CellDataAmountBeyondLimits = "Obs!  Antall celler i en tabell er foreslått å være mindre enn 20 000 celler.";
 Strings.OfficeOM.L_CellFormatAmountBeyondLimits = "Obs!  Formatet som er angitt av et API-kall for formatering, er foreslått å være under 100.";
 Strings.OfficeOM.L_CloseFileBeforeRetrieve = "Kall closeAsync på den gjeldende filen før du henter en annen.";

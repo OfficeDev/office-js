@@ -1,4 +1,4 @@
-/* Version: 16.0.9106.1000 */
+/* Version: 16.0.9314.1000 */
 
 Type.registerNamespace("Strings");
 Strings.OfficeOM = function()
@@ -20,7 +20,7 @@ Strings.OfficeOM.L_BindingCreationError = "Kötés-létrehozási hiba";
 Strings.OfficeOM.L_BindingNotExist = "A megadott kötés nem létezik.";
 Strings.OfficeOM.L_BindingToMultipleSelection = "A nem összefüggő kijelölések használata nem támogatott.";
 Strings.OfficeOM.L_BrowserAPINotSupported = "Böngészője nem támogatja a kért API-t.";
-Strings.OfficeOM.L_CallbackNotAFunction = "A visszahívás típusa csak függvény lehet, de ehelyett {0} típusú volt.";
+Strings.OfficeOM.L_CallbackNotAFunction = "A visszahívás típusa csak függvény lehet, de ehelyett {0} típusú volt."
 Strings.OfficeOM.L_CannotApplyPropertyThroughSetMethod = "A(z) {0} tulajdonság módosításai nem léptethetők érvénybe object.set metódussal.";
 Strings.OfficeOM.L_CannotNavigateTo = "Az objektum olyan helyen található, ahol a navigálás nem támogatott.";
 Strings.OfficeOM.L_CannotRegisterEvent = "Sikertelen volt az eseménykezelő regisztrálása.";
@@ -166,7 +166,7 @@ Strings.OfficeOM.L_SetDataIsTooLarge = "A megadott adatobjektum túl nagy.";
 Strings.OfficeOM.L_SetDataParametersConflict = "A megadott paraméterek ütköznek.";
 Strings.OfficeOM.L_SettingNameNotExist = "A megadott beállításnév nem létezik.";
 Strings.OfficeOM.L_SettingsAreStale = "Nem sikerült menteni a beállításokat, mert nem naprakészek.";
-Strings.OfficeOM.L_SettingsCannotSave = "Nem sikerült menteni a beállításokat."
+Strings.OfficeOM.L_SettingsCannotSave = "Nem sikerült menteni a beállításokat.";
 Strings.OfficeOM.L_SettingsStaleError = "Hiba: elavult beállítások";
 Strings.OfficeOM.L_ShowWindowDialogNotification = "A(z) {0} új ablakot próbál megnyitni.";
 Strings.OfficeOM.L_ShowWindowDialogNotificationAllow = "Engedélyezés";

@@ -1,4 +1,4 @@
-/* Version: 16.0.9106.1000 */
+/* Version: 16.0.9314.1000 */
 
 Type.registerNamespace("Strings");
 Strings.OfficeOM = function()
@@ -20,7 +20,7 @@ Strings.OfficeOM.L_BindingCreationError = "Sidumise loomise tõrge";
 Strings.OfficeOM.L_BindingNotExist = "Määratud sidumist pole olemas.";
 Strings.OfficeOM.L_BindingToMultipleSelection = "Mittekülgnevaid valikuid ei toetata.";
 Strings.OfficeOM.L_BrowserAPINotSupported = "See brauser ei toeta taotletud API-t.";
-Strings.OfficeOM.L_CallbackNotAFunction = "Tagasikutse peab olema funktsioon-tüüpi, kuid on tüüpi {0}.";
+Strings.OfficeOM.L_CallbackNotAFunction = "Tagasikutse peab olema funktsioon-tüüpi, kuid on tüüpi {0}."
 Strings.OfficeOM.L_CannotApplyPropertyThroughSetMethod = 'Atribuudi "{0}" muudatusi ei saa rakendada meetodi "object.set" abil.';
 Strings.OfficeOM.L_CannotNavigateTo = "Objekt asub kohas, kus navigeerimist ei toetata.";
 Strings.OfficeOM.L_CannotRegisterEvent = "Sündmuseohjurit ei saa registreerida.";
@@ -133,7 +133,7 @@ Strings.OfficeOM.L_NonUniformPartialSetNotSupported = "Koordinaatparameetreid ei
 Strings.OfficeOM.L_NotImplemented = "Funktsioon {0} pole juurutatud.";
 Strings.OfficeOM.L_NotSupported = "Funktsiooni {0} ei toetata.";
 Strings.OfficeOM.L_NotSupportedBindingType = "Määratud sidumistüüp {0} pole toetatud.";
-Strings.OfficeOM.L_NotSupportedEventType = "Määratud sündmuse tüüp {0} pole toetatud."
+Strings.OfficeOM.L_NotSupportedEventType = "Määratud sündmuse tüüp {0} pole toetatud.";
 Strings.OfficeOM.L_OperationCancelledError = "Toiming on tühistatud";
 Strings.OfficeOM.L_OperationCancelledErrorMessage = "Kasutaja on toimingu tühistanud.";
 Strings.OfficeOM.L_OperationNotSupported = "Toimingut ei toetata.";

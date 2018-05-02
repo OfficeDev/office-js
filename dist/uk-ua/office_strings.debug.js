@@ -1,4 +1,4 @@
-/* Version: 16.0.9106.1000 */
+/* Version: 16.0.9314.1000 */
 
 Type.registerNamespace("Strings");
 Strings.OfficeOM = function()
@@ -20,7 +20,7 @@ Strings.OfficeOM.L_BindingCreationError = "Помилка створення з�
 Strings.OfficeOM.L_BindingNotExist = "Указане зв’язування не існує.";
 Strings.OfficeOM.L_BindingToMultipleSelection = "Переривчасті виділення не підтримуються.";
 Strings.OfficeOM.L_BrowserAPINotSupported = "Цей браузер не підтримує запитаний API.";
-Strings.OfficeOM.L_CallbackNotAFunction = "Зворотній виклик має бути функцією, а не {0}.";
+Strings.OfficeOM.L_CallbackNotAFunction = "Зворотній виклик має бути функцією, а не {0}."
 Strings.OfficeOM.L_CannotApplyPropertyThroughSetMethod = 'Не можна застосувати зміни властивості "{0}" за допомогою методу "object.set".';
 Strings.OfficeOM.L_CannotNavigateTo = "Об’єкт розташовано там, де не підтримується навігація.";
 Strings.OfficeOM.L_CannotRegisterEvent = "Не вдалося зареєструвати обробник подій.";
@@ -160,7 +160,7 @@ Strings.OfficeOM.L_SSOServerErrorMessage = "Сталася неочікуван�
 Strings.OfficeOM.L_SSOUserConsentNotSupportedByCurrentAddinCategory = "Ця надбудова не підтримує згоду користувача.";
 Strings.OfficeOM.L_SSOUserConsentNotSupportedByCurrentAddinCategoryMessage = "Не вдалося виконати операцію, тому що ця надбудова не підтримує згоду користувача в цій категорії";
 Strings.OfficeOM.L_SaveSettingsError = "Помилка збереження настройок";
-Strings.OfficeOM.L_SelectionCannotBound = "Не вдалося зв’язати з поточним виділенням."
+Strings.OfficeOM.L_SelectionCannotBound = "Не вдалося зв’язати з поточним виділенням.";
 Strings.OfficeOM.L_SelectionNotSupportCoercionType = "Поточне виділення несумісне з указаним типом приведення.";
 Strings.OfficeOM.L_SetDataIsTooLarge = "Указаний об’єкт даних завеликий.";
 Strings.OfficeOM.L_SetDataParametersConflict = "Указані параметри конфліктують.";

@@ -1,4 +1,4 @@
-/* Version: 16.0.9106.1000 */
+/* Version: 16.0.9314.1000 */
 
 Type.registerNamespace("Strings");
 Strings.OfficeOM = function()
@@ -20,7 +20,7 @@ Strings.OfficeOM.L_BindingCreationError = "Erro de creación da vinculación";
 Strings.OfficeOM.L_BindingNotExist = "A vinculación especificada non existe.";
 Strings.OfficeOM.L_BindingToMultipleSelection = "As seleccións non contiguas non son compatibles.";
 Strings.OfficeOM.L_BrowserAPINotSupported = "Este explorador non é compatible coa API solicitada.";
-Strings.OfficeOM.L_CallbackNotAFunction = "A chamada de retorno debe ser de tipo función, pero era de tipo {0}.";
+Strings.OfficeOM.L_CallbackNotAFunction = "A chamada de retorno debe ser de tipo función, pero era de tipo {0}."
 Strings.OfficeOM.L_CannotApplyPropertyThroughSetMethod = 'Non se poden aplicar os cambios á propiedade "{0}" a través dun método "object.set".';
 Strings.OfficeOM.L_CannotNavigateTo = "O obxecto está situado nun lugar onde a navegación non é compatible.";
 Strings.OfficeOM.L_CannotRegisterEvent = "O indicador de eventos non se pode rexistrar.";
@@ -82,7 +82,7 @@ Strings.OfficeOM.L_InvalidApiArgumentsMessage = "Argumentos de entrada non váli
 Strings.OfficeOM.L_InvalidApiCallInContext = "Chamada API non válida no contexto actual.";
 Strings.OfficeOM.L_InvalidArgument = 'O argumento "{0}" non funciona para esta situación, falta ou non ten o formato correcto.';
 Strings.OfficeOM.L_InvalidArgumentGeneric = "Os argumentos que se pasaron á función non funcionaron para esta situación, faltan ou non teñen o formato axeitado.";
-Strings.OfficeOM.L_InvalidBinding = "Vinculación non válida"
+Strings.OfficeOM.L_InvalidBinding = "Vinculación non válida";
 Strings.OfficeOM.L_InvalidBindingError = "Erro de vinculación non válida";
 Strings.OfficeOM.L_InvalidBindingOperation = "Operación de vinculación non válida";
 Strings.OfficeOM.L_InvalidCellsValue = "Un ou máis dos parámetros de celas teñen valores non permitidos. Verifica outra vez os valores e téntao de novo.";

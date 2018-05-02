@@ -1,4 +1,4 @@
-/* Version: 16.0.9106.1000 */
+/* Version: 16.0.9314.1000 */
 
 Type.registerNamespace("Strings");
 Strings.OfficeOM = function()
@@ -20,7 +20,7 @@ Strings.OfficeOM.L_BindingCreationError = "Байланыстыруды жаса
 Strings.OfficeOM.L_BindingNotExist = "Берілген байланыстыру жоқ.";
 Strings.OfficeOM.L_BindingToMultipleSelection = "Ағымдағы таңдауды байланыстыру мүмкін емес. Бірнеше, байланыспаған таңдауға қолдау көрсетілмейді.";
 Strings.OfficeOM.L_BrowserAPINotSupported = "Бұл браузер сұралған API интерфейсін қолдамайды.";
-Strings.OfficeOM.L_CallbackNotAFunction = "Жауап түрі функция түріндей болуы қажет, түрі {0}.";
+Strings.OfficeOM.L_CallbackNotAFunction = "Жауап түрі функция түріндей болуы қажет, түрі {0}."
 Strings.OfficeOM.L_CannotApplyPropertyThroughSetMethod = '"{0}" сипатына арналған өзгерістер "object.set" әдісі арқылы қолданылмайды.';
 Strings.OfficeOM.L_CannotNavigateTo = "Нысан шарлау қолдау көрсетілмейтін жерде орналасқан.";
 Strings.OfficeOM.L_CannotRegisterEvent = "Оқиға өңдегішті тіркеу мүмкін емес.";
@@ -183,7 +183,7 @@ Strings.OfficeOM.L_UnknownBindingType = "Байланыстыру түріне �
 Strings.OfficeOM.L_UnsupportedDataObject = "Берілген деректер нысанына қолдау көрсетілмейді.";
 Strings.OfficeOM.L_UnsupportedEnumeration = "Қолданылмайтын тізу әрекеті";
 Strings.OfficeOM.L_UnsupportedEnumerationMessage = "Санамалауды ағымдағы серверлік бағдарламада қолдамайды.";
-Strings.OfficeOM.L_UnsupportedUserIdentity = "Пайдаланушының сәйкестік куәлігі түріне қолдау көрсетілмейді."
+Strings.OfficeOM.L_UnsupportedUserIdentity = "Пайдаланушының сәйкестік куәлігі түріне қолдау көрсетілмейді.";
 Strings.OfficeOM.L_UnsupportedUserIdentityMessage = "Пайдаланушының сәйкестік куәлігі түріне қолдау көрсетілмейді.";
 Strings.OfficeOM.L_UserAborted = "Пайдаланушы авторизация сұрауын үзді.";
 Strings.OfficeOM.L_UserAbortedMessage = "Пайдаланушы қондырма рұқсаттарына келіспеді.";

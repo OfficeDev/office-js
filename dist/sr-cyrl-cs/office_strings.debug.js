@@ -1,4 +1,4 @@
-/* Version: 16.0.9106.1000 */
+/* Version: 16.0.9314.1000 */
 
 Type.registerNamespace("Strings");
 Strings.OfficeOM = function()
@@ -20,7 +20,7 @@ Strings.OfficeOM.L_BindingCreationError = "Binding Creation Error";
 Strings.OfficeOM.L_BindingNotExist = "The specified binding does not exist.";
 Strings.OfficeOM.L_BindingToMultipleSelection = "Noncontiguous selections are not supported.";
 Strings.OfficeOM.L_BrowserAPINotSupported = "This browser does not support the requested API.";
-Strings.OfficeOM.L_CallbackNotAFunction = "Callback must be of type function, was of type {0}.";
+Strings.OfficeOM.L_CallbackNotAFunction = "Callback must be of type function, was of type {0}."
 Strings.OfficeOM.L_CannotApplyPropertyThroughSetMethod = "Changes to property '{0}' cannot be applied through an \"object.set\" method.";
 Strings.OfficeOM.L_CannotNavigateTo = "The object is located in a place where navigation is not supported.";
 Strings.OfficeOM.L_CannotRegisterEvent = "The event handler cannot be registered.";
@@ -33,8 +33,8 @@ Strings.OfficeOM.L_CoercionTypeNotSupported = "The specified coercion type is no
 Strings.OfficeOM.L_ColIndexOutOfRange = "The column index value is out of the allowed range. Use a value (0 or higher) that's less than the number of columns.";
 Strings.OfficeOM.L_ConnectionFailureWithDetails = "The request failed with status code of {0}, error code {1} and the following error message: {2}";
 Strings.OfficeOM.L_ConnectionFailureWithStatus = "The request failed with status code of {0}.";
-Strings.OfficeOM.L_CustomFunctionDefinitionMissing = "A property with this name that represents the function's definition must exist on Excel.CustomFunctions.";
-Strings.OfficeOM.L_CustomFunctionImplementationMissing = "The property with this name on Excel.CustomFunctions that represents the function's definition must contain a 'call' property that implements the function.";
+Strings.OfficeOM.L_CustomFunctionDefinitionMissing = "A property with this name that represents the function's definition must exist on Excel.Script.CustomFunctions.";
+Strings.OfficeOM.L_CustomFunctionImplementationMissing = "The property with this name on Excel.Script.CustomFunctions that represents the function's definition must contain a 'call' property that implements the function.";
 Strings.OfficeOM.L_CustomFunctionNameCannotSplit = "The function name must contain a non-empty namespace and a non-empty short name.";
 Strings.OfficeOM.L_CustomFunctionNameContainsBadChars = "The function name may only contain letters, digits, underscores, and periods.";
 Strings.OfficeOM.L_CustomXmlError = "Custom XML Error.";
@@ -182,7 +182,7 @@ Strings.OfficeOM.L_TooManyOptionalObjects = "multiple optional objects in parame
 Strings.OfficeOM.L_UnknownBindingType = "The binding type is not supported.";
 Strings.OfficeOM.L_UnsupportedDataObject = "The supplied data object type is not supported.";
 Strings.OfficeOM.L_UnsupportedEnumeration = "Unsupported Enumeration";
-Strings.OfficeOM.L_UnsupportedEnumerationMessage = "The enumeration isn't supported in the current host application."
+Strings.OfficeOM.L_UnsupportedEnumerationMessage = "The enumeration isn't supported in the current host application.";
 Strings.OfficeOM.L_UnsupportedUserIdentity = "User identity type is not supported.";
 Strings.OfficeOM.L_UnsupportedUserIdentityMessage = "The identity type of the user is not supported.";
 Strings.OfficeOM.L_UserAborted = "User aborted the consent request.";

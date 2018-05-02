@@ -1,4 +1,4 @@
-/* Version: 16.0.9106.1000 */
+/* Version: 16.0.9314.1000 */
 
 Type.registerNamespace("Strings");
 Strings.OfficeOM = function()
@@ -20,7 +20,7 @@ Strings.OfficeOM.L_BindingCreationError = "No se pudo crear el enlace";
 Strings.OfficeOM.L_BindingNotExist = "El enlace especificado no existe.";
 Strings.OfficeOM.L_BindingToMultipleSelection = "No se admiten las selecciones discontinuas.";
 Strings.OfficeOM.L_BrowserAPINotSupported = "Este explorador no es compatible con la API solicitada.";
-Strings.OfficeOM.L_CallbackNotAFunction = "La devolución de llamada debe ser de tipo función. Era de tipo {0}.";
+Strings.OfficeOM.L_CallbackNotAFunction = "La devolución de llamada debe ser de tipo función. Era de tipo {0}."
 Strings.OfficeOM.L_CannotApplyPropertyThroughSetMethod = 'Los cambios en la propiedad "{0}" no se puede aplicar a través de un método "object.set".';
 Strings.OfficeOM.L_CannotNavigateTo = "El objeto se encuentra en una ubicación donde no se admite la navegación.";
 Strings.OfficeOM.L_CannotRegisterEvent = "No se puede registrar el controlador de eventos.";
@@ -78,7 +78,7 @@ Strings.OfficeOM.L_InitializeNotReady = "Office.js no se ha cargado todavía por
 Strings.OfficeOM.L_InternalError = "Error interno";
 Strings.OfficeOM.L_InternalErrorDescription = "Error interno.";
 Strings.OfficeOM.L_InvalidAPICall = "Llamada de API no válida";
-Strings.OfficeOM.L_InvalidApiArgumentsMessage = "Los argumentos de entrada no son válidos."
+Strings.OfficeOM.L_InvalidApiArgumentsMessage = "Los argumentos de entrada no son válidos.";
 Strings.OfficeOM.L_InvalidApiCallInContext = "La llamada a API no es válida en el contexto actual.";
 Strings.OfficeOM.L_InvalidArgument = 'El argumento "{0}" no funciona en esta situación, falta o no tiene el formato correcto.';
 Strings.OfficeOM.L_InvalidArgumentGeneric = "Los argumentos pasados a la función no funcionan en esta situación, faltan o no están en el formato correcto.";

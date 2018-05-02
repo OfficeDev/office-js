@@ -1,4 +1,4 @@
-/* Version: 16.0.9106.1000 */
+/* Version: 16.0.9314.1000 */
 
 Type.registerNamespace("Strings");
 Strings.OfficeOM = function()
@@ -20,7 +20,7 @@ Strings.OfficeOM.L_BindingCreationError = "Errorea lotura sortzean";
 Strings.OfficeOM.L_BindingNotExist = "Zehaztutako lotura ez dago.";
 Strings.OfficeOM.L_BindingToMultipleSelection = "Ez dira ondoz ondokoak ez diren hautapenak onartzen.";
 Strings.OfficeOM.L_BrowserAPINotSupported = "Eskatutako APIa ez da arakatzailearekin bateragarria.";
-Strings.OfficeOM.L_CallbackNotAFunction = "Atzeradeiak funtzio motakoa izan behar du; {0} motakoa da.";
+Strings.OfficeOM.L_CallbackNotAFunction = "Atzeradeiak funtzio motakoa izan behar du; {0} motakoa da."
 Strings.OfficeOM.L_CannotApplyPropertyThroughSetMethod = '"{0}" propietatean egindako aldaketak ezin dira aplikatu "object.set" metodoaren bidez.';
 Strings.OfficeOM.L_CannotNavigateTo = "Objektua nabigatu ezin den toki batean kokatuta dago.";
 Strings.OfficeOM.L_CannotRegisterEvent = "Ezin da erregistratu gertaera-maneatzailea.";
@@ -143,7 +143,7 @@ Strings.OfficeOM.L_OsfControlTypeNotSupported = "Ez da OsfControl mota onartzen.
 Strings.OfficeOM.L_OutOfRange = "Barrutitik kanpo";
 Strings.OfficeOM.L_OverwriteWorksheetData = "Multzo-eragiketak huts egin du adierazitako datu-objektuak datuak gainidatzi edo lekualdatuko baititu.";
 Strings.OfficeOM.L_PermissionDenied = "Baimena ukatu da";
-Strings.OfficeOM.L_PropertyDoesNotExist = '"{0}" propietatea ez dago objektuan.'
+Strings.OfficeOM.L_PropertyDoesNotExist = '"{0}" propietatea ez dago objektuan.';
 Strings.OfficeOM.L_PropertyNotLoaded = '"{0}" propietatea ez dago erabilgarri. Propietatearen balioa irakurri aurretik, deitu edukitze-objektuaren kargatze-metodoari eta deitu "context.sync()" metodoari erlazionatutako eskaera-testuinguruan.';
 Strings.OfficeOM.L_ReadSettingsError = "Irakurketa-ezarpenen errorea";
 Strings.OfficeOM.L_RedundantCallbackSpecification = "Ezin da atzeradeia zehaztu ez argumentu-zerrendan ez aukerako objektuan.";

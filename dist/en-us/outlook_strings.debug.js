@@ -1,4 +1,4 @@
-/* Version: 16.0.9106.1000 */
+/* Version: 16.0.9314.1000 */
 
 if (window.Type && window.Type.registerNamespace) {
 Type.registerNamespace('_u');} else {
@@ -37,6 +37,7 @@ _u.ExtensibilityStrings.l_EmailAddressTooLong_Text='One or more of the email add
 _u.ExtensibilityStrings.l_EwsRequestOversized_Text='The request exceeds the 1 MB size limit. Please modify your EWS request.';
 _u.ExtensibilityStrings.l_ExceededMaxNumberOfAttachments_Text='Attachments cannot be added because the message already has the maximum number of attachments';
 _u.ExtensibilityStrings.l_HtmlSanitizationFailure_Text='The HTML santization has failed.';
+_u.ExtensibilityStrings.l_Insufficient_Item_Permissions_Text='The user doesn\'t have the permissions required to perform this operation.';
 _u.ExtensibilityStrings.l_InternalFormatError_Text='There was an internal format error.';
 _u.ExtensibilityStrings.l_InternalProtocolError_Text='Internal protocol error: \'{0}\'.';
 _u.ExtensibilityStrings.l_InvalidActionType_Text='The value of the parameter \'actionType\' is invalid. The accepted value is \"showTaskPane\".';
@@ -60,6 +61,8 @@ _u.ExtensibilityStrings.l_ParameterValueTooLongError_Text='The value of the \'{0
 _u.ExtensibilityStrings.l_ParametersNotAsExpected_Text='The given parameters do not match the expected format.';
 _u.ExtensibilityStrings.l_PersistedNotificationArrayReadError_Text='The API call you made failed because the persisted notifications couldn\'t be retrieved.';
 _u.ExtensibilityStrings.l_PersistedNotificationArraySaveError_Text='The API call you made failed because notifications couldn\'t be persisted.';
+_u.ExtensibilityStrings.l_RecurrenceErrorMaxOccurrences_Text='The recurring series exceeds the maximum limit of 999 occurrences.';
+_u.ExtensibilityStrings.l_RecurrenceErrorZeroOccurrences_Text='The recurring series has no occurrences in the specified date range.';
 _u.ExtensibilityStrings.l_Recurrence_Error_Instance_SetAsync_Text='A recurrence pattern can\'t be set for a single occurrence in a series.';
 _u.ExtensibilityStrings.l_Recurrence_Error_Properties_Invalid_Text='The recurrence pattern isn\'t valid. Please check that the specified recurrence properties align with the recurrence type.';
 _u.ExtensibilityStrings.l_SaveError_Text='Connection error occurred while trying to save the item on the server.';

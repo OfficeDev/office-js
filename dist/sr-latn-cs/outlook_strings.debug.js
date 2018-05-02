@@ -1,4 +1,4 @@
-/* Version: 16.0.9106.1000 */
+/* Version: 16.0.9314.1000 */
 
 Type.registerNamespace("_u");
 _u.ExtensibilityStrings = function()
@@ -31,9 +31,10 @@ _u.ExtensibilityStrings.l_EmailAddressTooLong_Text = "Neke od datih e-adresa su 
 _u.ExtensibilityStrings.l_EwsRequestOversized_Text = "Zahtev premašuje ograničenje veličine od 1 MB. Izmenite EWS zahtev.";
 _u.ExtensibilityStrings.l_ExceededMaxNumberOfAttachments_Text = "Nije moguće dodati priloge zato što poruka već ima maksimalan broj priloga";
 _u.ExtensibilityStrings.l_HtmlSanitizationFailure_Text = "HTML čišćenje nije uspelo.";
+_u.ExtensibilityStrings.l_Insufficient_Item_Permissions_Text = "The user doesn't have the permissions required to perform this operation.";
 _u.ExtensibilityStrings.l_InternalFormatError_Text = "Došlo je do interne greške u formatiranju.";
 _u.ExtensibilityStrings.l_InternalProtocolError_Text = "Interna greška protokola: '{0}'.";
-_u.ExtensibilityStrings.l_InvalidActionType_Text = "The value of the parameter 'actionType' is invalid. The accepted value is \"showTaskPane\".";
+_u.ExtensibilityStrings.l_InvalidActionType_Text = "The value of the parameter 'actionType' is invalid. The accepted value is \"showTaskPane\"."
 _u.ExtensibilityStrings.l_InvalidAttachmentId_Text = "ID priloga je nevažeći.";
 _u.ExtensibilityStrings.l_InvalidAttachmentPath_Text = "Putanja priloga je nevažeća.";
 _u.ExtensibilityStrings.l_InvalidCommandIdError_Text = "The value of the parameter 'commandId' is invalid.";
@@ -42,7 +43,7 @@ _u.ExtensibilityStrings.l_InvalidEndTime_Text = "Vreme završetka ne može biti 
 _u.ExtensibilityStrings.l_InvalidEventDates_Text = "Datum završetka je pre datuma početka.";
 _u.ExtensibilityStrings.l_InvalidParameterValueError_Text = "The value of the '{0}' parameter is invalid.";
 _u.ExtensibilityStrings.l_InvalidSelection_Text = "The selection is invalid.";
-_u.ExtensibilityStrings.l_InvalidTime_Text = "The input doesn't resolve to a valid time."
+_u.ExtensibilityStrings.l_InvalidTime_Text = "The input doesn't resolve to a valid time.";
 _u.ExtensibilityStrings.l_MessageInDifferentStoreError_Text = "The EWS ID can't be retrieved because the message is saved in a different store.";
 _u.ExtensibilityStrings.l_NoValidRecipientsProvided_Text = "Nisu dati važeći primaoci.";
 _u.ExtensibilityStrings.l_NotificationKeyNotFound_Text = "There are no notifications with the provided key.";
@@ -54,6 +55,8 @@ _u.ExtensibilityStrings.l_ParameterValueTooLongError_Text = "The value of the '{
 _u.ExtensibilityStrings.l_ParametersNotAsExpected_Text = "Dati parametri ne odgovaraju očekivanom formatu.";
 _u.ExtensibilityStrings.l_PersistedNotificationArrayReadError_Text = "The API call you made failed because the persisted notifications couldn't be retrieved.";
 _u.ExtensibilityStrings.l_PersistedNotificationArraySaveError_Text = "The API call you made failed because notifications couldn't be persisted.";
+_u.ExtensibilityStrings.l_RecurrenceErrorMaxOccurrences_Text = "The recurring series exceeds the maximum limit of 999 occurrences.";
+_u.ExtensibilityStrings.l_RecurrenceErrorZeroOccurrences_Text = "The recurring series has no occurrences in the specified date range.";
 _u.ExtensibilityStrings.l_Recurrence_Error_Instance_SetAsync_Text = "A recurrence pattern can't be set for a single occurrence in a series.";
 _u.ExtensibilityStrings.l_Recurrence_Error_Properties_Invalid_Text = "The recurrence pattern isn't valid. Please check that the specified recurrence properties align with the recurrence type.";
 _u.ExtensibilityStrings.l_SaveError_Text = "Connection error occurred while trying to save the item on the server.";

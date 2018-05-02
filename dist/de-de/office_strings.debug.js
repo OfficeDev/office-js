@@ -1,4 +1,4 @@
-/* Version: 16.0.9106.1000 */
+/* Version: 16.0.9314.1000 */
 
 Type.registerNamespace("Strings");
 Strings.OfficeOM = function()
@@ -20,7 +20,7 @@ Strings.OfficeOM.L_BindingCreationError = "Fehler beim Erstellen der Bindung.";
 Strings.OfficeOM.L_BindingNotExist = "Die angegebene Bindung ist nicht vorhanden.";
 Strings.OfficeOM.L_BindingToMultipleSelection = "Eine nicht zusammenhängende Auswahl wird nicht unterstützt.";
 Strings.OfficeOM.L_BrowserAPINotSupported = "Dieser Browser unterstützt die angeforderte API nicht.";
-Strings.OfficeOM.L_CallbackNotAFunction = 'Der Rückruf muss vom Typ "Funktion" sein, war aber vom Typ "{0}".';
+Strings.OfficeOM.L_CallbackNotAFunction = 'Der Rückruf muss vom Typ "Funktion" sein, war aber vom Typ "{0}".'
 Strings.OfficeOM.L_CannotApplyPropertyThroughSetMethod = 'Änderungen an der Eigenschaft "{0}" können nicht mit einer "object.set"-Methode angewendet werden.';
 Strings.OfficeOM.L_CannotNavigateTo = "Das Objekt befindet sich an einem Ort, wo keine Navigation unterstützt wird.";
 Strings.OfficeOM.L_CannotRegisterEvent = "Der Ereignishandler kann nicht registriert werden.";
@@ -41,7 +41,7 @@ Strings.OfficeOM.L_CustomXmlError = "Benutzerdefiniertes XML-Fehler.";
 Strings.OfficeOM.L_CustomXmlExceedQuotaMessage = "XPath beschränkt die Auswahl auf 1024 Elemente.";
 Strings.OfficeOM.L_CustomXmlExceedQuotaName = "Auswahlgrenzwert erreicht.";
 Strings.OfficeOM.L_CustomXmlNodeNotFound = "Der angegebene Knoten wurde nicht gefunden.";
-Strings.OfficeOM.L_CustomXmlOutOfDateMessage = "Die Daten sind veraltet. Rufen Sie das Objekt noch mal ab."
+Strings.OfficeOM.L_CustomXmlOutOfDateMessage = "Die Daten sind veraltet. Rufen Sie das Objekt noch mal ab.";
 Strings.OfficeOM.L_CustomXmlOutOfDateName = "Daten sind nicht aktuell.";
 Strings.OfficeOM.L_DataNotMatchBindingSize = "Das bereitgestellte Datenobjekt entspricht nicht der Größe der aktuellen Auswahl.";
 Strings.OfficeOM.L_DataNotMatchBindingType = "Das angegebene Datenobjekt ist mit dem Bindungstyp nicht kompatibel.";

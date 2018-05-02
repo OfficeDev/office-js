@@ -1,4 +1,4 @@
-/* Version: 16.0.9106.1000 */
+/* Version: 16.0.9314.1000 */
 
 Type.registerNamespace("Strings");
 Strings.OfficeOM = function()
@@ -20,7 +20,7 @@ Strings.OfficeOM.L_BindingCreationError = "Greška u stvaranju povezivanja";
 Strings.OfficeOM.L_BindingNotExist = "Navedeno povezivanje ne postoji.";
 Strings.OfficeOM.L_BindingToMultipleSelection = "Nekontinuirane selekcije nisu podržane.";
 Strings.OfficeOM.L_BrowserAPINotSupported = "This browser does not support the requested API.";
-Strings.OfficeOM.L_CallbackNotAFunction = "Povratni poziv mora biti funkcija tipa, bila je tipa {0}.";
+Strings.OfficeOM.L_CallbackNotAFunction = "Povratni poziv mora biti funkcija tipa, bila je tipa {0}."
 Strings.OfficeOM.L_CannotApplyPropertyThroughSetMethod = "Changes to property '{0}' cannot be applied through an \"object.set\" method.";
 Strings.OfficeOM.L_CannotNavigateTo = "Objekat se nalazi na lokaciji na kojoj navigacija nije podržana.";
 Strings.OfficeOM.L_CannotRegisterEvent = "The event handler cannot be registered.";
@@ -33,8 +33,8 @@ Strings.OfficeOM.L_CoercionTypeNotSupported = "Navedeni tip promene nije podrža
 Strings.OfficeOM.L_ColIndexOutOfRange = "Vrednost indeksa kolone je izvan dozvoljenog opsega. Koristite vrednost (0 ili veću) koja je manja od broja kolona.";
 Strings.OfficeOM.L_ConnectionFailureWithDetails = "The request failed with status code of {0}, error code {1} and the following error message: {2}";
 Strings.OfficeOM.L_ConnectionFailureWithStatus = "The request failed with status code of {0}.";
-Strings.OfficeOM.L_CustomFunctionDefinitionMissing = "A property with this name that represents the function's definition must exist on Excel.CustomFunctions.";
-Strings.OfficeOM.L_CustomFunctionImplementationMissing = "The property with this name on Excel.CustomFunctions that represents the function's definition must contain a 'call' property that implements the function.";
+Strings.OfficeOM.L_CustomFunctionDefinitionMissing = "A property with this name that represents the function's definition must exist on Excel.Script.CustomFunctions.";
+Strings.OfficeOM.L_CustomFunctionImplementationMissing = "The property with this name on Excel.Script.CustomFunctions that represents the function's definition must contain a 'call' property that implements the function.";
 Strings.OfficeOM.L_CustomFunctionNameCannotSplit = "The function name must contain a non-empty namespace and a non-empty short name.";
 Strings.OfficeOM.L_CustomFunctionNameContainsBadChars = "The function name may only contain letters, digits, underscores, and periods.";
 Strings.OfficeOM.L_CustomXmlError = "Greška u prilagođenim XML.";
@@ -76,7 +76,7 @@ Strings.OfficeOM.L_InValidOptionalArgument = "nevažeći opcionalni argument";
 Strings.OfficeOM.L_IndexOutOfRange = "Indeks je izvan opsega.";
 Strings.OfficeOM.L_InitializeNotReady = "Office.js još uvek nije potpuno učitan. Pokušajte ponovo kasnije ili postarajte se da dodate vaš kôd za pokretanje na vaš Office.initialize function.";
 Strings.OfficeOM.L_InternalError = "Unutrašnja greška";
-Strings.OfficeOM.L_InternalErrorDescription = "Došlo je do unutrašnje greške."
+Strings.OfficeOM.L_InternalErrorDescription = "Došlo je do unutrašnje greške.";
 Strings.OfficeOM.L_InvalidAPICall = "Nevažeći API poziv";
 Strings.OfficeOM.L_InvalidApiArgumentsMessage = "Invalid input arguments.";
 Strings.OfficeOM.L_InvalidApiCallInContext = "Nevažeći API poziv u trenutnom kontekstu.";

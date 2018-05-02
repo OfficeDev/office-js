@@ -1,4 +1,4 @@
-/* Version: 16.0.9106.1000 */
+/* Version: 16.0.9314.1000 */
 
 Type.registerNamespace("_u");
 _u.ExtensibilityStrings = function()
@@ -24,16 +24,17 @@ _u.ExtensibilityStrings.l_DataWriteErrorName_Text = "［xgx03］‏‏أبع[Dat
 _u.ExtensibilityStrings.l_DeleteAttachmentDoesNotExist_Text = "［dLsV2］‏‏أبع[The attachment cannot be deleted because attachment with the attachment index cannot be found.]לף";
 _u.ExtensibilityStrings.l_DisplayNameTooLong_Text = "［PlGmA］‏‏أبع[One or more of the display names provided is too long.]לף";
 _u.ExtensibilityStrings.l_DisplayReplyFormHtmlBodyRequired_Text = "［sh4OA］‏‏أبع[The 'htmlBody' is required.]לף";
-_u.ExtensibilityStrings.l_DuplicateNotificationKey_Text = "［4irY6］‏‏أبع[A notification with the provided key already exists.]לף"
+_u.ExtensibilityStrings.l_DuplicateNotificationKey_Text = "［4irY6］‏‏أبع[A notification with the provided key already exists.]לף";
 _u.ExtensibilityStrings.l_ElevatedPermissionNeededForMethod_Text = "［vpN0m］‏‏أبع[Elevated permission is required to call the method: '{0}'.]לף";
 _u.ExtensibilityStrings.l_ElevatedPermissionNeeded_Text = "［O3YaN］‏‏أبع[Elevated permission is required to access protected members of the JavaScript API for Office.]לף";
 _u.ExtensibilityStrings.l_EmailAddressTooLong_Text = "［LwH7z］‏‏أبع[One or more of the email addresses provided is too long.]לף";
 _u.ExtensibilityStrings.l_EwsRequestOversized_Text = "［uboan］‏‏أبع[The request exceeds the 1 MB size limit. Please modify your EWS request.]לף";
 _u.ExtensibilityStrings.l_ExceededMaxNumberOfAttachments_Text = "［PKXEO］‏‏أبع[Attachments cannot be added because the message already has the maximum number of attachments]לף";
 _u.ExtensibilityStrings.l_HtmlSanitizationFailure_Text = "［1o9wQ］‏‏أبع[The HTML santization has failed.]לף";
+_u.ExtensibilityStrings.l_Insufficient_Item_Permissions_Text = "［UnS7g］‏‏أبع[The user doesn't have the permissions required to perform this operation.]לף";
 _u.ExtensibilityStrings.l_InternalFormatError_Text = "［ex0FM］‏‏أبع[There was an internal format error.]לף";
 _u.ExtensibilityStrings.l_InternalProtocolError_Text = "［DZrmo］‏‏أبع[Internal protocol error: '{0}'.]לף";
-_u.ExtensibilityStrings.l_InvalidActionType_Text = "［5RL6t］‏‏أبع[The value of the parameter 'actionType' is invalid. The accepted value is \"showTaskPane\".]לף";
+_u.ExtensibilityStrings.l_InvalidActionType_Text = "［5RL6t］‏‏أبع[The value of the parameter 'actionType' is invalid. The accepted value is \"showTaskPane\".]לף"
 _u.ExtensibilityStrings.l_InvalidAttachmentId_Text = "［39s5K］‏‏أبع[The attachment ID was invalid.]לף";
 _u.ExtensibilityStrings.l_InvalidAttachmentPath_Text = "［tMziE］‏‏أبع[The attachment path was invalid.]לף";
 _u.ExtensibilityStrings.l_InvalidCommandIdError_Text = "［J0XLq］‏‏أبع[The value of the parameter 'commandId' is invalid.]לף";
@@ -54,6 +55,8 @@ _u.ExtensibilityStrings.l_ParameterValueTooLongError_Text = "［wqO9W］‏‏أ
 _u.ExtensibilityStrings.l_ParametersNotAsExpected_Text = "［X5aEC］‏‏أبع[The given parameters do not match the expected format.]לף";
 _u.ExtensibilityStrings.l_PersistedNotificationArrayReadError_Text = "［vriVR］‏‏أبع[The API call you made failed because the persisted notifications couldn't be retrieved.]לף";
 _u.ExtensibilityStrings.l_PersistedNotificationArraySaveError_Text = "［xo4Kx］‏‏أبع[The API call you made failed because notifications couldn't be persisted.]לף";
+_u.ExtensibilityStrings.l_RecurrenceErrorMaxOccurrences_Text = "［X1pSJ］‏‏أبع[The recurring series exceeds the maximum limit of 999 occurrences.]לף";
+_u.ExtensibilityStrings.l_RecurrenceErrorZeroOccurrences_Text = "［bqfrU］‏‏أبع[The recurring series has no occurrences in the specified date range.]לף";
 _u.ExtensibilityStrings.l_Recurrence_Error_Instance_SetAsync_Text = "［XlOSr］‏‏أبع[A recurrence pattern can't be set for a single occurrence in a series.]לף";
 _u.ExtensibilityStrings.l_Recurrence_Error_Properties_Invalid_Text = "［UMYct］‏‏أبع[The recurrence pattern isn't valid. Please check that the specified recurrence properties align with the recurrence type.]לף";
 _u.ExtensibilityStrings.l_SaveError_Text = "［1d3LS］‏‏أبع[Connection error occurred while trying to save the item on the server.]לף";

@@ -1,4 +1,4 @@
-/* Version: 16.0.9106.1000 */
+/* Version: 16.0.9314.1000 */
 
 Type.registerNamespace("Strings");
 Strings.OfficeOM = function()
@@ -20,7 +20,7 @@ Strings.OfficeOM.L_BindingCreationError = "Une erreur s'est produite lors de la 
 Strings.OfficeOM.L_BindingNotExist = "Désolé… La liaison spécifiée n’existe pas.";
 Strings.OfficeOM.L_BindingToMultipleSelection = "Les sélections non contiguës ne sont pas prises en charge.";
 Strings.OfficeOM.L_BrowserAPINotSupported = "Ce navigateur ne prend pas en charge l’API demandée.";
-Strings.OfficeOM.L_CallbackNotAFunction = "Le rappel était de type {0}, alors qu'il doit être de type fonction.";
+Strings.OfficeOM.L_CallbackNotAFunction = "Le rappel était de type {0}, alors qu'il doit être de type fonction."
 Strings.OfficeOM.L_CannotApplyPropertyThroughSetMethod = "Les modifications apportées à la propriété « {0} » ne peuvent pas être appliquées via une méthode « object.set ».";
 Strings.OfficeOM.L_CannotNavigateTo = "L’objet est situé dans un emplacement où la navigation n’est pas prise en charge.";
 Strings.OfficeOM.L_CannotRegisterEvent = "Le gestionnaire d’événements ne peut pas être inscrit.";
@@ -55,7 +55,7 @@ Strings.OfficeOM.L_DialogAddressNotTrusted = "Le domaine de l’URL n’est pas 
 Strings.OfficeOM.L_DialogAlreadyOpened = "L’opération a échoué car ce complément a déjà une boîte de dialogue active.";
 Strings.OfficeOM.L_DialogInvalidScheme = "Le schéma d’URL n’est pas pris en charge. Utilisez le protocole HTTPS à la place.";
 Strings.OfficeOM.L_DialogNavigateError = "Erreur de navigation dans la boîte de dialogue";
-Strings.OfficeOM.L_DialogOK = "OK"
+Strings.OfficeOM.L_DialogOK = "OK";
 Strings.OfficeOM.L_DialogRequireHTTPS = "Le protocole HTTP n’est pas pris en charge. Utilisez le protocole HTTPS à la place";
 Strings.OfficeOM.L_DisplayDialogError = "Erreur d’affichage de la boîte de dialogue";
 Strings.OfficeOM.L_DocumentReadOnly = "L’opération demandée n’est pas autorisée sur le mode de document actuel.";

@@ -1,4 +1,4 @@
-/* Version: 16.0.9106.1000 */
+/* Version: 16.0.9314.1000 */
 
 Type.registerNamespace("Strings");
 Strings.OfficeOM = function()
@@ -20,7 +20,7 @@ Strings.OfficeOM.L_BindingCreationError = "Fejl ved oprettelse af binding";
 Strings.OfficeOM.L_BindingNotExist = "Den angivne binding findes ikke.";
 Strings.OfficeOM.L_BindingToMultipleSelection = "Ikke-sammenhængende markeringer understøttes ikke.";
 Strings.OfficeOM.L_BrowserAPINotSupported = "Denne browser understøtter ikke den anmodede API.";
-Strings.OfficeOM.L_CallbackNotAFunction = "Tilbagekald skal være af typen funktion, men var af typen {0}.";
+Strings.OfficeOM.L_CallbackNotAFunction = "Tilbagekald skal være af typen funktion, men var af typen {0}."
 Strings.OfficeOM.L_CannotApplyPropertyThroughSetMethod = 'Ændringer i egenskaben "{0}" kan ikke anvendes gennem en "object.set"-metode.';
 Strings.OfficeOM.L_CannotNavigateTo = "Objektet er placeret et sted, hvor navigation ikke understøttes.";
 Strings.OfficeOM.L_CannotRegisterEvent = "Hændelseshandleren kan ikke registreres.";
@@ -43,7 +43,7 @@ Strings.OfficeOM.L_CustomXmlExceedQuotaName = "Grænsen for valg er nået";
 Strings.OfficeOM.L_CustomXmlNodeNotFound = "Den angivne node blev ikke fundet.";
 Strings.OfficeOM.L_CustomXmlOutOfDateMessage = "Dataene er forældede. Hent objektet igen.";
 Strings.OfficeOM.L_CustomXmlOutOfDateName = "Dataene er ikke aktuelle";
-Strings.OfficeOM.L_DataNotMatchBindingSize = "Det angivne dataobjekt svarer ikke til størrelsen på den aktuelle markering."
+Strings.OfficeOM.L_DataNotMatchBindingSize = "Det angivne dataobjekt svarer ikke til størrelsen på den aktuelle markering.";
 Strings.OfficeOM.L_DataNotMatchBindingType = "Det angivne dataobjekt er ikke kompatibelt med bindingstypen.";
 Strings.OfficeOM.L_DataNotMatchCoercionType = "Typen for det angivne dataobjekt er ikke kompatibel med den aktuelle markering.";
 Strings.OfficeOM.L_DataNotMatchSelection = "Det angivne dataobjekt er ikke kompatibelt med figuren eller målene i den aktuelle markering.";

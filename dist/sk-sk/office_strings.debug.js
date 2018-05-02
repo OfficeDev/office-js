@@ -1,4 +1,4 @@
-/* Version: 16.0.9106.1000 */
+/* Version: 16.0.9314.1000 */
 
 Type.registerNamespace("Strings");
 Strings.OfficeOM = function()
@@ -20,7 +20,7 @@ Strings.OfficeOM.L_BindingCreationError = "Chyba pri vytváraní väzby";
 Strings.OfficeOM.L_BindingNotExist = "Zadaná väzba neexistuje.";
 Strings.OfficeOM.L_BindingToMultipleSelection = "Nesúvislý výber nie je podporovaný.";
 Strings.OfficeOM.L_BrowserAPINotSupported = "Tento prehliadač nepodporuje požadované API.";
-Strings.OfficeOM.L_CallbackNotAFunction = "Spätné volanie musí byť typom funkcie, bolo typom {0}.";
+Strings.OfficeOM.L_CallbackNotAFunction = "Spätné volanie musí byť typom funkcie, bolo typom {0}."
 Strings.OfficeOM.L_CannotApplyPropertyThroughSetMethod = "Zmeny vlastnosti {0} nemožno použiť prostredníctvom metódy object.set.";
 Strings.OfficeOM.L_CannotNavigateTo = "Objekt sa nachádza na mieste, kde nie je podporovaná navigácia.";
 Strings.OfficeOM.L_CannotRegisterEvent = "Obsluha udalostí sa nedá zaregistrovať.";
@@ -136,7 +136,7 @@ Strings.OfficeOM.L_NotSupportedBindingType = "Zadaný typ väzby {0} nie je podp
 Strings.OfficeOM.L_NotSupportedEventType = "Zadaný typ udalosti {0} nie je podporovaný.";
 Strings.OfficeOM.L_OperationCancelledError = "Operácia bola zrušená";
 Strings.OfficeOM.L_OperationCancelledErrorMessage = "Používateľ zrušil operáciu.";
-Strings.OfficeOM.L_OperationNotSupported = "Operácia nie je podporovaná."
+Strings.OfficeOM.L_OperationNotSupported = "Operácia nie je podporovaná.";
 Strings.OfficeOM.L_OperationNotSupportedOnMatrixData = "Zdieľaný obsah musí byť vo formáte tabuľky. Údaje naformátujte ako tabuľku a skúste to znova.";
 Strings.OfficeOM.L_OperationNotSupportedOnThisBindingType = "Operácia nie je v tomto type väzby podporovaná.";
 Strings.OfficeOM.L_OsfControlTypeNotSupported = "Typ OsfControl nie je podporovaný.";

@@ -1,4 +1,4 @@
-/* Version: 16.0.9106.1000 */
+/* Version: 16.0.9314.1000 */
 
 Type.registerNamespace("Strings");
 Strings.OfficeOM = function()
@@ -20,7 +20,7 @@ Strings.OfficeOM.L_BindingCreationError = "Greška u stvaranju povezivanja";
 Strings.OfficeOM.L_BindingNotExist = "Navedeno povezivanje ne postoji.";
 Strings.OfficeOM.L_BindingToMultipleSelection = "Nekontinuirane selekcije nisu podržane.";
 Strings.OfficeOM.L_BrowserAPINotSupported = "Ovaj pregledač ne podržava zahtevani API.";
-Strings.OfficeOM.L_CallbackNotAFunction = "Povratni poziv mora biti funkcija tipa, bila je tipa {0}.";
+Strings.OfficeOM.L_CallbackNotAFunction = "Povratni poziv mora biti funkcija tipa, bila je tipa {0}."
 Strings.OfficeOM.L_CannotApplyPropertyThroughSetMethod = "Nije moguće primeniti promene svojstva „{0}“ putem metoda „object.set“.";
 Strings.OfficeOM.L_CannotNavigateTo = "Objekat se nalazi na lokaciji na kojoj navigacija nije podržana.";
 Strings.OfficeOM.L_CannotRegisterEvent = "Nije moguće registrovati rukovalac događajem.";
@@ -180,7 +180,7 @@ Strings.OfficeOM.L_TooManyIncompleteRequests = "Sačekajte da se prethodni poziv
 Strings.OfficeOM.L_TooManyOptionalFunction = "višestruke opcionalne funkcije na listi parametara";
 Strings.OfficeOM.L_TooManyOptionalObjects = "višestruki opcionalni objekti na listi parametara";
 Strings.OfficeOM.L_UnknownBindingType = "Tip povezivanja nije podržan.";
-Strings.OfficeOM.L_UnsupportedDataObject = "Navedeni tip objekta podataka nije podržan."
+Strings.OfficeOM.L_UnsupportedDataObject = "Navedeni tip objekta podataka nije podržan.";
 Strings.OfficeOM.L_UnsupportedEnumeration = "Nepodržano nabrajanje";
 Strings.OfficeOM.L_UnsupportedEnumerationMessage = "Nabrajanje nije podržano u trenutnoj aplikaciji hosta.";
 Strings.OfficeOM.L_UnsupportedUserIdentity = "Tip identiteta korisnika nije podržan.";

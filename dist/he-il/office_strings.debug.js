@@ -1,4 +1,4 @@
-/* Version: 16.0.9106.1000 */
+/* Version: 16.0.9314.1000 */
 
 Type.registerNamespace("Strings");
 Strings.OfficeOM = function()
@@ -20,7 +20,7 @@ Strings.OfficeOM.L_BindingCreationError = "שגיאה ביצירת איגוד";
 Strings.OfficeOM.L_BindingNotExist = "האיגוד שצוין לא קיים.";
 Strings.OfficeOM.L_BindingToMultipleSelection = "אין תמיכה בבחירות לא רציפות.";
 Strings.OfficeOM.L_BrowserAPINotSupported = "דפדפן זה אינו תומך ב- API המבוקש.";
-Strings.OfficeOM.L_CallbackNotAFunction = "סוג ההתקשרות חזרה חייב להיות פונקציה, הסוג היה {0}.";
+Strings.OfficeOM.L_CallbackNotAFunction = "סוג ההתקשרות חזרה חייב להיות פונקציה, הסוג היה {0}."
 Strings.OfficeOM.L_CannotApplyPropertyThroughSetMethod = "אין אפשרות להחיל שינויים על המאפיין '{0}' באמצעות פעולת שירות של \"object.set\".";
 Strings.OfficeOM.L_CannotNavigateTo = "האובייקט נמצא במקום שבו ניווט אינו נתמך.";
 Strings.OfficeOM.L_CannotRegisterEvent = "אין אפשרות לרשום את המטפל באירועים.";
@@ -185,7 +185,7 @@ Strings.OfficeOM.L_UnsupportedEnumeration = "ספירה לא נתמכת";
 Strings.OfficeOM.L_UnsupportedEnumerationMessage = "הספירה אינה נתמכת ביישום המארח הנוכחי.";
 Strings.OfficeOM.L_UnsupportedUserIdentity = "סוג זהות המשתמש אינו נתמך.";
 Strings.OfficeOM.L_UnsupportedUserIdentityMessage = "סוג הזהות של המשתמש אינו נתמך.";
-Strings.OfficeOM.L_UserAborted = "המשתמש ביטל את בקשת ההסכמה."
+Strings.OfficeOM.L_UserAborted = "המשתמש ביטל את בקשת ההסכמה.";
 Strings.OfficeOM.L_UserAbortedMessage = "המשתמש לא הסכים להרשאות התוספת.";
 Strings.OfficeOM.L_UserClickIgnore = "המשתמש בחר להתעלם מתיבת הדו-שיח.";
 Strings.OfficeOM.L_UserNotSignedIn = "אף משתמש לא נכנס ל- Office.";

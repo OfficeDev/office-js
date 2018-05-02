@@ -1,4 +1,4 @@
-/* Version: 16.0.9106.1000 */
+/* Version: 16.0.9314.1000 */
 
 Type.registerNamespace("Strings");
 Strings.OfficeOM = function()
@@ -13,14 +13,14 @@ Strings.OfficeOM.L_AddinIsAlreadyRequestingToken = "Il componente aggiuntivo sta
 Strings.OfficeOM.L_AddinIsAlreadyRequestingTokenMessage = "L'operazione non è riuscita perché questo componente aggiuntivo sta già richiedendo un token di accesso.";
 Strings.OfficeOM.L_ApiNotFoundDetails = "Il metodo o la proprietà {0} fa parte del set di requisiti {1}, che non è disponibile in questa versione di {2}.";
 Strings.OfficeOM.L_AppNameNotExist = "Il nome del componente aggiuntivo per {0} non esiste.";
-Strings.OfficeOM.L_AppNotExistInitializeNotCalled = "L'applicazione {0} non esiste. Microsoft.Office.WebExtension.initialize(reason) non chiamato."
+Strings.OfficeOM.L_AppNotExistInitializeNotCalled = "L'applicazione {0} non esiste. Microsoft.Office.WebExtension.initialize(reason) non chiamato.";
 Strings.OfficeOM.L_AttemptingToSetReadOnlyProperty = "Tentativo di impostare la proprietà di sola lettura '{0}'.";
 Strings.OfficeOM.L_BadSelectorString = "La stringa passata nel selettore non è correttamente formattata o non è supportata.";
 Strings.OfficeOM.L_BindingCreationError = "Errore di creazione associazione";
 Strings.OfficeOM.L_BindingNotExist = "L'associazione specificata non esiste.";
 Strings.OfficeOM.L_BindingToMultipleSelection = "Le selezioni non contigue non sono supportate.";
 Strings.OfficeOM.L_BrowserAPINotSupported = "Il browser non supporta l'API richiesta.";
-Strings.OfficeOM.L_CallbackNotAFunction = "Il callback deve essere di tipo funzione. Rilevato tipo {0}.";
+Strings.OfficeOM.L_CallbackNotAFunction = "Il callback deve essere di tipo funzione. Rilevato tipo {0}."
 Strings.OfficeOM.L_CannotApplyPropertyThroughSetMethod = "Non è possibile applicare le modifiche alla proprietà '{0}' tramite un metodo \"object.set\".";
 Strings.OfficeOM.L_CannotNavigateTo = "L'oggetto si trova in una posizione in cui non è supportato lo spostamento.";
 Strings.OfficeOM.L_CannotRegisterEvent = "Non è possibile registrare il gestore eventi.";

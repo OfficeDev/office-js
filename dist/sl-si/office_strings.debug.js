@@ -1,4 +1,4 @@
-/* Version: 16.0.9106.1000 */
+/* Version: 16.0.9314.1000 */
 
 Type.registerNamespace("Strings");
 Strings.OfficeOM = function()
@@ -8,7 +8,7 @@ Strings.OfficeOM.registerClass("Strings.OfficeOM");
 Strings.OfficeOM.L_APICallFailed = "Klic API ni uspel";
 Strings.OfficeOM.L_APINotSupported = "Klic API ni podprt";
 Strings.OfficeOM.L_ActivityLimitReached = "Dosežena je omejitev dejavnosti.";
-Strings.OfficeOM.L_AddBindingFromPromptDefaultText = "Izberite želeno možnost."
+Strings.OfficeOM.L_AddBindingFromPromptDefaultText = "Izberite želeno možnost.";
 Strings.OfficeOM.L_AddinIsAlreadyRequestingToken = "Dodatek že zahteva žeton za dostop.";
 Strings.OfficeOM.L_AddinIsAlreadyRequestingTokenMessage = "Postopek ni uspel, ker ta dodatek že zahteva žeton za dostop.";
 Strings.OfficeOM.L_ApiNotFoundDetails = "Metoda ali lastnost {0} je del nabora zahtev {1}, ki ni na voljo za vašo različico programa {2}.";
@@ -20,7 +20,7 @@ Strings.OfficeOM.L_BindingCreationError = "Napaka pri ustvarjanju vezave";
 Strings.OfficeOM.L_BindingNotExist = "Navedena vrsta vezave ne obstaja.";
 Strings.OfficeOM.L_BindingToMultipleSelection = "Nestični izbori niso podprti.";
 Strings.OfficeOM.L_BrowserAPINotSupported = "Ta brskalnik ne podpira zahtevanega API-ja.";
-Strings.OfficeOM.L_CallbackNotAFunction = "Povratni klic mora biti vrste funkcija. Bil je vrste {0}.";
+Strings.OfficeOM.L_CallbackNotAFunction = "Povratni klic mora biti vrste funkcija. Bil je vrste {0}."
 Strings.OfficeOM.L_CannotApplyPropertyThroughSetMethod = "Sprememb lastnosti »{0}« ni mogoče uporabiti z načinom predmeta »object.set«.";
 Strings.OfficeOM.L_CannotNavigateTo = "Predmet je na mestu, kjer krmarjenje ni podprto.";
 Strings.OfficeOM.L_CannotRegisterEvent = "Rutine za obravnavo dogodkov ni mogoče registrirati.";

@@ -1,4 +1,4 @@
-/* Version: 16.0.9106.1000 */
+/* Version: 16.0.9314.1000 */
 
 Type.registerNamespace("Strings");
 Strings.OfficeOM = function()
@@ -20,7 +20,7 @@ Strings.OfficeOM.L_BindingCreationError = "바인딩 만들기 오류";
 Strings.OfficeOM.L_BindingNotExist = "지정한 바인딩이 없습니다.";
 Strings.OfficeOM.L_BindingToMultipleSelection = "연속되지 않은 항목을 선택할 수 없습니다.";
 Strings.OfficeOM.L_BrowserAPINotSupported = "이 브라우저는 요청된 API를 지원하지 않습니다.";
-Strings.OfficeOM.L_CallbackNotAFunction = "콜백이 함수 유형이어야 하는데 {0} 유형입니다.";
+Strings.OfficeOM.L_CallbackNotAFunction = "콜백이 함수 유형이어야 하는데 {0} 유형입니다."
 Strings.OfficeOM.L_CannotApplyPropertyThroughSetMethod = "속성 '{0}'의 변경 내용을 \"object.set\" 메서드를 통해 적용할 수 없습니다.";
 Strings.OfficeOM.L_CannotNavigateTo = "개체가 탐색을 지원하지 않는 위치에 있습니다.";
 Strings.OfficeOM.L_CannotRegisterEvent = "이벤트 처리기를 등록할 수 없습니다.";
@@ -107,7 +107,7 @@ Strings.OfficeOM.L_InvalidOrTimedOutSessionMessage = "Office Online 세션이 �
 Strings.OfficeOM.L_InvalidParameters = "함수 {0}에 잘못된 매개 변수가 있습니다.";
 Strings.OfficeOM.L_InvalidReadForBlankRow = "지정된 행이 비어 있습니다.";
 Strings.OfficeOM.L_InvalidRequestContext = "다른 요청 컨텍스트에서 개체를 사용할 수 없습니다.";
-Strings.OfficeOM.L_InvalidResourceUrl = "잘못된 응용 프로그램 리소스 URL이 제공되었습니다."
+Strings.OfficeOM.L_InvalidResourceUrl = "잘못된 응용 프로그램 리소스 URL이 제공되었습니다.";
 Strings.OfficeOM.L_InvalidResourceUrlMessage = "매니페스트에 잘못된 리소스 URL이 지정되었습니다.";
 Strings.OfficeOM.L_InvalidSSOAddinMessage = "이 추가 기능에 대해 ID API가 지원되지 않습니다.";
 Strings.OfficeOM.L_InvalidSelectionForBindingType = "현재 선택 항목과 지정한 바인딩 유형으로는 바인딩을 만들 수 없습니다.";

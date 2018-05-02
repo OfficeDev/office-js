@@ -1,4 +1,4 @@
-/* Version: 16.0.9106.1000 */
+/* Version: 16.0.9314.1000 */
 
 Type.registerNamespace("Strings");
 Strings.OfficeOM = function()
@@ -20,7 +20,7 @@ Strings.OfficeOM.L_BindingCreationError = "Erro de criação de ligação";
 Strings.OfficeOM.L_BindingNotExist = "A ligação especificada não existe.";
 Strings.OfficeOM.L_BindingToMultipleSelection = "Não há suporte para várias seleções não contíguas.";
 Strings.OfficeOM.L_BrowserAPINotSupported = "Este navegador não oferece suporte para a API solicitada.";
-Strings.OfficeOM.L_CallbackNotAFunction = "O retorno de chamada deve ser do tipo função, era do tipo {0}.";
+Strings.OfficeOM.L_CallbackNotAFunction = "O retorno de chamada deve ser do tipo função, era do tipo {0}."
 Strings.OfficeOM.L_CannotApplyPropertyThroughSetMethod = "Altera a propriedade '{0}' que não pode ser aplicada por meio de um método \"object.set\".";
 Strings.OfficeOM.L_CannotNavigateTo = "O objeto está localizado em um local onde a navegação não é suportada.";
 Strings.OfficeOM.L_CannotRegisterEvent = "Não é possível registrar o manipulador de eventos.";
@@ -73,7 +73,7 @@ Strings.OfficeOM.L_GetDataParametersConflict = "Os parâmetros especificados est
 Strings.OfficeOM.L_GetSelectionNotSupported = "A seleção atual não tem suporte.";
 Strings.OfficeOM.L_HostError = "Erro de host";
 Strings.OfficeOM.L_InValidOptionalArgument = "argumento opcional inválido";
-Strings.OfficeOM.L_IndexOutOfRange = "Índice fora do intervalo."
+Strings.OfficeOM.L_IndexOutOfRange = "Índice fora do intervalo.";
 Strings.OfficeOM.L_InitializeNotReady = "O Office.js ainda não está totalmente carregado. Tente novamente mais tarde ou verifique se você adicionou seu código de inicialização na função Office.initialize.";
 Strings.OfficeOM.L_InternalError = "Erro interno";
 Strings.OfficeOM.L_InternalErrorDescription = "Ocorreu um erro interno.";

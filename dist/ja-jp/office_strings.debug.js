@@ -1,4 +1,4 @@
-/* Version: 16.0.9106.1000 */
+/* Version: 16.0.9314.1000 */
 
 Type.registerNamespace("Strings");
 Strings.OfficeOM = function()
@@ -20,7 +20,7 @@ Strings.OfficeOM.L_BindingCreationError = "バインドの作成エラーが発�
 Strings.OfficeOM.L_BindingNotExist = "指定したバインドが存在しません。";
 Strings.OfficeOM.L_BindingToMultipleSelection = "不連続の選択はサポートされていません。";
 Strings.OfficeOM.L_BrowserAPINotSupported = "このブラウザーでは、要求された API はサポートされません。";
-Strings.OfficeOM.L_CallbackNotAFunction = "コールバックの型は関数である必要がありますが、{0} でした。";
+Strings.OfficeOM.L_CallbackNotAFunction = "コールバックの型は関数である必要がありますが、{0} でした。"
 Strings.OfficeOM.L_CannotApplyPropertyThroughSetMethod = "プロパティ '{0}' の変更を、\"object.set\" メソッドを使用して適用することはできません。";
 Strings.OfficeOM.L_CannotNavigateTo = "オブジェクトは、ナビゲーションがサポートされていない場所にあります。";
 Strings.OfficeOM.L_CannotRegisterEvent = "イベント ハンドラーは登録できません。";
@@ -160,7 +160,7 @@ Strings.OfficeOM.L_SSOServerErrorMessage = "サーバーで予期しないエラ
 Strings.OfficeOM.L_SSOUserConsentNotSupportedByCurrentAddinCategory = "このアドインは、ユーザーの同意をサポートしていません。";
 Strings.OfficeOM.L_SSOUserConsentNotSupportedByCurrentAddinCategoryMessage = "このアドインはこのカテゴリのユーザーの同意をサポートしていないため、操作が失敗しました";
 Strings.OfficeOM.L_SaveSettingsError = "設定の保存エラーが発生しました";
-Strings.OfficeOM.L_SelectionCannotBound = "現在の選択内容にバインドできません。"
+Strings.OfficeOM.L_SelectionCannotBound = "現在の選択内容にバインドできません。";
 Strings.OfficeOM.L_SelectionNotSupportCoercionType = "現在の選択内容は、指定した強制型変換タイプと互換性がありません。";
 Strings.OfficeOM.L_SetDataIsTooLarge = "指定されたデータ オブジェクトが大きすぎます。";
 Strings.OfficeOM.L_SetDataParametersConflict = "指定されたパラメーターが競合しています。";
