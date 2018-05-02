@@ -1,4 +1,4 @@
-/* Version: 16.0.9027.1000 */
+/* Version: 16.0.9309.1000 */
 
 Type.registerNamespace("Strings");
 Strings.OfficeOM = function()
@@ -20,9 +20,9 @@ Strings.OfficeOM.L_BindingCreationError = "Σφάλμα δημιουργίας �
 Strings.OfficeOM.L_BindingNotExist = "Δεν υπάρχει η καθορισμένη σύνδεση.";
 Strings.OfficeOM.L_BindingToMultipleSelection = "Οι μη συνεχόμενες επιλογές δεν υποστηρίζονται.";
 Strings.OfficeOM.L_BrowserAPINotSupported = "Αυτό το πρόγραμμα περιήγησης δεν υποστηρίζει το API που ζητήθηκε.";
-Strings.OfficeOM.L_CallbackNotAFunction = "Η επιστροφή κλήσης πρέπει να είναι τύπου συνάρτησης, ήταν τύπου {0}.";
+Strings.OfficeOM.L_CallbackNotAFunction = "Η επιστροφή κλήσης πρέπει να είναι τύπου συνάρτησης, ήταν τύπου {0}."
 Strings.OfficeOM.L_CannotApplyPropertyThroughSetMethod = 'Δεν είναι δυνατή η εφαρμογή των αλλαγών στην ιδιότητα "{0}" μέσω μιας μεθόδου "object.set".';
-Strings.OfficeOM.L_CannotNavigateTo = "Το αντικείμενο βρίσκεται σε θέση όπου δεν υποστηρίζεται η περιήγηση."
+Strings.OfficeOM.L_CannotNavigateTo = "Το αντικείμενο βρίσκεται σε θέση όπου δεν υποστηρίζεται η περιήγηση.";
 Strings.OfficeOM.L_CannotRegisterEvent = "Δεν είναι δυνατή η καταχώρηση του προγράμματος χειρισμού συμβάντων.";
 Strings.OfficeOM.L_CannotWriteToSelection = "Δεν είναι δυνατή η εγγραφή στην τρέχουσα επιλογή.";
 Strings.OfficeOM.L_CellDataAmountBeyondLimits = "Σημείωση: Το πλήθος των κελιών σε έναν πίνακα προτείνεται να είναι κάτω από 20.000 κελιά.";

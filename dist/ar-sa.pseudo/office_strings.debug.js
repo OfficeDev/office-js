@@ -1,4 +1,4 @@
-/* Version: 16.0.9027.1000 */
+/* Version: 16.0.9309.1000 */
 
 Type.registerNamespace("Strings");
 Strings.OfficeOM = function()
@@ -20,7 +20,7 @@ Strings.OfficeOM.L_BindingCreationError = "［Ef1V2］‏‏أبع[Binding Creat
 Strings.OfficeOM.L_BindingNotExist = "［wLGkW］‏‏أبع[The specified binding does not exist.]לף";
 Strings.OfficeOM.L_BindingToMultipleSelection = "［b0tWL］‏‏أبع[Noncontiguous selections are not supported.]לף";
 Strings.OfficeOM.L_BrowserAPINotSupported = "［w9Nwv］‏‏أبع[This browser does not support the requested API.]לף";
-Strings.OfficeOM.L_CallbackNotAFunction = "［mjEM1］‏‏أبع[Callback must be of type function, was of type {0}.]לף";
+Strings.OfficeOM.L_CallbackNotAFunction = "［mjEM1］‏‏أبع[Callback must be of type function, was of type {0}.]לף"
 Strings.OfficeOM.L_CannotApplyPropertyThroughSetMethod = "［Z072K］‏‏أبع[Changes to property '{0}' cannot be applied through an \"object.set\" method.]לף";
 Strings.OfficeOM.L_CannotNavigateTo = "［2J8ro］‏‏أبع[The object is located in a place where navigation is not supported.]לף";
 Strings.OfficeOM.L_CannotRegisterEvent = "［7oStX］‏‏أبع[The event handler cannot be registered.]לף";
@@ -33,8 +33,8 @@ Strings.OfficeOM.L_CoercionTypeNotSupported = "［0MWOX］‏‏أبع[The speci
 Strings.OfficeOM.L_ColIndexOutOfRange = "［uM06f］‏‏أبع[The column index value is out of the allowed range. Use a value (0 or higher) that's less than the number of columns.]לף";
 Strings.OfficeOM.L_ConnectionFailureWithDetails = "［y3r7A］‏‏أبع[The request failed with status code of {0}, error code {1} and the following error message: {2}]לף";
 Strings.OfficeOM.L_ConnectionFailureWithStatus = "［Lwa49］‏‏أبع[The request failed with status code of {0}.]לף";
-Strings.OfficeOM.L_CustomFunctionDefinitionMissing = "［WVXyy］‏‏أبع[A property with this name that represents the function's definition must exist on Excel.CustomFunctions.]לף";
-Strings.OfficeOM.L_CustomFunctionImplementationMissing = "［DhY5m］‏‏أبع[The property with this name on Excel.CustomFunctions that represents the function's definition must contain a 'call' property that implements the function.]לף";
+Strings.OfficeOM.L_CustomFunctionDefinitionMissing = "［WVXyy］‏‏أبع[A property with this name that represents the function's definition must exist on Excel.Script.CustomFunctions.]לף";
+Strings.OfficeOM.L_CustomFunctionImplementationMissing = "［DhY5m］‏‏أبع[The property with this name on Excel.Script.CustomFunctions that represents the function's definition must contain a 'call' property that implements the function.]לף";
 Strings.OfficeOM.L_CustomFunctionNameCannotSplit = "［1DC6K］‏‏أبع[The function name must contain a non-empty namespace and a non-empty short name.]לף";
 Strings.OfficeOM.L_CustomFunctionNameContainsBadChars = "［D57c3］‏‏أبع[The function name may only contain letters, digits, underscores, and periods.]לף";
 Strings.OfficeOM.L_CustomXmlError = "［ot553］‏‏أبع[Custom XML Error.]לף";
@@ -93,7 +93,7 @@ Strings.OfficeOM.L_InvalidDataObject = "［gFTdx］‏‏أبع[Invalid Data Obj
 Strings.OfficeOM.L_InvalidFormat = "［aPhpJ］‏‏أبع[Invalid Format Error]לף";
 Strings.OfficeOM.L_InvalidFormatValue = "［0DFva］‏‏أبع[One or more of the format parameters have values that aren't allowed. Double-check the values and try again.]לף";
 Strings.OfficeOM.L_InvalidGetColumns = "［gwsNB］‏‏أبع[The specified columns are invalid.]לף";
-Strings.OfficeOM.L_InvalidGetRowColumnCounts = "［6atwJ］‏‏أبع[The specified rowCount or columnCount values are invalid.]לף"
+Strings.OfficeOM.L_InvalidGetRowColumnCounts = "［6atwJ］‏‏أبع[The specified rowCount or columnCount values are invalid.]לף";
 Strings.OfficeOM.L_InvalidGetRows = "［KshdR］‏‏أبع[The specified rows are invalid.]לף";
 Strings.OfficeOM.L_InvalidGetStartRowColumn = "［ghnzE］‏‏أبع[The specified startRow or startColumn values are invalid.]לף";
 Strings.OfficeOM.L_InvalidGrant = "［hWgqe］‏‏أبع[Preauthorization missing.]לף";

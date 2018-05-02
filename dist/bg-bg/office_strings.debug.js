@@ -1,4 +1,4 @@
-/* Version: 16.0.9027.1000 */
+/* Version: 16.0.9309.1000 */
 
 Type.registerNamespace("Strings");
 Strings.OfficeOM = function()
@@ -20,7 +20,7 @@ Strings.OfficeOM.L_BindingCreationError = "Грешка при създаван�
 Strings.OfficeOM.L_BindingNotExist = "Указаното обвързване не съществува.";
 Strings.OfficeOM.L_BindingToMultipleSelection = "Не се поддържат несъседни селекции.";
 Strings.OfficeOM.L_BrowserAPINotSupported = "Този браузър не поддържа искания API.";
-Strings.OfficeOM.L_CallbackNotAFunction = "Обратното повикване трябва да е от тип функция, а беше от тип {0}.";
+Strings.OfficeOM.L_CallbackNotAFunction = "Обратното повикване трябва да е от тип функция, а беше от тип {0}."
 Strings.OfficeOM.L_CannotApplyPropertyThroughSetMethod = 'Промените в свойство "{0}" не могат да бъдат приложени чрез метод "object.set".';
 Strings.OfficeOM.L_CannotNavigateTo = "Обектът се намира на място, където не се поддържа навигация.";
 Strings.OfficeOM.L_CannotRegisterEvent = "Манипулаторът на събитие не може да бъде регистриран.";
@@ -169,7 +169,7 @@ Strings.OfficeOM.L_SettingsAreStale = "Настройките не можаха 
 Strings.OfficeOM.L_SettingsCannotSave = "Настройките не можаха да бъдат записани.";
 Strings.OfficeOM.L_SettingsStaleError = "Грешка от неактуални настройки";
 Strings.OfficeOM.L_ShowWindowDialogNotification = "{0} иска да покаже нов прозорец.";
-Strings.OfficeOM.L_ShowWindowDialogNotificationAllow = "Позволи"
+Strings.OfficeOM.L_ShowWindowDialogNotificationAllow = "Позволи";
 Strings.OfficeOM.L_ShowWindowDialogNotificationIgnore = "Игнориране";
 Strings.OfficeOM.L_ShuttingDown = "Операцията беше неуспешна, защото данните в сървъра не са актуални.";
 Strings.OfficeOM.L_SliceSizeNotSupported = "Указаният размер на сегмент не се поддържа.";

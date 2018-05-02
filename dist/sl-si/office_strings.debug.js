@@ -1,4 +1,4 @@
-/* Version: 16.0.9027.1000 */
+/* Version: 16.0.9309.1000 */
 
 Type.registerNamespace("Strings");
 Strings.OfficeOM = function()
@@ -20,7 +20,7 @@ Strings.OfficeOM.L_BindingCreationError = "Napaka pri ustvarjanju vezave";
 Strings.OfficeOM.L_BindingNotExist = "Navedena vrsta vezave ne obstaja.";
 Strings.OfficeOM.L_BindingToMultipleSelection = "Nestični izbori niso podprti.";
 Strings.OfficeOM.L_BrowserAPINotSupported = "Ta brskalnik ne podpira zahtevanega API-ja.";
-Strings.OfficeOM.L_CallbackNotAFunction = "Povratni klic mora biti vrste funkcija. Bil je vrste {0}.";
+Strings.OfficeOM.L_CallbackNotAFunction = "Povratni klic mora biti vrste funkcija. Bil je vrste {0}."
 Strings.OfficeOM.L_CannotApplyPropertyThroughSetMethod = "Sprememb lastnosti »{0}« ni mogoče uporabiti z načinom predmeta »object.set«.";
 Strings.OfficeOM.L_CannotNavigateTo = "Predmet je na mestu, kjer krmarjenje ni podprto.";
 Strings.OfficeOM.L_CannotRegisterEvent = "Rutine za obravnavo dogodkov ni mogoče registrirati.";
@@ -133,7 +133,7 @@ Strings.OfficeOM.L_NonUniformPartialSetNotSupported = "Koordinatnih parametrov n
 Strings.OfficeOM.L_NotImplemented = "Funkcija {0} ni izvedena.";
 Strings.OfficeOM.L_NotSupported = "Funkcija {0} ni podprta.";
 Strings.OfficeOM.L_NotSupportedBindingType = "Navedena vrsta vezave {0} ni podprta. ";
-Strings.OfficeOM.L_NotSupportedEventType = "Navedena vrsta dogodka {0} ni podprta. "
+Strings.OfficeOM.L_NotSupportedEventType = "Navedena vrsta dogodka {0} ni podprta. ";
 Strings.OfficeOM.L_OperationCancelledError = "Postopek je preklican";
 Strings.OfficeOM.L_OperationCancelledErrorMessage = "Ta postopek je preklical uporabnik.";
 Strings.OfficeOM.L_OperationNotSupported = "Postopek ni podprt.";

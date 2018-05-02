@@ -1,4 +1,4 @@
-/* Version: 16.0.9027.1000 */
+/* Version: 16.0.9309.1000 */
 
 Type.registerNamespace("Strings");
 Strings.OfficeOM = function()
@@ -20,7 +20,7 @@ Strings.OfficeOM.L_BindingCreationError = "Chyba pri vytváraní väzby";
 Strings.OfficeOM.L_BindingNotExist = "Zadaná väzba neexistuje.";
 Strings.OfficeOM.L_BindingToMultipleSelection = "Nesúvislý výber nie je podporovaný.";
 Strings.OfficeOM.L_BrowserAPINotSupported = "Tento prehliadač nepodporuje požadované API.";
-Strings.OfficeOM.L_CallbackNotAFunction = "Spätné volanie musí byť typom funkcie, bolo typom {0}.";
+Strings.OfficeOM.L_CallbackNotAFunction = "Spätné volanie musí byť typom funkcie, bolo typom {0}."
 Strings.OfficeOM.L_CannotApplyPropertyThroughSetMethod = "Zmeny vlastnosti {0} nemožno použiť prostredníctvom metódy object.set.";
 Strings.OfficeOM.L_CannotNavigateTo = "Objekt sa nachádza na mieste, kde nie je podporovaná navigácia.";
 Strings.OfficeOM.L_CannotRegisterEvent = "Obsluha udalostí sa nedá zaregistrovať.";
@@ -119,7 +119,7 @@ Strings.OfficeOM.L_InvalidValue = "Neplatná hodnota";
 Strings.OfficeOM.L_MemoryLimit = "Prekročil sa limit pamäte";
 Strings.OfficeOM.L_MissingParameter = "Chýbajúci parameter";
 Strings.OfficeOM.L_MissingRequiredArguments = "chýba niekoľko požadovaných argumentov";
-Strings.OfficeOM.L_MultipleNamedItemFound = "Našlo sa viacero objektov s rovnakým názvom."
+Strings.OfficeOM.L_MultipleNamedItemFound = "Našlo sa viacero objektov s rovnakým názvom.";
 Strings.OfficeOM.L_NamedItemNotFound = "Pomenovaná položka neexistuje.";
 Strings.OfficeOM.L_NavOutOfBound = "Operácia zlyhala, pretože index je mimo rozsahu.";
 Strings.OfficeOM.L_NetworkProblem = "Problém so sieťou";
