@@ -1,5 +1,5 @@
 /* Excel Mac-specific API library */
-/* Version: 16.0.9303.3000 */
+/* Version: 16.0.9319.3000 */
 
 /* Office.js Version: 16.0.9124.1000 */ 
 /*
@@ -9296,6 +9296,10 @@ var OfficeExtension;
 			if (!OfficeExtension._internalConfig.enableUndoableFlag) {
 				requestFlags=requestFlags & ~16;
 			}
+			if (!OfficeExtension.Utility.isSetSupported("RichApiRuntimeFlag", "1.1")) {
+				requestFlags=requestFlags & ~4;
+				requestFlags=requestFlags & ~16;
+			}
 			if (typeof (this.m_flagsForTesting)==="number") {
 				requestFlags=this.m_flagsForTesting;
 			}
@@ -9466,8 +9470,8 @@ var OfficeExtension;
 		enableEarlyDispose: true,
 		alwaysPolyfillClientObjectUpdateMethod: false,
 		alwaysPolyfillClientObjectRetrieveMethod: false,
-		enableConcurrentFlag: false,
-		enableUndoableFlag: false,
+		enableConcurrentFlag: true,
+		enableUndoableFlag: true,
 	};
 	OfficeExtension.config={
 		extendedErrorLogging: false
@@ -13826,16 +13830,19 @@ var OfficeCore;
 			configurable: true
 		});
 		BiShim.prototype.initialize=function (capabilities) {
-			_createMethodAction(this.context, this, "Initialize", 0, [capabilities], false);
+			_createMethodAction(this.context, this, "Initialize", 0, [capabilities], 0);
 		};
 		BiShim.prototype.getData=function () {
-			var action=_createMethodAction(this.context, this, "getData", 1, [], false);
+			var action=_createMethodAction(this.context, this, "getData", 1, [], 4);
 			var ret=new OfficeExtension.ClientResult();
 			_addActionResultHandler(this, action, ret);
 			return ret;
 		};
 		BiShim.prototype.setVisualObjects=function (visualObjects) {
-			_createMethodAction(this.context, this, "setVisualObjects", 0, [visualObjects], false);
+			_createMethodAction(this.context, this, "setVisualObjects", 0, [visualObjects], 2);
+		};
+		BiShim.prototype.setVisualObjectsToPersist=function (visualObjectsToPersist) {
+			_createMethodAction(this.context, this, "setVisualObjectsToPersist", 0, [visualObjectsToPersist], 2);
 		};
 		BiShim.prototype._handleResult=function (value) {
 			_super.prototype._handleResult.call(this, value);
@@ -13849,7 +13856,7 @@ var OfficeCore;
 			_processRetrieveResult(this, value, result);
 		};
 		BiShim.newObject=function (context) {
-			var ret=new OfficeCore.BiShim(context, _createNewObjectObjectPath(context, "Microsoft.AgaveVisual.BiShim", false, false));
+			var ret=new OfficeCore.BiShim(context, _createNewObjectObjectPath(context, "Microsoft.AgaveVisual.BiShim", false, 4));
 			return ret;
 		};
 		BiShim.prototype.toJSON=function () {
@@ -14136,20 +14143,10 @@ var OfficeFirstPartyAuth;
 		var context=new OfficeCore.RequestContext();
 		var auth=OfficeCore.AuthenticationService.newObject(context);
 		context._customData="WacPartition";
-		var promise=new OfficeExtension.Promise(function (resolve, reject) {
-			var result=auth.getAccessToken(options);
-			context.sync()
-				.then(function () {
-				resolve(result);
-			})
-				.catch(function (e) {
-				throw e;
-			});
-		});
-		return promise.then(function (accessTokenResult) {
-			return new OfficeExtension.Promise(function (resolve, reject) {
-				resolve(accessTokenResult);
-			});
+		var result=auth.getAccessToken(options);
+		return context.sync()
+			.then(function () {
+			return result.value;
 		});
 	}
 	OfficeFirstPartyAuth.getAccessToken=getAccessToken;
@@ -14157,20 +14154,10 @@ var OfficeFirstPartyAuth;
 		var context=new OfficeCore.RequestContext();
 		var auth=OfficeCore.AuthenticationService.newObject(context);
 		context._customData="WacPartition";
-		var promise=new OfficeExtension.Promise(function (resolve, reject) {
-			var result=auth.getPrimaryIdentityInfo();
-			context.sync()
-				.then(function () {
-				resolve(result);
-			})
-				.catch(function (e) {
-				throw e;
-			});
-		});
-		return promise.then(function (idInfoResult) {
-			return new OfficeExtension.Promise(function (resolve, reject) {
-				resolve(idInfoResult);
-			});
+		var result=auth.getPrimaryIdentityInfo();
+		return context.sync()
+			.then(function () {
+			return result.value;
 		});
 	}
 	OfficeFirstPartyAuth.getPrimaryIdentityInfo=getPrimaryIdentityInfo;
@@ -20149,14 +20136,14 @@ var Excel;
 		});
 		Object.defineProperty(Chart.prototype, "_scalarPropertyNames", {
 			get: function () {
-				return ["name", "top", "left", "width", "height", "id"];
+				return ["name", "top", "left", "width", "height", "id", "showAllFieldButtons", "chartType"];
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(Chart.prototype, "_scalarPropertyUpdateable", {
 			get: function () {
-				return [true, true, true, true, true, false];
+				return [true, true, true, true, true, false, true, true];
 			},
 			enumerable: true,
 			configurable: true
@@ -20239,6 +20226,19 @@ var Excel;
 			enumerable: true,
 			configurable: true
 		});
+		Object.defineProperty(Chart.prototype, "chartType", {
+			get: function () {
+				_throwIfNotLoaded("chartType", this._C, _typeChart, this._isNull);
+				_throwIfApiNotSupported("Chart.chartType", _defaultApiSetName, "1.7", _hostName);
+				return this._C;
+			},
+			set: function (value) {
+				this._C=value;
+				_createSetPropertyAction(this.context, this, "ChartType", value, 0);
+			},
+			enumerable: true,
+			configurable: true
+		});
 		Object.defineProperty(Chart.prototype, "height", {
 			get: function () {
 				_throwIfNotLoaded("height", this._H, _typeChart, this._isNull);
@@ -20284,6 +20284,19 @@ var Excel;
 			enumerable: true,
 			configurable: true
 		});
+		Object.defineProperty(Chart.prototype, "showAllFieldButtons", {
+			get: function () {
+				_throwIfNotLoaded("showAllFieldButtons", this._Sh, _typeChart, this._isNull);
+				_throwIfApiNotSupported("Chart.showAllFieldButtons", _defaultApiSetName, "1.7", _hostName);
+				return this._Sh;
+			},
+			set: function (value) {
+				this._Sh=value;
+				_createSetPropertyAction(this.context, this, "ShowAllFieldButtons", value, 0);
+			},
+			enumerable: true,
+			configurable: true
+		});
 		Object.defineProperty(Chart.prototype, "top", {
 			get: function () {
 				_throwIfNotLoaded("top", this._To, _typeChart, this._isNull);
@@ -20309,7 +20322,7 @@ var Excel;
 			configurable: true
 		});
 		Chart.prototype.set=function (properties, options) {
-			this._recursivelySet(properties, options, ["name", "top", "left", "width", "height"], ["title", "dataLabels", "legend", "axes", "format"], [
+			this._recursivelySet(properties, options, ["name", "top", "left", "width", "height", "showAllFieldButtons", "chartType"], ["title", "dataLabels", "legend", "axes", "format"], [
 				"series",
 				"worksheet"
 			]);
@@ -20339,6 +20352,9 @@ var Excel;
 				return;
 			var obj=value;
 			_fixObjectPathIfNecessary(this, obj);
+			if (!_isUndefined(obj["ChartType"])) {
+				this._C=obj["ChartType"];
+			}
 			if (!_isUndefined(obj["Height"])) {
 				this._H=obj["Height"];
 			}
@@ -20350,6 +20366,9 @@ var Excel;
 			}
 			if (!_isUndefined(obj["Name"])) {
 				this._N=obj["Name"];
+			}
+			if (!_isUndefined(obj["ShowAllFieldButtons"])) {
+				this._Sh=obj["ShowAllFieldButtons"];
 			}
 			if (!_isUndefined(obj["Top"])) {
 				this._To=obj["Top"];
@@ -20380,10 +20399,12 @@ var Excel;
 		};
 		Chart.prototype.toJSON=function () {
 			return _toJson(this, {
+				"chartType": this._C,
 				"height": this._H,
 				"id": this._I,
 				"left": this._L,
 				"name": this._N,
+				"showAllFieldButtons": this._Sh,
 				"top": this._To,
 				"width": this._W,
 			}, {
@@ -20535,6 +20556,10 @@ var Excel;
 			enumerable: true,
 			configurable: true
 		});
+		ChartSeriesCollection.prototype.add=function (name, index) {
+			_throwIfApiNotSupported("ChartSeriesCollection.add", _defaultApiSetName, "1.7", _hostName);
+			return new Excel.ChartSeries(this.context, _createMethodObjectPath(this.context, this, "Add", 0, [name, index], false, true, null, 0));
+		};
 		ChartSeriesCollection.prototype.getCount=function () {
 			_throwIfApiNotSupported("ChartSeriesCollection.getCount", _defaultApiSetName, "1.4", _hostName);
 			var action=_createMethodAction(this.context, this, "GetCount", 1, [], 4);
@@ -20598,14 +20623,14 @@ var Excel;
 		});
 		Object.defineProperty(ChartSeries.prototype, "_scalarPropertyNames", {
 			get: function () {
-				return ["name", "hasDataLabels", "filtered", "markerSize", "markerStyle", "showShadow", "markerBackgroundColor", "markerForegroundColor", "smooth", "plotOrder", "gapWidth", "doughnutHoleSize"];
+				return ["name", "chartType", "hasDataLabels", "filtered", "markerSize", "markerStyle", "showShadow", "markerBackgroundColor", "markerForegroundColor", "smooth", "plotOrder", "gapWidth", "doughnutHoleSize"];
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(ChartSeries.prototype, "_scalarPropertyUpdateable", {
 			get: function () {
-				return [true, true, true, true, true, true, true, true, true, true, true, true];
+				return [true, true, true, true, true, true, true, true, true, true, true, true, true];
 			},
 			enumerable: true,
 			configurable: true
@@ -20644,6 +20669,19 @@ var Excel;
 					this._T=new Excel.ChartTrendlineCollection(this.context, _createPropertyObjectPath(this.context, this, "Trendlines", true, false, 4));
 				}
 				return this._T;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(ChartSeries.prototype, "chartType", {
+			get: function () {
+				_throwIfNotLoaded("chartType", this._C, _typeChartSeries, this._isNull);
+				_throwIfApiNotSupported("ChartSeries.chartType", _defaultApiSetName, "1.7", _hostName);
+				return this._C;
+			},
+			set: function (value) {
+				this._C=value;
+				_createSetPropertyAction(this.context, this, "ChartType", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -20804,7 +20842,7 @@ var Excel;
 			configurable: true
 		});
 		ChartSeries.prototype.set=function (properties, options) {
-			this._recursivelySet(properties, options, ["name", "hasDataLabels", "filtered", "markerSize", "markerStyle", "showShadow", "markerBackgroundColor", "markerForegroundColor", "smooth", "plotOrder", "gapWidth", "doughnutHoleSize"], ["format"], [
+			this._recursivelySet(properties, options, ["name", "chartType", "hasDataLabels", "filtered", "markerSize", "markerStyle", "showShadow", "markerBackgroundColor", "markerForegroundColor", "smooth", "plotOrder", "gapWidth", "doughnutHoleSize"], ["format"], [
 				"points",
 				"trendlines"
 			]);
@@ -20834,6 +20872,9 @@ var Excel;
 				return;
 			var obj=value;
 			_fixObjectPathIfNecessary(this, obj);
+			if (!_isUndefined(obj["ChartType"])) {
+				this._C=obj["ChartType"];
+			}
 			if (!_isUndefined(obj["DoughnutHoleSize"])) {
 				this._D=obj["DoughnutHoleSize"];
 			}
@@ -20884,6 +20925,7 @@ var Excel;
 		};
 		ChartSeries.prototype.toJSON=function () {
 			return _toJson(this, {
+				"chartType": this._C,
 				"doughnutHoleSize": this._D,
 				"filtered": this._F,
 				"gapWidth": this._G,
@@ -21403,6 +21445,10 @@ var Excel;
 		ChartAxes.prototype.update=function (properties) {
 			this._recursivelyUpdate(properties);
 		};
+		ChartAxes.prototype.getItem=function (type, group) {
+			_throwIfApiNotSupported("ChartAxes.getItem", _defaultApiSetName, "1.7", _hostName);
+			return new Excel.ChartAxis(this.context, _createMethodObjectPath(this.context, this, "GetItem", 1, [type, group], false, false, null, 4));
+		};
 		ChartAxes.prototype._handleResult=function (value) {
 			_super.prototype._handleResult.call(this, value);
 			if (_isNullOrUndefined(value))
@@ -21450,14 +21496,14 @@ var Excel;
 		});
 		Object.defineProperty(ChartAxis.prototype, "_scalarPropertyNames", {
 			get: function () {
-				return ["majorUnit", "maximum", "minimum", "minorUnit", "displayUnit", "showDisplayUnitLabel", "customDisplayUnit", "minorTimeUnitScale", "majorTimeUnitScale", "baseTimeUnit", "categoryType", "logBase", "left", "top", "height", "width", "reversePlotOrder", "crossesAt", "visible", "tickMarkSpacing", "tickLabelSpacing"];
+				return ["majorUnit", "maximum", "minimum", "minorUnit", "displayUnit", "showDisplayUnitLabel", "customDisplayUnit", "type", "minorTimeUnitScale", "majorTimeUnitScale", "baseTimeUnit", "categoryType", "axisGroup", "scaleType", "logBase", "left", "top", "height", "width", "reversePlotOrder", "crosses", "crossesAt", "visible", "majorTickMark", "minorTickMark", "tickMarkSpacing", "tickLabelPosition", "tickLabelSpacing"];
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(ChartAxis.prototype, "_scalarPropertyUpdateable", {
 			get: function () {
-				return [true, true, true, true, true, true, false, true, true, true, true, true, false, false, false, false, true, false, true, true, true];
+				return [true, true, true, true, true, true, false, false, true, true, true, true, false, true, true, false, false, false, false, true, true, false, true, true, true, true, true, true];
 			},
 			enumerable: true,
 			configurable: true
@@ -21509,6 +21555,15 @@ var Excel;
 			enumerable: true,
 			configurable: true
 		});
+		Object.defineProperty(ChartAxis.prototype, "axisGroup", {
+			get: function () {
+				_throwIfNotLoaded("axisGroup", this._A, _typeChartAxis, this._isNull);
+				_throwIfApiNotSupported("ChartAxis.axisGroup", _defaultApiSetName, "1.7", _hostName);
+				return this._A;
+			},
+			enumerable: true,
+			configurable: true
+		});
 		Object.defineProperty(ChartAxis.prototype, "baseTimeUnit", {
 			get: function () {
 				_throwIfNotLoaded("baseTimeUnit", this._B, _typeChartAxis, this._isNull);
@@ -21535,11 +21590,24 @@ var Excel;
 			enumerable: true,
 			configurable: true
 		});
+		Object.defineProperty(ChartAxis.prototype, "crosses", {
+			get: function () {
+				_throwIfNotLoaded("crosses", this._Cr, _typeChartAxis, this._isNull);
+				_throwIfApiNotSupported("ChartAxis.crosses", _defaultApiSetName, "1.7", _hostName);
+				return this._Cr;
+			},
+			set: function (value) {
+				this._Cr=value;
+				_createSetPropertyAction(this.context, this, "Crosses", value, 0);
+			},
+			enumerable: true,
+			configurable: true
+		});
 		Object.defineProperty(ChartAxis.prototype, "crossesAt", {
 			get: function () {
-				_throwIfNotLoaded("crossesAt", this._Cr, _typeChartAxis, this._isNull);
+				_throwIfNotLoaded("crossesAt", this._Cro, _typeChartAxis, this._isNull);
 				_throwIfApiNotSupported("ChartAxis.crossesAt", _defaultApiSetName, "1.7", _hostName);
-				return this._Cr;
+				return this._Cro;
 			},
 			enumerable: true,
 			configurable: true
@@ -21597,14 +21665,27 @@ var Excel;
 			enumerable: true,
 			configurable: true
 		});
-		Object.defineProperty(ChartAxis.prototype, "majorTimeUnitScale", {
+		Object.defineProperty(ChartAxis.prototype, "majorTickMark", {
 			get: function () {
-				_throwIfNotLoaded("majorTimeUnitScale", this._Ma, _typeChartAxis, this._isNull);
-				_throwIfApiNotSupported("ChartAxis.majorTimeUnitScale", _defaultApiSetName, "1.7", _hostName);
+				_throwIfNotLoaded("majorTickMark", this._Ma, _typeChartAxis, this._isNull);
+				_throwIfApiNotSupported("ChartAxis.majorTickMark", _defaultApiSetName, "1.7", _hostName);
 				return this._Ma;
 			},
 			set: function (value) {
 				this._Ma=value;
+				_createSetPropertyAction(this.context, this, "MajorTickMark", value, 0);
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(ChartAxis.prototype, "majorTimeUnitScale", {
+			get: function () {
+				_throwIfNotLoaded("majorTimeUnitScale", this._Maj, _typeChartAxis, this._isNull);
+				_throwIfApiNotSupported("ChartAxis.majorTimeUnitScale", _defaultApiSetName, "1.7", _hostName);
+				return this._Maj;
+			},
+			set: function (value) {
+				this._Maj=value;
 				_createSetPropertyAction(this.context, this, "MajorTimeUnitScale", value, 0);
 			},
 			enumerable: true,
@@ -21612,11 +21693,11 @@ var Excel;
 		});
 		Object.defineProperty(ChartAxis.prototype, "majorUnit", {
 			get: function () {
-				_throwIfNotLoaded("majorUnit", this._Maj, _typeChartAxis, this._isNull);
-				return this._Maj;
+				_throwIfNotLoaded("majorUnit", this._Majo, _typeChartAxis, this._isNull);
+				return this._Majo;
 			},
 			set: function (value) {
-				this._Maj=value;
+				this._Majo=value;
 				_createSetPropertyAction(this.context, this, "MajorUnit", value, 0);
 			},
 			enumerable: true,
@@ -21646,14 +21727,27 @@ var Excel;
 			enumerable: true,
 			configurable: true
 		});
-		Object.defineProperty(ChartAxis.prototype, "minorTimeUnitScale", {
+		Object.defineProperty(ChartAxis.prototype, "minorTickMark", {
 			get: function () {
-				_throwIfNotLoaded("minorTimeUnitScale", this._Mino, _typeChartAxis, this._isNull);
-				_throwIfApiNotSupported("ChartAxis.minorTimeUnitScale", _defaultApiSetName, "1.7", _hostName);
+				_throwIfNotLoaded("minorTickMark", this._Mino, _typeChartAxis, this._isNull);
+				_throwIfApiNotSupported("ChartAxis.minorTickMark", _defaultApiSetName, "1.7", _hostName);
 				return this._Mino;
 			},
 			set: function (value) {
 				this._Mino=value;
+				_createSetPropertyAction(this.context, this, "MinorTickMark", value, 0);
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(ChartAxis.prototype, "minorTimeUnitScale", {
+			get: function () {
+				_throwIfNotLoaded("minorTimeUnitScale", this._Minor, _typeChartAxis, this._isNull);
+				_throwIfApiNotSupported("ChartAxis.minorTimeUnitScale", _defaultApiSetName, "1.7", _hostName);
+				return this._Minor;
+			},
+			set: function (value) {
+				this._Minor=value;
 				_createSetPropertyAction(this.context, this, "MinorTimeUnitScale", value, 0);
 			},
 			enumerable: true,
@@ -21661,11 +21755,11 @@ var Excel;
 		});
 		Object.defineProperty(ChartAxis.prototype, "minorUnit", {
 			get: function () {
-				_throwIfNotLoaded("minorUnit", this._Minor, _typeChartAxis, this._isNull);
-				return this._Minor;
+				_throwIfNotLoaded("minorUnit", this._MinorU, _typeChartAxis, this._isNull);
+				return this._MinorU;
 			},
 			set: function (value) {
-				this._Minor=value;
+				this._MinorU=value;
 				_createSetPropertyAction(this.context, this, "MinorUnit", value, 0);
 			},
 			enumerable: true,
@@ -21684,27 +21778,53 @@ var Excel;
 			enumerable: true,
 			configurable: true
 		});
-		Object.defineProperty(ChartAxis.prototype, "showDisplayUnitLabel", {
+		Object.defineProperty(ChartAxis.prototype, "scaleType", {
 			get: function () {
-				_throwIfNotLoaded("showDisplayUnitLabel", this._S, _typeChartAxis, this._isNull);
-				_throwIfApiNotSupported("ChartAxis.showDisplayUnitLabel", _defaultApiSetName, "1.7", _hostName);
+				_throwIfNotLoaded("scaleType", this._S, _typeChartAxis, this._isNull);
+				_throwIfApiNotSupported("ChartAxis.scaleType", _defaultApiSetName, "1.7", _hostName);
 				return this._S;
 			},
 			set: function (value) {
 				this._S=value;
+				_createSetPropertyAction(this.context, this, "ScaleType", value, 0);
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(ChartAxis.prototype, "showDisplayUnitLabel", {
+			get: function () {
+				_throwIfNotLoaded("showDisplayUnitLabel", this._Sh, _typeChartAxis, this._isNull);
+				_throwIfApiNotSupported("ChartAxis.showDisplayUnitLabel", _defaultApiSetName, "1.7", _hostName);
+				return this._Sh;
+			},
+			set: function (value) {
+				this._Sh=value;
 				_createSetPropertyAction(this.context, this, "ShowDisplayUnitLabel", value, 0);
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(ChartAxis.prototype, "tickLabelPosition", {
+			get: function () {
+				_throwIfNotLoaded("tickLabelPosition", this._T, _typeChartAxis, this._isNull);
+				_throwIfApiNotSupported("ChartAxis.tickLabelPosition", _defaultApiSetName, "1.7", _hostName);
+				return this._T;
+			},
+			set: function (value) {
+				this._T=value;
+				_createSetPropertyAction(this.context, this, "TickLabelPosition", value, 0);
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(ChartAxis.prototype, "tickLabelSpacing", {
 			get: function () {
-				_throwIfNotLoaded("tickLabelSpacing", this._T, _typeChartAxis, this._isNull);
+				_throwIfNotLoaded("tickLabelSpacing", this._Ti, _typeChartAxis, this._isNull);
 				_throwIfApiNotSupported("ChartAxis.tickLabelSpacing", _defaultApiSetName, "1.7", _hostName);
-				return this._T;
+				return this._Ti;
 			},
 			set: function (value) {
-				this._T=value;
+				this._Ti=value;
 				_createSetPropertyAction(this.context, this, "TickLabelSpacing", value, 0);
 			},
 			enumerable: true,
@@ -21712,12 +21832,12 @@ var Excel;
 		});
 		Object.defineProperty(ChartAxis.prototype, "tickMarkSpacing", {
 			get: function () {
-				_throwIfNotLoaded("tickMarkSpacing", this._Ti, _typeChartAxis, this._isNull);
+				_throwIfNotLoaded("tickMarkSpacing", this._Tic, _typeChartAxis, this._isNull);
 				_throwIfApiNotSupported("ChartAxis.tickMarkSpacing", _defaultApiSetName, "1.7", _hostName);
-				return this._Ti;
+				return this._Tic;
 			},
 			set: function (value) {
-				this._Ti=value;
+				this._Tic=value;
 				_createSetPropertyAction(this.context, this, "TickMarkSpacing", value, 0);
 			},
 			enumerable: true,
@@ -21728,6 +21848,15 @@ var Excel;
 				_throwIfNotLoaded("top", this._To, _typeChartAxis, this._isNull);
 				_throwIfApiNotSupported("ChartAxis.top", _defaultApiSetName, "1.7", _hostName);
 				return this._To;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(ChartAxis.prototype, "type", {
+			get: function () {
+				_throwIfNotLoaded("type", this._Ty, _typeChartAxis, this._isNull);
+				_throwIfApiNotSupported("ChartAxis.type", _defaultApiSetName, "1.7", _hostName);
+				return this._Ty;
 			},
 			enumerable: true,
 			configurable: true
@@ -21755,7 +21884,7 @@ var Excel;
 			configurable: true
 		});
 		ChartAxis.prototype.set=function (properties, options) {
-			this._recursivelySet(properties, options, ["majorUnit", "maximum", "minimum", "minorUnit", "displayUnit", "showDisplayUnitLabel", "minorTimeUnitScale", "majorTimeUnitScale", "baseTimeUnit", "categoryType", "logBase", "reversePlotOrder", "visible", "tickMarkSpacing", "tickLabelSpacing"], ["majorGridlines", "minorGridlines", "title", "format"], []);
+			this._recursivelySet(properties, options, ["majorUnit", "maximum", "minimum", "minorUnit", "displayUnit", "showDisplayUnitLabel", "minorTimeUnitScale", "majorTimeUnitScale", "baseTimeUnit", "categoryType", "scaleType", "logBase", "reversePlotOrder", "crosses", "visible", "majorTickMark", "minorTickMark", "tickMarkSpacing", "tickLabelPosition", "tickLabelSpacing"], ["majorGridlines", "minorGridlines", "title", "format"], []);
 		};
 		ChartAxis.prototype.update=function (properties) {
 			this._recursivelyUpdate(properties);
@@ -21768,20 +21897,30 @@ var Excel;
 			_throwIfApiNotSupported("ChartAxis.setCrossesAt", _defaultApiSetName, "1.7", _hostName);
 			_createMethodAction(this.context, this, "SetCrossesAt", 0, [value], 0);
 		};
+		ChartAxis.prototype.setCustomDisplayUnit=function (value) {
+			_throwIfApiNotSupported("ChartAxis.setCustomDisplayUnit", _defaultApiSetName, "1.7", _hostName);
+			_createMethodAction(this.context, this, "SetCustomDisplayUnit", 0, [value], 0);
+		};
 		ChartAxis.prototype._handleResult=function (value) {
 			_super.prototype._handleResult.call(this, value);
 			if (_isNullOrUndefined(value))
 				return;
 			var obj=value;
 			_fixObjectPathIfNecessary(this, obj);
+			if (!_isUndefined(obj["AxisGroup"])) {
+				this._A=obj["AxisGroup"];
+			}
 			if (!_isUndefined(obj["BaseTimeUnit"])) {
 				this._B=obj["BaseTimeUnit"];
 			}
 			if (!_isUndefined(obj["CategoryType"])) {
 				this._C=obj["CategoryType"];
 			}
+			if (!_isUndefined(obj["Crosses"])) {
+				this._Cr=obj["Crosses"];
+			}
 			if (!_isUndefined(obj["CrossesAt"])) {
-				this._Cr=obj["CrossesAt"];
+				this._Cro=obj["CrossesAt"];
 			}
 			if (!_isUndefined(obj["CustomDisplayUnit"])) {
 				this._Cu=obj["CustomDisplayUnit"];
@@ -21798,11 +21937,14 @@ var Excel;
 			if (!_isUndefined(obj["LogBase"])) {
 				this._Lo=obj["LogBase"];
 			}
+			if (!_isUndefined(obj["MajorTickMark"])) {
+				this._Ma=obj["MajorTickMark"];
+			}
 			if (!_isUndefined(obj["MajorTimeUnitScale"])) {
-				this._Ma=obj["MajorTimeUnitScale"];
+				this._Maj=obj["MajorTimeUnitScale"];
 			}
 			if (!_isUndefined(obj["MajorUnit"])) {
-				this._Maj=obj["MajorUnit"];
+				this._Majo=obj["MajorUnit"];
 			}
 			if (!_isUndefined(obj["Maximum"])) {
 				this._Max=obj["Maximum"];
@@ -21810,26 +21952,38 @@ var Excel;
 			if (!_isUndefined(obj["Minimum"])) {
 				this._Mi=obj["Minimum"];
 			}
+			if (!_isUndefined(obj["MinorTickMark"])) {
+				this._Mino=obj["MinorTickMark"];
+			}
 			if (!_isUndefined(obj["MinorTimeUnitScale"])) {
-				this._Mino=obj["MinorTimeUnitScale"];
+				this._Minor=obj["MinorTimeUnitScale"];
 			}
 			if (!_isUndefined(obj["MinorUnit"])) {
-				this._Minor=obj["MinorUnit"];
+				this._MinorU=obj["MinorUnit"];
 			}
 			if (!_isUndefined(obj["ReversePlotOrder"])) {
 				this._R=obj["ReversePlotOrder"];
 			}
+			if (!_isUndefined(obj["ScaleType"])) {
+				this._S=obj["ScaleType"];
+			}
 			if (!_isUndefined(obj["ShowDisplayUnitLabel"])) {
-				this._S=obj["ShowDisplayUnitLabel"];
+				this._Sh=obj["ShowDisplayUnitLabel"];
+			}
+			if (!_isUndefined(obj["TickLabelPosition"])) {
+				this._T=obj["TickLabelPosition"];
 			}
 			if (!_isUndefined(obj["TickLabelSpacing"])) {
-				this._T=obj["TickLabelSpacing"];
+				this._Ti=obj["TickLabelSpacing"];
 			}
 			if (!_isUndefined(obj["TickMarkSpacing"])) {
-				this._Ti=obj["TickMarkSpacing"];
+				this._Tic=obj["TickMarkSpacing"];
 			}
 			if (!_isUndefined(obj["Top"])) {
 				this._To=obj["Top"];
+			}
+			if (!_isUndefined(obj["Type"])) {
+				this._Ty=obj["Type"];
 			}
 			if (!_isUndefined(obj["Visible"])) {
 				this._V=obj["Visible"];
@@ -21851,25 +22005,32 @@ var Excel;
 		};
 		ChartAxis.prototype.toJSON=function () {
 			return _toJson(this, {
+				"axisGroup": this._A,
 				"baseTimeUnit": this._B,
 				"categoryType": this._C,
-				"crossesAt": this._Cr,
+				"crosses": this._Cr,
+				"crossesAt": this._Cro,
 				"customDisplayUnit": this._Cu,
 				"displayUnit": this._D,
 				"height": this._H,
 				"left": this._L,
 				"logBase": this._Lo,
-				"majorTimeUnitScale": this._Ma,
-				"majorUnit": this._Maj,
+				"majorTickMark": this._Ma,
+				"majorTimeUnitScale": this._Maj,
+				"majorUnit": this._Majo,
 				"maximum": this._Max,
 				"minimum": this._Mi,
-				"minorTimeUnitScale": this._Mino,
-				"minorUnit": this._Minor,
+				"minorTickMark": this._Mino,
+				"minorTimeUnitScale": this._Minor,
+				"minorUnit": this._MinorU,
 				"reversePlotOrder": this._R,
-				"showDisplayUnitLabel": this._S,
-				"tickLabelSpacing": this._T,
-				"tickMarkSpacing": this._Ti,
+				"scaleType": this._S,
+				"showDisplayUnitLabel": this._Sh,
+				"tickLabelPosition": this._T,
+				"tickLabelSpacing": this._Ti,
+				"tickMarkSpacing": this._Tic,
 				"top": this._To,
+				"type": this._Ty,
 				"visible": this._V,
 				"width": this._W,
 			}, {
@@ -22796,14 +22957,14 @@ var Excel;
 		});
 		Object.defineProperty(ChartLegend.prototype, "_scalarPropertyNames", {
 			get: function () {
-				return ["visible", "position", "overlay", "left", "top", "showShadow"];
+				return ["visible", "position", "overlay", "left", "top", "width", "height", "showShadow"];
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(ChartLegend.prototype, "_scalarPropertyUpdateable", {
 			get: function () {
-				return [true, true, true, true, true, true];
+				return [true, true, true, true, true, true, true, true];
 			},
 			enumerable: true,
 			configurable: true
@@ -22832,6 +22993,19 @@ var Excel;
 					this._Le=new Excel.ChartLegendEntryCollection(this.context, _createPropertyObjectPath(this.context, this, "LegendEntries", true, false, 4));
 				}
 				return this._Le;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(ChartLegend.prototype, "height", {
+			get: function () {
+				_throwIfNotLoaded("height", this._H, _typeChartLegend, this._isNull);
+				_throwIfApiNotSupported("ChartLegend.height", _defaultApiSetName, "1.7", _hostName);
+				return this._H;
+			},
+			set: function (value) {
+				this._H=value;
+				_createSetPropertyAction(this.context, this, "Height", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -22911,8 +23085,21 @@ var Excel;
 			enumerable: true,
 			configurable: true
 		});
+		Object.defineProperty(ChartLegend.prototype, "width", {
+			get: function () {
+				_throwIfNotLoaded("width", this._W, _typeChartLegend, this._isNull);
+				_throwIfApiNotSupported("ChartLegend.width", _defaultApiSetName, "1.7", _hostName);
+				return this._W;
+			},
+			set: function (value) {
+				this._W=value;
+				_createSetPropertyAction(this.context, this, "Width", value, 0);
+			},
+			enumerable: true,
+			configurable: true
+		});
 		ChartLegend.prototype.set=function (properties, options) {
-			this._recursivelySet(properties, options, ["visible", "position", "overlay", "left", "top", "showShadow"], ["format"], [
+			this._recursivelySet(properties, options, ["visible", "position", "overlay", "left", "top", "width", "height", "showShadow"], ["format"], [
 				"legendEntries"
 			]);
 		};
@@ -22925,6 +23112,9 @@ var Excel;
 				return;
 			var obj=value;
 			_fixObjectPathIfNecessary(this, obj);
+			if (!_isUndefined(obj["Height"])) {
+				this._H=obj["Height"];
+			}
 			if (!_isUndefined(obj["Left"])) {
 				this._L=obj["Left"];
 			}
@@ -22943,6 +23133,9 @@ var Excel;
 			if (!_isUndefined(obj["Visible"])) {
 				this._V=obj["Visible"];
 			}
+			if (!_isUndefined(obj["Width"])) {
+				this._W=obj["Width"];
+			}
 			_handleNavigationPropertyResults(this, obj, ["format", "Format", "legendEntries", "LegendEntries"]);
 		};
 		ChartLegend.prototype.load=function (option) {
@@ -22957,12 +23150,14 @@ var Excel;
 		};
 		ChartLegend.prototype.toJSON=function () {
 			return _toJson(this, {
+				"height": this._H,
 				"left": this._L,
 				"overlay": this._O,
 				"position": this._P,
 				"showShadow": this._S,
 				"top": this._T,
 				"visible": this._V,
+				"width": this._W,
 			}, {
 				"format": this._F,
 				"legendEntries": this._Le,
@@ -23395,6 +23590,14 @@ var Excel;
 		ChartTitle.prototype.update=function (properties) {
 			this._recursivelyUpdate(properties);
 		};
+		ChartTitle.prototype.getSubstring=function (start, length) {
+			_throwIfApiNotSupported("ChartTitle.getSubstring", _defaultApiSetName, "1.7", _hostName);
+			return new Excel.ChartFormatString(this.context, _createMethodObjectPath(this.context, this, "GetSubstring", 1, [start, length], false, false, null, 4));
+		};
+		ChartTitle.prototype.setFormula=function (formula) {
+			_throwIfApiNotSupported("ChartTitle.setFormula", _defaultApiSetName, "1.7", _hostName);
+			_createMethodAction(this.context, this, "SetFormula", 0, [formula], 0);
+		};
 		ChartTitle.prototype._handleResult=function (value) {
 			_super.prototype._handleResult.call(this, value);
 			if (_isNullOrUndefined(value))
@@ -23474,6 +23677,72 @@ var Excel;
 		return ChartTitle;
 	}(OfficeExtension.ClientObject));
 	Excel.ChartTitle=ChartTitle;
+	var _typeChartFormatString="ChartFormatString";
+	var ChartFormatString=(function (_super) {
+		__extends(ChartFormatString, _super);
+		function ChartFormatString() {
+			return _super !==null && _super.apply(this, arguments) || this;
+		}
+		Object.defineProperty(ChartFormatString.prototype, "_className", {
+			get: function () {
+				return "ChartFormatString";
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(ChartFormatString.prototype, "_navigationPropertyNames", {
+			get: function () {
+				return ["font"];
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(ChartFormatString.prototype, "font", {
+			get: function () {
+				if (!this._F) {
+					this._F=new Excel.ChartFont(this.context, _createPropertyObjectPath(this.context, this, "Font", false, false, 4));
+				}
+				return this._F;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		ChartFormatString.prototype.set=function (properties, options) {
+			this._recursivelySet(properties, options, [], ["font"], []);
+		};
+		ChartFormatString.prototype.update=function (properties) {
+			this._recursivelyUpdate(properties);
+		};
+		ChartFormatString.prototype._handleResult=function (value) {
+			_super.prototype._handleResult.call(this, value);
+			if (_isNullOrUndefined(value))
+				return;
+			var obj=value;
+			_fixObjectPathIfNecessary(this, obj);
+			_handleNavigationPropertyResults(this, obj, ["font", "Font"]);
+		};
+		ChartFormatString.prototype.load=function (option) {
+			return _load(this, option);
+		};
+		ChartFormatString.prototype.retrieve=function (option) {
+			return _retrieve(this, option);
+		};
+		ChartFormatString.prototype._handleRetrieveResult=function (value, result) {
+			_super.prototype._handleRetrieveResult.call(this, value, result);
+			_processRetrieveResult(this, value, result);
+		};
+		ChartFormatString.prototype.toJSON=function () {
+			return _toJson(this, {}, {
+				"font": this._F,
+			});
+		};
+		ChartFormatString.prototype.ensureUnchanged=function (data) {
+			_createEnsureUnchangedAction(this.context, this, data);
+			return;
+		};
+		return ChartFormatString;
+	}(OfficeExtension.ClientObject));
+	Excel.ChartFormatString=ChartFormatString;
 	var _typeChartTitleFormat="ChartTitleFormat";
 	var ChartTitleFormat=(function (_super) {
 		__extends(ChartTitleFormat, _super);
@@ -23999,14 +24268,14 @@ var Excel;
 		});
 		Object.defineProperty(ChartTrendline.prototype, "_scalarPropertyNames", {
 			get: function () {
-				return ["polynomialOrder", "movingAveragePeriod", "_Id", "displayRSquared", "name", "intercept"];
+				return ["type", "polynomialOrder", "movingAveragePeriod", "_Id", "name", "intercept"];
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(ChartTrendline.prototype, "_scalarPropertyUpdateable", {
 			get: function () {
-				return [true, true, false, true, true, true];
+				return [true, true, true, false, true, true];
 			},
 			enumerable: true,
 			configurable: true
@@ -24024,18 +24293,6 @@ var Excel;
 					this._F=new Excel.ChartTrendlineFormat(this.context, _createPropertyObjectPath(this.context, this, "Format", false, false, 4));
 				}
 				return this._F;
-			},
-			enumerable: true,
-			configurable: true
-		});
-		Object.defineProperty(ChartTrendline.prototype, "displayRSquared", {
-			get: function () {
-				_throwIfNotLoaded("displayRSquared", this._D, _typeChartTrendline, this._isNull);
-				return this._D;
-			},
-			set: function (value) {
-				this._D=value;
-				_createSetPropertyAction(this.context, this, "DisplayRSquared", value, 0);
 			},
 			enumerable: true,
 			configurable: true
@@ -24088,6 +24345,18 @@ var Excel;
 			enumerable: true,
 			configurable: true
 		});
+		Object.defineProperty(ChartTrendline.prototype, "type", {
+			get: function () {
+				_throwIfNotLoaded("type", this._T, _typeChartTrendline, this._isNull);
+				return this._T;
+			},
+			set: function (value) {
+				this._T=value;
+				_createSetPropertyAction(this.context, this, "Type", value, 0);
+			},
+			enumerable: true,
+			configurable: true
+		});
 		Object.defineProperty(ChartTrendline.prototype, "_Id", {
 			get: function () {
 				_throwIfNotLoaded("_Id", this.__I, _typeChartTrendline, this._isNull);
@@ -24097,7 +24366,7 @@ var Excel;
 			configurable: true
 		});
 		ChartTrendline.prototype.set=function (properties, options) {
-			this._recursivelySet(properties, options, ["polynomialOrder", "movingAveragePeriod", "displayRSquared", "name", "intercept"], ["format"], []);
+			this._recursivelySet(properties, options, ["type", "polynomialOrder", "movingAveragePeriod", "name", "intercept"], ["format"], []);
 		};
 		ChartTrendline.prototype.update=function (properties) {
 			this._recursivelyUpdate(properties);
@@ -24111,9 +24380,6 @@ var Excel;
 				return;
 			var obj=value;
 			_fixObjectPathIfNecessary(this, obj);
-			if (!_isUndefined(obj["DisplayRSquared"])) {
-				this._D=obj["DisplayRSquared"];
-			}
 			if (!_isUndefined(obj["Intercept"])) {
 				this._I=obj["Intercept"];
 			}
@@ -24125,6 +24391,9 @@ var Excel;
 			}
 			if (!_isUndefined(obj["PolynomialOrder"])) {
 				this._P=obj["PolynomialOrder"];
+			}
+			if (!_isUndefined(obj["Type"])) {
+				this._T=obj["Type"];
 			}
 			if (!_isUndefined(obj["_Id"])) {
 				this.__I=obj["_Id"];
@@ -24152,11 +24421,11 @@ var Excel;
 		};
 		ChartTrendline.prototype.toJSON=function () {
 			return _toJson(this, {
-				"displayRSquared": this._D,
 				"intercept": this._I,
 				"movingAveragePeriod": this._M,
 				"name": this._N,
 				"polynomialOrder": this._P,
+				"type": this._T,
 			}, {
 				"format": this._F,
 			});
@@ -24196,6 +24465,9 @@ var Excel;
 			enumerable: true,
 			configurable: true
 		});
+		ChartTrendlineCollection.prototype.add=function (type) {
+			return new Excel.ChartTrendline(this.context, _createMethodObjectPath(this.context, this, "Add", 0, [type], false, true, null, 0));
+		};
 		ChartTrendlineCollection.prototype.getCount=function () {
 			var action=_createMethodAction(this.context, this, "GetCount", 1, [], 4);
 			var ret=new OfficeExtension.ClientResult();
@@ -28363,61 +28635,91 @@ var Excel;
 		return DataConnectionCollection;
 	}(OfficeExtension.ClientObject));
 	Excel.DataConnectionCollection=DataConnectionCollection;
-	var BindingType;
-	(function (BindingType) {
-		BindingType["range"]="Range";
-		BindingType["table"]="Table";
-		BindingType["text"]="Text";
-	})(BindingType=Excel.BindingType || (Excel.BindingType={}));
-	var BorderIndex;
-	(function (BorderIndex) {
-		BorderIndex["edgeTop"]="EdgeTop";
-		BorderIndex["edgeBottom"]="EdgeBottom";
-		BorderIndex["edgeLeft"]="EdgeLeft";
-		BorderIndex["edgeRight"]="EdgeRight";
-		BorderIndex["insideVertical"]="InsideVertical";
-		BorderIndex["insideHorizontal"]="InsideHorizontal";
-		BorderIndex["diagonalDown"]="DiagonalDown";
-		BorderIndex["diagonalUp"]="DiagonalUp";
-	})(BorderIndex=Excel.BorderIndex || (Excel.BorderIndex={}));
-	var BorderLineStyle;
-	(function (BorderLineStyle) {
-		BorderLineStyle["none"]="None";
-		BorderLineStyle["continuous"]="Continuous";
-		BorderLineStyle["dash"]="Dash";
-		BorderLineStyle["dashDot"]="DashDot";
-		BorderLineStyle["dashDotDot"]="DashDotDot";
-		BorderLineStyle["dot"]="Dot";
-		BorderLineStyle["double"]="Double";
-		BorderLineStyle["slantDashDot"]="SlantDashDot";
-	})(BorderLineStyle=Excel.BorderLineStyle || (Excel.BorderLineStyle={}));
-	var BorderWeight;
-	(function (BorderWeight) {
-		BorderWeight["hairline"]="Hairline";
-		BorderWeight["thin"]="Thin";
-		BorderWeight["medium"]="Medium";
-		BorderWeight["thick"]="Thick";
-	})(BorderWeight=Excel.BorderWeight || (Excel.BorderWeight={}));
-	var CalculationMode;
-	(function (CalculationMode) {
-		CalculationMode["automatic"]="Automatic";
-		CalculationMode["automaticExceptTables"]="AutomaticExceptTables";
-		CalculationMode["manual"]="Manual";
-	})(CalculationMode=Excel.CalculationMode || (Excel.CalculationMode={}));
-	var CalculationType;
-	(function (CalculationType) {
-		CalculationType["recalculate"]="Recalculate";
-		CalculationType["full"]="Full";
-		CalculationType["fullRebuild"]="FullRebuild";
-	})(CalculationType=Excel.CalculationType || (Excel.CalculationType={}));
-	var ClearApplyTo;
-	(function (ClearApplyTo) {
-		ClearApplyTo["all"]="All";
-		ClearApplyTo["formats"]="Formats";
-		ClearApplyTo["contents"]="Contents";
-		ClearApplyTo["hyperlinks"]="Hyperlinks";
-		ClearApplyTo["removeHyperlinks"]="RemoveHyperlinks";
-	})(ClearApplyTo=Excel.ClearApplyTo || (Excel.ClearApplyTo={}));
+	var AxisType;
+	(function (AxisType) {
+		AxisType["invalid"]="Invalid";
+		AxisType["category"]="Category";
+		AxisType["value"]="Value";
+		AxisType["series"]="Series";
+	})(AxisType=Excel.AxisType || (Excel.AxisType={}));
+	var AxisGroup;
+	(function (AxisGroup) {
+		AxisGroup["primary"]="Primary";
+		AxisGroup["secondary"]="Secondary";
+	})(AxisGroup=Excel.AxisGroup || (Excel.AxisGroup={}));
+	var AxisScaleType;
+	(function (AxisScaleType) {
+		AxisScaleType["linear"]="Linear";
+		AxisScaleType["logarithmic"]="Logarithmic";
+	})(AxisScaleType=Excel.AxisScaleType || (Excel.AxisScaleType={}));
+	var AxisCrosses;
+	(function (AxisCrosses) {
+		AxisCrosses["automatic"]="Automatic";
+		AxisCrosses["maximum"]="Maximum";
+		AxisCrosses["minimum"]="Minimum";
+		AxisCrosses["custom"]="Custom";
+	})(AxisCrosses=Excel.AxisCrosses || (Excel.AxisCrosses={}));
+	var AxisTickMark;
+	(function (AxisTickMark) {
+		AxisTickMark["none"]="None";
+		AxisTickMark["cross"]="Cross";
+		AxisTickMark["inside"]="Inside";
+		AxisTickMark["outside"]="Outside";
+	})(AxisTickMark=Excel.AxisTickMark || (Excel.AxisTickMark={}));
+	var AxisTickLabelPosition;
+	(function (AxisTickLabelPosition) {
+		AxisTickLabelPosition["nextToAxis"]="NextToAxis";
+		AxisTickLabelPosition["high"]="High";
+		AxisTickLabelPosition["low"]="Low";
+		AxisTickLabelPosition["none"]="None";
+	})(AxisTickLabelPosition=Excel.AxisTickLabelPosition || (Excel.AxisTickLabelPosition={}));
+	var TrendlineType;
+	(function (TrendlineType) {
+		TrendlineType["linear"]="Linear";
+		TrendlineType["exponential"]="Exponential";
+		TrendlineType["logarithmic"]="Logarithmic";
+		TrendlineType["movingAverage"]="MovingAverage";
+		TrendlineType["polynomial"]="Polynomial";
+		TrendlineType["power"]="Power";
+	})(TrendlineType=Excel.TrendlineType || (Excel.TrendlineType={}));
+	var ChartAxisType;
+	(function (ChartAxisType) {
+		ChartAxisType["invalid"]="Invalid";
+		ChartAxisType["category"]="Category";
+		ChartAxisType["value"]="Value";
+		ChartAxisType["series"]="Series";
+	})(ChartAxisType=Excel.ChartAxisType || (Excel.ChartAxisType={}));
+	var ChartAxisGroup;
+	(function (ChartAxisGroup) {
+		ChartAxisGroup["primary"]="Primary";
+		ChartAxisGroup["secondary"]="Secondary";
+	})(ChartAxisGroup=Excel.ChartAxisGroup || (Excel.ChartAxisGroup={}));
+	var ChartAxisScaleType;
+	(function (ChartAxisScaleType) {
+		ChartAxisScaleType["linear"]="Linear";
+		ChartAxisScaleType["logarithmic"]="Logarithmic";
+	})(ChartAxisScaleType=Excel.ChartAxisScaleType || (Excel.ChartAxisScaleType={}));
+	var ChartAxisPosition;
+	(function (ChartAxisPosition) {
+		ChartAxisPosition["automatic"]="Automatic";
+		ChartAxisPosition["maximum"]="Maximum";
+		ChartAxisPosition["minimum"]="Minimum";
+		ChartAxisPosition["custom"]="Custom";
+	})(ChartAxisPosition=Excel.ChartAxisPosition || (Excel.ChartAxisPosition={}));
+	var ChartAxisTickMark;
+	(function (ChartAxisTickMark) {
+		ChartAxisTickMark["none"]="None";
+		ChartAxisTickMark["cross"]="Cross";
+		ChartAxisTickMark["inside"]="Inside";
+		ChartAxisTickMark["outside"]="Outside";
+	})(ChartAxisTickMark=Excel.ChartAxisTickMark || (Excel.ChartAxisTickMark={}));
+	var ChartAxisTickLabelPosition;
+	(function (ChartAxisTickLabelPosition) {
+		ChartAxisTickLabelPosition["nextToAxis"]="NextToAxis";
+		ChartAxisTickLabelPosition["high"]="High";
+		ChartAxisTickLabelPosition["low"]="Low";
+		ChartAxisTickLabelPosition["none"]="None";
+	})(ChartAxisTickLabelPosition=Excel.ChartAxisTickLabelPosition || (Excel.ChartAxisTickLabelPosition={}));
 	var ChartAxisDisplayUnit;
 	(function (ChartAxisDisplayUnit) {
 		ChartAxisDisplayUnit["none"]="None";
@@ -28611,6 +28913,70 @@ var Excel;
 		ChartUnderlineStyle["none"]="None";
 		ChartUnderlineStyle["single"]="Single";
 	})(ChartUnderlineStyle=Excel.ChartUnderlineStyle || (Excel.ChartUnderlineStyle={}));
+	var ChartTrendlineType;
+	(function (ChartTrendlineType) {
+		ChartTrendlineType["linear"]="Linear";
+		ChartTrendlineType["exponential"]="Exponential";
+		ChartTrendlineType["logarithmic"]="Logarithmic";
+		ChartTrendlineType["movingAverage"]="MovingAverage";
+		ChartTrendlineType["polynomial"]="Polynomial";
+		ChartTrendlineType["power"]="Power";
+	})(ChartTrendlineType=Excel.ChartTrendlineType || (Excel.ChartTrendlineType={}));
+	var BindingType;
+	(function (BindingType) {
+		BindingType["range"]="Range";
+		BindingType["table"]="Table";
+		BindingType["text"]="Text";
+	})(BindingType=Excel.BindingType || (Excel.BindingType={}));
+	var BorderIndex;
+	(function (BorderIndex) {
+		BorderIndex["edgeTop"]="EdgeTop";
+		BorderIndex["edgeBottom"]="EdgeBottom";
+		BorderIndex["edgeLeft"]="EdgeLeft";
+		BorderIndex["edgeRight"]="EdgeRight";
+		BorderIndex["insideVertical"]="InsideVertical";
+		BorderIndex["insideHorizontal"]="InsideHorizontal";
+		BorderIndex["diagonalDown"]="DiagonalDown";
+		BorderIndex["diagonalUp"]="DiagonalUp";
+	})(BorderIndex=Excel.BorderIndex || (Excel.BorderIndex={}));
+	var BorderLineStyle;
+	(function (BorderLineStyle) {
+		BorderLineStyle["none"]="None";
+		BorderLineStyle["continuous"]="Continuous";
+		BorderLineStyle["dash"]="Dash";
+		BorderLineStyle["dashDot"]="DashDot";
+		BorderLineStyle["dashDotDot"]="DashDotDot";
+		BorderLineStyle["dot"]="Dot";
+		BorderLineStyle["double"]="Double";
+		BorderLineStyle["slantDashDot"]="SlantDashDot";
+	})(BorderLineStyle=Excel.BorderLineStyle || (Excel.BorderLineStyle={}));
+	var BorderWeight;
+	(function (BorderWeight) {
+		BorderWeight["hairline"]="Hairline";
+		BorderWeight["thin"]="Thin";
+		BorderWeight["medium"]="Medium";
+		BorderWeight["thick"]="Thick";
+	})(BorderWeight=Excel.BorderWeight || (Excel.BorderWeight={}));
+	var CalculationMode;
+	(function (CalculationMode) {
+		CalculationMode["automatic"]="Automatic";
+		CalculationMode["automaticExceptTables"]="AutomaticExceptTables";
+		CalculationMode["manual"]="Manual";
+	})(CalculationMode=Excel.CalculationMode || (Excel.CalculationMode={}));
+	var CalculationType;
+	(function (CalculationType) {
+		CalculationType["recalculate"]="Recalculate";
+		CalculationType["full"]="Full";
+		CalculationType["fullRebuild"]="FullRebuild";
+	})(CalculationType=Excel.CalculationType || (Excel.CalculationType={}));
+	var ClearApplyTo;
+	(function (ClearApplyTo) {
+		ClearApplyTo["all"]="All";
+		ClearApplyTo["formats"]="Formats";
+		ClearApplyTo["contents"]="Contents";
+		ClearApplyTo["hyperlinks"]="Hyperlinks";
+		ClearApplyTo["removeHyperlinks"]="RemoveHyperlinks";
+	})(ClearApplyTo=Excel.ClearApplyTo || (Excel.ClearApplyTo={}));
 	var ConditionalDataBarAxisFormat;
 	(function (ConditionalDataBarAxisFormat) {
 		ConditionalDataBarAxisFormat["automatic"]="Automatic";
@@ -28955,7 +29321,7 @@ var Excel;
 	})(EventSource=Excel.EventSource || (Excel.EventSource={}));
 	var DataChangeType;
 	(function (DataChangeType) {
-		DataChangeType["others"]="Others";
+		DataChangeType["unknown"]="Unknown";
 		DataChangeType["rangeEdited"]="RangeEdited";
 		DataChangeType["rowInserted"]="RowInserted";
 		DataChangeType["rowDeleted"]="RowDeleted";
@@ -28979,6 +29345,7 @@ var Excel;
 		EventType["chartDeactivated"]="ChartDeactivated";
 		EventType["chartDeleted"]="ChartDeleted";
 		EventType["worksheetCalculated"]="WorksheetCalculated";
+		EventType["visualSelectionChanged"]="VisualSelectionChanged";
 	})(EventType=Excel.EventType || (Excel.EventType={}));
 	var DocumentPropertyItem;
 	(function (DocumentPropertyItem) {

@@ -1,5 +1,5 @@
 /* Office JavaScript API library */
-/* Version: 16.0.9303.3000 */
+/* Version: 16.0.9320.1000 */
 /*
 	Copyright (c) Microsoft Corporation.  All rights reserved.
 */
@@ -89,6 +89,7 @@ OSF.SupportedLocales = {
     "ja-jp": true,
     "kk-kz": true,
     "ko-kr": true,
+    "lo-la": true,
     "lt-lt": true,
     "lv-lv": true,
     "ms-my": true,
@@ -141,6 +142,7 @@ OSF.AssociatedLocales = {
     ja: "ja-jp",
     kk: "kk-kz",
     ko: "ko-kr",
+    lo: "lo-la",
     lt: "lt-lt",
     lv: "lv-lv",
     ms: "ms-my",
@@ -1109,7 +1111,7 @@ var Office;
     Office.Promise = OfficePromise;
 })(Office || (Office = {}));
 OSF.ConstantNames = {
-    FileVersion: "16.0.9303.3000",
+    FileVersion: "16.0.9320.1000",
     OfficeJS: "office.js",
     OfficeDebugJS: "office.debug.js",
     DefaultLocale: "en-us",
