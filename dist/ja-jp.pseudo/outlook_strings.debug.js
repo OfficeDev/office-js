@@ -1,4 +1,4 @@
-/* Version: 16.0.9314.1000 */
+/* Version: 16.0.10827.10000 */
 
 Type.registerNamespace("_u");
 _u.ExtensibilityStrings = function()
@@ -14,6 +14,7 @@ _u.ExtensibilityStrings.l_AttachmentErrorName_Text = "[OG:Áttá¢hmêñt Ërrø
 _u.ExtensibilityStrings.l_AttachmentExceededSize_Text = "[OG:Thë áttª¢hmèñt çæññót þë æððëð þêçæùsé ït îs tóô þíg.瑞갂偁略 яšæẤßソ瑞థ్క لإَّ'Ii.]";
 _u.ExtensibilityStrings.l_AttachmentItemIdTooLong_Text = "[OG:Óñë ôr môrë ôf thé áttã¢hmèñt ÍÐs ìs tòö lõñg.瑞갂偁略 яšæẤßソథ్క لإَّ'Ii.]";
 _u.ExtensibilityStrings.l_AttachmentNameTooLong_Text = "[OG:Òñê òr mørë øf thé ãttà¢hméñt ñämés ìs tóó löñg.瑞갂偁略 яšæẤßソథ్క لإَّ'Ii.]";
+_u.ExtensibilityStrings.l_AttachmentNotSupported_Text = "[OG:Thè åttæçhméñt tÿpé îs ñót sûppòrtêð.瑞갂偁略 яšæẤథ్క لإَّ'Ii.]";
 _u.ExtensibilityStrings.l_AttachmentUploadGeneralFailure_Text = "[OG:Thê ªttåçhméñt çåññøt þé åððêð tó thé ìtëm.瑞갂偁略 яšæẤßథ్క لإَّ'Ii.]";
 _u.ExtensibilityStrings.l_AttachmentUrlTooLong_Text = "[OG:Ôñè ör mòrë ôf thé áttªçhmëñt ÛR£s ïs tõô lòñg.瑞갂偁略 яšæẤßソథ్క لإَّ'Ii.]";
 _u.ExtensibilityStrings.l_CallSaveAsyncBeforeToken_Text = "[OG:Thê tòkêñ ¢åñ't þè rëtrîèvéð µñtíl thè ítëm ìs sávêð.瑞갂偁略 яšæẤßソ瑞థ్క لإَّ'Ii.]";
@@ -34,6 +35,8 @@ _u.ExtensibilityStrings.l_HtmlSanitizationFailure_Text = "[OG:Thë HTM£ sãñt�
 _u.ExtensibilityStrings.l_Insufficient_Item_Permissions_Text = "[OG:Thê ûsër ðôësñ't håvê thé pérmíssïòñs rêqûìrèð tó pérförm thïs ópérätìõñ.瑞갂偁略 яšæẤßソ瑞갂偁略 яథ్క لإَّ'Ii.]";
 _u.ExtensibilityStrings.l_InternalFormatError_Text = "[OG:Thêré wâs àñ îñtérñäl førmæt ërrør.瑞갂偁略 яšæẤథ్క لإَّ'Ii.]";
 _u.ExtensibilityStrings.l_InternalProtocolError_Text = "[:Íñtêrñäl pròtõçõl ërrør: '{0}'.瑞갂偁略 яšæథ్క لإَّ'Ii.]";
+_u.ExtensibilityStrings.l_Internal_Server_Error_Text = "[OG:Thë Èxçhãñgê sérvér rëtûrñéð æñ èrrór. Plêæsé lôòk åt thë ðíågñòstîçs ôþjèçt før mórê ïñförmåtîøñ.瑞갂偁略 яšæẤßソ瑞갂偁略 яšæẤßソథ్క لإَّ'Ii.]";
+_u.ExtensibilityStrings.l_Internet_Not_Connected_Error_Text = "[OG:Thè úsër ìs ñò lòñgér ¢øññèçtëð tô thè ñëtwørk. Plêæsé çhê¢k ýòµr ñètwòrk ¢øññëçtìòñ áñð trÿ àgáíñ.瑞갂偁略 яšæẤßソ瑞갂偁略 яšæẤßソ瑞థ్క لإَّ'Ii.]";
 _u.ExtensibilityStrings.l_InvalidActionType_Text = "[OG:Thê vælúé øf thë pæræmëtër 'ãçtîôñTýpè' ís ìñvàlïð. Thê â¢¢éptèð vªlúè ís \"shöwTåskPæñè\".瑞갂偁略 яšæẤßソ瑞갂偁略 яšæẤథ్క لإَّ'Ii.]"
 _u.ExtensibilityStrings.l_InvalidAttachmentId_Text = "[OG:Thê àttã¢hmèñt ÌÐ wæs ïñvàlíð.瑞갂偁略 яšæథ్క لإَّ'Ii.]";
 _u.ExtensibilityStrings.l_InvalidAttachmentPath_Text = "[OG:Thë ªttä¢hmèñt päth wâs ìñvªlìð.瑞갂偁略 яšæథ్క لإَّ'Ii.]";
@@ -51,12 +54,15 @@ _u.ExtensibilityStrings.l_NullOrEmptyParameterError_Text = "[OG:Thè pªråmét�
 _u.ExtensibilityStrings.l_NumberOfNotificationsExceeded_Text = "[OG:Thè ñótìfïçâtíöñ çõµlðñ't þê åððéð þêçâµsé thê ñötïfíçªtíôñ lîmït hæs þèêñ rêª¢hëð.瑞갂偁略 яšæẤßソ瑞갂偁略 яšæẤథ్క لإَّ'Ii.]";
 _u.ExtensibilityStrings.l_NumberOfRecipientsExceeded_Text = "[OG:Thê tötâl ñúmþêr òf rê¢îpîëñts ìñ thè fìèlð çæñ't ëxçêëð {0}.瑞갂偁略 яšæẤßソ瑞갂偁థ్క لإَّ'Ii.]";
 _u.ExtensibilityStrings.l_OffsetNotfound_Text = "[:Àñ öffsët før thïs tïmè stæmp ¢óúlðñ't þë fõûñð.瑞갂偁略 яšæẤßソథ్క لإَّ'Ii.]";
+_u.ExtensibilityStrings.l_Olk_Http_Error_Text = "[OG:Thë réqûêst hás fáílèð. Plèæsë lõök åt thë ðîågñòstìçs õþjêçt fôr thê HTTP èrrõr ¢øðë.瑞갂偁略 яšæẤßソ瑞갂偁略 яšæẤథ్క لإَّ'Ii.]";
 _u.ExtensibilityStrings.l_ParameterValueTooLongError_Text = "[OG:Thê vælµé øf thé '{0}' pärãmêtér ïs tòö lôñg. Thè mªxîmûm ñümþêr õf çhærà¢tërs îs '{1}'.瑞갂偁略 яšæẤßソ瑞갂偁略 яšæẤథ్క لإَّ'Ii.]";
 _u.ExtensibilityStrings.l_ParametersNotAsExpected_Text = "[OG:Thë gîvéñ pªrªmëtêrs ðø ñøt mæt¢h thë éxpë¢téð fõrmàt.瑞갂偁略 яšæẤßソ瑞갂థ్క لإَّ'Ii.]";
 _u.ExtensibilityStrings.l_PersistedNotificationArrayReadError_Text = "[OG:Thë ÅPÍ ¢âll ýõù måðè fæíléð þê¢åµsë thê pérsìstéð ñótïfî¢ãtîõñs ¢ôülðñ't þè rëtrîëvêð.瑞갂偁略 яšæẤßソ瑞갂偁略 яšæẤథ్క لإَّ'Ii.]";
 _u.ExtensibilityStrings.l_PersistedNotificationArraySaveError_Text = "[OG:Thè ÂPÍ ¢áll ÿöù máðé fäìléð þêçåµsè ñötïfîçãtïóñs ¢òülðñ't þë pèrsïstêð.瑞갂偁略 яšæẤßソ瑞갂偁略 яథ్క لإَّ'Ii.]";
 _u.ExtensibilityStrings.l_RecurrenceErrorMaxOccurrences_Text = "[OG:Thè rê¢ûrrìñg sërïès ëxçéëðs thë mâxìmûm lîmït øf 999 òç¢úrrêñ¢ès.瑞갂偁略 яšæẤßソ瑞갂偁略థ్క لإَّ'Ii.]";
 _u.ExtensibilityStrings.l_RecurrenceErrorZeroOccurrences_Text = "[OG:Thê rë¢ürrìñg sérïês hãs ñò õ¢¢ûrrèñ¢ês ïñ thé spé¢ífïëð ðåtë râñgê.瑞갂偁略 яšæẤßソ瑞갂偁略 థ్క لإَّ'Ii.]";
+_u.ExtensibilityStrings.l_RecurrenceInvalidTimeZone_Text = "[OG:Thé spêçïfíèð tîmé zòñê ìs ñót sµppórtéð.瑞갂偁略 яšæẤథ్క لإَّ'Ii.]";
+_u.ExtensibilityStrings.l_RecurrenceUnsupportedAlternateCalendar_Text = "[OG:Thè rêçµrrèñçë pättèrñ wàs sét þÿ thê µsêr ùsìñg àñ æltèrñâté ¢álèñðær thàt îs ñõt sùppõrtèð.瑞갂偁略 яšæẤßソ瑞갂偁略 яšæẤßథ్క لإَّ'Ii.]";
 _u.ExtensibilityStrings.l_Recurrence_Error_Instance_SetAsync_Text = "[OG:Å réçûrrèñ¢é pâttêrñ çæñ't þé sët fôr æ sîñglé ø¢¢ùrréñ¢ë íñ æ sèrïës.瑞갂偁略 яšæẤßソ瑞갂偁略 яథ్క لإَّ'Ii.]";
 _u.ExtensibilityStrings.l_Recurrence_Error_Properties_Invalid_Text = "[OG:Thê ré¢µrrëñçé pãttërñ ísñ't vâlïð. Plèásè çhêçk thåt thè spë¢îfïëð ré¢ürrëñ¢é pròpèrtíës ælïgñ wïth thê réçùrréñçê tÿpé.瑞갂偁略 яšæẤßソ瑞갂偁略 яšæẤßソ瑞갂偁略 яథ్క لإَّ'Ii.]";
 _u.ExtensibilityStrings.l_SaveError_Text = "[OG:Çõññè¢tîôñ ërrõr øççürrêð whìlë trýîñg tó sãvë thé ïtëm øñ thè sêrvér.瑞갂偁略 яšæẤßソ瑞갂偁略 яథ్క لإَّ'Ii.]";

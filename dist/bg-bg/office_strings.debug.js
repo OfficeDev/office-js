@@ -1,4 +1,4 @@
-/* Version: 16.0.9314.1000 */
+/* Version: 16.0.10827.10000 */
 
 Type.registerNamespace("Strings");
 Strings.OfficeOM = function()
@@ -157,6 +157,7 @@ Strings.OfficeOM.L_SSOConnectionLostError = "Загубена е връзка п
 Strings.OfficeOM.L_SSOConnectionLostErrorMessage = "Загубена е връзка по време на процеса на влизане и е възможно потребителят да не е влязъл. Това вероятно се дължи на конфигурационните настройки на браузъра на потребителя, като напр. зоните за защита.";
 Strings.OfficeOM.L_SSOServerError = "Възникна грешка в доставчика на удостоверяване.";
 Strings.OfficeOM.L_SSOServerErrorMessage = "Възникна неочаквана грешка на сървъра.";
+Strings.OfficeOM.L_SSOUnsupportedPlatform = "API не се поддържа в тази платформа.";
 Strings.OfficeOM.L_SSOUserConsentNotSupportedByCurrentAddinCategory = "Тази добавка не поддържа потребителско съгласие.";
 Strings.OfficeOM.L_SSOUserConsentNotSupportedByCurrentAddinCategoryMessage = "Операцията е неуспешна, защото тази добавка не поддръжка потребителско съгласие в тази категория";
 Strings.OfficeOM.L_SaveSettingsError = "Грешка в настройките за записване";

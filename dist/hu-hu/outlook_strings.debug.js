@@ -1,4 +1,4 @@
-/* Version: 16.0.9314.1000 */
+/* Version: 16.0.10827.10000 */
 
 Type.registerNamespace("_u");
 _u.ExtensibilityStrings = function()
@@ -14,6 +14,7 @@ _u.ExtensibilityStrings.l_AttachmentErrorName_Text = "Melléklethiba";
 _u.ExtensibilityStrings.l_AttachmentExceededSize_Text = "A melléklet nem vehető fel, mert túl nagy a mérete.";
 _u.ExtensibilityStrings.l_AttachmentItemIdTooLong_Text = "A mellékletazonosítók közül egy vagy több túl hosszú.";
 _u.ExtensibilityStrings.l_AttachmentNameTooLong_Text = "A mellékletnevek közül egy vagy több túl hosszú.";
+_u.ExtensibilityStrings.l_AttachmentNotSupported_Text = "Ilyen típusú mellékletből nem tudunk adatokat olvasni.";
 _u.ExtensibilityStrings.l_AttachmentUploadGeneralFailure_Text = "A melléklet nem vehető fel az elembe.";
 _u.ExtensibilityStrings.l_AttachmentUrlTooLong_Text = "A mellékletek URL-címei közül egy vagy több túl hosszú.";
 _u.ExtensibilityStrings.l_CallSaveAsyncBeforeToken_Text = "A kódot csak az elem mentése után lehet beolvasni.";
@@ -31,9 +32,11 @@ _u.ExtensibilityStrings.l_EmailAddressTooLong_Text = "Egy vagy több megadott e-
 _u.ExtensibilityStrings.l_EwsRequestOversized_Text = "A kérés túllépi az 1 MB-os méretkorlátot. Módosítsa az EWS-kérést.";
 _u.ExtensibilityStrings.l_ExceededMaxNumberOfAttachments_Text = "Nem vehetők fel mellékletek, mert az üzenethez már a maximális számú melléklet van csatolva";
 _u.ExtensibilityStrings.l_HtmlSanitizationFailure_Text = "Nem sikerült a HTML-tisztítás.";
-_u.ExtensibilityStrings.l_Insufficient_Item_Permissions_Text = "The user doesn't have the permissions required to perform this operation.";
+_u.ExtensibilityStrings.l_Insufficient_Item_Permissions_Text = "A felhasználó nem rendelkezik a művelet elvégzéséhez szükséges engedélyekkel.";
 _u.ExtensibilityStrings.l_InternalFormatError_Text = "Belső formátumhiba történt.";
 _u.ExtensibilityStrings.l_InternalProtocolError_Text = "Belső protokollhiba: {0}.";
+_u.ExtensibilityStrings.l_Internal_Server_Error_Text = "Hibát jelzett az Exchange-kiszolgáló. Kérjük, hogy további információért tanulmányozza a diagnosztikai objektumot.";
+_u.ExtensibilityStrings.l_Internet_Not_Connected_Error_Text = "Nincs hálózati kapcsolat. Kérjük, ellenőrizze a hálózati kapcsolatot, és próbálkozzon újra.";
 _u.ExtensibilityStrings.l_InvalidActionType_Text = "Érvénytelen az actionType paraméter értéke. Csak a showTaskPane érték adható meg."
 _u.ExtensibilityStrings.l_InvalidAttachmentId_Text = "Érvénytelen a mellékletazonosító.";
 _u.ExtensibilityStrings.l_InvalidAttachmentPath_Text = "Érvénytelen a melléklet elérési útja.";
@@ -51,12 +54,15 @@ _u.ExtensibilityStrings.l_NullOrEmptyParameterError_Text = "A(z) {0} paramétert
 _u.ExtensibilityStrings.l_NumberOfNotificationsExceeded_Text = "Nem sikerült hozzáadni az értesítést, mert elérte az értesítések apponkénti számára vonatkozó korlátot.";
 _u.ExtensibilityStrings.l_NumberOfRecipientsExceeded_Text = "A címzettek teljes száma a mezőben nem lehet több, mint {0}.";
 _u.ExtensibilityStrings.l_OffsetNotfound_Text = "Nem található eltérési érték az időbélyeghez.";
+_u.ExtensibilityStrings.l_Olk_Http_Error_Text = "Sikertelen volt a kérelem. A HTTP-hibakód diagnosztikai objektuma további információval szolgál.";
 _u.ExtensibilityStrings.l_ParameterValueTooLongError_Text = "Túl hosszú a(z) {0} paraméter értéke. A karakterek maximális száma legfeljebb {1} lehet.";
 _u.ExtensibilityStrings.l_ParametersNotAsExpected_Text = "A megadott paraméterek nem felelnek meg a várt formátumnak.";
 _u.ExtensibilityStrings.l_PersistedNotificationArrayReadError_Text = "Sikertelen volt az API-hívás, mert nem sikerült beolvasni a megőrzött értesítéseket.";
 _u.ExtensibilityStrings.l_PersistedNotificationArraySaveError_Text = "Sikertelen volt az API-hívás, mert nem sikerült megőrizni az értesítéseket.";
 _u.ExtensibilityStrings.l_RecurrenceErrorMaxOccurrences_Text = "A megengedettnél (999) több előfordulást próbált beállítani az ismétlődő sorozathoz.";
 _u.ExtensibilityStrings.l_RecurrenceErrorZeroOccurrences_Text = "Az ismétlődő sorozathoz nem tartoznak előfordulások a megadott dátumtartományban.";
+_u.ExtensibilityStrings.l_RecurrenceInvalidTimeZone_Text = "Nem ismertük fel a megadott időzónát.";
+_u.ExtensibilityStrings.l_RecurrenceUnsupportedAlternateCalendar_Text = "Az ismétlődési szabályt a felhasználó állította be egy nem támogatott másik naptárral.";
 _u.ExtensibilityStrings.l_Recurrence_Error_Instance_SetAsync_Text = "Sorozat részét képező egyszeri alkalomhoz nem állítható be ismétlődési szabály.";
 _u.ExtensibilityStrings.l_Recurrence_Error_Properties_Invalid_Text = "Érvénytelen az ismétlődési szabály. Kérjük, ellenőrizze, hogy a megadott ismétlődési tulajdonságok megfelelnek-e az ismétlődési típusnak.";
 _u.ExtensibilityStrings.l_SaveError_Text = "Csatlakozási hiba történt az elem kiszolgálóra mentése közben.";

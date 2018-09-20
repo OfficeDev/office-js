@@ -1,4 +1,4 @@
-/* Version: 16.0.9314.1000 */
+/* Version: 16.0.10827.10000 */
 
 Type.registerNamespace("_u");
 _u.ExtensibilityStrings = function()
@@ -14,6 +14,7 @@ _u.ExtensibilityStrings.l_AttachmentErrorName_Text = "Помилка вклад�
 _u.ExtensibilityStrings.l_AttachmentExceededSize_Text = "Вкладення не можна додати, оскільки воно завелике.";
 _u.ExtensibilityStrings.l_AttachmentItemIdTooLong_Text = "Принаймні один з ідентифікаторів вкладень задовгий.";
 _u.ExtensibilityStrings.l_AttachmentNameTooLong_Text = "Принаймні одне з імен вкладень задовге.";
+_u.ExtensibilityStrings.l_AttachmentNotSupported_Text = "Цей тип вкладення не підтримується.";
 _u.ExtensibilityStrings.l_AttachmentUploadGeneralFailure_Text = "Вкладення не можна додати до цього елемента.";
 _u.ExtensibilityStrings.l_AttachmentUrlTooLong_Text = "Принаймні одна з URL-адрес вкладень задовга.";
 _u.ExtensibilityStrings.l_CallSaveAsyncBeforeToken_Text = "Щоб отримати маркер, спочатку збережіть елемент.";
@@ -31,9 +32,11 @@ _u.ExtensibilityStrings.l_EmailAddressTooLong_Text = "Принаймні одн�
 _u.ExtensibilityStrings.l_EwsRequestOversized_Text = "Розмір запиту перевищує максимально дозволений – 1 МБ. Змініть свій запит EWS.";
 _u.ExtensibilityStrings.l_ExceededMaxNumberOfAttachments_Text = "Вкладення не можна додати, оскільки повідомлення вже містить максимальну кількість вкладень";
 _u.ExtensibilityStrings.l_HtmlSanitizationFailure_Text = "Не вдалося очистити HTML.";
-_u.ExtensibilityStrings.l_Insufficient_Item_Permissions_Text = "The user doesn't have the permissions required to perform this operation.";
+_u.ExtensibilityStrings.l_Insufficient_Item_Permissions_Text = "У цього користувача немає дозволів на виконання цієї операції.";
 _u.ExtensibilityStrings.l_InternalFormatError_Text = "Сталася помилка, пов’язана із внутрішнім форматом.";
 _u.ExtensibilityStrings.l_InternalProtocolError_Text = "Помилка внутрішнього протоколу: {0}.";
+_u.ExtensibilityStrings.l_Internal_Server_Error_Text = "Сервер Exchange повернув помилку. Докладні відомості див. в об’єкті діагностики.";
+_u.ExtensibilityStrings.l_Internet_Not_Connected_Error_Text = "Користувач більше не підключений до мережі. Перевірте підключення до мережі та спробуйте ще раз.";
 _u.ExtensibilityStrings.l_InvalidActionType_Text = 'Значення параметра "actionType" неприпустиме. Припустиме значення ─ "showTaskPane".'
 _u.ExtensibilityStrings.l_InvalidAttachmentId_Text = "Неприпустимий ідентифікатор вкладення.";
 _u.ExtensibilityStrings.l_InvalidAttachmentPath_Text = "Неприпустимий шлях до вкладення.";
@@ -51,12 +54,15 @@ _u.ExtensibilityStrings.l_NullOrEmptyParameterError_Text = 'Параметр "{0
 _u.ExtensibilityStrings.l_NumberOfNotificationsExceeded_Text = "Не вдалося додати сповіщення, тому що кількість сповіщень досягла обмеження.";
 _u.ExtensibilityStrings.l_NumberOfRecipientsExceeded_Text = "Загальна кількість одержувачів у полі не має перевищувати {0}.";
 _u.ExtensibilityStrings.l_OffsetNotfound_Text = "Зміщення для цієї позначки часу не знайдено.";
+_u.ExtensibilityStrings.l_Olk_Http_Error_Text = "Не вдалося виконати запит. Знайдіть код помилки HTTP в об’єкті діагностики.";
 _u.ExtensibilityStrings.l_ParameterValueTooLongError_Text = 'Значення параметра "{0}" задовге. Максимальна кількість символів: {1}.';
 _u.ExtensibilityStrings.l_ParametersNotAsExpected_Text = "Указані параметри не відповідають припустимому формату.";
 _u.ExtensibilityStrings.l_PersistedNotificationArrayReadError_Text = "Під час вашого виклику API сталася помилка, тому що не вдалось отримати збережене сповіщення.";
 _u.ExtensibilityStrings.l_PersistedNotificationArraySaveError_Text = "Під час вашого виклику API сталася помилка, тому що не вдалося зберегти сповіщення.";
-_u.ExtensibilityStrings.l_RecurrenceErrorMaxOccurrences_Text = "У повторюваному ряді перевищено обмеження в 999 екземплярів.";
-_u.ExtensibilityStrings.l_RecurrenceErrorZeroOccurrences_Text = "У повторюваному ряді немає екземплярів з указаного проміжку часу.";
+_u.ExtensibilityStrings.l_RecurrenceErrorMaxOccurrences_Text = "У низці повторюваних подій перевищено обмеження в 999 екземплярів.";
+_u.ExtensibilityStrings.l_RecurrenceErrorZeroOccurrences_Text = "У низці повторюваних подій немає екземплярів з указаного проміжку часу.";
+_u.ExtensibilityStrings.l_RecurrenceInvalidTimeZone_Text = "Указаний часовий пояс не підтримується.";
+_u.ExtensibilityStrings.l_RecurrenceUnsupportedAlternateCalendar_Text = "Користувач указав шаблон повторення за допомогою альтернативного календаря, який не підтримується.";
 _u.ExtensibilityStrings.l_Recurrence_Error_Instance_SetAsync_Text = "Не можна вказати шаблон повторення для однієї події в низці.";
 _u.ExtensibilityStrings.l_Recurrence_Error_Properties_Invalid_Text = "Неприпустимий шаблон повторення. Переконайтеся, що вказані властивості повторення узгоджені з типом повторення.";
 _u.ExtensibilityStrings.l_SaveError_Text = "Під час спроби зберегти цей елемент на сервері сталася помилка.";

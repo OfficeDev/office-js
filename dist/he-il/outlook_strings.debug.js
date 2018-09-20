@@ -1,4 +1,4 @@
-/* Version: 16.0.9314.1000 */
+/* Version: 16.0.10827.10000 */
 
 Type.registerNamespace("_u");
 _u.ExtensibilityStrings = function()
@@ -14,6 +14,7 @@ _u.ExtensibilityStrings.l_AttachmentErrorName_Text = "שגיאת קובץ מצו
 _u.ExtensibilityStrings.l_AttachmentExceededSize_Text = "אין אפשרות להוסיף את הקובץ המצורף מאחר שהוא גדול מדי.";
 _u.ExtensibilityStrings.l_AttachmentItemIdTooLong_Text = "אחד או יותר ממזהי הקבצים המצורפים ארוך מדי.";
 _u.ExtensibilityStrings.l_AttachmentNameTooLong_Text = "אחד או יותר משמות הקבצים המצורפים ארוך מדי.";
+_u.ExtensibilityStrings.l_AttachmentNotSupported_Text = "סוג הקובץ המצורף אינו נתמך.";
 _u.ExtensibilityStrings.l_AttachmentUploadGeneralFailure_Text = "אין אפשרות להוסיף את הקובץ המצורף לפריט.";
 _u.ExtensibilityStrings.l_AttachmentUrlTooLong_Text = "אחת או יותר מכתובות ה- URL של הקבצים המצורפים ארוכה מדי.";
 _u.ExtensibilityStrings.l_CallSaveAsyncBeforeToken_Text = "אין אפשרות לאחזר את האסימון עד לשמירת הפריט.";
@@ -31,9 +32,11 @@ _u.ExtensibilityStrings.l_EmailAddressTooLong_Text = "אחת או יותר מכ�
 _u.ExtensibilityStrings.l_EwsRequestOversized_Text = "הבקשה חורגת ממגבלת הגודל, ‎1 MB. שנה את בקשת EWS שלך.";
 _u.ExtensibilityStrings.l_ExceededMaxNumberOfAttachments_Text = "אין אפשרות להוסיף קבצים מצורפים מאחר שההודעה כוללת כבר את מספר הקבצים המצורפים המרבי";
 _u.ExtensibilityStrings.l_HtmlSanitizationFailure_Text = "יצירת HTML עם תגים בטוחים נכשלה.";
-_u.ExtensibilityStrings.l_Insufficient_Item_Permissions_Text = "The user doesn't have the permissions required to perform this operation.";
+_u.ExtensibilityStrings.l_Insufficient_Item_Permissions_Text = "המשתמש לא קיבל את ההרשאות הדרושות לביצוע פעולה זו.";
 _u.ExtensibilityStrings.l_InternalFormatError_Text = "אירעה שגיאת עיצוב פנימית.";
 _u.ExtensibilityStrings.l_InternalProtocolError_Text = "שגיאת פרוטוקול פנימית: '{0}'.";
+_u.ExtensibilityStrings.l_Internal_Server_Error_Text = "שרת Exchange החזיר שגיאה. עיין באובייקט האבחון לקבלת מידע נוסף.";
+_u.ExtensibilityStrings.l_Internet_Not_Connected_Error_Text = "המשתמש אינו מחובר עוד לרשת. בדוק את חיבור הרשת שלך ונסה שוב.";
 _u.ExtensibilityStrings.l_InvalidActionType_Text = "הערך של הפרמטר 'actionType' אינו חוקי. הערך המקובל הוא 'showTaskPane'."
 _u.ExtensibilityStrings.l_InvalidAttachmentId_Text = "מזהה הקובץ המצורף לא היה חוקי.";
 _u.ExtensibilityStrings.l_InvalidAttachmentPath_Text = "נתיב הקובץ המצורף לא היה חוקי.";
@@ -51,12 +54,15 @@ _u.ExtensibilityStrings.l_NullOrEmptyParameterError_Text = "הפרמטר '{0}' �
 _u.ExtensibilityStrings.l_NumberOfNotificationsExceeded_Text = "לא היתה אפשרות להוסיף את ההודעה מאחר שהגעת למגבלת ההודעות.";
 _u.ExtensibilityStrings.l_NumberOfRecipientsExceeded_Text = "המספר הכולל של הנמענים בשדה אינו יכול לחרוג מ- {0}.";
 _u.ExtensibilityStrings.l_OffsetNotfound_Text = "לא נמצא היסט עבור חותמת זמן זו.";
+_u.ExtensibilityStrings.l_Olk_Http_Error_Text = "הבקשה נכשלה. עיין באובייקט האבחון עבור קוד השגיאה של HTTP.";
 _u.ExtensibilityStrings.l_ParameterValueTooLongError_Text = "הערך של הפרמטר '{0}' ארוך מדי. מספר התווים המרבי הוא '{1}'.";
 _u.ExtensibilityStrings.l_ParametersNotAsExpected_Text = "הפרמטרים הנתונים אינם תואמים לתבנית הצפויה.";
 _u.ExtensibilityStrings.l_PersistedNotificationArrayReadError_Text = "קריאת ה- API שביצעת נכשלה מאחר שלא היתה אפשרות לאחזר את ההודעות המתמידות.";
 _u.ExtensibilityStrings.l_PersistedNotificationArraySaveError_Text = "קריאת ה- API שביצעת נכשלה מאחר שלא היתה אפשרות להפוך את ההודעות למתמידות.";
 _u.ExtensibilityStrings.l_RecurrenceErrorMaxOccurrences_Text = "הסידרה החוזרת חורגת מהמגבלה המרבית, 999 מופעים.";
 _u.ExtensibilityStrings.l_RecurrenceErrorZeroOccurrences_Text = "לסידרה החוזרת אין מופעים בטווח התאריכים שצוין.";
+_u.ExtensibilityStrings.l_RecurrenceInvalidTimeZone_Text = "אזור הזמן שצוין אינו נתמך.";
+_u.ExtensibilityStrings.l_RecurrenceUnsupportedAlternateCalendar_Text = "תבנית המופע החוזר הוגדרה על-ידי המשתמש באמצעות לוח שנה חלופי שאינו נתמך.";
 _u.ExtensibilityStrings.l_Recurrence_Error_Instance_SetAsync_Text = "אין אפשרות להגדיר תבנית מופע חוזר עבור מופע בודד בסידרה.";
 _u.ExtensibilityStrings.l_Recurrence_Error_Properties_Invalid_Text = "תבנית המופע החוזר אינה חוקית. בדוק שמאפייני המופע החוזר שצוינו מתאימים לסוג המופע החוזר.";
 _u.ExtensibilityStrings.l_SaveError_Text = "אירעה שגיאת חיבור בעת ניסיון לשמור את הפריט בשרת.";

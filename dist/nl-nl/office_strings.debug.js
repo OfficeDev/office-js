@@ -1,4 +1,4 @@
-/* Version: 16.0.9314.1000 */
+/* Version: 16.0.10827.10000 */
 
 Type.registerNamespace("Strings");
 Strings.OfficeOM = function()
@@ -33,7 +33,7 @@ Strings.OfficeOM.L_CoercionTypeNotSupported = "Het opgegeven forceringstype word
 Strings.OfficeOM.L_ColIndexOutOfRange = "De kolom-indexwaarde ligt buiten het toegestane bereik. Gebruik een waarde (0 of hoger) die lager is dan het aantal kolommen.";
 Strings.OfficeOM.L_ConnectionFailureWithDetails = "De aanvraag is mislukt met statuscode {0}, foutcode {1} en het volgende foutbericht: {2}";
 Strings.OfficeOM.L_ConnectionFailureWithStatus = "De aanvraag is mislukt met statuscode {0}.";
-Strings.OfficeOM.L_CustomFunctionDefinitionMissing = "Excel.CustomFunctions moet een eigenschap met deze naam bevatten die de definitie van de functie vertegenwoordigt.";
+Strings.OfficeOM.L_CustomFunctionDefinitionMissing = "Er moet een eigenschap met deze naam voorkomen in Excel.Script.CustomFunctions die de definitie van de functie vertegenwoordigd.";
 Strings.OfficeOM.L_CustomFunctionImplementationMissing = "De eigenschap met deze naam in Excel.CustomFunctions die de definitie van de functie vertegenwoordigt, moet een eigenschap 'call' bevatten waarmee de functie wordt geïmplementeerd.";
 Strings.OfficeOM.L_CustomFunctionNameCannotSplit = "De functienaam moet een niet-lege naamruimte en een niet-lege korte naam bevatten.";
 Strings.OfficeOM.L_CustomFunctionNameContainsBadChars = "De functienaam mag alleen letters, cijfers, onderstrepingstekens en punten bevatten.";
@@ -157,6 +157,7 @@ Strings.OfficeOM.L_SSOConnectionLostError = "Tijdens het aanmeldproces is een ve
 Strings.OfficeOM.L_SSOConnectionLostErrorMessage = "Tijdens het aanmeldproces is een verbinding verbroken en de gebruiker is mogelijk niet aangemeld. Dit is waarschijnlijk vanwege de configuratie-instellingen van de browser van de gebruiker, zoals beveiligingszones.";
 Strings.OfficeOM.L_SSOServerError = "Er is een fout opgetreden in de verificatieprovider.";
 Strings.OfficeOM.L_SSOServerErrorMessage = "Er is een onverwachte fout opgetreden op de server.";
+Strings.OfficeOM.L_SSOUnsupportedPlatform = "API wordt niet ondersteund op dit platform.";
 Strings.OfficeOM.L_SSOUserConsentNotSupportedByCurrentAddinCategory = "Deze invoegtoepassing biedt geen ondersteuning voor toestemming van de gebruiker.";
 Strings.OfficeOM.L_SSOUserConsentNotSupportedByCurrentAddinCategoryMessage = "De bewerking is mislukt omdat deze invoegtoepassing geen ondersteuning biedt voor toestemming van de gebruiker in deze categorie";
 Strings.OfficeOM.L_SaveSettingsError = "Fout bij instellingen opslaan";

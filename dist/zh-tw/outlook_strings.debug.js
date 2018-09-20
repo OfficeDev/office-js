@@ -1,4 +1,4 @@
-/* Version: 16.0.9314.1000 */
+/* Version: 16.0.10827.10000 */
 
 Type.registerNamespace("_u");
 _u.ExtensibilityStrings = function()
@@ -14,6 +14,7 @@ _u.ExtensibilityStrings.l_AttachmentErrorName_Text = "附件錯誤";
 _u.ExtensibilityStrings.l_AttachmentExceededSize_Text = "附件過大而無法新增。";
 _u.ExtensibilityStrings.l_AttachmentItemIdTooLong_Text = "一或多個附件識別碼太長。";
 _u.ExtensibilityStrings.l_AttachmentNameTooLong_Text = "一或多個附件名稱太長。";
+_u.ExtensibilityStrings.l_AttachmentNotSupported_Text = "不支援此附件類型。";
 _u.ExtensibilityStrings.l_AttachmentUploadGeneralFailure_Text = "附件無法新增至項目。";
 _u.ExtensibilityStrings.l_AttachmentUrlTooLong_Text = "一或多個附件 URL 太長。";
 _u.ExtensibilityStrings.l_CallSaveAsyncBeforeToken_Text = "您必須先儲存項目才能擷取權杖。";
@@ -31,9 +32,11 @@ _u.ExtensibilityStrings.l_EmailAddressTooLong_Text = "提供的一或多個電�
 _u.ExtensibilityStrings.l_EwsRequestOversized_Text = "此要求超過 1 MB 的大小限制。請修改您的 EWS 要求。";
 _u.ExtensibilityStrings.l_ExceededMaxNumberOfAttachments_Text = "無法新增附件，因為郵件的附件數已達上限";
 _u.ExtensibilityStrings.l_HtmlSanitizationFailure_Text = "HTML 處理已失敗。";
-_u.ExtensibilityStrings.l_Insufficient_Item_Permissions_Text = "The user doesn't have the permissions required to perform this operation.";
+_u.ExtensibilityStrings.l_Insufficient_Item_Permissions_Text = "使用者沒有執行此作業所需的權限。";
 _u.ExtensibilityStrings.l_InternalFormatError_Text = "發生內部格式錯誤。";
 _u.ExtensibilityStrings.l_InternalProtocolError_Text = "內部通訊協定錯誤: '{0}'。";
+_u.ExtensibilityStrings.l_Internal_Server_Error_Text = "Exchange 伺服器傳回錯誤。請查看診斷物件以取得詳細資訊。";
+_u.ExtensibilityStrings.l_Internet_Not_Connected_Error_Text = "使用者已不再連線到網路。請檢查您的網路連線，然後再試一次。";
 _u.ExtensibilityStrings.l_InvalidActionType_Text = "'actionType' 參數的值無效。接受的值為 \"showTaskPane\"。"
 _u.ExtensibilityStrings.l_InvalidAttachmentId_Text = "附件識別碼無效。";
 _u.ExtensibilityStrings.l_InvalidAttachmentPath_Text = "附件路徑無效。";
@@ -51,12 +54,15 @@ _u.ExtensibilityStrings.l_NullOrEmptyParameterError_Text = "'{0}' 參數是必�
 _u.ExtensibilityStrings.l_NumberOfNotificationsExceeded_Text = "無法新增通知，因為已達到通知限制。";
 _u.ExtensibilityStrings.l_NumberOfRecipientsExceeded_Text = "在欄位中的收件者總數不能超過 {0}。";
 _u.ExtensibilityStrings.l_OffsetNotfound_Text = "找不到這個時間戳記的位移。";
+_u.ExtensibilityStrings.l_Olk_Http_Error_Text = "要求已失敗。請查看診斷物件以取得 HTTP 錯誤碼。";
 _u.ExtensibilityStrings.l_ParameterValueTooLongError_Text = "'{0}' 參數的值太長。字元數上限為 '{1}'。";
 _u.ExtensibilityStrings.l_ParametersNotAsExpected_Text = "指定的參數不符合預期的格式。";
 _u.ExtensibilityStrings.l_PersistedNotificationArrayReadError_Text = "您的 API 呼叫失敗，因為無法擷取保存的通知。";
 _u.ExtensibilityStrings.l_PersistedNotificationArraySaveError_Text = "您的 API 呼叫失敗，因為無法保存通知。";
 _u.ExtensibilityStrings.l_RecurrenceErrorMaxOccurrences_Text = "週期性系列超過發生次數 999 的上限。";
 _u.ExtensibilityStrings.l_RecurrenceErrorZeroOccurrences_Text = "週期性系列在指定的日期範圍中沒有發生。";
+_u.ExtensibilityStrings.l_RecurrenceInvalidTimeZone_Text = "不支援指定的時區。";
+_u.ExtensibilityStrings.l_RecurrenceUnsupportedAlternateCalendar_Text = "週期模式由使用者使用不支援的其他行事曆所設定。";
 _u.ExtensibilityStrings.l_Recurrence_Error_Instance_SetAsync_Text = "無法為系列中的單次活動設定週期模式。";
 _u.ExtensibilityStrings.l_Recurrence_Error_Properties_Invalid_Text = "週期模式無效。請檢查指定的週期屬性是否與週期類型相符。";
 _u.ExtensibilityStrings.l_SaveError_Text = "嘗試在伺服器上儲存項目時，發生連線錯誤。";

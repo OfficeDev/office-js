@@ -1,4 +1,4 @@
-/* Version: 16.0.9314.1000 */
+/* Version: 16.0.10827.10000 */
 
 Type.registerNamespace("Strings");
 Strings.OfficeOM = function()
@@ -33,8 +33,8 @@ Strings.OfficeOM.L_CoercionTypeNotSupported = "Il tipo di coercizione specificat
 Strings.OfficeOM.L_ColIndexOutOfRange = "Il valore dell'indice di colonna non è compreso nell'intervallo consentito. Usare un valore (0 o superiore) minore del numero di colonne.";
 Strings.OfficeOM.L_ConnectionFailureWithDetails = "La richiesta non è riuscita con codice di stato {0}, codice errore {1} e il messaggio di errore seguente: {2}";
 Strings.OfficeOM.L_ConnectionFailureWithStatus = "La richiesta non è riuscita con codice di stato {0}.";
-Strings.OfficeOM.L_CustomFunctionDefinitionMissing = "Una proprietà con questo nome che rappresenta la definizione della funzione deve esistere in Excel.CustomFunctions.";
-Strings.OfficeOM.L_CustomFunctionImplementationMissing = "La proprietà con questo nome in Excel.CustomFunctions che rappresenta la definizione della funzione deve contenere una proprietà 'call' che implementi la funzione.";
+Strings.OfficeOM.L_CustomFunctionDefinitionMissing = "Una proprietà con questo nome che rappresenta la definizione della funzione deve esistere in Excel.Script.CustomFunctions.";
+Strings.OfficeOM.L_CustomFunctionImplementationMissing = "La proprietà con questo nome in Excel.Script.CustomFunctions che rappresenta la definizione della funzione deve contenere una proprietà 'call' che implementa la funzione.";
 Strings.OfficeOM.L_CustomFunctionNameCannotSplit = "Il nome della funzione deve contenere uno spazio dei nomi non vuoto e un nome breve non vuoto.";
 Strings.OfficeOM.L_CustomFunctionNameContainsBadChars = "Il nome della funzione può contenere solo lettere, cifre, caratteri di sottolineatura e punti.";
 Strings.OfficeOM.L_CustomXmlError = "Errore XML personalizzato.";
@@ -157,6 +157,7 @@ Strings.OfficeOM.L_SSOConnectionLostError = "La connessione si è interrotta dur
 Strings.OfficeOM.L_SSOConnectionLostErrorMessage = "La connessione si è interrotta durante il processo di accesso e l'utente potrebbe non essere connesso. Il problema potrebbe essere dovuto alle impostazioni di configurazione del browser dell'utente, ad esempio le aree di sicurezza.";
 Strings.OfficeOM.L_SSOServerError = "Errore nel provider di autenticazione.";
 Strings.OfficeOM.L_SSOServerErrorMessage = "Si è verificato un errore imprevisto nel server.";
+Strings.OfficeOM.L_SSOUnsupportedPlatform = "API non supportata in questa piattaforma.";
 Strings.OfficeOM.L_SSOUserConsentNotSupportedByCurrentAddinCategory = "Questo componente aggiuntivo non supporta il consenso dell'utente.";
 Strings.OfficeOM.L_SSOUserConsentNotSupportedByCurrentAddinCategoryMessage = "L'operazione non è riuscita perché questo componente aggiuntivo non supporta il consenso dell'utente in questa categoria";
 Strings.OfficeOM.L_SaveSettingsError = "Errore di salvataggio delle impostazioni";

@@ -1,4 +1,4 @@
-/* Version: 16.0.9314.1000 */
+/* Version: 16.0.10827.10000 */
 
 Type.registerNamespace("Strings");
 Strings.OfficeOM = function()
@@ -157,6 +157,7 @@ Strings.OfficeOM.L_SSOConnectionLostError = "A connection was lost during the si
 Strings.OfficeOM.L_SSOConnectionLostErrorMessage = "A connection was lost during the sign in process, and the user may not be signed in. This was likely due to the user's browser configuration settings, such as security zones.";
 Strings.OfficeOM.L_SSOServerError = "Error occurred in the authentication provider.";
 Strings.OfficeOM.L_SSOServerErrorMessage = "An unexpected error occurred on the server.";
+Strings.OfficeOM.L_SSOUnsupportedPlatform = "API is not supported in this platform.";
 Strings.OfficeOM.L_SSOUserConsentNotSupportedByCurrentAddinCategory = "This add-in does not support user consent.";
 Strings.OfficeOM.L_SSOUserConsentNotSupportedByCurrentAddinCategoryMessage = "The operation failed because this add-in does not support user consent in this category";
 Strings.OfficeOM.L_SaveSettingsError = "Save Settings Error";

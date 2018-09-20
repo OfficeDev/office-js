@@ -1,4 +1,4 @@
-/* Version: 16.0.9314.1000 */
+/* Version: 16.0.10827.10000 */
 
 Type.registerNamespace("Strings");
 Strings.OfficeOM = function()
@@ -33,8 +33,8 @@ Strings.OfficeOM.L_CoercionTypeNotSupported = "不支援指定的強制型轉類
 Strings.OfficeOM.L_ColIndexOutOfRange = "欄索引值不在允許的範圍內。請用小於欄數的值 (0 或更大)。";
 Strings.OfficeOM.L_ConnectionFailureWithDetails = "要求失敗，狀態碼為 {0}、錯誤碼為 {1}，且錯誤訊息如下: {2}";
 Strings.OfficeOM.L_ConnectionFailureWithStatus = "要求失敗，狀態碼為 {0}。";
-Strings.OfficeOM.L_CustomFunctionDefinitionMissing = "具有此名稱且代表函數定義的屬性必須存在於 Excel.CustomFunctions。";
-Strings.OfficeOM.L_CustomFunctionImplementationMissing = "Excel.CustomFunctions 上具有此名稱且代表函數定義的屬性必須包含實作函數的 'call' 屬性。";
+Strings.OfficeOM.L_CustomFunctionDefinitionMissing = "具有此名稱且代表函數定義的屬性必須存在於 Excel.Script.CustomFunctions。";
+Strings.OfficeOM.L_CustomFunctionImplementationMissing = "Excel.Script.CustomFunctions 上具有此名稱且代表函數定義的屬性必須包含實作該函數的 'call' 屬性。";
 Strings.OfficeOM.L_CustomFunctionNameCannotSplit = "函數名稱必須包含非空白命名空間與非空白簡短名稱。";
 Strings.OfficeOM.L_CustomFunctionNameContainsBadChars = "函數名稱只能包含字母、數字、底線與句號。";
 Strings.OfficeOM.L_CustomXmlError = "自訂 XML 錯誤。";
@@ -157,6 +157,7 @@ Strings.OfficeOM.L_SSOConnectionLostError = "連線在登入程序期間已經�
 Strings.OfficeOM.L_SSOConnectionLostErrorMessage = "連線在登入程序期間已經中斷，因此使用者可能無法登入。這可能是使用者的瀏覽器設定 (例如安全性區域) 所致。";
 Strings.OfficeOM.L_SSOServerError = "驗證提供者時發生錯誤。";
 Strings.OfficeOM.L_SSOServerErrorMessage = "伺服器發生未預期的錯誤。";
+Strings.OfficeOM.L_SSOUnsupportedPlatform = "此平台不支援 API。";
 Strings.OfficeOM.L_SSOUserConsentNotSupportedByCurrentAddinCategory = "此增益集不支援使用者同意。";
 Strings.OfficeOM.L_SSOUserConsentNotSupportedByCurrentAddinCategoryMessage = "作業失敗，因為此增益集在此類別中不支援使用者同意";
 Strings.OfficeOM.L_SaveSettingsError = "儲存設定錯誤";

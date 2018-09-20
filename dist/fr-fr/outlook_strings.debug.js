@@ -1,4 +1,4 @@
-/* Version: 16.0.9314.1000 */
+/* Version: 16.0.10827.10000 */
 
 Type.registerNamespace("_u");
 _u.ExtensibilityStrings = function()
@@ -14,6 +14,7 @@ _u.ExtensibilityStrings.l_AttachmentErrorName_Text = "Erreur de pièce jointe";
 _u.ExtensibilityStrings.l_AttachmentExceededSize_Text = "La pièce jointe ne peut pas être ajoutée, car elle est trop volumineuse.";
 _u.ExtensibilityStrings.l_AttachmentItemIdTooLong_Text = "Un ou plusieurs des ID de pièces jointes sont trop longs.";
 _u.ExtensibilityStrings.l_AttachmentNameTooLong_Text = "Un ou plusieurs des noms de pièces jointes sont trop longs.";
+_u.ExtensibilityStrings.l_AttachmentNotSupported_Text = "Le type de pièce jointe n’est pas pris en charge.";
 _u.ExtensibilityStrings.l_AttachmentUploadGeneralFailure_Text = "La pièce jointe ne peut pas être ajoutée à l’élément.";
 _u.ExtensibilityStrings.l_AttachmentUrlTooLong_Text = "Une ou plusieurs des URL de pièces jointes sont trop longues.";
 _u.ExtensibilityStrings.l_CallSaveAsyncBeforeToken_Text = "Nous ne pouvons pas récupérer le jeton tant que l’élément n’a pas été enregistré.";
@@ -31,9 +32,11 @@ _u.ExtensibilityStrings.l_EmailAddressTooLong_Text = "Une ou plusieurs des adres
 _u.ExtensibilityStrings.l_EwsRequestOversized_Text = "La demande dépasse la limite de taille de 1 Mo. Veuillez modifier votre demande EWS.";
 _u.ExtensibilityStrings.l_ExceededMaxNumberOfAttachments_Text = "Les pièces jointes ne peuvent pas être ajoutées, car le nombre maximal de pièces jointes est déjà atteint";
 _u.ExtensibilityStrings.l_HtmlSanitizationFailure_Text = "Le nettoyage HTML a échoué.";
-_u.ExtensibilityStrings.l_Insufficient_Item_Permissions_Text = "The user doesn't have the permissions required to perform this operation.";
+_u.ExtensibilityStrings.l_Insufficient_Item_Permissions_Text = "L’utilisateur ne dispose pas des autorisations requises pour effectuer cette action.";
 _u.ExtensibilityStrings.l_InternalFormatError_Text = "Une erreur de format interne s’est produite.";
 _u.ExtensibilityStrings.l_InternalProtocolError_Text = "Désolé... Nous avons rencontré l’erreur de protocole interne « {0} ».";
+_u.ExtensibilityStrings.l_Internal_Server_Error_Text = "Le serveur Exchange a renvoyé une erreur. Pour plus d’informations, veuillez consulter l’objet de diagnostics.";
+_u.ExtensibilityStrings.l_Internet_Not_Connected_Error_Text = "L’utilisateur n’est plus connecté au réseau. Vérifiez la connexion réseau et réessayez.";
 _u.ExtensibilityStrings.l_InvalidActionType_Text = "La valeur du paramètre « actionType » n’est pas valide. La valeur admise est « showTaskPane »."
 _u.ExtensibilityStrings.l_InvalidAttachmentId_Text = "L’ID de la pièce jointe était incorrect.";
 _u.ExtensibilityStrings.l_InvalidAttachmentPath_Text = "Le chemin d’accès de la pièce jointe était incorrect.";
@@ -51,12 +54,15 @@ _u.ExtensibilityStrings.l_NullOrEmptyParameterError_Text = "Le paramètre « {0
 _u.ExtensibilityStrings.l_NumberOfNotificationsExceeded_Text = "Nous n’avons pas pu ajouter la notification, car la limite du nombre de notifications a été atteinte.";
 _u.ExtensibilityStrings.l_NumberOfRecipientsExceeded_Text = "Le nombre total de destinataires dans le champ ne peut pas dépasser {0}.";
 _u.ExtensibilityStrings.l_OffsetNotfound_Text = "Désolé... Nous ne trouvons pas de décalage pour cet horodatage.";
+_u.ExtensibilityStrings.l_Olk_Http_Error_Text = "La demande a échoué. Veuillez rechercher le code d’erreur HTTP dans l’objet de diagnostics.";
 _u.ExtensibilityStrings.l_ParameterValueTooLongError_Text = "La valeur du paramètre « {0} » est trop longue. Le nombre maximal de caractères est de « {1} ».";
 _u.ExtensibilityStrings.l_ParametersNotAsExpected_Text = "Les paramètres donnés ne correspondent pas au format attendu.";
 _u.ExtensibilityStrings.l_PersistedNotificationArrayReadError_Text = "L’appel d’API que vous avez effectué a échoué, car les notifications persistantes n’ont pas pu être récupérées.";
 _u.ExtensibilityStrings.l_PersistedNotificationArraySaveError_Text = "L’appel d’API que vous avez effectué a échoué, car les notifications n’ont pas pu être rendues persistantes.";
 _u.ExtensibilityStrings.l_RecurrenceErrorMaxOccurrences_Text = "La série périodique dépasse la limite maximale de 999 occurrences.";
 _u.ExtensibilityStrings.l_RecurrenceErrorZeroOccurrences_Text = "La série périodique ne comporte aucune occurrence dans la plage de dates spécifiée.";
+_u.ExtensibilityStrings.l_RecurrenceInvalidTimeZone_Text = "Le fuseau horaire spécifié n’est pas pris en charge.";
+_u.ExtensibilityStrings.l_RecurrenceUnsupportedAlternateCalendar_Text = "La périodicité a été définie par l’utilisateur à l’aide d’un calendrier secondaire qui n’est pas pris en charge.";
 _u.ExtensibilityStrings.l_Recurrence_Error_Instance_SetAsync_Text = "Nous ne pouvons pas définir une périodicité pour une seule occurrence d’une série.";
 _u.ExtensibilityStrings.l_Recurrence_Error_Properties_Invalid_Text = "La périodicité n’est pas valide. Vérifiez que les propriétés de périodicité spécifiées sont compatibles avec le type de périodicité.";
 _u.ExtensibilityStrings.l_SaveError_Text = "Nous avons rencontré une erreur de connexion lorsque nous avons essayé d’enregistrer l’élément sur le serveur.";

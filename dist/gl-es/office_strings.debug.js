@@ -1,4 +1,4 @@
-/* Version: 16.0.9314.1000 */
+/* Version: 16.0.10827.10000 */
 
 Type.registerNamespace("Strings");
 Strings.OfficeOM = function()
@@ -33,8 +33,8 @@ Strings.OfficeOM.L_CoercionTypeNotSupported = "O tipo de coerción especificado 
 Strings.OfficeOM.L_ColIndexOutOfRange = "O valor do índice de columna está fóra do intervalo permitido. Utiliza un valor (0 ou superior) menor que o número de columnas.";
 Strings.OfficeOM.L_ConnectionFailureWithDetails = "Erro na solicitude. Código de estado: {0}; código de erro: {1}; mensaxe de erro: {2}";
 Strings.OfficeOM.L_ConnectionFailureWithStatus = "Erro na solicitude. Código de estado: {0}.";
-Strings.OfficeOM.L_CustomFunctionDefinitionMissing = "Unha propiedade con este nome que representa que a definición da función debe existir en Excel.CustomFunctions.";
-Strings.OfficeOM.L_CustomFunctionImplementationMissing = 'A propiedade con este nome en Excel.CustomFunctions que represente a definición da función debe conter unha propiedade "call" que aplique a función.';
+Strings.OfficeOM.L_CustomFunctionDefinitionMissing = "Unha propiedade con este nome que representa que a definición da función debe existir en Excel.Script.CustomFunctions.";
+Strings.OfficeOM.L_CustomFunctionImplementationMissing = 'A propiedade con este nome en Excel.Script.CustomFunctions que represente a definición da función debe conter unha propiedade "call" que aplique a función.';
 Strings.OfficeOM.L_CustomFunctionNameCannotSplit = "O nome da función debe conter un espazo de nome que non estea baleiro e un nome corto que non estea baleiro.";
 Strings.OfficeOM.L_CustomFunctionNameContainsBadChars = "O nome da función só pode conter letras, díxitos, guións baixos e puntos.";
 Strings.OfficeOM.L_CustomXmlError = "Erro de XML personalizado.";
@@ -157,6 +157,7 @@ Strings.OfficeOM.L_SSOConnectionLostError = "Perdeuse a conexión durante o proc
 Strings.OfficeOM.L_SSOConnectionLostErrorMessage = "Perdeuse a conexión durante o proceso de inicio de sesión e pode que o usuario non iniciase sesión. Probablemente iso produciuse debido á configuración do navegador do usuario, como as zonas de seguranza.";
 Strings.OfficeOM.L_SSOServerError = "Ocorreu un erro no fornecedor de autenticación.";
 Strings.OfficeOM.L_SSOServerErrorMessage = "Ocorreu un erro inesperado no servidor.";
+Strings.OfficeOM.L_SSOUnsupportedPlatform = "API non é compatible con esta plataforma.";
 Strings.OfficeOM.L_SSOUserConsentNotSupportedByCurrentAddinCategory = "Este suplemento non admite o consentimento do usuario.";
 Strings.OfficeOM.L_SSOUserConsentNotSupportedByCurrentAddinCategoryMessage = "Produciuse un erro na operación porque este suplemento non admite o consentimento do usuario nesta categoría.";
 Strings.OfficeOM.L_SaveSettingsError = "Erro de configuración da función gardar";
