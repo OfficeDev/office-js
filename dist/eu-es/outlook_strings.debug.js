@@ -1,4 +1,4 @@
-/* Version: 16.0.9309.1000 */
+/* Version: 16.0.10827.10000 */
 
 Type.registerNamespace("_u");
 _u.ExtensibilityStrings = function()
@@ -14,6 +14,7 @@ _u.ExtensibilityStrings.l_AttachmentErrorName_Text = "Eranskinaren errorea";
 _u.ExtensibilityStrings.l_AttachmentExceededSize_Text = "Ezin da eranskina gehitu handiegia delako.";
 _u.ExtensibilityStrings.l_AttachmentItemIdTooLong_Text = "Eranskinen ID bat edo gehiago luzeegiak dira.";
 _u.ExtensibilityStrings.l_AttachmentNameTooLong_Text = "Eranskinen izen bat edo gehiago luzeegiak dira.";
+_u.ExtensibilityStrings.l_AttachmentNotSupported_Text = "Mota horretako eranskinak ez dira onartzen.";
 _u.ExtensibilityStrings.l_AttachmentUploadGeneralFailure_Text = "Eranskina ezin zaio elementuari gehitu.";
 _u.ExtensibilityStrings.l_AttachmentUrlTooLong_Text = "Eranskinetako URL bat edo gehiago luzeegiak dira.";
 _u.ExtensibilityStrings.l_CallSaveAsyncBeforeToken_Text = "Elementua gorde arte, ezin da eskuratu tokena.";
@@ -31,9 +32,11 @@ _u.ExtensibilityStrings.l_EmailAddressTooLong_Text = "Adierazitako helbide elekt
 _u.ExtensibilityStrings.l_EwsRequestOversized_Text = "Eskaerak 1 MB-ko gehienezko tamaina gainditzen du. Aldatu EWS eskaera.";
 _u.ExtensibilityStrings.l_ExceededMaxNumberOfAttachments_Text = "Ezin da eranskinik gehitu mezuak jada gehienezko eranskin kopurua baitu";
 _u.ExtensibilityStrings.l_HtmlSanitizationFailure_Text = "HTML immunizazioak huts egin du.";
-_u.ExtensibilityStrings.l_Insufficient_Item_Permissions_Text = "The user doesn't have the permissions required to perform this operation.";
+_u.ExtensibilityStrings.l_Insufficient_Item_Permissions_Text = "Erabiltzaileak ez du baimenik eragiketa hori egiteko.";
 _u.ExtensibilityStrings.l_InternalFormatError_Text = "Barruko formatu-errore bat izan da.";
 _u.ExtensibilityStrings.l_InternalProtocolError_Text = 'Barneko protokolo-errorea: "{0}".';
+_u.ExtensibilityStrings.l_Internal_Server_Error_Text = "Exchange zerbitzariak errore bat eman du. Informazio gehiago lortzeko, begiratu diagnostiko-objektua.";
+_u.ExtensibilityStrings.l_Internet_Not_Connected_Error_Text = "Erabiltzailea jada ez dago konektatuta sarera. Egiaztatu sareko konexioa eta saiatu berriro.";
 _u.ExtensibilityStrings.l_InvalidActionType_Text = '"actionType" parametroaren balioa ez da egokia. Onartzen den balioa "showTaskPane" da.'
 _u.ExtensibilityStrings.l_InvalidAttachmentId_Text = "Eranskinaren IDa baliogabea da.";
 _u.ExtensibilityStrings.l_InvalidAttachmentPath_Text = "Eranskinaren bide-izena baliogabea da.";
@@ -51,12 +54,15 @@ _u.ExtensibilityStrings.l_NullOrEmptyParameterError_Text = '"{0}" parametroa der
 _u.ExtensibilityStrings.l_NumberOfNotificationsExceeded_Text = "Ezin izan da gehitu jakinarazpena, jakinarazpenen mugara iritsi zarelako.";
 _u.ExtensibilityStrings.l_NumberOfRecipientsExceeded_Text = "Eremuko hartzaile kopuruak, guztira, ezin du {0} gainditu.";
 _u.ExtensibilityStrings.l_OffsetNotfound_Text = "Ez da denbora-zigilu honetarako desplazamendurik aurkitu.";
+_u.ExtensibilityStrings.l_Olk_Http_Error_Text = "Ezin izan da egin eskaera. Bilatu HTTP errorearen kodea diagnostiko-objektuan.";
 _u.ExtensibilityStrings.l_ParameterValueTooLongError_Text = '"{0}" parametroaren balioa luzeegia da. Gehienez, "{1}" karaktere erabil daitezke.';
 _u.ExtensibilityStrings.l_ParametersNotAsExpected_Text = "Emandako parametroak ez datoz bat espero zen formatuarekin.";
 _u.ExtensibilityStrings.l_PersistedNotificationArrayReadError_Text = "Ezin izan da erabili APIa, ezin izan direlako eskuratu mantendutako jakinarazpenak.";
 _u.ExtensibilityStrings.l_PersistedNotificationArraySaveError_Text = "Ezin izan da erabili APIa, jakinarazpenak ezin izan direlako mantendu.";
 _u.ExtensibilityStrings.l_RecurrenceErrorMaxOccurrences_Text = "Serie errepikariak 999 gertaldiko muga gainditzen du.";
 _u.ExtensibilityStrings.l_RecurrenceErrorZeroOccurrences_Text = "Serie errepikariak ez du gertaldirik zehaztutako data barrutian.";
+_u.ExtensibilityStrings.l_RecurrenceInvalidTimeZone_Text = "Zehaztutako ordu-zonak ez du balio.";
+_u.ExtensibilityStrings.l_RecurrenceUnsupportedAlternateCalendar_Text = "Errepikatze-maiztasuna erabiltzaileak ezarri du, onartzen ez den ordezko egutegi bat erabilita.";
 _u.ExtensibilityStrings.l_Recurrence_Error_Instance_SetAsync_Text = "Errepikatze-maiztasunak ezin dira ezarri serie bateko gertaldi bakarrean.";
 _u.ExtensibilityStrings.l_Recurrence_Error_Properties_Invalid_Text = "Errepikatze-maiztasunak ez du balio. Egiaztatu zehaztutako errepikatzearen propietateak bat datozela errepikatze motarekin.";
 _u.ExtensibilityStrings.l_SaveError_Text = "Konexio-errore bat gertatu da elementua zerbitzarian gordetzean.";

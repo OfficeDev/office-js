@@ -1,4 +1,4 @@
-/* Version: 16.0.9309.1000 */
+/* Version: 16.0.10827.10000 */
 
 Type.registerNamespace("Strings");
 Strings.OfficeOM = function()
@@ -33,8 +33,8 @@ Strings.OfficeOM.L_CoercionTypeNotSupported = "Jenis paksaan yang ditentukan tid
 Strings.OfficeOM.L_ColIndexOutOfRange = "Nilai indeks lajur berada di luar julat yang dibenarkan. Gunakan nilai (0 atau lebih tinggi) yang kurang daripada jumlah lajur.";
 Strings.OfficeOM.L_ConnectionFailureWithDetails = "Permintaan tersebut gagal dengan kod status {0}, kod ralat {1} dan mesej ralat yang berikut: {2}";
 Strings.OfficeOM.L_ConnectionFailureWithStatus = "Permintaan tersebut gagal dengan kod status {0}.";
-Strings.OfficeOM.L_CustomFunctionDefinitionMissing = "Sifat dengan nama ini yang mewakili takrif fungsi mesti ada pada Excel.CustomFunctions.";
-Strings.OfficeOM.L_CustomFunctionImplementationMissing = "Sifat dengan nama ini pada Excel.CustomFunctions yang mewakili takrif fungsi mesti mengandungi sifat 'panggil' yang melaksanakan fungsi tersebut.";
+Strings.OfficeOM.L_CustomFunctionDefinitionMissing = "Sifat dengan nama ini yang mewakili takrif fungsi mesti wujud pada Excel.Script.CustomFunctions.";
+Strings.OfficeOM.L_CustomFunctionImplementationMissing = "Sifat dengan nama ini pada Excel.Script.CustomFunctions yang mewakili takrif fungsi mesti mengandungi sifat 'panggil' yang melaksanakan fungsi tersebut.";
 Strings.OfficeOM.L_CustomFunctionNameCannotSplit = "Nama fungsi mesti mengandungi ruang nama bukan kosong dan nama pendek bukan kosong.";
 Strings.OfficeOM.L_CustomFunctionNameContainsBadChars = "Nama fungsi hanya boleh mengandungi huruf, digit, tanda garis bawah dan noktah.";
 Strings.OfficeOM.L_CustomXmlError = "Ralat XML Tersuai.";
@@ -157,6 +157,7 @@ Strings.OfficeOM.L_SSOConnectionLostError = "Sambungan telah terputus semasa pro
 Strings.OfficeOM.L_SSOConnectionLostErrorMessage = "Sambungan telah terputus semasa proses daftar masuk dan pengguna mungkin tidak didaftarkan masuk. Ini kemungkinan disebabkan oleh seting konfigurasi pelayar pengguna, seperti zon keselamatan.";
 Strings.OfficeOM.L_SSOServerError = "Ralat berlaku dalam pembekal pengesahan.";
 Strings.OfficeOM.L_SSOServerErrorMessage = "Ralat yang tidak dijangka berlaku pada pelayan.";
+Strings.OfficeOM.L_SSOUnsupportedPlatform = "API tidak disokong dalam platform ini.";
 Strings.OfficeOM.L_SSOUserConsentNotSupportedByCurrentAddinCategory = "Tambahan ini tidak menyokong keizinan pengguna.";
 Strings.OfficeOM.L_SSOUserConsentNotSupportedByCurrentAddinCategoryMessage = "Operasi gagal kerana tambahan ini tidak menyokong keizinan pengguna dalam kategori ini";
 Strings.OfficeOM.L_SaveSettingsError = "Ralat Seting Simpan";

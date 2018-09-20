@@ -1,4 +1,4 @@
-/* Version: 16.0.9309.1000 */
+/* Version: 16.0.10827.10000 */
 
 Type.registerNamespace("_u");
 _u.ExtensibilityStrings = function()
@@ -14,6 +14,7 @@ _u.ExtensibilityStrings.l_AttachmentErrorName_Text = "Eroare de atașare";
 _u.ExtensibilityStrings.l_AttachmentExceededSize_Text = "Atașarea nu poate fi adăugată pentru că este prea mare.";
 _u.ExtensibilityStrings.l_AttachmentItemIdTooLong_Text = "Una sau mai multe dintre ID-urile de atașări sunt prea lungi.";
 _u.ExtensibilityStrings.l_AttachmentNameTooLong_Text = "Unul sau mai multe dintre numele de atașări sunt prea lungi.";
+_u.ExtensibilityStrings.l_AttachmentNotSupported_Text = "Tipul de atașare nu este acceptat.";
 _u.ExtensibilityStrings.l_AttachmentUploadGeneralFailure_Text = "Atașarea nu poate fi adăugată la element.";
 _u.ExtensibilityStrings.l_AttachmentUrlTooLong_Text = "Unul sau mai multe dintre adresele URL de atașări sunt prea lungi.";
 _u.ExtensibilityStrings.l_CallSaveAsyncBeforeToken_Text = "Tokenul nu poate fi regăsit decât după ce este salvat elementul.";
@@ -31,9 +32,11 @@ _u.ExtensibilityStrings.l_EmailAddressTooLong_Text = "Una sau mai multe adrese d
 _u.ExtensibilityStrings.l_EwsRequestOversized_Text = "Cererea depășește limita de 1 MB. Modificați cererea EWS.";
 _u.ExtensibilityStrings.l_ExceededMaxNumberOfAttachments_Text = "Atașările nu pot fi adăugate pentru că mesajul are deja numărul maxim de atașări";
 _u.ExtensibilityStrings.l_HtmlSanitizationFailure_Text = "Sterilizarea HTML nu a reușit.";
-_u.ExtensibilityStrings.l_Insufficient_Item_Permissions_Text = "The user doesn't have the permissions required to perform this operation.";
+_u.ExtensibilityStrings.l_Insufficient_Item_Permissions_Text = "Utilizatorul nu are permisiunile necesare pentru a efectua această operațiune.";
 _u.ExtensibilityStrings.l_InternalFormatError_Text = "A apărut o eroare internă de format.";
 _u.ExtensibilityStrings.l_InternalProtocolError_Text = "Eroare internă de protocol: „{0}”.";
+_u.ExtensibilityStrings.l_Internal_Server_Error_Text = "Serverul Exchange a returnat o eroare. Vedeți obiectul de diagnostic pentru mai multe informații.";
+_u.ExtensibilityStrings.l_Internet_Not_Connected_Error_Text = "Utilizatorul nu mai este conectat la rețea. Verificați conexiunea la rețea și încercați din nou.";
 _u.ExtensibilityStrings.l_InvalidActionType_Text = "Valoarea parametrului „actionType” nu este validă. Valoarea acceptată este „showTaskPane”."
 _u.ExtensibilityStrings.l_InvalidAttachmentId_Text = "ID-ul atașării a fost nevalid.";
 _u.ExtensibilityStrings.l_InvalidAttachmentPath_Text = "Calea atașării a fost nevalidă.";
@@ -51,12 +54,15 @@ _u.ExtensibilityStrings.l_NullOrEmptyParameterError_Text = "Parametrul „{0}”
 _u.ExtensibilityStrings.l_NumberOfNotificationsExceeded_Text = "Notificarea nu a putut fi adăugată, deoarece s-a atins limita pentru notificări.";
 _u.ExtensibilityStrings.l_NumberOfRecipientsExceeded_Text = "Numărul total de destinatari din câmp nu poate depăși {0}.";
 _u.ExtensibilityStrings.l_OffsetNotfound_Text = "Nu s-a găsit un decalaj pentru această marcă de timp.";
+_u.ExtensibilityStrings.l_Olk_Http_Error_Text = "Solicitarea nu a reușit. Vedeți obiectul de diagnostic pentru codul de eroare HTTP.";
 _u.ExtensibilityStrings.l_ParameterValueTooLongError_Text = "Valoarea parametrului „{0}” este prea lungă. Numărul maxim de caractere este „{1}”.";
 _u.ExtensibilityStrings.l_ParametersNotAsExpected_Text = "Parametrii furnizați nu corespund formatului așteptat.";
 _u.ExtensibilityStrings.l_PersistedNotificationArrayReadError_Text = "Apelul API pe care l-ați efectuat nu a reușit, deoarece notificările menținute nu au putut fi regăsite.";
 _u.ExtensibilityStrings.l_PersistedNotificationArraySaveError_Text = "Apelul API pe care l-ați efectuat nu a reușit, deoarece notificările nu au putut fi menținute.";
 _u.ExtensibilityStrings.l_RecurrenceErrorMaxOccurrences_Text = "Seria recurentă depășește limita maximă de 999 de ocurențe.";
 _u.ExtensibilityStrings.l_RecurrenceErrorZeroOccurrences_Text = "Seria recurentă nu are ocurențe în intervalul de date specificat.";
+_u.ExtensibilityStrings.l_RecurrenceInvalidTimeZone_Text = "Fusul orar specificat nu este acceptat.";
+_u.ExtensibilityStrings.l_RecurrenceUnsupportedAlternateCalendar_Text = "Modelul de recurență a fost stabilit de utilizator folosind un calendar alternativ care nu este acceptat.";
 _u.ExtensibilityStrings.l_Recurrence_Error_Instance_SetAsync_Text = "Nu se poate seta un model de recurență pentru o singură ocurență dintr-o serie.";
 _u.ExtensibilityStrings.l_Recurrence_Error_Properties_Invalid_Text = "Modelul de recurență nu este valid. Asigurați-vă că proprietățile de recurență specificate sunt conforme cu tipul de recurență.";
 _u.ExtensibilityStrings.l_SaveError_Text = "A apărut o eroare de conexiune atunci când încercați să salvați elementul pe server.";

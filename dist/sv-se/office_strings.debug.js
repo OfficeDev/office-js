@@ -1,4 +1,4 @@
-/* Version: 16.0.9309.1000 */
+/* Version: 16.0.10827.10000 */
 
 Type.registerNamespace("Strings");
 Strings.OfficeOM = function()
@@ -33,8 +33,8 @@ Strings.OfficeOM.L_CoercionTypeNotSupported = "Den angivna konverteringstypen ka
 Strings.OfficeOM.L_ColIndexOutOfRange = "Värdet för kolumnindex ligger utanför det tillåtna intervallet. Använd ett värde (0 eller högre) som är mindre än antalet kolumner.";
 Strings.OfficeOM.L_ConnectionFailureWithDetails = "Begäran misslyckades med statuskod {0}, felkod {1} och följande felmeddelande: {2}";
 Strings.OfficeOM.L_ConnectionFailureWithStatus = "Begäran misslyckades med statuskod {0}.";
-Strings.OfficeOM.L_CustomFunctionDefinitionMissing = "En egenskap med det här namnet som representerar funktionens definition måste finns för Excel.CustomFunctions.";
-Strings.OfficeOM.L_CustomFunctionImplementationMissing = "Egenskapen med det här namnet för Excel.CustomFunctions som representerar funktionens definition måste innehålla en anropsegenskap som implementerar funktionen.";
+Strings.OfficeOM.L_CustomFunctionDefinitionMissing = "En egenskap med det här namnet som representerar funktionens definition måste finnas på Excel.CustomFunctions.";
+Strings.OfficeOM.L_CustomFunctionImplementationMissing = "Egenskapen med det här namnet på Excel.CustomFunctions som representerar funktionens definition måste innehålla en anropsegenskap som implementerar funktionen.";
 Strings.OfficeOM.L_CustomFunctionNameCannotSplit = "Funktionsnamnet måste innehålla ett icke-tomt namnområde och ett icke-tomt kortnamn.";
 Strings.OfficeOM.L_CustomFunctionNameContainsBadChars = "Funktionsnamnet får bara innehålla bokstäver, siffror, understreck och punkter.";
 Strings.OfficeOM.L_CustomXmlError = "Anpassat XML-fel.";
@@ -157,6 +157,7 @@ Strings.OfficeOM.L_SSOConnectionLostError = "En anslutning bröts under inloggni
 Strings.OfficeOM.L_SSOConnectionLostErrorMessage = "En anslutning bröts under inloggningen och användaren kanske inte är inloggad. Detta berodde troligen på användarens webbläsarinställningar för t.ex. säkerhetszoner.";
 Strings.OfficeOM.L_SSOServerError = "Fel uppstod i autentiseringsprovidern.";
 Strings.OfficeOM.L_SSOServerErrorMessage = "Ett oväntat fel uppstod på servern.";
+Strings.OfficeOM.L_SSOUnsupportedPlatform = "API stöds inte på den här plattformen.";
 Strings.OfficeOM.L_SSOUserConsentNotSupportedByCurrentAddinCategory = "Det här tillägget stöder inte användarmedgivande.";
 Strings.OfficeOM.L_SSOUserConsentNotSupportedByCurrentAddinCategoryMessage = "Åtgärden misslyckades eftersom tillägget inte stöder användarmedgivande i den här kategorin";
 Strings.OfficeOM.L_SaveSettingsError = "Fel när inställningar sparades";

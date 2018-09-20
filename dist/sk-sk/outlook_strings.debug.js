@@ -1,4 +1,4 @@
-/* Version: 16.0.9309.1000 */
+/* Version: 16.0.10827.10000 */
 
 Type.registerNamespace("_u");
 _u.ExtensibilityStrings = function()
@@ -14,6 +14,7 @@ _u.ExtensibilityStrings.l_AttachmentErrorName_Text = "Chyba prílohy";
 _u.ExtensibilityStrings.l_AttachmentExceededSize_Text = "Príloha sa nedá pridať, pretože je príliš veľká.";
 _u.ExtensibilityStrings.l_AttachmentItemIdTooLong_Text = "Minimálne jedno ID prílohy je príliš dlhé.";
 _u.ExtensibilityStrings.l_AttachmentNameTooLong_Text = "Minimálne jeden názov prílohy je príliš dlhý.";
+_u.ExtensibilityStrings.l_AttachmentNotSupported_Text = "Tento typ prílohy nie je podporovaný.";
 _u.ExtensibilityStrings.l_AttachmentUploadGeneralFailure_Text = "Príloha sa k položke nedá pridať.";
 _u.ExtensibilityStrings.l_AttachmentUrlTooLong_Text = "Minimálne jedna URL adresa prílohy je príliš dlhá.";
 _u.ExtensibilityStrings.l_CallSaveAsyncBeforeToken_Text = "Token sa nedá načítať, kým sa položka neuloží.";
@@ -31,9 +32,11 @@ _u.ExtensibilityStrings.l_EmailAddressTooLong_Text = "Minimálne jedna zadaná e
 _u.ExtensibilityStrings.l_EwsRequestOversized_Text = "Požiadavka prekročila maximálnu veľkosť 1 MB. Upravte požiadavku EWS.";
 _u.ExtensibilityStrings.l_ExceededMaxNumberOfAttachments_Text = "Prílohy sa nadajú pridať, pretože správa už obsahuje maximálny počet príloh";
 _u.ExtensibilityStrings.l_HtmlSanitizationFailure_Text = "HTML čistenie zlyhalo.";
-_u.ExtensibilityStrings.l_Insufficient_Item_Permissions_Text = "The user doesn't have the permissions required to perform this operation.";
+_u.ExtensibilityStrings.l_Insufficient_Item_Permissions_Text = "Používateľ nemá povolenia potrebné na vykonanie tejto operácie.";
 _u.ExtensibilityStrings.l_InternalFormatError_Text = "Vyskytla sa interná chyba formátu.";
 _u.ExtensibilityStrings.l_InternalProtocolError_Text = "Interná chyba protokolu: {0}.";
+_u.ExtensibilityStrings.l_Internal_Server_Error_Text = "Exchange server vrátil chybu. Ďalšie informácie vám poskytne objekt diagnostiky.";
+_u.ExtensibilityStrings.l_Internet_Not_Connected_Error_Text = "Používateľ už nie je pripojený k sieti. Overte svoje sieťové pripojenie a skúste to znova.";
 _u.ExtensibilityStrings.l_InvalidActionType_Text = "Hodnota parametra actionType je neplatná. Akceptovaná hodnota je showTaskPane."
 _u.ExtensibilityStrings.l_InvalidAttachmentId_Text = "Identifikácia prílohy bola neplatná.";
 _u.ExtensibilityStrings.l_InvalidAttachmentPath_Text = "Cesta k prílohe bola neplatná.";
@@ -51,12 +54,15 @@ _u.ExtensibilityStrings.l_NullOrEmptyParameterError_Text = "Parameter {0} je pov
 _u.ExtensibilityStrings.l_NumberOfNotificationsExceeded_Text = "Oznámenie sa nepodarilo pridať, pretože bol dosiahnutý limit oznámení.";
 _u.ExtensibilityStrings.l_NumberOfRecipientsExceeded_Text = "Celkový počet príjemcov v poli nemôže presiahnuť {0}.";
 _u.ExtensibilityStrings.l_OffsetNotfound_Text = "Posun tejto časovej známky sa nepodarilo nájsť.";
+_u.ExtensibilityStrings.l_Olk_Http_Error_Text = "Požiadavka zlyhala. Skontrolujte objekt diagnostiky pre chybový kód HTTP.";
 _u.ExtensibilityStrings.l_ParameterValueTooLongError_Text = "Hodnota parametra {0} je príliš dlhá. Maximálny počet znakov je {1}.";
 _u.ExtensibilityStrings.l_ParametersNotAsExpected_Text = "Zadané parametre nezodpovedajú očakávanému formátu.";
 _u.ExtensibilityStrings.l_PersistedNotificationArrayReadError_Text = "Uskutočnené volanie rozhrania API zlyhalo, pretože zachované oznámenia sa nepodarilo načítať.";
 _u.ExtensibilityStrings.l_PersistedNotificationArraySaveError_Text = "Uskutočnené volanie rozhrania API zlyhalo, pretože oznámenia sa nepodarilo zachovať.";
 _u.ExtensibilityStrings.l_RecurrenceErrorMaxOccurrences_Text = "Rady opakovaných výskytov prekračujú maximálnu hodnotu 999 výskytov.";
 _u.ExtensibilityStrings.l_RecurrenceErrorZeroOccurrences_Text = "Rady opakovaných výskytov nemajú žiadne výskyty v rámci zadaného časového rozsahu.";
+_u.ExtensibilityStrings.l_RecurrenceInvalidTimeZone_Text = "Zadané časové pásmo nie je podporované.";
+_u.ExtensibilityStrings.l_RecurrenceUnsupportedAlternateCalendar_Text = "Spôsob opakovania bol používateľom nastavený pomocou alternatívneho kalendára, ktorý nie je podporovaný.";
 _u.ExtensibilityStrings.l_Recurrence_Error_Instance_SetAsync_Text = "Spôsob opakovania sa nedá nastaviť pre jediný výskyt v rade.";
 _u.ExtensibilityStrings.l_Recurrence_Error_Properties_Invalid_Text = "Spôsob opakovania nie je platný. Skontrolujte, či zadané vlastnosti opakovania zodpovedajú typu opakovania.";
 _u.ExtensibilityStrings.l_SaveError_Text = "Pri pokuse o uloženie položky na server sa vyskytla chyba pripojenia.";

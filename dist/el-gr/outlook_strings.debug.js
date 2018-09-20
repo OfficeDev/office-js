@@ -1,4 +1,4 @@
-/* Version: 16.0.9309.1000 */
+/* Version: 16.0.10827.10000 */
 
 Type.registerNamespace("_u");
 _u.ExtensibilityStrings = function()
@@ -14,6 +14,7 @@ _u.ExtensibilityStrings.l_AttachmentErrorName_Text = "Σφάλμα συνημμ�
 _u.ExtensibilityStrings.l_AttachmentExceededSize_Text = "Δεν είναι δυνατή η προσθήκη του συνημμένου, επειδή είναι πάρα πολύ μεγάλο.";
 _u.ExtensibilityStrings.l_AttachmentItemIdTooLong_Text = "Ορισμένα αναγνωριστικά συνημμένων είναι πολύ μεγάλα.";
 _u.ExtensibilityStrings.l_AttachmentNameTooLong_Text = "Ορισμένα ονόματα συνημμένων είναι πολύ μεγάλα.";
+_u.ExtensibilityStrings.l_AttachmentNotSupported_Text = "Ο τύπος συνημμένου δεν υποστηρίζεται.";
 _u.ExtensibilityStrings.l_AttachmentUploadGeneralFailure_Text = "Δεν είναι δυνατή η προσθήκη του συνημμένου στο στοιχείο.";
 _u.ExtensibilityStrings.l_AttachmentUrlTooLong_Text = "Ορισμένες διευθύνσεις URL συνημμένων είναι πολύ μεγάλες.";
 _u.ExtensibilityStrings.l_CallSaveAsyncBeforeToken_Text = "Το διακριτικό δεν μπορεί να ανακτηθεί μέχρι να αποθηκευτεί το στοιχείο.";
@@ -31,9 +32,11 @@ _u.ExtensibilityStrings.l_EmailAddressTooLong_Text = "Μία ή περισσότ
 _u.ExtensibilityStrings.l_EwsRequestOversized_Text = "Η αίτηση υπερβαίνει το όριο μεγέθους 1 MB. Τροποποιήστε την αίτησή σας EWS.";
 _u.ExtensibilityStrings.l_ExceededMaxNumberOfAttachments_Text = "Δεν είναι δυνατή η προσθήκη συνημμένων, επειδή το μήνυμα διαθέτει ήδη το μέγιστο αριθμό συνημμένων";
 _u.ExtensibilityStrings.l_HtmlSanitizationFailure_Text = "Η επιδιόρθωση HTML απέτυχε.";
-_u.ExtensibilityStrings.l_Insufficient_Item_Permissions_Text = "The user doesn't have the permissions required to perform this operation.";
+_u.ExtensibilityStrings.l_Insufficient_Item_Permissions_Text = "Ο χρήστης δεν έχει τα απαιτούμενα δικαιώματα για την εκτέλεση αυτής της λειτουργίας.";
 _u.ExtensibilityStrings.l_InternalFormatError_Text = "Παρουσιάστηκε εσωτερικό σφάλμα μορφής.";
 _u.ExtensibilityStrings.l_InternalProtocolError_Text = "Εσωτερικό σφάλμα πρωτοκόλλου: '{0}'.";
+_u.ExtensibilityStrings.l_Internal_Server_Error_Text = "Ο διακομιστής Exchange επέστρεψε ένα σφάλμα. Ανατρέξτε στο αντικείμενο διαγνωστικών για περισσότερες πληροφορίες.";
+_u.ExtensibilityStrings.l_Internet_Not_Connected_Error_Text = "Ο χρήστης δεν είναι πλέον συνδεδεμένος στο δίκτυο. Ελέγξτε τη σύνδεση δικτύου σας και προσπαθήστε ξανά.";
 _u.ExtensibilityStrings.l_InvalidActionType_Text = 'Η τιμή της παραμέτρου "actionType" δεν είναι έγκυρη. Η αποδεκτή τιμή είναι "showTaskPane".'
 _u.ExtensibilityStrings.l_InvalidAttachmentId_Text = "Το αναγνωριστικό συνημμένου δεν ήταν έγκυρο.";
 _u.ExtensibilityStrings.l_InvalidAttachmentPath_Text = "Η διαδρομή συνημμένου δεν ήταν έγκυρη.";
@@ -51,12 +54,15 @@ _u.ExtensibilityStrings.l_NullOrEmptyParameterError_Text = 'Η παράμετρ�
 _u.ExtensibilityStrings.l_NumberOfNotificationsExceeded_Text = "Δεν ήταν δυνατή η προσθήκη της ειδοποίησης καθώς έχει συμπληρωθεί το όριο ειδοποιήσεων.";
 _u.ExtensibilityStrings.l_NumberOfRecipientsExceeded_Text = "Ο συνολικός αριθμός παραληπτών στο πεδίο δεν μπορεί να υπερβαίνει το {0}.";
 _u.ExtensibilityStrings.l_OffsetNotfound_Text = "Δεν ήταν δυνατό να βρεθεί μια μετατόπιση για αυτή τη χρονική σήμανση.";
+_u.ExtensibilityStrings.l_Olk_Http_Error_Text = "Η αίτηση απέτυχε. Ανατρέξτε στο αντικείμενο διαγνωστικών για να βρείτε τον κωδικό σφάλματος HTTP.";
 _u.ExtensibilityStrings.l_ParameterValueTooLongError_Text = 'Η τιμή της παραμέτρου "{0}" είναι πολύ μεγάλη. Το μέγιστο πλήθος χαρακτήρων είναι "{1}".';
 _u.ExtensibilityStrings.l_ParametersNotAsExpected_Text = "Οι δεδομένες παράμετροι δεν ταιριάζουν με την αναμενόμενη μορφή.";
 _u.ExtensibilityStrings.l_PersistedNotificationArrayReadError_Text = "Η κλήση API που κάνατε απέτυχε καθώς δεν ήταν δυνατή η ανάκτηση των αποθηκευμένων ειδοποιήσεων.";
 _u.ExtensibilityStrings.l_PersistedNotificationArraySaveError_Text = "Η κλήση API που κάνατε απέτυχε καθώς δεν ήταν δυνατή η αποθήκευση των ειδοποιήσεων.";
 _u.ExtensibilityStrings.l_RecurrenceErrorMaxOccurrences_Text = "Η περιοδική σειρά υπερβαίνει το μέγιστο όριο 999 εμφανίσεων.";
 _u.ExtensibilityStrings.l_RecurrenceErrorZeroOccurrences_Text = "Η περιοδική σειρά δεν διαθέτει εμφανίσεις στο καθορισμένο εύρος ημερομηνιών.";
+_u.ExtensibilityStrings.l_RecurrenceInvalidTimeZone_Text = "Η καθορισμένη ζώνη ώρας δεν υποστηρίζεται.";
+_u.ExtensibilityStrings.l_RecurrenceUnsupportedAlternateCalendar_Text = "Το μοτίβο περιοδικότητας ορίστηκε από τον χρήστη χρησιμοποιώντας ένα εναλλακτικό ημερολόγιο που δεν υποστηρίζεται.";
 _u.ExtensibilityStrings.l_Recurrence_Error_Instance_SetAsync_Text = "Δεν είναι δυνατός ο ορισμός ενός μοτίβου περιοδικότητας για μία μεμονωμένη εμφάνιση σε μια σειρά.";
 _u.ExtensibilityStrings.l_Recurrence_Error_Properties_Invalid_Text = "Το μοτίβο περιοδικότητας δεν είναι έγκυρο. Βεβαιωθείτε ότι οι καθορισμένες ιδιότητες περιοδικότητας συμφωνούν με τον τύπο περιοδικότητας.";
 _u.ExtensibilityStrings.l_SaveError_Text = "Παρουσιάστηκε σφάλμα σύνδεσης κατά την προσπάθεια αποθήκευσης του στοιχείου στον διακομιστή.";

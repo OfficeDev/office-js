@@ -1,4 +1,4 @@
-/* Version: 16.0.9309.1000 */
+/* Version: 16.0.10827.10000 */
 
 Type.registerNamespace("Strings");
 Strings.OfficeOM = function()
@@ -33,8 +33,8 @@ Strings.OfficeOM.L_CoercionTypeNotSupported = "Norādītais piespiedu pārvērš
 Strings.OfficeOM.L_ColIndexOutOfRange = "Kolonnas indeksa vērtība ir ārpus atļautā diapazona. Izmantojiet vērtību (0 vai lielāku), kas ir mazāka par kolonnu skaitu.";
 Strings.OfficeOM.L_ConnectionFailureWithDetails = "Pieprasījums neizdevās; statusa kods {0}, kļūdas kods {1} un šāds kļūdas ziņojums: {2}";
 Strings.OfficeOM.L_ConnectionFailureWithStatus = "Pieprasījums neizdevās ar statusa kodu {0}.";
-Strings.OfficeOM.L_CustomFunctionDefinitionMissing = "Rekvizītam ar šādu nosaukumu, kas apzīmē funkcijas definīciju, ir jāatrodas Excel.CustomFunctions.";
-Strings.OfficeOM.L_CustomFunctionImplementationMissing = 'Rekvizītam ar šādu nosaukumu, kas atrodas Excel.CustomFunctions un apzīmē funkcijas definīciju, jāsatur "call" rekvizīts, kurš īsteno funkciju.';
+Strings.OfficeOM.L_CustomFunctionDefinitionMissing = "Rekvizītam ar šādu nosaukumu, kas apzīmē funkcijas definīciju, ir jāatrodas šeit: Excel.Script.CustomFunctions.";
+Strings.OfficeOM.L_CustomFunctionImplementationMissing = 'Rekvizītam ar šādu nosaukumu, kas atrodas Excel.Script.CustomFunctions un apzīmē funkcijas definīciju, jāsatur rekvizīts "call", kurš īsteno funkciju.';
 Strings.OfficeOM.L_CustomFunctionNameCannotSplit = "Funkcijas nosaukumā jābūt netukšai nosaukumvietai un netukšam īsajam nosaukumam.";
 Strings.OfficeOM.L_CustomFunctionNameContainsBadChars = "Funkcijas nosaukumā drīkst būt tikai burti, cipari, pasvītras un punkti.";
 Strings.OfficeOM.L_CustomXmlError = "Pielāgota XML kļūda.";
@@ -157,6 +157,7 @@ Strings.OfficeOM.L_SSOConnectionLostError = "Pierakstīšanās laikā zuda savie
 Strings.OfficeOM.L_SSOConnectionLostErrorMessage = "Pierakstīšanās laikā zuda savienojums, un lietotājs nevar pierakstīties. Iespējams, ka to izraisīja lietotāja pārlūkprogrammas konfigurācijas iestatījumi, piemēram, drošības zonas.";
 Strings.OfficeOM.L_SSOServerError = "Kļūda radās autentifikācijas nodrošinātājā.";
 Strings.OfficeOM.L_SSOServerErrorMessage = "Serverī radās neparedzēta kļūda.";
+Strings.OfficeOM.L_SSOUnsupportedPlatform = "API netiek atbalstīts šajā platformā.";
 Strings.OfficeOM.L_SSOUserConsentNotSupportedByCurrentAddinCategory = "Šī pievienojumprogramma neatbalsta lietotāja piekrišanu.";
 Strings.OfficeOM.L_SSOUserConsentNotSupportedByCurrentAddinCategoryMessage = "Operācija neizdevās, jo šī pievienojumprogramma neatbalsta lietotāja piekrišanu šajā kategorijā";
 Strings.OfficeOM.L_SaveSettingsError = "Iestatījumu saglabāšanas kļūda";

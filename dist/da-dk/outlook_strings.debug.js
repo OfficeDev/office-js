@@ -1,4 +1,4 @@
-/* Version: 16.0.9309.1000 */
+/* Version: 16.0.10827.10000 */
 
 Type.registerNamespace("_u");
 _u.ExtensibilityStrings = function()
@@ -14,6 +14,7 @@ _u.ExtensibilityStrings.l_AttachmentErrorName_Text = "Fejl ved vedhæftet fil";
 _u.ExtensibilityStrings.l_AttachmentExceededSize_Text = "Den vedhæftede fil kan ikke tilføjes, fordi den er for stor.";
 _u.ExtensibilityStrings.l_AttachmentItemIdTooLong_Text = "Et eller flere af id'erne på de vedhæftede filer er for lange.";
 _u.ExtensibilityStrings.l_AttachmentNameTooLong_Text = "Et eller flere af navnene på de vedhæftede filer er for lange.";
+_u.ExtensibilityStrings.l_AttachmentNotSupported_Text = "Den vedhæftede fils type understøttes ikke.";
 _u.ExtensibilityStrings.l_AttachmentUploadGeneralFailure_Text = "Den vedhæftede fil kan ikke føjes til elementet.";
 _u.ExtensibilityStrings.l_AttachmentUrlTooLong_Text = "En eller flere af URL-adresserne til de vedhæftede filer er for lange.";
 _u.ExtensibilityStrings.l_CallSaveAsyncBeforeToken_Text = "Tokenet kan ikke hentes, før elementet er gemt.";
@@ -31,9 +32,11 @@ _u.ExtensibilityStrings.l_EmailAddressTooLong_Text = "En eller flere af de angiv
 _u.ExtensibilityStrings.l_EwsRequestOversized_Text = "Forespørgslen overskrider grænsen på 1 MB. Rediger EWS-anmodningen.";
 _u.ExtensibilityStrings.l_ExceededMaxNumberOfAttachments_Text = "Vedhæftede filer kan ikke tilføjes, fordi meddelelsen har allerede det maksimale antal vedhæftede filer";
 _u.ExtensibilityStrings.l_HtmlSanitizationFailure_Text = "HTML-santizationen mislykkedes.";
-_u.ExtensibilityStrings.l_Insufficient_Item_Permissions_Text = "The user doesn't have the permissions required to perform this operation.";
+_u.ExtensibilityStrings.l_Insufficient_Item_Permissions_Text = "Brugeren har ikke tilladelser til at udføre denne handling.";
 _u.ExtensibilityStrings.l_InternalFormatError_Text = "Der opstod en intern formatfejl.";
 _u.ExtensibilityStrings.l_InternalProtocolError_Text = "Intern protokolfejl: '{0}'.";
+_u.ExtensibilityStrings.l_Internal_Server_Error_Text = "Exchange-serveren har returneret en fejl. Se diagnosticeringsobjektet for at få flere oplysninger.";
+_u.ExtensibilityStrings.l_Internet_Not_Connected_Error_Text = "Brugeren har ikke længere forbindelse til netværket. Kontrollér netværksforbindelsen, og prøv igen.";
 _u.ExtensibilityStrings.l_InvalidActionType_Text = 'Værdien af parameteren "actionType" er ugyldig. Den accepterede værdi er "showTaskPane".'
 _u.ExtensibilityStrings.l_InvalidAttachmentId_Text = "Den vedhæftede fils id var ugyldigt.";
 _u.ExtensibilityStrings.l_InvalidAttachmentPath_Text = "Stien for den vedhæftede fil var ugyldig.";
@@ -51,12 +54,15 @@ _u.ExtensibilityStrings.l_NullOrEmptyParameterError_Text = 'Parameteren "{0}" er
 _u.ExtensibilityStrings.l_NumberOfNotificationsExceeded_Text = "Meddelelsen kunne ikke tilføjes, fordi grænsen for meddelelser er nået.";
 _u.ExtensibilityStrings.l_NumberOfRecipientsExceeded_Text = "Det samlede antal modtagere i feltet må ikke overskride {0}.";
 _u.ExtensibilityStrings.l_OffsetNotfound_Text = "Der blev ikke fundet en forskydning for dette tidsstempel.";
+_u.ExtensibilityStrings.l_Olk_Http_Error_Text = "Anmodningen mislykkedes. Se diagnosticeringsobjektet for at få HTTP-fejlkoden.";
 _u.ExtensibilityStrings.l_ParameterValueTooLongError_Text = 'Værdien af parameteren "{0}" er for lang. Det maksimale antal tegn er "{1}".';
 _u.ExtensibilityStrings.l_ParametersNotAsExpected_Text = "De angivne parametre svarer ikke til det forventede format.";
 _u.ExtensibilityStrings.l_PersistedNotificationArrayReadError_Text = "Det API-kald, du foretog, mislykkedes, fordi de permanente meddelelser ikke kunne hentes.";
 _u.ExtensibilityStrings.l_PersistedNotificationArraySaveError_Text = "Det API-kald, du foretog, mislykkedes, fordi meddelelserne ikke kunne gøres permanente.";
 _u.ExtensibilityStrings.l_RecurrenceErrorMaxOccurrences_Text = "Den tilbagevendende serie overskrider det maksimale antal forekomster på 999.";
 _u.ExtensibilityStrings.l_RecurrenceErrorZeroOccurrences_Text = "Den tilbagevendende serie har ingen forekomster i det angivne datointerval.";
+_u.ExtensibilityStrings.l_RecurrenceInvalidTimeZone_Text = "Den angivne tidszone understøttes ikke.";
+_u.ExtensibilityStrings.l_RecurrenceUnsupportedAlternateCalendar_Text = "Gentagelsesmønsteret er angivet af brugeren ved hjælp af en alternativ kalender, der ikke understøttes.";
 _u.ExtensibilityStrings.l_Recurrence_Error_Instance_SetAsync_Text = "Der kan ikke angives et gentagelsesmønster for en enkelt forekomst i en serie.";
 _u.ExtensibilityStrings.l_Recurrence_Error_Properties_Invalid_Text = "Gentagelsesmønsteret er ikke gyldigt. Kontrollér, at de angivne egenskaber for gentagelse justeres til gentagelsestypen.";
 _u.ExtensibilityStrings.l_SaveError_Text = "Der opstod forbindelsesfejl under forsøget på at gemme elementet på serveren.";

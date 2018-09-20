@@ -1,4 +1,4 @@
-/* Version: 16.0.9309.1000 */
+/* Version: 16.0.10827.10000 */
 
 Type.registerNamespace("Strings");
 Strings.OfficeOM = function()
@@ -33,8 +33,8 @@ Strings.OfficeOM.L_CoercionTypeNotSupported = "Der angegebene Koersionstyp wird 
 Strings.OfficeOM.L_ColIndexOutOfRange = "Der Wert für den Spaltenindex liegt außerhalb des zulässigen Bereichs. Verwenden Sie einen Wert (0 oder höher), der kleiner als die Anzahl der Spalten ist.";
 Strings.OfficeOM.L_ConnectionFailureWithDetails = "Fehler der Anforderung mit Statuscode {0}, Fehlercode {1} und der folgenden Fehlermeldung: {2}";
 Strings.OfficeOM.L_ConnectionFailureWithStatus = "Fehler der Anforderung mit Statuscode {0}.";
-Strings.OfficeOM.L_CustomFunctionDefinitionMissing = "Eine Eigenschaft mit diesem Namen, die die Definition der Funktion darstellt, muss in Excel.CustomFunctions vorhanden sein.";
-Strings.OfficeOM.L_CustomFunctionImplementationMissing = 'Die Eigenschaft mit diesem Namen in Excel.CustomFunctions, die die Definition der Funktion darstellt, muss eine "call"-Eigenschaft enthalten, die die Funktion implementiert.';
+Strings.OfficeOM.L_CustomFunctionDefinitionMissing = "Eine Eigenschaft mit diesem Namen, die die Definition der Funktion darstellt, muss in Excel.Script.CustomFunctions vorhanden sein.";
+Strings.OfficeOM.L_CustomFunctionImplementationMissing = 'Die Eigenschaft mit diesem Namen in Excel.Script.CustomFunctions, die die Definition der Funktion darstellt, muss eine "call"-Eigenschaft enthalten, die die Funktion implementiert.';
 Strings.OfficeOM.L_CustomFunctionNameCannotSplit = "Der Funktionsname kann muss einen nicht leeren Namespace und einen nicht leeren Kurznamen enthalten.";
 Strings.OfficeOM.L_CustomFunctionNameContainsBadChars = "Der Funktionsname darf nur Buchstaben, Zahlen, Unterstriche und Punkte enthalten.";
 Strings.OfficeOM.L_CustomXmlError = "Benutzerdefiniertes XML-Fehler.";
@@ -157,6 +157,7 @@ Strings.OfficeOM.L_SSOConnectionLostError = "Während der Anmeldung wurde die Ve
 Strings.OfficeOM.L_SSOConnectionLostErrorMessage = "Während der Anmeldung wurde die Verbindung unterbrochen, und der Benutzer ist möglicherweise nicht angemeldet. Der Grund hierfür lag wahrscheinlich in den Browserkonfigurationseinstellungen des Benutzers, z. B. den Sicherheitszonen.";
 Strings.OfficeOM.L_SSOServerError = "Fehler im Authentifizierungsanbieter.";
 Strings.OfficeOM.L_SSOServerErrorMessage = "Unerwarteter Fehler auf dem Server.";
+Strings.OfficeOM.L_SSOUnsupportedPlatform = "Die API wird in dieser Plattform nicht unterstützt.";
 Strings.OfficeOM.L_SSOUserConsentNotSupportedByCurrentAddinCategory = "Dieses Add-In unterstützt keine Benutzerzustimmung.";
 Strings.OfficeOM.L_SSOUserConsentNotSupportedByCurrentAddinCategoryMessage = "Vorgangsfehler, weil dieses Add-In keine Benutzerzustimmung in dieser Kategorie unterstützt.";
 Strings.OfficeOM.L_SaveSettingsError = "Fehler beim Speichern von Einstellungen.";

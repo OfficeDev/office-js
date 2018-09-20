@@ -1,14 +1,20 @@
 /* PowerPointer web application specific API library */
-/* Version: 16.0.9227.1000 */
+/* Version: 16.0.10212.10000 */
 /*
 	Copyright (c) Microsoft Corporation.  All rights reserved.
 */
 
 
 /*
-	Your use of this file is governed by the Microsoft Services Agreement http://go.microsoft.com/fwlink/?LinkId=266419.
-*/
+    Your use of this file is governed by the Microsoft Services Agreement http://go.microsoft.com/fwlink/?LinkId=266419.
 
+    This file also contains the following Promise implementation (with a few small modifications):
+        * @overview es6-promise - a tiny implementation of Promises/A+.
+        * @copyright Copyright (c) 2014 Yehuda Katz, Tom Dale, Stefan Penner and contributors (Conversion to ES6 API by Jake Archibald)
+        * @license   Licensed under MIT license
+        *            See https://raw.githubusercontent.com/jakearchibald/es6-promise/master/LICENSE
+        * @version   2.3.0
+*/
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
@@ -1089,7 +1095,8 @@ OSF.AgaveHostAction = {
     "ExitNoFocusableShift": 18,
     "MouseEnter": 19,
     "MouseLeave": 20,
-    "UpdateTargetUrl": 21
+    "UpdateTargetUrl": 21,
+    "InstallCustomFunctions": 22
 };
 OSF.SharedConstants = {
     "NotificationConversationIdSuffix": '_ntf'
@@ -1175,23 +1182,6 @@ Microsoft.Office.WebExtension.ValueFormat = {
 Microsoft.Office.WebExtension.FilterType = {
     All: "all"
 };
-Microsoft.Office.WebExtension.PlatformType = {
-    PC: "PC",
-    OfficeOnline: "OfficeOnline",
-    Mac: "Mac",
-    iOS: "iOS",
-    Android: "Android",
-    Universal: "Universal"
-};
-Microsoft.Office.WebExtension.HostType = {
-    Word: "Word",
-    Excel: "Excel",
-    PowerPoint: "PowerPoint",
-    Outlook: "Outlook",
-    OneNote: "OneNote",
-    Project: "Project",
-    Access: "Access"
-};
 Microsoft.Office.WebExtension.Parameters = {
     BindingType: "bindingType",
     CoercionType: "coercionType",
@@ -1260,6 +1250,7 @@ Microsoft.Office.WebExtension.Parameters = {
     MessageContent: "messageContent",
     HideTitle: "hideTitle",
     UseDeviceIndependentPixels: "useDeviceIndependentPixels",
+    PromptBeforeOpen: "promptBeforeOpen",
     AppCommandInvocationCompletedData: "appCommandInvocationCompletedData",
     Base64: "base64",
     FormId: "formId"
@@ -1518,7 +1509,10 @@ OSF.DDA.ErrorCodeManager = (function () {
             ooeSSOServerError: 13007,
             ooeAddinIsAlreadyRequestingToken: 13008,
             ooeSSOUserConsentNotSupportedByCurrentAddinCategory: 13009,
-            ooeSSOConnectionLost: 13010
+            ooeSSOConnectionLost: 13010,
+            ooeResourceNotAllowed: 13011,
+            ooeAccessDenied: 13990,
+            ooeGeneralException: 13991
         },
         initializeErrorMessages: function OSF_DDA_ErrorCodeManager$initializeErrorMessages(stringNS) {
             _errorMappings[OSF.DDA.ErrorCodeManager.errorCodes.ooeCoercionTypeNotSupported] = { name: stringNS.L_InvalidCoercion, message: stringNS.L_CoercionTypeNotSupported };
@@ -2123,82 +2117,6 @@ var OfficeExt;
     })(Requirement = OfficeExt.Requirement || (OfficeExt.Requirement = {}));
 })(OfficeExt || (OfficeExt = {}));
 OfficeExt.Requirement.RequirementsMatrixFactory.initializeOsfDda();
-var OfficeExt;
-(function (OfficeExt) {
-    var HostName;
-    (function (HostName) {
-        var Host = (function () {
-            function Host() {
-                this.getDiagnostics = function _getDiagnostics(version) {
-                    var diagnostics = {
-                        host: this.getHost(),
-                        version: (version || this.getDefaultVersion()),
-                        platform: this.getPlatform()
-                    };
-                    return diagnostics;
-                };
-                this.platformRemappings = {
-                    web: Microsoft.Office.WebExtension.PlatformType.OfficeOnline,
-                    winrt: Microsoft.Office.WebExtension.PlatformType.Universal,
-                    win32: Microsoft.Office.WebExtension.PlatformType.PC,
-                    mac: Microsoft.Office.WebExtension.PlatformType.Mac,
-                    ios: Microsoft.Office.WebExtension.PlatformType.iOS,
-                    android: Microsoft.Office.WebExtension.PlatformType.Android
-                };
-                this.camelCaseMappings = {
-                    powerpoint: Microsoft.Office.WebExtension.HostType.PowerPoint,
-                    onenote: Microsoft.Office.WebExtension.HostType.OneNote
-                };
-                this.hostInfo = OSF._OfficeAppFactory.getHostInfo();
-                this.getHost = this.getHost.bind(this);
-                this.getPlatform = this.getPlatform.bind(this);
-                this.getDiagnostics = this.getDiagnostics.bind(this);
-            }
-            Host.prototype.capitalizeFirstLetter = function (input) {
-                if (input) {
-                    return (input[0].toUpperCase() + input.slice(1).toLowerCase());
-                }
-                return input;
-            };
-            Host.getInstance = function () {
-                if (Host.hostObj === undefined) {
-                    Host.hostObj = new Host();
-                }
-                return Host.hostObj;
-            };
-            Host.prototype.getPlatform = function () {
-                if (this.hostInfo.hostPlatform) {
-                    var hostPlatform = this.hostInfo.hostPlatform.toLowerCase();
-                    if (this.platformRemappings[hostPlatform]) {
-                        return this.platformRemappings[hostPlatform];
-                    }
-                }
-                return null;
-            };
-            Host.prototype.getHost = function () {
-                if (this.hostInfo.hostType) {
-                    var hostType = this.hostInfo.hostType.toLowerCase();
-                    if (this.camelCaseMappings[hostType]) {
-                        return this.camelCaseMappings[hostType];
-                    }
-                    hostType = this.capitalizeFirstLetter(this.hostInfo.hostType);
-                    if (Microsoft.Office.WebExtension.HostType[hostType]) {
-                        return Microsoft.Office.WebExtension.HostType[hostType];
-                    }
-                }
-                return null;
-            };
-            Host.prototype.getDefaultVersion = function () {
-                if (this.getHost()) {
-                    return "16.0.0000.0000";
-                }
-                return null;
-            };
-            return Host;
-        })();
-        HostName.Host = Host;
-    })(HostName = OfficeExt.HostName || (OfficeExt.HostName = {}));
-})(OfficeExt || (OfficeExt = {}));
 Microsoft.Office.WebExtension.ApplicationMode = {
     WebEditor: "webEditor",
     WebViewer: "webViewer",
@@ -3571,7 +3489,8 @@ OSF.ShowWindowDialogParameterKeys = {
     Height: "height",
     DisplayInIframe: "displayInIframe",
     HideTitle: "hideTitle",
-    UseDeviceIndependentPixels: "useDeviceIndependentPixels"
+    UseDeviceIndependentPixels: "useDeviceIndependentPixels",
+    PromptBeforeOpen: "promptBeforeOpen"
 };
 OSF.HostThemeButtonStyleKeys = {
     ButtonBorderColor: "buttonBorderColor",
@@ -3586,7 +3505,9 @@ OSF.OmexPageParameterKeys = {
     AssetId: "assetid",
     NotificationType: "notificationType",
     AppCorrelationId: "corr",
-    AuthType: "authType"
+    AuthType: "authType",
+    AppId: "appid",
+    Scopes: "scopes"
 };
 OSF.AuthType = {
     Anonymous: 0,
@@ -3617,10 +3538,10 @@ var OfficeExt;
             return OSF.OUtil.parseInfoFromWindowName(skipSessionStorage, windowName, OSF.WindowNameItemKeys.AppContext);
         }
         WACUtils.parseAppContextFromWindowName = parseAppContextFromWindowName;
-        function serializeObjectToString(response) {
+        function serializeObjectToString(obj) {
             if (typeof (JSON) !== "undefined") {
                 try {
-                    return JSON.stringify(response);
+                    return JSON.stringify(obj);
                 }
                 catch (ex) {
                 }
@@ -3685,7 +3606,7 @@ var OfficeExt;
                 return false;
             }
             catch (e) {
-                OsfMsAjaxFactory.msAjaxDebug.trace("Error happens in shouldUseLocalStorageToPassMessage: " + e);
+                logExceptionToBrowserConsole("Error happens in shouldUseLocalStorageToPassMessage.", e);
                 return false;
             }
         }
@@ -3696,7 +3617,7 @@ var OfficeExt;
                 return userAgent.indexOf("MSIE ") > -1 || userAgent.indexOf("Trident/") > -1 || userAgent.indexOf("Edge/") > -1;
             }
             catch (e) {
-                OsfMsAjaxFactory.msAjaxDebug.trace("Error happens in isInternetExplorer: " + e);
+                logExceptionToBrowserConsole("Error happens in isInternetExplorer.", e);
                 return false;
             }
         }
@@ -3715,6 +3636,10 @@ var OfficeExt;
             }
         }
         WACUtils.removeMatchesFromLocalStorage = removeMatchesFromLocalStorage;
+        function logExceptionToBrowserConsole(message, exception) {
+            OsfMsAjaxFactory.msAjaxDebug.trace(message + " Exception details: " + serializeObjectToString(exception));
+        }
+        WACUtils.logExceptionToBrowserConsole = logExceptionToBrowserConsole;
         var CacheConstants = (function () {
             function CacheConstants() {
             }
@@ -3883,10 +3808,10 @@ var OfficeExt;
     OfficeExt.MsAjaxDebug = MsAjaxDebug;
     if (!OsfMsAjaxFactory.isMsAjaxLoaded()) {
         var registerTypeInternal = function registerTypeInternal(type, name, isClass) {
-            if (type.__typeName === undefined) {
+            if (type.__typeName === undefined || type.__typeName === null) {
                 type.__typeName = name;
             }
-            if (type.__class === undefined) {
+            if (type.__class === undefined || type.__class === null) {
                 type.__class = isClass;
             }
         };
@@ -5279,6 +5204,10 @@ OSF.InitializationHelper.prototype.getAppContext = function OSF_InitializationHe
         else {
             settings = appContext._settings;
         }
+        if (!me._hostInfo.isDialog || window.opener == null) {
+            var pageUrl = window.location.href;
+            me._webAppState.clientEndPoint.invoke("ContextActivationManager_notifyHost", null, [me._webAppState.id, OSF.AgaveHostAction.UpdateTargetUrl, pageUrl]);
+        }
         if (errorCode === 0 && appContext._id != undefined && appContext._appName != undefined && appContext._appVersion != undefined && appContext._appUILocale != undefined && appContext._dataLocale != undefined &&
             appContext._docUrl != undefined && appContext._clientMode != undefined && appContext._settings != undefined && appContext._reason != undefined) {
             me._appContext = appContext;
@@ -6143,7 +6072,7 @@ var OSFAppTelemetry;
         }
         appInfo.message = context.get_hostCustomMessage();
         appInfo.officeJSVersion = OSF.ConstantNames.FileVersion;
-        appInfo.hostJSVersion = "16.0.9227.1000";
+        appInfo.hostJSVersion = "16.0.10212.10000";
         if (context._wacHostEnvironment) {
             appInfo.wacHostEnvironment = context._wacHostEnvironment;
         }
@@ -9163,6 +9092,13 @@ OSF.DDA.AsyncMethodCalls.define({
                 "types": ["boolean"],
                 "defaultValue": false
             }
+        },
+        {
+            name: Microsoft.Office.WebExtension.Parameters.PromptBeforeOpen,
+            value: {
+                "types": ["boolean"],
+                "defaultValue": true
+            }
         }
     ],
     privateStateCallbacks: [],
@@ -9423,7 +9359,7 @@ var OfficeExt;
             Dialog.removeEventListenersForDialog = removeEventListenersForDialog;
             function handleNewWindowDialog(dialogInfo) {
                 try {
-                    if (OSF._OfficeAppFactory.getInitializationHelper()._appContext._skipNewWindowNotification) {
+                    if (!dialogInfo[OSF.ShowWindowDialogParameterKeys.PromptBeforeOpen]) {
                         showDialog(dialogInfo);
                         return;
                     }
@@ -10259,3 +10195,231 @@ OSF.InitializationHelper.prototype.prepareRightBeforeWebExtensionInitialize = fu
     var appCommandHandler = OfficeExt.AppCommand.AppCommandManager.instance();
     appCommandHandler.initializeAndChangeOnce();
 };
+
+
+
+window.OfficeExtensionBatch = window.OfficeExtension;
+
+
+
+!function(modules) {
+    var installedModules = {};
+    function __webpack_require__(moduleId) {
+        if (installedModules[moduleId]) return installedModules[moduleId].exports;
+        var module = installedModules[moduleId] = {
+            i: moduleId,
+            l: !1,
+            exports: {}
+        };
+        return modules[moduleId].call(module.exports, module, module.exports, __webpack_require__), 
+        module.l = !0, module.exports;
+    }
+    __webpack_require__.m = modules, __webpack_require__.c = installedModules, __webpack_require__.d = function(exports, name, getter) {
+        __webpack_require__.o(exports, name) || Object.defineProperty(exports, name, {
+            enumerable: !0,
+            get: getter
+        });
+    }, __webpack_require__.r = function(exports) {
+        "undefined" != typeof Symbol && Symbol.toStringTag && Object.defineProperty(exports, Symbol.toStringTag, {
+            value: "Module"
+        }), Object.defineProperty(exports, "__esModule", {
+            value: !0
+        });
+    }, __webpack_require__.t = function(value, mode) {
+        if (1 & mode && (value = __webpack_require__(value)), 8 & mode) return value;
+        if (4 & mode && "object" == typeof value && value && value.__esModule) return value;
+        var ns = Object.create(null);
+        if (__webpack_require__.r(ns), Object.defineProperty(ns, "default", {
+            enumerable: !0,
+            value: value
+        }), 2 & mode && "string" != typeof value) for (var key in value) __webpack_require__.d(ns, key, function(key) {
+            return value[key];
+        }.bind(null, key));
+        return ns;
+    }, __webpack_require__.n = function(module) {
+        var getter = module && module.__esModule ? function() {
+            return module.default;
+        } : function() {
+            return module;
+        };
+        return __webpack_require__.d(getter, "a", getter), getter;
+    }, __webpack_require__.o = function(object, property) {
+        return Object.prototype.hasOwnProperty.call(object, property);
+    }, __webpack_require__.p = "", __webpack_require__(__webpack_require__.s = 0);
+}([ function(module, exports, __webpack_require__) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", {
+        value: !0
+    });
+    var AsyncStorage = __webpack_require__(1), DialogApi = __webpack_require__(2);
+    window._OfficeRuntimeWeb = {
+        displayWebDialog: DialogApi.displayWebDialog,
+        AsyncStorage: AsyncStorage
+    };
+}, function(module, exports, __webpack_require__) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", {
+        value: !0
+    });
+    var prefix = "_Office_AsyncStorage_", dummyUnusedKey = prefix + "|_unusedKey_";
+    function ensureFreshLocalStorage() {
+        window.localStorage.setItem(dummyUnusedKey, null), window.localStorage.removeItem(dummyUnusedKey);
+    }
+    function performAction(action, callback) {
+        return void 0 === callback && (callback = function() {}), new Promise(function(resolve, reject) {
+            try {
+                ensureFreshLocalStorage(), action(), callback(null), resolve();
+            } catch (e) {
+                callback(e), reject(e);
+            }
+        });
+    }
+    function performActionAndReturnResult(action, callback) {
+        return void 0 === callback && (callback = function() {}), new Promise(function(resolve, reject) {
+            try {
+                ensureFreshLocalStorage();
+                var result = action();
+                callback(null, result), resolve(result);
+            } catch (e) {
+                callback(e, null), reject(e);
+            }
+        });
+    }
+    function performMultiAction(collection, action, callback) {
+        return void 0 === callback && (callback = function() {}), new Promise(function(resolve, reject) {
+            var errors = [];
+            try {
+                ensureFreshLocalStorage();
+            } catch (e) {
+                errors.push(e);
+            }
+            collection.forEach(function(item) {
+                try {
+                    action(item);
+                } catch (e) {
+                    errors.push(e);
+                }
+            }), callback(errors), errors.length > 0 ? reject(errors) : resolve();
+        });
+    }
+    exports.getItem = function(key, callback) {
+        return performActionAndReturnResult(function() {
+            return window.localStorage.getItem(prefix + key);
+        }, callback);
+    }, exports.setItem = function(key, value, callback) {
+        return performAction(function() {
+            return window.localStorage.setItem(prefix + key, value);
+        }, callback);
+    }, exports.removeItem = function(key, callback) {
+        return performAction(function() {
+            return window.localStorage.removeItem(prefix + key);
+        }, callback);
+    }, exports.clear = function(callback) {
+        return performAction(function() {
+            Object.keys(window.localStorage).filter(function(fullKey) {
+                return 0 === fullKey.indexOf(prefix);
+            }).forEach(function(fullKey) {
+                return window.localStorage.removeItem(fullKey);
+            });
+        }, callback);
+    }, exports.getAllKeys = function(callback) {
+        return performActionAndReturnResult(function() {
+            return Object.keys(window.localStorage).filter(function(fullKey) {
+                return 0 === fullKey.indexOf(prefix);
+            }).map(function(fullKey) {
+                return fullKey.substr(prefix.length);
+            });
+        }, callback);
+    }, exports.multiSet = function(keyValuePairs, callback) {
+        return performMultiAction(keyValuePairs, function(_a) {
+            var key = _a[0], value = _a[1];
+            return window.localStorage.setItem(prefix + key, value);
+        }, callback);
+    }, exports.multiRemove = function(keys, callback) {
+        return performMultiAction(keys, function(key) {
+            return window.localStorage.removeItem(prefix + key);
+        }, callback);
+    }, exports.multiGet = function(keys, callback) {
+        return new Promise(function(resolve, reject) {
+            callback || (callback = function() {});
+            var errors = [], results = keys.map(function(key) {
+                try {
+                    return [ key, window.localStorage.getItem(prefix + key) ];
+                } catch (e) {
+                    errors.push(e);
+                }
+            }).filter(function(pair) {
+                return pair;
+            });
+            errors.length > 0 ? (callback(errors, results), reject(errors)) : (callback(null, results), 
+            resolve(results));
+        });
+    };
+}, function(module, exports, __webpack_require__) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", {
+        value: !0
+    });
+    var OfficeExtension = __webpack_require__(3), Dialog = function() {
+        function Dialog(_dialog) {
+            this._dialog = _dialog;
+        }
+        return Dialog.prototype.close = function() {
+            return this._dialog.close(), OfficeExtension.CoreUtility.Promise.resolve();
+        }, Dialog;
+    }();
+    exports.Dialog = Dialog, exports.displayWebDialog = function(url, options) {
+        return new OfficeExtension.CoreUtility.Promise(function(resolve, reject) {
+            if (options.width && options.height && (!isInt(options.width) || !isInt(options.height))) throw new OfficeExtension.Error({
+                code: "InvalidArgument",
+                message: 'Dimensions must be "number%" or number.'
+            });
+            var dialog, dialogOptions = {
+                width: options.width ? parseInt(options.width, 10) : 50,
+                height: options.height ? parseInt(options.height, 10) : 50,
+                displayInIframe: options.displayInIFrame || !1
+            };
+            function messageHandler(args) {
+                options.onMessage && options.onMessage(args.message, dialog);
+            }
+            function eventHandler(args) {
+                12006 === args.error ? options.onClose && options.onClose() : options.onRuntimeError && options.onRuntimeError(new OfficeExtension.Error(lookupErrorCodeAndMessage(args.error)), dialog);
+            }
+            function isInt(value) {
+                return /^(\-|\+)?([0-9]+)%?$/.test(value);
+            }
+            function lookupErrorCodeAndMessage(internalCode) {
+                var _a, table = ((_a = {})[12002] = {
+                    code: "InvalidUrl",
+                    message: "Cannot load URL, no such page or bad URL syntax."
+                }, _a[12003] = {
+                    code: "InvalidUrl",
+                    message: "HTTPS is required."
+                }, _a[12004] = {
+                    code: "Untrusted",
+                    message: "Domain is not trusted."
+                }, _a[12005] = {
+                    code: "InvalidUrl",
+                    message: "HTTPS is required."
+                }, _a[12007] = {
+                    code: "FailedToOpen",
+                    message: "Another dialog is already opened."
+                }, _a);
+                return table[internalCode] ? table[internalCode] : {
+                    code: "Unknown",
+                    message: "An unknown error has occured"
+                };
+            }
+            Office.context.ui.displayDialogAsync(url, dialogOptions, function(asyncResult) {
+                "failed" === asyncResult.status ? reject(new OfficeExtension.Error(lookupErrorCodeAndMessage(asyncResult.error.code))) : ((dialog = asyncResult.value).addEventHandler(Office.EventType.DialogMessageReceived, messageHandler), 
+                dialog.addEventHandler(Office.EventType.DialogEventReceived, eventHandler), resolve(new Dialog(dialog)));
+            });
+        });
+    };
+}, function(module, exports) {
+    module.exports = OfficeExtensionBatch;
+} ]);
+
+
+
+window.OfficeRuntime = window._OfficeRuntimeWeb;

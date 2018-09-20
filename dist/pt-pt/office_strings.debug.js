@@ -1,4 +1,4 @@
-/* Version: 16.0.9309.1000 */
+/* Version: 16.0.10827.10000 */
 
 Type.registerNamespace("Strings");
 Strings.OfficeOM = function()
@@ -33,8 +33,8 @@ Strings.OfficeOM.L_CoercionTypeNotSupported = "O tipo de coerção especificado 
 Strings.OfficeOM.L_ColIndexOutOfRange = "O valor do índice de colunas encontra-se fora do intervalo permitido. Utilize um valor (0 ou superior) que seja inferior ao número de colunas.";
 Strings.OfficeOM.L_ConnectionFailureWithDetails = "O pedido falhou com o código de estado {0}, código de erro {1} e a seguinte mensagem de erro: {2}";
 Strings.OfficeOM.L_ConnectionFailureWithStatus = "O pedido falhou com o código de estado {0}.";
-Strings.OfficeOM.L_CustomFunctionDefinitionMissing = "Tem de existir uma propriedade com este nome na classe Excel.CustomFunctions que represente a definição da função.";
-Strings.OfficeOM.L_CustomFunctionImplementationMissing = 'A propriedade com este nome na classe Excel.CustomFunctions que representa a definição da função tem de conter uma propriedade "call" que implemente a função.';
+Strings.OfficeOM.L_CustomFunctionDefinitionMissing = "Tem de existir em Excel.Script.CustomFunctions uma propriedade com este nome que represente a definição da função.";
+Strings.OfficeOM.L_CustomFunctionImplementationMissing = 'A propriedade com este nome em Excel.Script.CustomFunctions que representa a definição da função tem de conter uma propriedade "call" que implemente a função.';
 Strings.OfficeOM.L_CustomFunctionNameCannotSplit = "O nome da função tem de conter um espaço de nomes não vazio e um nome abreviado não vazio.";
 Strings.OfficeOM.L_CustomFunctionNameContainsBadChars = "O nome da função só pode conter letras, algarismos, carateres de sublinhado e pontos finais.";
 Strings.OfficeOM.L_CustomXmlError = "Erro de XML Personalizado.";
@@ -157,6 +157,7 @@ Strings.OfficeOM.L_SSOConnectionLostError = "Foi perdida uma ligação durante o
 Strings.OfficeOM.L_SSOConnectionLostErrorMessage = "Foi perdida uma ligação durante o processo de início de sessão e o utilizador poderá não ter sessão iniciada. Isto deve-se provavelmente às definições de configuração do browser do utilizador, como as zonas de segurança.";
 Strings.OfficeOM.L_SSOServerError = "Ocorreu um erro no fornecedor de autenticação.";
 Strings.OfficeOM.L_SSOServerErrorMessage = "Ocorreu um erro inesperado no servidor.";
+Strings.OfficeOM.L_SSOUnsupportedPlatform = "A API não é suportada nesta plataforma.";
 Strings.OfficeOM.L_SSOUserConsentNotSupportedByCurrentAddinCategory = "Este suplemento não suporta o consentimento do utilizador.";
 Strings.OfficeOM.L_SSOUserConsentNotSupportedByCurrentAddinCategoryMessage = "A operação falhou porque este suplemento não suporta o consentimento do utilizador nesta categoria";
 Strings.OfficeOM.L_SaveSettingsError = "Erro ao Guardar Definições";

@@ -1,7 +1,7 @@
 {
     "name": "@microsoft/office-js",
     "description": "Office JavaScript APIs",
-    "version": "1.1.7-beta.0",
+    "version": "1.1.9-beta.0",
     "keywords": [
         "Office Add-ins",
         "Office JavaScript API",
