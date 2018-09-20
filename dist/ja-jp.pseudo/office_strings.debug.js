@@ -1,4 +1,4 @@
-/* Version: 16.0.9314.1000 */
+/* Version: 16.0.10827.10000 */
 
 Type.registerNamespace("Strings");
 Strings.OfficeOM = function()
@@ -157,6 +157,7 @@ Strings.OfficeOM.L_SSOConnectionLostError = "[OG:Á çöññê¢tíøñ wäs ló
 Strings.OfficeOM.L_SSOConnectionLostErrorMessage = "[OG:Ã çòññëçtíøñ wàs löst ðüríñg thë sîgñ ïñ prö¢êss, âñð thê ùsër mâÿ ñöt þé sìgñéð íñ. Thîs wås lîkélý ðüé tô thè üsêr's þröwsér çòñfïgûrátïóñ sèttïñgs, sùçh æs sé¢ûrìtý zøñès.瑞갂偁略 яšæẤßソ瑞갂偁略 яšæẤßソ瑞갂偁略 яšæẤßソ瑞갂偁略 яšæథ్క لإَّ'Ii.]";
 Strings.OfficeOM.L_SSOServerError = "[OG:Ërrõr ö¢¢µrrèð îñ thê äµthéñtï¢âtíòñ prøvíðèr.瑞갂偁略 яšæẤßソథ్క لإَّ'Ii.]";
 Strings.OfficeOM.L_SSOServerErrorMessage = "[OG:Âñ ûñêxpè¢têð ërròr òççürrêð ôñ thê sérvêr.瑞갂偁略 яšæẤßథ్క لإَّ'Ii.]";
+Strings.OfficeOM.L_SSOUnsupportedPlatform = "[OG:ÃPÌ ìs ñöt sùppórtèð ïñ thïs plâtførm.瑞갂偁略 яšæẤథ్క لإَّ'Ii.]";
 Strings.OfficeOM.L_SSOUserConsentNotSupportedByCurrentAddinCategory = "[OG:Thìs àðð-îñ ðõès ñõt sûppõrt üsèr çöñséñt.瑞갂偁略 яšæẤథ్క لإَّ'Ii.]";
 Strings.OfficeOM.L_SSOUserConsentNotSupportedByCurrentAddinCategoryMessage = "[OG:Thé õpêrªtïóñ fäïléð þé¢åµsê thîs ªðð-íñ ðòés ñöt süppört úsër ¢óñsêñt ïñ thïs çätêgörý瑞갂偁略 яšæẤßソ瑞갂偁略 яšæẤథ్క لإَّ'Ii.]";
 Strings.OfficeOM.L_SaveSettingsError = "[:§ªvè §êttîñgs Érrør瑞갂偁略 థ్క لإَّ'Ii.]";

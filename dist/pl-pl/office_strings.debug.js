@@ -1,4 +1,4 @@
-/* Version: 16.0.9314.1000 */
+/* Version: 16.0.10827.10000 */
 
 Type.registerNamespace("Strings");
 Strings.OfficeOM = function()
@@ -33,8 +33,8 @@ Strings.OfficeOM.L_CoercionTypeNotSupported = "Określony typ przekształcenia n
 Strings.OfficeOM.L_ColIndexOutOfRange = "Wartość indeksu kolumny jest spoza dozwolonego zakresu. Użyj wartości (0 lub wyższej) mniejszej od liczby kolumn.";
 Strings.OfficeOM.L_ConnectionFailureWithDetails = "Żądanie zakończyło się niepowodzeniem. Kod stanu: {0}, kod błędu: {1}, komunikat o błędzie: {2}";
 Strings.OfficeOM.L_ConnectionFailureWithStatus = "Żądanie zakończyło się niepowodzeniem z kodem stanu {0}.";
-Strings.OfficeOM.L_CustomFunctionDefinitionMissing = "Właściwość o tej nazwie, która reprezentuje definicję funkcji, musi istnieć w klasie Excel.CustomFunctions.";
-Strings.OfficeOM.L_CustomFunctionImplementationMissing = "Właściwość o tej nazwie w klasie Excel.CustomFunctions, która reprezentuje definicję funkcji, musi zawierać właściwość „call”, która zawiera implementację funkcji.";
+Strings.OfficeOM.L_CustomFunctionDefinitionMissing = "Właściwość o tej nazwie, która reprezentuje definicję funkcji, musi istnieć w klasie Excel.Script.CustomFunctions.";
+Strings.OfficeOM.L_CustomFunctionImplementationMissing = "Właściwość o tej nazwie w klasie Excel.Script.CustomFunctions, która reprezentuje definicję funkcji, musi zawierać właściwość „call”, która zawiera implementację funkcji.";
 Strings.OfficeOM.L_CustomFunctionNameCannotSplit = "Nazwa funkcji musi zawierać niepustą przestrzeń nazw i niepustą krótką nazwę.";
 Strings.OfficeOM.L_CustomFunctionNameContainsBadChars = "Nazwa funkcji może zawierać tylko litery, cyfry, znaki podkreślenia i kropki.";
 Strings.OfficeOM.L_CustomXmlError = "Błąd niestandardowego kodu XML.";
@@ -157,6 +157,7 @@ Strings.OfficeOM.L_SSOConnectionLostError = "Połączenie zostało utracone podc
 Strings.OfficeOM.L_SSOConnectionLostErrorMessage = "Połączenie zostało utracone podczas procesu logowania się i użytkownik może nie być zalogowany. Jest to prawdopodobnie spowodowane przez ustawienia konfiguracji przeglądarki użytkownika, takie jak strefy zabezpieczeń.";
 Strings.OfficeOM.L_SSOServerError = "Wystąpił błąd dostawcy uwierzytelniania.";
 Strings.OfficeOM.L_SSOServerErrorMessage = "Wystąpił nieoczekiwany błąd na serwerze.";
+Strings.OfficeOM.L_SSOUnsupportedPlatform = "Interfejs API nie jest obsługiwany na tej platformie.";
 Strings.OfficeOM.L_SSOUserConsentNotSupportedByCurrentAddinCategory = "Ten dodatek nie obsługuje zgody użytkownika.";
 Strings.OfficeOM.L_SSOUserConsentNotSupportedByCurrentAddinCategoryMessage = "Operacja nie powiodła się, ponieważ ten dodatek nie obsługuje zgody użytkownika w tej kategorii";
 Strings.OfficeOM.L_SaveSettingsError = "Błąd zapisu ustawień";

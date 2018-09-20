@@ -1,4 +1,4 @@
-/* Version: 16.0.9314.1000 */
+/* Version: 16.0.10827.10000 */
 
 Type.registerNamespace("Strings");
 Strings.OfficeOM = function()
@@ -33,8 +33,8 @@ Strings.OfficeOM.L_CoercionTypeNotSupported = "Määritettyä pakotustyyppiä ei
 Strings.OfficeOM.L_ColIndexOutOfRange = "Sarakkeen indeksiarvo on sallitun alueen ulkopuolella. Käytä arvoa (vähintään 0), joka on pienempi kuin rivien määrä.";
 Strings.OfficeOM.L_ConnectionFailureWithDetails = "Pyyntö epäonnistui. Tilakoodi on {0} ja virhekoodi on {1}. Virheviesti on seuraava: {2}";
 Strings.OfficeOM.L_ConnectionFailureWithStatus = "Pyyntö epäonnistui tilakoodilla {0}.";
-Strings.OfficeOM.L_CustomFunctionDefinitionMissing = "Excel.CustomFunctions-kohteessa on oltava tämänniminen ominaisuus, joka kuvaa funktion määritystä.";
-Strings.OfficeOM.L_CustomFunctionImplementationMissing = "Excel.CustomFunctions-kohteen tämännimisessä ominaisuudessa, joka kuvaa funktion määritystä, on oltava call-ominaisuus, joka ottaa funktion käyttöön.";
+Strings.OfficeOM.L_CustomFunctionDefinitionMissing = "Excel.Script.CustomFunctions-kohteessa on oltava tämän niminen ominaisuus, joka kuvaa funktion määritystä.";
+Strings.OfficeOM.L_CustomFunctionImplementationMissing = "Excel.Script.CustomFunctions-kohteen tämän nimisessä ominaisuudessa, joka kuvaa funktion määritystä, on oltava call-ominaisuus, joka ottaa funktion käyttöön.";
 Strings.OfficeOM.L_CustomFunctionNameCannotSplit = "Funktion nimessä on oltava muu kuin tyhjä nimitila ja muu kuin tyhjä lyhyt nimi.";
 Strings.OfficeOM.L_CustomFunctionNameContainsBadChars = "Funktion nimessä voi olla ainoastaan kirjaimia, lukuja, alaviivoja ja pisteitä.";
 Strings.OfficeOM.L_CustomXmlError = "Mukautettu XML -virhe.";
@@ -157,6 +157,7 @@ Strings.OfficeOM.L_SSOConnectionLostError = "Yhteys katkesi kirjautumisen aikana
 Strings.OfficeOM.L_SSOConnectionLostErrorMessage = "Yhteys katkesi kirjautumisen aikana, eikä käyttäjää ehkä kirjattu sisään. Tämä johtui todennäköisesti käyttäjän selaimen määritysasetuksista, esimerkiksi suojausvyöhykkeistä.";
 Strings.OfficeOM.L_SSOServerError = "Virhe käyttöoikeuksien todentamispalvelun tarjoajassa.";
 Strings.OfficeOM.L_SSOServerErrorMessage = "Odottamaton palvelinvirhe.";
+Strings.OfficeOM.L_SSOUnsupportedPlatform = "Tämä ympäristö ei tue ohjelmointirajapintoja.";
 Strings.OfficeOM.L_SSOUserConsentNotSupportedByCurrentAddinCategory = "Tämä apuohjelma ei tue käyttäjän suostumusta.";
 Strings.OfficeOM.L_SSOUserConsentNotSupportedByCurrentAddinCategoryMessage = "Toiminto epäonnistui, koska apuohjelma ei tue käyttäjän suostumusta tässä luokassa";
 Strings.OfficeOM.L_SaveSettingsError = "Asetuksien tallennusvirhe";

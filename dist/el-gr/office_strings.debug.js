@@ -1,4 +1,4 @@
-/* Version: 16.0.9314.1000 */
+/* Version: 16.0.10827.10000 */
 
 Type.registerNamespace("Strings");
 Strings.OfficeOM = function()
@@ -33,8 +33,8 @@ Strings.OfficeOM.L_CoercionTypeNotSupported = "Ο καθορισμένος τύ�
 Strings.OfficeOM.L_ColIndexOutOfRange = "Η τιμή δείκτη στήλης βρίσκεται εκτός της επιτρεπόμενης περιοχής. Χρησιμοποιήστε μια τιμή (0 ή υψηλότερη) η οποία θα είναι μικρότερη από το πλήθος των στηλών.";
 Strings.OfficeOM.L_ConnectionFailureWithDetails = "Η αίτηση απέτυχε με κωδικό κατάστασης {0}, κωδικό σφάλματος {1} και το ακόλουθο μήνυμα σφάλματος: {2}";
 Strings.OfficeOM.L_ConnectionFailureWithStatus = "Η αίτηση απέτυχε με κωδικό κατάστασης {0}.";
-Strings.OfficeOM.L_CustomFunctionDefinitionMissing = "Πρέπει να υπάρχει μια ιδιότητα με αυτό το όνομα που αναπαριστά τον ορισμό της συνάρτησης στην κλάση Excel.CustomFunctions.";
-Strings.OfficeOM.L_CustomFunctionImplementationMissing = "Η ιδιότητα με αυτό το όνομα στην κλάση Excel.CustomFunctions που αναπαριστά τον ορισμό της συνάρτησης πρέπει να περιέχει μια ιδιότητα 'call' που υλοποιεί τη συνάρτηση.";
+Strings.OfficeOM.L_CustomFunctionDefinitionMissing = "Μια ιδιότητα με αυτό το όνομα που αντιπροσωπεύει τον ορισμό της συνάρτησης πρέπει να υπάρχει στην κλάση Excel.Script.CustomFunctions.";
+Strings.OfficeOM.L_CustomFunctionImplementationMissing = 'Η ιδιότητα με αυτό το όνομα στην κλάση Excel.Script.CustomFunctions, η οποία αντιπροσωπεύει τον ορισμό της συνάρτησης πρέπει να περιέχει μια ιδιότητα "call" που υλοποιεί τη συνάρτηση.';
 Strings.OfficeOM.L_CustomFunctionNameCannotSplit = "Το όνομα της συνάρτησης πρέπει να περιέχει έναν μη κενό χώρο ονομάτων και ένα μη κενό σύντομο όνομα.";
 Strings.OfficeOM.L_CustomFunctionNameContainsBadChars = "Το όνομα της συνάρτησης πρέπει να περιέχει μόνο γράμματα, ψηφία, χαρακτήρες υπογράμμισης και τελείες.";
 Strings.OfficeOM.L_CustomXmlError = "Σφάλμα προσαρμοσμένης XML.";
@@ -157,6 +157,7 @@ Strings.OfficeOM.L_SSOConnectionLostError = "Μια σύνδεση χάθηκε 
 Strings.OfficeOM.L_SSOConnectionLostErrorMessage = "Μια σύνδεση χάθηκε κατά τη διαδικασία εισόδου και ο χρήστης ενδέχεται να μην έχει εισέλθει. Η πιθανότερη αιτία είναι οι ρυθμίσεις του προγράμματος περιήγησης του χρήστη, για παράδειγμα, οι ζώνες ασφάλειας.";
 Strings.OfficeOM.L_SSOServerError = "Παρουσιάστηκε σφάλμα στην υπηρεσία παροχής ελέγχου ταυτότητας.";
 Strings.OfficeOM.L_SSOServerErrorMessage = "Παρουσιάστηκε μη αναμενόμενο σφάλμα στο διακομιστή.";
+Strings.OfficeOM.L_SSOUnsupportedPlatform = "Το API δεν υποστηρίζεται σε αυτήν την πλατφόρμα.";
 Strings.OfficeOM.L_SSOUserConsentNotSupportedByCurrentAddinCategory = "Αυτό το πρόσθετο δεν υποστηρίζει τη συγκατάθεση του χρήστη.";
 Strings.OfficeOM.L_SSOUserConsentNotSupportedByCurrentAddinCategoryMessage = "Η λειτουργία απέτυχε, καθώς αυτό το πρόσθετο δεν υποστηρίζει τη συγκατάθεση του χρήστη σε αυτή την κατηγορία";
 Strings.OfficeOM.L_SaveSettingsError = "Σφάλμα ρυθμίσεων αποθήκευσης";

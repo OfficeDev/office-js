@@ -1,4 +1,4 @@
-/* Version: 16.0.9314.1000 */
+/* Version: 16.0.10827.10000 */
 
 Type.registerNamespace("_u");
 _u.ExtensibilityStrings = function()
@@ -14,6 +14,7 @@ _u.ExtensibilityStrings.l_AttachmentErrorName_Text = "Błąd załącznika";
 _u.ExtensibilityStrings.l_AttachmentExceededSize_Text = "Nie można dodać załącznika, ponieważ jest za duży.";
 _u.ExtensibilityStrings.l_AttachmentItemIdTooLong_Text = "Co najmniej jeden identyfikator załącznika jest za długi.";
 _u.ExtensibilityStrings.l_AttachmentNameTooLong_Text = "Co najmniej jedna nazwa załącznika jest za długa.";
+_u.ExtensibilityStrings.l_AttachmentNotSupported_Text = "Typ załącznika jest nieobsługiwany.";
 _u.ExtensibilityStrings.l_AttachmentUploadGeneralFailure_Text = "Nie można dodać załącznika do elementu.";
 _u.ExtensibilityStrings.l_AttachmentUrlTooLong_Text = "Co najmniej jeden adres URL załącznika jest za długi.";
 _u.ExtensibilityStrings.l_CallSaveAsyncBeforeToken_Text = "Nie można pobrać tokenu, dopóki element nie zostanie zapisany.";
@@ -31,9 +32,11 @@ _u.ExtensibilityStrings.l_EmailAddressTooLong_Text = "Co najmniej jeden z podany
 _u.ExtensibilityStrings.l_EwsRequestOversized_Text = "Żądanie przekracza limit rozmiaru 1 MB. Zmodyfikuj żądanie EWS.";
 _u.ExtensibilityStrings.l_ExceededMaxNumberOfAttachments_Text = "Nie można dodać załączników, ponieważ wiadomość zawiera już maksymalną liczbę załączników";
 _u.ExtensibilityStrings.l_HtmlSanitizationFailure_Text = "Oczyszczanie kodu HTML nie powiodło się.";
-_u.ExtensibilityStrings.l_Insufficient_Item_Permissions_Text = "The user doesn't have the permissions required to perform this operation.";
+_u.ExtensibilityStrings.l_Insufficient_Item_Permissions_Text = "Użytkownik nie ma uprawnień wymaganych do wykonania tej operacji.";
 _u.ExtensibilityStrings.l_InternalFormatError_Text = "Wystąpił wewnętrzny błąd formatu.";
 _u.ExtensibilityStrings.l_InternalProtocolError_Text = "Wewnętrzny błąd protokołu: „{0}”.";
+_u.ExtensibilityStrings.l_Internal_Server_Error_Text = "Serwer programu Exchange zwrócił błąd. Więcej informacji można znaleźć w obiekcie diagnostyki.";
+_u.ExtensibilityStrings.l_Internet_Not_Connected_Error_Text = "Użytkownik nie jest już połączony z siecią. Sprawdź połączenie sieciowe i spróbuj ponownie.";
 _u.ExtensibilityStrings.l_InvalidActionType_Text = "Wartość parametru „actionType” jest nieprawidłowa. Akceptowana wartość to „showTaskPane”."
 _u.ExtensibilityStrings.l_InvalidAttachmentId_Text = "Identyfikator załącznika był nieprawidłowy.";
 _u.ExtensibilityStrings.l_InvalidAttachmentPath_Text = "Ścieżka załącznika była nieprawidłowa.";
@@ -51,12 +54,15 @@ _u.ExtensibilityStrings.l_NullOrEmptyParameterError_Text = "Parametr „{0}” j
 _u.ExtensibilityStrings.l_NumberOfNotificationsExceeded_Text = "Nie można dodać powiadomienia, ponieważ osiągnięto limit powiadomień.";
 _u.ExtensibilityStrings.l_NumberOfRecipientsExceeded_Text = "Łączna liczba adresatów w polu nie może przekroczyć {0}.";
 _u.ExtensibilityStrings.l_OffsetNotfound_Text = "Nie można odnaleźć przesunięcia dla tej sygnatury czasowej.";
+_u.ExtensibilityStrings.l_Olk_Http_Error_Text = "Żądanie nie powiodło się. Kod błędu HTTP można znaleźć w obiekcie diagnostyki.";
 _u.ExtensibilityStrings.l_ParameterValueTooLongError_Text = "Wartość parametru „{0}” jest za długa. Maksymalna liczba znaków wynosi „{1}”.";
 _u.ExtensibilityStrings.l_ParametersNotAsExpected_Text = "Podane parametry są niezgodne z oczekiwanym formatem.";
 _u.ExtensibilityStrings.l_PersistedNotificationArrayReadError_Text = "Wywołanie interfejsu API nie powiodło się, ponieważ nie można pobrać zapisanych powiadomień.";
 _u.ExtensibilityStrings.l_PersistedNotificationArraySaveError_Text = "Wywołanie interfejsu API nie powiodło się, ponieważ nie można zapisać powiadomień.";
 _u.ExtensibilityStrings.l_RecurrenceErrorMaxOccurrences_Text = "Seria cykliczna przekracza maksymalny limit 999 wystąpień.";
 _u.ExtensibilityStrings.l_RecurrenceErrorZeroOccurrences_Text = "Seria cykliczna nie ma żadnych wystąpień w określonym zakresie dat.";
+_u.ExtensibilityStrings.l_RecurrenceInvalidTimeZone_Text = "Podana strefa czasowa nie jest obsługiwana.";
+_u.ExtensibilityStrings.l_RecurrenceUnsupportedAlternateCalendar_Text = "Wzorzec cyklu został ustawiony przez użytkownika za pomocą kalendarza alternatywnego, który nie jest obsługiwany.";
 _u.ExtensibilityStrings.l_Recurrence_Error_Instance_SetAsync_Text = "Nie można ustawić wzorca cyklu dla pojedynczego wystąpienia w serii.";
 _u.ExtensibilityStrings.l_Recurrence_Error_Properties_Invalid_Text = "Wzorzec cyklu jest nieprawidłowy. Sprawdź, czy określone właściwości cyklu są zgodne z typem cyklu.";
 _u.ExtensibilityStrings.l_SaveError_Text = "Wystąpił błąd połączenia podczas próby zapisania elementu na serwerze.";

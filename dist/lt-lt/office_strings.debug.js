@@ -1,4 +1,4 @@
-/* Version: 16.0.9314.1000 */
+/* Version: 16.0.10827.10000 */
 
 Type.registerNamespace("Strings");
 Strings.OfficeOM = function()
@@ -33,8 +33,8 @@ Strings.OfficeOM.L_CoercionTypeNotSupported = "Nurodytas konvertavimo tipas nepa
 Strings.OfficeOM.L_ColIndexOutOfRange = "Stulpelių indekso reikšmė nepriklauso leidžiamam diapazonui. Naudokite reikšmę (0 arba didesnę), kuri būtų mažesnė už stulpelių skaičių.";
 Strings.OfficeOM.L_ConnectionFailureWithDetails = "Užklausa nepavyko, būsenos kodas {0}, klaidos kodas {1}, klaidos pranešimas: {2}";
 Strings.OfficeOM.L_ConnectionFailureWithStatus = "Užklausa nepavyko, būsenos kodas {0}.";
-Strings.OfficeOM.L_CustomFunctionDefinitionMissing = "Excel.CustomFunctions klasėje turi būti ypatybė su šiuo pavadinimu, kuris nurodo funkcijos apibrėžimą.";
-Strings.OfficeOM.L_CustomFunctionImplementationMissing = "Excel.CustomFunctions klasės ypatybėje su šiuo pavadinimu, nurodančioje funkcijos apibrėžimą, turi būti ypatybė „call“, realizuojanti funkciją.";
+Strings.OfficeOM.L_CustomFunctionDefinitionMissing = "Excel.Script.CustomFunctions klasėje turi būti ypatybė su šiuo pavadinimu, kuris nurodo funkcijos apibrėžimą.";
+Strings.OfficeOM.L_CustomFunctionImplementationMissing = "Excel.Script.CustomFunctions klasės ypatybėje su šiuo pavadinimu, nurodančioje funkcijos apibrėžimą, turi būti ypatybė „call“, realizuojanti funkciją.";
 Strings.OfficeOM.L_CustomFunctionNameCannotSplit = "Funkcijos pavadinime negali būti tuščios vardų srities ir tuščio trumpo pavadinimo.";
 Strings.OfficeOM.L_CustomFunctionNameContainsBadChars = "Funkcijos pavadinime gali būti tik raidės, skaičiai, pabraukimo simboliai ir taškai.";
 Strings.OfficeOM.L_CustomXmlError = "Pasirinktinio XML klaida.";
@@ -157,6 +157,7 @@ Strings.OfficeOM.L_SSOConnectionLostError = "Prisijungiant nutrūko ryšys.";
 Strings.OfficeOM.L_SSOConnectionLostErrorMessage = "Prisijungiant nutrūko ryšys, vartotojas gali būti neprisijungęs. Taip galėjo atsitikti dėl vartotojo naršyklės konfigūravimo parametrų, pvz., saugos zonų.";
 Strings.OfficeOM.L_SSOServerError = "Įvyko autentifikavimo teikėjo klaida.";
 Strings.OfficeOM.L_SSOServerErrorMessage = "Serveryje įvyko netikėta klaida.";
+Strings.OfficeOM.L_SSOUnsupportedPlatform = "API nepalaikoma šioje platformoje.";
 Strings.OfficeOM.L_SSOUserConsentNotSupportedByCurrentAddinCategory = "Šis papildinys nepalaiko vartotojo sutikimo.";
 Strings.OfficeOM.L_SSOUserConsentNotSupportedByCurrentAddinCategoryMessage = "Operacija nepavyko, nes šis papildinys nepalaiko vartotojo sutikimo šioje kategorijoje";
 Strings.OfficeOM.L_SaveSettingsError = "Parametrų įrašymo klaida";

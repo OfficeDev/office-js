@@ -1,4 +1,4 @@
-/* Version: 16.0.9314.1000 */
+/* Version: 16.0.10827.10000 */
 
 Type.registerNamespace("Strings");
 Strings.OfficeOM = function()
@@ -33,8 +33,8 @@ Strings.OfficeOM.L_CoercionTypeNotSupported = "Tipul de impunere specificat nu e
 Strings.OfficeOM.L_ColIndexOutOfRange = "Valoarea de index a coloanei este în afara intervalului permis. Utilizați o valoare (0 sau mai mare) care este mai mică decât numărul de coloane.";
 Strings.OfficeOM.L_ConnectionFailureWithDetails = "Solicitarea nu a reușit, cu codul de stare {0}, codul de eroare {1} și următorul mesaj de eroare: {2}";
 Strings.OfficeOM.L_ConnectionFailureWithStatus = "Solicitarea nu a reușit, cu codul de stare {0}.";
-Strings.OfficeOM.L_CustomFunctionDefinitionMissing = "O proprietate cu acest nume care reprezintă definiția funcției trebuie să existe în Excel.CustomFunctions.";
-Strings.OfficeOM.L_CustomFunctionImplementationMissing = "Proprietatea cu acest nume din Excel.CustomFunctions care reprezintă definiția funcției trebuie să conțină o proprietate „call”, care implementează funcția.";
+Strings.OfficeOM.L_CustomFunctionDefinitionMissing = "O proprietate cu acest nume care reprezintă definiția funcției trebuie să existe în Excel.Script.CustomFunctions.";
+Strings.OfficeOM.L_CustomFunctionImplementationMissing = "Proprietatea cu acest nume din Excel.Script.CustomFunctions ce reprezintă definiția funcției trebuie să conțină o proprietate de „apel”, care implementează funcția.";
 Strings.OfficeOM.L_CustomFunctionNameCannotSplit = "Numele funcției trebuie să conțină un spațiu de nume care nu este gol și un nume scurt care nu este gol.";
 Strings.OfficeOM.L_CustomFunctionNameContainsBadChars = "Numele funcției poate conține numai litere, cifre, linii de subliniere și puncte.";
 Strings.OfficeOM.L_CustomXmlError = "Eroare XML particularizat.";
@@ -157,6 +157,7 @@ Strings.OfficeOM.L_SSOConnectionLostError = "O conexiune a fost pierdută în ti
 Strings.OfficeOM.L_SSOConnectionLostErrorMessage = "O conexiune a fost pierdută în timpul procesului de conectare și este posibil ca utilizatorul să nu fie conectat. Acest lucru a fost cauzat probabil de setările de configurare ale browserului utilizatorului, cum ar fi zonele de securitate.";
 Strings.OfficeOM.L_SSOServerError = "Eroare apărută la furnizorul de autentificare.";
 Strings.OfficeOM.L_SSOServerErrorMessage = "Eroare neașteptată pe server.";
+Strings.OfficeOM.L_SSOUnsupportedPlatform = "API-ul nu este acceptat în această platformă.";
 Strings.OfficeOM.L_SSOUserConsentNotSupportedByCurrentAddinCategory = "Acest program de completare nu acceptă acordul utilizatorului.";
 Strings.OfficeOM.L_SSOUserConsentNotSupportedByCurrentAddinCategoryMessage = "Operațiunea nu a reușit, deoarece acest program de completare nu acceptă acordul utilizatorului în această categorie";
 Strings.OfficeOM.L_SaveSettingsError = "Eroare de salvare a setărilor";

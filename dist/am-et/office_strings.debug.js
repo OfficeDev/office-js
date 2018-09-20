@@ -1,4 +1,4 @@
-/* Version: 16.0.9314.1000 */
+/* Version: 16.0.10827.10000 */
 
 Type.registerNamespace("Strings");
 Strings.OfficeOM = function()
@@ -33,8 +33,8 @@ Strings.OfficeOM.L_CoercionTypeNotSupported = "ተለይቶ የተገለፀው �
 Strings.OfficeOM.L_ColIndexOutOfRange = "የአምድ ኢንዴክስ ዋጋው ከተፈቀደው አውድ ውጪ ነው። ከአምዶች ቁጥር ያነሰ ዋጋ (0 ወይም የበለጠ) ይጠቀሙ።";
 Strings.OfficeOM.L_ConnectionFailureWithDetails = "በ {0} የአቋም ኮድ፣ የስህተት ኮድ {1} እና የሚከተለውን የስህተት መልዕክት፥ {2} ጥያቄው አልተሳካም።";
 Strings.OfficeOM.L_ConnectionFailureWithStatus = "በ {0} የአቋም ኮድ ጥያቄው አልተሳካም።";
-Strings.OfficeOM.L_CustomFunctionDefinitionMissing = "የተግባሩን ፍች የሚወክል ይህን ስም ያለው ባህሪይ በExcel.CustomFunctions ላይ መኖር አለበት።";
-Strings.OfficeOM.L_CustomFunctionImplementationMissing = "በExcel.CustomFunctions ላይ የተግባሩን ፍች የሚወክል ይህ ስም ያለው ባህሪይ ተግባሩን ሰራ ላይ የሚያውል 'የጥሪ' ባህሪይ መያዝ አለበት።";
+Strings.OfficeOM.L_CustomFunctionDefinitionMissing = "የተግባሩን ፍች የሚወክል ይህ ስም ያለው ባህሪይ በExcel.CustomFunctions ላይ መኖር አለበት።";
+Strings.OfficeOM.L_CustomFunctionImplementationMissing = "በExcel.CustomFunctions ላይ የተግባሩን ፍች የሚወክል ይህ ስም ያለው ባህሪይ ተግባሩን በሥራ ላይ የሚያውል የ'call' ባህሪይ መያዝ አለበት።";
 Strings.OfficeOM.L_CustomFunctionNameCannotSplit = "የተግባር ስም ባዶ ያልሆነ የስም ቦታ እና ባዶ ያልሆነ አጭር ስም መያዝ አለበት።";
 Strings.OfficeOM.L_CustomFunctionNameContainsBadChars = "ተግባሩ ፊደሎችን፣ አሀዞችን፣ ሰረዘዘብጦች እና ነጥቦችን ብቻ ሊያካትት ይችላል።";
 Strings.OfficeOM.L_CustomXmlError = "የታዛዥ XML ስህተት።";
@@ -157,6 +157,7 @@ Strings.OfficeOM.L_SSOConnectionLostError = "በመለያ በመግባት ሂደ
 Strings.OfficeOM.L_SSOConnectionLostErrorMessage = "በመለያ በመግባት ሂደት ጊዜ ግንኙነት ተቋርጦ ነበር፣ ስለሆነም ተጠቃሚው ገብቶ ላይሆን ይችላል። ይህ ሊሆን የሚችልበት ምክንያት በተጠቃሚው አሳሽ አወቃቀር ቅንብሮች ለምሳሌ የደህንነት ቀጠናዎች ሊሆን ይችላል።";
 Strings.OfficeOM.L_SSOServerError = "በፈቃድ አሰጣጥ አቅራቢው ውስጥ ስህተት ተከስቷል።";
 Strings.OfficeOM.L_SSOServerErrorMessage = "በአገልጋዩ ላይ ያልተጠበቀ ክስተት ተከ";
+Strings.OfficeOM.L_SSOUnsupportedPlatform = "API በዚህ መድረክ ውስጥ አይደገፍም።";
 Strings.OfficeOM.L_SSOUserConsentNotSupportedByCurrentAddinCategory = "ይህ ተጨማሪው የተጠቃሚ ይዘትን አይደግፍም።";
 Strings.OfficeOM.L_SSOUserConsentNotSupportedByCurrentAddinCategoryMessage = "ይህ ተጨማሪው በዚህ ፍቃድ ውስጥ የተጠቃሚ ይዘትን ስለማይደግፍ ክወናው አልተሳካም";
 Strings.OfficeOM.L_SaveSettingsError = "የክንውን አውዶች ስህተት ያስቀምጡ";

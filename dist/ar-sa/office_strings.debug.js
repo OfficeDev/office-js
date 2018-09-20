@@ -1,4 +1,4 @@
-/* Version: 16.0.9314.1000 */
+/* Version: 16.0.10827.10000 */
 
 Type.registerNamespace("Strings");
 Strings.OfficeOM = function()
@@ -33,8 +33,8 @@ Strings.OfficeOM.L_CoercionTypeNotSupported = "نوع الاندماج المح�
 Strings.OfficeOM.L_ColIndexOutOfRange = "إن قيمة فهرس العمود خارج النطاق المسموح به. استخدم قيمة (0 أو أعلى) تكون أصغر من عدد الأعمدة.";
 Strings.OfficeOM.L_ConnectionFailureWithDetails = "فشل الطلب برمز الحالة {0} ورمز الخطأ {1} وظهرت رسالة الخطأ التالية: {2}";
 Strings.OfficeOM.L_ConnectionFailureWithStatus = "فشل الطلب برمز الحالة {0}.";
-Strings.OfficeOM.L_CustomFunctionDefinitionMissing = "يجب وجود خاصية تحمل هذا الاسم تمثل تعريف الوظيفة في Excel.CustomFunctions.";
-Strings.OfficeOM.L_CustomFunctionImplementationMissing = "يجب أن تحتوي الخاصية التي تحمل هذا الاسم في Excel.CustomFunctions والتي تمثل تعريف الوظيفة على الخاصية 'call' التي تقوم بتنفيذ الوظيفة.";
+Strings.OfficeOM.L_CustomFunctionDefinitionMissing = "يلزم وجود خاصية تحمل هذا الاسم تمثل تعريف الدالة في Excel.Script.CustomFunctions.";
+Strings.OfficeOM.L_CustomFunctionImplementationMissing = "يجب أن تحتوي الخاصية التي تحمل هذا الاسم في Excel.Script.CustomFunctions الذي يمثل تعريف الدالة على الخاصية 'استدعاء' المسؤولة عن تنفيذ الدالة.";
 Strings.OfficeOM.L_CustomFunctionNameCannotSplit = "يجب أن يحتوي اسم الدالة على مساحة اسم غير فارغة واسم قصير غير فارغ.";
 Strings.OfficeOM.L_CustomFunctionNameContainsBadChars = "يمكن أن يحتوي اسم الدالة على أحرف وأرقام وتسطير سفلي ونقاط.";
 Strings.OfficeOM.L_CustomXmlError = "خطأ في XML المخصص.";
@@ -157,6 +157,7 @@ Strings.OfficeOM.L_SSOConnectionLostError = "تم فقد الاتصال أثنا
 Strings.OfficeOM.L_SSOConnectionLostErrorMessage = "تم فقد الاتصال أثناء عملية تسجيل الدخول، وربما لم يتم تسجيل دخول المستخدم. وهذا على الأغلب بسبب إعدادات تكوين مستعرض المستخدم، مثل مناطق الأمان.";
 Strings.OfficeOM.L_SSOServerError = "حدث خطأ في موفر المصادقة.";
 Strings.OfficeOM.L_SSOServerErrorMessage = "حدث خطأ غير متوقع في الخادم.";
+Strings.OfficeOM.L_SSOUnsupportedPlatform = "واجهة برمجة التطبيقات (API) غير مدعمة في هذا النظام الأساسي.";
 Strings.OfficeOM.L_SSOUserConsentNotSupportedByCurrentAddinCategory = "لا تدعم هذه الوظيفة الإضافية موافقة المستخدم.";
 Strings.OfficeOM.L_SSOUserConsentNotSupportedByCurrentAddinCategoryMessage = "فشلت العملية لأن هذه الوظيفة الإضافية لا تدعم موافقة المستخدم في هذه الفئة";
 Strings.OfficeOM.L_SaveSettingsError = "خطأ في إعدادات الحفظ";

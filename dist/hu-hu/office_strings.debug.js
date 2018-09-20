@@ -1,4 +1,4 @@
-/* Version: 16.0.9314.1000 */
+/* Version: 16.0.10827.10000 */
 
 Type.registerNamespace("Strings");
 Strings.OfficeOM = function()
@@ -33,8 +33,8 @@ Strings.OfficeOM.L_CoercionTypeNotSupported = "A megadott típuskonverzió nem t
 Strings.OfficeOM.L_ColIndexOutOfRange = "Az oszlopindex értéke kívül esik a megengedett tartományon. Olyan értéket használjon (0-t vagy nagyobbat), amely kisebb, mint az oszlopok száma.";
 Strings.OfficeOM.L_ConnectionFailureWithDetails = "Sikertelen volt a kérelem. Állapotkód: {0}, hibakód: {1}. Hibaüzenet: {2}";
 Strings.OfficeOM.L_ConnectionFailureWithStatus = "Sikertelen volt a kérelem. Állapotkód: {0}.";
-Strings.OfficeOM.L_CustomFunctionDefinitionMissing = "Az Excel.CustomFunctions osztályban léteznie kell egy ilyen nevű, a függvény definícióját jelző tulajdonságnak.";
-Strings.OfficeOM.L_CustomFunctionImplementationMissing = "Az Excel.CustomFunctions osztály ilyen nevű, a függvény definícióját jelző tulajdonságának tartalmaznia kell a függvényt implementáló call tulajdonságot.";
+Strings.OfficeOM.L_CustomFunctionDefinitionMissing = "Az Excel.Script.CustomFunctions osztályban léteznie kell egy ilyen nevű, a függvény definícióját jelző tulajdonságnak.";
+Strings.OfficeOM.L_CustomFunctionImplementationMissing = "Az Excel.Script.CustomFunctions osztály ilyen nevű, a függvény definícióját jelző tulajdonságának tartalmaznia kell a függvényt implementáló call tulajdonságot.";
 Strings.OfficeOM.L_CustomFunctionNameCannotSplit = "A függvény nevének nem üres névteret és nem üres rövid nevet kell tartalmaznia.";
 Strings.OfficeOM.L_CustomFunctionNameContainsBadChars = "A függvény nevében csak betűk, számok, aláhúzásjelek és pontok szerepelhetnek.";
 Strings.OfficeOM.L_CustomXmlError = "Egyéni XML-hiba.";
@@ -157,6 +157,7 @@ Strings.OfficeOM.L_SSOConnectionLostError = "Megszakadt a kapcsolat a bejelentke
 Strings.OfficeOM.L_SSOConnectionLostErrorMessage = "Megszakadt a kapcsolat a bejelentkezés közben, ezért lehet, hogy a felhasználó nem tudott bejelentkezni. A problémát valószínűleg a felhasználó böngészőjének beállításai (köztük a biztonsági zónák beállításai) okozzák.";
 Strings.OfficeOM.L_SSOServerError = "Hiba történt a hitelesítésszolgáltatón.";
 Strings.OfficeOM.L_SSOServerErrorMessage = "Hiba történt a kiszolgálón.";
+Strings.OfficeOM.L_SSOUnsupportedPlatform = "Ezen a platformon nem támogatott az API.";
 Strings.OfficeOM.L_SSOUserConsentNotSupportedByCurrentAddinCategory = "Ez a bővítmény nem támogatja a felhasználói beleegyezés használatát.";
 Strings.OfficeOM.L_SSOUserConsentNotSupportedByCurrentAddinCategoryMessage = "Sikertelen volt a művelet, mert ez a bővítmény nem támogatja a felhasználói beleegyezés használatát ebben a kategóriában.";
 Strings.OfficeOM.L_SaveSettingsError = "Beállításmentési hiba";
