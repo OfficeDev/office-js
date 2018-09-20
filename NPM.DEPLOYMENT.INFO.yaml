@@ -1,4 +1,9 @@
+version: 1.1.9-adhoc.36
 tag: adhoc
+githubReleaseUrl: https://github.com/OfficeDev/office-js/releases/tag/v1.1.9-adhoc.36
+githubViewUrl: https://github.com/OfficeDev/office-js/tree/v1.1.9-adhoc.36
+deployedAt: 2018-09-20 11:01 pm UTC  (2018-09-20 4:01 pm Pacific Time)
+
 history:
     adhocBranchName: __for_merging--release--16.0.10917.35450--2018-09-20--3.59pm
     commitMessage: __for_merging--release--16.0.10917.35450--2018-09-20--3.59pm
@@ -31,3 +36,11 @@ history:
             message: >-
                 [BEGIN PUBLISH UPDATES] --
                 __for_merging--release--16.0.10917.35450--2018-09-20--3.59pm
+
+
+unpkgUrls: |-
+    this specific build number:
+        https://unpkg.com/@microsoft/office-js@1.1.9-adhoc.36/dist/office.js
+        https://unpkg.com/@microsoft/office-js@1.1.9-adhoc.36/dist/office.d.ts
+
+buildLog: https://travis-ci.org/OfficeDev/office-js/builds/431265538
