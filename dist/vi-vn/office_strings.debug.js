@@ -1,4 +1,4 @@
-/* Version: 16.0.9309.1000 */
+/* Version: 16.0.10827.10000 */
 
 Type.registerNamespace("Strings");
 Strings.OfficeOM = function()
@@ -33,8 +33,8 @@ Strings.OfficeOM.L_CoercionTypeNotSupported = "Kiểu ép buộc đã xác đị
 Strings.OfficeOM.L_ColIndexOutOfRange = "Giá trị chỉ mục cột nằm ngoài phạm vi cho phép. Hãy sử dụng một giá trị (0 hoặc cao hơn) và bé hơn số lượng cột.";
 Strings.OfficeOM.L_ConnectionFailureWithDetails = "Yêu cầu không thành công với mã trạng thái {0}, mã lỗi {1} và thông báo lỗi sau: {2}";
 Strings.OfficeOM.L_ConnectionFailureWithStatus = "Yêu cầu không thành công với mã trạng thái {0}.";
-Strings.OfficeOM.L_CustomFunctionDefinitionMissing = "Thuộc tính có tên này đại diện cho định nghĩa của hàm phải tồn tại trong Excel.CustomFunctions.";
-Strings.OfficeOM.L_CustomFunctionImplementationMissing = "Thuộc tính có tên này trong Excel.CustomFunctions đại diện cho định nghĩa của chức năng phải chứa thuộc tính 'gọi' có tác dụng thực thi hàm.";
+Strings.OfficeOM.L_CustomFunctionDefinitionMissing = "Thuộc tính có tên này đại diện cho định nghĩa của hàm phải tồn tại trong Excel.Script.CustomFunctions.";
+Strings.OfficeOM.L_CustomFunctionImplementationMissing = "Thuộc tính có tên này trong Excel.Script.CustomFunctions đại diện cho định nghĩa của hàm phải bao gồm thuộc tính 'call' có tác dụng triển khai hàm.";
 Strings.OfficeOM.L_CustomFunctionNameCannotSplit = "Tên hàm phải chứa không gian tên không trống và tên ngắn không trống.";
 Strings.OfficeOM.L_CustomFunctionNameContainsBadChars = "Tên hàm chỉ có thể chứa chữ cái, chữ số, gạch dưới và dấu chấm.";
 Strings.OfficeOM.L_CustomXmlError = "Lỗi XML Tùy chỉnh.";
@@ -157,6 +157,7 @@ Strings.OfficeOM.L_SSOConnectionLostError = "Đã mất kết nối trong quá t
 Strings.OfficeOM.L_SSOConnectionLostErrorMessage = "Đã mất kết nối trong quá trình đăng nhập và người dùng có thể không đăng nhập được. Điều này có thể do cài đặt cấu hình trình duyệt của người dùng, như vùng bảo mật.";
 Strings.OfficeOM.L_SSOServerError = "Đã xảy ra lỗi trong nhà cung cấp xác thực.";
 Strings.OfficeOM.L_SSOServerErrorMessage = "Đã xảy ra lỗi ngoài dự kiến trên máy chủ.";
+Strings.OfficeOM.L_SSOUnsupportedPlatform = "Nền tảng này không hỗ trợ API.";
 Strings.OfficeOM.L_SSOUserConsentNotSupportedByCurrentAddinCategory = "Phần bổ trợ này không hỗ trợ sự chấp thuận của người dùng.";
 Strings.OfficeOM.L_SSOUserConsentNotSupportedByCurrentAddinCategoryMessage = "Thao tác không thành công do phần bổ trợ này không hỗ trợ sự chấp thuận của người dùng trong danh mục này";
 Strings.OfficeOM.L_SaveSettingsError = "Lỗi Thiết đặt Lưu";

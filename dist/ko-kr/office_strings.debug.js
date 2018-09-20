@@ -1,4 +1,4 @@
-/* Version: 16.0.9309.1000 */
+/* Version: 16.0.10827.10000 */
 
 Type.registerNamespace("Strings");
 Strings.OfficeOM = function()
@@ -33,8 +33,8 @@ Strings.OfficeOM.L_CoercionTypeNotSupported = "지정한 강제 변환 유형은
 Strings.OfficeOM.L_ColIndexOutOfRange = "열 인덱스 값이 허용되는 범위를 벗어납니다. 열 수보다 작은 값(0 이상)을 사용하세요.";
 Strings.OfficeOM.L_ConnectionFailureWithDetails = "요청이 실패했으며 상태 코드는 {0}, 오류 코드는 {1}, 오류 메시지는 {2}입니다.";
 Strings.OfficeOM.L_ConnectionFailureWithStatus = "요청이 실패했으며 상태 코드는 {0}입니다.";
-Strings.OfficeOM.L_CustomFunctionDefinitionMissing = "함수의 정의를 나타내는 이 이름의 속성이 Excel.CustomFunctions에 있어야 합니다.";
-Strings.OfficeOM.L_CustomFunctionImplementationMissing = "Excel.CustomFunctions에서 함수의 정의를 나타내는 이 이름을 가진 속성에는 함수를 구현하는 '호출' 속성이 포함되어야 합니다.";
+Strings.OfficeOM.L_CustomFunctionDefinitionMissing = "함수의 정의를 나타내는 이 이름의 속성이 Excel.Script.CustomFunctions에 있어야 합니다.";
+Strings.OfficeOM.L_CustomFunctionImplementationMissing = "Excel.Script.CustomFunctions에서 함수의 정의를 나타내는 이 이름을 가진 속성에는 함수를 구현하는 '호출' 속성이 포함되어야 합니다.";
 Strings.OfficeOM.L_CustomFunctionNameCannotSplit = "함수 이름에는 비어 있지 않은 네임스페이스와 비어 있지 않은 짧은 이름이 포함되어야 합니다.";
 Strings.OfficeOM.L_CustomFunctionNameContainsBadChars = "함수 이름에는 문자, 숫자, 밑줄 및 마침표만 포함될 수 있습니다.";
 Strings.OfficeOM.L_CustomXmlError = "사용자 지정 XML 오류입니다.";
@@ -157,6 +157,7 @@ Strings.OfficeOM.L_SSOConnectionLostError = "로그인 프로세스 동안 연�
 Strings.OfficeOM.L_SSOConnectionLostErrorMessage = "로그인 프로세스 동안 연결이 끊어졌고 사용자가 로그인되지 않았을 수 있습니다. 보안 영역과 같은 사용자 브라우저의 구성 설정 때문일 수 있습니다.";
 Strings.OfficeOM.L_SSOServerError = "인증 공급자에서 오류가 발생했습니다.";
 Strings.OfficeOM.L_SSOServerErrorMessage = "서버에서 예기치 않은 오류가 발생했습니다.";
+Strings.OfficeOM.L_SSOUnsupportedPlatform = "이 플랫폼에서 API가 지원되지 않습니다.";
 Strings.OfficeOM.L_SSOUserConsentNotSupportedByCurrentAddinCategory = "이 추가 기능은 사용자 동의를 지원하지 않습니다.";
 Strings.OfficeOM.L_SSOUserConsentNotSupportedByCurrentAddinCategoryMessage = "이 추가 기능에서 이 범주의 사용자 동의를 지원하지 않으므로 작업이 실패했습니다.";
 Strings.OfficeOM.L_SaveSettingsError = "설정 저장 오류";

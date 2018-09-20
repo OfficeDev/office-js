@@ -1,4 +1,4 @@
-/* Version: 16.0.9309.1000 */
+/* Version: 16.0.10827.10000 */
 
 Type.registerNamespace("Strings");
 Strings.OfficeOM = function()
@@ -33,8 +33,8 @@ Strings.OfficeOM.L_CoercionTypeNotSupported = "不支持指定的强制类型。
 Strings.OfficeOM.L_ColIndexOutOfRange = "列索引值不在允许的范围内。请使用少于列数的值(0 或更大)。";
 Strings.OfficeOM.L_ConnectionFailureWithDetails = "请求失败，状态代码为 {0}，错误代码为 {1}，并显示以下错误消息: {2}";
 Strings.OfficeOM.L_ConnectionFailureWithStatus = "请求失败，状态代码为 {0}。";
-Strings.OfficeOM.L_CustomFunctionDefinitionMissing = "Excel.CustomFunctions 中必须存在具有此名称、表示函数定义的属性。";
-Strings.OfficeOM.L_CustomFunctionImplementationMissing = 'Excel.CustomFunctions 中具有此名称的表示函数定义的属性必须包含实现了该函数的 "call" 属性。';
+Strings.OfficeOM.L_CustomFunctionDefinitionMissing = "Excel.Script.CustomFunctions 中必须存在具有此名称、表示函数定义的属性。";
+Strings.OfficeOM.L_CustomFunctionImplementationMissing = 'Excel.Script.CustomFunctions 中具有此名称的表示函数定义的属性必须包含实现了该函数的 "call" 属性。';
 Strings.OfficeOM.L_CustomFunctionNameCannotSplit = "函数名必须包含一个非空的命名空间和一个非空的短名称。";
 Strings.OfficeOM.L_CustomFunctionNameContainsBadChars = "函数名仅可包含字母、数字、下划线和句点。";
 Strings.OfficeOM.L_CustomXmlError = "自定义 XML 错误。";
@@ -157,6 +157,7 @@ Strings.OfficeOM.L_SSOConnectionLostError = "登录过程中丢失了连接。";
 Strings.OfficeOM.L_SSOConnectionLostErrorMessage = "登录过程中丢失了连接，用户可能未成功登录。这可能是由于用户的浏览器配置设置而导致，如安全区域设置。";
 Strings.OfficeOM.L_SSOServerError = "身份验证提供程序中出现错误。";
 Strings.OfficeOM.L_SSOServerErrorMessage = "服务器上发生异常错误。";
+Strings.OfficeOM.L_SSOUnsupportedPlatform = "此平台不支持 API。";
 Strings.OfficeOM.L_SSOUserConsentNotSupportedByCurrentAddinCategory = "即使用户同意，也不可使用此加载项。";
 Strings.OfficeOM.L_SSOUserConsentNotSupportedByCurrentAddinCategoryMessage = "操作失败，因为在此类别中即使用户同意，也不可使用此加载项";
 Strings.OfficeOM.L_SaveSettingsError = "保存设置错误";

@@ -1,4 +1,4 @@
-/* Version: 16.0.9309.1000 */
+/* Version: 16.0.10827.10000 */
 
 Type.registerNamespace("Strings");
 Strings.OfficeOM = function()
@@ -33,8 +33,8 @@ Strings.OfficeOM.L_CoercionTypeNotSupported = "Zadaný typ převodu není podpor
 Strings.OfficeOM.L_ColIndexOutOfRange = "Hodnota indexu sloupce je mimo povolený rozsah. Použijte hodnotu (0 nebo vyšší), která je menší než počet sloupců.";
 Strings.OfficeOM.L_ConnectionFailureWithDetails = "Žádost selhala se stavovým kódem {0}, kódem chyby {1} a následující chybovou zprávou: {2}";
 Strings.OfficeOM.L_ConnectionFailureWithStatus = "Žádost selhala se stavovým kódem {0}.";
-Strings.OfficeOM.L_CustomFunctionDefinitionMissing = "V Excel.CustomFunctions musí být vlastnost s tímto názvem, která představuje definici funkce.";
-Strings.OfficeOM.L_CustomFunctionImplementationMissing = "Vlastnost s tímto názvem v Excel.CustomFunctions, která představuje definici funkce, musí obsahovat vlastnost call implementující funkci.";
+Strings.OfficeOM.L_CustomFunctionDefinitionMissing = "V Excel.Script.CustomFunctions musí být vlastnost s tímto názvem, která představuje definici funkce.";
+Strings.OfficeOM.L_CustomFunctionImplementationMissing = "Vlastnost s tímto názvem v Excel.Script.CustomFunctions, která představuje definici funkce, musí obsahovat vlastnost call implementující funkci.";
 Strings.OfficeOM.L_CustomFunctionNameCannotSplit = "Název funkce musí obsahovat neprázdný obor názvů a neprázdný krátký název.";
 Strings.OfficeOM.L_CustomFunctionNameContainsBadChars = "Název funkce může obsahovat pouze písmena, číslice, podtržítka a tečky.";
 Strings.OfficeOM.L_CustomXmlError = "Chyba vlastního kódu XML";
@@ -157,6 +157,7 @@ Strings.OfficeOM.L_SSOConnectionLostError = "Během procesu přihlášení se p�
 Strings.OfficeOM.L_SSOConnectionLostErrorMessage = "Během procesu přihlášení se přerušilo připojení a uživatel možná není přihlášený. Způsobila to asi konfigurační nastavení v prohlížeči uživatele, například zóny zabezpečení.";
 Strings.OfficeOM.L_SSOServerError = "Ve zprostředkovateli ověřování došlo k chybě.";
 Strings.OfficeOM.L_SSOServerErrorMessage = "Na serveru došlo k neočekávané chybě.";
+Strings.OfficeOM.L_SSOUnsupportedPlatform = "API není v této platformě podporováno.";
 Strings.OfficeOM.L_SSOUserConsentNotSupportedByCurrentAddinCategory = "Tento doplněk nepodporuje vyjádření souhlasu uživatele.";
 Strings.OfficeOM.L_SSOUserConsentNotSupportedByCurrentAddinCategoryMessage = "Operace selhala, protože tento doplněk v této kategorii nepodporuje vyjádření souhlasu uživatele.";
 Strings.OfficeOM.L_SaveSettingsError = "Chyba ukládání nastavení";

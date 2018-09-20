@@ -1,4 +1,4 @@
-/* Version: 16.0.9309.1000 */
+/* Version: 16.0.10827.10000 */
 
 Type.registerNamespace("_u");
 _u.ExtensibilityStrings = function()
@@ -14,6 +14,7 @@ _u.ExtensibilityStrings.l_AttachmentErrorName_Text = "Priedo klaida";
 _u.ExtensibilityStrings.l_AttachmentExceededSize_Text = "Priedo įtraukti negalima, nes jis per didelis.";
 _u.ExtensibilityStrings.l_AttachmentItemIdTooLong_Text = "Vienas ar keli priedo ID yra per ilgi.";
 _u.ExtensibilityStrings.l_AttachmentNameTooLong_Text = "Vienas ar keli priedo pavadinimai yra per ilgi.";
+_u.ExtensibilityStrings.l_AttachmentNotSupported_Text = "The attachment type is not supported.";
 _u.ExtensibilityStrings.l_AttachmentUploadGeneralFailure_Text = "Priedo negalima įtraukti į elementą.";
 _u.ExtensibilityStrings.l_AttachmentUrlTooLong_Text = "Vienas ar keli priedo URL yra per ilgi.";
 _u.ExtensibilityStrings.l_CallSaveAsyncBeforeToken_Text = "Nepavyks gauti atpažinimo ženklo, kol neįrašytas elementas.";
@@ -31,9 +32,11 @@ _u.ExtensibilityStrings.l_EmailAddressTooLong_Text = "Vienas ar keli pateikti el
 _u.ExtensibilityStrings.l_EwsRequestOversized_Text = "Užklausa viršija 1 MB dydžio limitą. Modifikuokite EWS užklausą.";
 _u.ExtensibilityStrings.l_ExceededMaxNumberOfAttachments_Text = "Priedų negalima įtraukti, nes laiškas jau turi maksimalų priedų skaičių";
 _u.ExtensibilityStrings.l_HtmlSanitizationFailure_Text = "HTML valymas nepavyko.";
-_u.ExtensibilityStrings.l_Insufficient_Item_Permissions_Text = "The user doesn't have the permissions required to perform this operation.";
+_u.ExtensibilityStrings.l_Insufficient_Item_Permissions_Text = "Vartotojas neturi teisių, kurių reikia norint atlikti šią operaciją.";
 _u.ExtensibilityStrings.l_InternalFormatError_Text = "Įvyko vidinio formato klaida.";
 _u.ExtensibilityStrings.l_InternalProtocolError_Text = "Vidinė protokolo klaida: '{0}'.";
+_u.ExtensibilityStrings.l_Internal_Server_Error_Text = "„Exchange Server“ pateikė klaidą. Daugiau informacijos ieškokite gal diagnostikos objektą.";
+_u.ExtensibilityStrings.l_Internet_Not_Connected_Error_Text = "Vartotojas nebeprijungęs prie tinklo. Patikrinkite tinklo ryšį ir bandykite dar kartą.";
 _u.ExtensibilityStrings.l_InvalidActionType_Text = "Parasmetro actionType reikšmė netinkama. Priimtina reikšmė yra showTaskPane."
 _u.ExtensibilityStrings.l_InvalidAttachmentId_Text = "Priedo ID buvo neleistinas.";
 _u.ExtensibilityStrings.l_InvalidAttachmentPath_Text = "Priedo kelias buvo neleistinas.";
@@ -51,12 +54,15 @@ _u.ExtensibilityStrings.l_NullOrEmptyParameterError_Text = "Parametras {0} yra p
 _u.ExtensibilityStrings.l_NumberOfNotificationsExceeded_Text = "Pranešimo nepavyko įtraukti, nes pasiektas pranešimų limitas.";
 _u.ExtensibilityStrings.l_NumberOfRecipientsExceeded_Text = "Bendras gavėjų skaičius lauke negali viršyti {0}.";
 _u.ExtensibilityStrings.l_OffsetNotfound_Text = "Nepavyko rasti šios laiko žymės poslinkio.";
+_u.ExtensibilityStrings.l_Olk_Http_Error_Text = "Užklausa nepavyko. HTTP klaidos kodo ieškokite pagal diagnostikos objektą.";
 _u.ExtensibilityStrings.l_ParameterValueTooLongError_Text = "Parametro {0} reikšmė yra per ilga. Maksimalus simbolių skaičius – {1}.";
 _u.ExtensibilityStrings.l_ParametersNotAsExpected_Text = "Nurodyti parametrai neatitinka numatyto formato.";
 _u.ExtensibilityStrings.l_PersistedNotificationArrayReadError_Text = "API iškvietimas nepavyko, nes nepavyko būti gauti išliekančių pranešimų.";
 _u.ExtensibilityStrings.l_PersistedNotificationArraySaveError_Text = "Jūsų API iškvietimas nepavyko, nes nepavyko išlaikyti pranešimų.";
 _u.ExtensibilityStrings.l_RecurrenceErrorMaxOccurrences_Text = "Pasikartojanti seka viršija didžiausią 999 pasikartojimų ribą.";
 _u.ExtensibilityStrings.l_RecurrenceErrorZeroOccurrences_Text = "Pasikartojanti seka neturi pasikartojimų nurodytame datų diapazone.";
+_u.ExtensibilityStrings.l_RecurrenceInvalidTimeZone_Text = "Nurodyta laiko juosta nepalaikoma.";
+_u.ExtensibilityStrings.l_RecurrenceUnsupportedAlternateCalendar_Text = "Pasikartojimo šabloną nustatė vartotojas, naudojantis alternatyvųjį kalendorių, kuris nepalaikomas.";
 _u.ExtensibilityStrings.l_Recurrence_Error_Instance_SetAsync_Text = "Vienam pasikartojimui iš sekos negalima nustatyti pasikartojimo šablono.";
 _u.ExtensibilityStrings.l_Recurrence_Error_Properties_Invalid_Text = "Pasikartojimo šablonas negalioja. Patikrinkite, ar nurodytos pasikartojimo ypatybės atitinka pasikartojimo tipą.";
 _u.ExtensibilityStrings.l_SaveError_Text = "Bandant įrašyti elementą į serverį, įvyko prisijungimo klaida.";

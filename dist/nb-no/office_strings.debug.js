@@ -1,4 +1,4 @@
-/* Version: 16.0.9309.1000 */
+/* Version: 16.0.10827.10000 */
 
 Type.registerNamespace("Strings");
 Strings.OfficeOM = function()
@@ -33,8 +33,8 @@ Strings.OfficeOM.L_CoercionTypeNotSupported = "Den angitte konverteringstypen st
 Strings.OfficeOM.L_ColIndexOutOfRange = "Indeksverdien for kolonne er utenfor det tillatte området. Bruk en verdi (0 eller høyere) som er lavere enn antall kolonner.";
 Strings.OfficeOM.L_ConnectionFailureWithDetails = "Forespørselen mislyktes med statuskoden {0}, feilkoden {1} og den følgende feilmeldingen: {2}";
 Strings.OfficeOM.L_ConnectionFailureWithStatus = "Forespørselen mislyktes med statuskoden {0}.";
-Strings.OfficeOM.L_CustomFunctionDefinitionMissing = "En egenskap med dette navnet som representerer den funksjonens definisjon, må finnes på Excel.CustomFunctions.";
-Strings.OfficeOM.L_CustomFunctionImplementationMissing = "Egenskapen med dette navnet på Excel.CustomFunctions som representerer den funksjonens definisjon, må inneholde en samtaleegenskap som implementerer funksjonen.";
+Strings.OfficeOM.L_CustomFunctionDefinitionMissing = "En egenskap med dette navnet som representerer funksjonens definisjon, må finnes i Excel.Script.CustomFunctions.";
+Strings.OfficeOM.L_CustomFunctionImplementationMissing = "Egenskapen med dette navnet på Excel.Script.CustomFunctions som representerer funksjonens definisjon, må inneholde en «kalle»-egenskap som implementerer funksjonen.";
 Strings.OfficeOM.L_CustomFunctionNameCannotSplit = "Navnet på funksjonen må inneholde et navneområde som ikke er tomt, og et kort navn som ikke er tomt.";
 Strings.OfficeOM.L_CustomFunctionNameContainsBadChars = "Navnet på funksjonen kan bare inneholde bokstaver, sifre, understrekingstegn og punktum.";
 Strings.OfficeOM.L_CustomXmlError = "Egendefinerte XML-feil.";
@@ -157,6 +157,7 @@ Strings.OfficeOM.L_SSOConnectionLostError = "En tilkobling ble brutt under pålo
 Strings.OfficeOM.L_SSOConnectionLostErrorMessage = "En tilkobling ble brutt under påloggingsprosessen, og brukeren kan ikke logges på. Dette var sannsynligvis på grunn av konfigurasjonsinnstillingene for nettleseren til brukeren, for eksempel sikkerhetssoner.";
 Strings.OfficeOM.L_SSOServerError = "Det oppstod en feil i godkjenningstjenesten.";
 Strings.OfficeOM.L_SSOServerErrorMessage = "Det oppstod en uventet feil på serveren.";
+Strings.OfficeOM.L_SSOUnsupportedPlatform = "API støttes ikke på denne plattformen.";
 Strings.OfficeOM.L_SSOUserConsentNotSupportedByCurrentAddinCategory = "Dette tillegget støtter ikke brukersamtykke.";
 Strings.OfficeOM.L_SSOUserConsentNotSupportedByCurrentAddinCategoryMessage = "Operasjonen mislyktes fordi dette tillegget ikke støtter brukersamtykke i denne kategorien";
 Strings.OfficeOM.L_SaveSettingsError = "Feil under lagring av innstillinger";

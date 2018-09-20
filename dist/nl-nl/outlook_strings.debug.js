@@ -1,4 +1,4 @@
-/* Version: 16.0.9309.1000 */
+/* Version: 16.0.10827.10000 */
 
 Type.registerNamespace("_u");
 _u.ExtensibilityStrings = function()
@@ -14,6 +14,7 @@ _u.ExtensibilityStrings.l_AttachmentErrorName_Text = "Fout in bijlage";
 _u.ExtensibilityStrings.l_AttachmentExceededSize_Text = "De bijlage kan niet worden toegevoegd omdat deze te groot is.";
 _u.ExtensibilityStrings.l_AttachmentItemIdTooLong_Text = "Een of meer id's van bijlagen zijn te lang.";
 _u.ExtensibilityStrings.l_AttachmentNameTooLong_Text = "Een of meer namen van bijlagen zijn te lang.";
+_u.ExtensibilityStrings.l_AttachmentNotSupported_Text = "Het bijlagetype wordt niet ondersteund.";
 _u.ExtensibilityStrings.l_AttachmentUploadGeneralFailure_Text = "De bijlage kan niet worden toegevoegd aan het item.";
 _u.ExtensibilityStrings.l_AttachmentUrlTooLong_Text = "Een of meer bijlage-URL's zijn te lang.";
 _u.ExtensibilityStrings.l_CallSaveAsyncBeforeToken_Text = "De token kan niet worden opgehaald voordat het item is opgeslagen.";
@@ -31,9 +32,11 @@ _u.ExtensibilityStrings.l_EmailAddressTooLong_Text = "Een of meer van de opgegev
 _u.ExtensibilityStrings.l_EwsRequestOversized_Text = "De aanvraag overschrijdt de limiet van 1 MB. Pas uw EWS-aanvraag aan.";
 _u.ExtensibilityStrings.l_ExceededMaxNumberOfAttachments_Text = "U kunt geen bijlagen toevoegen omdat het bericht al het maximum aantal bijlagen bevat";
 _u.ExtensibilityStrings.l_HtmlSanitizationFailure_Text = "De HTML-opschoning is mislukt.";
-_u.ExtensibilityStrings.l_Insufficient_Item_Permissions_Text = "The user doesn't have the permissions required to perform this operation.";
+_u.ExtensibilityStrings.l_Insufficient_Item_Permissions_Text = "De gebruiker beschikt niet over de vereiste machtigingen om deze bewerking uit te voeren.";
 _u.ExtensibilityStrings.l_InternalFormatError_Text = "Er is een interne indelingsfout opgetreden.";
 _u.ExtensibilityStrings.l_InternalProtocolError_Text = "Interne protocolfout: '{0}'.";
+_u.ExtensibilityStrings.l_Internal_Server_Error_Text = "De Exchange-server heeft een fout geretourneerd. Raadpleeg de diagnostische gegevens van het object voor meer informatie.";
+_u.ExtensibilityStrings.l_Internet_Not_Connected_Error_Text = "De gebruiker is niet meer verbonden met het netwerk. Controleer de netwerkverbinding en probeer het opnieuw.";
 _u.ExtensibilityStrings.l_InvalidActionType_Text = "De waarde van de parameter actionType is ongeldig. De geaccepteerde waarde is showTaskPane."
 _u.ExtensibilityStrings.l_InvalidAttachmentId_Text = "De bijlage-id is ongeldig.";
 _u.ExtensibilityStrings.l_InvalidAttachmentPath_Text = "Het bijlagepad is ongeldig.";
@@ -51,12 +54,15 @@ _u.ExtensibilityStrings.l_NullOrEmptyParameterError_Text = "De parameter {0} is 
 _u.ExtensibilityStrings.l_NumberOfNotificationsExceeded_Text = "De melding is niet toegevoegd omdat de meldingslimiet is bereikt.";
 _u.ExtensibilityStrings.l_NumberOfRecipientsExceeded_Text = "Het totale aantal geadresseerden in het veld kan niet hoger zijn dan {0}.";
 _u.ExtensibilityStrings.l_OffsetNotfound_Text = "Er is geen offset gevonden voor dit tijdstempel.";
+_u.ExtensibilityStrings.l_Olk_Http_Error_Text = "De aanvraag is mislukt. Raadpleeg de diagnostische gegevens van het object voor de HTTP-foutcode.";
 _u.ExtensibilityStrings.l_ParameterValueTooLongError_Text = "De waarde van de parameter {0} is te lang. Het maximum aantal tekens is {1}.";
 _u.ExtensibilityStrings.l_ParametersNotAsExpected_Text = "De opgegeven parameters hebben niet de verwachte indeling.";
 _u.ExtensibilityStrings.l_PersistedNotificationArrayReadError_Text = "Uw API-aanroep is mislukt omdat de persistente meldingen niet zijn opgehaald.";
 _u.ExtensibilityStrings.l_PersistedNotificationArraySaveError_Text = "Uw API-aanroep is mislukt omdat meldingen niet zijn opgehaald.";
 _u.ExtensibilityStrings.l_RecurrenceErrorMaxOccurrences_Text = "De terugkerende reeks overschrijdt het maximum aantal van 999 exemplaren.";
 _u.ExtensibilityStrings.l_RecurrenceErrorZeroOccurrences_Text = "De terugkerende reeks komt niet voor in het opgegeven datumbereik.";
+_u.ExtensibilityStrings.l_RecurrenceInvalidTimeZone_Text = "De opgegeven tijdzone wordt niet ondersteund.";
+_u.ExtensibilityStrings.l_RecurrenceUnsupportedAlternateCalendar_Text = "Het terugkeerpatroon is ingesteld door de gebruiker met een alternatieve agenda die niet wordt ondersteund.";
 _u.ExtensibilityStrings.l_Recurrence_Error_Instance_SetAsync_Text = "Er kan geen terugkeerpatroon worden ingesteld voor één gebeurtenis in een reeks.";
 _u.ExtensibilityStrings.l_Recurrence_Error_Properties_Invalid_Text = "Het terugkeerpatroon is niet geldig. Controleer of de opgegeven eigenschappen van het terugkeerpatroon zijn afgestemd op het type terugkeerpatroon.";
 _u.ExtensibilityStrings.l_SaveError_Text = "Er is een verbindingsfout opgetreden bij het opslaan van het item op de server.";

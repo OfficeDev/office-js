@@ -1,4 +1,4 @@
-/* Version: 16.0.9309.1000 */
+/* Version: 16.0.10827.10000 */
 
 Type.registerNamespace("Strings");
 Strings.OfficeOM = function()
@@ -33,8 +33,8 @@ Strings.OfficeOM.L_CoercionTypeNotSupported = "Navedeni tip promene nije podrža
 Strings.OfficeOM.L_ColIndexOutOfRange = "Vrednost indeksa kolone je izvan dozvoljenog opsega. Koristite vrednost (0 ili veću) koja je manja od broja kolona.";
 Strings.OfficeOM.L_ConnectionFailureWithDetails = "Zahtev nije uspeo uz statusni kôd {0}, kôd greške {1} i sledeću poruku o grešci: {2}";
 Strings.OfficeOM.L_ConnectionFailureWithStatus = "Zahtev nije uspeo uz statusni kôd {0}.";
-Strings.OfficeOM.L_CustomFunctionDefinitionMissing = "Svojstvo sa ovim imenom koje predstavlja definiciju funkcije mora da postoji u okviru Excel.CustomFunctions.";
-Strings.OfficeOM.L_CustomFunctionImplementationMissing = "Svojstvo sa ovim imenom koje predstavlja definiciju funkcije u okviru Excel.CustomFunctions mora da sadrži svojstvo „call“ koje primenjuje funkciju.";
+Strings.OfficeOM.L_CustomFunctionDefinitionMissing = "Svojstvo sa ovim imenom koje predstavlja definiciju funkcije mora da postoji u okviru Excel.Script.CustomFunctions.";
+Strings.OfficeOM.L_CustomFunctionImplementationMissing = "Svojstvo sa ovim imenom koje predstavlja definiciju funkcije u okviru Excel.Script.CustomFunctions mora da sadrži svojstvo „call“ koje primenjuje funkciju.";
 Strings.OfficeOM.L_CustomFunctionNameCannotSplit = "Ime funkcije mora da sadrži prostor za ime koji nije prazan i kratko ime koje nije prazno.";
 Strings.OfficeOM.L_CustomFunctionNameContainsBadChars = "Ime funkcije može da sadrži samo slova, cifre, podvlake i tačke.";
 Strings.OfficeOM.L_CustomXmlError = "Greška u prilagođenim XML.";
@@ -157,6 +157,7 @@ Strings.OfficeOM.L_SSOConnectionLostError = "Veza je prekinuta tokom procesa pri
 Strings.OfficeOM.L_SSOConnectionLostErrorMessage = "Veza je prekinuta tokom procesa prijavljivanja i korisnik možda nije prijavljen. Do ovoga je verovatno došlo zbog korisnikovih postavki konfiguracije pregledača, kao što su bezbednosne zone.";
 Strings.OfficeOM.L_SSOServerError = "Došlo je do greške u dobavljaču usluge potvrde identiteta.";
 Strings.OfficeOM.L_SSOServerErrorMessage = "Došlo je do neočekivane greške na serveru.";
+Strings.OfficeOM.L_SSOUnsupportedPlatform = "API nije podržan u ovoj platformi.";
 Strings.OfficeOM.L_SSOUserConsentNotSupportedByCurrentAddinCategory = "Ovaj programski dodatak ne podržava pristanak korisnika.";
 Strings.OfficeOM.L_SSOUserConsentNotSupportedByCurrentAddinCategoryMessage = "Operacija nije uspela zato što ovaj programski dodatak ne podržava pristanak korisnika u ovoj kategoriji";
 Strings.OfficeOM.L_SaveSettingsError = "Greška pri čuvanju postavki";

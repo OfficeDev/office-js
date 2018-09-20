@@ -1,4 +1,4 @@
-/* Version: 16.0.9309.1000 */
+/* Version: 16.0.10827.10000 */
 
 Type.registerNamespace("Strings");
 Strings.OfficeOM = function()
@@ -33,8 +33,8 @@ Strings.OfficeOM.L_CoercionTypeNotSupported = "Määratud kooshoidmistüüpi ei 
 Strings.OfficeOM.L_ColIndexOutOfRange = "Veeruindeksi väärtus on väljaspool lubatud vahemikku. Kasutage veergude arvust väiksemat väärtust (0 või suurem).";
 Strings.OfficeOM.L_ConnectionFailureWithDetails = "Taotlus nurjus olekukoodiga {0}, tõrkekoodiga {1} ja järgmise tõrketeatega: {2}";
 Strings.OfficeOM.L_ConnectionFailureWithStatus = "Taotlus nurjus olekukoodiga {0}.";
-Strings.OfficeOM.L_CustomFunctionDefinitionMissing = "Excel.CustomFunctions peab sisaldama selle nimega atribuuti, mis tähistab funktsiooni definitsiooni.";
-Strings.OfficeOM.L_CustomFunctionImplementationMissing = 'Excel.CustomFunctionsis asuv selle nimega atribuut, mis tähistab funktsiooni definitsiooni, peab sisaldama funktsiooni juurutavat atribuuti "call".';
+Strings.OfficeOM.L_CustomFunctionDefinitionMissing = "Excel.Script.CustomFunctions peab sisaldama selle nimega atribuuti, mis tähistab funktsiooni definitsiooni.";
+Strings.OfficeOM.L_CustomFunctionImplementationMissing = 'Excel.Script.CustomFunctionsis asuv selle nimega atribuut, mis tähistab funktsiooni definitsiooni, peab sisaldama funktsiooni juurutavat atribuuti "call".';
 Strings.OfficeOM.L_CustomFunctionNameCannotSplit = "Funktsiooni nimi peab sisaldama mittetühja nimeruumi ja mittetühja lühinime.";
 Strings.OfficeOM.L_CustomFunctionNameContainsBadChars = "Funktsiooni nimi võib sisaldada ainult tähti, numbreid, allkriipse ja punkte.";
 Strings.OfficeOM.L_CustomXmlError = "Kohandatud XML-i tõrge.";
@@ -157,6 +157,7 @@ Strings.OfficeOM.L_SSOConnectionLostError = "Sisselogimise ajal ühendus katkes.
 Strings.OfficeOM.L_SSOConnectionLostErrorMessage = "Sisselogimise ajal ühendus katkes ja kasutaja ei pruugi olla sisse logitud. Tõenäoliselt on põhjus kasutaja brauseri konfiguratsioonisätetes (nt turbetsoonides).";
 Strings.OfficeOM.L_SSOServerError = "Autentimisteenuse pakkujas ilmnes tõrge.";
 Strings.OfficeOM.L_SSOServerErrorMessage = "Serveris ilmnes ootamatu tõrge.";
+Strings.OfficeOM.L_SSOUnsupportedPlatform = "See platvorm ei toeta seda API-t.";
 Strings.OfficeOM.L_SSOUserConsentNotSupportedByCurrentAddinCategory = "See lisandmoodul ei toeta kasutaja nõusolekut.";
 Strings.OfficeOM.L_SSOUserConsentNotSupportedByCurrentAddinCategoryMessage = "Toiming nurjus, kuna see lisandmoodul ei toeta kasutaja nõusolekut selles kategoorias";
 Strings.OfficeOM.L_SaveSettingsError = "Sätete salvestamise tõrge";

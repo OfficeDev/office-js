@@ -1,4 +1,4 @@
-/* Version: 16.0.9309.1000 */
+/* Version: 16.0.10827.10000 */
 
 Type.registerNamespace("_u");
 _u.ExtensibilityStrings = function()
@@ -14,6 +14,7 @@ _u.ExtensibilityStrings.l_AttachmentErrorName_Text = "Lỗi Phần đính kèm";
 _u.ExtensibilityStrings.l_AttachmentExceededSize_Text = "Không thể thêm phần đính kèm do quá lớn.";
 _u.ExtensibilityStrings.l_AttachmentItemIdTooLong_Text = "Một hoặc nhiều ID tệp đính kèm quá dài.";
 _u.ExtensibilityStrings.l_AttachmentNameTooLong_Text = "Một hoặc nhiều tên tệp đính kèm quá dài.";
+_u.ExtensibilityStrings.l_AttachmentNotSupported_Text = "Loại tệp đính kèm không được hỗ trợ.";
 _u.ExtensibilityStrings.l_AttachmentUploadGeneralFailure_Text = "Không thể thêm phần đính kèm vào mục.";
 _u.ExtensibilityStrings.l_AttachmentUrlTooLong_Text = "Một hoặc nhiều URL tệp đính kèm quá dài.";
 _u.ExtensibilityStrings.l_CallSaveAsyncBeforeToken_Text = "Không thể truy xuất mã thông báo cho đến khi mục được lưu.";
@@ -31,9 +32,11 @@ _u.ExtensibilityStrings.l_EmailAddressTooLong_Text = "Một hoặc nhiều đị
 _u.ExtensibilityStrings.l_EwsRequestOversized_Text = "Yêu cầu vượt quá giới hạn kích thước 1 MB. Vui lòng thay đổi yêu cầu EWS.";
 _u.ExtensibilityStrings.l_ExceededMaxNumberOfAttachments_Text = "Không thể thêm phần đính kèm do thư đã đạt lượng tệp đính kèm tối đa";
 _u.ExtensibilityStrings.l_HtmlSanitizationFailure_Text = "Làm sạch HTML đã thất bại.";
-_u.ExtensibilityStrings.l_Insufficient_Item_Permissions_Text = "The user doesn't have the permissions required to perform this operation.";
+_u.ExtensibilityStrings.l_Insufficient_Item_Permissions_Text = "Người dùng không có quyền cần thiết để thực hiện thao tác này.";
 _u.ExtensibilityStrings.l_InternalFormatError_Text = "Đã có lỗi định dạng nội bộ.";
 _u.ExtensibilityStrings.l_InternalProtocolError_Text = "Lỗi giao thức nội bộ: '{0}'.";
+_u.ExtensibilityStrings.l_Internal_Server_Error_Text = "Máy chủ Exchange đã trả về lỗi. Vui lòng xem đối tượng chẩn đoán để biết thêm thông tin.";
+_u.ExtensibilityStrings.l_Internet_Not_Connected_Error_Text = "Người dùng không còn kết nối với mạng. Vui lòng kiểm tra kết nối mạng của bạn, rồi thử lại.";
 _u.ExtensibilityStrings.l_InvalidActionType_Text = "Giá trị của tham số 'actionType' là không hợp lệ. Giá trị được chấp nhận là \"showTaskPane\"."
 _u.ExtensibilityStrings.l_InvalidAttachmentId_Text = "ID phần đính kèm không hợp lệ.";
 _u.ExtensibilityStrings.l_InvalidAttachmentPath_Text = "Đường dẫn phần đính kèm không hợp lệ.";
@@ -51,12 +54,15 @@ _u.ExtensibilityStrings.l_NullOrEmptyParameterError_Text = "Tham số '{0}' là 
 _u.ExtensibilityStrings.l_NumberOfNotificationsExceeded_Text = "Không thể thêm thông báo này do đã đạt đến giới hạn thông báo.";
 _u.ExtensibilityStrings.l_NumberOfRecipientsExceeded_Text = "Tổng số người nhận trong trường không thể vượt quá {0}.";
 _u.ExtensibilityStrings.l_OffsetNotfound_Text = "Không tìm thấy phần bù cho tem thời gian này.";
+_u.ExtensibilityStrings.l_Olk_Http_Error_Text = "Yêu cầu không thành công. Vui lòng xem đối tượng chẩn đoán để biết mã lỗi HTTP.";
 _u.ExtensibilityStrings.l_ParameterValueTooLongError_Text = "Giá trị của tham số '{0}' quá dài. Số ký tự tối đa là '{1}'.";
 _u.ExtensibilityStrings.l_ParametersNotAsExpected_Text = "Các thông số đã cung cấp không phù hợp với các định dạng dự kiến.";
 _u.ExtensibilityStrings.l_PersistedNotificationArrayReadError_Text = "Bạn không gọi được API do không thể truy xuất thông báo được duy trì.";
 _u.ExtensibilityStrings.l_PersistedNotificationArraySaveError_Text = "Bạn không gọi được API do không thể duy trì thông báo.";
 _u.ExtensibilityStrings.l_RecurrenceErrorMaxOccurrences_Text = "Chuỗi định kỳ vượt quá giới hạn tối đa 999 sự kiện.";
 _u.ExtensibilityStrings.l_RecurrenceErrorZeroOccurrences_Text = "Chuỗi định kỳ không có sự kiện nào trong phạm vi ngày được chỉ định.";
+_u.ExtensibilityStrings.l_RecurrenceInvalidTimeZone_Text = "Múi giờ đã chỉ định không được hỗ trợ.";
+_u.ExtensibilityStrings.l_RecurrenceUnsupportedAlternateCalendar_Text = "Kiểu lặp lại mà người dùng đặt bằng lịch thay thế không được hỗ trợ.";
 _u.ExtensibilityStrings.l_Recurrence_Error_Instance_SetAsync_Text = "Không thể đặt kiểu lặp lại cho một sự kiện duy nhất trong chuỗi.";
 _u.ExtensibilityStrings.l_Recurrence_Error_Properties_Invalid_Text = "Kiểu lặp lại không hợp lệ. Vui lòng kiểm tra để chắc rằng các thuộc tính lặp lại được chỉ định phù hợp với loại lặp lại.";
 _u.ExtensibilityStrings.l_SaveError_Text = "Đã xảy ra lỗi kết nối trong khi tìm cách lưu mục này trên máy chủ.";

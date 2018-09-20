@@ -1,4 +1,4 @@
-/* Version: 16.0.9309.1000 */
+/* Version: 16.0.10827.10000 */
 
 Type.registerNamespace("Strings");
 Strings.OfficeOM = function()
@@ -33,8 +33,8 @@ Strings.OfficeOM.L_CoercionTypeNotSupported = "El tipus de coerció especificat 
 Strings.OfficeOM.L_ColIndexOutOfRange = "El valor de l'índex de columnes està fora de l'interval permès. Feu servir un valor (0 o superior) inferior al nombre de columnes.";
 Strings.OfficeOM.L_ConnectionFailureWithDetails = "Hi ha hagut un error en processar la sol·licitud. Codi d'estat: {0}; codi d'error: {1}; missatge d'error: {2}.";
 Strings.OfficeOM.L_ConnectionFailureWithStatus = "La sol·licitud no s'ha pogut completar. Codi d'estat: {0}.";
-Strings.OfficeOM.L_CustomFunctionDefinitionMissing = "Una propietat amb aquest nom que representa la definició de la funció ha d'existir a Excel.CustomFunctions.";
-Strings.OfficeOM.L_CustomFunctionImplementationMissing = 'La propietat amb aquest nom en Excel.CustomFunctions que representa la definició de la funció ha de contenir una propietat "crida" que implementa la funció.';
+Strings.OfficeOM.L_CustomFunctionDefinitionMissing = "Cal que una propietat amb aquest nom que representi la definició de la funció existeixi a Excel.Script.CustomFunctions.";
+Strings.OfficeOM.L_CustomFunctionImplementationMissing = 'Cal que la propietat d\'Excel.Script.CustomFunctions amb aquest nom que representi la definició de la funció contingui una propietat "crida" que implementi la funció.';
 Strings.OfficeOM.L_CustomFunctionNameCannotSplit = "El nom de la funció ha de contenir un espai de nom i un nom curt no buits.";
 Strings.OfficeOM.L_CustomFunctionNameContainsBadChars = "El nom de la funció només pot contenir lletres, dígits, guions baixos i punts.";
 Strings.OfficeOM.L_CustomXmlError = "Error d'XML personalitzat.";
@@ -157,6 +157,7 @@ Strings.OfficeOM.L_SSOConnectionLostError = "S'ha perdut una connexió durant el
 Strings.OfficeOM.L_SSOConnectionLostErrorMessage = "S'ha perdut una connexió durant el procés d'inici de la sessió i és possible que l'usuari no la pugui iniciar. Això probablement ha estat a causa dels valors de configuració del navegador de l'usuari, com ara les zones de seguretat.";
 Strings.OfficeOM.L_SSOServerError = "S'ha produït un error al proveïdor d'autenticació.";
 Strings.OfficeOM.L_SSOServerErrorMessage = "S'ha produït un error inesperat al servidor.";
+Strings.OfficeOM.L_SSOUnsupportedPlatform = "L'API no s'admet en aquesta plataforma.";
 Strings.OfficeOM.L_SSOUserConsentNotSupportedByCurrentAddinCategory = "Aquest complement no admet el consentiment de l'usuari.";
 Strings.OfficeOM.L_SSOUserConsentNotSupportedByCurrentAddinCategoryMessage = "L'operació ha fallat perquè aquest complement no admet el consentiment de l'usuari en aquesta categoria.";
 Strings.OfficeOM.L_SaveSettingsError = "Error de configuració de desar";

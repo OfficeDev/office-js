@@ -1,4 +1,4 @@
-/* Version: 16.0.9309.1000 */
+/* Version: 16.0.10827.10000 */
 
 Type.registerNamespace("Strings");
 Strings.OfficeOM = function()
@@ -33,8 +33,8 @@ Strings.OfficeOM.L_CoercionTypeNotSupported = "סוג הכפייה שצוין א
 Strings.OfficeOM.L_ColIndexOutOfRange = "ערך אינדקס העמודות נמצא מחוץ לטווח המותר. השתמש בערך (0 ומעלה) הקטן ממספר העמודות.";
 Strings.OfficeOM.L_ConnectionFailureWithDetails = "הבקשה נכשלה עם קוד המצב {0}, קוד השגיאה {1} והודעת השגיאה הבאה: {2}";
 Strings.OfficeOM.L_ConnectionFailureWithStatus = "הבקשה נכשלה עם קוד המצב {0}.";
-Strings.OfficeOM.L_CustomFunctionDefinitionMissing = "מאפיין בשם זה שמייצג את הגדרת הפונקציה חייב להיות קיים ב- Excel.CustomFunctions.";
-Strings.OfficeOM.L_CustomFunctionImplementationMissing = "המאפיין בשם זה ב- Excel.CustomFunctions המייצג את הגדרת הפונקציה חייב להכיל מאפיין 'call' שמיישם את הפונקציה.";
+Strings.OfficeOM.L_CustomFunctionDefinitionMissing = "מאפיין בשם זה המייצג את הגדרת הפונקציה חייב להיות קיים ב- Excel.Script.CustomFunctions.";
+Strings.OfficeOM.L_CustomFunctionImplementationMissing = "המאפיין בשם זה ב- Excel.Script.CustomFunctions שמייצג את הגדרת הפונקציה חייב להכיל מאפיין 'call' המיישם את הפונקציה.";
 Strings.OfficeOM.L_CustomFunctionNameCannotSplit = "שם הפונקציה חייב להכיל מרחב שמות שאינו ריק ושם קצר שאינו ריק.";
 Strings.OfficeOM.L_CustomFunctionNameContainsBadChars = "שם הפונקציה יכול להכיל רק אותיות, ספרות, מקפים תחתונים ונקודות.";
 Strings.OfficeOM.L_CustomXmlError = "שגיאת XML מותאם אישית.";
@@ -157,6 +157,7 @@ Strings.OfficeOM.L_SSOConnectionLostError = "חיבור אבד בעת תהליך
 Strings.OfficeOM.L_SSOConnectionLostErrorMessage = "חיבור אבד בעת תהליך הכניסה, וייתכן שהמשתמש לא נכנס. סביר להניח שהגורם לכך הוא הגדרות תצורה של הדפדפן של המשתמש, כגון אזורי אבטחה.";
 Strings.OfficeOM.L_SSOServerError = "אירעה שגיאה בספק האימות.";
 Strings.OfficeOM.L_SSOServerErrorMessage = "אירעה שגיאה בלתי צפויה בשרת.";
+Strings.OfficeOM.L_SSOUnsupportedPlatform = "API אינו נתמך בפלטפורמה זו.";
 Strings.OfficeOM.L_SSOUserConsentNotSupportedByCurrentAddinCategory = "תוספת זו אינה תומכת בהסכמת משתמש.";
 Strings.OfficeOM.L_SSOUserConsentNotSupportedByCurrentAddinCategoryMessage = "הפעולה נכשלה מכיוון שתוספת זו אינה תומכת בהסכמת משתמש בקטגוריה זו";
 Strings.OfficeOM.L_SaveSettingsError = "שגיאה בשמירת הגדרות";

@@ -1,4 +1,4 @@
-/* Version: 16.0.9309.1000 */
+/* Version: 16.0.10827.10000 */
 
 Type.registerNamespace("_u");
 _u.ExtensibilityStrings = function()
@@ -14,6 +14,7 @@ _u.ExtensibilityStrings.l_AttachmentErrorName_Text = "［e6S9w］‏‏أبع[At
 _u.ExtensibilityStrings.l_AttachmentExceededSize_Text = "［D63AU］‏‏أبع[The attachment cannot be added because it is too big.]לף";
 _u.ExtensibilityStrings.l_AttachmentItemIdTooLong_Text = "［JMMxW］‏‏أبع[One or more of the attachment IDs is too long.]לף";
 _u.ExtensibilityStrings.l_AttachmentNameTooLong_Text = "［nSRcp］‏‏أبع[One or more of the attachment names is too long.]לף";
+_u.ExtensibilityStrings.l_AttachmentNotSupported_Text = "［Ufjta］‏‏أبع[The attachment type is not supported.]לף";
 _u.ExtensibilityStrings.l_AttachmentUploadGeneralFailure_Text = "［0gPAl］‏‏أبع[The attachment cannot be added to the item.]לף";
 _u.ExtensibilityStrings.l_AttachmentUrlTooLong_Text = "［n2mx3］‏‏أبع[One or more of the attachment URLs is too long.]לף";
 _u.ExtensibilityStrings.l_CallSaveAsyncBeforeToken_Text = "［VtZoQ］‏‏أبع[The token can't be retrieved until the item is saved.]לף";
@@ -34,6 +35,8 @@ _u.ExtensibilityStrings.l_HtmlSanitizationFailure_Text = "［1o9wQ］‏‏أب�
 _u.ExtensibilityStrings.l_Insufficient_Item_Permissions_Text = "［UnS7g］‏‏أبع[The user doesn't have the permissions required to perform this operation.]לף";
 _u.ExtensibilityStrings.l_InternalFormatError_Text = "［ex0FM］‏‏أبع[There was an internal format error.]לף";
 _u.ExtensibilityStrings.l_InternalProtocolError_Text = "［DZrmo］‏‏أبع[Internal protocol error: '{0}'.]לף";
+_u.ExtensibilityStrings.l_Internal_Server_Error_Text = "［33YvC］‏‏أبع[The Exchange server returned an error. Please look at the diagnostics object for more information.]לף";
+_u.ExtensibilityStrings.l_Internet_Not_Connected_Error_Text = "［mlqpV］‏‏أبع[The user is no longer connected to the network. Please check your network connection and try again.]לף";
 _u.ExtensibilityStrings.l_InvalidActionType_Text = "［5RL6t］‏‏أبع[The value of the parameter 'actionType' is invalid. The accepted value is \"showTaskPane\".]לף"
 _u.ExtensibilityStrings.l_InvalidAttachmentId_Text = "［39s5K］‏‏أبع[The attachment ID was invalid.]לף";
 _u.ExtensibilityStrings.l_InvalidAttachmentPath_Text = "［tMziE］‏‏أبع[The attachment path was invalid.]לף";
@@ -51,12 +54,15 @@ _u.ExtensibilityStrings.l_NullOrEmptyParameterError_Text = "［TUp25］‏‏أ�
 _u.ExtensibilityStrings.l_NumberOfNotificationsExceeded_Text = "［WMQ17］‏‏أبع[The notification couldn't be added because the notification limit has been reached.]לף";
 _u.ExtensibilityStrings.l_NumberOfRecipientsExceeded_Text = "［zpupz］‏‏أبع[The total number of recipients in the field can't exceed {0}.]לף";
 _u.ExtensibilityStrings.l_OffsetNotfound_Text = "［7Oysv］‏‏أبع[An offset for this time stamp couldn't be found.]לף";
+_u.ExtensibilityStrings.l_Olk_Http_Error_Text = "［5QU73］‏‏أبع[The request has failed. Please look at the diagnostics object for the HTTP error code.]לף";
 _u.ExtensibilityStrings.l_ParameterValueTooLongError_Text = "［wqO9W］‏‏أبع[The value of the '{0}' parameter is too long. The maximum number of characters is '{1}'.]לף";
 _u.ExtensibilityStrings.l_ParametersNotAsExpected_Text = "［X5aEC］‏‏أبع[The given parameters do not match the expected format.]לף";
 _u.ExtensibilityStrings.l_PersistedNotificationArrayReadError_Text = "［vriVR］‏‏أبع[The API call you made failed because the persisted notifications couldn't be retrieved.]לף";
 _u.ExtensibilityStrings.l_PersistedNotificationArraySaveError_Text = "［xo4Kx］‏‏أبع[The API call you made failed because notifications couldn't be persisted.]לף";
 _u.ExtensibilityStrings.l_RecurrenceErrorMaxOccurrences_Text = "［X1pSJ］‏‏أبع[The recurring series exceeds the maximum limit of 999 occurrences.]לף";
 _u.ExtensibilityStrings.l_RecurrenceErrorZeroOccurrences_Text = "［bqfrU］‏‏أبع[The recurring series has no occurrences in the specified date range.]לף";
+_u.ExtensibilityStrings.l_RecurrenceInvalidTimeZone_Text = "［98QT7］‏‏أبع[The specified time zone is not supported.]לף";
+_u.ExtensibilityStrings.l_RecurrenceUnsupportedAlternateCalendar_Text = "［zXCzp］‏‏أبع[The recurrence pattern was set by the user using an alternate calendar that is not supported.]לף";
 _u.ExtensibilityStrings.l_Recurrence_Error_Instance_SetAsync_Text = "［XlOSr］‏‏أبع[A recurrence pattern can't be set for a single occurrence in a series.]לף";
 _u.ExtensibilityStrings.l_Recurrence_Error_Properties_Invalid_Text = "［UMYct］‏‏أبع[The recurrence pattern isn't valid. Please check that the specified recurrence properties align with the recurrence type.]לף";
 _u.ExtensibilityStrings.l_SaveError_Text = "［1d3LS］‏‏أبع[Connection error occurred while trying to save the item on the server.]לף";

@@ -1,4 +1,4 @@
-/* Version: 16.0.9309.1000 */
+/* Version: 16.0.10827.10000 */
 
 Type.registerNamespace("_u");
 _u.ExtensibilityStrings = function()
@@ -14,6 +14,7 @@ _u.ExtensibilityStrings.l_AttachmentErrorName_Text = "Errore nell'allegato";
 _u.ExtensibilityStrings.l_AttachmentExceededSize_Text = "Non è possibile aggiungere l'allegato perché è troppo grande.";
 _u.ExtensibilityStrings.l_AttachmentItemIdTooLong_Text = "Uno o più ID allegato troppo lunghi.";
 _u.ExtensibilityStrings.l_AttachmentNameTooLong_Text = "Uno o più nomi degli allegati sono troppo lunghi.";
+_u.ExtensibilityStrings.l_AttachmentNotSupported_Text = "Il tipo di allegato non è supportato.";
 _u.ExtensibilityStrings.l_AttachmentUploadGeneralFailure_Text = "Non è possibile aggiungere l'allegato all'elemento.";
 _u.ExtensibilityStrings.l_AttachmentUrlTooLong_Text = "Uno o più URL degli allegati sono troppo lunghi.";
 _u.ExtensibilityStrings.l_CallSaveAsyncBeforeToken_Text = "Il token non può essere recuperato finché l'elemento non viene salvato.";
@@ -31,9 +32,11 @@ _u.ExtensibilityStrings.l_EmailAddressTooLong_Text = "Uno o più indirizzi di po
 _u.ExtensibilityStrings.l_EwsRequestOversized_Text = "Le dimensioni della richiesta superano il limite di 1 MB. Modificare la richiesta EWS.";
 _u.ExtensibilityStrings.l_ExceededMaxNumberOfAttachments_Text = "Non è possibile aggiungere allegati perché il messaggio contiene già il numero massimo di allegati";
 _u.ExtensibilityStrings.l_HtmlSanitizationFailure_Text = "La purificazione HTML non è riuscita.";
-_u.ExtensibilityStrings.l_Insufficient_Item_Permissions_Text = "The user doesn't have the permissions required to perform this operation.";
+_u.ExtensibilityStrings.l_Insufficient_Item_Permissions_Text = "L'utente non ha le autorizzazioni per eseguire questa operazione.";
 _u.ExtensibilityStrings.l_InternalFormatError_Text = "Errore di formato interno.";
 _u.ExtensibilityStrings.l_InternalProtocolError_Text = "Errore del protocollo interno: '{0}'.";
+_u.ExtensibilityStrings.l_Internal_Server_Error_Text = "Il server di Exchange ha restituito un errore. Vedere l\\'oggetto di diagnostica per altre informazioni.";
+_u.ExtensibilityStrings.l_Internet_Not_Connected_Error_Text = "L\\'utente non è più connesso alla rete. Controlla la connessione di rete e riprova.";
 _u.ExtensibilityStrings.l_InvalidActionType_Text = "Il valore del parametro 'actionType' non è valido. Il valore accettato è \"showTaskPane\"."
 _u.ExtensibilityStrings.l_InvalidAttachmentId_Text = "L'ID dell'allegato non è valido.";
 _u.ExtensibilityStrings.l_InvalidAttachmentPath_Text = "Il percorso dell'allegato non è valido.";
@@ -51,12 +54,15 @@ _u.ExtensibilityStrings.l_NullOrEmptyParameterError_Text = "Il parametro '{0}' �
 _u.ExtensibilityStrings.l_NumberOfNotificationsExceeded_Text = "Non è stato possibile aggiungere la notifica perché è stato raggiunto il limite di notifiche.";
 _u.ExtensibilityStrings.l_NumberOfRecipientsExceeded_Text = "Il numero totale di destinatari nel campo non può superare {0}.";
 _u.ExtensibilityStrings.l_OffsetNotfound_Text = "Non è possibile trovare uno scostamento per il timestamp.";
+_u.ExtensibilityStrings.l_Olk_Http_Error_Text = "Richiesta non riuscita. Controlla nell\\'oggetto di diagnostica il codice di errore HTTP.";
 _u.ExtensibilityStrings.l_ParameterValueTooLongError_Text = "Il valore del parametro '{0}' è troppo lungo. Il numero massimo di caratteri è '{1}'.";
 _u.ExtensibilityStrings.l_ParametersNotAsExpected_Text = "I parametri specificati non corrispondono al formato previsto.";
 _u.ExtensibilityStrings.l_PersistedNotificationArrayReadError_Text = "La chiamata all'API effettuata non è riuscita perché non è stato possibile recuperare le notifiche persistenti.";
 _u.ExtensibilityStrings.l_PersistedNotificationArraySaveError_Text = "La chiamata all'API effettuata non è riuscita perché non è stato possibile salvare le notifiche in modo persistente.";
 _u.ExtensibilityStrings.l_RecurrenceErrorMaxOccurrences_Text = "La serie ricorrente supera il limite massimo di 999 occorrenze.";
 _u.ExtensibilityStrings.l_RecurrenceErrorZeroOccurrences_Text = "La serie ricorrente non ha occorrenze nell\\'intervallo di date specificato.";
+_u.ExtensibilityStrings.l_RecurrenceInvalidTimeZone_Text = "Il fuso orario specificato non è supportato.";
+_u.ExtensibilityStrings.l_RecurrenceUnsupportedAlternateCalendar_Text = "Il criterio di ricorrenza è stato impostato dall\\'utente tramite un altro calendario non supportato.";
 _u.ExtensibilityStrings.l_Recurrence_Error_Instance_SetAsync_Text = "Non è possibile impostare un criterio di ricorrenza per una singola occorrenza di una serie.";
 _u.ExtensibilityStrings.l_Recurrence_Error_Properties_Invalid_Text = "Il criterio di ricorrenza non è valido. Verificare che le proprietà di ricorrenza specificate siano allineate con il tipo di ricorrenza.";
 _u.ExtensibilityStrings.l_SaveError_Text = "Si è verificato un errore di connessione durante il tentativo di salvare l\\'elemento nel server.";
