@@ -36,7 +36,7 @@ Best practices for using the Office.js NPM package include:
 
 ## Installing the NPM package
 
-To install `@microsoft/office-js` locally via the NPM package, run the following command:
+To install "office-js" locally via the NPM package, run the following command:
 
     npm install @microsoft/office-js --save
 
