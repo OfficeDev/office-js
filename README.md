@@ -52,7 +52,7 @@ Installing the NPM package locally creates a set of static Office.js files in th
 
 For example, if you add the contents of the `dist` folder to the `assets` directory of your web server (`https://mysite.com`), then you'd add the following `<script>` tag to your HTML file:
 
-`<script src="https://mysite.com/assets/office.js"></script>`
+    <script src="https://mysite.com/assets/office.js"></script>
 
 <br />
 
