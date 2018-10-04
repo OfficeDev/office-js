@@ -8,23 +8,23 @@ The JavaScript API for Office enables you to create web applications that intera
 
 ## About the NPM package
 
-The NPM package for Office.js (`@microsoft/office-js`) is a copy of what gets published to the official "evergreen" Office.js CDN, at **<https://appsforoffice.microsoft.com/lib/1/hosted/office.js>**. 
+The NPM package for Office.js is a copy of what gets published to the official "evergreen" Office.js CDN, at **<https://appsforoffice.microsoft.com/lib/1/hosted/office.js>**. 
 
-While the Office.js CDN contains all currently available Office.js APIs at any moment in time, each version of the `@microsoft/office-js` NPM package contains only the Office.js APIs that were available at the moment in time when that version of the NPM package was created. 
+While the Office.js CDN contains all currently available Office.js APIs at any moment in time, each version of the NPM package for Office.js contains only the Office.js APIs that were available at the moment in time when that version of the NPM package was created. 
 
 ### Target scenarios
 
-The `@microsoft/office-js` NPM package is intended as a way for you to obtain your own (non-CDN) copy of the Office.js files, that you can statically serve from your own website instead of using the CDN. This NPM package is primarily provided to address the following scenarios:
+The NPM package for Office.js is intended as a way for you to obtain your own (non-CDN) copy of the Office.js files, which you can then statically serve from your own website instead of using the CDN. This NPM package is primarily provided to address the following scenarios:
 
 1. If you are developing an add-in behind a firewall, where accessing the Office.js CDN is not possible.
 
 2. If you need offline access to the Office.js APIs (for example, to facilitate offline debugging).
 
-Additionally, using the alpha and beta versions of the NPM package can facilitate faster-cadence beta-testing (relative to the slower-cadence beta CDN at <https://appsforoffice.microsoft.com/lib/beta/hosted/office.js>).
+Additionally, using the alpha and beta versions of the NPM package can facilitate faster-cadence beta-testing (relative to the slower-cadence beta CDN at **<https://appsforoffice.microsoft.com/lib/beta/hosted/office.js>**).
 
 ### Best practices
 
-Best practices for using the `@microsoft/office-js` NPM package include:
+Best practices for using the Office.js NPM package include:
 
 - Refresh your NPM package periodically (to gain access to new APIs and/or bug fixes that may not have been available in your current version of the package).
 
