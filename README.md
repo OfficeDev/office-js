@@ -10,11 +10,11 @@ The JavaScript API for Office enables you to create web applications that intera
 
 The NPM package for Office.js is a copy of what gets published to the official "evergreen" Office.js CDN, at **<https://appsforoffice.microsoft.com/lib/1/hosted/office.js>**. 
 
-While the Office.js CDN contains all currently available Office.js APIs at any moment in time, each version of the NPM package for Office.js contains only the Office.js APIs that were available at the moment in time when that version of the NPM package was created. 
+While the Office.js CDN contains all currently available Office.js APIs at any moment in time, each version of the NPM package for Office.js contains only the Office.js APIs that were available at the point in time when that version of the NPM package was created. 
 
 ### Target scenarios
 
-The NPM package for Office.js is intended as a way for you to obtain your own (non-CDN) copy of the Office.js files, which you can then statically serve from your own website instead of using the CDN. This NPM package is primarily provided to address the following scenarios:
+The NPM package for Office.js is intended as a way for you to obtain your own (non-CDN) copy of the Office.js files, which you can then statically serve from your own site instead of using the CDN. This NPM package is primarily provided to address the following scenarios:
 
 1. If you are developing an add-in behind a firewall, where accessing the Office.js CDN is not possible.
 
@@ -28,7 +28,7 @@ Best practices for using the Office.js NPM package include:
 
 - Refresh your NPM package periodically (to gain access to new APIs and/or bug fixes that may not have been available in your current version of the package).
 
-- Do not try to import the NPM package. Instead, follow the instructions in [Using the NPM package](#using-the-npm-package).
+- Use the NPM package according to the instructions in [Using the NPM package](#using-the-npm-package); do not try to import the NPM package as you might commonly do with other NPM packages.
 
 - Do not use the NPM package in an add-in that you submit for publication to [AppSource](https://appsource.microsoft.com/marketplace/apps?product=office). Add-ins that are published to AppSource must use the Office.js CDN.
 
@@ -44,7 +44,7 @@ To install `@microsoft/office-js` locally via the NPM package, run the following
 
 ## Using the NPM package
 
-Installing the NPM package locally creates a set of static Office.js files in the `node_modules\@microsoft\office-js\dist` folder. To use the NPM package, do the following:
+Installing the NPM package locally creates a set of static Office.js files in the `node_modules\@microsoft\office-js\dist` folder of the directory where you ran the `npm install` command. To use the NPM package, do the following:
 
 1. Copy the contents of this folder as-is to the destination of your choosing.
 
