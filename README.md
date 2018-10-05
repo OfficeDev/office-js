@@ -30,7 +30,7 @@ Best practices for using the Office.js NPM package include:
 
 - Do not use the NPM package in an add-in that you submit for publication to [AppSource](https://appsource.microsoft.com/marketplace/apps?product=office). Add-ins that are published to AppSource must use the Office.js CDN.
 
-- Use TypeScript definitions for Office.js as described in [IntelliSense definitions](intellisense-definitions).
+- Use TypeScript definitions for Office.js as described in [IntelliSense definitions](#intellisense-definitions).
 
 <br />
 
