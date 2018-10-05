@@ -30,6 +30,8 @@ Best practices for using the Office.js NPM package include:
 
 - Do not use the NPM package in an add-in that you submit for publication to [AppSource](https://appsource.microsoft.com/marketplace/apps?product=office). Add-ins that are published to AppSource must use the Office.js CDN.
 
+- Use TypeScript definitions for Office.js as described in [IntelliSense definitions](intellisense-definitions).
+
 <br />
 
 ## Installing the NPM package
@@ -65,6 +67,18 @@ TypeScript definitions for Office.js are available.
 * For **any version** (including **RELEASE**, but also including **BETA**, etc.):
   * Inside of the NPM package, under `dist/office.d.ts`
   * In this repo: [dist/office.d.ts](dist/office.d.ts)
+
+### Using TypeScript definitions with the NPM package
+
+1. If you are using the Office.js NPM package for the [firewall scenario](#target-scenarios) and want a d.ts file that precisely matches the JS contents, use the d.ts file that is located within the `/dist/office.d.ts` folder of the NPM package. You can achieve this by using a [triple-slash reference](https://www.typescriptlang.org/docs/handbook/triple-slash-directives.html). 
+
+   - **Tip**: If you create a `references.ts` file at the root of the project, you can simply point the reference to `office.d.ts` there.
+
+2. If you are using the Office.js NPM package for **beta**, follow the guidance outlined in the preceding point (#1), but make sure to update often.
+
+If neither of these points apply to your scenario, you can just use the types from `@types/office-js` (which is identical to what's available via [DefinitelyTyped](https://github.com/DefinitelyTyped/DefinitelyTyped/blob/master/types/office-js/index.d.ts)) and reference the Office.js CDN at <https://appsforoffice.microsoft.com/lib/1/hosted/office.js> -- in which case you don't need to use the Office.js NPM package.
+
+### Enabling IntelliSense in Visual Studio
 
 Visual Studio 2017+ can use these same TypeScript definitions, even for regular JavaScript. For JavaScript IntelliSense in earlier versions of Visual Studio, an `office-vsdoc.js` is available alongside the `office.js` file. As long as you have a `Scripts/_references.js` file in your VS project, and as long as you substitute the existing triple-slash reference (`/// <reference path="https://.../office.js" />`) with the new location (the `-vsdoc` part gets substituted automatically, so use it just as you would in a `<script src="">` reference), you should have the corresponding JavaScript IntelliSense.
 
