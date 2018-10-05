@@ -20,8 +20,6 @@ The NPM package for Office.js is intended as a way for you to obtain your own (n
 
 2. If you need offline access to the Office.js APIs (for example, to facilitate offline debugging).
 
-Additionally, using the alpha and beta versions of the NPM package can facilitate faster-cadence beta-testing (relative to the slower-cadence beta CDN at **<https://appsforoffice.microsoft.com/lib/beta/hosted/office.js>**).
-
 ### Best practices
 
 Best practices for using the Office.js NPM package include:
@@ -46,13 +44,13 @@ To install "office-js" locally via the NPM package, run the following command:
 
 Installing the NPM package locally creates a set of static Office.js files in the `node_modules\@microsoft\office-js\dist` folder of the directory where you ran the `npm install` command. To use the NPM package, do the following:
 
-1. Copy the contents of this folder as-is to the destination of your choosing.
+1. Either manually or as part of a build script (e.g., `CopyWebpackPlugin` if you're using Webpack), have the files get served from a destination of your choosing (e.g., `/assets/office-js/`).
 
 2. Reference that location in a `<script>` tag within the HTML file in your add-in project.
 
-For example, if you add the contents of the `dist` folder to the `assets` directory of your web server (`https://mysite.com`), then you'd add the following `<script>` tag to your HTML file:
+For example, if you add the contents of the `dist` folder to the `assets/office-js` directory of your web server, then you'd add the following `<script>` tag to your HTML file:
 
-    <script src="https://mysite.com/assets/office.js"></script>
+    <script src="/assets/office-js/office.js"></script>
 
 <br />
 
@@ -60,15 +58,15 @@ For example, if you add the contents of the `dist` folder to the `assets` direct
 
 TypeScript definitions for Office.js are available.
 
-* For **latest RELEASE version** of Office.js:
- * DefinitelyTyped: <https://github.com/DefinitelyTyped/DefinitelyTyped/blob/master/types/office-js/index.d.ts>
- * @types: `@types/office-js`.  (Acquire as `npm install @types/office-js --save-dev`)
-* For **any version** (**including RELEASE**, but also including ALPHA, BETA, etc.):
+* For latest **RELEASE** version of Office.js:
+  * DefinitelyTyped: <https://github.com/DefinitelyTyped/DefinitelyTyped/blob/master/types/office-js/index.d.ts>
+  * @types: `@types/office-js`.  (Acquire as `npm install @types/office-js --save-dev`)
+
+* For **any version** (including **RELEASE**, but also including **BETA**, etc.):
   * Inside of the NPM package, under `dist/office.d.ts`
-  * In this repo: [dist/office.d.ts](dis/office.d.ts)
+  * In this repo: [dist/office.d.ts](dist/office.d.ts)
 
-Visual Studio 2017+ can use these same TypeScript definitions, even for regular JavaScript.  For JavaScript IntelliSense in earlier versions of Visual Studio, an `office-vsdoc.js` is available alongside the `office.js` file.  As long as you have a `Scripts/_references.js` file in your VS project, and as long as you substitute the existing triple-slash reference (`/// <reference path="https://.../office.js" />`) with the new location (the `-vsdoc` part gets substituted automatically, so use it just as you would in a `<script src="">` reference), you should have the corresponding JavaScript IntelliSense.
-
+Visual Studio 2017+ can use these same TypeScript definitions, even for regular JavaScript. For JavaScript IntelliSense in earlier versions of Visual Studio, an `office-vsdoc.js` is available alongside the `office.js` file. As long as you have a `Scripts/_references.js` file in your VS project, and as long as you substitute the existing triple-slash reference (`/// <reference path="https://.../office.js" />`) with the new location (the `-vsdoc` part gets substituted automatically, so use it just as you would in a `<script src="">` reference), you should have the corresponding JavaScript IntelliSense.
 
 <br />
 
