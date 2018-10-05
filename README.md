@@ -44,7 +44,7 @@ To install "office-js" locally via the NPM package, run the following command:
 
 Installing the NPM package locally creates a set of static Office.js files in the `node_modules\@microsoft\office-js\dist` folder of the directory where you ran the `npm install` command. To use the NPM package, do the following:
 
-1. Either manually or as part of a build script (e.g., `CopyWebpackPlugin` if you're using Webpack), have the files get served from a destination of your choosing (e.g., `/assets/office-js/`).
+1. Either manually or as part of a build script (e.g., `CopyWebpackPlugin` if you're using Webpack), have the files get served from a destination of your choosing (e.g., from the `/assets/office-js/` directory of your web server).
 
 2. Reference that location in a `<script>` tag within the HTML file in your add-in project.
 
