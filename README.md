@@ -93,7 +93,7 @@ When you have a version number, can use it as follows with <https://unpkg.com>: 
 
 ## Production vs. Beta vs. Private versions
 
-Office.js versioning is described in detail in <https://dev.office.com/docs/add-ins/develop/office-js-versioning>.  Importantly, there is a large difference between what is in the JS files, versus what are the capabilities of a particular computer (i.e., older or slower-to-update versions of office). 
+Office.js versioning is described in detail in <https://docs.microsoft.com/office/dev/add-ins/develop/office-versions-and-requirement-sets>.  Importantly, there is a large difference between what is in the JS files, versus what are the capabilities of a particular computer (i.e., older or slower-to-update versions of office). 
 
 The NPM package and the repo branches assume the following structure.
 
@@ -126,5 +126,5 @@ For example, to use a `1.1.2-beta-next.0` version, use the following references:
 
 For more information on Office Add-ins and the Office JavaScript APIs, see:
 
-- [Office Add-ins platform overview](https://dev.office.com/docs/add-ins/overview/office-add-ins)
-- [JavaScript API for Office reference](https://dev.office.com/reference/add-ins/javascript-api-for-office)
+- [Office Add-ins platform overview](https://docs.microsoft.com/office/dev/add-ins/overview/office-add-ins)
+- [JavaScript API for Office reference](https://docs.microsoft.com/javascript/api/overview/office?view=office-js)
