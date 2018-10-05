@@ -93,7 +93,7 @@ When you have a version number, can use it as follows with <https://unpkg.com>: 
 
 ## Production vs. Beta vs. Private versions
 
-Office.js versioning is described in detail in <https://docs.microsoft.com/office/dev/add-ins/develop/office-versions-and-requirement-sets>.  Importantly, there is a large difference between what is in the JS files, versus what are the capabilities of a particular computer (i.e., older or slower-to-update versions of office). 
+Office.js versioning is described in detail in <https://docs.microsoft.com/office/dev/add-ins/develop/referencing-the-javascript-api-for-office-library-from-its-cdn>.  Importantly, there is a large difference between what is in the JS files, versus what are the capabilities of a particular computer (i.e., older or slower-to-update versions of office). 
 
 The NPM package and the repo branches assume the following structure.
 
