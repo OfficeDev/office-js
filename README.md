@@ -76,7 +76,7 @@ TypeScript definitions for Office.js are available.
 
 2. If you are using the Office.js NPM package for **beta**, follow the guidance outlined in the preceding point (#1), but make sure to update often.
 
-If neither of these points apply to your scenario, you can just use the types from `@types/office-js` (which is identical to what's available via [DefinitelyTyped](https://github.com/DefinitelyTyped/DefinitelyTyped/blob/master/types/office-js/index.d.ts)) and reference the Office.js CDN at <https://appsforoffice.microsoft.com/lib/1/hosted/office.js> -- in which case you don't need to use the Office.js NPM package.
+If neither of these points applies to your scenario, you can just obtain the TypeScript definitions by using `@types/office-js` (which is identical to what's available via [DefinitelyTyped](https://github.com/DefinitelyTyped/DefinitelyTyped/blob/master/types/office-js/index.d.ts)) and reference the Office.js CDN at <https://appsforoffice.microsoft.com/lib/1/hosted/office.js> -- in which case, you don't need to use the Office.js NPM package.
 
 ### Enabling IntelliSense in Visual Studio
 
