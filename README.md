@@ -50,7 +50,7 @@ Installing the NPM package locally creates a set of static Office.js files in th
 
 2. Reference that location in a `<script>` tag within the HTML file in your add-in project.
 
-For example, if you add the contents of the `dist` folder to the `assets/office-js` directory of your web server, then you'd add the following `<script>` tag to your HTML file:
+For example, if you add the contents of the `dist` folder to the `assets/office-js` directory of your project, then you'd add the following `<script>` tag to your HTML file:
 
     <script src="/assets/office-js/office.js"></script>
 
