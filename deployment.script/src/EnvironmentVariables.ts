@@ -1,3 +1,5 @@
+import { isUndefined } from "util";
+
 export interface EnvironmentVariables {
     TRAVIS: string,
     TRAVIS_BRANCH: string,
@@ -21,4 +23,27 @@ export interface EnvironmentVariables {
      * https://docs.npmjs.com/getting-started/working_with_tokens
     */
     NPM_TOKEN: string
+}
+
+function env(variable: string): string {
+    const value = process.env[variable];
+    return isUndefined(value) ? "" : value; 
+}
+
+export function getEnvironmentVariables(): EnvironmentVariables {
+
+    const environment: EnvironmentVariables = {
+        TRAVIS: env("TRAVIS"),
+        TRAVIS_BRANCH:  env("TRAVIS_BRANCH"),
+        TRAVIS_PULL_REQUEST:  env("TRAVIS_PULL_REQUEST"),
+        TRAVIS_COMMIT:  env("TRAVIS_COMMIT"),
+        TRAVIS_COMMIT_MESSAGE:  env("TRAVIS_COMMIT_MESSAGE"),
+        TRAVIS_BUILD_ID:  env("TRAVIS_BUILD_ID"),
+        TRAVIS_BUILD_NUMBER:  env("TRAVIS_BUILD_NUMBER"),
+        TRAVIS_BUILD_DIR:  env("TRAVIS_BUILD_DIR"),
+        GH_TOKEN:  env("GH_TOKEN"),
+        NPM_TOKEN:  env("NPM_TOKEN"),
+    };
+
+    return environment;
 }
