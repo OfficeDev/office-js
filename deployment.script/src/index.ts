@@ -1,10 +1,14 @@
 import * as environment from "./EnvironmentVariables";
 import { isString, isUndefined } from "util";
 import * as semver from "semver";
-import { SemVer } from "semver";
+import { SemVer, coerce } from "semver";
 import {executeCommand} from "./executeCommand"
 import { relative } from "path";
 import {findLatestNpmPackageVersion} from "./findLatestNpmPackageVersion";
+import * as getNextNpmPackageVersion from "./getNextNpmPackageVersion";
+import * as standardFile from "./standardFile";
+import * as path from "path";
+import * as fs from "fs";
 
 const env: environment.EnvironmentVariables = environment.getEnvironmentVariables();
 
@@ -13,9 +17,9 @@ const env: environment.EnvironmentVariables = environment.getEnvironmentVariable
 const fieldsToPrint: (keyof environment.EnvironmentVariables)[] = [
     "TRAVIS",
     "TRAVIS_BRANCH",
-    "TRAVIS_BUILD_ID",
-    "TRAVIS_BUILD_NUMBER",
-    "TRAVIS_COMMIT_MESSAGE",
+    //"TRAVIS_BUILD_ID",
+    //"TRAVIS_BUILD_NUMBER",
+    //"TRAVIS_COMMIT_MESSAGE",
     "TRAVIS_PULL_REQUEST",
 
     // TRAVIS_BUILD_DIR Intentionally left out, since it serves no use to see, and causes issues if you copy-paste the output of these Travis parameters from the log into "launch.json"
@@ -121,11 +125,62 @@ custom:
 
 */
 
-
+function getNpmPackageTag(release_type: ReleaseType): string | undefined{
+    if (release_type === ReleaseType.release) {
+        return undefined;
+    } else {
+        return release_type as string;
+    }
+}
 
 
 // Base actions on the branch name
 const release_type = getReleaseTypeFromBranchName(env.TRAVIS_BRANCH);
+const tag = getNpmPackageTag(release_type);
+
+const nextNpmPackageVersion = getNextNpmPackageVersion.getNextNpmPackageVersion("@microsoft/office-js", tag);
+console.log(`Package Version: [${nextNpmPackageVersion}]`);
+
+function updatePackageVersion(packageJsonPath: string, version: string) {
+    type Package = {version: string};
+    
+    const packageData: Package = standardFile.readFileJson<Package>(packageJsonPath);
+
+    packageData.version = version;
+
+    standardFile.writeFileJson(packageJsonPath, packageData);
+}
+
+// update the package.json
+
+
+
+console.log(env.TRAVIS_BUILD_DIR);
+
+[env.TRAVIS_BUILD_DIR, path.join(env.TRAVIS_BUILD_DIR, "..")].forEach((dir: string)=> {
+
+    console.log(`dir: [${dir}]`);
+
+    
+    if (dir === "" || dir === undefined || dir === "..") {
+
+    } else if (fs.existsSync(dir) && standardFile.IsDirectory(dir)) {
+        console.log(`subdirectories: [${dir}]`);
+        console.log(standardFile.getSubDirectories(env.TRAVIS_BUILD_DIR));
+        
+        console.log(`files: [${dir}]`);
+        console.log(standardFile.getFilesInDirectory(env.TRAVIS_BUILD_DIR));
+    }
+
+});
+
+console.log("update package");
+updatePackageVersion("package.json", nextNpmPackageVersion);
+
+
+
+
+
 
 // view all versions
 
@@ -140,14 +195,15 @@ const release_type = getReleaseTypeFromBranchName(env.TRAVIS_BRANCH);
 // find similar versions
 
 
-[undefined, "beta", "adhoc"].forEach((version: string | undefined) => {
-    console.log(`version: [${version}] [${findLatestNpmPackageVersion("@microsoft/office-js", version)}]`);
-});
+// [undefined, "beta", "adhoc"].forEach((version: string | undefined) => {
+//     console.log(`version: [${version}] [${findLatestNpmPackageVersion("@microsoft/office-js", version)}]`);
+// });
 
+// getNextNpmPackageVersion.test();
 
-function getNextPackageVersion(release_type: ReleaseType, tag?: string) {
-    // read package.json
-}
+// function getNextPackageVersion(release_type: ReleaseType, tag?: string) {
+//     // read package.json
+// }
 
 
 // read package.json
@@ -181,20 +237,27 @@ prerelease(v): Returns an array of prerelease components, or null if none exist.
  * custom: x.y.(z+1)-custom.p
  */
 
-let t: semver.SemVer = new semver.SemVer("1.1.1");
-console.log(t.format());
+// let t: semver.SemVer = new semver.SemVer("1.1.1");
+// console.log(t.format());
 
-t = t.inc('patch');
-console.log(t.format());
+// t = t.inc('patch');
+// console.log(t.format());
 
-t = t.inc('prerelease');
-console.log(t.format());
+// t = t.inc('prerelease');
+// console.log(t.format());
 
-t = t.inc("prerelease", "beta");
-console.log(t.format());
+// t = t.inc("prerelease", "beta");
+// console.log(t.format());
 
-t = t.inc("prerelease");
-console.log(t.format());
+// t = t.inc("prerelease");
+// console.log(t.format());
+
+// const v = semver.coerce("1.1.3-beta.1");
+// console.log(v === null ? "null" : v.format());
+
+
+
+//semver.gte(basis, semver.coerce(tagVersion)
 
 // pretty easy to increment last digit
 // t= semver.inc('1.2.3-beta.0', 'prerelease') as string;
