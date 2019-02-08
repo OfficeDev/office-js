@@ -25,14 +25,10 @@ const fieldsToPrint: (keyof environment.EnvironmentVariables)[] = [
     // TRAVIS_BUILD_DIR Intentionally left out, since it serves no use to see, and causes issues if you copy-paste the output of these Travis parameters from the log into "launch.json"
 ];
 
-
-const fields = fieldsToPrint.map(item => `"${item}": "${process.env[item]}"`).join(",\n");
+const fields = fieldsToPrint.map(item => `"${item}": "${env[item]}"`).join(",\n");
 console.log(fields);
 
-// Base deployment action on the branch name
-const DEPLOYMENT_BRANCH_NAME_RELEASE = "release";
-const DEPLOYMENT_BRANCH_NAME_BETA = "beta";
-const DEPLOYMENT_BRANCH_NAME_CUSTOM_PREFIX = "custom";
+
 
 enum ReleaseType {
     release = "release",
@@ -40,6 +36,11 @@ enum ReleaseType {
     custom = "custom",
     none = "none"
 }
+
+// Base deployment action on the branch name
+const DEPLOYMENT_BRANCH_NAME_RELEASE = ReleaseType.release as string;
+const DEPLOYMENT_BRANCH_NAME_BETA =  ReleaseType.beta as string;
+const DEPLOYMENT_BRANCH_NAME_CUSTOM_PREFIX =  ReleaseType.custom as string;
 
 function getReleaseTypeFromBranchName(branchName: string): ReleaseType {
 
@@ -79,23 +80,18 @@ function deploymentPrerequisitesPassed(): boolean {
         shouldDeploy = false;
     }
 
-
-    const REQUIRED_ADDITIONAL_FIELDS: Array<keyof environment.EnvironmentVariables> = ["GH_TOKEN"];
-
-    REQUIRED_ADDITIONAL_FIELDS.forEach(key => {
-        if (!isString(process.env[key]) || (process.env[key] as string).trim().length <= 0) {
-            console.log(`Deployment skipped - [${key}] is a required global variables.`);
-            shouldDeploy = false;
-        }
-    });
+    if (env.NPM_TOKEN.length <= 0) {
+        console.log(`Deployment skipped - [NPM_TOKEN] is a required global variables.`);
+        shouldDeploy = false;
+    }
 
     return shouldDeploy;
 }
 
 if (!deploymentPrerequisitesPassed()){
     // TODO: Actually exit
-    console.log("TODO: Actually skip deployment")
-    // process.exit(0);
+    // console.log("TODO: Actually skip deployment")
+    process.exit(0);
 }
 
 /*
@@ -125,7 +121,11 @@ custom:
 
 */
 
-function getNpmPackageTag(release_type: ReleaseType): string | undefined{
+/**
+ * The tag that should be applied to the package
+ * @param release_type 
+ */
+function getNpmPackageTag(release_type: ReleaseType): string | undefined {
     if (release_type === ReleaseType.release) {
         return undefined;
     } else {
@@ -138,8 +138,6 @@ function getNpmPackageTag(release_type: ReleaseType): string | undefined{
 const release_type = getReleaseTypeFromBranchName(env.TRAVIS_BRANCH);
 const tag = getNpmPackageTag(release_type);
 
-const nextNpmPackageVersion = getNextNpmPackageVersion.getNextNpmPackageVersion("@microsoft/office-js", tag);
-console.log(`Package Version: [${nextNpmPackageVersion}]`);
 
 function updatePackageVersion(packageJsonPath: string, version: string) {
     type Package = {version: string};
@@ -156,12 +154,11 @@ function updatePackageVersion(packageJsonPath: string, version: string) {
 
 
 console.log(env.TRAVIS_BUILD_DIR);
-
+/*
 [env.TRAVIS_BUILD_DIR, path.join(env.TRAVIS_BUILD_DIR, "..")].forEach((dir: string)=> {
 
     console.log(`dir: [${dir}]`);
 
-    
     if (dir === "" || dir === undefined || dir === "..") {
 
     } else if (fs.existsSync(dir) && standardFile.IsDirectory(dir)) {
@@ -173,13 +170,68 @@ console.log(env.TRAVIS_BUILD_DIR);
     }
 
 });
+*/
+interface AdditionalInfoError extends Error {
+    additionalInfo: string;
+}
 
-console.log("update package");
-updatePackageVersion("package.json", nextNpmPackageVersion);
+function isPublishOverPreviouslyPublishVersionErrorString(errorText: string): boolean {
+    const phraseMatchIndex = [
+        "npm ERR! You cannot publish over the previously published version",
+        "npm ERR! Cannot publish over previously published version"
+    ]
+        .map(phrase => phrase.toLowerCase())
+        .findIndex(phrase => errorText.toLowerCase().indexOf(phrase) >= 0);
+    return phraseMatchIndex >= 0;
+}
+
+function deployNpmPackage(packageName: string, packageTag: string | undefined, npmAuthToken: string): void {
+    console.log("Write .npmrc Deployment Token:")
+    fs.writeFileSync(".npmrc", `//registry.npmjs.org/:_authToken=${env.NPM_TOKEN}`);
+    
+    let remainingPublishAttempts = 3;
+    let npmDeploymentSucceeded = false;
+
+    while (!npmDeploymentSucceeded && remainingPublishAttempts > 0){
+        remainingPublishAttempts -= 1;
+
+        // dist folder is underneath
+        const nextNpmPackageVersion = getNextNpmPackageVersion.getNextNpmPackageVersion("@microsoft/office-js", tag);
+        console.log(`Package Version: [${nextNpmPackageVersion}]`);
+        
+        console.log("update package:");
+        updatePackageVersion("package.json", nextNpmPackageVersion);
+        
+        console.log("Publish:")
+        const tagParameter = tag === undefined ? "" : `--tag ${tag}`;
+
+        try {
+            executeCommand(`npm publish ${tagParameter}`);
+            npmDeploymentSucceeded = true;
+        } catch (e) {
+            const wasFailureDueToPreviouslyPublishedDeletedVersion =
+                (e as AdditionalInfoError).additionalInfo &&
+                isPublishOverPreviouslyPublishVersionErrorString((e as AdditionalInfoError).additionalInfo);
+
+            if (wasFailureDueToPreviouslyPublishedDeletedVersion) {
+                console.log(`Previous version was taken, trying again with an incremented version number...`);
+            } else {
+                throw e;
+            }
+        }
+    }
+
+
+
+}
 
 
 
 
+const packageName = "@microsoft/office-js";
+const packageTag = tag;
+const npmAuthToken = env.NPM_TOKEN;
+deployNpmPackage(packageName, packageTag, npmAuthToken);
 
 
 // view all versions
