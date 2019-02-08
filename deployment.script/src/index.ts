@@ -151,9 +151,6 @@ function updatePackageVersion(packageJsonPath: string, version: string) {
 
 // update the package.json
 
-
-
-console.log(env.TRAVIS_BUILD_DIR);
 /*
 [env.TRAVIS_BUILD_DIR, path.join(env.TRAVIS_BUILD_DIR, "..")].forEach((dir: string)=> {
 
@@ -185,11 +182,13 @@ function isPublishOverPreviouslyPublishVersionErrorString(errorText: string): bo
     return phraseMatchIndex >= 0;
 }
 
-function deployNpmPackage(packageName: string, packageTag: string | undefined, npmAuthToken: string): void {
+function deployNpmPackage(packageDirectory: string, packageName: string, packageTag: string | undefined, npmAuthToken: string): void {
     console.log("Write .npmrc Deployment Token:")
     fs.writeFileSync(".npmrc", `//registry.npmjs.org/:_authToken=${env.NPM_TOKEN}`);
     
-    let remainingPublishAttempts = 3;
+    const packageJsonPath = path.join(packageDirectory, "package.json");
+
+    let remainingPublishAttempts = 1;
     let npmDeploymentSucceeded = false;
 
     while (!npmDeploymentSucceeded && remainingPublishAttempts > 0){
@@ -200,13 +199,14 @@ function deployNpmPackage(packageName: string, packageTag: string | undefined, n
         console.log(`Package Version: [${nextNpmPackageVersion}]`);
         
         console.log("update package:");
-        updatePackageVersion("package.json", nextNpmPackageVersion);
+        
+        updatePackageVersion(packageJsonPath, nextNpmPackageVersion);
         
         console.log("Publish:")
         const tagParameter = tag === undefined ? "" : `--tag ${tag}`;
 
         try {
-            executeCommand(`npm publish ${tagParameter}`);
+            executeCommand(`npm publish ${tagParameter}`, packageDirectory);
             npmDeploymentSucceeded = true;
         } catch (e) {
             const wasFailureDueToPreviouslyPublishedDeletedVersion =
@@ -227,11 +227,15 @@ function deployNpmPackage(packageName: string, packageTag: string | undefined, n
 
 
 
-
+const packageDirectory = env.TRAVIS_BUILD_DIR;
 const packageName = "@microsoft/office-js";
 const packageTag = tag;
 const npmAuthToken = env.NPM_TOKEN;
-deployNpmPackage(packageName, packageTag, npmAuthToken);
+
+console.log(`subdirectories: [${packageDirectory}]`);
+console.log(standardFile.getSubDirectories(packageDirectory));
+
+deployNpmPackage(packageDirectory, packageName, packageTag, npmAuthToken);
 
 
 // view all versions
