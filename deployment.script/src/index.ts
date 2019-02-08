@@ -183,16 +183,20 @@ function isPublishOverPreviouslyPublishVersionErrorString(errorText: string): bo
 }
 
 function deployNpmPackage(packageDirectory: string, packageName: string, packageTag: string | undefined, npmAuthToken: string): void {
-    console.log("Write .npmrc Deployment Token:")
-    fs.writeFileSync(".npmrc", `//registry.npmjs.org/:_authToken=${env.NPM_TOKEN}`);
-    
-    const packageJsonPath = path.join(packageDirectory, "package.json");
 
-    let remainingPublishAttempts = 1;
+    const packageJsonPath = path.join(packageDirectory, "package.json");
+    const npmrcPath = path.join(packageDirectory, ".npmrc");
+
+    console.log("Write .npmrc Deployment Token:")
+    fs.writeFileSync(npmrcPath, `//registry.npmjs.org/:_authToken=${env.NPM_TOKEN}`);
+    
+    let remainingPublishAttempts: number = 1;
     let npmDeploymentSucceeded = false;
 
     while (!npmDeploymentSucceeded && remainingPublishAttempts > 0){
-        remainingPublishAttempts -= 1;
+        remainingPublishAttempts = remainingPublishAttempts - 1;
+        console.log(`Attempting Publish to NPM...`);
+        console.log(`Remaining Publish Attempts ${remainingPublishAttempts}`);
 
         // dist folder is underneath
         const nextNpmPackageVersion = getNextNpmPackageVersion.getNextNpmPackageVersion("@microsoft/office-js", tag);
@@ -213,9 +217,7 @@ function deployNpmPackage(packageDirectory: string, packageName: string, package
                 (e as AdditionalInfoError).additionalInfo &&
                 isPublishOverPreviouslyPublishVersionErrorString((e as AdditionalInfoError).additionalInfo);
 
-            if (wasFailureDueToPreviouslyPublishedDeletedVersion) {
-                console.log(`Previous version was taken, trying again with an incremented version number...`);
-            } else {
+            if (!wasFailureDueToPreviouslyPublishedDeletedVersion) {
                 throw e;
             }
         }
