@@ -11,9 +11,6 @@
         "node": ">=6.9.4"
     },
     "scripts": {
-        "build.deploy.script": "tsc -p deployment.script/tsconfig.json",
-        "tslint.deploy.script": "tslint --project deployment.script/tsconfig.json",
-        "deploy": "node deployment.script/deploy.js"
     },
     "author": {
         "email": "onpm@microsoft.com",
