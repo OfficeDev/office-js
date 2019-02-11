@@ -12,6 +12,10 @@
     },
     "scripts": {
     },
+    "files": {
+        "dist",
+        "embedded"
+    },
     "author": {
         "email": "onpm@microsoft.com",
         "name": "Microsoft",
