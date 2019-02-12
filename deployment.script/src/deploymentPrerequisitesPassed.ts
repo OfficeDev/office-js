@@ -1,4 +1,5 @@
 import { EnvironmentVariables } from "./EnvironmentVariables";
+import { getReleaseTypeFromBranchName, ReleaseType } from "./ReleaseType";
 
 export function deploymentPrerequisitesPassed(env: EnvironmentVariables): boolean {
     let shouldDeploy = true;
