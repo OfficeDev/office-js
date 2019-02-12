@@ -55,7 +55,7 @@ export function deployNpmPackage(packageDirectory: string, packageName: string, 
         const tagParameter = packageTag === undefined ? "" : `--tag ${packageTag}`;
 
         try {
-            executeCommand(`npm publish ${tagParameter}`, packageDirectory);
+            executeCommand(`npm publish ${tagParameter}`, packageDirectory, false);
             npmDeploymentSucceeded = true;
         } catch (e) {
             const wasFailureDueToPreviouslyPublishedDeletedVersion =

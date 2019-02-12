@@ -17,7 +17,7 @@ import { SemVer } from "semver";
 export function getNextNpmPackageVersion(packageName: string, tag?: string): string {
 
     const currentVersionRelease = findLatestNpmPackageVersion(packageName);
-    console.log(`currentVersionRelease: ${currentVersionRelease}`);
+    // console.log(`currentVersionRelease: ${currentVersionRelease}`);
 
     // Handle case: release
     if (tag === undefined ) {

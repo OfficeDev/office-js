@@ -1,5 +1,9 @@
 import { EnvironmentVariables } from "./EnvironmentVariables";
 import * as standardFile from "./standardFile";
+import { executeCommand } from "./executeCommand";
+
+// const out = executeCommand(`npm view "@microsoft/office-js" versions --json`, `R:\\office-js-api\\tools`, true);
+// console.log(out);
 
 export function debug(env: EnvironmentVariables) {
     // Print environment variables

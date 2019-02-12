@@ -32,7 +32,7 @@ custom:
     version: x.y.(z+1)-custom.p
     tag: custom
 */
-
+console.log("Deployment Script: Start");
 const env: environment.EnvironmentVariables = environment.getEnvironmentVariables();
 
 // Printing for debug purposes
@@ -52,3 +52,4 @@ const packageTag = tag;
 const npmAuthToken = env.NPM_TOKEN;
 
 deployNpmPackage(packageDirectory, packageName, packageTag, npmAuthToken);
+console.log("Deployment Script: Complete");
