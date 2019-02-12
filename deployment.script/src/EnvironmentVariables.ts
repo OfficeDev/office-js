@@ -1,9 +1,9 @@
 import { isUndefined } from "util";
 
 export interface EnvironmentVariables {
-    TRAVIS: string,
+    TRAVIS: boolean,
     TRAVIS_BRANCH: string,
-    TRAVIS_PULL_REQUEST: string,
+    TRAVIS_PULL_REQUEST: boolean,
     TRAVIS_COMMIT: string,
     TRAVIS_COMMIT_MESSAGE: string,
     TRAVIS_BUILD_ID: string,
@@ -33,9 +33,9 @@ function env(variable: string): string {
 export function getEnvironmentVariables(): EnvironmentVariables {
 
     const environment: EnvironmentVariables = {
-        TRAVIS: env("TRAVIS"),
+        TRAVIS: env("TRAVIS") === "true",
         TRAVIS_BRANCH:  env("TRAVIS_BRANCH"),
-        TRAVIS_PULL_REQUEST:  env("TRAVIS_PULL_REQUEST"),
+        TRAVIS_PULL_REQUEST:  env("TRAVIS_PULL_REQUEST") === "true",
         TRAVIS_COMMIT:  env("TRAVIS_COMMIT"),
         TRAVIS_COMMIT_MESSAGE:  env("TRAVIS_COMMIT_MESSAGE"),
         TRAVIS_BUILD_ID:  env("TRAVIS_BUILD_ID"),
