@@ -64,7 +64,6 @@ console.log(`
 
 Unpkg CDN URLs:
 https://unpkg.com/@microsoft/office-js@${deployedPackageVersion}/dist/office.js
-https://unpkg.com/@microsoft/office-js@${deployedPackageVersion}/dist/office.d.ts`
-);
-
+https://unpkg.com/@microsoft/office-js@${deployedPackageVersion}/dist/office.d.ts
+`);
 }
