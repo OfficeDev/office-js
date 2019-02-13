@@ -18,3 +18,11 @@ export function debug(env: EnvironmentVariables) {
     console.log(`subdirectories: [${env.TRAVIS_BUILD_DIR}]`);
     console.log(standardFile.getSubDirectories(env.TRAVIS_BUILD_DIR));
 }
+
+export function banner(title: string): string {
+    const border = "-".repeat(title.length);
+    const format = `${border}
+${title}
+${border}`;
+    return format;
+}

@@ -30,8 +30,15 @@ function updatePackageVersion(packageJsonPath: string, version: string) {
     standardFile.writeFileJson(packageJsonPath, packageData);
 }
 
-
-export function deployNpmPackage(packageDirectory: string, packageName: string, packageTag: string | undefined, npmAuthToken: string): void {
+/**
+ * Deploy a new version of a npm package.
+ * @param packageDirectory
+ * @param packageName 
+ * @param packageTag 
+ * @param npmAuthToken
+ * @returns the deployed NPM package version or undefined if deployment was not successful
+ */
+export function deployNpmPackage(packageDirectory: string, packageName: string, packageTag: string | undefined, npmAuthToken: string): string | undefined{
 
     const packageJsonPath = path.join(packageDirectory, "package.json");
     const npmrcPath = path.join(packageDirectory, ".npmrc");
@@ -42,6 +49,8 @@ export function deployNpmPackage(packageDirectory: string, packageName: string, 
     const maxPublishAttempts: number = 1;
     let currentPublishAttempt: number = 0;
     let npmDeploymentSucceeded = false;
+
+    let deployedNpmPackageVersion = undefined;
 
     while (!npmDeploymentSucceeded && currentPublishAttempt < maxPublishAttempts){
         currentPublishAttempt = currentPublishAttempt + 1;
@@ -57,6 +66,7 @@ export function deployNpmPackage(packageDirectory: string, packageName: string, 
         try {
             executeCommand(`npm publish ${tagParameter}`, packageDirectory, true);
             npmDeploymentSucceeded = true;
+            deployedNpmPackageVersion = nextNpmPackageVersion;
         } catch (e) {
             const wasFailureDueToPreviouslyPublishedDeletedVersion =
                 (e as AdditionalInfoError).additionalInfo &&
@@ -67,4 +77,6 @@ export function deployNpmPackage(packageDirectory: string, packageName: string, 
             }
         }
     }
+
+    return deployedNpmPackageVersion;
 }

@@ -2,11 +2,12 @@ import * as environment from "./EnvironmentVariables";
 import * as standardFile from "./standardFile";
 
 import { EnvironmentVariables } from "./EnvironmentVariables";
-import { debug } from "./debug";
+import { debug, banner } from "./debug";
 import { deploymentPrerequisitesPassed } from "./deploymentPrerequisitesPassed";
 import { getReleaseTypeFromBranchName, ReleaseType } from "./ReleaseType";
 import { getNpmPackageTag } from "./getNpmPackageTag";
 import {deployNpmPackage} from "./deployNpmPackage";
+import { isUndefined } from "util";
 
 /*
 General Overview:
@@ -47,9 +48,23 @@ const release_type: ReleaseType = getReleaseTypeFromBranchName(env.TRAVIS_BRANCH
 const tag = getNpmPackageTag(release_type);
 
 const packageDirectory = env.TRAVIS_BUILD_DIR;
-const packageName = "@microsoft/office-js";
+const packageName = "@microsoft/office-js"; // could pull from the package.json
 const packageTag = tag;
 const npmAuthToken = env.NPM_TOKEN;
 
-deployNpmPackage(packageDirectory, packageName, packageTag, npmAuthToken);
+const deployedPackageVersion: string | undefined = deployNpmPackage(packageDirectory, packageName, packageTag, npmAuthToken);
 console.log("Deployment Script: Complete");
+
+
+const deploymentSucceeded = !isUndefined(deployedPackageVersion);
+// report in an extra ovious way
+console.log(banner(`DEPLOYMENT [${deploymentSucceeded ? "SUCCEEDED" : "FAILED"}]`))
+if (deploymentSucceeded) {
+console.log(`
+
+Unpkg CDN URLs:
+https://unpkg.com/@microsoft/office-js@${deployedPackageVersion}/dist/office.js
+https://unpkg.com/@microsoft/office-js@${deployedPackageVersion}/dist/office.d.ts`
+);
+
+}
