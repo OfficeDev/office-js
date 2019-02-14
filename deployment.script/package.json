@@ -10,11 +10,14 @@
     "build": "tsc -p tsconfig.json",
     "lint": "tslint --project tsconfig.json",
     "deploy": "node ./out/index.js",
-    "debug": "npm run build && node ./out/debug.js"
+    "debug": "npm run build && node ./out/debug.js",
+    "prettier": "prettier --list-different \"./**/*.@(ts|tsx|js|jsx|html)\"",
+    "prettier:write": "prettier --write \"./**/*.@(ts|tsx|js|jsx|html)\""
   },
   "devDependencies": {
     "@types/node": "^7.10.2",
     "@types/semver": "^5.5.0",
+    "prettier": "^1.15.2",
     "ts-node": "^8.0.2"
   },
   "dependencies": {

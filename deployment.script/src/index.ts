@@ -6,7 +6,7 @@ import { debug, banner } from "./debug";
 import { deploymentPrerequisitesPassed } from "./deploymentPrerequisitesPassed";
 import { getReleaseTypeFromBranchName, ReleaseType } from "./ReleaseType";
 import { getNpmPackageTag } from "./getNpmPackageTag";
-import {deployNpmPackage} from "./deployNpmPackage";
+import { deployNpmPackage } from "./deployNpmPackage";
 import { isUndefined } from "util";
 
 /*
@@ -39,8 +39,8 @@ const env: environment.EnvironmentVariables = environment.getEnvironmentVariable
 // Printing for debug purposes
 // debug(env);
 
-if (!deploymentPrerequisitesPassed(env)){
-    process.exit(0);
+if (!deploymentPrerequisitesPassed(env)) {
+  process.exit(0);
 }
 
 // Base actions on the branch name
@@ -52,15 +52,20 @@ const packageName = "@microsoft/office-js"; // could pull from the package.json
 const packageTag = tag;
 const npmAuthToken = env.NPM_TOKEN;
 
-const deployedPackageVersion: string | undefined = deployNpmPackage(packageDirectory, packageName, packageTag, npmAuthToken);
+// TODO: make it throw on failure instead
+const deployedPackageVersion: string | undefined = deployNpmPackage(
+  packageDirectory,
+  packageName,
+  packageTag,
+  npmAuthToken,
+);
 console.log("Deployment Script: Complete");
 
-
 const deploymentSucceeded = !isUndefined(deployedPackageVersion);
-// report in an extra ovious way
-console.log(banner(`DEPLOYMENT [${deploymentSucceeded ? "SUCCEEDED" : "FAILED"}]`))
+// report in an extra obvious way
+console.log(banner(`DEPLOYMENT [${deploymentSucceeded ? "SUCCEEDED" : "FAILED"}]`));
 if (deploymentSucceeded) {
-console.log(`
+  console.log(`
 
 Unpkg CDN URLs:
 https://unpkg.com/@microsoft/office-js@${deployedPackageVersion}/dist/office.js

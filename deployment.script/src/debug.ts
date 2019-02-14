@@ -6,23 +6,24 @@ import { executeCommand } from "./executeCommand";
 // console.log(out);
 
 export function debug(env: EnvironmentVariables) {
-    // Print environment variables
-    const fieldsToPrint: (keyof EnvironmentVariables)[] = [
-        "TRAVIS",
-        "TRAVIS_BRANCH",
-        "TRAVIS_PULL_REQUEST",];
+  // Print environment variables
+  const fieldsToPrint: (keyof EnvironmentVariables)[] = [
+    "TRAVIS",
+    "TRAVIS_BRANCH",
+    "TRAVIS_PULL_REQUEST",
+  ];
 
-    const fields = fieldsToPrint.map(item => `"${item}": "${env[item]}"`).join(",\n");
-    console.log(fields);
+  const fields = fieldsToPrint.map((item) => `"${item}": "${env[item]}"`).join(",\n");
+  console.log(fields);
 
-    console.log(`subdirectories: [${env.TRAVIS_BUILD_DIR}]`);
-    console.log(standardFile.getSubDirectories(env.TRAVIS_BUILD_DIR));
+  console.log(`subdirectories: [${env.TRAVIS_BUILD_DIR}]`);
+  console.log(standardFile.getSubDirectories(env.TRAVIS_BUILD_DIR));
 }
 
 export function banner(title: string): string {
-    const border = "-".repeat(title.length);
-    const format = `${border}
+  const border = "-".repeat(title.length);
+  const format = `${border}
 ${title}
 ${border}`;
-    return format;
+  return format;
 }
