@@ -68,7 +68,15 @@ if (deploymentSucceeded) {
   console.log(`
 
 Unpkg CDN URLs:
+
 https://unpkg.com/@microsoft/office-js@${deployedPackageVersion}/dist/office.js
 https://unpkg.com/@microsoft/office-js@${deployedPackageVersion}/dist/office.d.ts
+
+
+
+Unpkg CDN Debug URLs:
+
+https://unpkg.com/@microsoft/office-js@${deployedPackageVersion}/dist/office.debug.js
+https://unpkg.com/@microsoft/office-js@${deployedPackageVersion}/dist/office-with-first-party.d.ts
 `);
 }
