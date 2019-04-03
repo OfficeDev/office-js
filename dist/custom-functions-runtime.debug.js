@@ -1,9 +1,35 @@
 /* Office JavaScript API library - Custom Functions */
-/* Version: 16.0.10915.30001 */
+
 /*
 	Copyright (c) Microsoft Corporation.  All rights reserved.
 */
 
+/*
+	This file incorporates the "whatwg-fetch" implementation, version 2.0.3, licensed under MIT with the following licensing notice:
+	(See github.com/github/fetch/blob/master/LICENSE)
+
+		Copyright (c) 2014-2016 GitHub, Inc.
+
+		Permission is hereby granted, free of charge, to any person obtaining
+		a copy of this software and associated documentation files (the
+		"Software"), to deal in the Software without restriction, including
+		without limitation the rights to use, copy, modify, merge, publish,
+		distribute, sublicense, and/or sell copies of the Software, and to
+		permit persons to whom the Software is furnished to do so, subject to
+		the following conditions:
+
+		The above copyright notice and this permission notice shall be
+		included in all copies or substantial portions of the Software.
+
+		THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+		EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+		MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+		NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+		LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+		OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+		WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+*/
 
 /*
     Your use of this file is governed by the Microsoft Services Agreement http://go.microsoft.com/fwlink/?LinkId=266419.
@@ -17,9 +43,11 @@
 */
 var OSF = OSF || {};
 OSF.ConstantNames = {
+    FileVersion: "0.0.0.0",
     OfficeJS: "custom-functions-runtime.js",
     OfficeDebugJS: "custom-functions-runtime.debug.js",
-    HostFileScriptSuffix: "core"
+    HostFileScriptSuffix: "core",
+    IsCustomFunctionsRuntime: true
 };
 var OSF = OSF || {};
 OSF.HostSpecificFileVersionDefault = "16.00";
@@ -38,6 +66,7 @@ OSF.HostSpecificFileVersionMap = {
         "winrt": "16.00"
     },
     "onenote": {
+        "android": "16.00",
         "web": "16.00",
         "win32": "16.00",
         "winrt": "16.00"
@@ -67,6 +96,10 @@ OSF.HostSpecificFileVersionMap = {
         "web": "16.00",
         "win32": "16.01",
         "winrt": "16.00"
+    },
+    "visio": {
+        "web": "16.00",
+        "win32": "16.00"
     }
 };
 OSF.SupportedLocales = {
@@ -1117,10 +1150,149 @@ var Office;
     var OfficePromise = _Internal.OfficePromise;
     Office.Promise = OfficePromise;
 })(Office || (Office = {}));
+var OTel;
+(function (OTel) {
+    var CDN_PATH_OTELJS = 'telemetry/oteljs.js';
+    var CDN_PATH_OTELJS_AGAVE = 'telemetry/oteljs_agave.js';
+    var OTelLogger = (function () {
+        function OTelLogger() {
+        }
+        OTelLogger.loaded = function () {
+            return !(OTelLogger.logger === undefined);
+        };
+        OTelLogger.getOtelCDNLocation = function () {
+            return (OSF._OfficeAppFactory.getLoadScriptHelper().getOfficeJsBasePath() + CDN_PATH_OTELJS);
+        };
+        OTelLogger.getOtelSinkCDNLocation = function () {
+            return (OSF._OfficeAppFactory.getLoadScriptHelper().getOfficeJsBasePath() + CDN_PATH_OTELJS_AGAVE);
+        };
+        OTelLogger.getMapName = function (map, name) {
+            if (name !== undefined && map.hasOwnProperty(name)) {
+                return map[name];
+            }
+            return name;
+        };
+        OTelLogger.getHost = function () {
+            var host = OSF._OfficeAppFactory.getHostInfo()["hostType"];
+            var map = {
+                "excel": "Excel",
+                "onenote": "OneNote",
+                "outlook": "Outlook",
+                "powerpoint": "PowerPoint",
+                "project": "Project",
+                "visio": "Visio",
+                "word": "Word"
+            };
+            var mappedName = OTelLogger.getMapName(map, host);
+            return mappedName;
+        };
+        OTelLogger.getFlavor = function () {
+            var flavor = OSF._OfficeAppFactory.getHostInfo()["hostPlatform"];
+            var map = {
+                "android": "Android",
+                "ios": "iOS",
+                "mac": "Mac",
+                "universal": "Universal",
+                "web": "Web",
+                "win32": "Win32"
+            };
+            var mappedName = OTelLogger.getMapName(map, flavor);
+            return mappedName;
+        };
+        OTelLogger.ensureValue = function (value, alternative) {
+            if (!value) {
+                return alternative;
+            }
+            return value;
+        };
+        OTelLogger.create = function (info) {
+            var contract = {
+                id: info.appId,
+                assetId: info.assetId,
+                officeJsVersion: info.officeJSVersion,
+                hostJsVersion: info.hostJSVersion,
+                browserToken: info.clientId,
+                instanceId: info.appInstanceId,
+                name: info.name,
+                osfRuntimeVersion: OSF.ConstantNames.FileVersion,
+                sessionId: info.sessionId
+            };
+            var fields = oteljs.Contracts.Office.System.SDX.getFields("SDX", contract);
+            var host = OTelLogger.getHost();
+            var flavor = OTelLogger.getFlavor();
+            var version = info.hostVersion;
+            var context = {
+                'App.Name': host,
+                'App.Platform': flavor,
+                'App.Version': version,
+                'Session.Id': OTelLogger.ensureValue(info.correlationId, "00000000-0000-0000-0000-000000000000")
+            };
+            var sink = oteljs_agave.AgaveSink.createInstance(context);
+            var namespace = "Office.Extensibility.OfficeJs";
+            var ariaTenantToken = 'db334b301e7b474db5e0f02f07c51a47-a1b5bc36-1bbe-482f-a64a-c2d9cb606706-7439';
+            var nexusTenantToken = 1755;
+            var logger = new oteljs.TelemetryLogger(undefined, fields);
+            logger.addSink(sink);
+            logger.setTenantToken(namespace, ariaTenantToken, nexusTenantToken);
+            return logger;
+        };
+        OTelLogger.initialize = function (info) {
+            if (!OTelLogger.Enabled) {
+                OTelLogger.promises = [];
+                return;
+            }
+            var timeoutAfterOneSecond = 1000;
+            var afterOnReady = function () {
+                if ((typeof oteljs === "undefined") || (typeof oteljs_agave === "undefined")) {
+                    return;
+                }
+                if (!OTelLogger.loaded()) {
+                    OTelLogger.logger = OTelLogger.create(info);
+                }
+                if (OTelLogger.loaded()) {
+                    OTelLogger.promises.forEach(function (resolve) {
+                        resolve();
+                    });
+                }
+            };
+            var afterLoadOtelSink = function () {
+                Microsoft.Office.WebExtension.onReadyInternal().then(function () { return afterOnReady(); });
+            };
+            var afterLoadOtel = function () {
+                OSF.OUtil.loadScript(OTelLogger.getOtelSinkCDNLocation(), afterLoadOtelSink, timeoutAfterOneSecond);
+            };
+            OSF.OUtil.loadScript(OTelLogger.getOtelCDNLocation(), afterLoadOtel, timeoutAfterOneSecond);
+        };
+        OTelLogger.sendTelemetryEvent = function (telemetryEvent) {
+            OTelLogger.onTelemetryLoaded(function () {
+                try {
+                    OTelLogger.logger.sendTelemetryEvent(telemetryEvent);
+                }
+                catch (e) {
+                }
+            });
+        };
+        OTelLogger.onTelemetryLoaded = function (resolve) {
+            if (!OTelLogger.Enabled) {
+                return;
+            }
+            if (OTelLogger.loaded()) {
+                resolve();
+            }
+            else {
+                OTelLogger.promises.push(resolve);
+            }
+        };
+        OTelLogger.promises = [];
+        OTelLogger.Enabled = true;
+        return OTelLogger;
+    })();
+    OTel.OTelLogger = OTelLogger;
+})(OTel || (OTel = {}));
 (function () {
     var previousConstantNames = OSF.ConstantNames || {};
     OSF.ConstantNames = {
-        FileVersion: "16.0.10915.30001",
+        FileVersion: "0.0.0.0",
         OfficeJS: "office.js",
         OfficeDebugJS: "office.debug.js",
         DefaultLocale: "en-us",
@@ -1187,7 +1359,8 @@ OSF._OfficeAppFactory = (function OSF__OfficeAppFactory() {
         Outlook: "Outlook",
         OneNote: "OneNote",
         Project: "Project",
-        Access: "Access"
+        Access: "Access",
+        Visio: "Visio"
     };
     var _context = {};
     var _settings = {};
@@ -1200,6 +1373,7 @@ OSF._OfficeAppFactory = (function OSF__OfficeAppFactory() {
     var _isOfficeJsLoaded = false;
     var _officeOnReadyPendingResolves = [];
     var _isOfficeOnReadyCalled = false;
+    var _officeOnReadyHostAndPlatformInfo = { host: null, platform: null };
     var _loadScriptHelper = new ScriptLoading.LoadScriptHelper({
         OfficeJS: OSF.ConstantNames.OfficeJS,
         OfficeDebugJS: OSF.ConstantNames.OfficeDebugJS
@@ -1210,23 +1384,20 @@ OSF._OfficeAppFactory = (function OSF__OfficeAppFactory() {
     var _windowLocationHash = window.location.hash;
     var _windowLocationSearch = window.location.search;
     var _windowName = window.name;
-    var getHostAndPlatform = function (appNumber) {
-        return {
-            host: OfficeExt.HostName.Host.getInstance().getHost(appNumber),
-            platform: OfficeExt.HostName.Host.getInstance().getPlatform(appNumber)
-        };
-    };
     var setOfficeJsAsLoadedAndDispatchPendingOnReadyCallbacks = function (_a) {
         var host = _a.host, platform = _a.platform;
         _isOfficeJsLoaded = true;
+        _officeOnReadyHostAndPlatformInfo = { host: host, platform: platform };
         while (_officeOnReadyPendingResolves.length > 0) {
-            _officeOnReadyPendingResolves.shift()({ host: host, platform: platform });
+            _officeOnReadyPendingResolves.shift()(_officeOnReadyHostAndPlatformInfo);
         }
     };
-    Microsoft.Office.WebExtension.onReady = function Microsoft_Office_WebExtension_onReady(callback) {
-        _isOfficeOnReadyCalled = true;
+    Microsoft.Office.WebExtension.sendTelemetryEvent = function Microsoft_Office_WebExtension_sendTelemetryEvent(telemetryEvent) {
+        OTel.OTelLogger.sendTelemetryEvent(telemetryEvent);
+    };
+    Microsoft.Office.WebExtension.onReadyInternal = function Microsoft_Office_WebExtension_onReadyInternal(callback) {
         if (_isOfficeJsLoaded) {
-            var _a = getHostAndPlatform(1), host = _a.host, platform = _a.platform;
+            var host = _officeOnReadyHostAndPlatformInfo.host, platform = _officeOnReadyHostAndPlatformInfo.platform;
             if (callback) {
                 var result = callback({ host: host, platform: platform });
                 if (result && result.then && typeof result.then === "function") {
@@ -1249,6 +1420,10 @@ OSF._OfficeAppFactory = (function OSF__OfficeAppFactory() {
         return new Office.Promise(function (resolve) {
             _officeOnReadyPendingResolves.push(resolve);
         });
+    };
+    Microsoft.Office.WebExtension.onReady = function Microsoft_Office_WebExtension_onReady(callback) {
+        _isOfficeOnReadyCalled = true;
+        return Microsoft.Office.WebExtension.onReadyInternal(callback);
     };
     var getQueryStringValue = function OSF__OfficeAppFactory$getQueryStringValue(paramName) {
         var hostInfoValue;
@@ -1499,15 +1674,22 @@ OSF._OfficeAppFactory = (function OSF__OfficeAppFactory() {
                                     }
                                 }
                                 else {
+                                    if (!Microsoft.Office.WebExtension.initialize) {
+                                        Microsoft.Office.WebExtension.initialize = function () { };
+                                    }
                                     _initializationHelper.prepareRightBeforeWebExtensionInitialize(appContext);
                                 }
                                 _initializationHelper.prepareRightAfterWebExtensionInitialize && _initializationHelper.prepareRightAfterWebExtensionInitialize();
+                                var appNumber = appContext.get_appName();
+                                setOfficeJsAsLoadedAndDispatchPendingOnReadyCallbacks({
+                                    host: OfficeExt.HostName.Host.getInstance().getHost(appNumber),
+                                    platform: OfficeExt.HostName.Host.getInstance().getPlatform(appNumber)
+                                });
                             }
                             else {
                                 throw new Error("Office.js has not fully loaded. Your app must call \"Office.onReady()\" as part of it's loading sequence (or set the \"Office.initialize\" function). If your app has this functionality, try reloading this page.");
                             }
                         }, 400, 50);
-                        setOfficeJsAsLoadedAndDispatchPendingOnReadyCallbacks(getHostAndPlatform(appContext.get_appName()));
                     };
                     if (!_loadScriptHelper.isScriptLoading(OSF.ConstantNames.OfficeStringsId)) {
                         loadLocaleStrings(appContext.get_appUILocale());
@@ -1532,7 +1714,10 @@ OSF._OfficeAppFactory = (function OSF__OfficeAppFactory() {
                             }
                         }
                         if (isPlainBrowser) {
-                            setOfficeJsAsLoadedAndDispatchPendingOnReadyCallbacks({ host: null, platform: null });
+                            setOfficeJsAsLoadedAndDispatchPendingOnReadyCallbacks({
+                                host: null,
+                                platform: null
+                            });
                         }
                     }
                 }
@@ -1615,7 +1800,6 @@ OSF._OfficeAppFactory = (function OSF__OfficeAppFactory() {
         getWindowName: function OSF__OfficeAppFactory$getWindowName() { return _windowName; }
     };
 })();
-var CustomFunctionMappings = {};
 
 
 
@@ -1742,7 +1926,7 @@ var CustomFunctionMappings = {};
                         headers: RichApiMessageUtility.getResponseHeaders(asyncResult),
                         body: RichApiMessageUtility.getResponseBody(asyncResult)
                     } : RichApiMessageUtility.buildHttpResponseFromOfficeJsError(asyncResult.error.code, asyncResult.error.message), 
-                    CoreUtility.log(JSON.stringify(response)), resolve(response);
+                    CoreUtility.log("Response:"), CoreUtility.log(JSON.stringify(response)), resolve(response);
                 });
             });
         }, HttpUtility.validateAndNormalizeRequest = function(request) {
@@ -1770,6 +1954,22 @@ var CustomFunctionMappings = {};
             var _this = this;
             this.m_bridge = m_bridge, this.m_promiseResolver = {}, this.m_handlers = [], this.m_bridge.onMessageFromHost = function(messageText) {
                 var message = JSON.parse(messageText);
+                if (3 == message.type) {
+                    var genericMessageBody = message.message;
+                    if (genericMessageBody && genericMessageBody.entries) for (var i = 0; i < genericMessageBody.entries.length; i++) {
+                        var entryObjectOrArray = genericMessageBody.entries[i];
+                        if (Array.isArray(entryObjectOrArray)) {
+                            var entry = {
+                                messageCategory: entryObjectOrArray[0],
+                                messageType: entryObjectOrArray[1],
+                                targetId: entryObjectOrArray[2],
+                                message: entryObjectOrArray[3],
+                                id: entryObjectOrArray[4]
+                            };
+                            genericMessageBody.entries[i] = entry;
+                        }
+                    }
+                }
                 _this.dispatchMessage(message);
             };
         }
@@ -2159,6 +2359,54 @@ var CustomFunctionMappings = {};
     }, exports.config = {
         extendedErrorLogging: !1
     };
+    var CommonActionFactory = function() {
+        function CommonActionFactory() {}
+        return CommonActionFactory.createSetPropertyAction = function(context, parent, propertyName, value, flags) {
+            CommonUtility.validateObjectPath(parent);
+            var actionInfo = {
+                Id: context._nextId(),
+                ActionType: 4,
+                Name: propertyName,
+                ObjectPathId: parent._objectPath.objectPathInfo.Id,
+                ArgumentInfo: {}
+            }, args = [ value ], referencedArgumentObjectPaths = CommonUtility.setMethodArguments(context, actionInfo.ArgumentInfo, args);
+            CommonUtility.validateReferencedObjectPaths(referencedArgumentObjectPaths);
+            var action = new Action(actionInfo, 0, flags);
+            return action.referencedObjectPath = parent._objectPath, action.referencedArgumentObjectPaths = referencedArgumentObjectPaths, 
+            parent._addAction(action);
+        }, CommonActionFactory.createQueryAction = function(context, parent, queryOption, resultHandler) {
+            CommonUtility.validateObjectPath(parent);
+            var actionInfo = {
+                Id: context._nextId(),
+                ActionType: 2,
+                Name: "",
+                ObjectPathId: parent._objectPath.objectPathInfo.Id,
+                QueryInfo: queryOption
+            }, action = new Action(actionInfo, 1, 4);
+            return action.referencedObjectPath = parent._objectPath, parent._addAction(action, resultHandler);
+        }, CommonActionFactory.createQueryAsJsonAction = function(context, parent, queryOption, resultHandler) {
+            CommonUtility.validateObjectPath(parent);
+            var actionInfo = {
+                Id: context._nextId(),
+                ActionType: 7,
+                Name: "",
+                ObjectPathId: parent._objectPath.objectPathInfo.Id,
+                QueryInfo: queryOption
+            }, action = new Action(actionInfo, 1, 4);
+            return action.referencedObjectPath = parent._objectPath, parent._addAction(action, resultHandler);
+        }, CommonActionFactory.createUpdateAction = function(context, parent, objectState) {
+            CommonUtility.validateObjectPath(parent);
+            var actionInfo = {
+                Id: context._nextId(),
+                ActionType: 9,
+                Name: "",
+                ObjectPathId: parent._objectPath.objectPathInfo.Id,
+                ObjectState: objectState
+            }, action = new Action(actionInfo, 0, 0);
+            return action.referencedObjectPath = parent._objectPath, parent._addAction(action);
+        }, CommonActionFactory;
+    }();
+    exports.CommonActionFactory = CommonActionFactory;
     var ClientObjectBase = function() {
         function ClientObjectBase(contextBase, objectPath) {
             this.m_contextBase = contextBase, this.m_objectPath = objectPath;
@@ -2175,7 +2423,71 @@ var CustomFunctionMappings = {};
             },
             enumerable: !0,
             configurable: !0
-        }), ClientObjectBase;
+        }), ClientObjectBase.prototype._addAction = function(action, resultHandler) {
+            var _this = this;
+            return void 0 === resultHandler && (resultHandler = null), Core.CoreUtility.createPromise(function(resolve, reject) {
+                _this._context._addServiceApiAction(action, resultHandler, resolve, reject);
+            });
+        }, ClientObjectBase.prototype._retrieve = function(option, resultHandler) {
+            var shouldPolyfill = exports._internalConfig.alwaysPolyfillClientObjectRetrieveMethod;
+            shouldPolyfill || (shouldPolyfill = !CommonUtility.isSetSupported("RichApiRuntime", "1.1"));
+            var queryOption = ClientRequestContextBase._parseQueryOption(option);
+            return shouldPolyfill ? CommonActionFactory.createQueryAction(this._context, this, queryOption, resultHandler) : CommonActionFactory.createQueryAsJsonAction(this._context, this, queryOption, resultHandler);
+        }, ClientObjectBase.prototype._recursivelyUpdate = function(properties) {
+            var shouldPolyfill = exports._internalConfig.alwaysPolyfillClientObjectUpdateMethod;
+            shouldPolyfill || (shouldPolyfill = !CommonUtility.isSetSupported("RichApiRuntime", "1.2"));
+            try {
+                var scalarPropNames = this[CommonConstants.scalarPropertyNames];
+                scalarPropNames || (scalarPropNames = []);
+                var scalarPropUpdatable = this[CommonConstants.scalarPropertyUpdateable];
+                if (!scalarPropUpdatable) {
+                    scalarPropUpdatable = [];
+                    for (var i = 0; i < scalarPropNames.length; i++) scalarPropUpdatable.push(!1);
+                }
+                var navigationPropNames = this[CommonConstants.navigationPropertyNames];
+                navigationPropNames || (navigationPropNames = []);
+                var scalarProps = {}, navigationProps = {}, scalarPropCount = 0;
+                for (var propName in properties) {
+                    var index = scalarPropNames.indexOf(propName);
+                    if (index >= 0) {
+                        if (!scalarPropUpdatable[index]) throw new Core._Internal.RuntimeError({
+                            code: Core.CoreErrorCodes.invalidArgument,
+                            message: Core.CoreUtility._getResourceString(CommonResourceStrings.attemptingToSetReadOnlyProperty, propName),
+                            debugInfo: {
+                                errorLocation: propName
+                            }
+                        });
+                        scalarProps[propName] = properties[propName], ++scalarPropCount;
+                    } else {
+                        if (!(navigationPropNames.indexOf(propName) >= 0)) throw new Core._Internal.RuntimeError({
+                            code: Core.CoreErrorCodes.invalidArgument,
+                            message: Core.CoreUtility._getResourceString(CommonResourceStrings.propertyDoesNotExist, propName),
+                            debugInfo: {
+                                errorLocation: propName
+                            }
+                        });
+                        navigationProps[propName] = properties[propName];
+                    }
+                }
+                if (scalarPropCount > 0) if (shouldPolyfill) for (i = 0; i < scalarPropNames.length; i++) {
+                    var propValue = scalarProps[propName = scalarPropNames[i]];
+                    CommonUtility.isUndefined(propValue) || CommonActionFactory.createSetPropertyAction(this._context, this, propName, propValue);
+                } else CommonActionFactory.createUpdateAction(this._context, this, scalarProps);
+                for (var propName in navigationProps) {
+                    var navigationPropProxy = this[propName], navigationPropValue = navigationProps[propName];
+                    navigationPropProxy._recursivelyUpdate(navigationPropValue);
+                }
+            } catch (innerError) {
+                throw new Core._Internal.RuntimeError({
+                    code: Core.CoreErrorCodes.invalidArgument,
+                    message: Core.CoreUtility._getResourceString(Core.CoreResourceStrings.invalidArgument, "properties"),
+                    debugInfo: {
+                        errorLocation: this._className + ".update"
+                    },
+                    innerError: innerError
+                });
+            }
+        }, ClientObjectBase;
     }();
     exports.ClientObjectBase = ClientObjectBase;
     var Action = function() {
@@ -2340,6 +2652,71 @@ var CustomFunctionMappings = {};
         }, ClientRequestContextBase.prototype._addServiceApiAction = function(action, resultHandler, resolve, reject) {
             this.m_serviceApiQueue || (this.m_serviceApiQueue = new ServiceApiQueue(this)), 
             this.m_serviceApiQueue.add(action, resultHandler, resolve, reject);
+        }, ClientRequestContextBase._parseQueryOption = function(option) {
+            var queryOption = {};
+            if ("string" == typeof option) {
+                var select = option;
+                queryOption.Select = CommonUtility._parseSelectExpand(select);
+            } else if (Array.isArray(option)) queryOption.Select = option; else if ("object" == typeof option) {
+                var loadOption = option;
+                if (ClientRequestContextBase.isLoadOption(loadOption)) {
+                    if ("string" == typeof loadOption.select) queryOption.Select = CommonUtility._parseSelectExpand(loadOption.select); else if (Array.isArray(loadOption.select)) queryOption.Select = loadOption.select; else if (!CommonUtility.isNullOrUndefined(loadOption.select)) throw Core._Internal.RuntimeError._createInvalidArgError({
+                        argumentName: "option.select"
+                    });
+                    if ("string" == typeof loadOption.expand) queryOption.Expand = CommonUtility._parseSelectExpand(loadOption.expand); else if (Array.isArray(loadOption.expand)) queryOption.Expand = loadOption.expand; else if (!CommonUtility.isNullOrUndefined(loadOption.expand)) throw Core._Internal.RuntimeError._createInvalidArgError({
+                        argumentName: "option.expand"
+                    });
+                    if ("number" == typeof loadOption.top) queryOption.Top = loadOption.top; else if (!CommonUtility.isNullOrUndefined(loadOption.top)) throw Core._Internal.RuntimeError._createInvalidArgError({
+                        argumentName: "option.top"
+                    });
+                    if ("number" == typeof loadOption.skip) queryOption.Skip = loadOption.skip; else if (!CommonUtility.isNullOrUndefined(loadOption.skip)) throw Core._Internal.RuntimeError._createInvalidArgError({
+                        argumentName: "option.skip"
+                    });
+                } else queryOption = ClientRequestContextBase.parseStrictLoadOption(option);
+            } else if (!CommonUtility.isNullOrUndefined(option)) throw Core._Internal.RuntimeError._createInvalidArgError({
+                argumentName: "option"
+            });
+            return queryOption;
+        }, ClientRequestContextBase.isLoadOption = function(loadOption) {
+            if (!CommonUtility.isUndefined(loadOption.select) && ("string" == typeof loadOption.select || Array.isArray(loadOption.select))) return !0;
+            if (!CommonUtility.isUndefined(loadOption.expand) && ("string" == typeof loadOption.expand || Array.isArray(loadOption.expand))) return !0;
+            if (!CommonUtility.isUndefined(loadOption.top) && "number" == typeof loadOption.top) return !0;
+            if (!CommonUtility.isUndefined(loadOption.skip) && "number" == typeof loadOption.skip) return !0;
+            for (var i in loadOption) return !1;
+            return !0;
+        }, ClientRequestContextBase.parseStrictLoadOption = function(option) {
+            var ret = {
+                Select: []
+            };
+            return ClientRequestContextBase.parseStrictLoadOptionHelper(ret, "", "option", option), 
+            ret;
+        }, ClientRequestContextBase.combineQueryPath = function(pathPrefix, key, separator) {
+            return 0 === pathPrefix.length ? key : pathPrefix + separator + key;
+        }, ClientRequestContextBase.parseStrictLoadOptionHelper = function(queryInfo, pathPrefix, argPrefix, option) {
+            for (var key in option) {
+                var value = option[key];
+                if ("$all" === key) {
+                    if ("boolean" != typeof value) throw Core._Internal.RuntimeError._createInvalidArgError({
+                        argumentName: ClientRequestContextBase.combineQueryPath(argPrefix, key, ".")
+                    });
+                    value && queryInfo.Select.push(ClientRequestContextBase.combineQueryPath(pathPrefix, "*", "/"));
+                } else if ("$top" === key) {
+                    if ("number" != typeof value || pathPrefix.length > 0) throw Core._Internal.RuntimeError._createInvalidArgError({
+                        argumentName: ClientRequestContextBase.combineQueryPath(argPrefix, key, ".")
+                    });
+                    queryInfo.Top = value;
+                } else if ("$skip" === key) {
+                    if ("number" != typeof value || pathPrefix.length > 0) throw Core._Internal.RuntimeError._createInvalidArgError({
+                        argumentName: ClientRequestContextBase.combineQueryPath(argPrefix, key, ".")
+                    });
+                    queryInfo.Skip = value;
+                } else if ("boolean" == typeof value) value && queryInfo.Select.push(ClientRequestContextBase.combineQueryPath(pathPrefix, key, "/")); else {
+                    if ("object" != typeof value) throw Core._Internal.RuntimeError._createInvalidArgError({
+                        argumentName: ClientRequestContextBase.combineQueryPath(argPrefix, key, ".")
+                    });
+                    ClientRequestContextBase.parseStrictLoadOptionHelper(queryInfo, ClientRequestContextBase.combineQueryPath(pathPrefix, key, "/"), ClientRequestContextBase.combineQueryPath(argPrefix, key, "."), value);
+                }
+            }
         }, ClientRequestContextBase;
     }();
     exports.ClientRequestContextBase = ClientRequestContextBase;
@@ -2493,8 +2870,8 @@ var CustomFunctionMappings = {};
     }();
     exports.ClientRequestBase = ClientRequestBase;
     var ClientResult = function() {
-        function ClientResult(type) {
-            this.m_type = type;
+        function ClientResult(m_type) {
+            this.m_type = m_type;
         }
         return Object.defineProperty(ClientResult.prototype, "value", {
             get: function() {
@@ -2544,7 +2921,7 @@ var CustomFunctionMappings = {};
                     Headers: null,
                     Body: body
                 };
-                new HttpRequestExecutor().executeAsync(this.m_context._customData, flags, requestMessage).then(function(response) {
+                Core.CoreUtility.log("Request:"), Core.CoreUtility.log(JSON.stringify(body)), new HttpRequestExecutor().executeAsync(this.m_context._customData, flags, requestMessage).then(function(response) {
                     _this.processResponse(request, actions, response);
                 }).catch(function(ex) {
                     for (var i = 0; i < actions.length; i++) {
@@ -2618,14 +2995,40 @@ var CustomFunctionMappings = {};
         return __extends(CommonConstants, _super), CommonConstants.collectionPropertyPath = "_collectionPropertyPath", 
         CommonConstants.id = "Id", CommonConstants.idLowerCase = "id", CommonConstants.idPrivate = "_Id", 
         CommonConstants.keepReference = "_KeepReference", CommonConstants.objectPathIdPrivate = "_ObjectPathId", 
-        CommonConstants.referenceId = "_ReferenceId", CommonConstants;
+        CommonConstants.referenceId = "_ReferenceId", CommonConstants.items = "_Items", 
+        CommonConstants.itemsLowerCase = "items", CommonConstants.scalarPropertyNames = "_scalarPropertyNames", 
+        CommonConstants.navigationPropertyNames = "_navigationPropertyNames", CommonConstants.scalarPropertyUpdateable = "_scalarPropertyUpdateable", 
+        CommonConstants;
     }(Core.CoreConstants);
     exports.CommonConstants = CommonConstants;
     var CommonUtility = function(_super) {
         function CommonUtility() {
             return null !== _super && _super.apply(this, arguments) || this;
         }
-        return __extends(CommonUtility, _super), CommonUtility.adjustToDateTime = function(value) {
+        return __extends(CommonUtility, _super), CommonUtility.validateObjectPath = function(clientObject) {
+            for (var objectPath = clientObject._objectPath; objectPath; ) {
+                if (!objectPath.isValid) throw new Core._Internal.RuntimeError({
+                    code: Core.CoreErrorCodes.invalidObjectPath,
+                    message: Core.CoreUtility._getResourceString(Core.CoreResourceStrings.invalidObjectPath, CommonUtility.getObjectPathExpression(objectPath)),
+                    debugInfo: {
+                        errorLocation: CommonUtility.getObjectPathExpression(objectPath)
+                    }
+                });
+                objectPath = objectPath.parentObjectPath;
+            }
+        }, CommonUtility.validateReferencedObjectPaths = function(objectPaths) {
+            if (objectPaths) for (var i = 0; i < objectPaths.length; i++) for (var objectPath = objectPaths[i]; objectPath; ) {
+                if (!objectPath.isValid) throw new Core._Internal.RuntimeError({
+                    code: Core.CoreErrorCodes.invalidObjectPath,
+                    message: Core.CoreUtility._getResourceString(Core.CoreResourceStrings.invalidObjectPath, CommonUtility.getObjectPathExpression(objectPath))
+                });
+                objectPath = objectPath.parentObjectPath;
+            }
+        }, CommonUtility._toCamelLowerCase = function(name) {
+            if (Core.CoreUtility.isNullOrEmptyString(name)) return name;
+            for (var index = 0; index < name.length && name.charCodeAt(index) >= 65 && name.charCodeAt(index) <= 90; ) index++;
+            return index < name.length ? name.substr(0, index).toLowerCase() + name.substr(index) : name.toLowerCase();
+        }, CommonUtility.adjustToDateTime = function(value) {
             if (Core.CoreUtility.isNullOrUndefined(value)) return null;
             if ("string" == typeof value) return new Date(value);
             if (Array.isArray(value)) {
@@ -2692,6 +3095,52 @@ var CustomFunctionMappings = {};
                     }
                 });
             }
+        }, CommonUtility._parseSelectExpand = function(select) {
+            var args = [];
+            if (!Core.CoreUtility.isNullOrEmptyString(select)) for (var propertyNames = select.split(","), i = 0; i < propertyNames.length; i++) {
+                var propertyName = propertyNames[i];
+                (propertyName = sanitizeForAnyItemsSlash(propertyName.trim())).length > 0 && args.push(propertyName);
+            }
+            return args;
+            function sanitizeForAnyItemsSlash(propertyName) {
+                var propertyNameLower = propertyName.toLowerCase();
+                if ("items" === propertyNameLower || "items/" === propertyNameLower) return "*";
+                return ("items/" === propertyNameLower.substr(0, 6) || "items." === propertyNameLower.substr(0, 6)) && (propertyName = propertyName.substr(6)), 
+                propertyName.replace(new RegExp("[/.]items[/.]", "gi"), "/");
+            }
+        }, CommonUtility.changePropertyNameToCamelLowerCase = function(value) {
+            if (Array.isArray(value)) {
+                for (var ret = [], i = 0; i < value.length; i++) ret.push(this.changePropertyNameToCamelLowerCase(value[i]));
+                return ret;
+            }
+            if ("object" == typeof value && null !== value) {
+                ret = {};
+                for (var key in value) {
+                    var propValue = value[key];
+                    if (key === CommonConstants.items) {
+                        (ret = {})[CommonConstants.itemsLowerCase] = this.changePropertyNameToCamelLowerCase(propValue);
+                        break;
+                    }
+                    ret[CommonUtility._toCamelLowerCase(key)] = this.changePropertyNameToCamelLowerCase(propValue);
+                }
+                return ret;
+            }
+            return value;
+        }, CommonUtility.purifyJson = function(value) {
+            if (Array.isArray(value)) {
+                for (var ret = [], i = 0; i < value.length; i++) ret.push(this.purifyJson(value[i]));
+                return ret;
+            }
+            if ("object" == typeof value && null !== value) {
+                ret = {};
+                for (var key in value) if (95 !== key.charCodeAt(0)) {
+                    var propValue = value[key];
+                    "object" == typeof propValue && null !== propValue && Array.isArray(propValue.items) && (propValue = propValue.items), 
+                    ret[key] = this.purifyJson(propValue);
+                }
+                return ret;
+            }
+            return value;
         }, CommonUtility.collectObjectPathInfos = function(context, args, referencedObjectPaths, referencedObjectPathIds) {
             for (var hasOne = !1, i = 0; i < args.length; i++) if (args[i] instanceof ClientObjectBase) {
                 var clientObject = args[i];
@@ -2722,6 +3171,15 @@ var CustomFunctionMappings = {};
         }, CommonUtility._doApiNotSupportedCheck = !1, CommonUtility;
     }(Core.CoreUtility);
     exports.CommonUtility = CommonUtility;
+    var CommonResourceStrings = function(_super) {
+        function CommonResourceStrings() {
+            return null !== _super && _super.apply(this, arguments) || this;
+        }
+        return __extends(CommonResourceStrings, _super), CommonResourceStrings.propertyDoesNotExist = "PropertyDoesNotExist", 
+        CommonResourceStrings.attemptingToSetReadOnlyProperty = "AttemptingToSetReadOnlyProperty", 
+        CommonResourceStrings;
+    }(Core.CoreResourceStrings);
+    exports.CommonResourceStrings = CommonResourceStrings;
 }, function(module, exports, __webpack_require__) {
     "use strict";
     Object.defineProperty(exports, "__esModule", {
@@ -2773,18 +3231,27 @@ var CustomFunctionMappings = {};
     Object.defineProperty(exports, "__esModule", {
         value: !0
     });
-    var OfficeExtensionBatch = __webpack_require__(2), customfunctions_runtime_1 = __webpack_require__(5);
+    var OfficeExtensionBatch = __webpack_require__(2), CFRuntime = __webpack_require__(5);
     __webpack_require__(6), __webpack_require__(7), window.OfficeExtensionBatch = OfficeExtensionBatch, 
-    window.CustomFunctionMappings = {}, "undefined" == typeof Promise && (window.Promise = Office.Promise), 
-    window.OfficeExtension = {
+    "undefined" == typeof CustomFunctionMappings && (window.CustomFunctionMappings = {}), 
+    "undefined" == typeof Promise && (window.Promise = Office.Promise), window.OfficeExtension = {
         Promise: Promise,
         Error: OfficeExtensionBatch.Error,
         ErrorCodes: OfficeExtensionBatch.ErrorCodes
-    }, Office.onReady(function(hostInfo) {
-        hostInfo.host === Office.HostType.Excel ? function initializeCustomFunctionsOrDelay() {
-            CustomFunctionMappings && CustomFunctionMappings.__delay__ ? setTimeout(initializeCustomFunctionsOrDelay, 50) : customfunctions_runtime_1.CustomFunctions.initialize();
-        }() : console.warn("Warning: Expected to be loaded inside of an Excel add-in.");
-    });
+    }, window.CustomFunctions = window.CustomFunctions || {}, window.CustomFunctions.delayInitialization = function() {
+        CustomFunctionMappings.__delay__ = !0;
+    }, window.CustomFunctions.associate = function(name, func) {
+        CFRuntime.associate.apply(null, arguments), delete CustomFunctionMappings.__delay__;
+    }, function() {
+        function documentReadyCallback() {
+            Office.onReady(function(hostInfo) {
+                hostInfo.host === Office.HostType.Excel ? function initializeCustomFunctionsOrDelay() {
+                    CustomFunctionMappings && CustomFunctionMappings.__delay__ ? setTimeout(initializeCustomFunctionsOrDelay, 50) : CFRuntime.CustomFunctions.initialize();
+                }() : console.warn("Warning: Expected to be loaded inside of an Excel add-in.");
+            });
+        }
+        "loading" === document.readyState ? document.addEventListener("DOMContentLoaded", documentReadyCallback) : documentReadyCallback();
+    }();
 }, function(module, exports, __webpack_require__) {
     "use strict";
     var __extends = this && this.__extends || function() {
@@ -2829,25 +3296,11 @@ var CustomFunctionMappings = {};
         return TraceMarkerActionResultHandler.prototype._handleResult = function(value) {
             this.m_callback && this.m_callback();
         }, TraceMarkerActionResultHandler;
-    }(), ActionFactory = function() {
-        function ActionFactory() {}
-        return ActionFactory.createSetPropertyAction = function(context, parent, propertyName, value, flags) {
-            Utility.validateObjectPath(parent);
-            var actionInfo = {
-                Id: context._nextId(),
-                ActionType: 4,
-                Name: propertyName,
-                ObjectPathId: parent._objectPath.objectPathInfo.Id,
-                ArgumentInfo: {}
-            }, args = [ value ], referencedArgumentObjectPaths = Utility.setMethodArguments(context, actionInfo.ArgumentInfo, args);
-            Utility.validateReferencedObjectPaths(referencedArgumentObjectPaths), context._pendingRequest.ensureInstantiateObjectPath(parent._objectPath), 
-            context._pendingRequest.ensureInstantiateObjectPaths(referencedArgumentObjectPaths);
-            var ret = new Common.Action(actionInfo, 0, flags);
-            return context._pendingRequest.addAction(ret), context._pendingRequest.addReferencedObjectPath(parent._objectPath), 
-            context._pendingRequest.addReferencedObjectPaths(referencedArgumentObjectPaths), 
-            ret.referencedObjectPath = parent._objectPath, ret.referencedArgumentObjectPaths = referencedArgumentObjectPaths, 
-            ret;
-        }, ActionFactory.createMethodAction = function(context, parent, methodName, operationType, args, flags) {
+    }(), ActionFactory = function(_super) {
+        function ActionFactory() {
+            return null !== _super && _super.apply(this, arguments) || this;
+        }
+        return __extends(ActionFactory, _super), ActionFactory.createMethodAction = function(context, parent, methodName, operationType, args, flags) {
             Utility.validateObjectPath(parent);
             var actionInfo = {
                 Id: context._nextId(),
@@ -2856,70 +3309,32 @@ var CustomFunctionMappings = {};
                 ObjectPathId: parent._objectPath.objectPathInfo.Id,
                 ArgumentInfo: {}
             }, referencedArgumentObjectPaths = Utility.setMethodArguments(context, actionInfo.ArgumentInfo, args);
-            Utility.validateReferencedObjectPaths(referencedArgumentObjectPaths), context._pendingRequest.ensureInstantiateObjectPath(parent._objectPath), 
-            context._pendingRequest.ensureInstantiateObjectPaths(referencedArgumentObjectPaths);
-            var ret = new Common.Action(actionInfo, operationType, Utility._fixupApiFlags(flags));
-            return context._pendingRequest.addAction(ret), context._pendingRequest.addReferencedObjectPath(parent._objectPath), 
-            context._pendingRequest.addReferencedObjectPaths(referencedArgumentObjectPaths), 
-            ret.referencedObjectPath = parent._objectPath, ret.referencedArgumentObjectPaths = referencedArgumentObjectPaths, 
-            ret;
-        }, ActionFactory.createQueryAction = function(context, parent, queryOption) {
-            Utility.validateObjectPath(parent), context._pendingRequest.ensureInstantiateObjectPath(parent._objectPath);
-            var actionInfo = {
-                Id: context._nextId(),
-                ActionType: 2,
-                Name: "",
-                ObjectPathId: parent._objectPath.objectPathInfo.Id
-            };
-            actionInfo.QueryInfo = queryOption;
-            var ret = new Common.Action(actionInfo, 1, 4);
-            return context._pendingRequest.addAction(ret), context._pendingRequest.addReferencedObjectPath(parent._objectPath), 
-            ret.referencedObjectPath = parent._objectPath, ret;
+            Utility.validateReferencedObjectPaths(referencedArgumentObjectPaths);
+            var action = new Common.Action(actionInfo, operationType, Utility._fixupApiFlags(flags));
+            return action.referencedObjectPath = parent._objectPath, action.referencedArgumentObjectPaths = referencedArgumentObjectPaths, 
+            parent._addAction(action), action;
         }, ActionFactory.createRecursiveQueryAction = function(context, parent, query) {
-            Utility.validateObjectPath(parent), context._pendingRequest.ensureInstantiateObjectPath(parent._objectPath);
+            Utility.validateObjectPath(parent);
             var actionInfo = {
                 Id: context._nextId(),
                 ActionType: 6,
                 Name: "",
                 ObjectPathId: parent._objectPath.objectPathInfo.Id,
                 RecursiveQueryInfo: query
-            }, ret = new Common.Action(actionInfo, 1, 4);
-            return context._pendingRequest.addAction(ret), context._pendingRequest.addReferencedObjectPath(parent._objectPath), 
-            ret.referencedObjectPath = parent._objectPath, ret;
-        }, ActionFactory.createQueryAsJsonAction = function(context, parent, queryOption) {
-            Utility.validateObjectPath(parent), context._pendingRequest.ensureInstantiateObjectPath(parent._objectPath);
-            var actionInfo = {
-                Id: context._nextId(),
-                ActionType: 7,
-                Name: "",
-                ObjectPathId: parent._objectPath.objectPathInfo.Id
-            };
-            actionInfo.QueryInfo = queryOption;
-            var ret = new Common.Action(actionInfo, 1, 4);
-            return context._pendingRequest.addAction(ret), context._pendingRequest.addReferencedObjectPath(parent._objectPath), 
-            ret.referencedObjectPath = parent._objectPath, ret;
+            }, action = new Common.Action(actionInfo, 1, 4);
+            return action.referencedObjectPath = parent._objectPath, parent._addAction(action), 
+            action;
         }, ActionFactory.createEnsureUnchangedAction = function(context, parent, objectState) {
-            Utility.validateObjectPath(parent), context._pendingRequest.ensureInstantiateObjectPath(parent._objectPath);
+            Utility.validateObjectPath(parent);
             var actionInfo = {
                 Id: context._nextId(),
                 ActionType: 8,
                 Name: "",
                 ObjectPathId: parent._objectPath.objectPathInfo.Id,
                 ObjectState: objectState
-            }, ret = new Common.Action(actionInfo, 1, 4);
-            return context._pendingRequest.addAction(ret), context._pendingRequest.addReferencedObjectPath(parent._objectPath), 
-            ret.referencedObjectPath = parent._objectPath, ret;
-        }, ActionFactory.createUpdateAction = function(context, parent, objectState) {
-            Utility.validateObjectPath(parent), context._pendingRequest.ensureInstantiateObjectPath(parent._objectPath);
-            var actionInfo = {
-                Id: context._nextId(),
-                ActionType: 9,
-                Name: "",
-                ObjectPathId: parent._objectPath.objectPathInfo.Id,
-                ObjectState: objectState
-            }, ret = new Common.Action(actionInfo, 0, 0);
-            return context._pendingRequest.addAction(ret), context._pendingRequest.addReferencedObjectPath(parent._objectPath), 
-            ret.referencedObjectPath = parent._objectPath, ret;
+            }, action = new Common.Action(actionInfo, 1, 4);
+            return action.referencedObjectPath = parent._objectPath, parent._addAction(action), 
+            action;
         }, ActionFactory.createInstantiateAction = function(context, obj) {
             Utility.validateObjectPath(obj), context._pendingRequest.ensureInstantiateObjectPath(obj._objectPath.parentObjectPath), 
             context._pendingRequest.ensureInstantiateObjectPaths(obj._objectPath.argumentObjectPaths);
@@ -2928,10 +3343,9 @@ var CustomFunctionMappings = {};
                 ActionType: 1,
                 Name: "",
                 ObjectPathId: obj._objectPath.objectPathInfo.Id
-            }, ret = new Common.Action(actionInfo, 1, 4);
-            return ret.referencedObjectPath = obj._objectPath, context._pendingRequest.addAction(ret), 
-            context._pendingRequest.addReferencedObjectPath(obj._objectPath), context._pendingRequest.addActionResultHandler(ret, new InstantiateActionResultHandler(obj)), 
-            ret;
+            }, action = new Common.Action(actionInfo, 1, 4);
+            return action.referencedObjectPath = obj._objectPath, obj._addAction(action, new InstantiateActionResultHandler(obj), !0), 
+            action;
         }, ActionFactory.createTraceAction = function(context, message, addTraceMessage) {
             var actionInfo = {
                 Id: context._nextId(),
@@ -2945,7 +3359,7 @@ var CustomFunctionMappings = {};
             var action = ActionFactory.createTraceAction(context, null, !1);
             context._pendingRequest.addActionResultHandler(action, new TraceMarkerActionResultHandler(callback));
         }, ActionFactory;
-    }();
+    }(Common.CommonActionFactory);
     exports.ActionFactory = ActionFactory;
     var ClientObject = function(_super) {
         function ClientObject(context, objectPath) {
@@ -2983,7 +3397,13 @@ var CustomFunctionMappings = {};
             },
             enumerable: !0,
             configurable: !0
-        }), ClientObject.prototype._handleResult = function(value) {
+        }), ClientObject.prototype._addAction = function(action, resultHandler, isInstantiationEnsured) {
+            return void 0 === resultHandler && (resultHandler = null), isInstantiationEnsured || (this.context._pendingRequest.ensureInstantiateObjectPath(this._objectPath), 
+            this.context._pendingRequest.ensureInstantiateObjectPaths(action.referencedArgumentObjectPaths)), 
+            this.context._pendingRequest.addAction(action), this.context._pendingRequest.addReferencedObjectPath(this._objectPath), 
+            this.context._pendingRequest.addReferencedObjectPaths(action.referencedArgumentObjectPaths), 
+            this.context._pendingRequest.addActionResultHandler(action, resultHandler), Core.CoreUtility._createPromiseFromResult(null);
+        }, ClientObject.prototype._handleResult = function(value) {
             this._isNull = Utility.isNullOrUndefined(value), this.context.trackedObjects._autoTrackIfNecessaryWhenHandleObjectResultValue(this, value);
         }, ClientObject.prototype._handleIdResult = function(value) {
             this._isNull = Utility.isNullOrUndefined(value), Utility.fixObjectPathIfNecessary(this, value), 
@@ -3021,14 +3441,14 @@ var CustomFunctionMappings = {};
                     var propertyDescriptor = Object.getOwnPropertyDescriptor(Object.getPrototypeOf(this), prop);
                     if (!propertyDescriptor) throw new Core._Internal.RuntimeError({
                         code: Core.CoreErrorCodes.invalidArgument,
-                        message: Core.CoreUtility._getResourceString(ResourceStrings.propertyDoesNotExist, prop),
+                        message: Core.CoreUtility._getResourceString(Common.CommonResourceStrings.propertyDoesNotExist, prop),
                         debugInfo: {
                             errorLocation: prop
                         }
                     });
                     if (throwOnReadOnly && !propertyDescriptor.set) throw new Core._Internal.RuntimeError({
                         code: Core.CoreErrorCodes.invalidArgument,
-                        message: Core.CoreUtility._getResourceString(ResourceStrings.attemptingToSetReadOnlyProperty, prop),
+                        message: Core.CoreUtility._getResourceString(Common.CommonResourceStrings.attemptingToSetReadOnlyProperty, prop),
                         debugInfo: {
                             errorLocation: prop
                         }
@@ -3040,60 +3460,6 @@ var CustomFunctionMappings = {};
                     message: Core.CoreUtility._getResourceString(Core.CoreResourceStrings.invalidArgument, "properties"),
                     debugInfo: {
                         errorLocation: this._className + ".set"
-                    },
-                    innerError: innerError
-                });
-            }
-        }, ClientObject.prototype._recursivelyUpdate = function(properties) {
-            var shouldPolyfill = Common._internalConfig.alwaysPolyfillClientObjectUpdateMethod;
-            shouldPolyfill || (shouldPolyfill = !Utility.isSetSupported("RichApiRuntime", "1.2"));
-            try {
-                var scalarPropNames = this[Constants.scalarPropertyNames];
-                scalarPropNames || (scalarPropNames = []);
-                var scalarPropUpdatable = this[Constants.scalarPropertyUpdateable];
-                if (!scalarPropUpdatable) {
-                    scalarPropUpdatable = [];
-                    for (var i = 0; i < scalarPropNames.length; i++) scalarPropUpdatable.push(!1);
-                }
-                var navigationPropNames = this[Constants.navigationPropertyNames];
-                navigationPropNames || (navigationPropNames = []);
-                var scalarProps = {}, navigationProps = {}, scalarPropCount = 0;
-                for (var propName in properties) {
-                    var index = scalarPropNames.indexOf(propName);
-                    if (index >= 0) {
-                        if (!scalarPropUpdatable[index]) throw new Core._Internal.RuntimeError({
-                            code: Core.CoreErrorCodes.invalidArgument,
-                            message: Core.CoreUtility._getResourceString(ResourceStrings.attemptingToSetReadOnlyProperty, propName),
-                            debugInfo: {
-                                errorLocation: propName
-                            }
-                        });
-                        scalarProps[propName] = properties[propName], ++scalarPropCount;
-                    } else {
-                        if (!(navigationPropNames.indexOf(propName) >= 0)) throw new Core._Internal.RuntimeError({
-                            code: Core.CoreErrorCodes.invalidArgument,
-                            message: Core.CoreUtility._getResourceString(ResourceStrings.propertyDoesNotExist, propName),
-                            debugInfo: {
-                                errorLocation: propName
-                            }
-                        });
-                        navigationProps[propName] = properties[propName];
-                    }
-                }
-                if (scalarPropCount > 0) if (shouldPolyfill) for (i = 0; i < scalarPropNames.length; i++) {
-                    var propValue = scalarProps[propName = scalarPropNames[i]];
-                    Utility.isUndefined(propValue) || ActionFactory.createSetPropertyAction(this.context, this, propName, propValue);
-                } else ActionFactory.createUpdateAction(this.context, this, scalarProps);
-                for (var propName in navigationProps) {
-                    var navigationPropProxy = this[propName], navigationPropValue = navigationProps[propName];
-                    navigationPropProxy._recursivelyUpdate(navigationPropValue);
-                }
-            } catch (innerError) {
-                throw new Core._Internal.RuntimeError({
-                    code: Core.CoreErrorCodes.invalidArgument,
-                    message: Core.CoreUtility._getResourceString(Core.CoreResourceStrings.invalidArgument, "properties"),
-                    debugInfo: {
-                        errorLocation: this._className + ".update"
                     },
                     innerError: innerError
                 });
@@ -3243,73 +3609,8 @@ var CustomFunctionMappings = {};
             if (1 === this.m_batchMode && !this.m_explicitBatchInProgress) throw Utility.createRuntimeError(Core.CoreErrorCodes.generalException, Core.CoreUtility._getResourceString(ResourceStrings.notInsideBatch), null);
         }, ClientRequestContext.prototype.load = function(clientObj, option) {
             Utility.validateContext(this, clientObj);
-            var queryOption = ClientRequestContext._parseQueryOption(option), action = ActionFactory.createQueryAction(this, clientObj, queryOption);
-            this._pendingRequest.addActionResultHandler(action, clientObj);
-        }, ClientRequestContext.isLoadOption = function(loadOption) {
-            if (!Utility.isUndefined(loadOption.select) && ("string" == typeof loadOption.select || Array.isArray(loadOption.select))) return !0;
-            if (!Utility.isUndefined(loadOption.expand) && ("string" == typeof loadOption.expand || Array.isArray(loadOption.expand))) return !0;
-            if (!Utility.isUndefined(loadOption.top) && "number" == typeof loadOption.top) return !0;
-            if (!Utility.isUndefined(loadOption.skip) && "number" == typeof loadOption.skip) return !0;
-            for (var i in loadOption) return !1;
-            return !0;
-        }, ClientRequestContext.parseStrictLoadOption = function(option) {
-            var ret = {
-                Select: []
-            };
-            return ClientRequestContext.parseStrictLoadOptionHelper(ret, "", "option", option), 
-            ret;
-        }, ClientRequestContext.combineQueryPath = function(pathPrefix, key, separator) {
-            return 0 === pathPrefix.length ? key : pathPrefix + separator + key;
-        }, ClientRequestContext.parseStrictLoadOptionHelper = function(queryInfo, pathPrefix, argPrefix, option) {
-            for (var key in option) {
-                var value = option[key];
-                if ("$all" === key) {
-                    if ("boolean" != typeof value) throw Core._Internal.RuntimeError._createInvalidArgError({
-                        argumentName: ClientRequestContext.combineQueryPath(argPrefix, key, ".")
-                    });
-                    value && queryInfo.Select.push(ClientRequestContext.combineQueryPath(pathPrefix, "*", "/"));
-                } else if ("$top" === key) {
-                    if ("number" != typeof value || pathPrefix.length > 0) throw Core._Internal.RuntimeError._createInvalidArgError({
-                        argumentName: ClientRequestContext.combineQueryPath(argPrefix, key, ".")
-                    });
-                    queryInfo.Top = value;
-                } else if ("$skip" === key) {
-                    if ("number" != typeof value || pathPrefix.length > 0) throw Core._Internal.RuntimeError._createInvalidArgError({
-                        argumentName: ClientRequestContext.combineQueryPath(argPrefix, key, ".")
-                    });
-                    queryInfo.Skip = value;
-                } else if ("boolean" == typeof value) value && queryInfo.Select.push(ClientRequestContext.combineQueryPath(pathPrefix, key, "/")); else {
-                    if ("object" != typeof value) throw Core._Internal.RuntimeError._createInvalidArgError({
-                        argumentName: ClientRequestContext.combineQueryPath(argPrefix, key, ".")
-                    });
-                    ClientRequestContext.parseStrictLoadOptionHelper(queryInfo, ClientRequestContext.combineQueryPath(pathPrefix, key, "/"), ClientRequestContext.combineQueryPath(argPrefix, key, "."), value);
-                }
-            }
-        }, ClientRequestContext._parseQueryOption = function(option) {
-            var queryOption = {};
-            if ("string" == typeof option) {
-                var select = option;
-                queryOption.Select = Utility._parseSelectExpand(select);
-            } else if (Array.isArray(option)) queryOption.Select = option; else if ("object" == typeof option) {
-                var loadOption = option;
-                if (ClientRequestContext.isLoadOption(loadOption)) {
-                    if ("string" == typeof loadOption.select) queryOption.Select = Utility._parseSelectExpand(loadOption.select); else if (Array.isArray(loadOption.select)) queryOption.Select = loadOption.select; else if (!Utility.isNullOrUndefined(loadOption.select)) throw Core._Internal.RuntimeError._createInvalidArgError({
-                        argumentName: "option.select"
-                    });
-                    if ("string" == typeof loadOption.expand) queryOption.Expand = Utility._parseSelectExpand(loadOption.expand); else if (Array.isArray(loadOption.expand)) queryOption.Expand = loadOption.expand; else if (!Utility.isNullOrUndefined(loadOption.expand)) throw Core._Internal.RuntimeError._createInvalidArgError({
-                        argumentName: "option.expand"
-                    });
-                    if ("number" == typeof loadOption.top) queryOption.Top = loadOption.top; else if (!Utility.isNullOrUndefined(loadOption.top)) throw Core._Internal.RuntimeError._createInvalidArgError({
-                        argumentName: "option.top"
-                    });
-                    if ("number" == typeof loadOption.skip) queryOption.Skip = loadOption.skip; else if (!Utility.isNullOrUndefined(loadOption.skip)) throw Core._Internal.RuntimeError._createInvalidArgError({
-                        argumentName: "option.skip"
-                    });
-                } else queryOption = ClientRequestContext.parseStrictLoadOption(option);
-            } else if (!Utility.isNullOrUndefined(option)) throw Core._Internal.RuntimeError._createInvalidArgError({
-                argumentName: "option"
-            });
-            return queryOption;
+            var queryOption = ClientRequestContext._parseQueryOption(option);
+            Common.CommonActionFactory.createQueryAction(this, clientObj, queryOption, clientObj);
         }, ClientRequestContext.prototype.loadRecursive = function(clientObj, options, maxDepth) {
             if (!Utility.isPlainJsonObject(options)) throw Core._Internal.RuntimeError._createInvalidArgError({
                 argumentName: "options"
@@ -3619,60 +3920,25 @@ var CustomFunctionMappings = {};
             enumerable: !0,
             configurable: !0
         }), RetrieveResultImpl.prototype.toJSON = function() {
-            if (this.m_isLoaded) return this.m_isNullObject ? null : (Utility.isUndefined(this.m_json) && (this.m_json = this.purifyJson(this.m_value)), 
+            if (this.m_isLoaded) return this.m_isNullObject ? null : (Utility.isUndefined(this.m_json) && (this.m_json = Utility.purifyJson(this.m_value)), 
             this.m_json);
         }, RetrieveResultImpl.prototype.toString = function() {
             return JSON.stringify(this.toJSON());
         }, RetrieveResultImpl.prototype._handleResult = function(value) {
             this.m_isLoaded = !0, null === value || "object" == typeof value && value && value._IsNull ? (this.m_isNullObject = !0, 
-            value = null) : this.m_isNullObject = !1, this.m_shouldPolyfill && (value = this.changePropertyNameToCamelLowerCase(value)), 
+            value = null) : this.m_isNullObject = !1, this.m_shouldPolyfill && (value = Utility.changePropertyNameToCamelLowerCase(value)), 
             this.m_value = value, this.m_proxy._handleRetrieveResult(value, this);
-        }, RetrieveResultImpl.prototype.changePropertyNameToCamelLowerCase = function(value) {
-            if (Array.isArray(value)) {
-                for (var ret = [], i = 0; i < value.length; i++) ret.push(this.changePropertyNameToCamelLowerCase(value[i]));
-                return ret;
-            }
-            if ("object" == typeof value && null !== value) {
-                ret = {};
-                for (var key in value) {
-                    var propValue = value[key];
-                    if (key === Constants.items) {
-                        (ret = {})[Constants.itemsLowerCase] = this.changePropertyNameToCamelLowerCase(propValue);
-                        break;
-                    }
-                    ret[Utility._toCamelLowerCase(key)] = this.changePropertyNameToCamelLowerCase(propValue);
-                }
-                return ret;
-            }
-            return value;
-        }, RetrieveResultImpl.prototype.purifyJson = function(value) {
-            if (Array.isArray(value)) {
-                for (var ret = [], i = 0; i < value.length; i++) ret.push(this.purifyJson(value[i]));
-                return ret;
-            }
-            if ("object" == typeof value && null !== value) {
-                ret = {};
-                for (var key in value) if (95 !== key.charCodeAt(0)) {
-                    var propValue = value[key];
-                    "object" == typeof propValue && null !== propValue && Array.isArray(propValue.items) && (propValue = propValue.items), 
-                    ret[key] = this.purifyJson(propValue);
-                }
-                return ret;
-            }
-            return value;
         }, RetrieveResultImpl;
     }(), Constants = function(_super) {
         function Constants() {
             return null !== _super && _super.apply(this, arguments) || this;
         }
         return __extends(Constants, _super), Constants.getItemAt = "GetItemAt", Constants.index = "_Index", 
-        Constants.items = "_Items", Constants.iterativeExecutor = "IterativeExecutor", Constants.isTracked = "_IsTracked", 
+        Constants.iterativeExecutor = "IterativeExecutor", Constants.isTracked = "_IsTracked", 
         Constants.eventMessageCategory = 65536, Constants.eventWorkbookId = "Workbook", 
-        Constants.eventSourceRemote = "Remote", Constants.itemsLowerCase = "items", Constants.proxy = "$proxy", 
-        Constants.scalarPropertyNames = "_scalarPropertyNames", Constants.navigationPropertyNames = "_navigationPropertyNames", 
-        Constants.className = "_className", Constants.isCollection = "_isCollection", Constants.scalarPropertyUpdateable = "_scalarPropertyUpdateable", 
-        Constants.collectionPropertyPath = "_collectionPropertyPath", Constants.objectPathInfoDoNotKeepReferenceFieldName = "D", 
-        Constants;
+        Constants.eventSourceRemote = "Remote", Constants.proxy = "$proxy", Constants.className = "_className", 
+        Constants.isCollection = "_isCollection", Constants.collectionPropertyPath = "_collectionPropertyPath", 
+        Constants.objectPathInfoDoNotKeepReferenceFieldName = "D", Constants;
     }(Common.CommonConstants);
     exports.Constants = Constants;
     var ClientRequest = function(_super) {
@@ -4468,7 +4734,6 @@ var CustomFunctionMappings = {};
         return __extends(ResourceStrings, _super), ResourceStrings.cannotRegisterEvent = "CannotRegisterEvent", 
         ResourceStrings.connectionFailureWithStatus = "ConnectionFailureWithStatus", ResourceStrings.connectionFailureWithDetails = "ConnectionFailureWithDetails", 
         ResourceStrings.propertyNotLoaded = "PropertyNotLoaded", ResourceStrings.runMustReturnPromise = "RunMustReturnPromise", 
-        ResourceStrings.propertyDoesNotExist = "PropertyDoesNotExist", ResourceStrings.attemptingToSetReadOnlyProperty = "AttemptingToSetReadOnlyProperty", 
         ResourceStrings.moreInfoInnerError = "MoreInfoInnerError", ResourceStrings.cannotApplyPropertyThroughSetMethod = "CannotApplyPropertyThroughSetMethod", 
         ResourceStrings.invalidOperationInCellEditMode = "InvalidOperationInCellEditMode", 
         ResourceStrings.objectIsUntracked = "ObjectIsUntracked", ResourceStrings.customFunctionDefintionMissing = "CustomFunctionDefintionMissing", 
@@ -4482,7 +4747,7 @@ var CustomFunctionMappings = {};
         ResourceStrings.customFunctionWindowMissing = "CustomFunctionWindowMissing", ResourceStrings.customFunctionDefintionMissingOnWindow = "CustomFunctionDefintionMissingOnWindow", 
         ResourceStrings.pendingBatchInProgress = "PendingBatchInProgress", ResourceStrings.notInsideBatch = "NotInsideBatch", 
         ResourceStrings.cannotUpdateReadOnlyProperty = "CannotUpdateReadOnlyProperty", ResourceStrings;
-    }(Core.CoreResourceStrings);
+    }(Common.CommonResourceStrings);
     exports.ResourceStrings = ResourceStrings, Core.CoreUtility.addResourceStringValues({
         CannotRegisterEvent: "The event handler cannot be registered.",
         PropertyNotLoaded: "The property '{0}' is not available. Before reading the property's value, call the load method on the containing object and call \"context.sync()\" on the associated request context.",
@@ -4510,25 +4775,6 @@ var CustomFunctionMappings = {};
         }
         return __extends(Utility, _super), Utility.fixObjectPathIfNecessary = function(clientObject, value) {
             clientObject && clientObject._objectPath && value && clientObject._objectPath.updateUsingObjectData(value, clientObject);
-        }, Utility.validateObjectPath = function(clientObject) {
-            for (var objectPath = clientObject._objectPath; objectPath; ) {
-                if (!objectPath.isValid) throw new Core._Internal.RuntimeError({
-                    code: ErrorCodes.invalidObjectPath,
-                    message: Core.CoreUtility._getResourceString(ResourceStrings.invalidObjectPath, Utility.getObjectPathExpression(objectPath)),
-                    debugInfo: {
-                        errorLocation: Utility.getObjectPathExpression(objectPath)
-                    }
-                });
-                objectPath = objectPath.parentObjectPath;
-            }
-        }, Utility.validateReferencedObjectPaths = function(objectPaths) {
-            if (objectPaths) for (var i = 0; i < objectPaths.length; i++) for (var objectPath = objectPaths[i]; objectPath; ) {
-                if (!objectPath.isValid) throw new Core._Internal.RuntimeError({
-                    code: ErrorCodes.invalidObjectPath,
-                    message: Core.CoreUtility._getResourceString(ResourceStrings.invalidObjectPath, Utility.getObjectPathExpression(objectPath))
-                });
-                objectPath = objectPath.parentObjectPath;
-            }
         }, Utility.load = function(clientObj, option) {
             return clientObj.context.load(clientObj, option), clientObj;
         }, Utility.loadAndSync = function(clientObj, option) {
@@ -4538,27 +4784,13 @@ var CustomFunctionMappings = {};
         }, Utility.retrieve = function(clientObj, option) {
             var shouldPolyfill = Common._internalConfig.alwaysPolyfillClientObjectRetrieveMethod;
             shouldPolyfill || (shouldPolyfill = !Utility.isSetSupported("RichApiRuntime", "1.1"));
-            var action, result = new RetrieveResultImpl(clientObj, shouldPolyfill), queryOption = ClientRequestContext._parseQueryOption(option);
-            return action = shouldPolyfill ? ActionFactory.createQueryAction(clientObj.context, clientObj, queryOption) : ActionFactory.createQueryAsJsonAction(clientObj.context, clientObj, queryOption), 
-            clientObj.context._pendingRequest.addActionResultHandler(action, result), result;
+            var result = new RetrieveResultImpl(clientObj, shouldPolyfill);
+            return clientObj._retrieve(option, result), result;
         }, Utility.retrieveAndSync = function(clientObj, option) {
             var result = Utility.retrieve(clientObj, option);
             return clientObj.context.sync().then(function() {
                 return result;
             });
-        }, Utility._parseSelectExpand = function(select) {
-            var args = [];
-            if (!Core.CoreUtility.isNullOrEmptyString(select)) for (var propertyNames = select.split(","), i = 0; i < propertyNames.length; i++) {
-                var propertyName = propertyNames[i];
-                (propertyName = sanitizeForAnyItemsSlash(propertyName.trim())).length > 0 && args.push(propertyName);
-            }
-            return args;
-            function sanitizeForAnyItemsSlash(propertyName) {
-                var propertyNameLower = propertyName.toLowerCase();
-                if ("items" === propertyNameLower || "items/" === propertyNameLower) return "*";
-                return ("items/" === propertyNameLower.substr(0, 6) || "items." === propertyNameLower.substr(0, 6)) && (propertyName = propertyName.substr(6)), 
-                propertyName.replace(new RegExp("[/.]items[/.]", "gi"), "/");
-            }
         }, Utility.toJson = function(clientObj, scalarProperties, navigationProperties, collectionItemsIfAny) {
             var result = {};
             for (var prop in scalarProperties) {
@@ -4615,10 +4847,6 @@ var CustomFunctionMappings = {};
             clientObj.context._pendingRequest.addActionResultHandler(action, resultHandler);
         }, Utility._handleNavigationPropertyResults = function(clientObj, objectValue, propertyNames) {
             for (var i = 0; i < propertyNames.length - 1; i += 2) Core.CoreUtility.isUndefined(objectValue[propertyNames[i + 1]]) || clientObj[propertyNames[i]]._handleResult(objectValue[propertyNames[i + 1]]);
-        }, Utility._toCamelLowerCase = function(name) {
-            if (Core.CoreUtility.isNullOrEmptyString(name)) return name;
-            for (var index = 0; index < name.length && name.charCodeAt(index) >= 65 && name.charCodeAt(index) <= 90; ) index++;
-            return index < name.length ? name.substr(0, index).toLowerCase() + name.substr(index) : name.toLowerCase();
         }, Utility._fixupApiFlags = function(flags) {
             return "boolean" == typeof flags && (flags = flags ? 1 : 0), flags;
         }, Utility.definePropertyThrowUnloadedException = function(obj, typeName, propertyName) {
@@ -4733,7 +4961,8 @@ var CustomFunctionMappings = {};
         _CustomFunctionMetadata: {}
     };
     var CustomFunctionLoggingSeverity, InvocationContext = function() {
-        function InvocationContext(setResultHandler) {
+        function InvocationContext(functionName, address, setResultHandler) {
+            this._functionName = functionName, _isNullOrUndefined(address) || (this._address = address), 
             this.setResult = setResultHandler;
         }
         return Object.defineProperty(InvocationContext.prototype, "onCanceled", {
@@ -4742,6 +4971,18 @@ var CustomFunctionMappings = {};
             },
             set: function(handler) {
                 this._onCanceled = handler;
+            },
+            enumerable: !0,
+            configurable: !0
+        }), Object.defineProperty(InvocationContext.prototype, "functionName", {
+            get: function() {
+                return this._functionName;
+            },
+            enumerable: !0,
+            configurable: !0
+        }), Object.defineProperty(InvocationContext.prototype, "address", {
+            get: function() {
+                return this._address;
             },
             enumerable: !0,
             configurable: !0
@@ -4758,19 +4999,21 @@ var CustomFunctionMappings = {};
     }(), CustomFunctionsLogger = function() {
         function CustomFunctionsLogger() {}
         return CustomFunctionsLogger.logEvent = function(log, data, data2) {
-            var logMessage = log.Severity + " " + log.Message + data;
-            if (data2 && (logMessage = logMessage + " " + data2), OfficeExtension.Utility.log(logMessage), 
-            CustomFunctionsLogger.s_shouldLog) switch (log.Severity) {
-              case CustomFunctionLoggingSeverity.Verbose:
-                null !== console.log && console.log(logMessage);
-                break;
+            if (CustomFunctionsLogger.s_shouldLog || OfficeExtension.CoreUtility._logEnabled) {
+                var logMessage = log.Severity + " " + log.Message + data;
+                if (data2 && (logMessage = logMessage + " " + data2), OfficeExtension.Utility.log(logMessage), 
+                CustomFunctionsLogger.s_shouldLog) switch (log.Severity) {
+                  case CustomFunctionLoggingSeverity.Verbose:
+                    null !== console.log && console.log(logMessage);
+                    break;
 
-              case CustomFunctionLoggingSeverity.Info:
-                null !== console.info && console.info(logMessage);
-                break;
+                  case CustomFunctionLoggingSeverity.Info:
+                    null !== console.info && console.info(logMessage);
+                    break;
 
-              case CustomFunctionLoggingSeverity.Error:
-                null !== console.error && console.error(logMessage);
+                  case CustomFunctionLoggingSeverity.Error:
+                    null !== console.error && console.error(logMessage);
+                }
             }
         }, CustomFunctionsLogger.shouldLog = function() {
             try {
@@ -4782,9 +5025,11 @@ var CustomFunctionMappings = {};
         CustomFunctionsLogger.s_shouldLog = CustomFunctionsLogger.shouldLog(), CustomFunctionsLogger;
     }(), CustomFunctionProxy = function() {
         function CustomFunctionProxy() {
-            this._whenInit = void 0, this._isInit = !1, this._setResultsDelayMillis = 50, this._setResultsLifeMillis = 6e4, 
-            this._ensureInitRetryDelayMillis = 500, this._resultEntryBuffer = [], this._isSetResultsTaskScheduled = !1, 
-            this._batchQuotaMillis = 1e3, this._invocationContextMap = {};
+            this._whenInit = void 0, this._isInit = !1, this._setResultsDelayMillis = 50, this._setResultsOverdueDelayMillis = 2e3, 
+            this._maxContextSyncExecutionDurationMills = 15e3, this._minContextSyncIntervalMills = 500, 
+            this._setResultsLifeMillis = 6e4, this._ensureInitRetryDelayMillis = 500, this._resultEntryBuffer = {}, 
+            this._isSetResultsTaskScheduled = !1, this._setResultsTaskOverdueTime = 0, this._inProgressContextSyncExpectedFinishTime = 0, 
+            this._batchQuotaMillis = 1e3, this._invocationContextMap = {}, this._customFunctionAssociateMappings = {};
         }
         return CustomFunctionProxy.prototype._initSettings = function() {
             if ("object" == typeof exports.Script && "object" == typeof exports.Script._CustomFunctionSettings) {
@@ -4817,18 +5062,34 @@ var CustomFunctionMappings = {};
                 _this._isInit = !0;
             })), this._isInit || context._pendingRequest._addPreSyncPromise(this._whenInit), 
             this._whenInit;
+        }, CustomFunctionProxy.prototype.associate = function(arg1, arg2) {
+            function consoleWarn(message) {
+                "undefined" != typeof console && console.warn && console.warn(message);
+            }
+            if (1 == arguments.length && "object" == typeof arguments[0] && arguments[0]) {
+                var mappings = arguments[0];
+                for (var key in mappings) this.associate(key, mappings[key]);
+            } else if (2 == arguments.length) {
+                var name_1 = arguments[0], func = arguments[1];
+                if ("string" != typeof name_1) return void consoleWarn(CustomFunctionProxy.CustomFunctionInvalidArg.Message + "associate");
+                if ("function" != typeof func) return void consoleWarn(CustomFunctionProxy.CustomFunctionInvalidArg.Message + name_1);
+                var nameUpperCase = name_1.toUpperCase();
+                this._customFunctionAssociateMappings[nameUpperCase] && consoleWarn(CustomFunctionProxy.CustomFunctionDuplicatedName.Message + name_1), 
+                this._customFunctionAssociateMappings[nameUpperCase] = func;
+            } else consoleWarn(CustomFunctionProxy.CustomFunctionInvalidArg.Message + "associate");
         }, CustomFunctionProxy.prototype._initFromHostBridge = function(hostBridge) {
             var _this = this;
             this._initSettings(), hostBridge.addHostMessageHandler(function(bridgeMessage) {
-                3 === bridgeMessage.type && _this._handleMessage(bridgeMessage.message);
+                3 === bridgeMessage.type ? _this._handleMessage(bridgeMessage.message) : 4 === bridgeMessage.type && _this._handleSettings(bridgeMessage.message);
             }), this._isInit = !0, this._whenInit = OfficeExtension.CoreUtility.Promise.resolve();
+        }, CustomFunctionProxy.prototype._handleSettings = function(args) {
+            OfficeExtension.Utility.log("CustomFunctionProxy._handleSettings:" + JSON.stringify(args)), 
+            args && "object" == typeof args && (CustomFunctionsLogger.s_shouldLog = args[CustomFunctionsLogger.CustomFunctionLoggingFlag]);
         }, CustomFunctionProxy.prototype._handleMessage = function(args) {
             try {
                 OfficeExtension.Utility.log("CustomFunctionProxy._handleMessage"), OfficeExtension.Utility.checkArgumentNull(args, "args");
-                for (var entryArray = args.entries, invocationArray = [], cancellationArray = [], metadataArray = [], i = 0; i < entryArray.length; i++) if (1 === entryArray[i].messageCategory) if (1e3 === entryArray[i].messageType) invocationArray.push(entryArray[i]); else if (1001 === entryArray[i].messageType) cancellationArray.push(entryArray[i]); else {
-                    if (1002 !== entryArray[i].messageType) throw OfficeExtension.Utility.createRuntimeError(CustomFunctionErrorCode.generalException, "unexpected message type", "CustomFunctionProxy._handleMessage");
-                    metadataArray.push(entryArray[i]);
-                }
+                for (var entryArray = args.entries, invocationArray = [], cancellationArray = [], metadataArray = [], i = 0; i < entryArray.length; i++) 1 === entryArray[i].messageCategory && ("string" == typeof entryArray[i].message && (entryArray[i].message = JSON.parse(entryArray[i].message)), 
+                1e3 === entryArray[i].messageType ? invocationArray.push(entryArray[i]) : 1001 === entryArray[i].messageType ? cancellationArray.push(entryArray[i]) : 1002 === entryArray[i].messageType ? metadataArray.push(entryArray[i]) : OfficeExtension.Utility.log("CustomFunctionProxy._handleMessage unknown message type " + entryArray[i].messageType));
                 if (metadataArray.length > 0 && this._handleMetadataEntries(metadataArray), invocationArray.length > 0) {
                     var batchArray = this._batchInvocationEntries(invocationArray);
                     batchArray.length > 0 && this._invokeRemainingBatchEntries(batchArray, 0);
@@ -4851,9 +5112,7 @@ var CustomFunctionMappings = {};
             OfficeExtension.Utility.log(message);
         }, CustomFunctionProxy.prototype._handleMetadataEntries = function(entryArray) {
             for (var i = 0; i < entryArray.length; i++) {
-                var messageJson = entryArray[i].message;
-                if (OfficeExtension.Utility.isNullOrEmptyString(messageJson)) throw OfficeExtension.Utility.createRuntimeError(CustomFunctionErrorCode.generalException, "messageJson", "CustomFunctionProxy._handleMetadataEntries");
-                var message = JSON.parse(messageJson);
+                var message = entryArray[i].message;
                 if (_isNullOrUndefined(message)) throw OfficeExtension.Utility.createRuntimeError(CustomFunctionErrorCode.generalException, "message", "CustomFunctionProxy._handleMetadataEntries");
                 exports.Script._CustomFunctionMetadata[message.functionName] = {
                     options: {
@@ -4864,43 +5123,47 @@ var CustomFunctionMappings = {};
             }
         }, CustomFunctionProxy.prototype._handleCancellationEntries = function(entryArray) {
             for (var i = 0; i < entryArray.length; i++) {
-                var messageJson = entryArray[i].message;
-                if (OfficeExtension.Utility.isNullOrEmptyString(messageJson)) throw OfficeExtension.Utility.createRuntimeError(CustomFunctionErrorCode.generalException, "messageJson", "CustomFunctionProxy._handleCancellationEntries");
-                var message = JSON.parse(messageJson);
+                var message = entryArray[i].message;
                 if (_isNullOrUndefined(message)) throw OfficeExtension.Utility.createRuntimeError(CustomFunctionErrorCode.generalException, "message", "CustomFunctionProxy._handleCancellationEntries");
                 var invocationId = message.invocationId, invocationContext = this._invocationContextMap[invocationId];
-                if (!_isNullOrUndefined(invocationContext)) {
-                    if (_isNullOrUndefined(invocationContext.onCanceled)) throw OfficeExtension.Utility.createRuntimeError(CustomFunctionErrorCode.invalidOperation, OfficeExtension.Utility._getResourceString(OfficeExtension.ResourceStrings.customFunctionCancellationHandlerMissing), "CustomFunctionProxy._handleCancellationEntries");
-                    invocationContext.onCanceled();
-                }
+                _isNullOrUndefined(invocationContext) || (delete this._invocationContextMap[invocationId], 
+                CustomFunctionsLogger.logEvent(CustomFunctionProxy.CustomFunctionCancellation, invocationContext.functionName), 
+                _isNullOrUndefined(invocationContext.onCanceled) || invocationContext.onCanceled());
             }
         }, CustomFunctionProxy.prototype._batchInvocationEntries = function(entryArray) {
             for (var _this = this, batchArray = [], _loop_1 = function(i) {
-                var messageJson = entryArray[i].message;
-                if (OfficeExtension.Utility.isNullOrEmptyString(messageJson)) throw OfficeExtension.Utility.createRuntimeError(CustomFunctionErrorCode.generalException, "messageJson", "CustomFunctionProxy._batchInvocationEntries");
-                var message = JSON.parse(messageJson);
-                if (_isNullOrUndefined(message)) throw OfficeExtension.Utility.createRuntimeError(CustomFunctionErrorCode.generalException, "message", "CustomFunctionProxy._batchInvocationEntries");
+                var message, arrayOrObjectMessage = entryArray[i].message;
+                if (message = Array.isArray(arrayOrObjectMessage) ? {
+                    invocationId: arrayOrObjectMessage[0],
+                    functionName: arrayOrObjectMessage[1],
+                    parameterValues: arrayOrObjectMessage[2],
+                    address: arrayOrObjectMessage[3],
+                    flags: arrayOrObjectMessage[4]
+                } : arrayOrObjectMessage, _isNullOrUndefined(message)) throw OfficeExtension.Utility.createRuntimeError(CustomFunctionErrorCode.generalException, "message", "CustomFunctionProxy._batchInvocationEntries");
                 if (_isNullOrUndefined(message.invocationId) || message.invocationId < 0) throw OfficeExtension.Utility.createRuntimeError(CustomFunctionErrorCode.generalException, "invocationId", "CustomFunctionProxy._batchInvocationEntries");
                 if (_isNullOrUndefined(message.functionName)) throw OfficeExtension.Utility.createRuntimeError(CustomFunctionErrorCode.generalException, "functionName", "CustomFunctionProxy._batchInvocationEntries");
-                var isCancelable, isStreaming, call = null, metadata = exports.Script._CustomFunctionMetadata[message.functionName];
-                if (_isNullOrUndefined(metadata)) return CustomFunctionsLogger.logEvent(CustomFunctionProxy.CustomFunctionExecutionNotFoundLog, message.functionName), 
-                this_1._setError(message.invocationId, "N/A", 1), "continue";
+                var call = null, isCancelable = !1, isStreaming = !1;
+                if ("number" == typeof message.flags) isCancelable = 0 != (1 & message.flags), isStreaming = 0 != (2 & message.flags); else {
+                    var metadata = exports.Script._CustomFunctionMetadata[message.functionName];
+                    if (_isNullOrUndefined(metadata)) return CustomFunctionsLogger.logEvent(CustomFunctionProxy.CustomFunctionExecutionNotFoundLog, message.functionName), 
+                    this_1._setError(message.invocationId, "N/A", 1), "continue";
+                    isCancelable = metadata.options.cancelable, isStreaming = metadata.options.stream;
+                }
                 try {
                     call = this_1._getFunction(message.functionName);
                 } catch (ex) {
                     return CustomFunctionsLogger.logEvent(CustomFunctionProxy.CustomFunctionExecutionNotFoundLog, message.functionName), 
                     this_1._setError(message.invocationId, ex, 1), "continue";
                 }
-                if (isCancelable = metadata.options.cancelable, (isStreaming = metadata.options.stream) || isCancelable) {
+                var invocationContext = void 0;
+                if (isStreaming || isCancelable) {
                     var setResult = void 0;
                     isStreaming && (setResult = function(result) {
-                        _this._setResult(message.invocationId, result);
-                    });
-                    var invocationContext;
-                    invocationContext = new InvocationContext(setResult), this_1._invocationContextMap[message.invocationId] = invocationContext, 
-                    message.parameterValues.push(invocationContext);
-                }
-                batchArray.push({
+                        _this._invocationContextMap[message.invocationId] ? _this._setResult(message.invocationId, result) : CustomFunctionsLogger.logEvent(CustomFunctionProxy.CustomFunctionAlreadyCancelled, message.functionName);
+                    }), invocationContext = new InvocationContext(message.functionName, message.address, setResult), 
+                    this_1._invocationContextMap[message.invocationId] = invocationContext;
+                } else invocationContext = new InvocationContext(message.functionName, message.address);
+                message.parameterValues.push(invocationContext), batchArray.push({
                     call: call,
                     isBatching: !1,
                     isStreaming: isStreaming,
@@ -4910,15 +5173,21 @@ var CustomFunctionMappings = {};
                 });
             }, this_1 = this, i = 0; i < entryArray.length; i++) _loop_1(i);
             return batchArray;
+        }, CustomFunctionProxy.prototype._ensureCustomFunctionMappingsUpperCase = function() {
+            if (_isNullOrUndefined(this._customFunctionMappingsUpperCase)) {
+                if (this._customFunctionMappingsUpperCase = {}, "object" == typeof CustomFunctionMappings) for (var key in OfficeExtension.CoreUtility.log("CustomFunctionMappings.Keys=" + JSON.stringify(Object.keys(CustomFunctionMappings))), 
+                CustomFunctionMappings) this._customFunctionMappingsUpperCase[key.toUpperCase()] && CustomFunctionsLogger.logEvent(CustomFunctionProxy.CustomFunctionDuplicatedName, key), 
+                this._customFunctionMappingsUpperCase[key.toUpperCase()] = CustomFunctionMappings[key];
+                for (var key in OfficeExtension.CoreUtility.log("CustomFunctionAssociateMappings.Keys=" + JSON.stringify(Object.keys(this._customFunctionAssociateMappings))), 
+                this._customFunctionAssociateMappings) this._customFunctionMappingsUpperCase[key.toUpperCase()] && CustomFunctionsLogger.logEvent(CustomFunctionProxy.CustomFunctionDuplicatedName, key), 
+                this._customFunctionMappingsUpperCase[key.toUpperCase()] = this._customFunctionAssociateMappings[key];
+            }
         }, CustomFunctionProxy.prototype._getCustomFunctionMappings = function(functionName) {
-            if ("object" == typeof CustomFunctionMappings) {
-                if (_isNullOrUndefined(this._customFunctionMappingsUpperCase)) for (var key in this._customFunctionMappingsUpperCase = {}, 
-                CustomFunctionMappings) this._customFunctionMappingsUpperCase[key.toUpperCase()] = CustomFunctionMappings[key];
-                var functionNameUpperCase = functionName.toUpperCase();
-                if (!_isNullOrUndefined(this._customFunctionMappingsUpperCase[functionNameUpperCase])) {
-                    if ("function" == typeof this._customFunctionMappingsUpperCase[functionNameUpperCase]) return this._customFunctionMappingsUpperCase[functionNameUpperCase];
-                    throw OfficeExtension.Utility.createRuntimeError(CustomFunctionErrorCode.invalidOperation, OfficeExtension.Utility._getResourceString(OfficeExtension.ResourceStrings.customFunctionInvalidFunctionMapping, functionName), "CustomFunctionProxy._getCustomFunctionMappings");
-                }
+            this._ensureCustomFunctionMappingsUpperCase();
+            var functionNameUpperCase = functionName.toUpperCase();
+            if (!_isNullOrUndefined(this._customFunctionMappingsUpperCase[functionNameUpperCase])) {
+                if ("function" == typeof this._customFunctionMappingsUpperCase[functionNameUpperCase]) return this._customFunctionMappingsUpperCase[functionNameUpperCase];
+                throw OfficeExtension.Utility.createRuntimeError(CustomFunctionErrorCode.invalidOperation, OfficeExtension.Utility._getResourceString(OfficeExtension.ResourceStrings.customFunctionInvalidFunctionMapping, functionName), "CustomFunctionProxy._getCustomFunctionMappings");
             }
         }, CustomFunctionProxy.prototype._getFunction = function(functionName) {
             var call = this._getCustomFunctionMappings(functionName);
@@ -4968,41 +5237,72 @@ var CustomFunctionMappings = {};
                 id: invocationId,
                 value: result
             };
-            "number" == typeof result && isNaN(result) && (invocationResult.failed = !0, invocationResult.value = "NaN"), 
-            this._resultEntryBuffer.push({
-                timeCreated: Date.now(),
+            "number" == typeof result ? isNaN(result) ? (invocationResult.failed = !0, invocationResult.value = "NaN") : isFinite(result) || (invocationResult.failed = !0, 
+            invocationResult.value = "Infinity", invocationResult.errorCode = 6) : result instanceof Error && (invocationResult.failed = !0, 
+            invocationResult.value = CustomFunctionProxy.toLogMessage(result), invocationResult.errorCode = 0);
+            var timeNow = Date.now();
+            this._resultEntryBuffer[invocationId] = {
+                timeCreated: timeNow,
                 result: invocationResult
-            }), this._ensureSetResultsTaskIsScheduled();
+            }, this._ensureSetResultsTaskIsScheduled(timeNow);
         }, CustomFunctionProxy.prototype._setError = function(invocationId, error, errorCode) {
             var result = {
                 id: invocationId,
                 failed: !0,
                 value: "object" == typeof error ? JSON.stringify(error) : error.toString(),
                 errorCode: errorCode
-            };
-            this._resultEntryBuffer.push({
-                timeCreated: Date.now(),
+            }, timeNow = Date.now();
+            this._resultEntryBuffer[invocationId] = {
+                timeCreated: timeNow,
                 result: result
-            }), this._ensureSetResultsTaskIsScheduled();
-        }, CustomFunctionProxy.prototype._ensureSetResultsTaskIsScheduled = function() {
-            !this._isSetResultsTaskScheduled && this._resultEntryBuffer.length > 0 && (OfficeExtension.Utility.log("setTimeout(CustomFunctionProxy._executeSetResultsTask)"), 
+            }, this._ensureSetResultsTaskIsScheduled(timeNow);
+        }, CustomFunctionProxy.prototype._ensureSetResultsTaskIsScheduled = function(timeNow) {
+            if (this._setResultsTaskOverdueTime > 0 && timeNow > this._setResultsTaskOverdueTime) return OfficeExtension.Utility.log("SetResultsTask overdue"), 
+            void this._executeSetResultsTask();
+            this._isSetResultsTaskScheduled || (OfficeExtension.Utility.log("setTimeout(CustomFunctionProxy._executeSetResultsTask)"), 
             setTimeout(this._executeSetResultsTask.bind(this), this._setResultsDelayMillis), 
-            this._isSetResultsTaskScheduled = !0);
+            this._isSetResultsTaskScheduled = !0, this._setResultsTaskOverdueTime = timeNow + this._setResultsDelayMillis + this._setResultsOverdueDelayMillis);
+        }, CustomFunctionProxy.prototype._convertCustomFunctionInvocationResultToArray = function(result) {
+            var ret = [];
+            return ret.push(result.id), ret.push(!result.failed), OfficeExtension.CoreUtility.isUndefined(result.value) ? ret.push(null) : ret.push(result.value), 
+            result.failed && (OfficeExtension.CoreUtility.isUndefined(result.errorCode) ? ret.push(0) : ret.push(result.errorCode)), 
+            ret;
         }, CustomFunctionProxy.prototype._executeSetResultsTask = function() {
             var _this = this;
-            OfficeExtension.Utility.log("CustomFunctionProxy._executeSetResultsTask"), this._isSetResultsTaskScheduled = !1;
-            for (var resultEntryBufferCopy = [], context = new CustomFunctionRequestContext(), invocationResults = []; this._resultEntryBuffer.length > 0; ) {
-                var resultEntry = this._resultEntryBuffer.pop();
-                resultEntryBufferCopy.push(resultEntry), invocationResults.push(resultEntry.result);
+            OfficeExtension.Utility.log("CustomFunctionProxy._executeSetResultsTask");
+            var timeNow = Date.now();
+            if (this._inProgressContextSyncExpectedFinishTime > 0 && this._inProgressContextSyncExpectedFinishTime > timeNow) return OfficeExtension.Utility.log("context.sync() is in progress. setTimeout(CustomFunctionProxy._executeSetResultsTask)"), 
+            setTimeout(this._executeSetResultsTask.bind(this), this._setResultsDelayMillis), 
+            void (this._setResultsTaskOverdueTime = timeNow + this._setResultsDelayMillis + this._setResultsOverdueDelayMillis);
+            this._isSetResultsTaskScheduled = !1, this._setResultsTaskOverdueTime = 0;
+            var resultEntryBufferCopy = this._resultEntryBuffer;
+            this._resultEntryBuffer = {};
+            var useArrayResult = OfficeExtension.Utility.isSetSupported("CustomFunctions", "1.7"), invocationResults = [];
+            for (var key in resultEntryBufferCopy) useArrayResult ? invocationResults.push(this._convertCustomFunctionInvocationResultToArray(resultEntryBufferCopy[key].result)) : invocationResults.push(resultEntryBufferCopy[key].result);
+            if (0 !== invocationResults.length) {
+                var context = new CustomFunctionRequestContext();
+                useArrayResult ? context.customFunctions.setInvocationArrayResults(invocationResults) : context.customFunctions.setInvocationResults(invocationResults);
+                var contextSyncStartTime = Date.now();
+                this._inProgressContextSyncExpectedFinishTime = contextSyncStartTime + this._maxContextSyncExecutionDurationMills, 
+                context.sync().then(function(value) {
+                    _this._clearInProgressContextSyncExpectedFinishTimeAfterMinInterval(Date.now() - contextSyncStartTime);
+                }, function(reason) {
+                    var timeNow = Date.now();
+                    _this._clearInProgressContextSyncExpectedFinishTimeAfterMinInterval(timeNow - contextSyncStartTime), 
+                    _this._restoreResultEntries(timeNow, resultEntryBufferCopy), _this._ensureSetResultsTaskIsScheduled(timeNow);
+                });
             }
-            context.customFunctions.setInvocationResults(invocationResults), context.sync().then(function(value) {}, function(reason) {
-                _this._restoreResultEntries(resultEntryBufferCopy), _this._ensureSetResultsTaskIsScheduled();
-            });
-        }, CustomFunctionProxy.prototype._restoreResultEntries = function(resultEntryBufferCopy) {
-            for (var timeNow = Date.now(); resultEntryBufferCopy.length > 0; ) {
-                var resultSetter = resultEntryBufferCopy.pop();
-                timeNow - resultSetter.timeCreated <= this._setResultsLifeMillis && this._resultEntryBuffer.push(resultSetter);
+        }, CustomFunctionProxy.prototype._restoreResultEntries = function(timeNow, resultEntryBufferCopy) {
+            for (var key in resultEntryBufferCopy) {
+                var resultSetter = resultEntryBufferCopy[key];
+                timeNow - resultSetter.timeCreated <= this._setResultsLifeMillis && (this._resultEntryBuffer[key] || (this._resultEntryBuffer[key] = resultSetter));
             }
+        }, CustomFunctionProxy.prototype._clearInProgressContextSyncExpectedFinishTimeAfterMinInterval = function(lastContextSyncDurationMills) {
+            var _this = this, interval = Math.max(this._minContextSyncIntervalMills, 2 * lastContextSyncDurationMills);
+            OfficeExtension.Utility.log("setTimeout(clearInProgressContestSyncExpectedFinishedTime," + interval + ")"), 
+            setTimeout(function() {
+                OfficeExtension.Utility.log("clearInProgressContestSyncExpectedFinishedTime"), _this._inProgressContextSyncExpectedFinishTime = 0;
+            }, interval);
         }, CustomFunctionProxy.CustomFunctionExecutionStartLog = new CustomFunctionLog(CustomFunctionLoggingSeverity.Verbose, "CustomFunctions [Execution] [Begin] Function="), 
         CustomFunctionProxy.CustomFunctionExecutionFailureLog = new CustomFunctionLog(CustomFunctionLoggingSeverity.Error, "CustomFunctions [Execution] [End] [Failure] Function="), 
         CustomFunctionProxy.CustomFunctionExecutionRejectedPromoseLog = new CustomFunctionLog(CustomFunctionLoggingSeverity.Error, "CustomFunctions [Execution] [End] [Failure] [RejectedPromise] Function="), 
@@ -5010,9 +5310,14 @@ var CustomFunctionMappings = {};
         CustomFunctionProxy.CustomFunctionExecutionBatchMismatchLog = new CustomFunctionLog(CustomFunctionLoggingSeverity.Error, "CustomFunctions [Execution] [End] [Failure] [BatchMismatch] Function="), 
         CustomFunctionProxy.CustomFunctionExecutionFinishLog = new CustomFunctionLog(CustomFunctionLoggingSeverity.Info, "CustomFunctions [Execution] [End] [Success] Function="), 
         CustomFunctionProxy.CustomFunctionExecutionNotFoundLog = new CustomFunctionLog(CustomFunctionLoggingSeverity.Error, "CustomFunctions [Execution] [NotFound] Function="), 
+        CustomFunctionProxy.CustomFunctionCancellation = new CustomFunctionLog(CustomFunctionLoggingSeverity.Info, "CustomFunctions [Cancellation] Function="), 
+        CustomFunctionProxy.CustomFunctionAlreadyCancelled = new CustomFunctionLog(CustomFunctionLoggingSeverity.Info, "CustomFunctions [AlreadyCancelled] Function="), 
+        CustomFunctionProxy.CustomFunctionDuplicatedName = new CustomFunctionLog(CustomFunctionLoggingSeverity.Error, "CustomFunctions [DuplicatedName] Function="), 
+        CustomFunctionProxy.CustomFunctionInvalidArg = new CustomFunctionLog(CustomFunctionLoggingSeverity.Error, "CustomFunctions [InvalidArg] Name="), 
         CustomFunctionProxy;
     }();
     exports.CustomFunctionProxy = CustomFunctionProxy, exports.customFunctionProxy = new CustomFunctionProxy(), 
+    exports.associate = exports.customFunctionProxy.associate.bind(exports.customFunctionProxy), 
     Core.HostBridge.onInited(function(hostBridge) {
         exports.customFunctionProxy._initFromHostBridge(hostBridge);
     });
@@ -5030,7 +5335,7 @@ var CustomFunctionMappings = {};
             var context = new CustomFunctionRequestContext();
             return exports.customFunctionProxy.ensureInit(context).then(function() {
                 return context.customFunctions._SetOsfControlContainerReadyForCustomFunctions(), 
-                context.sync().catch(function(error) {
+                context._customData = "SetOsfControlContainerReadyForCustomFunctions", context.sync().catch(function(error) {
                     return function(error, rethrowOtherError) {
                         var isCellEditModeError = error instanceof OfficeExtension.Error && error.code === CustomFunctionErrorCode.invalidOperationInCellEditMode;
                         if (OfficeExtension.CoreUtility.log("Error on starting custom functions: " + error), 
@@ -5047,6 +5352,9 @@ var CustomFunctionMappings = {};
                     }(error, !0);
                 });
             });
+        }, CustomFunctions.prototype.setInvocationArrayResults = function(results) {
+            _throwIfApiNotSupported("CustomFunctions.setInvocationArrayResults", "CustomFunctions", "1.4", "Excel"), 
+            _invokeMethod(this, "SetInvocationArrayResults", 0, [ results ], 2, 0);
         }, CustomFunctions.prototype.setInvocationResults = function(results) {
             _invokeMethod(this, "SetInvocationResults", 0, [ results ], 2, 0);
         }, CustomFunctions.prototype._SetInvocationError = function(invocationId, message) {
@@ -5127,7 +5435,6 @@ var CustomFunctionMappings = {};
                 getItem: wrapStorageMethod("getItem"),
                 setItem: wrapStorageMethod("setItem"),
                 removeItem: wrapStorageMethod("removeItem"),
-                clear: wrapStorageMethod("clear"),
                 getAllKeys: wrapStorageMethod("getAllKeys"),
                 multiSet: wrapStorageMethod("multiSet"),
                 multiRemove: wrapStorageMethod("multiRemove"),

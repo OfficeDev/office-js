@@ -1,4 +1,4 @@
-/* Version: 16.0.10827.10000 */
+/* Version: 16.0.11030.10000 */
 
 Type.registerNamespace("_u");
 _u.ExtensibilityStrings = function()
@@ -14,7 +14,7 @@ _u.ExtensibilityStrings.l_AttachmentErrorName_Text = "Ek Hatası";
 _u.ExtensibilityStrings.l_AttachmentExceededSize_Text = "Ek çok büyük olduğu için eklenemiyor.";
 _u.ExtensibilityStrings.l_AttachmentItemIdTooLong_Text = "Bir veya daha fazla ek kimliği çok uzun.";
 _u.ExtensibilityStrings.l_AttachmentNameTooLong_Text = "Bir veya daha fazla ek adı çok uzun.";
-_u.ExtensibilityStrings.l_AttachmentNotSupported_Text = "The attachment type is not supported.";
+_u.ExtensibilityStrings.l_AttachmentNotSupported_Text = "Ek türü desteklenmiyor.";
 _u.ExtensibilityStrings.l_AttachmentUploadGeneralFailure_Text = "Öğeye ek eklenemiyor.";
 _u.ExtensibilityStrings.l_AttachmentUrlTooLong_Text = "Bir veya daha fazla URL eki çok uzun.";
 _u.ExtensibilityStrings.l_CallSaveAsyncBeforeToken_Text = "Öğe kaydedilinceye kadar belirteç alınamıyor.";

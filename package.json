@@ -1,28 +1,29 @@
 {
     "name": "@microsoft/office-js",
+    "version": "1.1.10",
     "description": "Office JavaScript APIs",
-    "version": "1.1.9-beta.0",
     "keywords": [
         "Office Add-ins",
         "Office JavaScript API",
         "Office"
     ],
-    "engines": {
-        "node": ">=6.9.4"
+    "homepage": "https://dev.office.com/docs/add-ins/overview/office-add-ins",
+    "bugs": {
+        "url": "https://stackoverflow.com/questions/tagged/office-js"
     },
-    "scripts": {
-        "build.deploy.script": "tsc -p deployment.script/tsconfig.json",
-        "tslint.deploy.script": "tslint --project deployment.script/tsconfig.json",
-        "deploy": "node deployment.script/deploy.js"
-    },
+    "license": "LICENSE",
     "author": {
         "email": "onpm@microsoft.com",
         "name": "Microsoft",
         "url": "https://github.com/officedev"
     },
-    "bugs": {
-        "url": "https://stackoverflow.com/questions/tagged/office-js"
+    "files": [
+        "dist",
+        "embedded"
+    ],
+    "scripts": {
     },
-    "homepage": "https://dev.office.com/docs/add-ins/overview/office-add-ins",
-    "license": "LICENSE"
+    "engines": {
+        "node": ">=6.9.4"
+    }
 }

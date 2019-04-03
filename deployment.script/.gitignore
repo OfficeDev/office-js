@@ -1,33 +1,14 @@
-# Addition files to ignore from the NPM package:
-.vscode
-deployment.script
-.travis.yml
-gulpfile.js
-
-# Until we publish sources, no point to have tslint.json and yarn.lock
-#   (which today are only used for the deployment.script folder, which is excluded)
-tslint.json
-yarn.lock
-
-# Don't include the .github folder either; the only useful thing it contains
-# is an image used in the README file, but that's not worth it.
-.github
+#####################################################################
+#### Please keep this file in sync with the ".gitignore"
+#### and ".npmignore" files from the "release branch"
+####     (for ".npmignore", the contents from this file is pasted
+####      in the bottom portion of the file)
+#####################################################################
 
 
-
-
-##################################################################
-####### The rest of this file is IDENTICAL to .gitignore #########
-################ Please keep BOTH OF THEM IN SYNC ################
-##################################################################
-
-
-
-.npmrc
 node_modules/**
-typings/**
-deployment.script/*.js
-deployment.script/*.map
+*.js
+*.map
 npm-debug.log*
 
 .vs

@@ -1,4 +1,4 @@
-/* Version: 16.0.10827.10000 */
+/* Version: 16.0.11030.10000 */
 
 Type.registerNamespace("_u");
 _u.ExtensibilityStrings = function()
@@ -14,7 +14,7 @@ _u.ExtensibilityStrings.l_AttachmentErrorName_Text = "Erreur de pièce jointe";
 _u.ExtensibilityStrings.l_AttachmentExceededSize_Text = "La pièce jointe ne peut pas être ajoutée, car elle est trop volumineuse.";
 _u.ExtensibilityStrings.l_AttachmentItemIdTooLong_Text = "Un ou plusieurs des ID de pièces jointes sont trop longs.";
 _u.ExtensibilityStrings.l_AttachmentNameTooLong_Text = "Un ou plusieurs des noms de pièces jointes sont trop longs.";
-_u.ExtensibilityStrings.l_AttachmentNotSupported_Text = "Le type de pièce jointe n’est pas pris en charge.";
+_u.ExtensibilityStrings.l_AttachmentNotSupported_Text = "Ce type de pièce jointe n’est pas pris en charge.";
 _u.ExtensibilityStrings.l_AttachmentUploadGeneralFailure_Text = "La pièce jointe ne peut pas être ajoutée à l’élément.";
 _u.ExtensibilityStrings.l_AttachmentUrlTooLong_Text = "Une ou plusieurs des URL de pièces jointes sont trop longues.";
 _u.ExtensibilityStrings.l_CallSaveAsyncBeforeToken_Text = "Nous ne pouvons pas récupérer le jeton tant que l’élément n’a pas été enregistré.";

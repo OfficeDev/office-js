@@ -1,4 +1,4 @@
-/* Version: 16.0.10827.10000 */
+/* Version: 16.0.11030.10000 */
 
 Type.registerNamespace("_u");
 _u.ExtensibilityStrings = function()
@@ -14,7 +14,7 @@ _u.ExtensibilityStrings.l_AttachmentErrorName_Text = "Priedo klaida";
 _u.ExtensibilityStrings.l_AttachmentExceededSize_Text = "Priedo įtraukti negalima, nes jis per didelis.";
 _u.ExtensibilityStrings.l_AttachmentItemIdTooLong_Text = "Vienas ar keli priedo ID yra per ilgi.";
 _u.ExtensibilityStrings.l_AttachmentNameTooLong_Text = "Vienas ar keli priedo pavadinimai yra per ilgi.";
-_u.ExtensibilityStrings.l_AttachmentNotSupported_Text = "The attachment type is not supported.";
+_u.ExtensibilityStrings.l_AttachmentNotSupported_Text = "Priedo tipas nepalaikomas.";
 _u.ExtensibilityStrings.l_AttachmentUploadGeneralFailure_Text = "Priedo negalima įtraukti į elementą.";
 _u.ExtensibilityStrings.l_AttachmentUrlTooLong_Text = "Vienas ar keli priedo URL yra per ilgi.";
 _u.ExtensibilityStrings.l_CallSaveAsyncBeforeToken_Text = "Nepavyks gauti atpažinimo ženklo, kol neįrašytas elementas.";

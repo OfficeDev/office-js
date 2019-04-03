@@ -1,4 +1,4 @@
-/* Version: 16.0.10827.10000 */
+/* Version: 16.0.11030.10000 */
 
 Type.registerNamespace("_u");
 _u.ExtensibilityStrings = function()
@@ -14,7 +14,7 @@ _u.ExtensibilityStrings.l_AttachmentErrorName_Text = "Manusetõrge";
 _u.ExtensibilityStrings.l_AttachmentExceededSize_Text = "Manust ei saa lisada, kuna selle maht on liiga suur.";
 _u.ExtensibilityStrings.l_AttachmentItemIdTooLong_Text = "Mõni manuse ID on liiga pikk.";
 _u.ExtensibilityStrings.l_AttachmentNameTooLong_Text = "Mõni manuse nimi on liiga pikk.";
-_u.ExtensibilityStrings.l_AttachmentNotSupported_Text = "Manusetüüpi ei toetata.";
+_u.ExtensibilityStrings.l_AttachmentNotSupported_Text = "Seda manusetüüpi ei toetata.";
 _u.ExtensibilityStrings.l_AttachmentUploadGeneralFailure_Text = "Manust ei saa üksusele lisada.";
 _u.ExtensibilityStrings.l_AttachmentUrlTooLong_Text = "Mõni manuse URL on liiga pikk.";
 _u.ExtensibilityStrings.l_CallSaveAsyncBeforeToken_Text = "Tõendit ei saa enne üksuse salvestamist tuua.";

@@ -66,21 +66,19 @@ The NPM package and the repo branches assume the following structure.
 | ------------------ |--------------|-------------|
 | `release` | `release` (and also `latest`, [a default NPM tag](https://docs.npmjs.com/getting-started/using-tags)) | The latest of the released publicly-available APIs. <br/> This should be identical with what is currently on <https://appsforoffice.microsoft.com/lib/1/hosted/office.js> |
 | `beta`   | `beta` |  Forthcoming APIs, not necessarily ready for public consumption yet (and may still change...), but likely available on [Insider Fast (and maybe Insider Slow) builds](https://products.office.com/office-insider).  <br/> This should be identical to what is currently on <https://appsforoffice.microsoft.com/lib/beta/hosted/office.js> |
-| `release-next` | `release-next` | A forthcoming update the the "release" branch (typically a couple weeks ahead of "release") |
-| `beta-next` | `beta-next` | A forthcoming update the the "beta" branch (typically a couple weeks ahead of "beta") |
-| `private` | `private` | Any flavor of a release, but deployed for a very specific need (e.g., try out something experimental) or for a specific partner. Unlike the other tags, successive versions of this tag are not necessarily cumulative updates; it is possible to have a `1.1.2-private.1` that has the beta JS, and then a `1.1.2-private.2` that only contains the publicly-available release APIs (with maybe some tweaks) |
+| `custom` | `custom` | Any flavor of a release, but deployed for a very specific need (e.g., try out something experimental) or for a specific partner. Unlike the other tags, successive versions of this tag are not necessarily cumulative updates; it is possible to have a `1.1.2-private.1` that has the beta JS, and then a `1.1.2-private.2` that only contains the publicly-available release APIs (with maybe some tweaks) |
 
 
 <br />
 
-## Using a Private or Beta version with [Script Lab](https://aka.ms/script-lab)
+## Using a Custom or Beta version with [Script Lab](https://aka.ms/script-lab)
 
 To use a version of the NPM package with [Script Lab](https://aka.ms/script-lab), substitute the CDN reference and the `@types/office-js` reference with the NPM package name and version.  [Note: Script Lab uses <https://unpkg.com> for resolving the package names, so it's very similar guidance as above].
 
-For example, to use a `1.1.2-beta-next.0` version, use the following references:
+For example, to use a `1.1.2-beta.0` version, use the following references:
 
-    @microsoft/office-js@1.1.2-beta-next.0/dist/office.js
-    @microsoft/office-js@1.1.2-beta-next.0/dist/office.d.ts
+    @microsoft/office-js@1.1.2-beta.0/dist/office.js
+    @microsoft/office-js@1.1.2-beta.0/dist/office.d.ts
 
 
 ![Using the NPM package with Script Lab](.github/images/script-lab-substitute-refs.png)
