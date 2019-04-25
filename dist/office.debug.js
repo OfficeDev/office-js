@@ -1,5 +1,5 @@
 /* Office JavaScript API library */
-/* Version: 16.0.10910.10000 */
+/* Version: 16.0.11329.10000 */
 /*
 	Copyright (c) Microsoft Corporation.  All rights reserved.
 */
@@ -32,6 +32,7 @@ OSF.HostSpecificFileVersionMap = {
         "winrt": "16.00"
     },
     "onenote": {
+        "android": "16.00",
         "web": "16.00",
         "win32": "16.00",
         "winrt": "16.00"
@@ -61,6 +62,10 @@ OSF.HostSpecificFileVersionMap = {
         "web": "16.00",
         "win32": "16.01",
         "winrt": "16.00"
+    },
+    "visio": {
+        "web": "16.00",
+        "win32": "16.00"
     }
 };
 OSF.SupportedLocales = {
@@ -1111,10 +1116,149 @@ var Office;
     var OfficePromise = _Internal.OfficePromise;
     Office.Promise = OfficePromise;
 })(Office || (Office = {}));
+var OTel;
+(function (OTel) {
+    var CDN_PATH_OTELJS = 'telemetry/oteljs.js';
+    var CDN_PATH_OTELJS_AGAVE = 'telemetry/oteljs_agave.js';
+    var OTelLogger = (function () {
+        function OTelLogger() {
+        }
+        OTelLogger.loaded = function () {
+            return !(OTelLogger.logger === undefined);
+        };
+        OTelLogger.getOtelCDNLocation = function () {
+            return (OSF._OfficeAppFactory.getLoadScriptHelper().getOfficeJsBasePath() + CDN_PATH_OTELJS);
+        };
+        OTelLogger.getOtelSinkCDNLocation = function () {
+            return (OSF._OfficeAppFactory.getLoadScriptHelper().getOfficeJsBasePath() + CDN_PATH_OTELJS_AGAVE);
+        };
+        OTelLogger.getMapName = function (map, name) {
+            if (name !== undefined && map.hasOwnProperty(name)) {
+                return map[name];
+            }
+            return name;
+        };
+        OTelLogger.getHost = function () {
+            var host = OSF._OfficeAppFactory.getHostInfo()["hostType"];
+            var map = {
+                "excel": "Excel",
+                "onenote": "OneNote",
+                "outlook": "Outlook",
+                "powerpoint": "PowerPoint",
+                "project": "Project",
+                "visio": "Visio",
+                "word": "Word"
+            };
+            var mappedName = OTelLogger.getMapName(map, host);
+            return mappedName;
+        };
+        OTelLogger.getFlavor = function () {
+            var flavor = OSF._OfficeAppFactory.getHostInfo()["hostPlatform"];
+            var map = {
+                "android": "Android",
+                "ios": "iOS",
+                "mac": "Mac",
+                "universal": "Universal",
+                "web": "Web",
+                "win32": "Win32"
+            };
+            var mappedName = OTelLogger.getMapName(map, flavor);
+            return mappedName;
+        };
+        OTelLogger.ensureValue = function (value, alternative) {
+            if (!value) {
+                return alternative;
+            }
+            return value;
+        };
+        OTelLogger.create = function (info) {
+            var contract = {
+                id: info.appId,
+                assetId: info.assetId,
+                officeJsVersion: info.officeJSVersion,
+                hostJsVersion: info.hostJSVersion,
+                browserToken: info.clientId,
+                instanceId: info.appInstanceId,
+                name: info.name,
+                osfRuntimeVersion: OSF.ConstantNames.FileVersion,
+                sessionId: info.sessionId
+            };
+            var fields = oteljs.Contracts.Office.System.SDX.getFields("SDX", contract);
+            var host = OTelLogger.getHost();
+            var flavor = OTelLogger.getFlavor();
+            var version = info.hostVersion;
+            var context = {
+                'App.Name': host,
+                'App.Platform': flavor,
+                'App.Version': version,
+                'Session.Id': OTelLogger.ensureValue(info.correlationId, "00000000-0000-0000-0000-000000000000")
+            };
+            var sink = oteljs_agave.AgaveSink.createInstance(context);
+            var namespace = "Office.Extensibility.OfficeJs";
+            var ariaTenantToken = 'db334b301e7b474db5e0f02f07c51a47-a1b5bc36-1bbe-482f-a64a-c2d9cb606706-7439';
+            var nexusTenantToken = 1755;
+            var logger = new oteljs.TelemetryLogger(undefined, fields);
+            logger.addSink(sink);
+            logger.setTenantToken(namespace, ariaTenantToken, nexusTenantToken);
+            return logger;
+        };
+        OTelLogger.initialize = function (info) {
+            if (!OTelLogger.Enabled) {
+                OTelLogger.promises = [];
+                return;
+            }
+            var timeoutAfterOneSecond = 1000;
+            var afterOnReady = function () {
+                if ((typeof oteljs === "undefined") || (typeof oteljs_agave === "undefined")) {
+                    return;
+                }
+                if (!OTelLogger.loaded()) {
+                    OTelLogger.logger = OTelLogger.create(info);
+                }
+                if (OTelLogger.loaded()) {
+                    OTelLogger.promises.forEach(function (resolve) {
+                        resolve();
+                    });
+                }
+            };
+            var afterLoadOtelSink = function () {
+                Microsoft.Office.WebExtension.onReadyInternal().then(function () { return afterOnReady(); });
+            };
+            var afterLoadOtel = function () {
+                OSF.OUtil.loadScript(OTelLogger.getOtelSinkCDNLocation(), afterLoadOtelSink, timeoutAfterOneSecond);
+            };
+            OSF.OUtil.loadScript(OTelLogger.getOtelCDNLocation(), afterLoadOtel, timeoutAfterOneSecond);
+        };
+        OTelLogger.sendTelemetryEvent = function (telemetryEvent) {
+            OTelLogger.onTelemetryLoaded(function () {
+                try {
+                    OTelLogger.logger.sendTelemetryEvent(telemetryEvent);
+                }
+                catch (e) {
+                }
+            });
+        };
+        OTelLogger.onTelemetryLoaded = function (resolve) {
+            if (!OTelLogger.Enabled) {
+                return;
+            }
+            if (OTelLogger.loaded()) {
+                resolve();
+            }
+            else {
+                OTelLogger.promises.push(resolve);
+            }
+        };
+        OTelLogger.promises = [];
+        OTelLogger.Enabled = true;
+        return OTelLogger;
+    })();
+    OTel.OTelLogger = OTelLogger;
+})(OTel || (OTel = {}));
 (function () {
     var previousConstantNames = OSF.ConstantNames || {};
     OSF.ConstantNames = {
-        FileVersion: "16.0.10910.10000",
+        FileVersion: "16.0.11329.10000",
         OfficeJS: "office.js",
         OfficeDebugJS: "office.debug.js",
         DefaultLocale: "en-us",
@@ -1181,7 +1325,8 @@ OSF._OfficeAppFactory = (function OSF__OfficeAppFactory() {
         Outlook: "Outlook",
         OneNote: "OneNote",
         Project: "Project",
-        Access: "Access"
+        Access: "Access",
+        Visio: "Visio"
     };
     var _context = {};
     var _settings = {};
@@ -1194,6 +1339,7 @@ OSF._OfficeAppFactory = (function OSF__OfficeAppFactory() {
     var _isOfficeJsLoaded = false;
     var _officeOnReadyPendingResolves = [];
     var _isOfficeOnReadyCalled = false;
+    var _officeOnReadyHostAndPlatformInfo = { host: null, platform: null };
     var _loadScriptHelper = new ScriptLoading.LoadScriptHelper({
         OfficeJS: OSF.ConstantNames.OfficeJS,
         OfficeDebugJS: OSF.ConstantNames.OfficeDebugJS
@@ -1204,23 +1350,20 @@ OSF._OfficeAppFactory = (function OSF__OfficeAppFactory() {
     var _windowLocationHash = window.location.hash;
     var _windowLocationSearch = window.location.search;
     var _windowName = window.name;
-    var getHostAndPlatform = function (appNumber) {
-        return {
-            host: OfficeExt.HostName.Host.getInstance().getHost(appNumber),
-            platform: OfficeExt.HostName.Host.getInstance().getPlatform(appNumber)
-        };
-    };
     var setOfficeJsAsLoadedAndDispatchPendingOnReadyCallbacks = function (_a) {
         var host = _a.host, platform = _a.platform;
         _isOfficeJsLoaded = true;
+        _officeOnReadyHostAndPlatformInfo = { host: host, platform: platform };
         while (_officeOnReadyPendingResolves.length > 0) {
-            _officeOnReadyPendingResolves.shift()({ host: host, platform: platform });
+            _officeOnReadyPendingResolves.shift()(_officeOnReadyHostAndPlatformInfo);
         }
     };
-    Microsoft.Office.WebExtension.onReady = function Microsoft_Office_WebExtension_onReady(callback) {
-        _isOfficeOnReadyCalled = true;
+    Microsoft.Office.WebExtension.sendTelemetryEvent = function Microsoft_Office_WebExtension_sendTelemetryEvent(telemetryEvent) {
+        OTel.OTelLogger.sendTelemetryEvent(telemetryEvent);
+    };
+    Microsoft.Office.WebExtension.onReadyInternal = function Microsoft_Office_WebExtension_onReadyInternal(callback) {
         if (_isOfficeJsLoaded) {
-            var _a = getHostAndPlatform(1), host = _a.host, platform = _a.platform;
+            var host = _officeOnReadyHostAndPlatformInfo.host, platform = _officeOnReadyHostAndPlatformInfo.platform;
             if (callback) {
                 var result = callback({ host: host, platform: platform });
                 if (result && result.then && typeof result.then === "function") {
@@ -1243,6 +1386,10 @@ OSF._OfficeAppFactory = (function OSF__OfficeAppFactory() {
         return new Office.Promise(function (resolve) {
             _officeOnReadyPendingResolves.push(resolve);
         });
+    };
+    Microsoft.Office.WebExtension.onReady = function Microsoft_Office_WebExtension_onReady(callback) {
+        _isOfficeOnReadyCalled = true;
+        return Microsoft.Office.WebExtension.onReadyInternal(callback);
     };
     var getQueryStringValue = function OSF__OfficeAppFactory$getQueryStringValue(paramName) {
         var hostInfoValue;
@@ -1493,15 +1640,22 @@ OSF._OfficeAppFactory = (function OSF__OfficeAppFactory() {
                                     }
                                 }
                                 else {
+                                    if (!Microsoft.Office.WebExtension.initialize) {
+                                        Microsoft.Office.WebExtension.initialize = function () { };
+                                    }
                                     _initializationHelper.prepareRightBeforeWebExtensionInitialize(appContext);
                                 }
                                 _initializationHelper.prepareRightAfterWebExtensionInitialize && _initializationHelper.prepareRightAfterWebExtensionInitialize();
+                                var appNumber = appContext.get_appName();
+                                setOfficeJsAsLoadedAndDispatchPendingOnReadyCallbacks({
+                                    host: OfficeExt.HostName.Host.getInstance().getHost(appNumber),
+                                    platform: OfficeExt.HostName.Host.getInstance().getPlatform(appNumber)
+                                });
                             }
                             else {
                                 throw new Error("Office.js has not fully loaded. Your app must call \"Office.onReady()\" as part of it's loading sequence (or set the \"Office.initialize\" function). If your app has this functionality, try reloading this page.");
                             }
                         }, 400, 50);
-                        setOfficeJsAsLoadedAndDispatchPendingOnReadyCallbacks(getHostAndPlatform(appContext.get_appName()));
                     };
                     if (!_loadScriptHelper.isScriptLoading(OSF.ConstantNames.OfficeStringsId)) {
                         loadLocaleStrings(appContext.get_appUILocale());
@@ -1526,7 +1680,10 @@ OSF._OfficeAppFactory = (function OSF__OfficeAppFactory() {
                             }
                         }
                         if (isPlainBrowser) {
-                            setOfficeJsAsLoadedAndDispatchPendingOnReadyCallbacks({ host: null, platform: null });
+                            setOfficeJsAsLoadedAndDispatchPendingOnReadyCallbacks({
+                                host: null,
+                                platform: null
+                            });
                         }
                     }
                 }

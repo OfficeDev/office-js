@@ -1,5 +1,5 @@
 /* Outlook Mac specific API library */
-/* Version: 16.0.10219.10000 */
+/* Version: 16.0.11325.10000 */
 /*!
 Copyright (c) Microsoft Corporation.  All rights reserved.
 */
@@ -1149,7 +1149,9 @@ OSF.AppName = {
     VisioWebApp: 8388610,
     OneNoteIOS: 8388611,
     WordAndroid: 8388613,
-    PowerpointAndroid: 8388614
+    PowerpointAndroid: 8388614,
+    Visio: 8388615,
+    OneNoteAndroid: 4194305
 };
 OSF.InternalPerfMarker = {
     DataCoercionBegin: "Agave.HostCall.CoerceDataStart",
@@ -1183,7 +1185,9 @@ OSF.AgaveHostAction = {
     MouseEnter: 19,
     MouseLeave: 20,
     UpdateTargetUrl: 21,
-    InstallCustomFunctions: 22
+    InstallCustomFunctions: 22,
+    SendTelemetryEvent: 23,
+    UninstallCustomFunctions: 24
 };
 OSF.SharedConstants = {NotificationConversationIdSuffix: "_ntf"};
 OSF.DialogMessageType = {
@@ -1379,6 +1383,7 @@ Microsoft.Office.WebExtension.Parameters = {
     ForceAddAccount: "forceAddAccount",
     AuthChallenge: "authChallenge",
     Reserved: "reserved",
+    Tcid: "tcid",
     Xml: "xml",
     Namespace: "namespace",
     Prefix: "prefix",
@@ -1502,7 +1507,9 @@ OSF.DDA.MethodDispId = {
     dispidSetDataNodeTextMethod: 143,
     dispidMessageParentMethod: 144,
     dispidSendMessageMethod: 145,
-    dispidMethodMax: 145
+    dispidExecuteFeature: 146,
+    dispidQueryFeature: 147,
+    dispidMethodMax: 147
 };
 OSF.DDA.EventDispId = {
     dispidEventMin: 0,
@@ -1530,6 +1537,8 @@ OSF.DDA.EventDispId = {
     dispidOlkRecipientsChangedEvent: 47,
     dispidOlkAppointmentTimeChangedEvent: 48,
     dispidOlkRecurrenceChangedEvent: 49,
+    dispidOlkAttachmentsChangedEvent: 50,
+    dispidOlkEnhancedLocationsChangedEvent: 51,
     dispidTaskSelectionChangedEvent: 56,
     dispidResourceSelectionChangedEvent: 57,
     dispidViewSelectionChangedEvent: 58,
@@ -1619,6 +1628,7 @@ OSF.DDA.ErrorCodeManager = function()
                 ooeInvalidOrTimedOutSession: 5012,
                 ooeInvalidApiArguments: 5013,
                 ooeOperationCancelled: 5014,
+                ooeWorkbookHidden: 5015,
                 ooeTooManyIncompleteRequests: 5100,
                 ooeRequestTokenUnavailable: 5101,
                 ooeActivityLimitReached: 5102,
@@ -1667,6 +1677,7 @@ OSF.DDA.ErrorCodeManager = function()
                 ooeSSOUserConsentNotSupportedByCurrentAddinCategory: 13009,
                 ooeSSOConnectionLost: 13010,
                 ooeResourceNotAllowed: 13011,
+                ooeSSOUnsupportedPlatform: 13012,
                 ooeAccessDenied: 13990,
                 ooeGeneralException: 13991
             },
@@ -1896,6 +1907,10 @@ OSF.DDA.ErrorCodeManager = function()
                     name: stringNS.L_APICallFailed,
                     message: stringNS.L_InvalidApiArgumentsMessage
                 };
+                _errorMappings[OSF.DDA.ErrorCodeManager.errorCodes.ooeWorkbookHidden] = {
+                    name: stringNS.L_APICallFailed,
+                    message: stringNS.L_WorkbookHiddenMessage
+                };
                 _errorMappings[OSF.DDA.ErrorCodeManager.errorCodes.ooeCustomXmlNodeNotFound] = {
                     name: stringNS.L_InvalidNode,
                     message: stringNS.L_CustomXmlNodeNotFound
@@ -2060,6 +2075,10 @@ OSF.DDA.ErrorCodeManager = function()
                     name: stringNS.L_SSOConnectionLostError,
                     message: stringNS.L_SSOConnectionLostErrorMessage
                 };
+                _errorMappings[OSF.DDA.ErrorCodeManager.errorCodes.ooeSSOUnsupportedPlatform] = {
+                    name: stringNS.L_SSOConnectionLostError,
+                    message: stringNS.L_SSOUnsupportedPlatform
+                };
                 _errorMappings[OSF.DDA.ErrorCodeManager.errorCodes.ooeOperationCancelled] = {
                     name: stringNS.L_OperationCancelledError,
                     message: stringNS.L_OperationCancelledErrorMessage
@@ -2113,6 +2132,7 @@ var OfficeExt;
                     };
                     this._getVersion = function(version)
                     {
+                        version = version + "";
                         var temp = version.split(".");
                         var major = 0;
                         var minor = 0;
@@ -2695,6 +2715,7 @@ OSF.DDA.Context = function OSF_DDA_Context(officeAppContext, document, license, 
         commerceAllowed: {value: officeAppContext.get_commerceAllowed()},
         host: {value: OfficeExt.HostName.Host.getInstance().getHost()},
         platform: {value: OfficeExt.HostName.Host.getInstance().getPlatform()},
+        isDialog: {value: OSF._OfficeAppFactory.getHostInfo().isDialog},
         diagnostics: {value: OfficeExt.HostName.Host.getInstance().getDiagnostics(officeAppContext.get_hostFullVersion())}
     });
     if(license)
@@ -3476,6 +3497,8 @@ OSF.DDA.DispIdHost.Facade = function OSF_DDA_DispIdHost_Facade(getDelegateMethod
             OpenBrowserWindow: did.dispidOpenBrowserWindow,
             CreateDocumentAsync: did.dispidCreateDocumentMethod,
             InsertFormAsync: did.dispidInsertFormMethod,
+            ExecuteFeature: did.dispidExecuteFeature,
+            QueryFeature: did.dispidQueryFeature,
             AddDataPartAsync: did.dispidAddDataPartMethod,
             GetDataPartByIdAsync: did.dispidGetDataPartByIdMethod,
             GetDataPartsByNameSpaceAsync: did.dispidGetDataPartsByNamespaceMethod,
@@ -3542,6 +3565,8 @@ OSF.DDA.DispIdHost.Facade = function OSF_DDA_DispIdHost_Facade(getDelegateMethod
             RecipientsChanged: did.dispidOlkRecipientsChangedEvent,
             AppointmentTimeChanged: did.dispidOlkAppointmentTimeChangedEvent,
             RecurrenceChanged: did.dispidOlkRecurrenceChangedEvent,
+            AttachmentsChanged: did.dispidOlkAttachmentsChangedEvent,
+            EnhancedLocationsChanged: did.dispidOlkEnhancedLocationsChangedEvent,
             TaskSelectionChanged: did.dispidTaskSelectionChangedEvent,
             ResourceSelectionChanged: did.dispidResourceSelectionChangedEvent,
             ViewSelectionChanged: did.dispidViewSelectionChangedEvent,
@@ -4007,6 +4032,9 @@ OSF.DDA.SafeArray.Delegate._onException = function OSF_DDA_SafeArray_Delegate$On
             case-2147209089:
                 status = OSF.DDA.ErrorCodeManager.errorCodes.ooeInvalidParam;
                 break;
+            case-2147208704:
+                status = OSF.DDA.ErrorCodeManager.errorCodes.ooeTooManyIncompleteRequests;
+                break;
             case-2146827850:
             default:
                 status = OSF.DDA.ErrorCodeManager.errorCodes.ooeInternalError;
@@ -4357,6 +4385,10 @@ OSF.InitializationHelper.prototype.prepareApiSurface = function OSF_Initializati
     }
     if(OSF.DDA.OpenBrowser)
         OSF.DDA.DispIdHost.addAsyncMethods(appContext.ui,[OSF.DDA.AsyncMethodNames.OpenBrowserWindow]);
+    if(OSF.DDA.ExecuteFeature)
+        OSF.DDA.DispIdHost.addAsyncMethods(appContext.ui,[OSF.DDA.AsyncMethodNames.ExecuteFeature]);
+    if(OSF.DDA.QueryFeature)
+        OSF.DDA.DispIdHost.addAsyncMethods(appContext.ui,[OSF.DDA.AsyncMethodNames.QueryFeature]);
     if(OSF.DDA.Auth)
     {
         appContext.auth = new OSF.DDA.Auth;
@@ -4518,6 +4550,7 @@ var OfficeExt;
                     if(MacRichClientHostController.interval)
                         window.clearInterval(MacRichClientHostController.interval);
                     MacRichClientHostController.popup.close();
+                    MacRichClientHostController.popup = null;
                     MacRichClientHostController.NotifyError = null;
                     callback(OSF.DDA.ErrorCodeManager.errorCodes.ooeSuccess)
                 }
@@ -5101,6 +5134,18 @@ OSF.DDA.OMFactory.manufactureEventArgs = function OSF_DDA_OMFactory$manufactureE
             else
                 throw OsfMsAjaxFactory.msAjaxError.argument(Microsoft.Office.WebExtension.Parameters.EventType,OSF.OUtil.formatString(Strings.OfficeOM.L_NotSupportedEventType,eventType));
             break;
+        case Microsoft.Office.WebExtension.EventType.AttachmentsChanged:
+            if(OSF._OfficeAppFactory.getHostInfo()["hostType"] == "outlook")
+                args = new OSF.DDA.OlkAttachmentsChangedEventArgs(eventProperties);
+            else
+                throw OsfMsAjaxFactory.msAjaxError.argument(Microsoft.Office.WebExtension.Parameters.EventType,OSF.OUtil.formatString(Strings.OfficeOM.L_NotSupportedEventType,eventType));
+            break;
+        case Microsoft.Office.WebExtension.EventType.EnhancedLocationsChanged:
+            if(OSF._OfficeAppFactory.getHostInfo()["hostType"] == "outlook")
+                args = new OSF.DDA.OlkEnhancedLocationsChangedEventArgs(eventProperties);
+            else
+                throw OsfMsAjaxFactory.msAjaxError.argument(Microsoft.Office.WebExtension.Parameters.EventType,OSF.OUtil.formatString(Strings.OfficeOM.L_NotSupportedEventType,eventType));
+            break;
         default:
             throw OsfMsAjaxFactory.msAjaxError.argument(Microsoft.Office.WebExtension.Parameters.EventType,OSF.OUtil.formatString(Strings.OfficeOM.L_NotSupportedEventType,eventType));
     }
@@ -5506,6 +5551,62 @@ OSF.DDA.OlkRecurrenceChangedEventArgs = function OSF_DDA_OlkRecurrenceChangedEve
         recurrence: {value: recurrenceObject}
     })
 };
+OSF.OUtil.augmentList(Microsoft.Office.WebExtension.EventType,{OfficeThemeChanged: "officeThemeChanged"});
+OSF.OUtil.augmentList(OSF.DDA.EventDescriptors,{OfficeThemeData: "OfficeThemeData"});
+OSF.OUtil.setNamespace("Theming",OSF.DDA);
+OSF.DDA.Theming.OfficeThemeChangedEventArgs = function OSF_DDA_Theming_OfficeThemeChangedEventArgs(officeTheme)
+{
+    var themeData = JSON.parse(officeTheme.OfficeThemeData[0]);
+    var themeDataHex = {};
+    for(var color in themeData)
+        themeDataHex[color] = OSF.OUtil.convertIntToCssHexColor(themeData[color]);
+    OSF.OUtil.defineEnumerableProperties(this,{
+        type: {value: Microsoft.Office.WebExtension.EventType.OfficeThemeChanged},
+        officeTheme: {value: themeDataHex}
+    })
+};
+OSF.OUtil.augmentList(Microsoft.Office.WebExtension.EventType,{AttachmentsChanged: "olkAttachmentsChanged"});
+OSF.OUtil.augmentList(OSF.DDA.EventDescriptors,{OlkAttachmentsChangedData: "OlkAttachmentsChangedData"});
+OSF.DDA.OlkAttachmentsChangedEventArgs = function OSF_DDA_OlkAttachmentsChangedEventArgs(eventData)
+{
+    var attachmentStatus;
+    var attachmentDetails;
+    try
+    {
+        var attachmentChangedObject = JSON.parse(eventData[OSF.DDA.EventDescriptors.OlkAttachmentsChangedData][0]);
+        attachmentStatus = attachmentChangedObject.attachmentStatus;
+        attachmentDetails = Microsoft.Office.WebExtension.OutlookBase.CreateAttachmentDetails(attachmentChangedObject.attachmentDetails)
+    }
+    catch(e)
+    {
+        attachmentStatus = null;
+        attachmentDetails = null
+    }
+    OSF.OUtil.defineEnumerableProperties(this,{
+        type: {value: Microsoft.Office.WebExtension.EventType.AttachmentsChanged},
+        attachmentStatus: {value: attachmentStatus},
+        attachmentDetails: {value: attachmentDetails}
+    })
+};
+OSF.OUtil.augmentList(Microsoft.Office.WebExtension.EventType,{EnhancedLocationsChanged: "olkEnhancedLocationsChanged"});
+OSF.OUtil.augmentList(OSF.DDA.EventDescriptors,{OlkEnhancedLocationsChangedData: "OlkEnhancedLocationsChangedData"});
+OSF.DDA.OlkEnhancedLocationsChangedEventArgs = function OSF_DDA_OlkEnhancedLocationsChangedEventArgs(eventData)
+{
+    var enhancedLocations;
+    try
+    {
+        var enhancedLocationsChangedObject = JSON.parse(eventData[OSF.DDA.EventDescriptors.OlkEnhancedLocationsChangedData][0]);
+        enhancedLocations = enhancedLocationsChangedObject.enhancedLocations
+    }
+    catch(e)
+    {
+        enhancedLocations = null
+    }
+    OSF.OUtil.defineEnumerableProperties(this,{
+        type: {value: Microsoft.Office.WebExtension.EventType.EnhancedLocationsChanged},
+        enhancedLocations: {value: enhancedLocations}
+    })
+};
 OSF.DDA.OlkItemSelectedChangedEventArgs = function OSF_DDA_OlkItemSelectedChangedEventArgs(eventData)
 {
     var initialDataSource = eventData[OSF.DDA.EventDescriptors.OlkItemSelectedData][0];
@@ -5545,6 +5646,30 @@ OSF.DDA.SafeArray.Delegate.ParameterMap.define({
     type: OSF.DDA.EventDispId.dispidOlkRecurrenceChangedEvent,
     fromHost: [{
             name: OSF.DDA.EventDescriptors.OlkRecurrenceChangedData,
+            value: OSF.DDA.SafeArray.Delegate.ParameterMap.sourceData
+        }],
+    isComplexType: true
+});
+OSF.DDA.SafeArray.Delegate.ParameterMap.define({
+    type: OSF.DDA.EventDispId.dispidOfficeThemeChangedEvent,
+    fromHost: [{
+            name: OSF.DDA.EventDescriptors.OfficeThemeData,
+            value: OSF.DDA.SafeArray.Delegate.ParameterMap.sourceData
+        }],
+    isComplexType: true
+});
+OSF.DDA.SafeArray.Delegate.ParameterMap.define({
+    type: OSF.DDA.EventDispId.dispidOlkAttachmentsChangedEvent,
+    fromHost: [{
+            name: OSF.DDA.EventDescriptors.OlkAttachmentsChangedData,
+            value: OSF.DDA.SafeArray.Delegate.ParameterMap.sourceData
+        }],
+    isComplexType: true
+});
+OSF.DDA.SafeArray.Delegate.ParameterMap.define({
+    type: OSF.DDA.EventDispId.dispidOlkEnhancedLocationsChangedEvent,
+    fromHost: [{
+            name: OSF.DDA.EventDescriptors.OlkEnhancedLocationsChangedData,
             value: OSF.DDA.SafeArray.Delegate.ParameterMap.sourceData
         }],
     isComplexType: true
@@ -6249,12 +6374,220 @@ var Logger;
 var OSFAriaLogger;
 (function(OSFAriaLogger)
 {
+    var TelemetryEventAppActivated = {
+            name: "AppActivated",
+            enabled: true,
+            basic: true,
+            critical: true,
+            points: [{
+                    name: "Browser",
+                    type: "string"
+                },{
+                    name: "Message",
+                    type: "string"
+                },{
+                    name: "AppId",
+                    type: "string"
+                },{
+                    name: "AppURL",
+                    type: "string"
+                },{
+                    name: "UserId",
+                    type: "string"
+                },{
+                    name: "Host",
+                    type: "string"
+                },{
+                    name: "HostVersion",
+                    type: "string"
+                },{
+                    name: "CorrelationId",
+                    type: "string",
+                    rename: "HostSessionId"
+                },{
+                    name: "AppSizeWidth",
+                    type: "int64"
+                },{
+                    name: "AppSizeHeight",
+                    type: "int64"
+                },{
+                    name: "AppInstanceId",
+                    type: "string"
+                },{
+                    name: "OfficeJSVersion",
+                    type: "string"
+                },{
+                    name: "HostJSVersion",
+                    type: "string"
+                },{
+                    name: "IsFromWacAutomation",
+                    type: "string"
+                },]
+        };
+    var TelemetryEventScriptLoad = {
+            name: "ScriptLoad",
+            enabled: true,
+            basic: false,
+            critical: false,
+            points: [{
+                    name: "ScriptId",
+                    type: "string"
+                },{
+                    name: "StartTime",
+                    type: "double"
+                },{
+                    name: "ResponseTime",
+                    type: "double"
+                },]
+        };
+    var TelemetryEventApiUsage = {
+            name: "APIUsage",
+            enabled: false,
+            basic: false,
+            critical: false,
+            points: [{
+                    name: "APIType",
+                    type: "string"
+                },{
+                    name: "APIID",
+                    type: "int64"
+                },{
+                    name: "Parameters",
+                    type: "string"
+                },{
+                    name: "ResponseTime",
+                    type: "int64"
+                },{
+                    name: "ErrorType",
+                    type: "int64"
+                },]
+        };
+    var TelemetryEventAppInitialization = {
+            name: "AppInitialization",
+            enabled: true,
+            basic: false,
+            critical: false,
+            points: [{
+                    name: "SuccessCode",
+                    type: "int64"
+                },{
+                    name: "Message",
+                    type: "string"
+                },]
+        };
+    var TelemetryEventAppClosed = {
+            name: "AppClosed",
+            enabled: true,
+            basic: false,
+            critical: false,
+            points: [{
+                    name: "FocusTime",
+                    type: "int64"
+                },{
+                    name: "AppSizeFinalWidth",
+                    type: "int64"
+                },{
+                    name: "AppSizeFinalHeight",
+                    type: "int64"
+                },{
+                    name: "OpenTime",
+                    type: "int64"
+                },]
+        };
+    var TelemetryEvents = [TelemetryEventAppActivated,TelemetryEventScriptLoad,TelemetryEventApiUsage,TelemetryEventAppInitialization,TelemetryEventAppClosed,];
+    function createDataField(value, point)
+    {
+        var key = point.rename === undefined ? point.name : point.rename;
+        var type = point.type;
+        var field = undefined;
+        switch(type)
+        {
+            case"string":
+                field = oteljs.makeStringDataField(key,value);
+                break;
+            case"double":
+                if(typeof value === "string")
+                    value = parseFloat(value);
+                field = oteljs.makeDoubleDataField(key,value);
+                break;
+            case"int64":
+                if(typeof value === "string")
+                    value = parseInt(value);
+                field = oteljs.makeInt64DataField(key,value);
+                break;
+            case"boolean":
+                if(typeof value === "string")
+                    value = value === "true";
+                field = oteljs.makeBooleanDataField(key,value);
+                break
+        }
+        return field
+    }
+    function getEventDefinition(eventName)
+    {
+        for(var _i = 0; _i < TelemetryEvents.length; _i++)
+        {
+            var event_1 = TelemetryEvents[_i];
+            if(event_1.name === eventName)
+                return event_1
+        }
+        return undefined
+    }
+    function eventEnabled(eventName)
+    {
+        var eventDefinition = getEventDefinition(eventName);
+        if(eventDefinition === undefined)
+            return false;
+        return eventDefinition.enabled
+    }
+    function generateTelemetryEvent(eventName, telemetryData)
+    {
+        var eventDefinition = getEventDefinition(eventName);
+        if(eventDefinition === undefined)
+            return undefined;
+        var dataFields = [];
+        for(var _i = 0, _a = eventDefinition.points; _i < _a.length; _i++)
+        {
+            var point = _a[_i];
+            var key = point.name;
+            var value = telemetryData[key];
+            if(value === undefined)
+                continue;
+            var field = createDataField(value,point);
+            if(field !== undefined)
+                dataFields.push(field)
+        }
+        var flags = {dataCategories: oteljs.DataCategories.ProductServiceUsage};
+        if(eventDefinition.critical)
+            flags.samplingPolicy = oteljs.SamplingPolicy.CriticalBusinessImpact;
+        if(eventDefinition.basic)
+            flags.diagnosticLevel = oteljs.DiagnosticLevel.BasicEvent;
+        var eventNameFull = "Office.Extensibility.OfficeJs." + eventName + "X";
+        var event = {
+                eventName: eventNameFull,
+                dataFields: dataFields,
+                eventFlags: flags
+            };
+        return event
+    }
+    function sendOtelTelemetryEvent(eventName, telemetryData)
+    {
+        if(eventEnabled(eventName))
+            if(typeof OTel !== "undefined")
+                OTel.OTelLogger.onTelemetryLoaded(function()
+                {
+                    var event = generateTelemetryEvent(eventName,telemetryData);
+                    if(event === undefined)
+                        return;
+                    Microsoft.Office.WebExtension.sendTelemetryEvent(event)
+                })
+    }
     var AriaLogger = function()
         {
             function AriaLogger(){}
             AriaLogger.prototype.getAriaCDNLocation = function()
             {
-                return OSF._OfficeAppFactory.getLoadScriptHelper().getOfficeJsBasePath() + "/ariatelemetry/aria-web-telemetry.js"
+                return OSF._OfficeAppFactory.getLoadScriptHelper().getOfficeJsBasePath() + "ariatelemetry/aria-web-telemetry.js"
             };
             AriaLogger.getInstance = function()
             {
@@ -6266,37 +6599,42 @@ var OSFAriaLogger;
             {
                 return arg["Fields"] !== undefined
             };
-            AriaLogger.prototype.loadAriaScriptAndLog = function(tableName, telemetryData)
+            AriaLogger.prototype.sendTelemetry = function(tableName, telemetryData)
             {
                 var startAfterMs = 1e3;
-                OSF.OUtil.loadScript(this.getAriaCDNLocation(),function()
-                {
-                    try
+                if(AriaLogger.EnableSendingTelemetryWithLegacyAria)
+                    OSF.OUtil.loadScript(this.getAriaCDNLocation(),function()
                     {
-                        if(!this.ALogger)
+                        try
                         {
-                            var OfficeExtensibilityTenantID = "db334b301e7b474db5e0f02f07c51a47-a1b5bc36-1bbe-482f-a64a-c2d9cb606706-7439";
-                            this.ALogger = AWTLogManager.initialize(OfficeExtensibilityTenantID)
+                            if(!this.ALogger)
+                            {
+                                var OfficeExtensibilityTenantID = "db334b301e7b474db5e0f02f07c51a47-a1b5bc36-1bbe-482f-a64a-c2d9cb606706-7439";
+                                this.ALogger = AWTLogManager.initialize(OfficeExtensibilityTenantID)
+                            }
+                            var eventProperties = new AWTEventProperties;
+                            eventProperties.setName("Office.Extensibility.OfficeJS." + tableName);
+                            for(var key in telemetryData)
+                                if(key.toLowerCase() !== "table")
+                                    eventProperties.setProperty(key,telemetryData[key]);
+                            var today = new Date;
+                            eventProperties.setProperty("Date",today.toISOString());
+                            this.ALogger.logEvent(eventProperties)
                         }
-                        var eventProperties = new AWTEventProperties;
-                        eventProperties.setName("Office.Extensibility.OfficeJS." + tableName);
-                        for(var key in telemetryData)
-                            if(key.toLowerCase() !== "table")
-                                eventProperties.setProperty(key,telemetryData[key]);
-                        var today = new Date;
-                        eventProperties.setProperty("Date",today.toISOString());
-                        this.ALogger.logEvent(eventProperties)
-                    }
-                    catch(e){}
-                },startAfterMs)
+                        catch(e){}
+                    },startAfterMs);
+                if(AriaLogger.EnableSendingTelemetryWithOTel)
+                    sendOtelTelemetryEvent(tableName,telemetryData)
             };
             AriaLogger.prototype.logData = function(data)
             {
                 if(this.isIUsageData(data))
-                    this.loadAriaScriptAndLog(data["Table"],data["Fields"]);
+                    this.sendTelemetry(data["Table"],data["Fields"]);
                 else
-                    this.loadAriaScriptAndLog(data["Table"],data)
+                    this.sendTelemetry(data["Table"],data)
             };
+            AriaLogger.EnableSendingTelemetryWithOTel = true;
+            AriaLogger.EnableSendingTelemetryWithLegacyAria = true;
             return AriaLogger
         }();
     OSFAriaLogger.AriaLogger = AriaLogger
@@ -6315,6 +6653,7 @@ var OSFAppTelemetry;
             function AppInfo(){}
             return AppInfo
         }();
+    OSFAppTelemetry.AppInfo = AppInfo;
     var Event = function()
         {
             function Event(name, handler)
@@ -6427,6 +6766,87 @@ var OSFAppTelemetry;
             input = input.replace(/[{}]/g,"").toLowerCase();
         return input || ""
     }
+    var UrlFilter = function()
+        {
+            function UrlFilter(){}
+            UrlFilter.hashString = function(s)
+            {
+                var hash = 0;
+                if(s.length === 0)
+                    return hash;
+                for(var i = 0; i < s.length; i++)
+                {
+                    var c = s.charCodeAt(i);
+                    hash = (hash << 5) - hash + c;
+                    hash |= 0
+                }
+                return hash
+            };
+            UrlFilter.stringToHash = function(s)
+            {
+                var hash = UrlFilter.hashString(s);
+                var stringHash = hash.toString();
+                if(hash < 0)
+                    stringHash = "1" + stringHash.substring(1);
+                else
+                    stringHash = "0" + stringHash;
+                return stringHash
+            };
+            UrlFilter.startsWith = function(s, prefix)
+            {
+                return s.indexOf(prefix) == -0
+            };
+            UrlFilter.isFileUrl = function(url)
+            {
+                return UrlFilter.startsWith(url.toLowerCase(),"file:")
+            };
+            UrlFilter.removeHttpPrefix = function(url)
+            {
+                var prefix = "";
+                if(UrlFilter.startsWith(url.toLowerCase(),UrlFilter.httpsPrefix))
+                    prefix = UrlFilter.httpsPrefix;
+                else if(UrlFilter.startsWith(url.toLowerCase(),UrlFilter.httpPrefix))
+                    prefix = UrlFilter.httpPrefix;
+                var clean = url.slice(prefix.length);
+                return clean
+            };
+            UrlFilter.getUrlDomain = function(url)
+            {
+                var domain = UrlFilter.removeHttpPrefix(url);
+                domain = domain.split("/")[0];
+                domain = domain.split(":")[0];
+                return domain
+            };
+            UrlFilter.isIp4Address = function(domain)
+            {
+                var ipv4Regex = /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
+                return ipv4Regex.test(domain)
+            };
+            UrlFilter.filter = function(url)
+            {
+                if(UrlFilter.isFileUrl(url))
+                {
+                    var hash = UrlFilter.stringToHash(url);
+                    return"file://" + hash
+                }
+                var domain = UrlFilter.getUrlDomain(url);
+                if(UrlFilter.isIp4Address(domain))
+                {
+                    var hash = UrlFilter.stringToHash(url);
+                    if(UrlFilter.startsWith(domain,"10."))
+                        return"IP10Range_" + hash;
+                    else if(UrlFilter.startsWith(domain,"192."))
+                        return"IP192Range_" + hash;
+                    else if(UrlFilter.startsWith(domain,"127."))
+                        return"IP127Range_" + hash;
+                    return"IPOther_" + hash
+                }
+                return domain
+            };
+            UrlFilter.httpPrefix = "http://";
+            UrlFilter.httpsPrefix = "https://";
+            return UrlFilter
+        }();
     function initialize(context)
     {
         if(!OSFAppTelemetry.enableTelemetry)
@@ -6448,7 +6868,7 @@ var OSFAppTelemetry;
             appInfo.appInstanceId = appInfo.appInstanceId.replace(/[{}]/g,"").toLowerCase();
         appInfo.message = context.get_hostCustomMessage();
         appInfo.officeJSVersion = OSF.ConstantNames.FileVersion;
-        appInfo.hostJSVersion = "16.0.10219.10000";
+        appInfo.hostJSVersion = "16.0.11325.10000";
         if(context._wacHostEnvironment)
             appInfo.wacHostEnvironment = context._wacHostEnvironment;
         if(context._isFromWacAutomation !== undefined && context._isFromWacAutomation !== null)
@@ -6458,7 +6878,7 @@ var OSFAppTelemetry;
         var url = location.href;
         if(url)
             url = url.split("?")[0].split("#")[0];
-        appInfo.appURL = url;
+        appInfo.appURL = UrlFilter.filter(url);
         (function getUserIdAndAssetIdFromToken(token, appInfo)
         {
             var xmlContent;
@@ -6487,6 +6907,10 @@ var OSFAppTelemetry;
                 parser = null
             }
         })(context.get_eToken(),appInfo);
+        appInfo.sessionId = sessionId;
+        appInfo.name = context.get_addinName();
+        if(typeof OTel !== "undefined")
+            OTel.OTelLogger.initialize(appInfo);
         (function handleLifecycle()
         {
             var startTime = new Date;
@@ -6549,7 +6973,7 @@ var OSFAppTelemetry;
         data.AppId = appInfo.appId;
         data.AssetId = appInfo.assetId;
         data.AppURL = appInfo.appURL;
-        data.UserId = appInfo.userId;
+        data.UserId = "";
         data.ClientId = appInfo.clientId;
         data.Browser = appInfo.browser;
         data.Host = appInfo.host;
@@ -7027,6 +7451,62 @@ OSF.DDA.SafeArray.Delegate.ParameterMap.define({
             value: 1
         }]
 });
+OSF.DDA.AsyncMethodNames.addNames({
+    ExecuteFeature: "executeFeatureAsync",
+    QueryFeature: "queryFeatureAsync"
+});
+OSF.OUtil.augmentList(OSF.DDA.PropertyDescriptors,{
+    FeatureProperties: "FeatureProperties",
+    TcidEnabled: "TcidEnabled",
+    TcidVisible: "TcidVisible"
+});
+OSF.DDA.ExecuteFeature = function OSF_DDA_ExecuteFeature(){};
+OSF.DDA.QueryFeature = function OSF_DDA_QueryFeature(){};
+OSF.DDA.AsyncMethodCalls.define({
+    method: OSF.DDA.AsyncMethodNames.ExecuteFeature,
+    requiredArguments: [{
+            name: Microsoft.Office.WebExtension.Parameters.Tcid,
+            types: ["number"]
+        }],
+    privateStateCallbacks: []
+});
+OSF.DDA.AsyncMethodCalls.define({
+    method: OSF.DDA.AsyncMethodNames.QueryFeature,
+    requiredArguments: [{
+            name: Microsoft.Office.WebExtension.Parameters.Tcid,
+            types: ["number"]
+        }],
+    privateStateCallbacks: []
+});
+OSF.DDA.SafeArray.Delegate.ParameterMap.define({
+    type: OSF.DDA.PropertyDescriptors.FeatureProperties,
+    fromHost: [{
+            name: OSF.DDA.PropertyDescriptors.TcidEnabled,
+            value: 0
+        },{
+            name: OSF.DDA.PropertyDescriptors.TcidVisible,
+            value: 1
+        }],
+    isComplexType: true
+});
+OSF.DDA.SafeArray.Delegate.ParameterMap.define({
+    type: OSF.DDA.MethodDispId.dispidExecuteFeature,
+    toHost: [{
+            name: Microsoft.Office.WebExtension.Parameters.Tcid,
+            value: 0
+        }]
+});
+OSF.DDA.SafeArray.Delegate.ParameterMap.define({
+    type: OSF.DDA.MethodDispId.dispidQueryFeature,
+    fromHost: [{
+            name: OSF.DDA.PropertyDescriptors.FeatureProperties,
+            value: OSF.DDA.SafeArray.Delegate.ParameterMap.self
+        }],
+    toHost: [{
+            name: Microsoft.Office.WebExtension.Parameters.Tcid,
+            value: 0
+        }]
+});
 var OfficeJsClient_OutlookWin32;
 (function(OfficeJsClient_OutlookWin32)
 {
@@ -7390,6 +7870,10 @@ OSF.InitializationHelper.prototype.loadAppSpecificScriptAndCreateOM = function O
         WestPacificStandardTime: "West Pacific Standard Time",
         YakutskStandardTime: "Yakutsk Standard Time"
     };
+    Microsoft.Office.WebExtension.MailboxEnums.LocationType = {
+        Custom: "custom",
+        Room: "room"
+    };
     Type.registerNamespace("OSF.DDA");
     var OSF = window["OSF"] || {};
     OSF.DDA = OSF.DDA || {};
@@ -7688,7 +8172,7 @@ OSF.InitializationHelper.prototype.loadAppSpecificScriptAndCreateOM = function O
         addEventSupport: function()
         {
             if(this._item$p$0)
-                OSF.DDA.DispIdHost["addEventSupport"](this._item$p$0,new OSF.EventDispatch([Microsoft.Office.WebExtension.EventType["RecipientsChanged"],Microsoft.Office.WebExtension.EventType["AppointmentTimeChanged"],Microsoft.Office.WebExtension.EventType["RecurrenceChanged"],Microsoft.Office.WebExtension.EventType["AttachmentsChanged"]]))
+                OSF.DDA.DispIdHost["addEventSupport"](this._item$p$0,new OSF.EventDispatch([Microsoft.Office.WebExtension.EventType["RecipientsChanged"],Microsoft.Office.WebExtension.EventType["AppointmentTimeChanged"],Microsoft.Office.WebExtension.EventType["RecurrenceChanged"],Microsoft.Office.WebExtension.EventType["AttachmentsChanged"],Microsoft.Office.WebExtension.EventType["EnhancedLocationsChanged"]]))
         },
         windowOpenOverrideHandler: function(url, targetName, features, replace)
         {
@@ -7766,29 +8250,34 @@ OSF.InitializationHelper.prototype.loadAppSpecificScriptAndCreateOM = function O
         },
         _standardInvokeHostMethod$i$0: function(dispid, data, format, userContext, callback)
         {
-            var $$t_B = this;
+            var $$t_C = this;
             this.invokeHostMethod(dispid,data,function(resultCode, response)
             {
                 if(callback)
                 {
                     var asyncResult = null;
+                    var wasSuccessful = true;
                     if(Object["isInstanceOfType"](response))
                     {
                         var responseDictionary = response;
+                        if("wasSuccessful" in responseDictionary)
+                            wasSuccessful = responseDictionary["wasSuccessful"];
                         if("error" in responseDictionary || "data" in responseDictionary || "errorCode" in responseDictionary)
                             if(!responseDictionary["error"])
                             {
                                 var formattedData = format ? format(responseDictionary["data"]) : responseDictionary["data"];
-                                asyncResult = $$t_B.createAsyncResult(formattedData,0,0,userContext,null)
+                                asyncResult = $$t_C.createAsyncResult(formattedData,0,0,userContext,null)
                             }
                             else
                             {
                                 var errorCode = responseDictionary["errorCode"];
-                                asyncResult = $$t_B.createAsyncResult(null,1,errorCode,userContext,null)
+                                asyncResult = $$t_C.createAsyncResult(null,1,errorCode,userContext,null)
                             }
                     }
                     if(!asyncResult && resultCode)
-                        asyncResult = $$t_B.createAsyncResult(null,1,9002,userContext,null);
+                        asyncResult = $$t_C.createAsyncResult(null,1,9002,userContext,null);
+                    if(!asyncResult && !resultCode && !wasSuccessful)
+                        asyncResult = $$t_C.createAsyncResult(null,1,5e3,userContext,null);
                     callback(asyncResult)
                 }
             })
@@ -7989,6 +8478,8 @@ OSF.InitializationHelper.prototype.loadAppSpecificScriptAndCreateOM = function O
                 case 107:
                 case 108:
                 case 149:
+                case 154:
+                case 157:
                     break;
                 case 12:
                     optionalParameters["isRest"] = data["isRest"];
@@ -8083,6 +8574,10 @@ OSF.InitializationHelper.prototype.loadAppSpecificScriptAndCreateOM = function O
                 case 151:
                 case 152:
                 case 153:
+                case 155:
+                case 156:
+                case 158:
+                case 159:
                     optionalParameters = data;
                     break;
                 default:
@@ -8779,6 +9274,7 @@ OSF.InitializationHelper.prototype.loadAppSpecificScriptAndCreateOM = function O
     };
     $h.Appointment = function(dataDictionary)
     {
+        this.$$d__getEnhancedLocation$p$2 = Function.createDelegate(this,this._getEnhancedLocation$p$2);
         this.$$d__getSeriesId$p$2 = Function.createDelegate(this,this._getSeriesId$p$2);
         this.$$d__getRecurrence$p$2 = Function.createDelegate(this,this._getRecurrence$p$2);
         this.$$d__getOrganizer$p$2 = Function.createDelegate(this,this._getOrganizer$p$2);
@@ -8801,9 +9297,11 @@ OSF.InitializationHelper.prototype.loadAppSpecificScriptAndCreateOM = function O
         $h.InitialData._defineReadOnlyProperty$i(this,"normalizedSubject",this.$$d__getNormalizedSubject$p$2);
         $h.InitialData._defineReadOnlyProperty$i(this,"organizer",this.$$d__getOrganizer$p$2);
         $h.InitialData._defineReadOnlyProperty$i(this,"recurrence",this.$$d__getRecurrence$p$2);
-        $h.InitialData._defineReadOnlyProperty$i(this,"seriesId",this.$$d__getSeriesId$p$2)
+        $h.InitialData._defineReadOnlyProperty$i(this,"seriesId",this.$$d__getSeriesId$p$2);
+        $h.InitialData._defineReadOnlyProperty$i(this,"enhancedLocation",this.$$d__getEnhancedLocation$p$2)
     };
     $h.Appointment.prototype = {
+        _enhancedLocation$p$2: null,
         getItemType: function()
         {
             return window["Microsoft"]["Office"]["WebExtension"]["MailboxEnums"]["ItemType"]["Appointment"]
@@ -8853,6 +9351,13 @@ OSF.InitializationHelper.prototype.loadAppSpecificScriptAndCreateOM = function O
         _getSeriesId$p$2: function()
         {
             return this._data$p$0.get__seriesId$i$0()
+        },
+        _getEnhancedLocation$p$2: function()
+        {
+            this._data$p$0._throwOnRestrictedPermissionLevel$i$0();
+            if(!this._enhancedLocation$p$2)
+                this._enhancedLocation$p$2 = new $h.EnhancedLocation(false);
+            return this._enhancedLocation$p$2
         }
     };
     $h.Appointment.prototype.getEntities = function()
@@ -8896,6 +9401,7 @@ OSF.InitializationHelper.prototype.loadAppSpecificScriptAndCreateOM = function O
     };
     $h.AppointmentCompose = function(data)
     {
+        this.$$d__getEnhancedLocation$p$2 = Function.createDelegate(this,this._getEnhancedLocation$p$2);
         this.$$d__getOrganizer$p$2 = Function.createDelegate(this,this._getOrganizer$p$2);
         this.$$d__getSeriesId$p$2 = Function.createDelegate(this,this._getSeriesId$p$2);
         this.$$d__getRecurrence$p$2 = Function.createDelegate(this,this._getRecurrence$p$2);
@@ -8912,7 +9418,8 @@ OSF.InitializationHelper.prototype.loadAppSpecificScriptAndCreateOM = function O
         $h.InitialData._defineReadOnlyProperty$i(this,"location",this.$$d__getLocation$p$2);
         $h.InitialData._defineReadOnlyProperty$i(this,"recurrence",this.$$d__getRecurrence$p$2);
         $h.InitialData._defineReadOnlyProperty$i(this,"seriesId",this.$$d__getSeriesId$p$2);
-        $h.InitialData._defineReadOnlyProperty$i(this,"organizer",this.$$d__getOrganizer$p$2)
+        $h.InitialData._defineReadOnlyProperty$i(this,"organizer",this.$$d__getOrganizer$p$2);
+        $h.InitialData._defineReadOnlyProperty$i(this,"enhancedLocation",this.$$d__getEnhancedLocation$p$2)
     };
     $h.AppointmentCompose.prototype = {
         _requiredAttendees$p$2: null,
@@ -8920,6 +9427,7 @@ OSF.InitializationHelper.prototype.loadAppSpecificScriptAndCreateOM = function O
         _start$p$2: null,
         _end$p$2: null,
         _location$p$2: null,
+        _enhancedLocation$p$2: null,
         _recurrence$p$2: null,
         _organizer$p$2: null,
         getItemType: function()
@@ -8961,6 +9469,13 @@ OSF.InitializationHelper.prototype.loadAppSpecificScriptAndCreateOM = function O
                 this._location$p$2 = new $h.ComposeLocation;
             return this._location$p$2
         },
+        _getEnhancedLocation$p$2: function()
+        {
+            this._data$p$0._throwOnRestrictedPermissionLevel$i$0();
+            if(!this._enhancedLocation$p$2)
+                this._enhancedLocation$p$2 = new $h.EnhancedLocation(true);
+            return this._enhancedLocation$p$2
+        },
         _getRecurrence$p$2: function()
         {
             this._data$p$0._throwOnRestrictedPermissionLevel$i$0();
@@ -9001,7 +9516,8 @@ OSF.InitializationHelper.prototype.loadAppSpecificScriptAndCreateOM = function O
             $h.InitialData._defineReadOnlyProperty$i(this,"contentType",this.$$d__getContentType$p$0);
         $h.InitialData._defineReadOnlyProperty$i(this,"size",this.$$d__getSize$p$0);
         $h.InitialData._defineReadOnlyProperty$i(this,"attachmentType",this.$$d__getAttachmentType$p$0);
-        $h.InitialData._defineReadOnlyProperty$i(this,"isInline",this.$$d__getIsInline$p$0);
+        if("isInline" in this._data$p$0)
+            $h.InitialData._defineReadOnlyProperty$i(this,"isInline",this.$$d__getIsInline$p$0);
         if("url" in this._data$p$0)
             $h.InitialData._defineReadOnlyProperty$i(this,"url",this.$$d__getUrl$p$0)
     };
@@ -9075,6 +9591,48 @@ OSF.InitializationHelper.prototype.loadAppSpecificScriptAndCreateOM = function O
         var dataToHost = {coercionType: hostCoercionType};
         window["OSF"]["DDA"]["OutlookAppOm"]._instance$p._standardInvokeHostMethod$i$0(37,dataToHost,null,commonParameters._asyncContext$p$0,commonParameters._callback$p$0)
     };
+    $h.Categories = function(){};
+    $h.Categories.prototype = {validateCategoriesArray: function(categories)
+        {
+            if($h.ScriptHelpers.isNullOrUndefined(categories))
+                throw Error.argument("categories");
+            if(!Array["isInstanceOfType"](categories))
+                throw Error.argumentType("categories",Object["getType"](categories),Array);
+            if(!categories["length"])
+                throw Error.argument("categories");
+            for(var i = 0; i < categories["length"]; i++)
+                if(!$h.ScriptHelpers.isNonEmptyString(categories[i]) || categories[i].length > 255)
+                    throw Error.argument("categories");
+        }};
+    $h.Categories.prototype.getAsync = function()
+    {
+        var args = [];
+        for(var $$pai_2 = 0; $$pai_2 < arguments["length"]; ++$$pai_2)
+            args[$$pai_2] = arguments[$$pai_2];
+        window["OSF"]["DDA"]["OutlookAppOm"]._instance$p._throwOnMethodCallForInsufficientPermission$i$0(1,"categories.getAsync");
+        var parameters = $h.CommonParameters.parse(args,true);
+        window["OSF"]["DDA"]["OutlookAppOm"]._instance$p._standardInvokeHostMethod$i$0(157,null,null,parameters._asyncContext$p$0,parameters._callback$p$0)
+    };
+    $h.Categories.prototype.addAsync = function(categories)
+    {
+        var args = [];
+        for(var $$pai_3 = 1; $$pai_3 < arguments["length"]; ++$$pai_3)
+            args[$$pai_3 - 1] = arguments[$$pai_3];
+        window["OSF"]["DDA"]["OutlookAppOm"]._instance$p._throwOnMethodCallForInsufficientPermission$i$0(2,"categories.addAsync");
+        var parameters = $h.CommonParameters.parse(args,false);
+        this.validateCategoriesArray(categories);
+        window["OSF"]["DDA"]["OutlookAppOm"]._instance$p._standardInvokeHostMethod$i$0(158,{categories: categories},null,parameters._asyncContext$p$0,parameters._callback$p$0)
+    };
+    $h.Categories.prototype.removeAsync = function(categories)
+    {
+        var args = [];
+        for(var $$pai_3 = 1; $$pai_3 < arguments["length"]; ++$$pai_3)
+            args[$$pai_3 - 1] = arguments[$$pai_3];
+        window["OSF"]["DDA"]["OutlookAppOm"]._instance$p._throwOnMethodCallForInsufficientPermission$i$0(2,"categories.removeAsync");
+        var parameters = $h.CommonParameters.parse(args,false);
+        this.validateCategoriesArray(categories);
+        window["OSF"]["DDA"]["OutlookAppOm"]._instance$p._standardInvokeHostMethod$i$0(159,{categories: categories},null,parameters._asyncContext$p$0,parameters._callback$p$0)
+    };
     $h.ComposeFrom = function()
     {
         this.$$d__getAsyncFormatter$p$0 = Function.createDelegate(this,this._getAsyncFormatter$p$0)
@@ -9093,7 +9651,7 @@ OSF.InitializationHelper.prototype.loadAppSpecificScriptAndCreateOM = function O
         var parameters = $h.CommonParameters.parse(args,true);
         window["OSF"]["DDA"]["OutlookAppOm"]._instance$p._standardInvokeHostMethod$i$0(107,null,this.$$d__getAsyncFormatter$p$0,parameters._asyncContext$p$0,parameters._callback$p$0)
     };
-    window["$h"]["InternetHeaders"] = $h.InternetHeaders = function(supportsWriteMethods)
+    $h.InternetHeaders = function(supportsWriteMethods)
     {
         this.$$d_getAsyncApi = Function.createDelegate(this,this.getAsyncApi);
         this.$$d_removeAsyncApi = Function.createDelegate(this,this.removeAsyncApi);
@@ -9122,7 +9680,7 @@ OSF.InitializationHelper.prototype.loadAppSpecificScriptAndCreateOM = function O
             var args = [];
             for(var $$pai_7 = 1; $$pai_7 < arguments["length"]; ++$$pai_7)
                 args[$$pai_7 - 1] = arguments[$$pai_7];
-            window["OSF"]["DDA"]["OutlookAppOm"]._instance$p._throwOnMethodCallForInsufficientPermission$i$0(2,"internetHeaders.getAsync");
+            window["OSF"]["DDA"]["OutlookAppOm"]._instance$p._throwOnMethodCallForInsufficientPermission$i$0(2,"internetHeaders.setAsync");
             var parameters = $h.CommonParameters.parse(args,false);
             if($h.ScriptHelpers.isNullOrUndefined(internetHeadersNameValuePairs))
                 throw Error.argument("internetHeaders");
@@ -9144,7 +9702,7 @@ OSF.InitializationHelper.prototype.loadAppSpecificScriptAndCreateOM = function O
             var args = [];
             for(var $$pai_3 = 1; $$pai_3 < arguments["length"]; ++$$pai_3)
                 args[$$pai_3 - 1] = arguments[$$pai_3];
-            window["OSF"]["DDA"]["OutlookAppOm"]._instance$p._throwOnMethodCallForInsufficientPermission$i$0(2,"internetHeaders.getAsync");
+            window["OSF"]["DDA"]["OutlookAppOm"]._instance$p._throwOnMethodCallForInsufficientPermission$i$0(2,"internetHeaders.removeAsync");
             var parameters = $h.CommonParameters.parse(args,false);
             this.validateInternetHeaderArray(internetHeadersNames);
             window["OSF"]["DDA"]["OutlookAppOm"]._instance$p._standardInvokeHostMethod$i$0(153,{internetHeaderKeys: internetHeadersNames},null,parameters._asyncContext$p$0,parameters._callback$p$0)
@@ -10055,6 +10613,85 @@ OSF.InitializationHelper.prototype.loadAppSpecificScriptAndCreateOM = function O
             result["recipientType"] = this._getRecipientType$p$0();
         return result
     };
+    $h.EnhancedLocation = function(supportsWriteMethods)
+    {
+        this.$$d_getAsyncApi = Function.createDelegate(this,this.getAsyncApi);
+        this.$$d_removeAsyncApi = Function.createDelegate(this,this.removeAsyncApi);
+        this.$$d_addAsyncApi = Function.createDelegate(this,this.addAsyncApi);
+        var currentInstance = this;
+        if(supportsWriteMethods)
+        {
+            currentInstance["addAsync"] = this.$$d_addAsyncApi;
+            currentInstance["removeAsync"] = this.$$d_removeAsyncApi
+        }
+        currentInstance["getAsync"] = this.$$d_getAsyncApi
+    };
+    $h.EnhancedLocation.prototype = {
+        getAsyncApi: function()
+        {
+            var args = [];
+            for(var $$pai_2 = 0; $$pai_2 < arguments["length"]; ++$$pai_2)
+                args[$$pai_2] = arguments[$$pai_2];
+            window["OSF"]["DDA"]["OutlookAppOm"]._instance$p._throwOnMethodCallForInsufficientPermission$i$0(1,"enhancedLocation.getAsync");
+            var parameters = $h.CommonParameters.parse(args,true);
+            window["OSF"]["DDA"]["OutlookAppOm"]._instance$p._standardInvokeHostMethod$i$0(154,null,null,parameters._asyncContext$p$0,parameters._callback$p$0)
+        },
+        addAsyncApi: function(locationIdentifiersArray)
+        {
+            var args = [];
+            for(var $$pai_3 = 1; $$pai_3 < arguments["length"]; ++$$pai_3)
+                args[$$pai_3 - 1] = arguments[$$pai_3];
+            window["OSF"]["DDA"]["OutlookAppOm"]._instance$p._throwOnMethodCallForInsufficientPermission$i$0(2,"enhancedLocation.addAsync");
+            var parameters = $h.CommonParameters.parse(args,false);
+            this._validateLocationIdentifiers$p$0(locationIdentifiersArray);
+            window["OSF"]["DDA"]["OutlookAppOm"]._instance$p._standardInvokeHostMethod$i$0(155,{enhancedLocations: locationIdentifiersArray},null,parameters._asyncContext$p$0,parameters._callback$p$0)
+        },
+        removeAsyncApi: function(locationIdentifiersArray)
+        {
+            var args = [];
+            for(var $$pai_3 = 1; $$pai_3 < arguments["length"]; ++$$pai_3)
+                args[$$pai_3 - 1] = arguments[$$pai_3];
+            window["OSF"]["DDA"]["OutlookAppOm"]._instance$p._throwOnMethodCallForInsufficientPermission$i$0(2,"enhancedLocation.removeAsync");
+            var parameters = $h.CommonParameters.parse(args,false);
+            this._validateLocationIdentifiers$p$0(locationIdentifiersArray);
+            window["OSF"]["DDA"]["OutlookAppOm"]._instance$p._standardInvokeHostMethod$i$0(156,{enhancedLocations: locationIdentifiersArray},null,parameters._asyncContext$p$0,parameters._callback$p$0)
+        },
+        _validateLocationIdentifiers$p$0: function(locationIdentifier)
+        {
+            if($h.ScriptHelpers.isNullOrUndefined(locationIdentifier))
+                throw Error.argument("locationIdentifier");
+            if(!Array["isInstanceOfType"](locationIdentifier))
+                throw Error.argumentType("locationIdentifier",Object["getType"](locationIdentifier),Array);
+            if(!locationIdentifier["length"])
+                throw Error.argument("locationIdentifier");
+            for(var $$arr_1 = locationIdentifier, $$len_2 = $$arr_1.length, $$idx_3 = 0; $$idx_3 < $$len_2; ++$$idx_3)
+            {
+                var locationIdentifiersDictionary = $$arr_1[$$idx_3];
+                this._validateLocationIdentifierDictionary$p$0(locationIdentifiersDictionary);
+                var locationIdentifierType = locationIdentifiersDictionary["type"];
+                if(locationIdentifierType === window["Microsoft"]["Office"]["WebExtension"]["MailboxEnums"]["LocationType"]["Room"] || locationIdentifierType === window["Microsoft"]["Office"]["WebExtension"]["MailboxEnums"]["LocationType"]["Custom"])
+                    this._validateIdParameter$p$0(locationIdentifiersDictionary["id"],locationIdentifierType);
+                else
+                    throw Error.argument("type");
+            }
+        },
+        _validateIdParameter$p$0: function(id, type)
+        {
+            if(!$h.ScriptHelpers.isNonEmptyString(id))
+                throw Error.argument("id");
+            if(type === window["Microsoft"]["Office"]["WebExtension"]["MailboxEnums"]["LocationType"]["Room"])
+                if(id.length > 571)
+                    throw Error.argument("id");
+        },
+        _validateLocationIdentifierDictionary$p$0: function(dict)
+        {
+            if($h.ScriptHelpers.isNullOrUndefined(dict))
+                throw Error.argument("locationIdentifier");
+            var keys = Object["keys"](dict);
+            if(keys["length"] < 2)
+                throw Error.argument("locationIdentifier");
+        }
+    };
     $h.Entities = function(data, filteredEntitiesData, timeSent, permissionLevel)
     {
         this.$$d__createMeetingSuggestion$p$0 = Function.createDelegate(this,this._createMeetingSuggestion$p$0);
@@ -10531,6 +11168,7 @@ OSF.InitializationHelper.prototype.loadAppSpecificScriptAndCreateOM = function O
         return this._durationMinutes$p$0
     };
     $h.ReplyConstants = function(){};
+    $h.EmailAddressConstants = function(){};
     $h.AsyncConstants = function(){};
     $h.ApiTelemetryCode = function(){};
     window["Office"]["cast"]["item"] = Office.cast.item = function(){};
@@ -10648,13 +11286,16 @@ OSF.InitializationHelper.prototype.loadAppSpecificScriptAndCreateOM = function O
     $h.ItemBase = function(data)
     {
         this.$$d__createCustomProperties$i$0 = Function.createDelegate(this,this._createCustomProperties$i$0);
+        this.$$d__getCategories$p$0 = Function.createDelegate(this,this._getCategories$p$0);
         this.$$d__getNotificationMessages$p$0 = Function.createDelegate(this,this._getNotificationMessages$p$0);
         this.$$d_getItemType = Function.createDelegate(this,this.getItemType);
         this._data$p$0 = data;
         $h.InitialData._defineReadOnlyProperty$i(this,"itemType",this.$$d_getItemType);
-        $h.InitialData._defineReadOnlyProperty$i(this,"notificationMessages",this.$$d__getNotificationMessages$p$0)
+        $h.InitialData._defineReadOnlyProperty$i(this,"notificationMessages",this.$$d__getNotificationMessages$p$0);
+        $h.InitialData._defineReadOnlyProperty$i(this,"categories",this.$$d__getCategories$p$0)
     };
     $h.ItemBase.prototype = {
+        _categories$p$0: null,
         get__isFromSharedFolder$i$0: function()
         {
             return this._data$p$0.get__isFromSharedFolder$i$0()
@@ -10674,6 +11315,13 @@ OSF.InitializationHelper.prototype.loadAppSpecificScriptAndCreateOM = function O
             if(!this._notificationMessages$p$0)
                 this._notificationMessages$p$0 = new $h.NotificationMessages;
             return this._notificationMessages$p$0
+        },
+        _getCategories$p$0: function()
+        {
+            this._data$p$0._throwOnRestrictedPermissionLevel$i$0();
+            if(!this._categories$p$0)
+                this._categories$p$0 = new $h.Categories;
+            return this._categories$p$0
         }
     };
     $h.ItemBase.prototype.loadCustomPropertiesAsync = function()
@@ -10707,6 +11355,7 @@ OSF.InitializationHelper.prototype.loadAppSpecificScriptAndCreateOM = function O
     };
     $h.MeetingRequest = function(data)
     {
+        this.$$d__getEnhancedLocation$p$3 = Function.createDelegate(this,this._getEnhancedLocation$p$3);
         this.$$d__getSeriesId$p$3 = Function.createDelegate(this,this._getSeriesId$p$3);
         this.$$d__getRecurrence$p$3 = Function.createDelegate(this,this._getRecurrence$p$3);
         this.$$d__getRequiredAttendees$p$3 = Function.createDelegate(this,this._getRequiredAttendees$p$3);
@@ -10721,9 +11370,11 @@ OSF.InitializationHelper.prototype.loadAppSpecificScriptAndCreateOM = function O
         $h.InitialData._defineReadOnlyProperty$i(this,"optionalAttendees",this.$$d__getOptionalAttendees$p$3);
         $h.InitialData._defineReadOnlyProperty$i(this,"requiredAttendees",this.$$d__getRequiredAttendees$p$3);
         $h.InitialData._defineReadOnlyProperty$i(this,"recurrence",this.$$d__getRecurrence$p$3);
-        $h.InitialData._defineReadOnlyProperty$i(this,"seriesId",this.$$d__getSeriesId$p$3)
+        $h.InitialData._defineReadOnlyProperty$i(this,"seriesId",this.$$d__getSeriesId$p$3);
+        $h.InitialData._defineReadOnlyProperty$i(this,"enhancedLocation",this.$$d__getEnhancedLocation$p$3)
     };
     $h.MeetingRequest.prototype = {
+        _enhancedLocation$p$3: null,
         _getStart$p$3: function()
         {
             return this._data$p$0.get__start$i$0()
@@ -10753,6 +11404,13 @@ OSF.InitializationHelper.prototype.loadAppSpecificScriptAndCreateOM = function O
         _getSeriesId$p$3: function()
         {
             return this._data$p$0.get__seriesId$i$0()
+        },
+        _getEnhancedLocation$p$3: function()
+        {
+            this._data$p$0._throwOnRestrictedPermissionLevel$i$0();
+            if(!this._enhancedLocation$p$3)
+                this._enhancedLocation$p$3 = new $h.EnhancedLocation(false);
+            return this._enhancedLocation$p$3
         }
     };
     $h.MeetingSuggestion = function(data, dateTimeSent)
@@ -11235,7 +11893,7 @@ OSF.InitializationHelper.prototype.loadAppSpecificScriptAndCreateOM = function O
         {
             this._data$p$0._throwOnRestrictedPermissionLevel$i$0();
             if(!this._internetHeaders$p$2)
-                this._internetHeaders$p$2 = new window["$h"]["InternetHeaders"](false);
+                this._internetHeaders$p$2 = new $h.InternetHeaders(false);
             return this._internetHeaders$p$2
         }
     };
@@ -11340,7 +11998,7 @@ OSF.InitializationHelper.prototype.loadAppSpecificScriptAndCreateOM = function O
         {
             this._data$p$0._throwOnRestrictedPermissionLevel$i$0();
             if(!this._internetHeaders$p$2)
-                this._internetHeaders$p$2 = new window["$h"]["InternetHeaders"](true);
+                this._internetHeaders$p$2 = new $h.InternetHeaders(true);
             return this._internetHeaders$p$2
         }
     };
@@ -11728,6 +12386,12 @@ OSF.InitializationHelper.prototype.loadAppSpecificScriptAndCreateOM = function O
         getInternetHeadersAsync: 151,
         setInternetHeadersAsync: 152,
         removeInternetHeadersAsync: 153,
+        getEnhancedLocationsAsync: 154,
+        addEnhancedLocationsAsync: 155,
+        removeEnhancedLocationsAsync: 156,
+        getCategoriesAsync: 157,
+        addCategoriesAsync: 158,
+        removeCategoriesAsync: 159,
         trackCtq: 400,
         recordTrace: 401,
         recordDataPoint: 402,
@@ -12357,8 +13021,9 @@ OSF.InitializationHelper.prototype.loadAppSpecificScriptAndCreateOM = function O
     $h.AppointmentCompose["registerClass"]("$h.AppointmentCompose",$h.ComposeItem);
     $h.AttachmentDetails["registerClass"]("$h.AttachmentDetails");
     $h.Body["registerClass"]("$h.Body");
+    $h.Categories["registerClass"]("$h.Categories");
     $h.ComposeFrom["registerClass"]("$h.ComposeFrom");
-    window["$h"]["InternetHeaders"]["registerClass"]("$h.InternetHeaders");
+    $h.InternetHeaders["registerClass"]("$h.InternetHeaders");
     $h.ComposeBody["registerClass"]("$h.ComposeBody",$h.Body);
     $h.ComposeRecipient["registerClass"]("$h.ComposeRecipient");
     $h.ComposeRecurrence["registerClass"]("$h.ComposeRecurrence");
@@ -12369,6 +13034,7 @@ OSF.InitializationHelper.prototype.loadAppSpecificScriptAndCreateOM = function O
     $h.CustomProperties["registerClass"]("$h.CustomProperties");
     $h.Diagnostics["registerClass"]("$h.Diagnostics");
     $h.EmailAddressDetails["registerClass"]("$h.EmailAddressDetails");
+    $h.EnhancedLocation["registerClass"]("$h.EnhancedLocation");
     $h.Entities["registerClass"]("$h.Entities");
     window["Microsoft"]["Office"]["WebExtension"]["SeriesTime"]["registerClass"]("Microsoft.Office.WebExtension.SeriesTime");
     $h.Message["registerClass"]("$h.Message",$h.Item);
@@ -12427,9 +13093,9 @@ OSF.InitializationHelper.prototype.loadAppSpecificScriptAndCreateOM = function O
     $h.AttachmentConstants.attachmentIdParameterName = "id";
     $h.AttachmentDetails._attachmentTypeMap$p = [window["Microsoft"]["Office"]["WebExtension"]["MailboxEnums"]["AttachmentType"]["File"],window["Microsoft"]["Office"]["WebExtension"]["MailboxEnums"]["AttachmentType"]["Item"],window["Microsoft"]["Office"]["WebExtension"]["MailboxEnums"]["AttachmentType"]["Cloud"]];
     $h.Body.coercionTypeParameterName = "coercionType";
-    window["$h"]["InternetHeaders"].internetHeadersLimit = 998;
+    $h.Categories.categoriesCharacterLimit = 255;
+    $h.InternetHeaders.internetHeadersLimit = 998;
     $h.ComposeRecipient.displayNameLengthLimit = 255;
-    $h.ComposeRecipient.maxSmtpLength = 571;
     $h.ComposeRecipient.recipientsLimit = 100;
     $h.ComposeRecipient.totalRecipientsLimit = 500;
     $h.ComposeRecipient.addressParameterName = "address";
@@ -12474,6 +13140,7 @@ OSF.InitializationHelper.prototype.loadAppSpecificScriptAndCreateOM = function O
     window["Microsoft"]["Office"]["WebExtension"]["SeriesTime"].startTimeMinKey = "startTimeMin";
     window["Microsoft"]["Office"]["WebExtension"]["SeriesTime"].durationMinKey = "durationMin";
     $h.ReplyConstants.htmlBodyKeyName = "htmlBody";
+    $h.EmailAddressConstants.maxSmtpLength = 571;
     $h.AsyncConstants.optionsKeyName = "options";
     $h.AsyncConstants.callbackKeyName = "callback";
     $h.AsyncConstants.asyncResultKeyName = "asyncResult";
@@ -12547,6 +13214,7 @@ OSF.InitializationHelper.prototype.loadAppSpecificScriptAndCreateOM = function O
     $h.OutlookErrorManager.OutlookErrorCodes.attachmentTypeNotSupported = 9043;
     $h.OutlookErrorManager.OutlookErrorCodes.ooeInvalidDataFormat = 2006;
     $h.OutlookErrorManager.OsfDdaErrorCodes.ooeCoercionTypeNotSupported = 1e3;
+    $h.OutlookErrorManager.OsfDdaErrorCodes.ooeOperationNotSupported = 5e3;
     $h.CommonParameters.asyncContextKeyName = "asyncContext";
     $h.ShouldRunNewCodeForFlags.saveCustomProperties = 1;
     $h.InitialData.userProfileTypeKey = "userProfileType";
