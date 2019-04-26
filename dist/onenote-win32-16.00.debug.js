@@ -17,9 +17,9 @@
 
 // Sources:
 // osfweb: 16.0\11329.10000
-// runtime: 16.0.11422.30006
-// core: 16.0\11502.10000
-// host: 16.0\11502.10000
+// runtime: 16.0.11525.30002
+// core: 16.0\11601.10000
+// host: 16.0\11601.10000
 
 var __extends=(this && this.__extends) || function (d, b) {
 	for (var p in b)
@@ -15216,10 +15216,11 @@ var OfficeFirstPartyAuth;
 		ErrorCode.PackageNotLoaded="PackageNotLoaded";
 		return ErrorCode;
 	}());
+	var WebAuthReplyUrlsStorageKey="officeWebAuthReplyUrls";
 	var retrievedAuthContext=false;
 	var errorMessage;
 	OfficeFirstPartyAuth.debugging=false;
-	function load(replyurl) {
+	function load(replyUrl) {
 		if (OSF.WebAuth && OSF._OfficeAppFactory.getHostInfo().hostPlatform=="web") {
 			try {
 				if (!Office || !Office.context || !Office.context.webAuth) {
@@ -15232,28 +15233,36 @@ var OfficeFirstPartyAuth;
 						if (!authContext || authContext.isAnonymous) {
 							return false;
 						}
-						var appid=authContext.appId;
-						var regexp=/aad:([0-9a-f-]+);msa:([0-9a-f-]+)/gi;
-						var apps=regexp.exec(authContext.appId);
-						if (apps && apps.length==3) {
-							appid=(authContext.authorityType.toLowerCase()=="msa")
-								? apps[2]
-								: apps[1];
-						}
-						var config={
-							authority: authContext.authority,
-							appId: appid,
-							redirectUri: (replyurl) ? replyurl : null,
-							upn: authContext.upn
-						};
 						OSF.WebAuth.config={
 							idp: authContext.authorityType.toLowerCase(),
-							aadConfig: config,
-							msaConfig: config,
-							enableConsoleLogging: OfficeFirstPartyAuth.debugging
+							aadConfig: {
+								authority: (OfficeFirstPartyAuth.authorityOverride && OfficeFirstPartyAuth.debugging) ? OfficeFirstPartyAuth.authorityOverride : authContext.authority,
+								appId: authContext.appId,
+								redirectUri: (replyUrl) ? replyUrl : null,
+								upn: authContext.upn
+							},
+							msaConfig: {
+								authority: (OfficeFirstPartyAuth.authorityOverride && OfficeFirstPartyAuth.debugging) ? OfficeFirstPartyAuth.authorityOverride : authContext.authority,
+								appId: (authContext.msaAppId) ? authContext.msaAppId : authContext.appId,
+								redirectUri: (replyUrl) ? replyUrl : null,
+								upn: authContext.upn
+							},
+							enableConsoleLogging: OfficeFirstPartyAuth.debugging,
+							telemetry: { HashedUserId: authContext.userId }
 						};
-						OSF.WebAuth.load();
-						return OSF.WebAuth.loaded;
+						OSF.WebAuth.load(function (loaded) {
+							logLoadEvent(loaded);
+							return loaded;
+						});
+						var finalReplyUrl=(replyUrl) ? replyUrl : window.location.href.split("?")[0];
+						var replyUrls=sessionStorage.getItem(WebAuthReplyUrlsStorageKey);
+						if (replyUrls || replyUrls==="") {
+							replyUrls=finalReplyUrl;
+						}
+						else {
+							replyUrls+=", "+finalReplyUrl;
+						}
+						sessionStorage.setItem(WebAuthReplyUrlsStorageKey, replyUrls);
 					}
 					else {
 						retrievedAuthContext=false;
@@ -15267,24 +15276,16 @@ var OfficeFirstPartyAuth;
 				OSF.WebAuth.config=null;
 				errorMessage=e;
 			}
-			OSF.WebAuth.load();
-			return OSF.WebAuth.loaded;
+			OSF.WebAuth.load(function (loaded) {
+				return loaded;
+			});
 		}
 		return false;
 	}
 	OfficeFirstPartyAuth.load=load;
 	function getAccessToken(options, behaviorOption) {
-		if (OSF.WebAuth && OSF._OfficeAppFactory.getHostInfo().hostPlatform=="web") {
+		if (OSF.WebAuth && OSF.WebAuth.loaded && OSF._OfficeAppFactory.getHostInfo().hostPlatform=="web") {
 			return new OfficeExtension.CoreUtility.Promise(function (resolve, reject) {
-				if (!OSF.WebAuth.loaded) {
-					if (!retrievedAuthContext) {
-						reject({ code: ErrorCode.CannotGetAuthContext, message: errorMessage });
-					}
-					reject({
-						code: ErrorCode.PackageNotLoaded,
-						message: (Strings && Strings.OfficeOM.L_ImplicitNotLoaded) ? Strings.OfficeOM.L_ImplicitNotLoaded : ErrorCode.PackageNotLoaded
-					});
-				}
 				if (behaviorOption.forceRefresh) {
 					OSF.WebAuth.clearCache();
 				}
@@ -15292,8 +15293,10 @@ var OfficeFirstPartyAuth;
 					? OfficeCore.IdentityType.microsoftAccount
 					: OfficeCore.IdentityType.organizationAccount;
 				OSF.WebAuth.getToken(options.resource, (behaviorOption.popup) ? behaviorOption.popup : null).then(function (result) {
+					logAcquireEvent(true, options.resource, (behaviorOption.popup) ? behaviorOption.popup : null);
 					resolve({ accessToken: result.Token, tokenIdenityType: identityType });
 				})["catch"](function (result) {
+					logAcquireEvent(false, options.resource, (behaviorOption.popup) ? behaviorOption.popup : null, result.ErrorCode);
 					reject({ code: result.ErrorCode, message: result.ErrorMessage });
 				});
 			});
@@ -15359,6 +15362,73 @@ var OfficeFirstPartyAuth;
 		return context.sync().then(function () { return result.value; });
 	}
 	OfficeFirstPartyAuth.getPrimaryIdentityInfo=getPrimaryIdentityInfo;
+	function logLoadEvent(result) {
+		if (OfficeFirstPartyAuth.debugging) {
+			console.log("Logging Implicit load event");
+		}
+		if (typeof OTel !=="undefined") {
+			OTel.OTelLogger.onTelemetryLoaded(function () {
+				var telemetryData=[
+					oteljs.makeStringDataField('IdentityProvider', OSF.WebAuth.config.idp),
+					oteljs.makeStringDataField('AppId', (OSF.WebAuth.config.idp.toLowerCase()=="msa")
+						? OSF.WebAuth.config.msaConfig.appId
+						: OSF.WebAuth.config.aadConfig.appId),
+					oteljs.makeBooleanDataField('Js', typeof Implicit !=="undefined" ? true : false),
+					oteljs.makeBooleanDataField('Result', result)
+				];
+				if (OSF.WebAuth.config.telemetry) {
+					for (var key in OSF.WebAuth.config.telemetry) {
+						telemetryData.push(oteljs.makeStringDataField(key, OSF.WebAuth.config.telemetry[key]));
+					}
+				}
+				OTel.OTelLogger.sendTelemetryEvent({
+					eventName: "Office.Extensibility.OfficeJs.OfficeFirstPartyAuth.Load",
+					dataFields: telemetryData,
+					eventFlags: {
+						dataCategories: oteljs.DataCategories.ProductServiceUsage
+					}
+				});
+			});
+		}
+	}
+	function logAcquireEvent(result, target, popup, message) {
+		if (OfficeFirstPartyAuth.debugging) {
+			console.log("Logging Implicit acquire event");
+		}
+		if (typeof OTel !=="undefined") {
+			OTel.OTelLogger.onTelemetryLoaded(function () {
+				var telemetryData=[
+					oteljs.makeStringDataField('IdentityProvider', OSF.WebAuth.config.idp),
+					oteljs.makeStringDataField('AppId', (OSF.WebAuth.config.idp.toLowerCase()=="msa")
+						? OSF.WebAuth.config.msaConfig.appId
+						: OSF.WebAuth.config.aadConfig.appId),
+					oteljs.makeStringDataField('Target', target),
+					oteljs.makeBooleanDataField('Popup', (typeof popup==="boolean") ? popup : false),
+					oteljs.makeBooleanDataField('Result', result),
+					oteljs.makeStringDataField('Error', message)
+				];
+				if (OSF.WebAuth.config.telemetry) {
+					for (var key in OSF.WebAuth.config.telemetry) {
+						telemetryData.push(oteljs.makeStringDataField(key, OSF.WebAuth.config.telemetry[key]));
+					}
+				}
+				OTel.OTelLogger.sendTelemetryEvent({
+					eventName: "Office.Extensibility.OfficeJs.OfficeFirstPartyAuth.GetAccessToken",
+					dataFields: telemetryData,
+					eventFlags: {
+						dataCategories: oteljs.DataCategories.ProductServiceUsage
+					}
+				});
+			});
+		}
+	}
+	function loadWebAuthForReplyPage() {
+		var webAuthRedirectUrls=sessionStorage.getItem(WebAuthReplyUrlsStorageKey);
+		if (webAuthRedirectUrls !==null && webAuthRedirectUrls.indexOf(window.location.origin+window.location.pathname) !==-1) {
+			load();
+		}
+	}
+	loadWebAuthForReplyPage();
 })(OfficeFirstPartyAuth || (OfficeFirstPartyAuth={}));
 var OfficeCore;
 (function (OfficeCore) {
@@ -15436,6 +15506,10 @@ var OfficeCore;
 		});
 		AuthenticationService.prototype.getAccessToken=function (tokenParameters, targetId) {
 			return _invokeMethod(this, "GetAccessToken", 1, [tokenParameters, targetId], 4 | 1, 0);
+		};
+		AuthenticationService.prototype.getIdentities=function () {
+			_throwIfApiNotSupported("AuthenticationService.getIdentities", "FirstPartyAuthentication", "1.3", _hostName);
+			return _invokeMethod(this, "GetIdentities", 1, [], 4 | 1, 0);
 		};
 		AuthenticationService.prototype.getPrimaryIdentityInfo=function () {
 			_throwIfApiNotSupported("AuthenticationService.getPrimaryIdentityInfo", "FirstPartyAuthentication", "1.2", _hostName);
@@ -16160,14 +16234,6 @@ var OneNote;
 		Application.prototype.navigateToPageWithClientUrl=function (url) {
 			return _createMethodObject(OneNote.Page, this, "NavigateToPageWithClientUrl", 1, [url], false, false, null, 4);
 		};
-		Application.prototype.registerSendCommandEvent=function () {
-			_throwIfApiNotSupported("Application.registerSendCommandEvent", _defaultApiSetName, "1.5", _hostName);
-			_invokeMethod(this, "RegisterSendCommandEvent", 0, [], 0, 0);
-		};
-		Application.prototype.unregisterSendCommandEvent=function () {
-			_throwIfApiNotSupported("Application.unregisterSendCommandEvent", _defaultApiSetName, "1.5", _hostName);
-			_invokeMethod(this, "UnregisterSendCommandEvent", 0, [], 0, 0);
-		};
 		Application.prototype._ClientLog=function (level, eventName, flag, data) {
 			_invokeMethod(this, "_ClientLog", 1, [level, eventName, flag, data], 4, 0);
 		};
@@ -16252,6 +16318,18 @@ var OneNote;
 			_throwIfApiNotSupported("Application._RegisterNotebookChangedEvent", _defaultApiSetName, "1.3", _hostName);
 			_invokeMethod(this, "_RegisterNotebookChangedEvent", 0, [], 0, 0);
 		};
+		Application.prototype._RegisterPageSelectionChangedEvent=function () {
+			_throwIfApiNotSupported("Application._RegisterPageSelectionChangedEvent", _defaultApiSetName, "1.5", _hostName);
+			_invokeMethod(this, "_RegisterPageSelectionChangedEvent", 0, [], 0, 0);
+		};
+		Application.prototype._RegisterSectionSelectionChangedEvent=function () {
+			_throwIfApiNotSupported("Application._RegisterSectionSelectionChangedEvent", _defaultApiSetName, "1.5", _hostName);
+			_invokeMethod(this, "_RegisterSectionSelectionChangedEvent", 0, [], 0, 0);
+		};
+		Application.prototype._RegisterStickyNotesContextMenuExecutedEvent=function () {
+			_throwIfApiNotSupported("Application._RegisterStickyNotesContextMenuExecutedEvent", _defaultApiSetName, "1.5", _hostName);
+			_invokeMethod(this, "_RegisterStickyNotesContextMenuExecutedEvent", 0, [], 0, 0);
+		};
 		Application.prototype._RemoveAllReferences=function () {
 			_invokeMethod(this, "_RemoveAllReferences", 1, [], 4, 0);
 		};
@@ -16273,6 +16351,18 @@ var OneNote;
 		Application.prototype._UnregisterNotebookChangedEvent=function () {
 			_throwIfApiNotSupported("Application._UnregisterNotebookChangedEvent", _defaultApiSetName, "1.3", _hostName);
 			_invokeMethod(this, "_UnregisterNotebookChangedEvent", 0, [], 0, 0);
+		};
+		Application.prototype._UnregisterPageSelectionChangedEvent=function () {
+			_throwIfApiNotSupported("Application._UnregisterPageSelectionChangedEvent", _defaultApiSetName, "1.5", _hostName);
+			_invokeMethod(this, "_UnregisterPageSelectionChangedEvent", 0, [], 0, 0);
+		};
+		Application.prototype._UnregisterSectionSelectionChangedEvent=function () {
+			_throwIfApiNotSupported("Application._UnregisterSectionSelectionChangedEvent", _defaultApiSetName, "1.5", _hostName);
+			_invokeMethod(this, "_UnregisterSectionSelectionChangedEvent", 0, [], 0, 0);
+		};
+		Application.prototype._UnregisterStickyNotesContextMenuExecutedEvent=function () {
+			_throwIfApiNotSupported("Application._UnregisterStickyNotesContextMenuExecutedEvent", _defaultApiSetName, "1.5", _hostName);
+			_invokeMethod(this, "_UnregisterStickyNotesContextMenuExecutedEvent", 0, [], 0, 0);
 		};
 		Application.prototype._UploadToUserInfoService=function (strKey, stdValue) {
 			_invokeMethod(this, "_UploadToUserInfoService", 1, [strKey, stdValue], 4, 0);
@@ -16322,27 +16412,73 @@ var OneNote;
 			enumerable: true,
 			configurable: true
 		});
-		Object.defineProperty(Application.prototype, "onSendCommandEvent", {
+		Object.defineProperty(Application.prototype, "onPageSelectionChanged", {
 			get: function () {
 				var _this=this;
-				_throwIfApiNotSupported("Application.onSendCommandEvent", _defaultApiSetName, "1.5", _hostName);
-				if (!this.m_sendCommandEvent) {
-					this.m_sendCommandEvent=new OfficeExtension.GenericEventHandlers(this.context, this, "SendCommandEvent", {
-						eventType: 11,
-						registerFunc: function () { _this.registerSendCommandEvent(); },
-						unregisterFunc: function () { _this.unregisterSendCommandEvent(); },
+				_throwIfApiNotSupported("Application.onPageSelectionChanged", _defaultApiSetName, "1.5", _hostName);
+				if (!this.m_pageSelectionChanged) {
+					this.m_pageSelectionChanged=new OfficeExtension.GenericEventHandlers(this.context, this, "PageSelectionChanged", {
+						eventType: 13,
+						registerFunc: function () { _this._RegisterPageSelectionChangedEvent(); },
+						unregisterFunc: function () { _this._UnregisterPageSelectionChangedEvent(); },
 						getTargetIdFunc: function () { return ""; },
 						eventArgsTransformFunc: function (value) {
 							var event={
-								type: EventType.sendCommandEvent,
-								name: value.name,
-								parameter: value.parameter
+								type: EventType.pageSelectionChanged,
+								oldId: value.oldId
 							};
 							return OfficeExtension.Utility._createPromiseFromResult(event);
 						}
 					});
 				}
-				return this.m_sendCommandEvent;
+				return this.m_pageSelectionChanged;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(Application.prototype, "onSectionSelectionChanged", {
+			get: function () {
+				var _this=this;
+				_throwIfApiNotSupported("Application.onSectionSelectionChanged", _defaultApiSetName, "1.5", _hostName);
+				if (!this.m_sectionSelectionChanged) {
+					this.m_sectionSelectionChanged=new OfficeExtension.GenericEventHandlers(this.context, this, "SectionSelectionChanged", {
+						eventType: 12,
+						registerFunc: function () { _this._RegisterSectionSelectionChangedEvent(); },
+						unregisterFunc: function () { _this._UnregisterSectionSelectionChangedEvent(); },
+						getTargetIdFunc: function () { return ""; },
+						eventArgsTransformFunc: function (value) {
+							var event={
+								type: EventType.sectionSelectionChanged,
+								oldId: value.oldId
+							};
+							return OfficeExtension.Utility._createPromiseFromResult(event);
+						}
+					});
+				}
+				return this.m_sectionSelectionChanged;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(Application.prototype, "onStickyNotesContextMenuExecutedEvent", {
+			get: function () {
+				var _this=this;
+				_throwIfApiNotSupported("Application.onStickyNotesContextMenuExecutedEvent", _defaultApiSetName, "1.5", _hostName);
+				if (!this.m_stickyNotesContextMenuExecutedEvent) {
+					this.m_stickyNotesContextMenuExecutedEvent=new OfficeExtension.GenericEventHandlers(this.context, this, "StickyNotesContextMenuExecutedEvent", {
+						eventType: 11,
+						registerFunc: function () { _this._RegisterStickyNotesContextMenuExecutedEvent(); },
+						unregisterFunc: function () { _this._UnregisterStickyNotesContextMenuExecutedEvent(); },
+						getTargetIdFunc: function () { return ""; },
+						eventArgsTransformFunc: function (value) {
+							var event={
+								type: EventType.stickyNotesContextMenuExecuted
+							};
+							return OfficeExtension.Utility._createPromiseFromResult(event);
+						}
+					});
+				}
+				return this.m_stickyNotesContextMenuExecutedEvent;
 			},
 			enumerable: true,
 			configurable: true
@@ -22454,7 +22590,9 @@ var OneNote;
 	var EventType;
 	(function (EventType) {
 		EventType["notebookChanged"]="NotebookChanged";
-		EventType["sendCommandEvent"]="SendCommandEvent";
+		EventType["stickyNotesContextMenuExecuted"]="StickyNotesContextMenuExecuted";
+		EventType["sectionSelectionChanged"]="SectionSelectionChanged";
+		EventType["pageSelectionChanged"]="PageSelectionChanged";
 	})(EventType=OneNote.EventType || (OneNote.EventType={}));
 	var ErrorCodes;
 	(function (ErrorCodes) {

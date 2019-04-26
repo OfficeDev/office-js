@@ -16,10 +16,10 @@
 
 
 // Sources:
-// osfweb: 16.0\11423.10000
-// runtime: 16.0.11505.30001
-// core: 16.0\11509.10000
-// host: 16.0\11509.10000
+// osfweb: 16.0\11519.10000
+// runtime: 16.0.11525.30007
+// core: 16.0\11603.10000
+// host: 16.0\11603.10000
 
 var __extends=(this && this.__extends) || function (d, b) {
 	for (var p in b)
@@ -5137,7 +5137,7 @@ var OSFAriaLogger;
 			}
 		};
 		AriaLogger.EnableSendingTelemetryWithOTel=true;
-		AriaLogger.EnableSendingTelemetryWithLegacyAria=true;
+		AriaLogger.EnableSendingTelemetryWithLegacyAria=false;
 		return AriaLogger;
 	})();
 	OSFAriaLogger.AriaLogger=AriaLogger;
@@ -5365,7 +5365,7 @@ var OSFAppTelemetry;
 		}
 		appInfo.message=context.get_hostCustomMessage();
 		appInfo.officeJSVersion=OSF.ConstantNames.FileVersion;
-		appInfo.hostJSVersion="16.0.11509.10000";
+		appInfo.hostJSVersion="16.0.11603.10000";
 		if (context._wacHostEnvironment) {
 			appInfo.wacHostEnvironment=context._wacHostEnvironment;
 		}
@@ -15005,10 +15005,11 @@ var OfficeFirstPartyAuth;
 		ErrorCode.PackageNotLoaded="PackageNotLoaded";
 		return ErrorCode;
 	}());
+	var WebAuthReplyUrlsStorageKey="officeWebAuthReplyUrls";
 	var retrievedAuthContext=false;
 	var errorMessage;
 	OfficeFirstPartyAuth.debugging=false;
-	function load(replyurl) {
+	function load(replyUrl) {
 		if (OSF.WebAuth && OSF._OfficeAppFactory.getHostInfo().hostPlatform=="web") {
 			try {
 				if (!Office || !Office.context || !Office.context.webAuth) {
@@ -15026,21 +15027,31 @@ var OfficeFirstPartyAuth;
 							aadConfig: {
 								authority: (OfficeFirstPartyAuth.authorityOverride && OfficeFirstPartyAuth.debugging) ? OfficeFirstPartyAuth.authorityOverride : authContext.authority,
 								appId: authContext.appId,
-								redirectUri: (replyurl) ? replyurl : null,
+								redirectUri: (replyUrl) ? replyUrl : null,
 								upn: authContext.upn
 							},
 							msaConfig: {
 								authority: (OfficeFirstPartyAuth.authorityOverride && OfficeFirstPartyAuth.debugging) ? OfficeFirstPartyAuth.authorityOverride : authContext.authority,
 								appId: (authContext.msaAppId) ? authContext.msaAppId : authContext.appId,
-								redirectUri: (replyurl) ? replyurl : null,
+								redirectUri: (replyUrl) ? replyUrl : null,
 								upn: authContext.upn
 							},
 							enableConsoleLogging: OfficeFirstPartyAuth.debugging,
 							telemetry: { HashedUserId: authContext.userId }
 						};
-						OSF.WebAuth.load();
-						logLoadEvent();
-						return OSF.WebAuth.loaded;
+						OSF.WebAuth.load(function (loaded) {
+							logLoadEvent(loaded);
+							return loaded;
+						});
+						var finalReplyUrl=(replyUrl) ? replyUrl : window.location.href.split("?")[0];
+						var replyUrls=sessionStorage.getItem(WebAuthReplyUrlsStorageKey);
+						if (replyUrls || replyUrls==="") {
+							replyUrls=finalReplyUrl;
+						}
+						else {
+							replyUrls+=", "+finalReplyUrl;
+						}
+						sessionStorage.setItem(WebAuthReplyUrlsStorageKey, replyUrls);
 					}
 					else {
 						retrievedAuthContext=false;
@@ -15054,26 +15065,27 @@ var OfficeFirstPartyAuth;
 				OSF.WebAuth.config=null;
 				errorMessage=e;
 			}
-			OSF.WebAuth.load();
-			return OSF.WebAuth.loaded;
+			OSF.WebAuth.load(function (loaded) {
+				return loaded;
+			});
 		}
-		return false;
+		return true;
 	}
 	OfficeFirstPartyAuth.load=load;
 	function getAccessToken(options, behaviorOption) {
 		if (OSF.WebAuth && OSF.WebAuth.loaded && OSF._OfficeAppFactory.getHostInfo().hostPlatform=="web") {
 			return new OfficeExtension.CoreUtility.Promise(function (resolve, reject) {
-				if (behaviorOption.forceRefresh) {
+				if (behaviorOption && behaviorOption.forceRefresh) {
 					OSF.WebAuth.clearCache();
 				}
 				var identityType=(OSF.WebAuth.config.idp.toLowerCase()=="msa")
 					? OfficeCore.IdentityType.microsoftAccount
 					: OfficeCore.IdentityType.organizationAccount;
-				OSF.WebAuth.getToken(options.resource, (behaviorOption.popup) ? behaviorOption.popup : null).then(function (result) {
-					logAcquireEvent(true, options.resource, (behaviorOption.popup) ? behaviorOption.popup : null);
+				OSF.WebAuth.getToken(options.resource, (behaviorOption && behaviorOption.popup) ? behaviorOption.popup : null).then(function (result) {
+					logAcquireEvent(true, options.resource, (behaviorOption && behaviorOption.popup) ? behaviorOption.popup : null);
 					resolve({ accessToken: result.Token, tokenIdenityType: identityType });
 				})["catch"](function (result) {
-					logAcquireEvent(true, options.resource, (behaviorOption.popup) ? behaviorOption.popup : null, result.ErrorCode);
+					logAcquireEvent(false, options.resource, (behaviorOption && behaviorOption.popup) ? behaviorOption.popup : null, result.ErrorCode);
 					reject({ code: result.ErrorCode, message: result.ErrorMessage });
 				});
 			});
@@ -15139,7 +15151,10 @@ var OfficeFirstPartyAuth;
 		return context.sync().then(function () { return result.value; });
 	}
 	OfficeFirstPartyAuth.getPrimaryIdentityInfo=getPrimaryIdentityInfo;
-	function logLoadEvent() {
+	function logLoadEvent(result) {
+		if (OfficeFirstPartyAuth.debugging) {
+			console.log("Logging Implicit load event");
+		}
 		if (typeof OTel !=="undefined") {
 			OTel.OTelLogger.onTelemetryLoaded(function () {
 				var telemetryData=[
@@ -15148,7 +15163,7 @@ var OfficeFirstPartyAuth;
 						? OSF.WebAuth.config.msaConfig.appId
 						: OSF.WebAuth.config.aadConfig.appId),
 					oteljs.makeBooleanDataField('Js', typeof Implicit !=="undefined" ? true : false),
-					oteljs.makeBooleanDataField('Result', OSF.WebAuth.loaded)
+					oteljs.makeBooleanDataField('Result', result)
 				];
 				if (OSF.WebAuth.config.telemetry) {
 					for (var key in OSF.WebAuth.config.telemetry) {
@@ -15166,6 +15181,9 @@ var OfficeFirstPartyAuth;
 		}
 	}
 	function logAcquireEvent(result, target, popup, message) {
+		if (OfficeFirstPartyAuth.debugging) {
+			console.log("Logging Implicit acquire event");
+		}
 		if (typeof OTel !=="undefined") {
 			OTel.OTelLogger.onTelemetryLoaded(function () {
 				var telemetryData=[
@@ -15193,6 +15211,13 @@ var OfficeFirstPartyAuth;
 			});
 		}
 	}
+	function loadWebAuthForReplyPage() {
+		var webAuthRedirectUrls=sessionStorage.getItem(WebAuthReplyUrlsStorageKey);
+		if (webAuthRedirectUrls !==null && webAuthRedirectUrls.indexOf(window.location.origin+window.location.pathname) !==-1) {
+			load();
+		}
+	}
+	loadWebAuthForReplyPage();
 })(OfficeFirstPartyAuth || (OfficeFirstPartyAuth={}));
 var OfficeCore;
 (function (OfficeCore) {
@@ -15902,9 +15927,9 @@ var PowerPoint;
 			_throwIfApiNotSupported("Application.insertHyperLink", _defaultApiSetName, "1.1", _hostName);
 			_invokeMethod(this, "InsertHyperLink", 0, [address, displayName], 1, 0);
 		};
-		Application.prototype.insertSlideFromContent=function (slideContent, slideContentSize) {
+		Application.prototype.insertSlideFromContent=function (slideContent) {
 			_throwIfApiNotSupported("Application.insertSlideFromContent", _defaultApiSetName, "1.1", _hostName);
-			return _invokeMethod(this, "InsertSlideFromContent", 0, [slideContent, slideContentSize], 1, 0);
+			return _invokeMethod(this, "InsertSlideFromContent", 0, [slideContent], 1, 0);
 		};
 		Application.prototype._handleResult=function (value) {
 			_super.prototype._handleResult.call(this, value);
@@ -16061,6 +16086,7 @@ var PowerPoint;
 	PowerPoint.createPresentation=createPresentation;
 })(PowerPoint || (PowerPoint={}));
 OSFAriaLogger.AriaLogger.EnableSendingTelemetryWithOTel=true;
+OSFAriaLogger.AriaLogger.EnableSendingTelemetryWithLegacyAria=true;
 
 
 
@@ -16119,10 +16145,11 @@ window.OfficeExtensionBatch = window.OfficeExtension;
     Object.defineProperty(exports, "__esModule", {
         value: !0
     });
-    var DialogApi = __webpack_require__(2), AsyncStorage = __webpack_require__(3);
+    var DialogApi = __webpack_require__(2), StorageApi = __webpack_require__(3);
     window._OfficeRuntimeNative = {
         displayWebDialog: DialogApi.displayWebDialog,
-        AsyncStorage: AsyncStorage.AsyncStorage
+        AsyncStorage: StorageApi.AsyncStorage,
+        storage: StorageApi.storage
     };
 }, function(module, exports, __webpack_require__) {
     "use strict";
@@ -16166,7 +16193,7 @@ window.OfficeExtensionBatch = window.OfficeExtension;
         return void 0 === options && (options = {}), new OfficeExtension.CoreUtility.Promise(function(resolve, reject) {
             if (options.width && options.height && (!isInt(options.width) || !isInt(options.height))) throw new OfficeExtension.Error({
                 code: "InvalidArgument",
-                message: "Dimensions must be % or number."
+                message: 'Dimensions must be "number%" or number.'
             });
             var ctx = new OfficeExtension.ClientRequestContext(), dialogService = DialogService.newObject(ctx), dialog = new Dialog(dialogService), eventResult = dialogService.onDialogMessage.add(function(args) {
                 switch (OfficeExtension.Utility.log("dialogMessageHandler:" + JSON.stringify(args)), 
@@ -16320,6 +16347,19 @@ window.OfficeExtensionBatch = window.OfficeExtension;
     OfficeExtension.Utility.throwIfNotLoaded, OfficeExtension.Utility.throwIfApiNotSupported, 
     OfficeExtension.Utility.load, OfficeExtension.Utility.retrieve, OfficeExtension.Utility.toJson), _fixObjectPathIfNecessary = OfficeExtension.Utility.fixObjectPathIfNecessary, _processRetrieveResult = (OfficeExtension.Utility._handleNavigationPropertyResults, 
     OfficeExtension.Utility.adjustToDateTime, OfficeExtension.Utility.processRetrieveResult);
+    function callPersistentKvStorageManager(nativeCall, getValueOnSuccess) {
+        return new OfficeExtension.CoreUtility.Promise(function(resolve, reject) {
+            var storageManager = PersistentKvStorageManager.getInstance(), invokeId = storageManager.setCallBack(function(result, error) {
+                error ? reject(error) : resolve(getValueOnSuccess ? getValueOnSuccess(result) : void 0);
+            });
+            storageManager.ctx.sync().then(function() {
+                var storageService = storageManager.getPersistentKvStorageService();
+                return nativeCall(storageService, invokeId), storageManager.ctx.sync();
+            }).catch(function(e) {
+                reject(e);
+            });
+        });
+    }
     function callStorageManager(nativeCall, getValueOnSuccess, callback) {
         return new OfficeExtension.CoreUtility.Promise(function(resolve, reject) {
             var storageManager = PersistentKvStorageManager.getInstance(), invokeId = storageManager.setCallBack(function(result, error) {
@@ -16362,8 +16402,8 @@ window.OfficeExtensionBatch = window.OfficeExtension;
             return callStorageManager(function(storage, invokeId) {
                 return storage.multiGet(invokeId, JSON.stringify(keys));
             }, function(result) {
-                var keyValues = JSON.parse(result), map = {};
-                return keyValues && keyValues.forEach(function(_a) {
+                var map = {};
+                return JSON.parse(result).forEach(function(_a) {
                     var key = _a[0], value = _a[1];
                     return map[key] = value, value;
                 }), keys.map(function(key) {
@@ -16398,6 +16438,57 @@ window.OfficeExtensionBatch = window.OfficeExtension;
             }, function() {
                 return null;
             }, callback);
+        }
+    }, exports.storage = {
+        getItem: function(key) {
+            return callPersistentKvStorageManager(function(perStorage, invokeId) {
+                return perStorage.multiGet(invokeId, JSON.stringify([ key ]));
+            }, function(result) {
+                var parsedResult = JSON.parse(result);
+                return parsedResult && parsedResult[0] && parsedResult[0][1] ? parsedResult[0][1] : null;
+            });
+        },
+        setItem: function(key, value) {
+            return callPersistentKvStorageManager(function(perStorage, invokeId) {
+                return perStorage.multiSet(invokeId, JSON.stringify([ [ key, value ] ]));
+            });
+        },
+        removeItem: function(key) {
+            return callPersistentKvStorageManager(function(perStorage, invokeId) {
+                return perStorage.multiRemove(invokeId, JSON.stringify([ key ]));
+            });
+        },
+        getItems: function(keys) {
+            return callPersistentKvStorageManager(function(perStorage, invokeId) {
+                return perStorage.multiGet(invokeId, JSON.stringify(keys));
+            }, function(result) {
+                var keyValues = JSON.parse(result), map = {};
+                return keys.forEach(function(k) {
+                    map[k] = null;
+                }), keyValues.forEach(function(_a) {
+                    var key = _a[0], value = _a[1];
+                    return map[key] = value, value;
+                }), map;
+            });
+        },
+        setItems: function(keyValues) {
+            var keyValuePairs = [];
+            for (var key in keyValues) keyValues.hasOwnProperty(key) && keyValuePairs.push([ key, keyValues[key] ]);
+            return callPersistentKvStorageManager(function(storage, invokeId) {
+                return storage.multiSet(invokeId, JSON.stringify(keyValuePairs));
+            });
+        },
+        removeItems: function(keys) {
+            return callPersistentKvStorageManager(function(perStorage, invokeId) {
+                return perStorage.multiRemove(invokeId, JSON.stringify(keys));
+            });
+        },
+        getKeys: function() {
+            return callPersistentKvStorageManager(function(perStorage, invokeId) {
+                return perStorage.getAllKeys(invokeId);
+            }, function(result) {
+                return JSON.parse(result);
+            });
         }
     };
     var PersistentKvStorageManager = function() {

@@ -1,4 +1,4 @@
-/* Version: 16.0.11423.10000 */
+/* Version: 16.0.11519.10000 */
 /*
 	Copyright (c) Microsoft Corporation.  All rights reserved.
 */
@@ -3402,10 +3402,10 @@ var Excel;
 	var AutoFilter = (function(_super) {
 		__extends(AutoFilter, _super);
 		function AutoFilter() {
-			/// <summary> Represents the AutoFilter object. [Api set: ExcelApi BETA (PREVIEW ONLY)] </summary>
+			/// <summary> Represents the AutoFilter object.               AutoFilter turns the values in Excel column into specific filters based on the cell contents. [Api set: ExcelApi BETA (PREVIEW ONLY)] </summary>
 			/// <field name="context" type="Excel.RequestContext">The request context associated with this object.</field>
 			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
-			/// <field name="criteria" type="Array" elementType="Excel.Interfaces.FilterCriteria">Array that holds all filter criterias in an autofiltered range. Read-Only. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
+			/// <field name="criteria" type="Array" elementType="Excel.Interfaces.FilterCriteria">An array that holds all the filter criteria in the autofiltered range. Read-Only. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
 			/// <field name="enabled" type="Boolean">Indicates if the AutoFilter is enabled or not. Read-Only. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
 			/// <field name="isDataFiltered" type="Boolean">Indicates if the AutoFilter has filter criteria. Read-Only. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
 		}
@@ -3419,16 +3419,16 @@ var Excel;
 		}
 		AutoFilter.prototype.apply = function(range, columnIndex, criteria) {
 			/// <summary>
-			/// Applies AutoFilter on a range and filters the column if column index and filter criteria are specified. [Api set: ExcelApi BETA (PREVIEW ONLY)]
+			/// Applies the AutoFilter to a range. This filters the column if column index and filter criteria are specified. [Api set: ExcelApi BETA (PREVIEW ONLY)]
 			/// </summary>
-			/// <param name="range" >The range where the AutoFilter will apply on.</param>
-			/// <param name="columnIndex" type="Number" optional="true">The column index which the AutoFilter will apply on, start from 0.</param>
+			/// <param name="range" >The range over which the AutoFilter will apply on.</param>
+			/// <param name="columnIndex" type="Number" optional="true">The zero-based column index to which the AutoFilter is applied.</param>
 			/// <param name="criteria" type="Excel.Interfaces.FilterCriteria" optional="true">The filter criteria.</param>
 			/// <returns ></returns>
 		}
 		AutoFilter.prototype.clearCriteria = function() {
 			/// <summary>
-			/// Clears the criteria if AutoFilter has filters [Api set: ExcelApi BETA (PREVIEW ONLY)]
+			/// Clears the filter criteria of the AutoFilter. [Api set: ExcelApi BETA (PREVIEW ONLY)]
 			/// </summary>
 			/// <returns ></returns>
 		}
@@ -3440,7 +3440,7 @@ var Excel;
 		}
 		AutoFilter.prototype.getRangeOrNullObject = function() {
 			/// <summary>
-			/// If there is Range object associated with the AutoFilter, this method returns it.              Otherwise, this method returns a null object. [Api set: ExcelApi BETA (PREVIEW ONLY)]
+			/// Returns the Range object that represents the range to which the AutoFilter applies.              If there is no Range object associated with the AutoFilter, this method returns a null object. [Api set: ExcelApi BETA (PREVIEW ONLY)]
 			/// </summary>
 			/// <returns type="Excel.Range"></returns>
 		}
@@ -3843,11 +3843,11 @@ var Excel;
 	(function (Interfaces) {
 		var CellBorder = (function() {
 			function CellBorder() {
-				/// <summary> Represents the returned single border properties of getCell/Row/ColumnProperties or border property input parameter of setCell/Row/ColumnProperties. [Api set: ExcelApi BETA (PREVIEW ONLY)] </summary>
-				/// <field name="color" > [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
-				/// <field name="style" type="String"> [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
-				/// <field name="tintAndShade" type="Number"> [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
-				/// <field name="weight" type="String"> [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
+				/// <summary> Represents the properties of a single border returned by `getCellProperties`, `getRowProperties`, and `getColumnProperties` or the border property input parameter of `setCellProperties`, `setRowProperties`, and `setColumnProperties`. [Api set: ExcelApi BETA (PREVIEW ONLY)] </summary>
+				/// <field name="color" >Represents the `color` property of a single border. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
+				/// <field name="style" type="String">Represents the `style` property of a single border. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
+				/// <field name="tintAndShade" type="Number">Represents the `tintAndShade` property of a single border. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
+				/// <field name="weight" type="String">Represents the `weight` property of a single border. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
 			}
 			return CellBorder;
 		})();
@@ -3862,15 +3862,15 @@ var Excel;
 	(function (Interfaces) {
 		var CellBorderCollection = (function() {
 			function CellBorderCollection() {
-				/// <summary> Represents the returned format.borders properties of getCell/Row/ColumnProperties or format.borders input parameter of setCell/Row/ColumnProperties. [Api set: ExcelApi BETA (PREVIEW ONLY)] </summary>
-				/// <field name="bottom" type="Excel.Interfaces.CellBorder"> [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
-				/// <field name="diagonalDown" type="Excel.Interfaces.CellBorder"> [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
-				/// <field name="diagonalUp" type="Excel.Interfaces.CellBorder"> [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
-				/// <field name="horizontal" type="Excel.Interfaces.CellBorder"> [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
-				/// <field name="left" type="Excel.Interfaces.CellBorder"> [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
-				/// <field name="right" type="Excel.Interfaces.CellBorder"> [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
-				/// <field name="top" type="Excel.Interfaces.CellBorder"> [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
-				/// <field name="vertical" type="Excel.Interfaces.CellBorder"> [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
+				/// <summary> Represents the `format.borders` properties of `getCellProperties`, `getRowProperties`, and `getColumnProperties` or the `format.borders` input parameter of `setCellProperties`, `setRowProperties`, and `setColumnProperties`. [Api set: ExcelApi BETA (PREVIEW ONLY)] </summary>
+				/// <field name="bottom" type="Excel.Interfaces.CellBorder">Represents the `format.borders.bottom` property. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
+				/// <field name="diagonalDown" type="Excel.Interfaces.CellBorder">Represents the `format.borders.diagonalDown` property. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
+				/// <field name="diagonalUp" type="Excel.Interfaces.CellBorder">Represents the `format.borders.diagonalUp` property. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
+				/// <field name="horizontal" type="Excel.Interfaces.CellBorder">Represents the `format.borders.horizontal` property. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
+				/// <field name="left" type="Excel.Interfaces.CellBorder">Represents the `format.borders.left` property. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
+				/// <field name="right" type="Excel.Interfaces.CellBorder">Represents the `format.borders.right` property. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
+				/// <field name="top" type="Excel.Interfaces.CellBorder">Represents the `format.borders.top` property. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
+				/// <field name="vertical" type="Excel.Interfaces.CellBorder">Represents the `format.borders.vertical` property. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
 			}
 			return CellBorderCollection;
 		})();
@@ -3885,11 +3885,11 @@ var Excel;
 	(function (Interfaces) {
 		var CellPropertiesBorderLoadOptions = (function() {
 			function CellPropertiesBorderLoadOptions() {
-				/// <summary> Represents which properties to load on the format.borders object. [Api set: ExcelApi BETA (PREVIEW ONLY)] </summary>
-				/// <field name="color" type="Boolean"> [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
-				/// <field name="style" type="Boolean"> [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
-				/// <field name="tintAndShade" type="Boolean"> [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
-				/// <field name="weight" type="Boolean"> [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
+				/// <summary> Specifies which properties to load on the `format.borders` object. [Api set: ExcelApi BETA (PREVIEW ONLY)] </summary>
+				/// <field name="color" type="Boolean">Specifies whether to load on the `color` property. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
+				/// <field name="style" type="Boolean">Specifies whether to load on the `style` property. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
+				/// <field name="tintAndShade" type="Boolean">Specifies whether to load on the `tintAndShade` property. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
+				/// <field name="weight" type="Boolean">Specifies whether to load on the `weight` property. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
 			}
 			return CellPropertiesBorderLoadOptions;
 		})();
@@ -3904,12 +3904,12 @@ var Excel;
 	(function (Interfaces) {
 		var CellPropertiesFill = (function() {
 			function CellPropertiesFill() {
-				/// <summary> Represents the returned format.fill properties of getCell/Row/ColumnProperties or format.fill input parameter of setCell/Row/ColumnProperties. [Api set: ExcelApi BETA (PREVIEW ONLY)] </summary>
-				/// <field name="color" > [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
-				/// <field name="pattern" type="String"> [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
-				/// <field name="patternColor" > [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
-				/// <field name="patternTintAndShade" type="Number"> [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
-				/// <field name="tintAndShade" type="Number"> [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
+				/// <summary> Represents the `format.fill` properties of `getCellProperties`, `getRowProperties`, and `getColumnProperties` or the `format.fill` input parameter of `setCellProperties`, `setRowProperties`, and `setColumnProperties`. [Api set: ExcelApi BETA (PREVIEW ONLY)] </summary>
+				/// <field name="color" >Represents the `format.fill.color` property. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
+				/// <field name="pattern" type="String">Represents the `format.fill.pattern` property. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
+				/// <field name="patternColor" >Represents the `format.fill.patternColor` property. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
+				/// <field name="patternTintAndShade" type="Number">Represents the `format.fill.patternTintAndShade` property. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
+				/// <field name="tintAndShade" type="Number">Represents the `format.fill.tintAndShade` property. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
 			}
 			return CellPropertiesFill;
 		})();
@@ -3924,12 +3924,12 @@ var Excel;
 	(function (Interfaces) {
 		var CellPropertiesFillLoadOptions = (function() {
 			function CellPropertiesFillLoadOptions() {
-				/// <summary> Represents which properties to load on the format.fill object. [Api set: ExcelApi BETA (PREVIEW ONLY)] </summary>
-				/// <field name="color" type="Boolean"> [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
-				/// <field name="pattern" type="Boolean"> [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
-				/// <field name="patternColor" type="Boolean"> [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
-				/// <field name="patternTintAndShade" type="Boolean"> [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
-				/// <field name="tintAndShade" type="Boolean"> [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
+				/// <summary> Specifies which properties to load on the `format.fill` object. [Api set: ExcelApi BETA (PREVIEW ONLY)] </summary>
+				/// <field name="color" type="Boolean">Specifies whether to load on the `color` property. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
+				/// <field name="pattern" type="Boolean">Specifies whether to load on the `pattern` property. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
+				/// <field name="patternColor" type="Boolean">Specifies whether to load on the `patternColor` property. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
+				/// <field name="patternTintAndShade" type="Boolean">Specifies whether to load on the `patternTintAndShade` property. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
+				/// <field name="tintAndShade" type="Boolean">Specifies whether to load on the `tintAndShade` property. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
 			}
 			return CellPropertiesFillLoadOptions;
 		})();
@@ -3944,17 +3944,17 @@ var Excel;
 	(function (Interfaces) {
 		var CellPropertiesFont = (function() {
 			function CellPropertiesFont() {
-				/// <summary> Represents the returned format.font properties of getCell/Row/ColumnProperties or format.font input parameter of setCell/Row/ColumnProperties. [Api set: ExcelApi BETA (PREVIEW ONLY)] </summary>
-				/// <field name="bold" type="Boolean"> [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
-				/// <field name="color" > [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
-				/// <field name="italic" type="Boolean"> [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
-				/// <field name="name" > [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
-				/// <field name="size" type="Number"> [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
-				/// <field name="strikethrough" type="Boolean"> [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
-				/// <field name="subscript" type="Boolean"> [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
-				/// <field name="superscript" type="Boolean"> [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
-				/// <field name="tintAndShade" type="Number"> [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
-				/// <field name="underline" type="String"> [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
+				/// <summary> Represents the `format.font` properties of `getCellProperties`, `getRowProperties`, and `getColumnProperties` or the `format.font` input parameter of `setCellProperties`, `setRowProperties`, and `setColumnProperties`. [Api set: ExcelApi BETA (PREVIEW ONLY)] </summary>
+				/// <field name="bold" type="Boolean">Represents the `format.font.bold` property. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
+				/// <field name="color" >Represents the `format.font.color` property. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
+				/// <field name="italic" type="Boolean">Represents the `format.font.italic` property. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
+				/// <field name="name" >Represents the `format.font.name` property. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
+				/// <field name="size" type="Number">Represents the `format.font.size` property. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
+				/// <field name="strikethrough" type="Boolean">Represents the `format.font.strikethrough` property. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
+				/// <field name="subscript" type="Boolean">Represents the `format.font.subscript` property. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
+				/// <field name="superscript" type="Boolean">Represents the `format.font.superscript` property. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
+				/// <field name="tintAndShade" type="Number">Represents the `format.font.tintAndShade` property. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
+				/// <field name="underline" type="String">Represents the `format.font.underline` property. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
 			}
 			return CellPropertiesFont;
 		})();
@@ -3969,17 +3969,17 @@ var Excel;
 	(function (Interfaces) {
 		var CellPropertiesFontLoadOptions = (function() {
 			function CellPropertiesFontLoadOptions() {
-				/// <summary> Represents which properties to load on the format.font object. [Api set: ExcelApi BETA (PREVIEW ONLY)] </summary>
-				/// <field name="bold" type="Boolean"> [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
-				/// <field name="color" type="Boolean"> [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
-				/// <field name="italic" type="Boolean"> [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
-				/// <field name="name" type="Boolean"> [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
-				/// <field name="size" type="Boolean"> [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
-				/// <field name="strikethrough" type="Boolean"> [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
-				/// <field name="subscript" type="Boolean"> [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
-				/// <field name="superscript" type="Boolean"> [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
-				/// <field name="tintAndShade" type="Boolean"> [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
-				/// <field name="underline" type="Boolean"> [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
+				/// <summary> Specifies which properties to load on the `format.font` object. [Api set: ExcelApi BETA (PREVIEW ONLY)] </summary>
+				/// <field name="bold" type="Boolean">Specifies whether to load on the `bold` property. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
+				/// <field name="color" type="Boolean">Specifies whether to load on the `color` property. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
+				/// <field name="italic" type="Boolean">Specifies whether to load on the `italic` property. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
+				/// <field name="name" type="Boolean">Specifies whether to load on the `name` property. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
+				/// <field name="size" type="Boolean">Specifies whether to load on the `size` property. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
+				/// <field name="strikethrough" type="Boolean">Specifies whether to load on the `strikethrough` property. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
+				/// <field name="subscript" type="Boolean">Specifies whether to load on the `subscript` property. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
+				/// <field name="superscript" type="Boolean">Specifies whether to load on the `superscript` property. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
+				/// <field name="tintAndShade" type="Boolean">Specifies whether to load on the `tintAndShade` property. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
+				/// <field name="underline" type="Boolean">Specifies whether to load on the `underline` property. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
 			}
 			return CellPropertiesFontLoadOptions;
 		})();
@@ -3994,9 +3994,9 @@ var Excel;
 	(function (Interfaces) {
 		var CellPropertiesProtection = (function() {
 			function CellPropertiesProtection() {
-				/// <summary> Represents the returned format.protection properties of getCell/Row/ColumnProperties or format.protection input parameter of setCell/Row/ColumnProperties. [Api set: ExcelApi BETA (PREVIEW ONLY)] </summary>
-				/// <field name="formulaHidden" type="Boolean"> [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
-				/// <field name="locked" type="Boolean"> [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
+				/// <summary> Represents the `format.protection` properties of `getCellProperties`, `getRowProperties`, and `getColumnProperties` or the `format.protection` input parameter of `setCellProperties`, `setRowProperties`, and `setColumnProperties`. [Api set: ExcelApi BETA (PREVIEW ONLY)] </summary>
+				/// <field name="formulaHidden" type="Boolean">Represents the `format.protection.formulaHidden` property. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
+				/// <field name="locked" type="Boolean">Represents the `format.protection.locked` property. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
 			}
 			return CellPropertiesProtection;
 		})();
@@ -9086,6 +9086,8 @@ var Excel;
 		"worksheetFormatChanged": "worksheetFormatChanged",
 		"wacoperationEvent": "wacoperationEvent",
 		"ribbonCommandExecuted": "ribbonCommandExecuted",
+		"worksheetRowSorted": "worksheetRowSorted",
+		"worksheetColumnSorted": "worksheetColumnSorted",
 	}
 	Excel.EventType = EventType;
 })(Excel || (Excel = {__proto__: null}));
@@ -14669,7 +14671,8 @@ var Excel;
 			/// <summary>
 			/// Returns a 2D array, encapsulating the data for each cell&apos;s font, fill, borders, alignment, and other properties. [Api set: ExcelApi BETA (PREVIEW ONLY)]
 			/// </summary>
-			/// <returns type="OfficeExtension.ClientResult&lt;Excel.CellPropertiesInternal[][]&gt;"></returns>
+			/// <param name="cellPropertiesLoadOptions" type="Excel.Interfaces.CellPropertiesLoadOptionsInternal">An object that represents which cell properties to load.</param>
+			/// <returns type="OfficeExtension.ClientResult&lt;Excel.CellPropertiesInternal[][]&gt;">A 2D array where each item represents the requested properties of the corresponding cell.</returns>
 			var result = new OfficeExtension.ClientResult();
 			result.__proto__ = null;
 			result.value = [];
@@ -14686,7 +14689,8 @@ var Excel;
 			/// <summary>
 			/// Returns a single-dimensional array, encapsulating the data for each column&apos;s font, fill, borders, alignment, and other properties.  For properties that are not consistent across each cell within a given column, null will be returned. [Api set: ExcelApi BETA (PREVIEW ONLY)]
 			/// </summary>
-			/// <returns type="OfficeExtension.ClientResult&lt;Excel.CellPropertiesInternal[]&gt;"></returns>
+			/// <param name="columnPropertiesLoadOptions" type="Excel.Interfaces.CellPropertiesLoadOptionsInternal">An object that represents which column properties to load.</param>
+			/// <returns type="OfficeExtension.ClientResult&lt;Excel.CellPropertiesInternal[]&gt;">An array where each item represents the requested properties of the corresponding column.</returns>
 			var result = new OfficeExtension.ClientResult();
 			result.__proto__ = null;
 			result.value = [];
@@ -14787,7 +14791,8 @@ var Excel;
 			/// <summary>
 			/// Returns a single-dimensional array, encapsulating the data for each row&apos;s font, fill, borders, alignment, and other properties.  For properties that are not consistent across each cell within a given row, null will be returned. [Api set: ExcelApi BETA (PREVIEW ONLY)]
 			/// </summary>
-			/// <returns type="OfficeExtension.ClientResult&lt;Excel.CellPropertiesInternal[]&gt;"></returns>
+			/// <param name="rowPropertiesLoadOptions" type="Excel.Interfaces.CellPropertiesLoadOptionsInternal">An object that represents which row properties to load.</param>
+			/// <returns type="OfficeExtension.ClientResult&lt;Excel.CellPropertiesInternal[]&gt;">An array where each item represents the requested properties of the corresponding row.</returns>
 			var result = new OfficeExtension.ClientResult();
 			result.__proto__ = null;
 			result.value = [];
@@ -14925,12 +14930,14 @@ var Excel;
 			/// <summary>
 			/// Updates the range based on a 2D array of cell properties , encapsulating things like font, fill, borders, alignment, and so forth. [Api set: ExcelApi BETA (PREVIEW ONLY)]
 			/// </summary>
+			/// <param name="cellPropertiesData" type="Array" elementType="Array">A 2D array that represents which properties to set in each cell.</param>
 			/// <returns ></returns>
 		}
 		Range.prototype.setColumnProperties = function(columnPropertiesData) {
 			/// <summary>
 			/// Updates the range based on a single-dimensional array of column properties, encapsulating things like font, fill, borders, alignment, and so forth. [Api set: ExcelApi BETA (PREVIEW ONLY)]
 			/// </summary>
+			/// <param name="columnPropertiesData" type="Array" elementType="Excel.Interfaces.CellPropertiesInternal">An array that represents which properties to set in each column.</param>
 			/// <returns ></returns>
 		}
 		Range.prototype.setDirty = function() {
@@ -14943,6 +14950,7 @@ var Excel;
 			/// <summary>
 			/// Updates the range based on a single-dimensional array of row properties, encapsulating things like font, fill, borders, alignment, and so forth. [Api set: ExcelApi BETA (PREVIEW ONLY)]
 			/// </summary>
+			/// <param name="rowPropertiesData" type="Array" elementType="Excel.Interfaces.CellPropertiesInternal">An array that represents which properties to set in each row.</param>
 			/// <returns ></returns>
 		}
 		Range.prototype.showCard = function() {
@@ -18917,9 +18925,11 @@ var Excel;
 			/// <field name="onActivated" type="OfficeExtension.EventHandlers">Occurs when the worksheet is activated. [Api set: ExcelApi 1.7]</field>
 			/// <field name="onCalculated" type="OfficeExtension.EventHandlers">Occurs when the worksheet is calculated. [Api set: ExcelApi 1.8]</field>
 			/// <field name="onChanged" type="OfficeExtension.EventHandlers">Occurs when data changed on a specific worksheet. [Api set: ExcelApi 1.7]</field>
+			/// <field name="onColumnSorted" type="OfficeExtension.EventHandlers">Occurs when sorting on columns. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
 			/// <field name="onDeactivated" type="OfficeExtension.EventHandlers">Occurs when the worksheet is deactivated. [Api set: ExcelApi 1.7]</field>
 			/// <field name="onFiltered" type="OfficeExtension.EventHandlers">Occurs when filter is applied on a specific worksheet. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
 			/// <field name="onFormatChanged" type="OfficeExtension.EventHandlers">Occurs when format changed on a specific worksheet. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
+			/// <field name="onRowSorted" type="OfficeExtension.EventHandlers">Occurs when sorting on rows. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
 			/// <field name="onSelectionChanged" type="OfficeExtension.EventHandlers">Occurs when the selection changes on a specific worksheet. [Api set: ExcelApi 1.7]</field>
 		}
 
@@ -19117,6 +19127,20 @@ var Excel;
 				return;
 			}
 		};
+		Worksheet.prototype.onColumnSorted = {
+			__proto__: null,
+			add: function (handler) {
+				/// <param name="handler" type="function(eventArgs: Excel.Interfaces.WorksheetColumnSortedEventArgs)">Handler for the event. EventArgs: Provides information about the worksheet that raised the ColumnSorted event. </param>
+				/// <returns type="OfficeExtension.EventHandlerResult"></returns>
+				var eventInfo = new Excel.Interfaces.WorksheetColumnSortedEventArgs();
+				eventInfo.__proto__ = null;
+				handler(eventInfo);
+			},
+			remove: function (handler) {
+				/// <param name="handler" type="function(eventArgs: Excel.Interfaces.WorksheetColumnSortedEventArgs)">Handler for the event.</param>
+				return;
+			}
+		};
 		Worksheet.prototype.onDeactivated = {
 			__proto__: null,
 			add: function (handler) {
@@ -19156,6 +19180,20 @@ var Excel;
 			},
 			remove: function (handler) {
 				/// <param name="handler" type="function(eventArgs: Excel.Interfaces.WorksheetFormatChangedEventArgs)">Handler for the event.</param>
+				return;
+			}
+		};
+		Worksheet.prototype.onRowSorted = {
+			__proto__: null,
+			add: function (handler) {
+				/// <param name="handler" type="function(eventArgs: Excel.Interfaces.WorksheetRowSortedEventArgs)">Handler for the event. EventArgs: Provides information about the worksheet that raised the RowSorted event. </param>
+				/// <returns type="OfficeExtension.EventHandlerResult"></returns>
+				var eventInfo = new Excel.Interfaces.WorksheetRowSortedEventArgs();
+				eventInfo.__proto__ = null;
+				handler(eventInfo);
+			},
+			remove: function (handler) {
+				/// <param name="handler" type="function(eventArgs: Excel.Interfaces.WorksheetRowSortedEventArgs)">Handler for the event.</param>
 				return;
 			}
 		};
@@ -19264,10 +19302,12 @@ var Excel;
 			/// <field name="onAdded" type="OfficeExtension.EventHandlers">Occurs when a new worksheet is added to the workbook. [Api set: ExcelApi 1.7]</field>
 			/// <field name="onCalculated" type="OfficeExtension.EventHandlers">Occurs when any worksheet in the workbook is calculated. [Api set: ExcelApi 1.8]</field>
 			/// <field name="onChanged" type="OfficeExtension.EventHandlers">Occurs when any worksheet in the workbook is changed. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
+			/// <field name="onColumnSorted" type="OfficeExtension.EventHandlers">Occurs when sorting on columns. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
 			/// <field name="onDeactivated" type="OfficeExtension.EventHandlers">Occurs when any worksheet in the workbook is deactivated. [Api set: ExcelApi 1.7]</field>
 			/// <field name="onDeleted" type="OfficeExtension.EventHandlers">Occurs when a worksheet is deleted from the workbook. [Api set: ExcelApi 1.7]</field>
 			/// <field name="onFiltered" type="OfficeExtension.EventHandlers">Occurs when any worksheet&apos;s filter is applied in the workbook. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
 			/// <field name="onFormatChanged" type="OfficeExtension.EventHandlers">Occurs when any worksheet in the workbook has format changed. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
+			/// <field name="onRowSorted" type="OfficeExtension.EventHandlers">Occurs when sorting on rows. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
 			/// <field name="onSelectionChanged" type="OfficeExtension.EventHandlers">Occurs when the selection changes on any worksheet. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
 			/// <field name="items" type="Array" elementType="Excel.Worksheet">Gets the loaded child items in this collection.</field>
 		}
@@ -19401,6 +19441,20 @@ var Excel;
 				return;
 			}
 		};
+		WorksheetCollection.prototype.onColumnSorted = {
+			__proto__: null,
+			add: function (handler) {
+				/// <param name="handler" type="function(eventArgs: Excel.Interfaces.WorksheetColumnSortedEventArgs)">Handler for the event. EventArgs: Provides information about the worksheet that raised the ColumnSorted event. </param>
+				/// <returns type="OfficeExtension.EventHandlerResult"></returns>
+				var eventInfo = new Excel.Interfaces.WorksheetColumnSortedEventArgs();
+				eventInfo.__proto__ = null;
+				handler(eventInfo);
+			},
+			remove: function (handler) {
+				/// <param name="handler" type="function(eventArgs: Excel.Interfaces.WorksheetColumnSortedEventArgs)">Handler for the event.</param>
+				return;
+			}
+		};
 		WorksheetCollection.prototype.onDeactivated = {
 			__proto__: null,
 			add: function (handler) {
@@ -19457,6 +19511,20 @@ var Excel;
 				return;
 			}
 		};
+		WorksheetCollection.prototype.onRowSorted = {
+			__proto__: null,
+			add: function (handler) {
+				/// <param name="handler" type="function(eventArgs: Excel.Interfaces.WorksheetRowSortedEventArgs)">Handler for the event. EventArgs: Provides information about the worksheet that raised the RowSorted event. </param>
+				/// <returns type="OfficeExtension.EventHandlerResult"></returns>
+				var eventInfo = new Excel.Interfaces.WorksheetRowSortedEventArgs();
+				eventInfo.__proto__ = null;
+				handler(eventInfo);
+			},
+			remove: function (handler) {
+				/// <param name="handler" type="function(eventArgs: Excel.Interfaces.WorksheetRowSortedEventArgs)">Handler for the event.</param>
+				return;
+			}
+		};
 		WorksheetCollection.prototype.onSelectionChanged = {
 			__proto__: null,
 			add: function (handler) {
@@ -19475,6 +19543,25 @@ var Excel;
 		return WorksheetCollection;
 	})(OfficeExtension.ClientObject);
 	Excel.WorksheetCollection = WorksheetCollection;
+})(Excel || (Excel = {__proto__: null}));
+
+var Excel;
+(function (Excel) {
+	var Interfaces;
+	(function (Interfaces) {
+		var WorksheetColumnSortedEventArgs = (function() {
+			function WorksheetColumnSortedEventArgs() {
+				/// <summary> Provides information about the worksheet that raised the ColumnSorted event. [Api set: ExcelApi BETA (PREVIEW ONLY)] </summary>
+				/// <field name="address" type="String">Gets the range address that represents the sorted areas of a specific worksheet. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
+				/// <field name="source" type="String">Gets the source of the event. See Excel.EventSource for details. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
+				/// <field name="type" type="String">Gets the type of the event. See Excel.EventType for details. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
+				/// <field name="worksheetId" type="String">Gets the id of the worksheet in which the sorting happened. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
+			}
+			return WorksheetColumnSortedEventArgs;
+		})();
+		Interfaces.WorksheetColumnSortedEventArgs.__proto__ = null;
+		Interfaces.WorksheetColumnSortedEventArgs = WorksheetColumnSortedEventArgs;
+	})(Interfaces = Excel.Interfaces || (Excel.Interfaces = { __proto__: null}));
 })(Excel || (Excel = {__proto__: null}));
 
 var Excel;
@@ -19690,6 +19777,25 @@ var Excel;
 		})();
 		Interfaces.WorksheetProtectionOptions.__proto__ = null;
 		Interfaces.WorksheetProtectionOptions = WorksheetProtectionOptions;
+	})(Interfaces = Excel.Interfaces || (Excel.Interfaces = { __proto__: null}));
+})(Excel || (Excel = {__proto__: null}));
+
+var Excel;
+(function (Excel) {
+	var Interfaces;
+	(function (Interfaces) {
+		var WorksheetRowSortedEventArgs = (function() {
+			function WorksheetRowSortedEventArgs() {
+				/// <summary> Provides information about the worksheet that raised the RowSorted event. [Api set: ExcelApi BETA (PREVIEW ONLY)] </summary>
+				/// <field name="address" type="String">Gets the range address that represents the sorted areas of a specific worksheet. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
+				/// <field name="source" type="String">Gets the source of the event. See Excel.EventSource for details. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
+				/// <field name="type" type="String">Gets the type of the event. See Excel.EventType for details. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
+				/// <field name="worksheetId" type="String">Gets the id of the worksheet in which the sorting happened. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
+			}
+			return WorksheetRowSortedEventArgs;
+		})();
+		Interfaces.WorksheetRowSortedEventArgs.__proto__ = null;
+		Interfaces.WorksheetRowSortedEventArgs = WorksheetRowSortedEventArgs;
 	})(Interfaces = Excel.Interfaces || (Excel.Interfaces = { __proto__: null}));
 })(Excel || (Excel = {__proto__: null}));
 

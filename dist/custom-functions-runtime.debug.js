@@ -1214,13 +1214,12 @@ var OTel;
                 browserToken: info.clientId,
                 instanceId: info.appInstanceId,
                 name: info.name,
-                osfRuntimeVersion: OSF.ConstantNames.FileVersion,
                 sessionId: info.sessionId
             };
             var fields = oteljs.Contracts.Office.System.SDX.getFields("SDX", contract);
             var host = OTelLogger.getHost();
             var flavor = OTelLogger.getFlavor();
-            var version = info.hostVersion;
+            var version = (flavor === "Web" && info.hostVersion.slice(0, 2) === "0.") ? "16.0.0.0" : info.hostVersion;
             var context = {
                 'App.Name': host,
                 'App.Platform': flavor,
@@ -2175,7 +2174,14 @@ OSF._OfficeAppFactory = (function OSF__OfficeAppFactory() {
         }, CoreUtility.isNullOrEmptyString = function(value) {
             return null === value || (void 0 === value || 0 == value.length);
         }, CoreUtility.isPlainJsonObject = function(value) {
-            return !CoreUtility.isNullOrUndefined(value) && ("object" == typeof value && Object.getPrototypeOf(value) === Object.getPrototypeOf({}));
+            if (CoreUtility.isNullOrUndefined(value)) return !1;
+            if ("object" != typeof value) return !1;
+            if ("[object Object]" !== Object.prototype.toString.apply(value)) return !1;
+            var prototype = value;
+            do {
+                prototype = Object.getPrototypeOf(prototype);
+            } while (null !== prototype && null !== Object.getPrototypeOf(prototype));
+            return Object.getPrototypeOf(value) === prototype;
         }, CoreUtility.trim = function(str) {
             return str.replace(new RegExp("^\\s+|\\s+$", "g"), "");
         }, CoreUtility.caseInsensitiveCompareString = function(str1, str2) {
@@ -2762,7 +2768,7 @@ OSF._OfficeAppFactory = (function OSF__OfficeAppFactory() {
         }, ClientRequestBase.prototype.ensureInstantiateObjectPaths = function(objectPaths) {
             if (objectPaths) for (var i = 0; i < objectPaths.length; i++) this.ensureInstantiateObjectPath(objectPaths[i]);
         }, ClientRequestBase.prototype.addReferencedObjectPath = function(objectPath) {
-            if (!this.m_referencedObjectPaths[objectPath.objectPathInfo.Id]) {
+            if (objectPath && !this.m_referencedObjectPaths[objectPath.objectPathInfo.Id]) {
                 if (!objectPath.isValid) throw new Core._Internal.RuntimeError({
                     code: Core.CoreErrorCodes.invalidObjectPath,
                     message: Core.CoreUtility._getResourceString(Core.CoreResourceStrings.invalidObjectPath, CommonUtility.getObjectPathExpression(objectPath)),
@@ -5448,7 +5454,23 @@ OSF._OfficeAppFactory = (function OSF__OfficeAppFactory() {
         }(),
         displayWebDialog: wrapMethod(function(impl) {
             return impl.displayWebDialog;
-        })
+        }),
+        storage: function() {
+            return {
+                getItem: wrapStorageMethod("getItem"),
+                setItem: wrapStorageMethod("setItem"),
+                removeItem: wrapStorageMethod("removeItem"),
+                getKeys: wrapStorageMethod("getKeys"),
+                setItems: wrapStorageMethod("setItems"),
+                removeItems: wrapStorageMethod("removeItems"),
+                getItems: wrapStorageMethod("getItems")
+            };
+            function wrapStorageMethod(methodName) {
+                return wrapMethod(function(impl) {
+                    return impl.storage[methodName];
+                });
+            }
+        }()
     };
 }, function(module, exports) {
     !function(self) {

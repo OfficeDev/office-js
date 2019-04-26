@@ -4306,13 +4306,28 @@ var OfficeExt;
         function RichClientHostController() {
         }
         RichClientHostController.prototype.execute = function (id, params, callback) {
-            window.external.Execute(id, params, callback);
+            if (typeof OsfOMToken != 'undefined' && OsfOMToken) {
+                window.external.Execute(id, params, callback, OsfOMToken);
+            }
+            else {
+                window.external.Execute(id, params, callback);
+            }
         };
         RichClientHostController.prototype.registerEvent = function (id, targetId, handler, callback) {
-            window.external.RegisterEvent(id, targetId, handler, callback);
+            if (typeof OsfOMToken != 'undefined' && OsfOMToken) {
+                window.external.RegisterEvent(id, targetId, handler, callback, OsfOMToken);
+            }
+            else {
+                window.external.RegisterEvent(id, targetId, handler, callback);
+            }
         };
         RichClientHostController.prototype.unregisterEvent = function (id, targetId, callback) {
-            window.external.UnregisterEvent(id, targetId, callback);
+            if (typeof OsfOMToken != 'undefined' && OsfOMToken) {
+                window.external.UnregisterEvent(id, targetId, callback, OsfOMToken);
+            }
+            else {
+                window.external.UnregisterEvent(id, targetId, callback);
+            }
         };
         return RichClientHostController;
     })();
@@ -4412,7 +4427,12 @@ OSF.initializeRichCommon = function OSF_initializeRichCommon() {
             if (onCalling) {
                 onCalling();
             }
-            OSF.DDA._OsfControlContext.GetSettings().Read(keys, values);
+            if (typeof OsfOMToken != 'undefined' && OsfOMToken) {
+                OSF.DDA._OsfControlContext.GetSettings(OsfOMToken).Read(keys, values);
+            }
+            else {
+                OSF.DDA._OsfControlContext.GetSettings().Read(keys, values);
+            }
             if (onReceiving) {
                 onReceiving();
             }
@@ -4432,7 +4452,12 @@ OSF.initializeRichCommon = function OSF_initializeRichCommon() {
             if (onCalling) {
                 onCalling();
             }
-            OSF.DDA._OsfControlContext.GetSettings().Write(keys, values);
+            if (typeof OsfOMToken != 'undefined' && OsfOMToken) {
+                OSF.DDA._OsfControlContext.GetSettings(OsfOMToken).Write(keys, values);
+            }
+            else {
+                OSF.DDA._OsfControlContext.GetSettings().Write(keys, values);
+            }
             if (onReceiving) {
                 onReceiving();
             }
@@ -4948,17 +4973,10 @@ var OSFAriaLogger;
     var TelemetryEventAppActivated = { name: "AppActivated", enabled: true, basic: true, critical: true, points: [
             { name: "Browser", type: "string" },
             { name: "Message", type: "string" },
-            { name: "AppId", type: "string" },
             { name: "AppURL", type: "string" },
-            { name: "UserId", type: "string" },
             { name: "Host", type: "string" },
-            { name: "HostVersion", type: "string" },
-            { name: "CorrelationId", type: "string", rename: "HostSessionId" },
             { name: "AppSizeWidth", type: "int64" },
             { name: "AppSizeHeight", type: "int64" },
-            { name: "AppInstanceId", type: "string" },
-            { name: "OfficeJSVersion", type: "string" },
-            { name: "HostJSVersion", type: "string" },
             { name: "IsFromWacAutomation", type: "string" },
         ] };
     var TelemetryEventScriptLoad = { name: "ScriptLoad", enabled: true, basic: false, critical: false, points: [
@@ -5129,7 +5147,7 @@ var OSFAriaLogger;
             }
         };
         AriaLogger.EnableSendingTelemetryWithOTel = true;
-        AriaLogger.EnableSendingTelemetryWithLegacyAria = true;
+        AriaLogger.EnableSendingTelemetryWithLegacyAria = false;
         return AriaLogger;
     })();
     OSFAriaLogger.AriaLogger = AriaLogger;
@@ -6089,10 +6107,11 @@ OSF.DDA.SafeArray.Delegate.ParameterMap.define({
     Object.defineProperty(exports, "__esModule", {
         value: !0
     });
-    var DialogApi = __webpack_require__(2), AsyncStorage = __webpack_require__(3);
+    var DialogApi = __webpack_require__(2), StorageApi = __webpack_require__(3);
     window._OfficeRuntimeNative = {
         displayWebDialog: DialogApi.displayWebDialog,
-        AsyncStorage: AsyncStorage.AsyncStorage
+        AsyncStorage: StorageApi.AsyncStorage,
+        storage: StorageApi.storage
     };
 }, function(module, exports, __webpack_require__) {
     "use strict";
@@ -6136,7 +6155,7 @@ OSF.DDA.SafeArray.Delegate.ParameterMap.define({
         return void 0 === options && (options = {}), new OfficeExtension.CoreUtility.Promise(function(resolve, reject) {
             if (options.width && options.height && (!isInt(options.width) || !isInt(options.height))) throw new OfficeExtension.Error({
                 code: "InvalidArgument",
-                message: "Dimensions must be % or number."
+                message: 'Dimensions must be "number%" or number.'
             });
             var ctx = new OfficeExtension.ClientRequestContext(), dialogService = DialogService.newObject(ctx), dialog = new Dialog(dialogService), eventResult = dialogService.onDialogMessage.add(function(args) {
                 switch (OfficeExtension.Utility.log("dialogMessageHandler:" + JSON.stringify(args)), 
@@ -6290,6 +6309,19 @@ OSF.DDA.SafeArray.Delegate.ParameterMap.define({
     OfficeExtension.Utility.throwIfNotLoaded, OfficeExtension.Utility.throwIfApiNotSupported, 
     OfficeExtension.Utility.load, OfficeExtension.Utility.retrieve, OfficeExtension.Utility.toJson), _fixObjectPathIfNecessary = OfficeExtension.Utility.fixObjectPathIfNecessary, _processRetrieveResult = (OfficeExtension.Utility._handleNavigationPropertyResults, 
     OfficeExtension.Utility.adjustToDateTime, OfficeExtension.Utility.processRetrieveResult);
+    function callPersistentKvStorageManager(nativeCall, getValueOnSuccess) {
+        return new OfficeExtension.CoreUtility.Promise(function(resolve, reject) {
+            var storageManager = PersistentKvStorageManager.getInstance(), invokeId = storageManager.setCallBack(function(result, error) {
+                error ? reject(error) : resolve(getValueOnSuccess ? getValueOnSuccess(result) : void 0);
+            });
+            storageManager.ctx.sync().then(function() {
+                var storageService = storageManager.getPersistentKvStorageService();
+                return nativeCall(storageService, invokeId), storageManager.ctx.sync();
+            }).catch(function(e) {
+                reject(e);
+            });
+        });
+    }
     function callStorageManager(nativeCall, getValueOnSuccess, callback) {
         return new OfficeExtension.CoreUtility.Promise(function(resolve, reject) {
             var storageManager = PersistentKvStorageManager.getInstance(), invokeId = storageManager.setCallBack(function(result, error) {
@@ -6332,8 +6364,8 @@ OSF.DDA.SafeArray.Delegate.ParameterMap.define({
             return callStorageManager(function(storage, invokeId) {
                 return storage.multiGet(invokeId, JSON.stringify(keys));
             }, function(result) {
-                var keyValues = JSON.parse(result), map = {};
-                return keyValues && keyValues.forEach(function(_a) {
+                var map = {};
+                return JSON.parse(result).forEach(function(_a) {
                     var key = _a[0], value = _a[1];
                     return map[key] = value, value;
                 }), keys.map(function(key) {
@@ -6368,6 +6400,57 @@ OSF.DDA.SafeArray.Delegate.ParameterMap.define({
             }, function() {
                 return null;
             }, callback);
+        }
+    }, exports.storage = {
+        getItem: function(key) {
+            return callPersistentKvStorageManager(function(perStorage, invokeId) {
+                return perStorage.multiGet(invokeId, JSON.stringify([ key ]));
+            }, function(result) {
+                var parsedResult = JSON.parse(result);
+                return parsedResult && parsedResult[0] && parsedResult[0][1] ? parsedResult[0][1] : null;
+            });
+        },
+        setItem: function(key, value) {
+            return callPersistentKvStorageManager(function(perStorage, invokeId) {
+                return perStorage.multiSet(invokeId, JSON.stringify([ [ key, value ] ]));
+            });
+        },
+        removeItem: function(key) {
+            return callPersistentKvStorageManager(function(perStorage, invokeId) {
+                return perStorage.multiRemove(invokeId, JSON.stringify([ key ]));
+            });
+        },
+        getItems: function(keys) {
+            return callPersistentKvStorageManager(function(perStorage, invokeId) {
+                return perStorage.multiGet(invokeId, JSON.stringify(keys));
+            }, function(result) {
+                var keyValues = JSON.parse(result), map = {};
+                return keys.forEach(function(k) {
+                    map[k] = null;
+                }), keyValues.forEach(function(_a) {
+                    var key = _a[0], value = _a[1];
+                    return map[key] = value, value;
+                }), map;
+            });
+        },
+        setItems: function(keyValues) {
+            var keyValuePairs = [];
+            for (var key in keyValues) keyValues.hasOwnProperty(key) && keyValuePairs.push([ key, keyValues[key] ]);
+            return callPersistentKvStorageManager(function(storage, invokeId) {
+                return storage.multiSet(invokeId, JSON.stringify(keyValuePairs));
+            });
+        },
+        removeItems: function(keys) {
+            return callPersistentKvStorageManager(function(perStorage, invokeId) {
+                return perStorage.multiRemove(invokeId, JSON.stringify(keys));
+            });
+        },
+        getKeys: function() {
+            return callPersistentKvStorageManager(function(perStorage, invokeId) {
+                return perStorage.getAllKeys(invokeId);
+            }, function(result) {
+                return JSON.parse(result);
+            });
         }
     };
     var PersistentKvStorageManager = function() {

@@ -1,5 +1,5 @@
 /* Outlook web application specific API library */
-/* Version: 16.0.11325.10000 */
+/* Version: 16.0.11527.30000 */
 /*
 /*!
 Copyright (c) Microsoft Corporation.  All rights reserved.
@@ -1425,6 +1425,7 @@ Microsoft.Office.WebExtension.Parameters = {
     HideTitle: "hideTitle",
     UseDeviceIndependentPixels: "useDeviceIndependentPixels",
     PromptBeforeOpen: "promptBeforeOpen",
+    EnforceAppDomain: "enforceAppDomain",
     AppCommandInvocationCompletedData: "appCommandInvocationCompletedData",
     Base64: "base64",
     FormId: "formId"
@@ -1477,6 +1478,7 @@ OSF.DDA.MethodDispId = {
     dispidAppCommandInvocationCompletedMethod: 94,
     dispidCloseContainerMethod: 97,
     dispidGetAccessTokenMethod: 98,
+    dispidGetAuthContextMethod: 99,
     dispidOpenBrowserWindow: 102,
     dispidCreateDocumentMethod: 105,
     dispidInsertFormMethod: 106,
@@ -1546,6 +1548,7 @@ OSF.DDA.EventDispId = {
     dispidOlkRecurrenceChangedEvent: 49,
     dispidOlkAttachmentsChangedEvent: 50,
     dispidOlkEnhancedLocationsChangedEvent: 51,
+    dispidOlkInfobarClickedEvent: 52,
     dispidTaskSelectionChangedEvent: 56,
     dispidResourceSelectionChangedEvent: 57,
     dispidViewSelectionChangedEvent: 58,
@@ -2731,6 +2734,8 @@ OSF.DDA.Context = function OSF_DDA_Context(officeAppContext, document, license, 
         OSF.OUtil.defineEnumerableProperty(this,"ui",{value: officeAppContext.ui});
     if(officeAppContext.auth)
         OSF.OUtil.defineEnumerableProperty(this,"auth",{value: officeAppContext.auth});
+    if(officeAppContext.webAuth)
+        OSF.OUtil.defineEnumerableProperty(this,"webAuth",{value: officeAppContext.webAuth});
     if(officeAppContext.application)
         OSF.OUtil.defineEnumerableProperty(this,"application",{value: officeAppContext.application});
     if(officeAppContext.get_isDialog())
@@ -3498,6 +3503,7 @@ OSF.DDA.DispIdHost.Facade = function OSF_DDA_DispIdHost_Facade(getDelegateMethod
             SetTableOptionsAsync: did.dispidSetTableOptionsMethod,
             SetFormatsAsync: did.dispidSetFormatsMethod,
             GetAccessTokenAsync: did.dispidGetAccessTokenMethod,
+            GetAuthContextAsync: did.dispidGetAuthContextMethod,
             ExecuteRichApiRequestAsync: did.dispidExecuteRichApiRequestMethod,
             AppCommandInvocationCompletedAsync: did.dispidAppCommandInvocationCompletedMethod,
             CloseContainerAsync: did.dispidCloseContainerMethod,
@@ -3574,6 +3580,7 @@ OSF.DDA.DispIdHost.Facade = function OSF_DDA_DispIdHost_Facade(getDelegateMethod
             RecurrenceChanged: did.dispidOlkRecurrenceChangedEvent,
             AttachmentsChanged: did.dispidOlkAttachmentsChangedEvent,
             EnhancedLocationsChanged: did.dispidOlkEnhancedLocationsChangedEvent,
+            InfobarClicked: did.dispidOlkInfobarClickedEvent,
             TaskSelectionChanged: did.dispidTaskSelectionChangedEvent,
             ResourceSelectionChanged: did.dispidResourceSelectionChangedEvent,
             ViewSelectionChanged: did.dispidViewSelectionChangedEvent,
@@ -3661,7 +3668,7 @@ OSF.DDA.DispIdHost.Facade = function OSF_DDA_DispIdHost_Facade(getDelegateMethod
                             responseArgs = hostResponseArgs;
                         var payload = asyncMethodCall.processResponse(status,responseArgs,caller,callArgs);
                         OSF.DDA.issueAsyncResult(callArgs,status,payload);
-                        if(OSF.AppTelemetry)
+                        if(OSF.AppTelemetry && !(OSF.ConstantNames && OSF.ConstantNames.IsCustomFunctionsRuntime))
                             OSF.AppTelemetry.onMethodDone(dispId,hostCallArgs,Math.abs((new Date).getTime() - startTime),status)
                     }
                 })
@@ -4015,7 +4022,8 @@ OSF.ShowWindowDialogParameterKeys = {
     DisplayInIframe: "displayInIframe",
     HideTitle: "hideTitle",
     UseDeviceIndependentPixels: "useDeviceIndependentPixels",
-    PromptBeforeOpen: "promptBeforeOpen"
+    PromptBeforeOpen: "promptBeforeOpen",
+    EnforceAppDomain: "enforceAppDomain"
 };
 OSF.HostThemeButtonStyleKeys = {
     ButtonBorderColor: "buttonBorderColor",
@@ -4283,7 +4291,8 @@ Microsoft.Office.Common.ServiceEndPoint = function Microsoft_Office_Common_Servi
     this._conversations = {};
     this._policyManager = null;
     this._appDomains = {};
-    this._onHandleRequestError = null
+    this._onHandleRequestError = null;
+    this._addInSourceLocationSubdomainAllowedIsEnabled = false
 };
 Microsoft.Office.Common.ServiceEndPoint.prototype = {
     registerMethod: function Microsoft_Office_Common_ServiceEndPoint$registerMethod(methodName, method, invokeType, blockingOthers)
@@ -4382,7 +4391,7 @@ Microsoft.Office.Common.ServiceEndPoint.prototype = {
             throw e;
         this.unregisterMethod(eventName)
     },
-    registerConversation: function Microsoft_Office_Common_ServiceEndPoint$registerConversation(conversationId, conversationUrl, appDomains, serializerVersion)
+    registerConversation: function Microsoft_Office_Common_ServiceEndPoint$registerConversation(conversationId, conversationUrl, appDomains, serializerVersion, addInSourceLocationSubdomainAllowedIsEnabled)
     {
         var e = Function._validateParams(arguments,[{
                     name: "conversationId",
@@ -4403,9 +4412,16 @@ Microsoft.Office.Common.ServiceEndPoint.prototype = {
                     type: Number,
                     mayBeNull: true,
                     optional: true
+                },{
+                    name: "addInSourceLocationSubdomainAllowedIsEnabled",
+                    type: Boolean,
+                    mayBeNull: true,
+                    optional: true
                 }]);
         if(e)
             throw e;
+        if(addInSourceLocationSubdomainAllowedIsEnabled)
+            this._addInSourceLocationSubdomainAllowedIsEnabled = addInSourceLocationSubdomainAllowedIsEnabled;
         if(appDomains)
         {
             if(!(appDomains instanceof Array))
@@ -4806,6 +4822,25 @@ Microsoft.Office.Common.XdmCommunicationManager = function()
         delete org_parser,app_domain_parser;
         return res
     }
+    function IsOriginSubdomainOfSourceLocation(sourceLocation, messageOrigin)
+    {
+        if(!sourceLocation || !messageOrigin)
+            return false;
+        var sourceLocationParser = document.createElement("a");
+        sourceLocationParser.href = sourceLocation;
+        var messageOriginParser = document.createElement("a");
+        messageOriginParser.href = messageOrigin;
+        var isSameProtocol = sourceLocationParser.protocol === messageOriginParser.protocol;
+        var isSamePort = sourceLocationParser.port === messageOriginParser.port;
+        var originHostName = messageOriginParser.hostname;
+        var sourceLocationHostName = sourceLocationParser.hostname;
+        var isSameDomain = originHostName === sourceLocationHostName;
+        var isSubDomain = false;
+        if(!isSameDomain && originHostName.length > sourceLocationHostName.length + 1)
+            isSubDomain = originHostName.slice(-(sourceLocationHostName.length + 1)) === "." + sourceLocationHostName;
+        var isSameDomainOrSubdomain = isSameDomain || isSubDomain;
+        return isSamePort && isSameProtocol && isSameDomainOrSubdomain
+    }
     function _urlCompare(url_parser1, url_parser2)
     {
         return url_parser1.hostname == url_parser2.hostname && url_parser1.protocol == url_parser2.protocol && url_parser1.port == url_parser2.port
@@ -4839,7 +4874,11 @@ Microsoft.Office.Common.XdmCommunicationManager = function()
                     var allowedDomains = [conversation.url].concat(serviceEndPoint._appDomains[messageObject._conversationId]);
                     if(!_checkOriginWithAppDomains(allowedDomains,e.origin))
                         if(!OfficeExt.appSpecificCheckOrigin(allowedDomains,e,messageObject._origin,_checkOriginWithAppDomains))
-                            throw"Failed origin check";
+                        {
+                            var isOriginSubdomain = serviceEndPoint._addInSourceLocationSubdomainAllowedIsEnabled && IsOriginSubdomainOfSourceLocation(conversation.url,e.origin);
+                            if(!isOriginSubdomain)
+                                throw"Failed origin check";
+                        }
                     var policyManager = serviceEndPoint.getPolicyManager();
                     if(policyManager && !policyManager.checkPermission(messageObject._conversationId,messageObject._actionName,messageObject._data))
                         throw"Access Denied";
@@ -5581,6 +5620,8 @@ OSF.InitializationHelper.prototype.getAppContext = function OSF_InitializationHe
             }
             else
                 settings = appContext._settings;
+            if(appContext._appName === OSF.AppName.OutlookWebApp && !!appContext._requirementMatrix && appContext._requirementMatrix.indexOf("react") == -1)
+                OSF.AgaveHostAction.SendTelemetryEvent = undefined;
             if(!me._hostInfo.isDialog || window.opener == null)
             {
                 var pageUrl = window.location.href;
@@ -5811,6 +5852,14 @@ OSF.InitializationHelper.prototype.initWebAuth = function OSF_InitializationHelp
     {
         appContext.auth = new OSF.DDA.Auth;
         OSF.DDA.DispIdHost.addAsyncMethods(appContext.auth,[OSF.DDA.AsyncMethodNames.GetAccessTokenAsync])
+    }
+};
+OSF.InitializationHelper.prototype.initWebAuthImplicit = function OSF_InitializationHelper$initWebAuthImplicit(appContext)
+{
+    if(OSF.DDA.WebAuth)
+    {
+        appContext.webAuth = new OSF.DDA.WebAuth;
+        OSF.DDA.DispIdHost.addAsyncMethods(appContext.webAuth,[OSF.DDA.AsyncMethodNames.GetAuthContextAsync])
     }
 };
 OSF.getClientEndPoint = function OSF$getClientEndPoint()
@@ -6618,39 +6667,17 @@ var OSFAriaLogger;
                     name: "Message",
                     type: "string"
                 },{
-                    name: "AppId",
-                    type: "string"
-                },{
                     name: "AppURL",
-                    type: "string"
-                },{
-                    name: "UserId",
                     type: "string"
                 },{
                     name: "Host",
                     type: "string"
-                },{
-                    name: "HostVersion",
-                    type: "string"
-                },{
-                    name: "CorrelationId",
-                    type: "string",
-                    rename: "HostSessionId"
                 },{
                     name: "AppSizeWidth",
                     type: "int64"
                 },{
                     name: "AppSizeHeight",
                     type: "int64"
-                },{
-                    name: "AppInstanceId",
-                    type: "string"
-                },{
-                    name: "OfficeJSVersion",
-                    type: "string"
-                },{
-                    name: "HostJSVersion",
-                    type: "string"
                 },{
                     name: "IsFromWacAutomation",
                     type: "string"
@@ -7100,7 +7127,7 @@ var OSFAppTelemetry;
             appInfo.appInstanceId = appInfo.appInstanceId.replace(/[{}]/g,"").toLowerCase();
         appInfo.message = context.get_hostCustomMessage();
         appInfo.officeJSVersion = OSF.ConstantNames.FileVersion;
-        appInfo.hostJSVersion = "16.0.11325.10000";
+        appInfo.hostJSVersion = "16.0.11527.30000";
         if(context._wacHostEnvironment)
             appInfo.wacHostEnvironment = context._wacHostEnvironment;
         if(context._isFromWacAutomation !== undefined && context._isFromWacAutomation !== null)
@@ -7660,6 +7687,12 @@ OSF.DDA.OMFactory.manufactureEventArgs = function OSF_DDA_OMFactory$manufactureE
             else
                 throw OsfMsAjaxFactory.msAjaxError.argument(Microsoft.Office.WebExtension.Parameters.EventType,OSF.OUtil.formatString(Strings.OfficeOM.L_NotSupportedEventType,eventType));
             break;
+        case Microsoft.Office.WebExtension.EventType.InfobarClicked:
+            if(OSF._OfficeAppFactory.getHostInfo()["hostType"] == "outlook")
+                args = new OSF.DDA.OlkInfobarClickedEventArgs(eventProperties);
+            else
+                throw OsfMsAjaxFactory.msAjaxError.argument(Microsoft.Office.WebExtension.Parameters.EventType,OSF.OUtil.formatString(Strings.OfficeOM.L_NotSupportedEventType,eventType));
+            break;
         default:
             throw OsfMsAjaxFactory.msAjaxError.argument(Microsoft.Office.WebExtension.Parameters.EventType,OSF.OUtil.formatString(Strings.OfficeOM.L_NotSupportedEventType,eventType));
     }
@@ -8108,6 +8141,12 @@ OSF.DDA.AsyncMethodCalls.define({
                 types: ["boolean"],
                 defaultValue: true
             }
+        },{
+            name: Microsoft.Office.WebExtension.Parameters.EnforceAppDomain,
+            value: {
+                types: ["boolean"],
+                defaultValue: false
+            }
         }],
     privateStateCallbacks: [],
     onSucceeded: function(args, caller, callArgs)
@@ -8331,6 +8370,11 @@ var OfficeExt;
             {
                 try
                 {
+                    if(dialogInfo[OSF.ShowWindowDialogParameterKeys.EnforceAppDomain] && !checkAppDomain(dialogInfo))
+                    {
+                        showDialogCallback(OSF.DDA.ErrorCodeManager.errorCodes.ooeAppDomains);
+                        return
+                    }
                     if(!dialogInfo[OSF.ShowWindowDialogParameterKeys.PromptBeforeOpen])
                     {
                         showDialog(dialogInfo);
@@ -8628,6 +8672,12 @@ var OfficeExt;
                         if(OSF.AppTelemetry)
                             OSF.AppTelemetry.logAppException("Error happened during storage changed handler." + e)
                     }
+            }
+            function checkAppDomain(dialogInfo)
+            {
+                var appDomains = OSF._OfficeAppFactory.getInitializationHelper()._appContext._appDomains;
+                var url = dialogInfo[OSF.ShowWindowDialogParameterKeys.Url];
+                return Microsoft.Office.Common.XdmCommunicationManager.checkUrlWithAppDomains(appDomains,url)
             }
             function showDialog(dialogInfo)
             {
@@ -9112,6 +9162,24 @@ OSF.DDA.OlkEnhancedLocationsChangedEventArgs = function OSF_DDA_OlkEnhancedLocat
         enhancedLocations: {value: enhancedLocations}
     })
 };
+OSF.OUtil.augmentList(Microsoft.Office.WebExtension.EventType,{InfobarClicked: "olkInfobarClicked"});
+OSF.OUtil.augmentList(OSF.DDA.EventDescriptors,{OlkInfobarClickedData: "OlkInfobarClickedData"});
+OSF.DDA.OlkInfobarClickedEventArgs = function OSF_DDA_OlkInfobarClickedEventArgs(eventData)
+{
+    var infobarDetails;
+    try
+    {
+        infobarDetails = eventData[OSF.DDA.EventDescriptors.OlkInfobarClickedData][0]
+    }
+    catch(e)
+    {
+        infobarDetails = null
+    }
+    OSF.OUtil.defineEnumerableProperties(this,{
+        type: {value: Microsoft.Office.WebExtension.EventType.InfobarClicked},
+        infobarDetails: {value: infobarDetails}
+    })
+};
 OSF.DDA.OlkItemSelectedChangedEventArgs = function OSF_DDA_OlkItemSelectedChangedEventArgs(eventData)
 {
     var initialDataSource = eventData[OSF.DDA.EventDescriptors.OlkItemSelectedData];
@@ -9174,6 +9242,14 @@ OSF.DDA.WAC.Delegate.ParameterMap.define({
     type: OSF.DDA.EventDispId.dispidOlkEnhancedLocationsChangedEvent,
     fromHost: [{
             name: OSF.DDA.EventDescriptors.OlkEnhancedLocationsChangedData,
+            value: OSF.DDA.WAC.Delegate.ParameterMap.self
+        }],
+    isComplexType: true
+});
+OSF.DDA.WAC.Delegate.ParameterMap.define({
+    type: OSF.DDA.EventDispId.dispidOlkInfobarClickedEvent,
+    fromHost: [{
+            name: OSF.DDA.EventDescriptors.OlkInfobarClickedData,
             value: OSF.DDA.WAC.Delegate.ParameterMap.self
         }],
     isComplexType: true
@@ -9925,7 +10001,7 @@ OSF.InitializationHelper.prototype.loadAppSpecificScriptAndCreateOM = function O
         addEventSupport: function()
         {
             if(this._item$p$0)
-                OSF.DDA.DispIdHost["addEventSupport"](this._item$p$0,new OSF.EventDispatch([Microsoft.Office.WebExtension.EventType["RecipientsChanged"],Microsoft.Office.WebExtension.EventType["AppointmentTimeChanged"],Microsoft.Office.WebExtension.EventType["RecurrenceChanged"],Microsoft.Office.WebExtension.EventType["AttachmentsChanged"],Microsoft.Office.WebExtension.EventType["EnhancedLocationsChanged"]]))
+                OSF.DDA.DispIdHost["addEventSupport"](this._item$p$0,new OSF.EventDispatch([Microsoft.Office.WebExtension.EventType["RecipientsChanged"],Microsoft.Office.WebExtension.EventType["AppointmentTimeChanged"],Microsoft.Office.WebExtension.EventType["RecurrenceChanged"],Microsoft.Office.WebExtension.EventType["AttachmentsChanged"],Microsoft.Office.WebExtension.EventType["EnhancedLocationsChanged"],Microsoft.Office.WebExtension.EventType["InfobarClicked"]]))
         },
         windowOpenOverrideHandler: function(url, targetName, features, replace)
         {
@@ -10334,6 +10410,7 @@ OSF.InitializationHelper.prototype.loadAppSpecificScriptAndCreateOM = function O
                 case 159:
                 case 161:
                 case 162:
+                case 163:
                     optionalParameters = data;
                     break;
                 default:
@@ -10827,6 +10904,12 @@ OSF.InitializationHelper.prototype.loadAppSpecificScriptAndCreateOM = function O
         if($h.ScriptHelpers.isNullOrUndefined(itemId))
             throw Error.argumentNull("itemId");
         this.invokeHostMethod(9,{itemId: window["OSF"]["DDA"]["OutlookAppOm"].getItemIdBasedOnHost(itemId)},null)
+    };
+    OSF.DDA.OutlookAppOm.prototype.logTelemetry = function(jsonData)
+    {
+        if($h.ScriptHelpers.isNullOrUndefined(jsonData))
+            throw Error.argumentNull("jsonData");
+        this.invokeHostMethod(163,{telemetryData: jsonData},null)
     };
     OSF.DDA.OutlookAppOm.prototype.RegisterConsentAsync = function(consentState)
     {
@@ -14218,6 +14301,7 @@ OSF.InitializationHelper.prototype.loadAppSpecificScriptAndCreateOM = function O
         getMasterCategoriesAsync: 160,
         addMasterCategoriesAsync: 161,
         removeMasterCategoriesAsync: 162,
+        logTelemetry: 163,
         trackCtq: 400,
         recordTrace: 401,
         recordDataPoint: 402,

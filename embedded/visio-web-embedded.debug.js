@@ -17,9 +17,9 @@
 
 // Sources:
 // osfweb: none
-// runtime: 16.0.11422.30006
-// core: 16.0\11502.10000
-// host: visio 16.0.11504.34950
+// runtime: 16.0.11525.30007
+// core: 16.0\11603.10000
+// host: visio 16.0.11604.34950
 
 var __extends=(this && this.__extends) || (function () {
 	var extendStatics=function (d, b) {
@@ -6317,10 +6317,11 @@ var OfficeFirstPartyAuth;
 		ErrorCode.PackageNotLoaded="PackageNotLoaded";
 		return ErrorCode;
 	}());
+	var WebAuthReplyUrlsStorageKey="officeWebAuthReplyUrls";
 	var retrievedAuthContext=false;
 	var errorMessage;
 	OfficeFirstPartyAuth.debugging=false;
-	function load(replyurl) {
+	function load(replyUrl) {
 		if (OSF.WebAuth && OSF._OfficeAppFactory.getHostInfo().hostPlatform=="web") {
 			try {
 				if (!Office || !Office.context || !Office.context.webAuth) {
@@ -6333,28 +6334,36 @@ var OfficeFirstPartyAuth;
 						if (!authContext || authContext.isAnonymous) {
 							return false;
 						}
-						var appid=authContext.appId;
-						var regexp=/aad:([0-9a-f-]+);msa:([0-9a-f-]+)/gi;
-						var apps=regexp.exec(authContext.appId);
-						if (apps && apps.length==3) {
-							appid=(authContext.authorityType.toLowerCase()=="msa")
-								? apps[2]
-								: apps[1];
-						}
-						var config={
-							authority: authContext.authority,
-							appId: appid,
-							redirectUri: (replyurl) ? replyurl : null,
-							upn: authContext.upn
-						};
 						OSF.WebAuth.config={
 							idp: authContext.authorityType.toLowerCase(),
-							aadConfig: config,
-							msaConfig: config,
-							enableConsoleLogging: OfficeFirstPartyAuth.debugging
+							aadConfig: {
+								authority: (OfficeFirstPartyAuth.authorityOverride && OfficeFirstPartyAuth.debugging) ? OfficeFirstPartyAuth.authorityOverride : authContext.authority,
+								appId: authContext.appId,
+								redirectUri: (replyUrl) ? replyUrl : null,
+								upn: authContext.upn
+							},
+							msaConfig: {
+								authority: (OfficeFirstPartyAuth.authorityOverride && OfficeFirstPartyAuth.debugging) ? OfficeFirstPartyAuth.authorityOverride : authContext.authority,
+								appId: (authContext.msaAppId) ? authContext.msaAppId : authContext.appId,
+								redirectUri: (replyUrl) ? replyUrl : null,
+								upn: authContext.upn
+							},
+							enableConsoleLogging: OfficeFirstPartyAuth.debugging,
+							telemetry: { HashedUserId: authContext.userId }
 						};
-						OSF.WebAuth.load();
-						return OSF.WebAuth.loaded;
+						OSF.WebAuth.load(function (loaded) {
+							logLoadEvent(loaded);
+							return loaded;
+						});
+						var finalReplyUrl=(replyUrl) ? replyUrl : window.location.href.split("?")[0];
+						var replyUrls=sessionStorage.getItem(WebAuthReplyUrlsStorageKey);
+						if (replyUrls || replyUrls==="") {
+							replyUrls=finalReplyUrl;
+						}
+						else {
+							replyUrls+=", "+finalReplyUrl;
+						}
+						sessionStorage.setItem(WebAuthReplyUrlsStorageKey, replyUrls);
 					}
 					else {
 						retrievedAuthContext=false;
@@ -6368,33 +6377,27 @@ var OfficeFirstPartyAuth;
 				OSF.WebAuth.config=null;
 				errorMessage=e;
 			}
-			OSF.WebAuth.load();
-			return OSF.WebAuth.loaded;
+			OSF.WebAuth.load(function (loaded) {
+				return loaded;
+			});
 		}
-		return false;
+		return true;
 	}
 	OfficeFirstPartyAuth.load=load;
 	function getAccessToken(options, behaviorOption) {
-		if (OSF.WebAuth && OSF._OfficeAppFactory.getHostInfo().hostPlatform=="web") {
+		if (OSF.WebAuth && OSF.WebAuth.loaded && OSF._OfficeAppFactory.getHostInfo().hostPlatform=="web") {
 			return new OfficeExtension.CoreUtility.Promise(function (resolve, reject) {
-				if (!OSF.WebAuth.loaded) {
-					if (!retrievedAuthContext) {
-						reject({ code: ErrorCode.CannotGetAuthContext, message: errorMessage });
-					}
-					reject({
-						code: ErrorCode.PackageNotLoaded,
-						message: (Strings && Strings.OfficeOM.L_ImplicitNotLoaded) ? Strings.OfficeOM.L_ImplicitNotLoaded : ErrorCode.PackageNotLoaded
-					});
-				}
-				if (behaviorOption.forceRefresh) {
+				if (behaviorOption && behaviorOption.forceRefresh) {
 					OSF.WebAuth.clearCache();
 				}
 				var identityType=(OSF.WebAuth.config.idp.toLowerCase()=="msa")
 					? OfficeCore.IdentityType.microsoftAccount
 					: OfficeCore.IdentityType.organizationAccount;
-				OSF.WebAuth.getToken(options.resource, (behaviorOption.popup) ? behaviorOption.popup : null).then(function (result) {
+				OSF.WebAuth.getToken(options.resource, (behaviorOption && behaviorOption.popup) ? behaviorOption.popup : null).then(function (result) {
+					logAcquireEvent(true, options.resource, (behaviorOption && behaviorOption.popup) ? behaviorOption.popup : null);
 					resolve({ accessToken: result.Token, tokenIdenityType: identityType });
 				})["catch"](function (result) {
+					logAcquireEvent(false, options.resource, (behaviorOption && behaviorOption.popup) ? behaviorOption.popup : null, result.ErrorCode);
 					reject({ code: result.ErrorCode, message: result.ErrorMessage });
 				});
 			});
@@ -6460,6 +6463,73 @@ var OfficeFirstPartyAuth;
 		return context.sync().then(function () { return result.value; });
 	}
 	OfficeFirstPartyAuth.getPrimaryIdentityInfo=getPrimaryIdentityInfo;
+	function logLoadEvent(result) {
+		if (OfficeFirstPartyAuth.debugging) {
+			console.log("Logging Implicit load event");
+		}
+		if (typeof OTel !=="undefined") {
+			OTel.OTelLogger.onTelemetryLoaded(function () {
+				var telemetryData=[
+					oteljs.makeStringDataField('IdentityProvider', OSF.WebAuth.config.idp),
+					oteljs.makeStringDataField('AppId', (OSF.WebAuth.config.idp.toLowerCase()=="msa")
+						? OSF.WebAuth.config.msaConfig.appId
+						: OSF.WebAuth.config.aadConfig.appId),
+					oteljs.makeBooleanDataField('Js', typeof Implicit !=="undefined" ? true : false),
+					oteljs.makeBooleanDataField('Result', result)
+				];
+				if (OSF.WebAuth.config.telemetry) {
+					for (var key in OSF.WebAuth.config.telemetry) {
+						telemetryData.push(oteljs.makeStringDataField(key, OSF.WebAuth.config.telemetry[key]));
+					}
+				}
+				OTel.OTelLogger.sendTelemetryEvent({
+					eventName: "Office.Extensibility.OfficeJs.OfficeFirstPartyAuth.Load",
+					dataFields: telemetryData,
+					eventFlags: {
+						dataCategories: oteljs.DataCategories.ProductServiceUsage
+					}
+				});
+			});
+		}
+	}
+	function logAcquireEvent(result, target, popup, message) {
+		if (OfficeFirstPartyAuth.debugging) {
+			console.log("Logging Implicit acquire event");
+		}
+		if (typeof OTel !=="undefined") {
+			OTel.OTelLogger.onTelemetryLoaded(function () {
+				var telemetryData=[
+					oteljs.makeStringDataField('IdentityProvider', OSF.WebAuth.config.idp),
+					oteljs.makeStringDataField('AppId', (OSF.WebAuth.config.idp.toLowerCase()=="msa")
+						? OSF.WebAuth.config.msaConfig.appId
+						: OSF.WebAuth.config.aadConfig.appId),
+					oteljs.makeStringDataField('Target', target),
+					oteljs.makeBooleanDataField('Popup', (typeof popup==="boolean") ? popup : false),
+					oteljs.makeBooleanDataField('Result', result),
+					oteljs.makeStringDataField('Error', message)
+				];
+				if (OSF.WebAuth.config.telemetry) {
+					for (var key in OSF.WebAuth.config.telemetry) {
+						telemetryData.push(oteljs.makeStringDataField(key, OSF.WebAuth.config.telemetry[key]));
+					}
+				}
+				OTel.OTelLogger.sendTelemetryEvent({
+					eventName: "Office.Extensibility.OfficeJs.OfficeFirstPartyAuth.GetAccessToken",
+					dataFields: telemetryData,
+					eventFlags: {
+						dataCategories: oteljs.DataCategories.ProductServiceUsage
+					}
+				});
+			});
+		}
+	}
+	function loadWebAuthForReplyPage() {
+		var webAuthRedirectUrls=sessionStorage.getItem(WebAuthReplyUrlsStorageKey);
+		if (webAuthRedirectUrls !==null && webAuthRedirectUrls.indexOf(window.location.origin+window.location.pathname) !==-1) {
+			load();
+		}
+	}
+	loadWebAuthForReplyPage();
 })(OfficeFirstPartyAuth || (OfficeFirstPartyAuth={}));
 var OfficeCore;
 (function (OfficeCore) {
@@ -6537,6 +6607,10 @@ var OfficeCore;
 		});
 		AuthenticationService.prototype.getAccessToken=function (tokenParameters, targetId) {
 			return _invokeMethod(this, "GetAccessToken", 1, [tokenParameters, targetId], 4 | 1, 0);
+		};
+		AuthenticationService.prototype.getIdentities=function () {
+			_throwIfApiNotSupported("AuthenticationService.getIdentities", "FirstPartyAuthentication", "1.3", _hostName);
+			return _invokeMethod(this, "GetIdentities", 1, [], 4 | 1, 0);
 		};
 		AuthenticationService.prototype.getPrimaryIdentityInfo=function () {
 			_throwIfApiNotSupported("AuthenticationService.getPrimaryIdentityInfo", "FirstPartyAuthentication", "1.2", _hostName);

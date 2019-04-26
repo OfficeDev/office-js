@@ -16,10 +16,10 @@
 
 
 // Sources:
-// osfweb: 16.0\11423.10000
-// runtime: 16.0.11505.30001
-// core: 16.0\11509.10000
-// host: 16.0\11509.10000
+// osfweb: 16.0\11519.10000
+// runtime: 16.0.11525.30007
+// core: 16.0\11603.10000
+// host: 16.0\11603.10000
 
 var __extends=(this && this.__extends) || function (d, b) {
 	for (var p in b)
@@ -5435,7 +5435,7 @@ var OSFAriaLogger;
 			}
 		};
 		AriaLogger.EnableSendingTelemetryWithOTel=true;
-		AriaLogger.EnableSendingTelemetryWithLegacyAria=true;
+		AriaLogger.EnableSendingTelemetryWithLegacyAria=false;
 		return AriaLogger;
 	})();
 	OSFAriaLogger.AriaLogger=AriaLogger;
@@ -5663,7 +5663,7 @@ var OSFAppTelemetry;
 		}
 		appInfo.message=context.get_hostCustomMessage();
 		appInfo.officeJSVersion=OSF.ConstantNames.FileVersion;
-		appInfo.hostJSVersion="16.0.11509.10000";
+		appInfo.hostJSVersion="16.0.11603.10000";
 		if (context._wacHostEnvironment) {
 			appInfo.wacHostEnvironment=context._wacHostEnvironment;
 		}
@@ -14902,10 +14902,11 @@ var OfficeFirstPartyAuth;
 		ErrorCode.PackageNotLoaded="PackageNotLoaded";
 		return ErrorCode;
 	}());
+	var WebAuthReplyUrlsStorageKey="officeWebAuthReplyUrls";
 	var retrievedAuthContext=false;
 	var errorMessage;
 	OfficeFirstPartyAuth.debugging=false;
-	function load(replyurl) {
+	function load(replyUrl) {
 		if (OSF.WebAuth && OSF._OfficeAppFactory.getHostInfo().hostPlatform=="web") {
 			try {
 				if (!Office || !Office.context || !Office.context.webAuth) {
@@ -14923,21 +14924,31 @@ var OfficeFirstPartyAuth;
 							aadConfig: {
 								authority: (OfficeFirstPartyAuth.authorityOverride && OfficeFirstPartyAuth.debugging) ? OfficeFirstPartyAuth.authorityOverride : authContext.authority,
 								appId: authContext.appId,
-								redirectUri: (replyurl) ? replyurl : null,
+								redirectUri: (replyUrl) ? replyUrl : null,
 								upn: authContext.upn
 							},
 							msaConfig: {
 								authority: (OfficeFirstPartyAuth.authorityOverride && OfficeFirstPartyAuth.debugging) ? OfficeFirstPartyAuth.authorityOverride : authContext.authority,
 								appId: (authContext.msaAppId) ? authContext.msaAppId : authContext.appId,
-								redirectUri: (replyurl) ? replyurl : null,
+								redirectUri: (replyUrl) ? replyUrl : null,
 								upn: authContext.upn
 							},
 							enableConsoleLogging: OfficeFirstPartyAuth.debugging,
 							telemetry: { HashedUserId: authContext.userId }
 						};
-						OSF.WebAuth.load();
-						logLoadEvent();
-						return OSF.WebAuth.loaded;
+						OSF.WebAuth.load(function (loaded) {
+							logLoadEvent(loaded);
+							return loaded;
+						});
+						var finalReplyUrl=(replyUrl) ? replyUrl : window.location.href.split("?")[0];
+						var replyUrls=sessionStorage.getItem(WebAuthReplyUrlsStorageKey);
+						if (replyUrls || replyUrls==="") {
+							replyUrls=finalReplyUrl;
+						}
+						else {
+							replyUrls+=", "+finalReplyUrl;
+						}
+						sessionStorage.setItem(WebAuthReplyUrlsStorageKey, replyUrls);
 					}
 					else {
 						retrievedAuthContext=false;
@@ -14951,26 +14962,27 @@ var OfficeFirstPartyAuth;
 				OSF.WebAuth.config=null;
 				errorMessage=e;
 			}
-			OSF.WebAuth.load();
-			return OSF.WebAuth.loaded;
+			OSF.WebAuth.load(function (loaded) {
+				return loaded;
+			});
 		}
-		return false;
+		return true;
 	}
 	OfficeFirstPartyAuth.load=load;
 	function getAccessToken(options, behaviorOption) {
 		if (OSF.WebAuth && OSF.WebAuth.loaded && OSF._OfficeAppFactory.getHostInfo().hostPlatform=="web") {
 			return new OfficeExtension.CoreUtility.Promise(function (resolve, reject) {
-				if (behaviorOption.forceRefresh) {
+				if (behaviorOption && behaviorOption.forceRefresh) {
 					OSF.WebAuth.clearCache();
 				}
 				var identityType=(OSF.WebAuth.config.idp.toLowerCase()=="msa")
 					? OfficeCore.IdentityType.microsoftAccount
 					: OfficeCore.IdentityType.organizationAccount;
-				OSF.WebAuth.getToken(options.resource, (behaviorOption.popup) ? behaviorOption.popup : null).then(function (result) {
-					logAcquireEvent(true, options.resource, (behaviorOption.popup) ? behaviorOption.popup : null);
+				OSF.WebAuth.getToken(options.resource, (behaviorOption && behaviorOption.popup) ? behaviorOption.popup : null).then(function (result) {
+					logAcquireEvent(true, options.resource, (behaviorOption && behaviorOption.popup) ? behaviorOption.popup : null);
 					resolve({ accessToken: result.Token, tokenIdenityType: identityType });
 				})["catch"](function (result) {
-					logAcquireEvent(true, options.resource, (behaviorOption.popup) ? behaviorOption.popup : null, result.ErrorCode);
+					logAcquireEvent(false, options.resource, (behaviorOption && behaviorOption.popup) ? behaviorOption.popup : null, result.ErrorCode);
 					reject({ code: result.ErrorCode, message: result.ErrorMessage });
 				});
 			});
@@ -15036,7 +15048,10 @@ var OfficeFirstPartyAuth;
 		return context.sync().then(function () { return result.value; });
 	}
 	OfficeFirstPartyAuth.getPrimaryIdentityInfo=getPrimaryIdentityInfo;
-	function logLoadEvent() {
+	function logLoadEvent(result) {
+		if (OfficeFirstPartyAuth.debugging) {
+			console.log("Logging Implicit load event");
+		}
 		if (typeof OTel !=="undefined") {
 			OTel.OTelLogger.onTelemetryLoaded(function () {
 				var telemetryData=[
@@ -15045,7 +15060,7 @@ var OfficeFirstPartyAuth;
 						? OSF.WebAuth.config.msaConfig.appId
 						: OSF.WebAuth.config.aadConfig.appId),
 					oteljs.makeBooleanDataField('Js', typeof Implicit !=="undefined" ? true : false),
-					oteljs.makeBooleanDataField('Result', OSF.WebAuth.loaded)
+					oteljs.makeBooleanDataField('Result', result)
 				];
 				if (OSF.WebAuth.config.telemetry) {
 					for (var key in OSF.WebAuth.config.telemetry) {
@@ -15063,6 +15078,9 @@ var OfficeFirstPartyAuth;
 		}
 	}
 	function logAcquireEvent(result, target, popup, message) {
+		if (OfficeFirstPartyAuth.debugging) {
+			console.log("Logging Implicit acquire event");
+		}
 		if (typeof OTel !=="undefined") {
 			OTel.OTelLogger.onTelemetryLoaded(function () {
 				var telemetryData=[
@@ -15090,6 +15108,13 @@ var OfficeFirstPartyAuth;
 			});
 		}
 	}
+	function loadWebAuthForReplyPage() {
+		var webAuthRedirectUrls=sessionStorage.getItem(WebAuthReplyUrlsStorageKey);
+		if (webAuthRedirectUrls !==null && webAuthRedirectUrls.indexOf(window.location.origin+window.location.pathname) !==-1) {
+			load();
+		}
+	}
+	loadWebAuthForReplyPage();
 })(OfficeFirstPartyAuth || (OfficeFirstPartyAuth={}));
 var OfficeCore;
 (function (OfficeCore) {
@@ -15799,9 +15824,9 @@ var PowerPoint;
 			_throwIfApiNotSupported("Application.insertHyperLink", _defaultApiSetName, "1.1", _hostName);
 			_invokeMethod(this, "InsertHyperLink", 0, [address, displayName], 1, 0);
 		};
-		Application.prototype.insertSlideFromContent=function (slideContent, slideContentSize) {
+		Application.prototype.insertSlideFromContent=function (slideContent) {
 			_throwIfApiNotSupported("Application.insertSlideFromContent", _defaultApiSetName, "1.1", _hostName);
-			return _invokeMethod(this, "InsertSlideFromContent", 0, [slideContent, slideContentSize], 1, 0);
+			return _invokeMethod(this, "InsertSlideFromContent", 0, [slideContent], 1, 0);
 		};
 		Application.prototype._handleResult=function (value) {
 			_super.prototype._handleResult.call(this, value);
@@ -15958,4 +15983,5 @@ var PowerPoint;
 	PowerPoint.createPresentation=createPresentation;
 })(PowerPoint || (PowerPoint={}));
 OSFAriaLogger.AriaLogger.EnableSendingTelemetryWithOTel=true;
+OSFAriaLogger.AriaLogger.EnableSendingTelemetryWithLegacyAria=true;
 

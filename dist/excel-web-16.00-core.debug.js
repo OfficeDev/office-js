@@ -5944,17 +5944,10 @@ var OSFAriaLogger;
     var TelemetryEventAppActivated = { name: "AppActivated", enabled: true, basic: true, critical: true, points: [
             { name: "Browser", type: "string" },
             { name: "Message", type: "string" },
-            { name: "AppId", type: "string" },
             { name: "AppURL", type: "string" },
-            { name: "UserId", type: "string" },
             { name: "Host", type: "string" },
-            { name: "HostVersion", type: "string" },
-            { name: "CorrelationId", type: "string", rename: "HostSessionId" },
             { name: "AppSizeWidth", type: "int64" },
             { name: "AppSizeHeight", type: "int64" },
-            { name: "AppInstanceId", type: "string" },
-            { name: "OfficeJSVersion", type: "string" },
-            { name: "HostJSVersion", type: "string" },
             { name: "IsFromWacAutomation", type: "string" },
         ] };
     var TelemetryEventScriptLoad = { name: "ScriptLoad", enabled: true, basic: false, critical: false, points: [
@@ -6125,7 +6118,7 @@ var OSFAriaLogger;
             }
         };
         AriaLogger.EnableSendingTelemetryWithOTel = true;
-        AriaLogger.EnableSendingTelemetryWithLegacyAria = true;
+        AriaLogger.EnableSendingTelemetryWithLegacyAria = false;
         return AriaLogger;
     })();
     OSFAriaLogger.AriaLogger = AriaLogger;
@@ -8133,10 +8126,11 @@ OSF.InitializationHelper.prototype.prepareApiSurface = function OSF_Initializati
     Object.defineProperty(exports, "__esModule", {
         value: !0
     });
-    var AsyncStorage = __webpack_require__(1), DialogApi = __webpack_require__(2);
+    var AsyncStorage = __webpack_require__(1), DialogApi = __webpack_require__(2), officeruntime_storage_web_1 = __webpack_require__(4);
     window._OfficeRuntimeWeb = {
         displayWebDialog: DialogApi.displayWebDialog,
-        AsyncStorage: AsyncStorage
+        AsyncStorage: AsyncStorage,
+        storage: officeruntime_storage_web_1.storage
     };
 }, function(module, exports, __webpack_require__) {
     "use strict";
@@ -8300,4 +8294,101 @@ OSF.InitializationHelper.prototype.prepareApiSurface = function OSF_Initializati
     };
 }, function(module, exports) {
     module.exports = OfficeExtensionBatch;
+}, function(module, exports, __webpack_require__) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", {
+        value: !0
+    });
+    var prefix = "_OfficeRuntime_Storage_", dummyUnusedKey = prefix + "|_unusedKey_";
+    function ensureFreshLocalStorage() {
+        window.localStorage.setItem(dummyUnusedKey, null), window.localStorage.removeItem(dummyUnusedKey);
+    }
+    function performAction(action) {
+        return new Promise(function(resolve, reject) {
+            try {
+                ensureFreshLocalStorage(), action(), resolve();
+            } catch (e) {
+                reject(e);
+            }
+        });
+    }
+    function performActionAndReturnResult(action) {
+        return new Promise(function(resolve, reject) {
+            try {
+                ensureFreshLocalStorage(), resolve(action());
+            } catch (e) {
+                reject(e);
+            }
+        });
+    }
+    function performMultiAction(collection, action) {
+        return new Promise(function(resolve, reject) {
+            var errors = [];
+            try {
+                ensureFreshLocalStorage();
+            } catch (e) {
+                errors.push(e);
+            }
+            for (var key in collection) if (collection.hasOwnProperty(key) || Array.isArray(collection)) try {
+                Array.isArray(collection) ? action(collection[key]) : action(key);
+            } catch (e) {
+                errors.push(e);
+            }
+            errors.length > 0 ? reject(new Error("Unknown error.")) : resolve();
+        });
+    }
+    exports.storage = {
+        getItem: function(key) {
+            return performActionAndReturnResult(function() {
+                return window.localStorage.getItem(prefix + key);
+            });
+        },
+        setItem: function(key, value) {
+            return performAction(function() {
+                return window.localStorage.setItem(prefix + key, value);
+            });
+        },
+        removeItem: function(key) {
+            return performAction(function() {
+                return window.localStorage.removeItem(prefix + key);
+            });
+        },
+        getItems: function(keys) {
+            return new Promise(function(resolve, reject) {
+                var result = {}, errors = [];
+                try {
+                    ensureFreshLocalStorage();
+                } catch (e) {
+                    reject(e);
+                }
+                keys.forEach(function(key) {
+                    try {
+                        var value = window.localStorage.getItem(prefix + key);
+                        result[key] = value || null;
+                    } catch (e) {
+                        errors.push(e);
+                    }
+                }), errors.length > 0 ? reject(new Error("Unknown error.")) : resolve(result);
+            });
+        },
+        setItems: function(keyValues) {
+            return performMultiAction(keyValues, function(key) {
+                return window.localStorage.setItem(prefix + key, keyValues[key]);
+            });
+        },
+        removeItems: function(keys) {
+            return performMultiAction(keys, function(key) {
+                window.localStorage.removeItem(prefix + key);
+            });
+        },
+        getKeys: function() {
+            return performActionAndReturnResult(function() {
+                return Object.keys(window.localStorage).filter(function(fullKey) {
+                    return 0 === fullKey.indexOf(prefix);
+                }).map(function(fullKey) {
+                    return fullKey.substr(prefix.length);
+                });
+            });
+        }
+    };
 } ]);

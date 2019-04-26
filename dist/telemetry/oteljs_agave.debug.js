@@ -3162,6 +3162,8 @@ var oteljs_agave = function(modules) {
         DiagnosticLevel[DiagnosticLevel["ReservedDoNotUse"] = 0] = "ReservedDoNotUse";
         DiagnosticLevel[DiagnosticLevel["BasicEvent"] = 10] = "BasicEvent";
         DiagnosticLevel[DiagnosticLevel["FullEvent"] = 100] = "FullEvent";
+        DiagnosticLevel[DiagnosticLevel["NecessaryServiceDataEvent"] = 110] = "NecessaryServiceDataEvent";
+        DiagnosticLevel[DiagnosticLevel["AlwaysOnNecessaryServiceDataEvent"] = 120] = "AlwaysOnNecessaryServiceDataEvent";
     })(DiagnosticLevel || (DiagnosticLevel = {}));
     function isWacAgave() {
         if (typeof Office !== "undefined" && typeof Office.context !== "undefined" && typeof Office.context.platform !== "undefined") {
@@ -3602,7 +3604,7 @@ var oteljs_agave = function(modules) {
             this._fullEventsEnabled = false;
         }
         FullEventProcessor.prototype.processEvent = function(event) {
-            return this._fullEventsEnabled || !!event.eventFlags && event.eventFlags.diagnosticLevel === DiagnosticLevel.BasicEvent;
+            return this._fullEventsEnabled || !!event.eventFlags && (event.eventFlags.diagnosticLevel === DiagnosticLevel.BasicEvent || event.eventFlags.diagnosticLevel === DiagnosticLevel.NecessaryServiceDataEvent || event.eventFlags.diagnosticLevel === DiagnosticLevel.AlwaysOnNecessaryServiceDataEvent);
         };
         FullEventProcessor.prototype.setFullEventsEnabled = function(enabled) {
             this._fullEventsEnabled = enabled;
@@ -3664,6 +3666,22 @@ var oteljs_agave = function(modules) {
         }
         Utils.newGuid = newGuid;
     })(Utils_Utils || (Utils_Utils = {}));
+    var OutlookSink_OutlookSink = function() {
+        function OutlookSink() {}
+        OutlookSink.isSupported = function() {
+            return !!Office && Office.context.requirements.isSetSupported("OutlookTelemetry", 1);
+        };
+        OutlookSink.prototype.sendTelemetryEvent = function(event) {
+            if (event.eventName.match(/^Office\.Extensibility\.OfficeJs\.[a-zA-Z]*$/)) {
+                Office.context.mailbox.logTelemetry(JSON.stringify(event));
+            } else {
+                logNotification(LogLevel.Warning, Category.Sink, function() {
+                    return "Outlook only accepts OfficeJS telemetry events";
+                });
+            }
+        };
+        return OutlookSink;
+    }();
     var __assign = undefined && undefined.__assign || Object.assign || function(t) {
         for (var s, i = 1, n = arguments.length; i < n; i++) {
             s = arguments[i];
@@ -3717,6 +3735,8 @@ var oteljs_agave = function(modules) {
                 } else {
                     this.failToInitialize();
                 }
+            } else if (OutlookSink_OutlookSink.isSupported()) {
+                this.connectOutlookSink();
             } else {
                 this._awaitingInitialization = true;
                 getRichApiSink(false, this.onGetRichApi.bind(this));
@@ -3767,6 +3787,12 @@ var oteljs_agave = function(modules) {
                     return "AgaveSink does not have an underlying sink";
                 });
             }
+        };
+        AgaveSink.prototype.connectOutlookSink = function() {
+            this._sink = new OutlookSink_OutlookSink();
+            logNotification(LogLevel.Info, Category.Sink, function() {
+                return "AgaveSink is using OutlookSink";
+            });
         };
         AgaveSink.prototype.connectRichApiSink = function(sink) {
             this._sink = sink;

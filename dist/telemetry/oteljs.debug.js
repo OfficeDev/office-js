@@ -736,6 +736,8 @@ var oteljs = function(modules) {
         DiagnosticLevel[DiagnosticLevel["ReservedDoNotUse"] = 0] = "ReservedDoNotUse";
         DiagnosticLevel[DiagnosticLevel["BasicEvent"] = 10] = "BasicEvent";
         DiagnosticLevel[DiagnosticLevel["FullEvent"] = 100] = "FullEvent";
+        DiagnosticLevel[DiagnosticLevel["NecessaryServiceDataEvent"] = 110] = "NecessaryServiceDataEvent";
+        DiagnosticLevel[DiagnosticLevel["AlwaysOnNecessaryServiceDataEvent"] = 120] = "AlwaysOnNecessaryServiceDataEvent";
     })(DiagnosticLevel || (DiagnosticLevel = {}));
     function getEffectiveEventFlags(telemetryEvent) {
         var eventFlags = {
@@ -888,6 +890,7 @@ var oteljs = function(modules) {
         }
         TenantTokenManager.clear = clear;
     })(TenantTokenManager_TenantTokenManager || (TenantTokenManager_TenantTokenManager = {}));
+    var oteljsVersion = "3.1.7";
     var SuppressNexus = -1;
     var SimpleTelemetryLogger_SimpleTelemetryLogger = function() {
         function SimpleTelemetryLogger(parent, persistentDataFields) {
@@ -899,6 +902,8 @@ var oteljs = function(modules) {
             if (parent) {
                 this.onSendEvent = parent.onSendEvent;
                 (_a = this.persistentDataFields).push.apply(_a, parent.persistentDataFields);
+            } else {
+                this.persistentDataFields.push(makeStringDataField("OTelJS.Version", oteljsVersion));
             }
             if (persistentDataFields) {
                 (_b = this.persistentDataFields).push.apply(_b, persistentDataFields);
@@ -1152,9 +1157,13 @@ var oteljs = function(modules) {
             });
         };
         TelemetryLogger.prototype.sendError = function(error) {
+            var dataFields = Office_System_Error_Error.getFields("Error", error.error);
+            if (error.dataFields != null) {
+                dataFields.push.apply(dataFields, error.dataFields);
+            }
             return this.sendTelemetryEvent({
                 eventName: error.eventName,
-                dataFields: Office_System_Error_Error.getFields("Error", error.error),
+                dataFields: dataFields,
                 eventFlags: error.eventFlags
             });
         };
