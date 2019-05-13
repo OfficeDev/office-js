@@ -890,14 +890,12 @@ var oteljs = function(modules) {
         }
         TenantTokenManager.clear = clear;
     })(TenantTokenManager_TenantTokenManager || (TenantTokenManager_TenantTokenManager = {}));
-    var oteljsVersion = "3.1.7";
+    var oteljsVersion = "3.1.9";
     var SuppressNexus = -1;
     var SimpleTelemetryLogger_SimpleTelemetryLogger = function() {
         function SimpleTelemetryLogger(parent, persistentDataFields) {
             var _a, _b;
             this.onSendEvent = new Event();
-            this.telemetryEnabled = true;
-            this.queriedForTelemetryEnabled = false;
             this.persistentDataFields = [];
             if (parent) {
                 this.onSendEvent = parent.onSendEvent;
@@ -911,9 +909,6 @@ var oteljs = function(modules) {
         }
         SimpleTelemetryLogger.prototype.sendTelemetryEvent = function(event) {
             try {
-                if (!this.isTelemetryEnabled()) {
-                    return;
-                }
                 if (this.onSendEvent.getListenerCount() === 0) {
                     logNotification(LogLevel.Warning, Category.Core, function() {
                         return "No telemetry sinks are attached.";
@@ -954,10 +949,6 @@ var oteljs = function(modules) {
         SimpleTelemetryLogger.prototype.setTenantTokens = function(tokenTree) {
             TenantTokenManager_TenantTokenManager.setTenantTokens(tokenTree);
         };
-        SimpleTelemetryLogger.prototype.setIsTelemetryEnabled_TestOnly = function(enabled) {
-            this.telemetryEnabled = enabled;
-            this.queriedForTelemetryEnabled = true;
-        };
         SimpleTelemetryLogger.prototype.cloneEvent = function(event) {
             var localEvent = {
                 eventName: event.eventName,
@@ -977,24 +968,6 @@ var oteljs = function(modules) {
             }
             localEvent.dataFields = !!event.dataFields ? event.dataFields.slice() : [];
             return localEvent;
-        };
-        SimpleTelemetryLogger.prototype.isTelemetryEnabled = function() {
-            if (!this.queriedForTelemetryEnabled) {
-                this.telemetryEnabled = this.isTelemetryEnabledInternal();
-                this.queriedForTelemetryEnabled = true;
-            }
-            return this.telemetryEnabled;
-        };
-        SimpleTelemetryLogger.prototype.isTelemetryEnabledInternal = function() {
-            if (typeof OSF !== "undefined") {
-                if (typeof OSF.AppTelemetry === "undefined" || typeof OSF.AppTelemetry.enableTelemetry === "undefined" || OSF.AppTelemetry.enableTelemetry === false) {
-                    logNotification(LogLevel.Warning, Category.Core, function() {
-                        return "AppTelemetry is disabled for this platform.";
-                    });
-                    return false;
-                }
-            }
-            return true;
         };
         return SimpleTelemetryLogger;
     }();

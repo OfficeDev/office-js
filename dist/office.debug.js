@@ -1180,13 +1180,12 @@ var OTel;
                 browserToken: info.clientId,
                 instanceId: info.appInstanceId,
                 name: info.name,
-                osfRuntimeVersion: OSF.ConstantNames.FileVersion,
                 sessionId: info.sessionId
             };
             var fields = oteljs.Contracts.Office.System.SDX.getFields("SDX", contract);
             var host = OTelLogger.getHost();
             var flavor = OTelLogger.getFlavor();
-            var version = info.hostVersion;
+            var version = (flavor === "Web" && info.hostVersion.slice(0, 2) === "0.") ? "16.0.0.0" : info.hostVersion;
             var context = {
                 'App.Name': host,
                 'App.Platform': flavor,
@@ -1358,6 +1357,7 @@ OSF._OfficeAppFactory = (function OSF__OfficeAppFactory() {
             _officeOnReadyPendingResolves.shift()(_officeOnReadyHostAndPlatformInfo);
         }
     };
+    Microsoft.Office.WebExtension.FeatureGates = {};
     Microsoft.Office.WebExtension.sendTelemetryEvent = function Microsoft_Office_WebExtension_sendTelemetryEvent(telemetryEvent) {
         OTel.OTelLogger.sendTelemetryEvent(telemetryEvent);
     };
@@ -1612,6 +1612,12 @@ OSF._OfficeAppFactory = (function OSF__OfficeAppFactory() {
                         OSF.AppTelemetry.logAppCommonMessage("getAppContextAsync callback start");
                     }
                     _appInstanceId = appContext._appInstanceId;
+                    if (appContext.get_featureGates) {
+                        var featureGates = appContext.get_featureGates();
+                        if (featureGates) {
+                            Microsoft.Office.WebExtension.FeatureGates = featureGates;
+                        }
+                    }
                     var updateVersionInfo = function updateVersionInfo() {
                         var hostVersionItems = _hostInfo.hostSpecificFileVersion.split(".");
                         if (appContext.get_appMinorVersion) {
