@@ -61,7 +61,7 @@ var oteljs_agave = function(modules) {
         return Object.prototype.hasOwnProperty.call(object, property);
     };
     __webpack_require__.p = "";
-    return __webpack_require__(__webpack_require__.s = 21);
+    return __webpack_require__(__webpack_require__.s = 22);
 }([ function(module, exports, __webpack_require__) {
     "use strict";
     Object.defineProperty(exports, "__esModule", {
@@ -618,7 +618,7 @@ var oteljs_agave = function(modules) {
     exports.AWTLogger = AWTLogger_1.default;
     var AWTLogManager_1 = __webpack_require__(17);
     exports.AWTLogManager = AWTLogManager_1.default;
-    var AWTTransmissionManager_1 = __webpack_require__(33);
+    var AWTTransmissionManager_1 = __webpack_require__(36);
     exports.AWTTransmissionManager = AWTTransmissionManager_1.default;
     var AWTSerializer_1 = __webpack_require__(15);
     exports.AWTSerializer = AWTSerializer_1.default;
@@ -1254,9 +1254,9 @@ var oteljs_agave = function(modules) {
         value: true
     });
     var Enums_1 = __webpack_require__(0);
-    var AWTHttpManager_1 = __webpack_require__(22);
+    var AWTHttpManager_1 = __webpack_require__(25);
     var AWTTransmissionManagerCore_1 = __webpack_require__(3);
-    var AWTRecordBatcher_1 = __webpack_require__(32);
+    var AWTRecordBatcher_1 = __webpack_require__(35);
     var AWTNotificationManager_1 = __webpack_require__(4);
     var UploadNowCheckTimer = 250;
     var MaxNumberEventPerBatch = 500;
@@ -1807,7 +1807,7 @@ var oteljs_agave = function(modules) {
     Object.defineProperty(exports, "__esModule", {
         value: true
     });
-    var Bond = __webpack_require__(23);
+    var Bond = __webpack_require__(26);
     var Enums_1 = __webpack_require__(0);
     var AWTNotificationManager_1 = __webpack_require__(4);
     var Utils = __webpack_require__(2);
@@ -2220,8 +2220,8 @@ var oteljs_agave = function(modules) {
     }();
     exports.default = AWTLogManagerSettings;
 }, function(module, exports, __webpack_require__) {
-    var rng = __webpack_require__(34);
-    var bytesToUuid = __webpack_require__(35);
+    var rng = __webpack_require__(23);
+    var bytesToUuid = __webpack_require__(24);
     function v4(options, buf, offset) {
         var i = buf && offset || 0;
         if (typeof options == "string") {
@@ -2240,8 +2240,37 @@ var oteljs_agave = function(modules) {
         return buf || bytesToUuid(rnds);
     }
     module.exports = v4;
-}, , function(module, exports, __webpack_require__) {
-    module.exports = __webpack_require__(36);
+}, , , function(module, exports, __webpack_require__) {
+    module.exports = __webpack_require__(37);
+}, function(module, exports) {
+    var getRandomValues = typeof crypto != "undefined" && crypto.getRandomValues && crypto.getRandomValues.bind(crypto) || typeof msCrypto != "undefined" && typeof window.msCrypto.getRandomValues == "function" && msCrypto.getRandomValues.bind(msCrypto);
+    if (getRandomValues) {
+        var rnds8 = new Uint8Array(16);
+        module.exports = function whatwgRNG() {
+            getRandomValues(rnds8);
+            return rnds8;
+        };
+    } else {
+        var rnds = new Array(16);
+        module.exports = function mathRNG() {
+            for (var i = 0, r; i < 16; i++) {
+                if ((i & 3) === 0) r = Math.random() * 4294967296;
+                rnds[i] = r >>> ((i & 3) << 3) & 255;
+            }
+            return rnds;
+        };
+    }
+}, function(module, exports) {
+    var byteToHex = [];
+    for (var i = 0; i < 256; ++i) {
+        byteToHex[i] = (i + 256).toString(16).substr(1);
+    }
+    function bytesToUuid(buf, offset) {
+        var i = offset || 0;
+        var bth = byteToHex;
+        return [ bth[buf[i++]], bth[buf[i++]], bth[buf[i++]], bth[buf[i++]], "-", bth[buf[i++]], bth[buf[i++]], "-", bth[buf[i++]], bth[buf[i++]], "-", bth[buf[i++]], bth[buf[i++]], "-", bth[buf[i++]], bth[buf[i++]], bth[buf[i++]], bth[buf[i++]], bth[buf[i++]], bth[buf[i++]] ].join("");
+    }
+    module.exports = bytesToUuid;
 }, function(module, exports, __webpack_require__) {
     "use strict";
     Object.defineProperty(exports, "__esModule", {
@@ -2249,9 +2278,9 @@ var oteljs_agave = function(modules) {
     });
     var Enums_1 = __webpack_require__(0);
     var AWTSerializer_1 = __webpack_require__(15);
-    var AWTRetryPolicy_1 = __webpack_require__(29);
-    var AWTKillSwitch_1 = __webpack_require__(30);
-    var AWTClockSkewManager_1 = __webpack_require__(31);
+    var AWTRetryPolicy_1 = __webpack_require__(32);
+    var AWTKillSwitch_1 = __webpack_require__(33);
+    var AWTClockSkewManager_1 = __webpack_require__(34);
     var Version = __webpack_require__(16);
     var Utils = __webpack_require__(2);
     var AWTNotificationManager_1 = __webpack_require__(4);
@@ -2517,11 +2546,11 @@ var oteljs_agave = function(modules) {
     Object.defineProperty(exports, "__esModule", {
         value: true
     });
-    var bond_const_1 = __webpack_require__(24);
+    var bond_const_1 = __webpack_require__(27);
     exports._BondDataType = bond_const_1._BondDataType;
-    var _Encoding = __webpack_require__(25);
+    var _Encoding = __webpack_require__(28);
     exports._Encoding = _Encoding;
-    var IO = __webpack_require__(28);
+    var IO = __webpack_require__(31);
     exports.IO = IO;
     var microsoft_bond_primitives_1 = __webpack_require__(8);
     exports.Int64 = microsoft_bond_primitives_1.Int64;
@@ -2619,8 +2648,8 @@ var oteljs_agave = function(modules) {
         value: true
     });
     var microsoft_bond_primitives_1 = __webpack_require__(8);
-    var microsoft_bond_floatutils_1 = __webpack_require__(26);
-    var microsoft_bond_utils_1 = __webpack_require__(27);
+    var microsoft_bond_floatutils_1 = __webpack_require__(29);
+    var microsoft_bond_utils_1 = __webpack_require__(30);
     function _Utf8_GetBytes(value) {
         var array = [];
         for (var i = 0; i < value.length; ++i) {
@@ -3039,35 +3068,6 @@ var oteljs_agave = function(modules) {
         return AWTTransmissionManager;
     }();
     exports.default = AWTTransmissionManager;
-}, function(module, exports) {
-    var getRandomValues = typeof crypto != "undefined" && crypto.getRandomValues && crypto.getRandomValues.bind(crypto) || typeof msCrypto != "undefined" && typeof window.msCrypto.getRandomValues == "function" && msCrypto.getRandomValues.bind(msCrypto);
-    if (getRandomValues) {
-        var rnds8 = new Uint8Array(16);
-        module.exports = function whatwgRNG() {
-            getRandomValues(rnds8);
-            return rnds8;
-        };
-    } else {
-        var rnds = new Array(16);
-        module.exports = function mathRNG() {
-            for (var i = 0, r; i < 16; i++) {
-                if ((i & 3) === 0) r = Math.random() * 4294967296;
-                rnds[i] = r >>> ((i & 3) << 3) & 255;
-            }
-            return rnds;
-        };
-    }
-}, function(module, exports) {
-    var byteToHex = [];
-    for (var i = 0; i < 256; ++i) {
-        byteToHex[i] = (i + 256).toString(16).substr(1);
-    }
-    function bytesToUuid(buf, offset) {
-        var i = offset || 0;
-        var bth = byteToHex;
-        return [ bth[buf[i++]], bth[buf[i++]], bth[buf[i++]], bth[buf[i++]], "-", bth[buf[i++]], bth[buf[i++]], "-", bth[buf[i++]], bth[buf[i++]], "-", bth[buf[i++]], bth[buf[i++]], "-", bth[buf[i++]], bth[buf[i++]], bth[buf[i++]], bth[buf[i++]], bth[buf[i++]], bth[buf[i++]] ].join("");
-    }
-    module.exports = bytesToUuid;
 }, function(module, __webpack_exports__, __webpack_require__) {
     "use strict";
     __webpack_require__.r(__webpack_exports__);
@@ -3119,13 +3119,6 @@ var oteljs_agave = function(modules) {
             message: message
         });
     }
-    var DataFieldType;
-    (function(DataFieldType) {
-        DataFieldType[DataFieldType["String"] = 0] = "String";
-        DataFieldType[DataFieldType["Boolean"] = 1] = "Boolean";
-        DataFieldType[DataFieldType["Int64"] = 2] = "Int64";
-        DataFieldType[DataFieldType["Double"] = 3] = "Double";
-    })(DataFieldType || (DataFieldType = {}));
     var SamplingPolicy;
     (function(SamplingPolicy) {
         SamplingPolicy[SamplingPolicy["NotSet"] = 0] = "NotSet";
@@ -3435,6 +3428,13 @@ var oteljs_agave = function(modules) {
     var AWTQueueManager = __webpack_require__(11);
     var AWTQueueManager_default = __webpack_require__.n(AWTQueueManager);
     var Enums = __webpack_require__(0);
+    var DataFieldType;
+    (function(DataFieldType) {
+        DataFieldType[DataFieldType["String"] = 0] = "String";
+        DataFieldType[DataFieldType["Boolean"] = 1] = "Boolean";
+        DataFieldType[DataFieldType["Int64"] = 2] = "Int64";
+        DataFieldType[DataFieldType["Double"] = 3] = "Double";
+    })(DataFieldType || (DataFieldType = {}));
     var EVENT_NAME_DOT_REPLACE_REGEX = /\./g;
     var SEPARATOR_TOKEN = ".";
     var DATA_TOKEN = "Data";
@@ -3658,6 +3658,25 @@ var oteljs_agave = function(modules) {
         };
         return AriaSink;
     }();
+    var OutlookSink_OutlookSink = function() {
+        function OutlookSink() {
+            this.supportsAllEvents = false;
+            this.supportsAllEvents = Office.context.requirements.isSetSupported("OutlookTelemetry", 1.1);
+        }
+        OutlookSink.isSupported = function() {
+            return !!Office && Office.context.requirements.isSetSupported("OutlookTelemetry");
+        };
+        OutlookSink.prototype.sendTelemetryEvent = function(event) {
+            if (!this.supportsAllEvents && !event.eventName.match(/^Office\.Extensibility\.OfficeJs\.[a-zA-Z]*$/)) {
+                logNotification(LogLevel.Info, Category.Sink, function() {
+                    return "This version of Outlook only accepts OfficeJS telemetry events";
+                });
+                return;
+            }
+            Office.context.mailbox.logTelemetry(JSON.stringify(event));
+        };
+        return OutlookSink;
+    }();
     var v4 = __webpack_require__(19);
     var Utils_Utils;
     (function(Utils) {
@@ -3666,22 +3685,6 @@ var oteljs_agave = function(modules) {
         }
         Utils.newGuid = newGuid;
     })(Utils_Utils || (Utils_Utils = {}));
-    var OutlookSink_OutlookSink = function() {
-        function OutlookSink() {}
-        OutlookSink.isSupported = function() {
-            return !!Office && Office.context.requirements.isSetSupported("OutlookTelemetry", 1);
-        };
-        OutlookSink.prototype.sendTelemetryEvent = function(event) {
-            if (event.eventName.match(/^Office\.Extensibility\.OfficeJs\.[a-zA-Z]*$/)) {
-                Office.context.mailbox.logTelemetry(JSON.stringify(event));
-            } else {
-                logNotification(LogLevel.Warning, Category.Sink, function() {
-                    return "Outlook only accepts OfficeJS telemetry events";
-                });
-            }
-        };
-        return OutlookSink;
-    }();
     var __assign = undefined && undefined.__assign || Object.assign || function(t) {
         for (var s, i = 1, n = arguments.length; i < n; i++) {
             s = arguments[i];
@@ -3689,31 +3692,70 @@ var oteljs_agave = function(modules) {
         }
         return t;
     };
-    var CLIENTID_LOCALSTORAGE_NAME = "OTelJS.ClientId";
-    var clientId = null;
-    var sessionId = null;
+    var defaultAriaContext = {
+        "App.Name": "TBD",
+        "App.Platform": "TBD",
+        "App.Version": "TBD",
+        "Device.OsBuild": "TBD",
+        "Device.OsVersion": "TBD",
+        "Host.Id": "",
+        "Host.Version": "",
+        "Session.Id": "",
+        "Release.Audience": "TBD",
+        "Release.AudienceGroup": "TBD",
+        "Release.Channel": "TBD",
+        "Release.Fork": "TBD"
+    };
+    var BASE10 = 10;
+    var MAX_MAJOR_VERSION = 16;
+    var MAX_MINOR_VERSION = 0;
+    var MAX_BUILD_VERSION = 11601;
+    var _additionalContext;
+    var _sendEventEnabled;
+    function AriaHelper_initialize(additionalContext, sendEventEnabled) {
+        _additionalContext = additionalContext;
+        _sendEventEnabled = sendEventEnabled;
+    }
+    function convertContextToTypedDataFields() {
+        var context = __assign({}, defaultAriaContext, _additionalContext);
+        var additionalDataFields = [];
+        Object.keys(context).forEach(function(key) {
+            additionalDataFields.push({
+                name: key,
+                value: context[key],
+                dataType: DataFieldType.String
+            });
+        });
+        return additionalDataFields;
+    }
+    function getAdditionalDataFields() {
+        if (!_additionalContext["Session.Id"]) {
+            _additionalContext["Session.Id"] = getSessionId();
+        }
+        return convertContextToTypedDataFields();
+    }
+    function canSendToAria() {
+        if (!_sendEventEnabled) {
+            return false;
+        }
+        var platform = _additionalContext["App.Platform"];
+        var version = _additionalContext["App.Version"];
+        if (platform !== "Win32" || !version) {
+            return true;
+        }
+        var versionTokens = version.split(".");
+        return versionTokens.length < 3 || !(parseInt(versionTokens[0], BASE10) >= MAX_MAJOR_VERSION) || !(parseInt(versionTokens[1], BASE10) >= MAX_MINOR_VERSION) || !(parseInt(versionTokens[2], BASE10) >= MAX_BUILD_VERSION);
+    }
+    function getSessionId() {
+        return Utils_Utils.newGuid();
+    }
+    var E_TELEMETRY_DISABLED = "AppTelemetry is disabled for this platform.";
     var AgaveSink_AgaveSink = function() {
         function AgaveSink(ariaAdditionalContext, ariaSendEventEnabled) {
             this._isUsable = true;
             this._awaitingInitialization = false;
             this._eventQueue = [];
-            this.defaultAriaContext = {
-                "App.Name": "TBD",
-                "App.Platform": "TBD",
-                "App.Version": "TBD",
-                "Device.OsBuild": "TBD",
-                "Device.OsVersion": "TBD",
-                "Host.Id": "",
-                "Host.Version": "",
-                "Client.Id": "",
-                "Session.Id": "",
-                "Release.Audience": "TBD",
-                "Release.AudienceGroup": "TBD",
-                "Release.Channel": "TBD",
-                "Release.Fork": "TBD"
-            };
-            this._ariaAdditionalContext = ariaAdditionalContext;
-            this._ariaSendEventEnabled = ariaSendEventEnabled;
+            AriaHelper_initialize(ariaAdditionalContext, ariaSendEventEnabled);
             this.initialize();
         }
         AgaveSink.createInstance = function(ariaAdditionalContext, ariaSendEventEnabled) {
@@ -3727,16 +3769,19 @@ var oteljs_agave = function(modules) {
             return sink;
         };
         AgaveSink.prototype.initialize = function() {
-            if (isWacAgave() || typeof OfficeExtension === "undefined") {
-                if (SdxWacSink_SdxWacSink.isSupported()) {
-                    this.connectSdxWacSink();
-                } else if (this._ariaSendEventEnabled) {
+            if (!this.isTelemetryEnabled()) {
+                this.failToInitialize(E_TELEMETRY_DISABLED);
+            }
+            if (OutlookSink_OutlookSink.isSupported()) {
+                this.connectOutlookSink();
+            } else if (SdxWacSink_SdxWacSink.isSupported()) {
+                this.connectSdxWacSink();
+            } else if (isWacAgave() || typeof OfficeExtension === "undefined") {
+                if (canSendToAria()) {
                     this.connectAriaSink();
                 } else {
                     this.failToInitialize();
                 }
-            } else if (OutlookSink_OutlookSink.isSupported()) {
-                this.connectOutlookSink();
             } else {
                 this._awaitingInitialization = true;
                 getRichApiSink(false, this.onGetRichApi.bind(this));
@@ -3746,7 +3791,7 @@ var oteljs_agave = function(modules) {
             var _this = this;
             if (richApiSink) {
                 this.connectRichApiSink(richApiSink);
-            } else if (this._ariaSendEventEnabled) {
+            } else if (canSendToAria()) {
                 this.connectAriaSink();
             } else {
                 this.failToInitialize();
@@ -3756,10 +3801,10 @@ var oteljs_agave = function(modules) {
                 _this.sendTelemetryEvent(event);
             });
         };
-        AgaveSink.prototype.failToInitialize = function() {
+        AgaveSink.prototype.failToInitialize = function(reason) {
             this._isUsable = false;
             this._awaitingInitialization = false;
-            var errorMessage = "AgaveSink could not find a suitable sink to use";
+            var errorMessage = reason ? reason : "AgaveSink could not find a suitable sink to use";
             logNotification(LogLevel.Error, Category.Sink, function() {
                 return errorMessage;
             });
@@ -3801,12 +3846,7 @@ var oteljs_agave = function(modules) {
             });
         };
         AgaveSink.prototype.connectAriaSink = function() {
-            this._ariaAdditionalContext["Client.Id"] = getClientId();
-            if (!this._ariaAdditionalContext["Session.Id"]) {
-                this._ariaAdditionalContext["Session.Id"] = getSessionId();
-            }
-            var additionalDataFields = this.convertContextToTypedDataFields(this._ariaAdditionalContext);
-            this._sink = new AriaSink_AriaSink(additionalDataFields);
+            this._sink = new AriaSink_AriaSink(getAdditionalDataFields());
             logNotification(LogLevel.Info, Category.Sink, function() {
                 return "AgaveSink is using AriaSink";
             });
@@ -3817,41 +3857,19 @@ var oteljs_agave = function(modules) {
                 return "AgaveSink is using SdxWacSink";
             });
         };
-        AgaveSink.prototype.convertContextToTypedDataFields = function(additionalContext) {
-            var context = __assign({}, this.defaultAriaContext, additionalContext);
-            var additionalDataFields = [];
-            Object.keys(context).forEach(function(key) {
-                additionalDataFields.push({
-                    name: key,
-                    value: context[key],
-                    dataType: DataFieldType.String
-                });
-            });
-            return additionalDataFields;
+        AgaveSink.prototype.isTelemetryEnabled = function() {
+            if (typeof OSF !== "undefined") {
+                if (typeof OSF.AppTelemetry === "undefined" || typeof OSF.AppTelemetry.enableTelemetry === "undefined" || OSF.AppTelemetry.enableTelemetry === false) {
+                    logNotification(LogLevel.Warning, Category.Core, function() {
+                        return E_TELEMETRY_DISABLED;
+                    });
+                    return false;
+                }
+            }
+            return true;
         };
         return AgaveSink;
     }();
-    function getClientId() {
-        if (clientId != null) {
-            return clientId;
-        }
-        if (typeof localStorage !== "undefined") {
-            clientId = localStorage.getItem(CLIENTID_LOCALSTORAGE_NAME);
-        }
-        if (clientId == null) {
-            clientId = Utils_Utils.newGuid();
-            if (typeof localStorage !== "undefined") {
-                localStorage.setItem(CLIENTID_LOCALSTORAGE_NAME, clientId);
-            }
-        }
-        return clientId;
-    }
-    function getSessionId() {
-        if (sessionId == null) {
-            sessionId = Utils_Utils.newGuid();
-        }
-        return sessionId;
-    }
     __webpack_require__.d(__webpack_exports__, "AgaveSink", function() {
         return AgaveSink_AgaveSink;
     });

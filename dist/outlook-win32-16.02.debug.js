@@ -1,9 +1,9 @@
 /* Outlook rich client specific API library */
-/* Version: 16.0.11506.10000 */
-/*
+/* Version: 16.0.11616.10000 */
+/*!
 Copyright (c) Microsoft Corporation.  All rights reserved.
 */
-/*
+/*!
 Your use of this file is governed by the Microsoft Services Agreement http://go.microsoft.com/fwlink/?LinkId=266419.
 This file also contains the following Promise implementation (with a few small modifications):
 * @overview es6-promise - a tiny implementation of Promises/A+.
@@ -1201,7 +1201,7 @@ OSF.DialogMessageType = {
     DialogParentMessageReceived: 1,
     DialogClosed: 12006
 };
-OSF.OfficeAppContext = function OSF_OfficeAppContext(id, appName, appVersion, appUILocale, dataLocale, docUrl, clientMode, settings, reason, osfControlType, eToken, correlationId, appInstanceId, touchEnabled, commerceAllowed, appMinorVersion, requirementMatrix, hostCustomMessage, hostFullVersion, clientWindowHeight, clientWindowWidth, addinName, appDomains, dialogRequirementMatrix)
+OSF.OfficeAppContext = function OSF_OfficeAppContext(id, appName, appVersion, appUILocale, dataLocale, docUrl, clientMode, settings, reason, osfControlType, eToken, correlationId, appInstanceId, touchEnabled, commerceAllowed, appMinorVersion, requirementMatrix, hostCustomMessage, hostFullVersion, clientWindowHeight, clientWindowWidth, addinName, appDomains, dialogRequirementMatrix, featureGates)
 {
     this._id = id;
     this._appName = appName;
@@ -1228,6 +1228,7 @@ OSF.OfficeAppContext = function OSF_OfficeAppContext(id, appName, appVersion, ap
     this._addinName = addinName;
     this._appDomains = appDomains;
     this._dialogRequirementMatrix = dialogRequirementMatrix;
+    this._featureGates = featureGates;
     this.get_id = function get_id()
     {
         return this._id
@@ -1331,6 +1332,10 @@ OSF.OfficeAppContext = function OSF_OfficeAppContext(id, appName, appVersion, ap
     this.get_appDomains = function get_appDomains()
     {
         return this._appDomains
+    };
+    this.get_featureGates = function get_featureGates()
+    {
+        return this._featureGates
     }
 };
 OSF.OsfControlType = {
@@ -4454,15 +4459,24 @@ var OfficeExt;
             function RichClientHostController(){}
             RichClientHostController.prototype.execute = function(id, params, callback)
             {
-                window.external.Execute(id,params,callback)
+                if(typeof OsfOMToken != "undefined" && OsfOMToken)
+                    window.external.Execute(id,params,callback,OsfOMToken);
+                else
+                    window.external.Execute(id,params,callback)
             };
             RichClientHostController.prototype.registerEvent = function(id, targetId, handler, callback)
             {
-                window.external.RegisterEvent(id,targetId,handler,callback)
+                if(typeof OsfOMToken != "undefined" && OsfOMToken)
+                    window.external.RegisterEvent(id,targetId,handler,callback,OsfOMToken);
+                else
+                    window.external.RegisterEvent(id,targetId,handler,callback)
             };
             RichClientHostController.prototype.unregisterEvent = function(id, targetId, callback)
             {
-                window.external.UnregisterEvent(id,targetId,callback)
+                if(typeof OsfOMToken != "undefined" && OsfOMToken)
+                    window.external.UnregisterEvent(id,targetId,callback,OsfOMToken);
+                else
+                    window.external.UnregisterEvent(id,targetId,callback)
             };
             return RichClientHostController
         }();
@@ -4580,7 +4594,10 @@ OSF.initializeRichCommon = function OSF_initializeRichCommon()
             var values = [];
             if(onCalling)
                 onCalling();
-            OSF.DDA._OsfControlContext.GetSettings().Read(keys,values);
+            if(typeof OsfOMToken != "undefined" && OsfOMToken)
+                OSF.DDA._OsfControlContext.GetSettings(OsfOMToken).Read(keys,values);
+            else
+                OSF.DDA._OsfControlContext.GetSettings().Read(keys,values);
             if(onReceiving)
                 onReceiving();
             var serializedSettings = {};
@@ -4599,7 +4616,10 @@ OSF.initializeRichCommon = function OSF_initializeRichCommon()
             }
             if(onCalling)
                 onCalling();
-            OSF.DDA._OsfControlContext.GetSettings().Write(keys,values);
+            if(typeof OsfOMToken != "undefined" && OsfOMToken)
+                OSF.DDA._OsfControlContext.GetSettings(OsfOMToken).Write(keys,values);
+            else
+                OSF.DDA._OsfControlContext.GetSettings().Write(keys,values);
             if(onReceiving)
                 onReceiving()
         }
@@ -6362,39 +6382,17 @@ var OSFAriaLogger;
                     name: "Message",
                     type: "string"
                 },{
-                    name: "AppId",
-                    type: "string"
-                },{
                     name: "AppURL",
-                    type: "string"
-                },{
-                    name: "UserId",
                     type: "string"
                 },{
                     name: "Host",
                     type: "string"
-                },{
-                    name: "HostVersion",
-                    type: "string"
-                },{
-                    name: "CorrelationId",
-                    type: "string",
-                    rename: "HostSessionId"
                 },{
                     name: "AppSizeWidth",
                     type: "int64"
                 },{
                     name: "AppSizeHeight",
                     type: "int64"
-                },{
-                    name: "AppInstanceId",
-                    type: "string"
-                },{
-                    name: "OfficeJSVersion",
-                    type: "string"
-                },{
-                    name: "HostJSVersion",
-                    type: "string"
                 },{
                     name: "IsFromWacAutomation",
                     type: "string"
@@ -6575,10 +6573,45 @@ var OSFAriaLogger;
             {
                 return arg["Fields"] !== undefined
             };
+            AriaLogger.prototype.shouldSendDirectToAria = function()
+            {
+                var flavor;
+                var version;
+                if(OSF._OfficeAppFactory && OSF._OfficeAppFactory.getHostInfo)
+                    flavor = OSF._OfficeAppFactory.getHostInfo()["hostPlatform"];
+                if(!flavor)
+                    return false;
+                else if(flavor.toLowerCase() !== "win32")
+                    return true;
+                if(window.external && typeof window.external.GetContext !== "undefined" && typeof window.external.GetContext().GetHostFullVersion !== "undefined")
+                    version = window.external.GetContext().GetHostFullVersion();
+                var BASE10 = 10;
+                var MAX_MAJOR_VERSION = 16;
+                var MAX_MINOR_VERSION = 0;
+                var MAX_BUILD_VERSION = 11601;
+                if(version)
+                {
+                    var versionTokens = version.split(".");
+                    if(versionTokens.length < 3)
+                        return false;
+                    else if(parseInt(versionTokens[0],BASE10) >= MAX_MAJOR_VERSION && parseInt(versionTokens[1],BASE10) >= MAX_MINOR_VERSION && parseInt(versionTokens[2],BASE10) >= MAX_BUILD_VERSION)
+                        return false;
+                    else
+                        return true
+                }
+                return false
+            };
+            AriaLogger.prototype.isDirectToAriaEnabled = function()
+            {
+                if(this.EnableDirectToAria === undefined || this.EnableDirectToAria === null)
+                    this.EnableDirectToAria = this.shouldSendDirectToAria();
+                return this.EnableDirectToAria
+            };
             AriaLogger.prototype.sendTelemetry = function(tableName, telemetryData)
             {
                 var startAfterMs = 1e3;
-                if(AriaLogger.EnableSendingTelemetryWithLegacyAria)
+                var sendAriaEnabled = AriaLogger.EnableSendingTelemetryWithLegacyAria && this.isDirectToAriaEnabled();
+                if(sendAriaEnabled)
                     OSF.OUtil.loadScript(this.getAriaCDNLocation(),function()
                     {
                         try
@@ -6610,7 +6643,7 @@ var OSFAriaLogger;
                     this.sendTelemetry(data["Table"],data)
             };
             AriaLogger.EnableSendingTelemetryWithOTel = true;
-            AriaLogger.EnableSendingTelemetryWithLegacyAria = true;
+            AriaLogger.EnableSendingTelemetryWithLegacyAria = false;
             return AriaLogger
         }();
     OSFAriaLogger.AriaLogger = AriaLogger
@@ -6844,7 +6877,7 @@ var OSFAppTelemetry;
             appInfo.appInstanceId = appInfo.appInstanceId.replace(/[{}]/g,"").toLowerCase();
         appInfo.message = context.get_hostCustomMessage();
         appInfo.officeJSVersion = OSF.ConstantNames.FileVersion;
-        appInfo.hostJSVersion = "16.0.11506.10000";
+        appInfo.hostJSVersion = "16.0.11616.10000";
         if(context._wacHostEnvironment)
             appInfo.wacHostEnvironment = context._wacHostEnvironment;
         if(context._isFromWacAutomation !== undefined && context._isFromWacAutomation !== null)
@@ -13330,4 +13363,6 @@ OSF.InitializationHelper.prototype.loadAppSpecificScriptAndCreateOM = function O
     appContext.appOM = new OSF.DDA.OutlookAppOm(appContext,this._webAppState.wnd,appReady);
     if(appContext.get_appName() == OSF.AppName.Outlook || appContext.get_appName() == OSF.AppName.OutlookWebApp || appContext.get_appName() == OSF.AppName.OutlookIOS || appContext.get_appName() == OSF.AppName.OutlookAndroid)
         OSF.DDA.DispIdHost.addEventSupport(appContext.appOM,new OSF.EventDispatch([Microsoft.Office.WebExtension.EventType.ItemChanged,Microsoft.Office.WebExtension.EventType.OfficeThemeChanged]))
-}
+};
+OSFAriaLogger.AriaLogger.EnableSendingTelemetryWithOTel = true;
+OSFAriaLogger.AriaLogger.EnableSendingTelemetryWithLegacyAria = true

@@ -1110,7 +1110,7 @@ OSF.DialogMessageType = {
     DialogParentMessageReceived: 1,
     DialogClosed: 12006
 };
-OSF.OfficeAppContext = function OSF_OfficeAppContext(id, appName, appVersion, appUILocale, dataLocale, docUrl, clientMode, settings, reason, osfControlType, eToken, correlationId, appInstanceId, touchEnabled, commerceAllowed, appMinorVersion, requirementMatrix, hostCustomMessage, hostFullVersion, clientWindowHeight, clientWindowWidth, addinName, appDomains, dialogRequirementMatrix) {
+OSF.OfficeAppContext = function OSF_OfficeAppContext(id, appName, appVersion, appUILocale, dataLocale, docUrl, clientMode, settings, reason, osfControlType, eToken, correlationId, appInstanceId, touchEnabled, commerceAllowed, appMinorVersion, requirementMatrix, hostCustomMessage, hostFullVersion, clientWindowHeight, clientWindowWidth, addinName, appDomains, dialogRequirementMatrix, featureGates) {
     this._id = id;
     this._appName = appName;
     this._appVersion = appVersion;
@@ -1136,6 +1136,7 @@ OSF.OfficeAppContext = function OSF_OfficeAppContext(id, appName, appVersion, ap
     this._addinName = addinName;
     this._appDomains = appDomains;
     this._dialogRequirementMatrix = dialogRequirementMatrix;
+    this._featureGates = featureGates;
     this.get_id = function get_id() { return this._id; };
     this.get_appName = function get_appName() { return this._appName; };
     this.get_appVersion = function get_appVersion() { return this._appVersion; };
@@ -1162,6 +1163,7 @@ OSF.OfficeAppContext = function OSF_OfficeAppContext(id, appName, appVersion, ap
     this.get_clientWindowWidth = function get_clientWindowWidth() { return this._clientWindowWidth; };
     this.get_addinName = function get_addinName() { return this._addinName; };
     this.get_appDomains = function get_appDomains() { return this._appDomains; };
+    this.get_featureGates = function get_featureGates() { return this._featureGates; };
 };
 OSF.OsfControlType = {
     DocumentLevel: 0,
@@ -5110,9 +5112,51 @@ var OSFAriaLogger;
         AriaLogger.prototype.isIUsageData = function (arg) {
             return arg["Fields"] !== undefined;
         };
+        AriaLogger.prototype.shouldSendDirectToAria = function () {
+            var flavor;
+            var version;
+            if (OSF._OfficeAppFactory && OSF._OfficeAppFactory.getHostInfo) {
+                flavor = OSF._OfficeAppFactory.getHostInfo()["hostPlatform"];
+            }
+            if (!flavor) {
+                return false;
+            }
+            else if (flavor.toLowerCase() !== "win32") {
+                return true;
+            }
+            if (window.external && window.external.GetContext && window.external.GetContext().GetHostVersion) {
+                version = window.external.GetContext().GetHostVersion();
+            }
+            var BASE10 = 10;
+            var MAX_MAJOR_VERSION = 16;
+            var MAX_MINOR_VERSION = 0;
+            var MAX_BUILD_VERSION = 11601;
+            if (version) {
+                var versionTokens = version.split('.');
+                if (versionTokens.length < 3) {
+                    return false;
+                }
+                else if (parseInt(versionTokens[0], BASE10) >= MAX_MAJOR_VERSION &&
+                    parseInt(versionTokens[1], BASE10) >= MAX_MINOR_VERSION &&
+                    parseInt(versionTokens[2], BASE10) >= MAX_BUILD_VERSION) {
+                    return false;
+                }
+                else {
+                    return true;
+                }
+            }
+            return false;
+        };
+        AriaLogger.prototype.isDirectToAriaEnabled = function () {
+            if (this.EnableDirectToAria === undefined || this.EnableDirectToAria === null) {
+                this.EnableDirectToAria = this.shouldSendDirectToAria();
+            }
+            return this.EnableDirectToAria;
+        };
         AriaLogger.prototype.sendTelemetry = function (tableName, telemetryData) {
             var startAfterMs = 1000;
-            if (AriaLogger.EnableSendingTelemetryWithLegacyAria) {
+            var sendAriaEnabled = AriaLogger.EnableSendingTelemetryWithLegacyAria && this.isDirectToAriaEnabled();
+            if (sendAriaEnabled) {
                 OSF.OUtil.loadScript(this.getAriaCDNLocation(), function () {
                     try {
                         if (!this.ALogger) {
