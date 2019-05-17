@@ -20,6 +20,8 @@ The NPM package for Office.js is intended as a way for you to obtain your own (n
 
 2. If you need offline access to the Office.js APIs (for example, to facilitate offline debugging).
 
+**Note**: Officially, Outlook doesn't support this. However, if you choose to proceed, you may also need to self-host a copy of Microsoft Ajax or other dependencies as needed.
+
 ### Best practices
 
 Best practices for using the Office.js NPM package include:
