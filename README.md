@@ -8,9 +8,9 @@ The JavaScript API for Office enables you to create web applications that intera
 
 ## About the NPM package
 
-The NPM package for Office.js is a copy of what gets published to the official "evergreen" Office.js CDN, at **<https://appsforoffice.microsoft.com/lib/1/hosted/office.js>**. 
+The NPM package for Office.js is a copy of what gets published to the official "evergreen" Office.js CDN, at **<https://appsforoffice.microsoft.com/lib/1/hosted/office.js>**.
 
-While the Office.js CDN contains all currently available Office.js APIs at any moment in time, each version of the NPM package for Office.js contains only the Office.js APIs that were available at the point in time when that version of the NPM package was created. 
+While the Office.js CDN contains all currently available Office.js APIs at any moment in time, each version of the NPM package for Office.js contains only the Office.js APIs that were available at the point in time when that version of the NPM package was created.
 
 ### Target scenarios
 
@@ -19,8 +19,6 @@ The NPM package for Office.js is intended as a way for you to obtain your own (n
 1. If you are developing an add-in behind a firewall, where accessing the Office.js CDN is not possible.
 
 2. If you need offline access to the Office.js APIs (for example, to facilitate offline debugging).
-
-**Note**: Officially, Outlook doesn't support this. However, if you choose to proceed, you may also have to self-host a copy of Microsoft Ajax or other dependencies as needed.
 
 ### Best practices
 
@@ -33,6 +31,16 @@ Best practices for using the Office.js NPM package include:
 - Do not use the NPM package in an add-in that you submit for publication to [AppSource](https://appsource.microsoft.com/marketplace/apps?product=office). Add-ins that are published to AppSource must use the Office.js CDN.
 
 - Use TypeScript definitions for Office.js as described in [IntelliSense definitions](#intellisense-definitions).
+
+### Support
+
+The Office.js CDN is the official, supported source for Office Add-ins. This means that for the NPM package the following are not guaranteed.
+
+- Frequency of updates
+
+- Timely support for issues and bugs
+
+Also, Outlook does not support offline scenarios due to a network access requirement for dependencies like the Microsoft Ajax library.
 
 <br />
 
@@ -48,7 +56,7 @@ To install "office-js" locally via the NPM package, run the following command:
 
 Installing the NPM package locally creates a set of static Office.js files in the `node_modules\@microsoft\office-js\dist` folder of the directory where you ran the `npm install` command. To use the NPM package, do the following:
 
-1. Either manually or as part of a build script (e.g., `CopyWebpackPlugin` if you're using Webpack), have the files get served from a destination of your choosing (e.g., from the `/assets/office-js/` directory of your web server).
+1. Either manually or as part of a build script (e.g., `CopyWebpackPlugin` if you're using Webpack) have the files get served from a destination of your choosing (e.g., from the `/assets/office-js/` directory of your web server).
 
 2. Reference that location in a `<script>` tag within the HTML file in your add-in project.
 
@@ -107,7 +115,7 @@ When you have a version number, can use it as follows with <https://unpkg.com>: 
 
 ## Production vs. Beta vs. Private versions
 
-Office.js versioning is described in detail in <https://docs.microsoft.com/office/dev/add-ins/develop/referencing-the-javascript-api-for-office-library-from-its-cdn>.  Importantly, there is a large difference between what is in the JS files, versus what are the capabilities of a particular computer (i.e., older or slower-to-update versions of office). 
+Office.js versioning is described in detail in <https://docs.microsoft.com/office/dev/add-ins/develop/referencing-the-javascript-api-for-office-library-from-its-cdn>.  Importantly, there is a large difference between what is in the JS files, versus what are the capabilities of a particular computer (i.e., older or slower-to-update versions of office).
 
 The NPM package and the repo branches assume the following structure.
 
@@ -132,7 +140,7 @@ For example, to use a `1.1.2-beta-next.0` version, use the following references:
     @microsoft/office-js@1.1.2-beta-next.0/dist/office.d.ts
 
 
-![Using the NPM package with Script Lab](https://github.com/OfficeDev/office-js/blob/release/.github/images/script-lab-substitute-refs.png)
+![Using the NPM package with Script Lab](https://raw.githubusercontent.com/OfficeDev/office-js/release/.github/images/script-lab-substitute-refs.png)
 
 <br />
 
