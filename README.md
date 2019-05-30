@@ -40,7 +40,7 @@ The Office.js CDN is the official, supported source for Office Add-ins. This mea
 
 - Timely support for issues and bugs
 
-Also, Outlook does not support offline scenarios due to a network access requirement for dependencies like the Microsoft Ajax library.
+Also, Outlook does not support hosting Office.js offline due to a network access requirement for dependencies like the Microsoft Ajax library.
 
 <br />
 
