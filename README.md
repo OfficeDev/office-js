@@ -42,7 +42,7 @@ To install "office-js" locally via the NPM package, run the following command:
 
 <br />
 
-Our policy requires that developers always reference the latest version of Office.js library. This is done to ensure that essential product updates are served quickly to the Office add-ins by always referencing the latest release of the library for a given version, such as Generally Available (GA) version. Given that latest Office.js release is backward-compatible with prior releases, it is safe to update to the most recent release of the library when one is avilable. Hence, only the latest version of Office.js NPM package is made available for installation. 
+Our policy requires that developers always reference the latest version of Office.js library. This is done to ensure that essential product updates are served quickly to the Office add-ins by always referencing the latest release of the library for a given version, such as Generally Available (GA) version. Given that the latest Office.js release is backward-compatible with prior releases, it is safe to update to the most recent release of the library when one is available. Hence, only the latest version of Office.js NPM package is made available for installation. 
 
 ## Using the NPM package
 
