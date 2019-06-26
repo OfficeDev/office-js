@@ -14,11 +14,12 @@ While the Office.js CDN contains all currently available Office.js APIs at any m
 
 ### Target scenarios
 
-The NPM package for Office.js is intended as a way for you to obtain your own (non-CDN) copy of the Office.js files, which you can then statically serve from your own site instead of using the CDN. This NPM package is primarily provided to address the following scenarios:
+The NPM package for Office.js is intended as a way for you to obtain offline copy (non-CDN) of the Office.js files, which you can then statically serve from your own site instead of using the CDN. This NPM package is primarily provided to address the following scenarios:
 
 1. If you are developing an add-in behind a firewall, where accessing the Office.js CDN is not possible.
-
 2. If you need offline access to the Office.js APIs (for example, to facilitate offline debugging).
+
+If you plan to publish your Office Add-in from AppSource, you must use the CDN reference. Offlince Office.js references are only appropriate for internal, development, and debugging scenarios. 
 
 ### Best practices
 
@@ -34,13 +35,13 @@ Best practices for using the Office.js NPM package include:
 
 ### Support
 
-The Office.js CDN is the official, supported source for Office Add-ins. This means that for the NPM package the following are not guaranteed.
+The Office.js CDN is the official, supported source for Office Add-ins. For the NPM package sourced through this repository, the following are not supported: 
 
-- Frequency of updates
+- Any version of the NPM package prior to v1.1.10. 
+- Turnaround time for resolution of issues and bugs. 
+- Frequency of updates to match the CDN version. 
 
-- Timely support for issues and bugs
-
-Also, Outlook does not support hosting Office.js offline due to a network access requirement for dependencies like the Microsoft Ajax library.
+Also, Outlook add-ins does not support hosting Office.js offline due to a network access requirement for dependencies like the Microsoft Ajax library.
 
 <br />
 
