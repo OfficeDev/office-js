@@ -35,7 +35,7 @@ Best practices for using the Office.js NPM package include:
 
 ### Support
 
-The Office.js CDN is the official, supported source for Office Add-ins. For the NPM package sourced through this repository, only the latest version of the package will be used to provide patches and updates. We'll not support nor apply any patches to previous major/minor versions of the package. In addition, the following are guaranteed for the NPM package: 
+The Office.js CDN is the official, supported source for Office Add-ins. For the NPM package sourced through this repository, only the latest version of the package is supported. We'll not support nor apply any patches to previous major/minor versions of the package. In addition, the following are guaranteed for the NPM package: 
 
 - Turnaround time for resolution of issues and bugs. 
 - Frequency of updates to match the CDN version. 
