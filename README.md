@@ -14,7 +14,7 @@ While the Office.js CDN contains all currently available Office.js APIs at any m
 
 ### Target scenarios
 
-The NPM package for Office.js is intended as a way for you to obtain offline copy (non-CDN) of the Office.js files, which you can then statically serve from your own site instead of using the CDN. This NPM package is primarily provided to address the following scenarios:
+The NPM package for Office.js is intended as a way for you to obtain an offline copy (non-CDN) of the Office.js files, which you can then statically serve from your own site instead of using the CDN. This NPM package is primarily provided to address the following scenarios:
 
 1. If you are developing an add-in behind a firewall, where accessing the Office.js CDN is not possible.
 2. If you need offline access to the Office.js APIs (for example, to facilitate offline debugging).
