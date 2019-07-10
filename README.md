@@ -19,7 +19,7 @@ The NPM package for Office.js is intended as a way for you to obtain an offline 
 1. If you are developing an add-in behind a firewall, where accessing the Office.js CDN is not possible.
 2. If you need offline access to the Office.js APIs (for example, to facilitate offline debugging).
 
-If you plan to publish your Office Add-in from AppSource, you must use the CDN reference. Offline Office.js references are only appropriate for internal, development, and debugging scenarios. 
+**Important**: If you plan to publish your Office Add-in from AppSource, you must use the CDN reference. Offline Office.js references are only appropriate for internal, development, and debugging scenarios. 
 
 ### Best practices
 
