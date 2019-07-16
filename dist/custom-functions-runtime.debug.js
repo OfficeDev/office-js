@@ -1288,6 +1288,81 @@ var OTel;
     })();
     OTel.OTelLogger = OTelLogger;
 })(OTel || (OTel = {}));
+var OfficeExt;
+(function (OfficeExt) {
+    var Association = (function () {
+        function Association() {
+            this.m_mappings = {};
+            this.m_onchangeHandlers = [];
+        }
+        Association.prototype.associate = function (arg1, arg2) {
+            function consoleWarn(message) {
+                if (typeof console !== 'undefined' && console.warn) {
+                    console.warn(message);
+                }
+            }
+            if (arguments.length == 1 && typeof arguments[0] === 'object' && arguments[0]) {
+                var mappings = arguments[0];
+                for (var key in mappings) {
+                    this.associate(key, mappings[key]);
+                }
+            }
+            else if (arguments.length == 2) {
+                var name_1 = arguments[0];
+                var func = arguments[1];
+                if (typeof name_1 !== 'string') {
+                    consoleWarn('[InvalidArg] Function=associate');
+                    return;
+                }
+                if (typeof func !== 'function') {
+                    consoleWarn('[InvalidArg] Function=associate');
+                    return;
+                }
+                var nameUpperCase = name_1.toUpperCase();
+                if (this.m_mappings[nameUpperCase]) {
+                    consoleWarn('[DuplicatedName] Function=' + name_1);
+                }
+                this.m_mappings[nameUpperCase] = func;
+                for (var i = 0; i < this.m_onchangeHandlers.length; i++) {
+                    this.m_onchangeHandlers[i]();
+                }
+            }
+            else {
+                consoleWarn('[InvalidArg] Function=associate');
+            }
+        };
+        Association.prototype.onchange = function (handler) {
+            if (handler) {
+                this.m_onchangeHandlers.push(handler);
+            }
+        };
+        Object.defineProperty(Association.prototype, "mappings", {
+            get: function () {
+                return this.m_mappings;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        return Association;
+    })();
+    OfficeExt.Association = Association;
+})(OfficeExt || (OfficeExt = {}));
+var CustomFunctionMappings = window.CustomFunctionMappings || {};
+var CustomFunctions;
+(function (CustomFunctions) {
+    function delayInitialization() {
+        CustomFunctionMappings['__delay__'] = true;
+    }
+    CustomFunctions.delayInitialization = delayInitialization;
+    ;
+    CustomFunctions._association = new OfficeExt.Association();
+    function associate() {
+        CustomFunctions._association.associate.apply(CustomFunctions._association, arguments);
+        delete CustomFunctionMappings['__delay__'];
+    }
+    CustomFunctions.associate = associate;
+    ;
+})(CustomFunctions || (CustomFunctions = {}));
 (function () {
     var previousConstantNames = OSF.ConstantNames || {};
     OSF.ConstantNames = {
@@ -1329,6 +1404,10 @@ OSF.InitializationHelper.prototype.loadAppSpecificScriptAndCreateOM = function O
 };
 OSF.InitializationHelper.prototype.prepareRightAfterWebExtensionInitialize = function OSF_InitializationHelper$prepareRightAfterWebExtensionInitialize() {
 };
+OSF.HostInfoFlags = {
+    SharedApp: 1,
+    CustomFunction: 2
+};
 OSF._OfficeAppFactory = (function OSF__OfficeAppFactory() {
     var _setNamespace = function OSF_OUtil$_setNamespace(name, parent) {
         if (parent && name && !parent[name]) {
@@ -1365,7 +1444,7 @@ OSF._OfficeAppFactory = (function OSF__OfficeAppFactory() {
     var _settings = {};
     var _hostFacade = {};
     var _WebAppState = { id: null, webAppUrl: null, conversationID: null, clientEndPoint: null, wnd: window.parent, focused: false };
-    var _hostInfo = { isO15: true, isRichClient: true, hostType: "", hostPlatform: "", hostSpecificFileVersion: "", hostLocale: "", osfControlAppCorrelationId: "", isDialog: false, disableLogging: false };
+    var _hostInfo = { isO15: true, isRichClient: true, hostType: "", hostPlatform: "", hostSpecificFileVersion: "", hostLocale: "", osfControlAppCorrelationId: "", isDialog: false, disableLogging: false, flags: 0 };
     var _isLoggingAllowed = true;
     var _initializationHelper = {};
     var _appInstanceId = null;
@@ -1551,6 +1630,7 @@ OSF._OfficeAppFactory = (function OSF__OfficeAppFactory() {
             }
             _hostInfo.isDialog = (((typeof items[5]) != "undefined") && items[5] == "isDialog") ? true : false;
             _hostInfo.disableLogging = (((typeof items[6]) != "undefined") && items[6] == "disableLogging") ? true : false;
+            _hostInfo.flags = (((typeof items[7]) === "string") && items[7].length > 0) ? parseInt(items[7]) : 0;
             var hostSpecificFileVersionValue = parseFloat(_hostInfo.hostSpecificFileVersion);
             var fallbackVersion = OSF.HostSpecificFileVersionDefault;
             if (OSF.HostSpecificFileVersionMap[_hostInfo.hostType] && OSF.HostSpecificFileVersionMap[_hostInfo.hostType][_hostInfo.hostPlatform]) {
@@ -1584,6 +1664,11 @@ OSF._OfficeAppFactory = (function OSF__OfficeAppFactory() {
         if (_hostInfo.hostPlatform == "web" && _hostInfo.isDialog && window == window.top && window.opener == null) {
             window.open('', '_self', '');
             window.close();
+        }
+        if ((_hostInfo.flags & (OSF.HostInfoFlags.SharedApp | OSF.HostInfoFlags.CustomFunction)) !== 0) {
+            if (typeof (window.Promise) === 'undefined') {
+                window.Promise = window.Office.Promise;
+            }
         }
         _loadScriptHelper.setAppCorrelationId(_hostInfo.osfControlAppCorrelationId);
         var basePath = _loadScriptHelper.getOfficeJsBasePath();
@@ -1988,8 +2073,8 @@ OSF._OfficeAppFactory = (function OSF__OfficeAppFactory() {
                     CoreUtility.isReadonlyRestRequest(request.method) || (requestFlags = 1);
                     var index = request.url.indexOf("?");
                     if (index >= 0) {
-                        var query = request.url.substr(index + 1), flagsInQueryString = CoreUtility._parseRequestFlagsFromQueryStringIfAny(query);
-                        flagsInQueryString >= 0 && (requestFlags = flagsInQueryString);
+                        var query = request.url.substr(index + 1), flagsAndCustomData = CoreUtility._parseRequestFlagsAndCustomDataFromQueryStringIfAny(query);
+                        flagsAndCustomData.flags >= 0 && (requestFlags = flagsAndCustomData.flags);
                     }
                     var bridgeMessage = {
                         id: HostBridge.nextId(),
@@ -2093,7 +2178,8 @@ OSF._OfficeAppFactory = (function OSF__OfficeAppFactory() {
         function CoreConstants() {}
         return CoreConstants.flags = "flags", CoreConstants.sourceLibHeader = "SdkVersion", 
         CoreConstants.processQuery = "ProcessQuery", CoreConstants.localDocument = "http://document.localhost/", 
-        CoreConstants.localDocumentApiPrefix = "http://document.localhost/_api/", CoreConstants;
+        CoreConstants.localDocumentApiPrefix = "http://document.localhost/_api/", CoreConstants.customData = "customdata", 
+        CoreConstants;
     }();
     exports.CoreConstants = CoreConstants;
     var RichApiMessageUtility = function() {
@@ -2260,15 +2346,18 @@ OSF._OfficeAppFactory = (function OSF__OfficeAppFactory() {
                 headers: request.headers,
                 body: request.body
             };
-        }, CoreUtility._parseRequestFlagsFromQueryStringIfAny = function(queryString) {
-            for (var parts = queryString.split("&"), i = 0; i < parts.length; i++) {
+        }, CoreUtility._parseRequestFlagsAndCustomDataFromQueryStringIfAny = function(queryString) {
+            for (var ret = {
+                flags: -1,
+                customData: ""
+            }, parts = queryString.split("&"), i = 0; i < parts.length; i++) {
                 var keyvalue = parts[i].split("=");
                 if (keyvalue[0].toLowerCase() === CoreConstants.flags) {
                     var flags = parseInt(keyvalue[1]);
-                    return flags &= 511;
-                }
+                    flags &= 511, ret.flags = flags;
+                } else keyvalue[0].toLowerCase() === CoreConstants.customData && (ret.customData = decodeURIComponent(keyvalue[1]));
             }
-            return -1;
+            return ret;
         }, CoreUtility._getRequestBodyText = function(request) {
             var body = "";
             return "string" == typeof request.body ? body = request.body : request.body && "object" == typeof request.body && (body = JSON.stringify(request.body)), 
@@ -2281,14 +2370,16 @@ OSF._OfficeAppFactory = (function OSF__OfficeAppFactory() {
             return response.body;
         }, CoreUtility._buildRequestMessageSafeArray = function(request) {
             var requestFlags = 0;
-            if (CoreUtility.isReadonlyRestRequest(request.method) || (requestFlags = 1), request.url.substr(0, CoreConstants.processQuery.length).toLowerCase() === CoreConstants.processQuery.toLowerCase()) {
+            CoreUtility.isReadonlyRestRequest(request.method) || (requestFlags = 1);
+            var customData = "";
+            if (request.url.substr(0, CoreConstants.processQuery.length).toLowerCase() === CoreConstants.processQuery.toLowerCase()) {
                 var index = request.url.indexOf("?");
                 if (index > 0) {
-                    var queryString = request.url.substr(index + 1), flagsInQueryString = CoreUtility._parseRequestFlagsFromQueryStringIfAny(queryString);
-                    flagsInQueryString >= 0 && (requestFlags = flagsInQueryString);
+                    var queryString = request.url.substr(index + 1), flagsAndCustomData = CoreUtility._parseRequestFlagsAndCustomDataFromQueryStringIfAny(queryString);
+                    flagsAndCustomData.flags >= 0 && (requestFlags = flagsAndCustomData.flags), customData = flagsAndCustomData.customData;
                 }
             }
-            return RichApiMessageUtility.buildRequestMessageSafeArray("", requestFlags, request.method, request.url, request.headers, CoreUtility._getRequestBodyText(request));
+            return RichApiMessageUtility.buildRequestMessageSafeArray(customData, requestFlags, request.method, request.url, request.headers, CoreUtility._getRequestBodyText(request));
         }, CoreUtility._parseHttpResponseHeaders = function(allResponseHeaders) {
             var responseHeaders = {};
             if (!CoreUtility.isNullOrEmptyString(allResponseHeaders)) for (var regex = new RegExp("\r?\n"), entries = allResponseHeaders.split(regex), i = 0; i < entries.length; i++) {
@@ -2969,12 +3060,12 @@ OSF._OfficeAppFactory = (function OSF__OfficeAppFactory() {
         }, ServiceApiQueue;
     }(), HttpRequestExecutor = function() {
         function HttpRequestExecutor() {}
-        return HttpRequestExecutor.prototype.executeAsync = function(customData, requestFlags, requestMessage) {
-            var url = requestMessage.Url;
-            "/" != url.charAt(url.length - 1) && (url += "/");
+        return HttpRequestExecutor.prototype.getRequestUrl = function(baseUrl, requestFlags) {
+            return "/" != baseUrl.charAt(baseUrl.length - 1) && (baseUrl += "/"), baseUrl = (baseUrl += Core.CoreConstants.processQuery) + "?" + Core.CoreConstants.flags + "=" + requestFlags.toString();
+        }, HttpRequestExecutor.prototype.executeAsync = function(customData, requestFlags, requestMessage) {
             var requestInfo = {
                 method: "POST",
-                url: url = (url += Core.CoreConstants.processQuery) + "?" + Core.CoreConstants.flags + "=" + requestFlags.toString(),
+                url: this.getRequestUrl(requestMessage.Url, requestFlags),
                 headers: {},
                 body: requestMessage.Body
             };
@@ -3245,28 +3336,14 @@ OSF._OfficeAppFactory = (function OSF__OfficeAppFactory() {
     Object.defineProperty(exports, "__esModule", {
         value: !0
     });
-    var OfficeExtensionBatch = __webpack_require__(2), CFRuntime = __webpack_require__(5);
-    __webpack_require__(6), __webpack_require__(7), window.OfficeExtensionBatch = OfficeExtensionBatch, 
+    var OfficeExtensionBatch = __webpack_require__(2);
+    __webpack_require__(5), __webpack_require__(6), window.OfficeExtensionBatch = OfficeExtensionBatch, 
     "undefined" == typeof CustomFunctionMappings && (window.CustomFunctionMappings = {}), 
     "undefined" == typeof Promise && (window.Promise = Office.Promise), window.OfficeExtension = {
         Promise: Promise,
         Error: OfficeExtensionBatch.Error,
         ErrorCodes: OfficeExtensionBatch.ErrorCodes
-    }, window.CustomFunctions = window.CustomFunctions || {}, window.CustomFunctions.delayInitialization = function() {
-        CustomFunctionMappings.__delay__ = !0;
-    }, window.CustomFunctions.associate = function(name, func) {
-        CFRuntime.associate.apply(null, arguments), delete CustomFunctionMappings.__delay__;
-    }, window.CustomFunctions.setCustomFunctionInvoker = CFRuntime.setCustomFunctionInvoker, 
-    function() {
-        function documentReadyCallback() {
-            Office.onReady(function(hostInfo) {
-                hostInfo.host === Office.HostType.Excel ? function initializeCustomFunctionsOrDelay() {
-                    CustomFunctionMappings && CustomFunctionMappings.__delay__ ? setTimeout(initializeCustomFunctionsOrDelay, 50) : CFRuntime.CustomFunctions.initialize();
-                }() : console.warn("Warning: Expected to be loaded inside of an Excel add-in.");
-            });
-        }
-        "loading" === document.readyState ? document.addEventListener("DOMContentLoaded", documentReadyCallback) : documentReadyCallback();
-    }();
+    }, __webpack_require__(7).default(!0);
 }, function(module, exports, __webpack_require__) {
     "use strict";
     var __extends = this && this.__extends || function() {
@@ -4367,7 +4444,7 @@ OSF._OfficeAppFactory = (function OSF__OfficeAppFactory() {
             GenericEventRegistration.s_genericEventRegistration;
         }, GenericEventRegistration.richApiMessageEventCategory = 65536, GenericEventRegistration;
     }();
-    exports._testSetRichApiMessageReadyImpl = function(impl) {
+    exports.GenericEventRegistration = GenericEventRegistration, exports._testSetRichApiMessageReadyImpl = function(impl) {
         GenericEventRegistration._testReadyImpl = impl;
     }, exports._testTriggerRichApiMessageEvent = function(msg) {
         GenericEventRegistration.getGenericEventRegistration()._handleRichApiMessage(msg);
@@ -4919,534 +4996,6 @@ OSF._OfficeAppFactory = (function OSF__OfficeAppFactory() {
         Utility;
     }(Common.CommonUtility);
     exports.Utility = Utility;
-}, function(module, exports, __webpack_require__) {
-    "use strict";
-    var __extends = this && this.__extends || function() {
-        var extendStatics = function(d, b) {
-            return (extendStatics = Object.setPrototypeOf || {
-                __proto__: []
-            } instanceof Array && function(d, b) {
-                d.__proto__ = b;
-            } || function(d, b) {
-                for (var p in b) b.hasOwnProperty(p) && (d[p] = b[p]);
-            })(d, b);
-        };
-        return function(d, b) {
-            function __() {
-                this.constructor = d;
-            }
-            extendStatics(d, b), d.prototype = null === b ? Object.create(b) : (__.prototype = b.prototype, 
-            new __());
-        };
-    }();
-    Object.defineProperty(exports, "__esModule", {
-        value: !0
-    });
-    var OfficeExtension = __webpack_require__(2), Core = __webpack_require__(0), _createPropertyObject = OfficeExtension.BatchApiHelper.createPropertyObject, _createRootServiceObject = (OfficeExtension.BatchApiHelper.createMethodObject, 
-    OfficeExtension.BatchApiHelper.createIndexerObject, OfficeExtension.BatchApiHelper.createRootServiceObject), _createTopLevelServiceObject = OfficeExtension.BatchApiHelper.createTopLevelServiceObject, _invokeMethod = (OfficeExtension.BatchApiHelper.createChildItemObject, 
-    OfficeExtension.BatchApiHelper.invokeMethod), _isNullOrUndefined = (OfficeExtension.BatchApiHelper.invokeEnsureUnchanged, 
-    OfficeExtension.BatchApiHelper.invokeSetProperty, OfficeExtension.Utility.isNullOrUndefined), _throwIfApiNotSupported = (OfficeExtension.Utility.isUndefined, 
-    OfficeExtension.Utility.throwIfNotLoaded, OfficeExtension.Utility.throwIfApiNotSupported), _load = OfficeExtension.Utility.load, _toJson = (OfficeExtension.Utility.retrieve, 
-    OfficeExtension.Utility.toJson), _fixObjectPathIfNecessary = OfficeExtension.Utility.fixObjectPathIfNecessary, _handleNavigationPropertyResults = OfficeExtension.Utility._handleNavigationPropertyResults, _processRetrieveResult = (OfficeExtension.Utility.adjustToDateTime, 
-    OfficeExtension.Utility.processRetrieveResult), CustomFunctionRequestContext = function(_super) {
-        function CustomFunctionRequestContext(requestInfo) {
-            var _this = _super.call(this, requestInfo) || this;
-            return _this.m_customFunctions = CustomFunctions.newObject(_this), _this.m_container = _createRootServiceObject(CustomFunctionsContainer, _this), 
-            _this._rootObject = _this.m_container, _this._rootObjectPropertyName = "customFunctionsContainer", 
-            _this._requestFlagModifier = 128, _this;
-        }
-        return __extends(CustomFunctionRequestContext, _super), Object.defineProperty(CustomFunctionRequestContext.prototype, "customFunctions", {
-            get: function() {
-                return this.m_customFunctions;
-            },
-            enumerable: !0,
-            configurable: !0
-        }), Object.defineProperty(CustomFunctionRequestContext.prototype, "customFunctionsContainer", {
-            get: function() {
-                return this.m_container;
-            },
-            enumerable: !0,
-            configurable: !0
-        }), CustomFunctionRequestContext.prototype._processOfficeJsErrorResponse = function(officeJsErrorCode, response) {
-            5004 === officeJsErrorCode && (response.ErrorCode = CustomFunctionErrorCode.invalidOperationInCellEditMode, 
-            response.ErrorMessage = OfficeExtension.Utility._getResourceString(OfficeExtension.ResourceStrings.invalidOperationInCellEditMode));
-        }, CustomFunctionRequestContext;
-    }(OfficeExtension.ClientRequestContext);
-    exports.Script = {
-        _CustomFunctionMetadata: {}
-    };
-    var CustomFunctionLoggingSeverity, InvocationContext = function() {
-        function InvocationContext(functionName, address, setResultHandler) {
-            this._functionName = functionName, _isNullOrUndefined(address) || (this._address = address), 
-            this.setResult = setResultHandler;
-        }
-        return Object.defineProperty(InvocationContext.prototype, "onCanceled", {
-            get: function() {
-                if (!_isNullOrUndefined(this._onCanceled) && "function" == typeof this._onCanceled) return this._onCanceled;
-            },
-            set: function(handler) {
-                this._onCanceled = handler;
-            },
-            enumerable: !0,
-            configurable: !0
-        }), Object.defineProperty(InvocationContext.prototype, "functionName", {
-            get: function() {
-                return this._functionName;
-            },
-            enumerable: !0,
-            configurable: !0
-        }), Object.defineProperty(InvocationContext.prototype, "address", {
-            get: function() {
-                return this._address;
-            },
-            enumerable: !0,
-            configurable: !0
-        }), InvocationContext;
-    }();
-    exports.InvocationContext = InvocationContext, function(CustomFunctionLoggingSeverity) {
-        CustomFunctionLoggingSeverity.Info = "Medium", CustomFunctionLoggingSeverity.Error = "Unexpected", 
-        CustomFunctionLoggingSeverity.Verbose = "Verbose";
-    }(CustomFunctionLoggingSeverity || (CustomFunctionLoggingSeverity = {}));
-    var CustomFunctionLog = function() {
-        return function(Severity, Message) {
-            this.Severity = Severity, this.Message = Message;
-        };
-    }(), CustomFunctionsLogger = function() {
-        function CustomFunctionsLogger() {}
-        return CustomFunctionsLogger.logEvent = function(log, data, data2) {
-            if (CustomFunctionsLogger.s_shouldLog || OfficeExtension.CoreUtility._logEnabled) {
-                var logMessage = log.Severity + " " + log.Message + data;
-                if (data2 && (logMessage = logMessage + " " + data2), OfficeExtension.Utility.log(logMessage), 
-                CustomFunctionsLogger.s_shouldLog) switch (log.Severity) {
-                  case CustomFunctionLoggingSeverity.Verbose:
-                    null !== console.log && console.log(logMessage);
-                    break;
-
-                  case CustomFunctionLoggingSeverity.Info:
-                    null !== console.info && console.info(logMessage);
-                    break;
-
-                  case CustomFunctionLoggingSeverity.Error:
-                    null !== console.error && console.error(logMessage);
-                }
-            }
-        }, CustomFunctionsLogger.shouldLog = function() {
-            try {
-                return !_isNullOrUndefined(console) && !_isNullOrUndefined(window) && window.name && "string" == typeof window.name && JSON.parse(window.name)[CustomFunctionsLogger.CustomFunctionLoggingFlag];
-            } catch (ex) {
-                return OfficeExtension.Utility.log(JSON.stringify(ex)), !1;
-            }
-        }, CustomFunctionsLogger.CustomFunctionLoggingFlag = "CustomFunctionsRuntimeLogging", 
-        CustomFunctionsLogger.s_shouldLog = CustomFunctionsLogger.shouldLog(), CustomFunctionsLogger;
-    }(), CustomFunctionProxy = function() {
-        function CustomFunctionProxy() {
-            this._whenInit = void 0, this._isInit = !1, this._setResultsDelayMillis = 50, this._setResultsOverdueDelayMillis = 2e3, 
-            this._maxContextSyncExecutionDurationMills = 15e3, this._minContextSyncIntervalMills = 500, 
-            this._setResultsLifeMillis = 6e4, this._ensureInitRetryDelayMillis = 500, this._resultEntryBuffer = {}, 
-            this._isSetResultsTaskScheduled = !1, this._setResultsTaskOverdueTime = 0, this._inProgressContextSyncExpectedFinishTime = 0, 
-            this._batchQuotaMillis = 1e3, this._invocationContextMap = {}, this._customFunctionAssociateMappings = {};
-        }
-        return CustomFunctionProxy.prototype._initSettings = function() {
-            if ("object" == typeof exports.Script && "object" == typeof exports.Script._CustomFunctionSettings) {
-                if ("number" == typeof exports.Script._CustomFunctionSettings.setResultsDelayMillis) {
-                    var setResultsDelayMillis = exports.Script._CustomFunctionSettings.setResultsDelayMillis;
-                    setResultsDelayMillis = Math.max(0, setResultsDelayMillis), setResultsDelayMillis = Math.min(1e3, setResultsDelayMillis), 
-                    this._setResultsDelayMillis = setResultsDelayMillis;
-                }
-                if ("number" == typeof exports.Script._CustomFunctionSettings.ensureInitRetryDelayMillis) {
-                    var ensureInitRetryDelayMillis = exports.Script._CustomFunctionSettings.ensureInitRetryDelayMillis;
-                    ensureInitRetryDelayMillis = Math.max(0, ensureInitRetryDelayMillis), ensureInitRetryDelayMillis = Math.min(2e3, ensureInitRetryDelayMillis), 
-                    this._ensureInitRetryDelayMillis = ensureInitRetryDelayMillis;
-                }
-                if ("number" == typeof exports.Script._CustomFunctionSettings.setResultsLifeMillis) {
-                    var setResultsLifeMillis = exports.Script._CustomFunctionSettings.setResultsLifeMillis;
-                    setResultsLifeMillis = Math.max(0, setResultsLifeMillis), setResultsLifeMillis = Math.min(6e5, setResultsLifeMillis), 
-                    this._setResultsLifeMillis = setResultsLifeMillis;
-                }
-                if ("number" == typeof exports.Script._CustomFunctionSettings.batchQuotaMillis) {
-                    var batchQuotaMillis = exports.Script._CustomFunctionSettings.batchQuotaMillis;
-                    batchQuotaMillis = Math.max(0, batchQuotaMillis), batchQuotaMillis = Math.min(1e3, batchQuotaMillis), 
-                    this._batchQuotaMillis = batchQuotaMillis;
-                }
-            }
-        }, CustomFunctionProxy.prototype.ensureInit = function(context) {
-            var _this = this;
-            return this._initSettings(), void 0 === this._whenInit && (this._whenInit = OfficeExtension.Utility._createPromiseFromResult(null).then(function() {
-                if (!_this._isInit) return context.eventRegistration.register(5, "", _this._handleMessage.bind(_this));
-            }).then(function() {
-                _this._isInit = !0;
-            })), this._isInit || context._pendingRequest._addPreSyncPromise(this._whenInit), 
-            this._whenInit;
-        }, CustomFunctionProxy.prototype.associate = function(arg1, arg2) {
-            function consoleWarn(message) {
-                "undefined" != typeof console && console.warn && console.warn(message);
-            }
-            if (1 == arguments.length && "object" == typeof arguments[0] && arguments[0]) {
-                var mappings = arguments[0];
-                for (var key in mappings) this.associate(key, mappings[key]);
-            } else if (2 == arguments.length) {
-                var name_1 = arguments[0], func = arguments[1];
-                if ("string" != typeof name_1) return void consoleWarn(CustomFunctionProxy.CustomFunctionInvalidArg.Message + "associate");
-                if ("function" != typeof func) return void consoleWarn(CustomFunctionProxy.CustomFunctionInvalidArg.Message + name_1);
-                var nameUpperCase = name_1.toUpperCase();
-                this._customFunctionAssociateMappings[nameUpperCase] && consoleWarn(CustomFunctionProxy.CustomFunctionDuplicatedName.Message + name_1), 
-                this._customFunctionAssociateMappings[nameUpperCase] = func;
-            } else consoleWarn(CustomFunctionProxy.CustomFunctionInvalidArg.Message + "associate");
-        }, CustomFunctionProxy.prototype.setCustomFunctionInvoker = function(invoker) {
-            this._invoker = invoker;
-        }, CustomFunctionProxy.prototype._initFromHostBridge = function(hostBridge) {
-            var _this = this;
-            this._initSettings(), hostBridge.addHostMessageHandler(function(bridgeMessage) {
-                3 === bridgeMessage.type ? _this._handleMessage(bridgeMessage.message) : 4 === bridgeMessage.type && _this._handleSettings(bridgeMessage.message);
-            }), this._isInit = !0, this._whenInit = OfficeExtension.CoreUtility.Promise.resolve();
-        }, CustomFunctionProxy.prototype._handleSettings = function(args) {
-            OfficeExtension.Utility.log("CustomFunctionProxy._handleSettings:" + JSON.stringify(args)), 
-            args && "object" == typeof args && (CustomFunctionsLogger.s_shouldLog = args[CustomFunctionsLogger.CustomFunctionLoggingFlag]);
-        }, CustomFunctionProxy.prototype._handleMessage = function(args) {
-            try {
-                OfficeExtension.Utility.log("CustomFunctionProxy._handleMessage"), OfficeExtension.Utility.checkArgumentNull(args, "args");
-                for (var entryArray = args.entries, invocationArray = [], cancellationArray = [], metadataArray = [], i = 0; i < entryArray.length; i++) 1 === entryArray[i].messageCategory && ("string" == typeof entryArray[i].message && (entryArray[i].message = JSON.parse(entryArray[i].message)), 
-                1e3 === entryArray[i].messageType ? invocationArray.push(entryArray[i]) : 1001 === entryArray[i].messageType ? cancellationArray.push(entryArray[i]) : 1002 === entryArray[i].messageType ? metadataArray.push(entryArray[i]) : OfficeExtension.Utility.log("CustomFunctionProxy._handleMessage unknown message type " + entryArray[i].messageType));
-                if (metadataArray.length > 0 && this._handleMetadataEntries(metadataArray), invocationArray.length > 0) {
-                    var batchArray = this._batchInvocationEntries(invocationArray);
-                    batchArray.length > 0 && this._invokeRemainingBatchEntries(batchArray, 0);
-                }
-                cancellationArray.length > 0 && this._handleCancellationEntries(cancellationArray);
-            } catch (ex) {
-                throw CustomFunctionProxy._tryLog(ex), ex;
-            }
-            return OfficeExtension.Utility._createPromiseFromResult(null);
-        }, CustomFunctionProxy.toLogMessage = function(ex) {
-            var ret = "Unknown Error";
-            if (ex) try {
-                ex.toString && (ret = ex.toString()), ret = ret + " " + JSON.stringify(ex);
-            } catch (otherEx) {
-                ret = "Unexpected Error";
-            }
-            return ret;
-        }, CustomFunctionProxy._tryLog = function(ex) {
-            var message = CustomFunctionProxy.toLogMessage(ex);
-            OfficeExtension.Utility.log(message);
-        }, CustomFunctionProxy.prototype._handleMetadataEntries = function(entryArray) {
-            for (var i = 0; i < entryArray.length; i++) {
-                var message = entryArray[i].message;
-                if (_isNullOrUndefined(message)) throw OfficeExtension.Utility.createRuntimeError(CustomFunctionErrorCode.generalException, "message", "CustomFunctionProxy._handleMetadataEntries");
-                exports.Script._CustomFunctionMetadata[message.functionName] = {
-                    options: {
-                        stream: message.isStream,
-                        cancelable: message.isCancelable
-                    }
-                };
-            }
-        }, CustomFunctionProxy.prototype._handleCancellationEntries = function(entryArray) {
-            for (var i = 0; i < entryArray.length; i++) {
-                var message = entryArray[i].message;
-                if (_isNullOrUndefined(message)) throw OfficeExtension.Utility.createRuntimeError(CustomFunctionErrorCode.generalException, "message", "CustomFunctionProxy._handleCancellationEntries");
-                var invocationId = message.invocationId, invocationContext = this._invocationContextMap[invocationId];
-                _isNullOrUndefined(invocationContext) || (delete this._invocationContextMap[invocationId], 
-                CustomFunctionsLogger.logEvent(CustomFunctionProxy.CustomFunctionCancellation, invocationContext.functionName), 
-                _isNullOrUndefined(invocationContext.onCanceled) || invocationContext.onCanceled());
-            }
-        }, CustomFunctionProxy.prototype._batchInvocationEntries = function(entryArray) {
-            for (var _this = this, batchArray = [], _loop_1 = function(i) {
-                var message, arrayOrObjectMessage = entryArray[i].message;
-                if (message = Array.isArray(arrayOrObjectMessage) ? {
-                    invocationId: arrayOrObjectMessage[0],
-                    functionName: arrayOrObjectMessage[1],
-                    parameterValues: arrayOrObjectMessage[2],
-                    address: arrayOrObjectMessage[3],
-                    flags: arrayOrObjectMessage[4]
-                } : arrayOrObjectMessage, _isNullOrUndefined(message)) throw OfficeExtension.Utility.createRuntimeError(CustomFunctionErrorCode.generalException, "message", "CustomFunctionProxy._batchInvocationEntries");
-                if (_isNullOrUndefined(message.invocationId) || message.invocationId < 0) throw OfficeExtension.Utility.createRuntimeError(CustomFunctionErrorCode.generalException, "invocationId", "CustomFunctionProxy._batchInvocationEntries");
-                if (_isNullOrUndefined(message.functionName)) throw OfficeExtension.Utility.createRuntimeError(CustomFunctionErrorCode.generalException, "functionName", "CustomFunctionProxy._batchInvocationEntries");
-                var call = null, isCancelable = !1, isStreaming = !1;
-                if ("number" == typeof message.flags) isCancelable = 0 != (1 & message.flags), isStreaming = 0 != (2 & message.flags); else {
-                    var metadata = exports.Script._CustomFunctionMetadata[message.functionName];
-                    if (_isNullOrUndefined(metadata)) return CustomFunctionsLogger.logEvent(CustomFunctionProxy.CustomFunctionExecutionNotFoundLog, message.functionName), 
-                    this_1._setError(message.invocationId, "N/A", 1), "continue";
-                    isCancelable = metadata.options.cancelable, isStreaming = metadata.options.stream;
-                }
-                if (this_1._invoker) return this_1._invokeFunctionUsingInvoker(message), "continue";
-                try {
-                    call = this_1._getFunction(message.functionName);
-                } catch (ex) {
-                    return CustomFunctionsLogger.logEvent(CustomFunctionProxy.CustomFunctionExecutionNotFoundLog, message.functionName), 
-                    this_1._setError(message.invocationId, ex, 1), "continue";
-                }
-                var invocationContext = void 0;
-                if (isStreaming || isCancelable) {
-                    var setResult = void 0;
-                    isStreaming && (setResult = function(result) {
-                        _this._invocationContextMap[message.invocationId] ? _this._setResult(message.invocationId, result) : CustomFunctionsLogger.logEvent(CustomFunctionProxy.CustomFunctionAlreadyCancelled, message.functionName);
-                    }), invocationContext = new InvocationContext(message.functionName, message.address, setResult), 
-                    this_1._invocationContextMap[message.invocationId] = invocationContext;
-                } else invocationContext = new InvocationContext(message.functionName, message.address);
-                message.parameterValues.push(invocationContext), batchArray.push({
-                    call: call,
-                    isBatching: !1,
-                    isStreaming: isStreaming,
-                    invocationIds: [ message.invocationId ],
-                    parameterValueSets: [ message.parameterValues ],
-                    functionName: message.functionName
-                });
-            }, this_1 = this, i = 0; i < entryArray.length; i++) _loop_1(i);
-            return batchArray;
-        }, CustomFunctionProxy.prototype._invokeFunctionUsingInvoker = function(message) {
-            var _this = this, isCancelable = 0 != (1 & message.flags), isStreaming = 0 != (2 & message.flags), invocationId = message.invocationId, setResult = void 0;
-            if (isStreaming) setResult = function(result) {
-                _this._invocationContextMap[invocationId] && _this._setResult(invocationId, result);
-            }; else {
-                var setResultCalled_1 = !1;
-                setResult = function(result) {
-                    setResultCalled_1 || _this._setResult(invocationId, result), setResultCalled_1 = !0;
-                };
-            }
-            var invocationContext = new InvocationContext(message.functionName, message.address, setResult);
-            (isStreaming || isCancelable) && (this._invocationContextMap[invocationId] = invocationContext), 
-            this._invoker.invoke(message.functionName, message.parameterValues, invocationContext);
-        }, CustomFunctionProxy.prototype._ensureCustomFunctionMappingsUpperCase = function() {
-            if (_isNullOrUndefined(this._customFunctionMappingsUpperCase)) {
-                if (this._customFunctionMappingsUpperCase = {}, "object" == typeof CustomFunctionMappings) for (var key in OfficeExtension.CoreUtility.log("CustomFunctionMappings.Keys=" + JSON.stringify(Object.keys(CustomFunctionMappings))), 
-                CustomFunctionMappings) this._customFunctionMappingsUpperCase[key.toUpperCase()] && CustomFunctionsLogger.logEvent(CustomFunctionProxy.CustomFunctionDuplicatedName, key), 
-                this._customFunctionMappingsUpperCase[key.toUpperCase()] = CustomFunctionMappings[key];
-                for (var key in OfficeExtension.CoreUtility.log("CustomFunctionAssociateMappings.Keys=" + JSON.stringify(Object.keys(this._customFunctionAssociateMappings))), 
-                this._customFunctionAssociateMappings) this._customFunctionMappingsUpperCase[key.toUpperCase()] && CustomFunctionsLogger.logEvent(CustomFunctionProxy.CustomFunctionDuplicatedName, key), 
-                this._customFunctionMappingsUpperCase[key.toUpperCase()] = this._customFunctionAssociateMappings[key];
-            }
-        }, CustomFunctionProxy.prototype._getCustomFunctionMappings = function(functionName) {
-            this._ensureCustomFunctionMappingsUpperCase();
-            var functionNameUpperCase = functionName.toUpperCase();
-            if (!_isNullOrUndefined(this._customFunctionMappingsUpperCase[functionNameUpperCase])) {
-                if ("function" == typeof this._customFunctionMappingsUpperCase[functionNameUpperCase]) return this._customFunctionMappingsUpperCase[functionNameUpperCase];
-                throw OfficeExtension.Utility.createRuntimeError(CustomFunctionErrorCode.invalidOperation, OfficeExtension.Utility._getResourceString(OfficeExtension.ResourceStrings.customFunctionInvalidFunctionMapping, functionName), "CustomFunctionProxy._getCustomFunctionMappings");
-            }
-        }, CustomFunctionProxy.prototype._getFunction = function(functionName) {
-            var call = this._getCustomFunctionMappings(functionName);
-            if (!_isNullOrUndefined(call)) return call;
-            if (_isNullOrUndefined(window)) throw OfficeExtension.Utility.createRuntimeError(CustomFunctionErrorCode.invalidOperation, OfficeExtension.Utility._getResourceString(OfficeExtension.ResourceStrings.customFunctionWindowMissing), "CustomFunctionProxy._getFunction");
-            for (var functionParent = window, functionNameSegments = functionName.split("."), i = 0; i < functionNameSegments.length - 1; i++) if (functionParent = functionParent[functionNameSegments[i]], 
-            _isNullOrUndefined(functionParent) || "object" != typeof functionParent) throw OfficeExtension.Utility.createRuntimeError(CustomFunctionErrorCode.invalidOperation, OfficeExtension.Utility._getResourceString(OfficeExtension.ResourceStrings.customFunctionDefintionMissingOnWindow, functionName), "CustomFunctionProxy._getFunction");
-            if ("function" != typeof (call = functionParent[functionNameSegments[functionNameSegments.length - 1]])) throw OfficeExtension.Utility.createRuntimeError(CustomFunctionErrorCode.invalidOperation, OfficeExtension.Utility._getResourceString(OfficeExtension.ResourceStrings.customFunctionInvalidFunction, functionName), "CustomFunctionProxy._getFunction");
-            return call;
-        }, CustomFunctionProxy.prototype._invokeRemainingBatchEntries = function(batchArray, startIndex) {
-            OfficeExtension.Utility.log("CustomFunctionProxy._invokeRemainingBatchEntries");
-            for (var startTimeMillis = Date.now(), i = startIndex; i < batchArray.length; i++) {
-                if (!(Date.now() - startTimeMillis < this._batchQuotaMillis)) {
-                    OfficeExtension.Utility.log("setTimeout(CustomFunctionProxy._invokeRemainingBatchEntries)"), 
-                    setTimeout(this._invokeRemainingBatchEntries.bind(this), 0, batchArray, i);
-                    break;
-                }
-                this._invokeFunctionAndSetResult(batchArray[i]);
-            }
-        }, CustomFunctionProxy.prototype._invokeFunctionAndSetResult = function(batch) {
-            var results, _this = this;
-            CustomFunctionsLogger.logEvent(CustomFunctionProxy.CustomFunctionExecutionStartLog, batch.functionName);
-            try {
-                results = batch.isBatching ? batch.call.call(null, batch.parameterValueSets) : [ batch.call.apply(null, batch.parameterValueSets[0]) ];
-            } catch (ex) {
-                for (var i = 0; i < batch.invocationIds.length; i++) this._setError(batch.invocationIds[i], ex, 2);
-                return void CustomFunctionsLogger.logEvent(CustomFunctionProxy.CustomFunctionExecutionExceptionThrownLog, batch.functionName, CustomFunctionProxy.toLogMessage(ex));
-            }
-            if (batch.isStreaming) ; else if (results.length === batch.parameterValueSets.length) {
-                var _loop_2 = function(i) {
-                    _isNullOrUndefined(results[i]) || "object" != typeof results[i] || "function" != typeof results[i].then ? (CustomFunctionsLogger.logEvent(CustomFunctionProxy.CustomFunctionExecutionFinishLog, batch.functionName), 
-                    this_2._setResult(batch.invocationIds[i], results[i])) : results[i].then(function(value) {
-                        CustomFunctionsLogger.logEvent(CustomFunctionProxy.CustomFunctionExecutionFinishLog, batch.functionName), 
-                        _this._setResult(batch.invocationIds[i], value);
-                    }, function(reason) {
-                        CustomFunctionsLogger.logEvent(CustomFunctionProxy.CustomFunctionExecutionRejectedPromoseLog, batch.functionName, CustomFunctionProxy.toLogMessage(reason)), 
-                        _this._setError(batch.invocationIds[i], reason, 3);
-                    });
-                }, this_2 = this;
-                for (i = 0; i < results.length; i++) _loop_2(i);
-            } else {
-                CustomFunctionsLogger.logEvent(CustomFunctionProxy.CustomFunctionExecutionBatchMismatchLog, batch.functionName);
-                for (i = 0; i < batch.invocationIds.length; i++) this._setError(batch.invocationIds[i], OfficeExtension.Utility._getResourceString(OfficeExtension.ResourceStrings.customFunctionUnexpectedNumberOfEntriesInResultBatch), 4);
-            }
-        }, CustomFunctionProxy.prototype._setResult = function(invocationId, result) {
-            var invocationResult = {
-                id: invocationId,
-                value: result
-            };
-            "number" == typeof result ? isNaN(result) ? (invocationResult.failed = !0, invocationResult.value = "NaN") : isFinite(result) || (invocationResult.failed = !0, 
-            invocationResult.value = "Infinity", invocationResult.errorCode = 6) : result instanceof Error && (invocationResult.failed = !0, 
-            invocationResult.value = CustomFunctionProxy.toLogMessage(result), invocationResult.errorCode = 0);
-            var timeNow = Date.now();
-            this._resultEntryBuffer[invocationId] = {
-                timeCreated: timeNow,
-                result: invocationResult
-            }, this._ensureSetResultsTaskIsScheduled(timeNow);
-        }, CustomFunctionProxy.prototype._setError = function(invocationId, error, errorCode) {
-            var result = {
-                id: invocationId,
-                failed: !0,
-                value: "object" == typeof error ? JSON.stringify(error) : error.toString(),
-                errorCode: errorCode
-            }, timeNow = Date.now();
-            this._resultEntryBuffer[invocationId] = {
-                timeCreated: timeNow,
-                result: result
-            }, this._ensureSetResultsTaskIsScheduled(timeNow);
-        }, CustomFunctionProxy.prototype._ensureSetResultsTaskIsScheduled = function(timeNow) {
-            if (this._setResultsTaskOverdueTime > 0 && timeNow > this._setResultsTaskOverdueTime) return OfficeExtension.Utility.log("SetResultsTask overdue"), 
-            void this._executeSetResultsTask();
-            this._isSetResultsTaskScheduled || (OfficeExtension.Utility.log("setTimeout(CustomFunctionProxy._executeSetResultsTask)"), 
-            setTimeout(this._executeSetResultsTask.bind(this), this._setResultsDelayMillis), 
-            this._isSetResultsTaskScheduled = !0, this._setResultsTaskOverdueTime = timeNow + this._setResultsDelayMillis + this._setResultsOverdueDelayMillis);
-        }, CustomFunctionProxy.prototype._convertCustomFunctionInvocationResultToArray = function(result) {
-            var ret = [];
-            return ret.push(result.id), ret.push(!result.failed), OfficeExtension.CoreUtility.isUndefined(result.value) ? ret.push(null) : ret.push(result.value), 
-            result.failed && (OfficeExtension.CoreUtility.isUndefined(result.errorCode) ? ret.push(0) : ret.push(result.errorCode)), 
-            ret;
-        }, CustomFunctionProxy.prototype._executeSetResultsTask = function() {
-            var _this = this;
-            OfficeExtension.Utility.log("CustomFunctionProxy._executeSetResultsTask");
-            var timeNow = Date.now();
-            if (this._inProgressContextSyncExpectedFinishTime > 0 && this._inProgressContextSyncExpectedFinishTime > timeNow) return OfficeExtension.Utility.log("context.sync() is in progress. setTimeout(CustomFunctionProxy._executeSetResultsTask)"), 
-            setTimeout(this._executeSetResultsTask.bind(this), this._setResultsDelayMillis), 
-            void (this._setResultsTaskOverdueTime = timeNow + this._setResultsDelayMillis + this._setResultsOverdueDelayMillis);
-            this._isSetResultsTaskScheduled = !1, this._setResultsTaskOverdueTime = 0;
-            var resultEntryBufferCopy = this._resultEntryBuffer;
-            this._resultEntryBuffer = {};
-            var useArrayResult = OfficeExtension.Utility.isSetSupported("CustomFunctions", "1.7"), invocationResults = [];
-            for (var key in resultEntryBufferCopy) useArrayResult ? invocationResults.push(this._convertCustomFunctionInvocationResultToArray(resultEntryBufferCopy[key].result)) : invocationResults.push(resultEntryBufferCopy[key].result);
-            if (0 !== invocationResults.length) {
-                var context = new CustomFunctionRequestContext();
-                useArrayResult ? context.customFunctions.setInvocationArrayResults(invocationResults) : context.customFunctions.setInvocationResults(invocationResults);
-                var contextSyncStartTime = Date.now();
-                this._inProgressContextSyncExpectedFinishTime = contextSyncStartTime + this._maxContextSyncExecutionDurationMills, 
-                context.sync().then(function(value) {
-                    _this._clearInProgressContextSyncExpectedFinishTimeAfterMinInterval(Date.now() - contextSyncStartTime);
-                }, function(reason) {
-                    var timeNow = Date.now();
-                    _this._clearInProgressContextSyncExpectedFinishTimeAfterMinInterval(timeNow - contextSyncStartTime), 
-                    _this._restoreResultEntries(timeNow, resultEntryBufferCopy), _this._ensureSetResultsTaskIsScheduled(timeNow);
-                });
-            }
-        }, CustomFunctionProxy.prototype._restoreResultEntries = function(timeNow, resultEntryBufferCopy) {
-            for (var key in resultEntryBufferCopy) {
-                var resultSetter = resultEntryBufferCopy[key];
-                timeNow - resultSetter.timeCreated <= this._setResultsLifeMillis && (this._resultEntryBuffer[key] || (this._resultEntryBuffer[key] = resultSetter));
-            }
-        }, CustomFunctionProxy.prototype._clearInProgressContextSyncExpectedFinishTimeAfterMinInterval = function(lastContextSyncDurationMills) {
-            var _this = this, interval = Math.max(this._minContextSyncIntervalMills, 2 * lastContextSyncDurationMills);
-            OfficeExtension.Utility.log("setTimeout(clearInProgressContestSyncExpectedFinishedTime," + interval + ")"), 
-            setTimeout(function() {
-                OfficeExtension.Utility.log("clearInProgressContestSyncExpectedFinishedTime"), _this._inProgressContextSyncExpectedFinishTime = 0;
-            }, interval);
-        }, CustomFunctionProxy.CustomFunctionExecutionStartLog = new CustomFunctionLog(CustomFunctionLoggingSeverity.Verbose, "CustomFunctions [Execution] [Begin] Function="), 
-        CustomFunctionProxy.CustomFunctionExecutionFailureLog = new CustomFunctionLog(CustomFunctionLoggingSeverity.Error, "CustomFunctions [Execution] [End] [Failure] Function="), 
-        CustomFunctionProxy.CustomFunctionExecutionRejectedPromoseLog = new CustomFunctionLog(CustomFunctionLoggingSeverity.Error, "CustomFunctions [Execution] [End] [Failure] [RejectedPromise] Function="), 
-        CustomFunctionProxy.CustomFunctionExecutionExceptionThrownLog = new CustomFunctionLog(CustomFunctionLoggingSeverity.Error, "CustomFunctions [Execution] [End] [Failure] [ExceptionThrown] Function="), 
-        CustomFunctionProxy.CustomFunctionExecutionBatchMismatchLog = new CustomFunctionLog(CustomFunctionLoggingSeverity.Error, "CustomFunctions [Execution] [End] [Failure] [BatchMismatch] Function="), 
-        CustomFunctionProxy.CustomFunctionExecutionFinishLog = new CustomFunctionLog(CustomFunctionLoggingSeverity.Info, "CustomFunctions [Execution] [End] [Success] Function="), 
-        CustomFunctionProxy.CustomFunctionExecutionNotFoundLog = new CustomFunctionLog(CustomFunctionLoggingSeverity.Error, "CustomFunctions [Execution] [NotFound] Function="), 
-        CustomFunctionProxy.CustomFunctionCancellation = new CustomFunctionLog(CustomFunctionLoggingSeverity.Info, "CustomFunctions [Cancellation] Function="), 
-        CustomFunctionProxy.CustomFunctionAlreadyCancelled = new CustomFunctionLog(CustomFunctionLoggingSeverity.Info, "CustomFunctions [AlreadyCancelled] Function="), 
-        CustomFunctionProxy.CustomFunctionDuplicatedName = new CustomFunctionLog(CustomFunctionLoggingSeverity.Error, "CustomFunctions [DuplicatedName] Function="), 
-        CustomFunctionProxy.CustomFunctionInvalidArg = new CustomFunctionLog(CustomFunctionLoggingSeverity.Error, "CustomFunctions [InvalidArg] Name="), 
-        CustomFunctionProxy;
-    }();
-    exports.CustomFunctionProxy = CustomFunctionProxy, exports.customFunctionProxy = new CustomFunctionProxy(), 
-    exports.associate = exports.customFunctionProxy.associate.bind(exports.customFunctionProxy), 
-    exports.setCustomFunctionInvoker = exports.customFunctionProxy.setCustomFunctionInvoker.bind(exports.customFunctionProxy), 
-    Core.HostBridge.onInited(function(hostBridge) {
-        exports.customFunctionProxy._initFromHostBridge(hostBridge);
-    });
-    var CustomFunctions = function(_super) {
-        function CustomFunctions() {
-            return null !== _super && _super.apply(this, arguments) || this;
-        }
-        return __extends(CustomFunctions, _super), Object.defineProperty(CustomFunctions.prototype, "_className", {
-            get: function() {
-                return "CustomFunctions";
-            },
-            enumerable: !0,
-            configurable: !0
-        }), CustomFunctions.initialize = function() {
-            var context = new CustomFunctionRequestContext();
-            return exports.customFunctionProxy.ensureInit(context).then(function() {
-                return context.customFunctions._SetOsfControlContainerReadyForCustomFunctions(), 
-                context._customData = "SetOsfControlContainerReadyForCustomFunctions", context.sync().catch(function(error) {
-                    return function(error, rethrowOtherError) {
-                        var isCellEditModeError = error instanceof OfficeExtension.Error && error.code === CustomFunctionErrorCode.invalidOperationInCellEditMode;
-                        if (OfficeExtension.CoreUtility.log("Error on starting custom functions: " + error), 
-                        isCellEditModeError) {
-                            OfficeExtension.CoreUtility.log("Was in cell-edit mode, will try again");
-                            var delay_1 = exports.customFunctionProxy._ensureInitRetryDelayMillis;
-                            return new OfficeExtension.CoreUtility.Promise(function(resolve) {
-                                return setTimeout(resolve, delay_1);
-                            }).then(function() {
-                                return CustomFunctions.initialize();
-                            });
-                        }
-                        if (rethrowOtherError) throw error;
-                    }(error, !0);
-                });
-            });
-        }, CustomFunctions.prototype.setInvocationArrayResults = function(results) {
-            _throwIfApiNotSupported("CustomFunctions.setInvocationArrayResults", "CustomFunctions", "1.4", "Excel"), 
-            _invokeMethod(this, "SetInvocationArrayResults", 0, [ results ], 2, 0);
-        }, CustomFunctions.prototype.setInvocationResults = function(results) {
-            _invokeMethod(this, "SetInvocationResults", 0, [ results ], 2, 0);
-        }, CustomFunctions.prototype._SetInvocationError = function(invocationId, message) {
-            _invokeMethod(this, "_SetInvocationError", 0, [ invocationId, message ], 2, 0);
-        }, CustomFunctions.prototype._SetInvocationResult = function(invocationId, result) {
-            _invokeMethod(this, "_SetInvocationResult", 0, [ invocationId, result ], 2, 0);
-        }, CustomFunctions.prototype._SetOsfControlContainerReadyForCustomFunctions = function() {
-            _invokeMethod(this, "_SetOsfControlContainerReadyForCustomFunctions", 0, [], 10, 0);
-        }, CustomFunctions.prototype._handleResult = function(value) {
-            (_super.prototype._handleResult.call(this, value), _isNullOrUndefined(value)) || _fixObjectPathIfNecessary(this, value);
-        }, CustomFunctions.prototype._handleRetrieveResult = function(value, result) {
-            _super.prototype._handleRetrieveResult.call(this, value, result), _processRetrieveResult(this, value, result);
-        }, CustomFunctions.newObject = function(context) {
-            return _createTopLevelServiceObject(CustomFunctions, context, "Microsoft.ExcelServices.CustomFunctions", !1, 4);
-        }, CustomFunctions.prototype.toJSON = function() {
-            return _toJson(this, {}, {});
-        }, CustomFunctions;
-    }(OfficeExtension.ClientObject);
-    exports.CustomFunctions = CustomFunctions;
-    var CustomFunctionErrorCode, CustomFunctionsContainer = function(_super) {
-        function CustomFunctionsContainer() {
-            return null !== _super && _super.apply(this, arguments) || this;
-        }
-        return __extends(CustomFunctionsContainer, _super), Object.defineProperty(CustomFunctionsContainer.prototype, "_className", {
-            get: function() {
-                return "CustomFunctionsContainer";
-            },
-            enumerable: !0,
-            configurable: !0
-        }), Object.defineProperty(CustomFunctionsContainer.prototype, "_navigationPropertyNames", {
-            get: function() {
-                return [ "customFunctions" ];
-            },
-            enumerable: !0,
-            configurable: !0
-        }), Object.defineProperty(CustomFunctionsContainer.prototype, "customFunctions", {
-            get: function() {
-                return _throwIfApiNotSupported("CustomFunctionsContainer.customFunctions", "CustomFunctions", "1.2", "Excel"), 
-                this._C || (this._C = _createPropertyObject(CustomFunctions, this, "CustomFunctions", !1, 4)), 
-                this._C;
-            },
-            enumerable: !0,
-            configurable: !0
-        }), CustomFunctionsContainer.prototype._handleResult = function(value) {
-            if (_super.prototype._handleResult.call(this, value), !_isNullOrUndefined(value)) {
-                var obj = value;
-                _fixObjectPathIfNecessary(this, obj), _handleNavigationPropertyResults(this, obj, [ "customFunctions", "CustomFunctions" ]);
-            }
-        }, CustomFunctionsContainer.prototype.load = function(option) {
-            return _load(this, option);
-        }, CustomFunctionsContainer.prototype._handleRetrieveResult = function(value, result) {
-            _super.prototype._handleRetrieveResult.call(this, value, result), _processRetrieveResult(this, value, result);
-        }, CustomFunctionsContainer.prototype.toJSON = function() {
-            return _toJson(this, {}, {});
-        }, CustomFunctionsContainer;
-    }(OfficeExtension.ClientObject);
-    exports.CustomFunctionsContainer = CustomFunctionsContainer, function(CustomFunctionErrorCode) {
-        CustomFunctionErrorCode.generalException = "GeneralException", CustomFunctionErrorCode.invalidOperation = "InvalidOperation", 
-        CustomFunctionErrorCode.invalidOperationInCellEditMode = "InvalidOperationInCellEditMode";
-    }(CustomFunctionErrorCode || (CustomFunctionErrorCode = {}));
 }, function(module, exports) {
     function getOfficeRuntimeImplementation(info) {
         return window[info.platform === Office.PlatformType.OfficeOnline ? "_OfficeRuntimeWeb" : "_OfficeRuntimeNative"];
@@ -5474,7 +5023,7 @@ OSF._OfficeAppFactory = (function OSF__OfficeAppFactory() {
             };
             function wrapStorageMethod(methodName) {
                 return wrapMethod(function(impl) {
-                    return impl.AsyncStorage[methodName];
+                    return impl.storage[methodName];
                 });
             }
         }(),
@@ -5496,7 +5045,24 @@ OSF._OfficeAppFactory = (function OSF__OfficeAppFactory() {
                     return impl.storage[methodName];
                 });
             }
-        }()
+        }(),
+        experimentation: function() {
+            return {
+                getBooleanFeatureGateAsync: wrapExperimentationMethod("getBooleanFeatureGateAsync"),
+                getIntFeatureGateAsync: wrapExperimentationMethod("getIntFeatureGateAsync"),
+                getStringFeatureGateAsync: wrapExperimentationMethod("getStringFeatureGateAsync")
+            };
+            function wrapExperimentationMethod(methodName) {
+                return wrapMethod(function(impl) {
+                    return impl.experimentation[methodName];
+                });
+            }
+        }(),
+        apiInformation: {
+            isSetSupported: function(capability, semVer) {
+                return Office.context.requirements.isSetSupported(capability, Number(semVer));
+            }
+        }
     };
 }, function(module, exports) {
     !function(self) {
@@ -5729,4 +5295,614 @@ OSF._OfficeAppFactory = (function OSF__OfficeAppFactory() {
             this.headers = new Headers(options.headers), this.url = options.url || "", this._initBody(bodyInit);
         }
     }("undefined" != typeof self ? self : this);
+}, function(module, exports, __webpack_require__) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", {
+        value: !0
+    });
+    var CFRuntime = __webpack_require__(8);
+    exports.default = function(shouldInitRuntime) {
+        function documentReadyCallback() {
+            Office.onReady(function(hostInfo) {
+                hostInfo.host === Office.HostType.Excel ? function initializeCustomFunctionsOrDelay() {
+                    CustomFunctionMappings && CustomFunctionMappings.__delay__ ? setTimeout(initializeCustomFunctionsOrDelay, 50) : CFRuntime.CustomFunctions.initialize();
+                }() : console.warn("Warning: Expected to be loaded inside of an Excel add-in.");
+            });
+        }
+        window.CustomFunctions = window.CustomFunctions || {}, window.CustomFunctions.setCustomFunctionInvoker = CFRuntime.setCustomFunctionInvoker, 
+        window.CustomFunctions.Error = CFRuntime.CustomFunctionError, window.CustomFunctions.ErrorCode = CFRuntime.ErrorCode, 
+        CFRuntime.setCustomFunctionAssociation(window.CustomFunctions._association), shouldInitRuntime && ("loading" === document.readyState ? document.addEventListener("DOMContentLoaded", documentReadyCallback) : documentReadyCallback());
+    };
+}, function(module, exports, __webpack_require__) {
+    "use strict";
+    var __extends = this && this.__extends || function() {
+        var extendStatics = function(d, b) {
+            return (extendStatics = Object.setPrototypeOf || {
+                __proto__: []
+            } instanceof Array && function(d, b) {
+                d.__proto__ = b;
+            } || function(d, b) {
+                for (var p in b) b.hasOwnProperty(p) && (d[p] = b[p]);
+            })(d, b);
+        };
+        return function(d, b) {
+            function __() {
+                this.constructor = d;
+            }
+            extendStatics(d, b), d.prototype = null === b ? Object.create(b) : (__.prototype = b.prototype, 
+            new __());
+        };
+    }();
+    Object.defineProperty(exports, "__esModule", {
+        value: !0
+    });
+    var OfficeExtension = __webpack_require__(2), Core = __webpack_require__(0), _createPropertyObject = OfficeExtension.BatchApiHelper.createPropertyObject, _createRootServiceObject = (OfficeExtension.BatchApiHelper.createMethodObject, 
+    OfficeExtension.BatchApiHelper.createIndexerObject, OfficeExtension.BatchApiHelper.createRootServiceObject), _createTopLevelServiceObject = OfficeExtension.BatchApiHelper.createTopLevelServiceObject, _invokeMethod = (OfficeExtension.BatchApiHelper.createChildItemObject, 
+    OfficeExtension.BatchApiHelper.invokeMethod), _isNullOrUndefined = (OfficeExtension.BatchApiHelper.invokeEnsureUnchanged, 
+    OfficeExtension.BatchApiHelper.invokeSetProperty, OfficeExtension.Utility.isNullOrUndefined), _throwIfApiNotSupported = (OfficeExtension.Utility.isUndefined, 
+    OfficeExtension.Utility.throwIfNotLoaded, OfficeExtension.Utility.throwIfApiNotSupported), _load = OfficeExtension.Utility.load, _toJson = (OfficeExtension.Utility.retrieve, 
+    OfficeExtension.Utility.toJson), _fixObjectPathIfNecessary = OfficeExtension.Utility.fixObjectPathIfNecessary, _handleNavigationPropertyResults = OfficeExtension.Utility._handleNavigationPropertyResults, _processRetrieveResult = (OfficeExtension.Utility.adjustToDateTime, 
+    OfficeExtension.Utility.processRetrieveResult), CustomFunctionRequestContext = function(_super) {
+        function CustomFunctionRequestContext(requestInfo) {
+            var _this = _super.call(this, requestInfo) || this;
+            return _this.m_customFunctions = CustomFunctions.newObject(_this), _this.m_container = _createRootServiceObject(CustomFunctionsContainer, _this), 
+            _this._rootObject = _this.m_container, _this._rootObjectPropertyName = "customFunctionsContainer", 
+            _this._requestFlagModifier = 128, _this;
+        }
+        return __extends(CustomFunctionRequestContext, _super), Object.defineProperty(CustomFunctionRequestContext.prototype, "customFunctions", {
+            get: function() {
+                return this.m_customFunctions;
+            },
+            enumerable: !0,
+            configurable: !0
+        }), Object.defineProperty(CustomFunctionRequestContext.prototype, "customFunctionsContainer", {
+            get: function() {
+                return this.m_container;
+            },
+            enumerable: !0,
+            configurable: !0
+        }), CustomFunctionRequestContext.prototype._processOfficeJsErrorResponse = function(officeJsErrorCode, response) {
+            5004 === officeJsErrorCode && (response.ErrorCode = CustomFunctionRuntimeErrorCode.invalidOperationInCellEditMode, 
+            response.ErrorMessage = OfficeExtension.Utility._getResourceString(OfficeExtension.ResourceStrings.invalidOperationInCellEditMode));
+        }, CustomFunctionRequestContext;
+    }(OfficeExtension.ClientRequestContext);
+    exports.Script = {
+        _CustomFunctionMetadata: {}
+    };
+    var CustomFunctionLoggingSeverity, InvocationContext = function() {
+        function InvocationContext(functionName, address, setResultHandler, setErrorHandler) {
+            this._functionName = functionName, _isNullOrUndefined(address) || (this._address = address), 
+            this.setResult = setResultHandler, this.setError = setErrorHandler;
+        }
+        return Object.defineProperty(InvocationContext.prototype, "onCanceled", {
+            get: function() {
+                if (!_isNullOrUndefined(this._onCanceled) && "function" == typeof this._onCanceled) return this._onCanceled;
+            },
+            set: function(handler) {
+                this._onCanceled = handler;
+            },
+            enumerable: !0,
+            configurable: !0
+        }), Object.defineProperty(InvocationContext.prototype, "functionName", {
+            get: function() {
+                return this._functionName;
+            },
+            enumerable: !0,
+            configurable: !0
+        }), Object.defineProperty(InvocationContext.prototype, "address", {
+            get: function() {
+                return this._address;
+            },
+            enumerable: !0,
+            configurable: !0
+        }), InvocationContext;
+    }();
+    exports.InvocationContext = InvocationContext, function(CustomFunctionLoggingSeverity) {
+        CustomFunctionLoggingSeverity.Info = "Medium", CustomFunctionLoggingSeverity.Error = "Unexpected", 
+        CustomFunctionLoggingSeverity.Verbose = "Verbose";
+    }(CustomFunctionLoggingSeverity || (CustomFunctionLoggingSeverity = {}));
+    var ErrorCode, CustomFunctionLog = function() {
+        return function(Severity, Message) {
+            this.Severity = Severity, this.Message = Message;
+        };
+    }(), CustomFunctionsLogger = function() {
+        function CustomFunctionsLogger() {}
+        return CustomFunctionsLogger.logEvent = function(log, data, data2) {
+            if (CustomFunctionsLogger.s_shouldLog || OfficeExtension.CoreUtility._logEnabled) {
+                var logMessage = log.Severity + " " + log.Message + data;
+                if (data2 && (logMessage = logMessage + " " + data2), OfficeExtension.Utility.log(logMessage), 
+                CustomFunctionsLogger.s_shouldLog) switch (log.Severity) {
+                  case CustomFunctionLoggingSeverity.Verbose:
+                    null !== console.log && console.log(logMessage);
+                    break;
+
+                  case CustomFunctionLoggingSeverity.Info:
+                    null !== console.info && console.info(logMessage);
+                    break;
+
+                  case CustomFunctionLoggingSeverity.Error:
+                    null !== console.error && console.error(logMessage);
+                }
+            }
+        }, CustomFunctionsLogger.shouldLog = function() {
+            try {
+                return !_isNullOrUndefined(console) && !_isNullOrUndefined(window) && window.name && "string" == typeof window.name && JSON.parse(window.name)[CustomFunctionsLogger.CustomFunctionLoggingFlag];
+            } catch (ex) {
+                return OfficeExtension.Utility.log(JSON.stringify(ex)), !1;
+            }
+        }, CustomFunctionsLogger.CustomFunctionLoggingFlag = "CustomFunctionsRuntimeLogging", 
+        CustomFunctionsLogger.s_shouldLog = CustomFunctionsLogger.shouldLog(), CustomFunctionsLogger;
+    }();
+    !function(ErrorCode) {
+        ErrorCode.invalidValue = "#VALUE!", ErrorCode.notAvailable = "#N/A", ErrorCode.divisionByZero = "#DIV/0!", 
+        ErrorCode.invalidNumber = "#NUM!", ErrorCode.nullReference = "#NULL!";
+    }(ErrorCode = exports.ErrorCode || (exports.ErrorCode = {}));
+    var CustomFunctionError = function(_super) {
+        function CustomFunctionError(errorCode, message) {
+            var _this = _super.call(this, message) || this;
+            return Object.setPrototypeOf(_this, CustomFunctionError.prototype), _this._code = errorCode || ErrorCode.invalidValue, 
+            _this._message = message || "", _this;
+        }
+        return __extends(CustomFunctionError, _super), Object.defineProperty(CustomFunctionError.prototype, "code", {
+            get: function() {
+                return this._code;
+            },
+            enumerable: !0,
+            configurable: !0
+        }), Object.defineProperty(CustomFunctionError.prototype, "message", {
+            get: function() {
+                return this._message;
+            },
+            enumerable: !0,
+            configurable: !0
+        }), CustomFunctionError;
+    }(Error);
+    exports.CustomFunctionError = CustomFunctionError;
+    var CustomFunctionProxy = function() {
+        function CustomFunctionProxy() {
+            this._whenInit = void 0, this._isInit = !1, this._setResultsDelayMillis = 50, this._setResultsOverdueDelayMillis = 2e3, 
+            this._maxContextSyncExecutionDurationMills = 15e3, this._minContextSyncIntervalMills = 500, 
+            this._setResultsLifeMillis = 6e4, this._ensureInitRetryDelayMillis = 500, this._resultEntryBuffer = {}, 
+            this._isSetResultsTaskScheduled = !1, this._setResultsTaskOverdueTime = 0, this._inProgressContextSyncExpectedFinishTime = 0, 
+            this._batchQuotaMillis = 1e3, this._invocationContextMap = {};
+        }
+        return CustomFunctionProxy.prototype._initSettings = function() {
+            if ("object" == typeof exports.Script && "object" == typeof exports.Script._CustomFunctionSettings) {
+                if ("number" == typeof exports.Script._CustomFunctionSettings.setResultsDelayMillis) {
+                    var setResultsDelayMillis = exports.Script._CustomFunctionSettings.setResultsDelayMillis;
+                    setResultsDelayMillis = Math.max(0, setResultsDelayMillis), setResultsDelayMillis = Math.min(1e3, setResultsDelayMillis), 
+                    this._setResultsDelayMillis = setResultsDelayMillis;
+                }
+                if ("number" == typeof exports.Script._CustomFunctionSettings.ensureInitRetryDelayMillis) {
+                    var ensureInitRetryDelayMillis = exports.Script._CustomFunctionSettings.ensureInitRetryDelayMillis;
+                    ensureInitRetryDelayMillis = Math.max(0, ensureInitRetryDelayMillis), ensureInitRetryDelayMillis = Math.min(2e3, ensureInitRetryDelayMillis), 
+                    this._ensureInitRetryDelayMillis = ensureInitRetryDelayMillis;
+                }
+                if ("number" == typeof exports.Script._CustomFunctionSettings.setResultsLifeMillis) {
+                    var setResultsLifeMillis = exports.Script._CustomFunctionSettings.setResultsLifeMillis;
+                    setResultsLifeMillis = Math.max(0, setResultsLifeMillis), setResultsLifeMillis = Math.min(6e5, setResultsLifeMillis), 
+                    this._setResultsLifeMillis = setResultsLifeMillis;
+                }
+                if ("number" == typeof exports.Script._CustomFunctionSettings.batchQuotaMillis) {
+                    var batchQuotaMillis = exports.Script._CustomFunctionSettings.batchQuotaMillis;
+                    batchQuotaMillis = Math.max(0, batchQuotaMillis), batchQuotaMillis = Math.min(1e3, batchQuotaMillis), 
+                    this._batchQuotaMillis = batchQuotaMillis;
+                }
+            }
+        }, CustomFunctionProxy.prototype.ensureInit = function(context) {
+            var _this = this;
+            return this._initSettings(), void 0 === this._whenInit && (this._whenInit = OfficeExtension.Utility._createPromiseFromResult(null).then(function() {
+                if (!_this._isInit) return context.eventRegistration.register(5, "", _this._handleMessage.bind(_this));
+            }).then(function() {
+                _this._isInit = !0;
+            })), this._isInit || context._pendingRequest._addPreSyncPromise(this._whenInit), 
+            this._whenInit;
+        }, CustomFunctionProxy.prototype.setCustomFunctionInvoker = function(invoker) {
+            this._invoker = invoker;
+        }, CustomFunctionProxy.prototype.setCustomFunctionAssociation = function(association) {
+            var _this = this;
+            this._customFunctionMappingsUpperCase = void 0, this._association = association, 
+            this._association && this._association.onchange(function() {
+                _this._customFunctionMappingsUpperCase = void 0;
+            });
+        }, CustomFunctionProxy.prototype._initFromHostBridge = function(hostBridge) {
+            var _this = this;
+            this._initSettings(), hostBridge.addHostMessageHandler(function(bridgeMessage) {
+                3 === bridgeMessage.type ? _this._handleMessage(bridgeMessage.message) : 4 === bridgeMessage.type && _this._handleSettings(bridgeMessage.message);
+            }), this._isInit = !0, this._whenInit = OfficeExtension.CoreUtility.Promise.resolve();
+        }, CustomFunctionProxy.prototype._handleSettings = function(args) {
+            OfficeExtension.Utility.log("CustomFunctionProxy._handleSettings:" + JSON.stringify(args)), 
+            args && "object" == typeof args && (CustomFunctionsLogger.s_shouldLog = args[CustomFunctionsLogger.CustomFunctionLoggingFlag]);
+        }, CustomFunctionProxy.prototype._handleMessage = function(args) {
+            try {
+                OfficeExtension.Utility.log("CustomFunctionProxy._handleMessage"), OfficeExtension.Utility.checkArgumentNull(args, "args");
+                for (var entryArray = args.entries, invocationArray = [], cancellationArray = [], metadataArray = [], i = 0; i < entryArray.length; i++) 1 === entryArray[i].messageCategory && ("string" == typeof entryArray[i].message && (entryArray[i].message = JSON.parse(entryArray[i].message)), 
+                1e3 === entryArray[i].messageType ? invocationArray.push(entryArray[i]) : 1001 === entryArray[i].messageType ? cancellationArray.push(entryArray[i]) : 1002 === entryArray[i].messageType ? metadataArray.push(entryArray[i]) : OfficeExtension.Utility.log("CustomFunctionProxy._handleMessage unknown message type " + entryArray[i].messageType));
+                if (metadataArray.length > 0 && this._handleMetadataEntries(metadataArray), invocationArray.length > 0) {
+                    var batchArray = this._batchInvocationEntries(invocationArray);
+                    batchArray.length > 0 && this._invokeRemainingBatchEntries(batchArray, 0);
+                }
+                cancellationArray.length > 0 && this._handleCancellationEntries(cancellationArray);
+            } catch (ex) {
+                throw CustomFunctionProxy._tryLog(ex), ex;
+            }
+            return OfficeExtension.Utility._createPromiseFromResult(null);
+        }, CustomFunctionProxy.toLogMessage = function(ex) {
+            var ret = "Unknown Error";
+            if (ex) try {
+                ex.toString && (ret = ex.toString()), ret = ret + " " + JSON.stringify(ex);
+            } catch (otherEx) {
+                ret = "Unexpected Error";
+            }
+            return ret;
+        }, CustomFunctionProxy._tryLog = function(ex) {
+            var message = CustomFunctionProxy.toLogMessage(ex);
+            OfficeExtension.Utility.log(message);
+        }, CustomFunctionProxy.prototype._handleMetadataEntries = function(entryArray) {
+            for (var i = 0; i < entryArray.length; i++) {
+                var message = entryArray[i].message;
+                if (_isNullOrUndefined(message)) throw OfficeExtension.Utility.createRuntimeError(CustomFunctionRuntimeErrorCode.generalException, "message", "CustomFunctionProxy._handleMetadataEntries");
+                exports.Script._CustomFunctionMetadata[message.functionName] = {
+                    options: {
+                        stream: message.isStream,
+                        cancelable: message.isCancelable
+                    }
+                };
+            }
+        }, CustomFunctionProxy.prototype._handleCancellationEntries = function(entryArray) {
+            for (var i = 0; i < entryArray.length; i++) {
+                var message = entryArray[i].message;
+                if (_isNullOrUndefined(message)) throw OfficeExtension.Utility.createRuntimeError(CustomFunctionRuntimeErrorCode.generalException, "message", "CustomFunctionProxy._handleCancellationEntries");
+                var invocationId = message.invocationId, invocationContext = this._invocationContextMap[invocationId];
+                _isNullOrUndefined(invocationContext) || (delete this._invocationContextMap[invocationId], 
+                CustomFunctionsLogger.logEvent(CustomFunctionProxy.CustomFunctionCancellation, invocationContext.functionName), 
+                _isNullOrUndefined(invocationContext.onCanceled) || invocationContext.onCanceled());
+            }
+        }, CustomFunctionProxy.prototype._batchInvocationEntries = function(entryArray) {
+            for (var _this = this, batchArray = [], _loop_1 = function(i) {
+                var message, arrayOrObjectMessage = entryArray[i].message;
+                if (message = Array.isArray(arrayOrObjectMessage) ? {
+                    invocationId: arrayOrObjectMessage[0],
+                    functionName: arrayOrObjectMessage[1],
+                    parameterValues: arrayOrObjectMessage[2],
+                    address: arrayOrObjectMessage[3],
+                    flags: arrayOrObjectMessage[4]
+                } : arrayOrObjectMessage, _isNullOrUndefined(message)) throw OfficeExtension.Utility.createRuntimeError(CustomFunctionRuntimeErrorCode.generalException, "message", "CustomFunctionProxy._batchInvocationEntries");
+                if (_isNullOrUndefined(message.invocationId) || message.invocationId < 0) throw OfficeExtension.Utility.createRuntimeError(CustomFunctionRuntimeErrorCode.generalException, "invocationId", "CustomFunctionProxy._batchInvocationEntries");
+                if (_isNullOrUndefined(message.functionName)) throw OfficeExtension.Utility.createRuntimeError(CustomFunctionRuntimeErrorCode.generalException, "functionName", "CustomFunctionProxy._batchInvocationEntries");
+                var call = null, isCancelable = !1, isStreaming = !1;
+                if ("number" == typeof message.flags) isCancelable = 0 != (1 & message.flags), isStreaming = 0 != (2 & message.flags); else {
+                    var metadata = exports.Script._CustomFunctionMetadata[message.functionName];
+                    if (_isNullOrUndefined(metadata)) return CustomFunctionsLogger.logEvent(CustomFunctionProxy.CustomFunctionExecutionNotFoundLog, message.functionName), 
+                    this_1._setError(message.invocationId, "N/A", 1), "continue";
+                    isCancelable = metadata.options.cancelable, isStreaming = metadata.options.stream;
+                }
+                if (this_1._invoker && !this_1._customFunctionMappingsContains(message.functionName)) return this_1._invokeFunctionUsingInvoker(message), 
+                "continue";
+                try {
+                    call = this_1._getFunction(message.functionName);
+                } catch (ex) {
+                    return CustomFunctionsLogger.logEvent(CustomFunctionProxy.CustomFunctionExecutionNotFoundLog, message.functionName), 
+                    this_1._setError(message.invocationId, ex, 1), "continue";
+                }
+                var invocationContext = void 0;
+                if (isStreaming || isCancelable) {
+                    var setResult = void 0, setError = void 0;
+                    isStreaming && (setResult = function(result) {
+                        _this._invocationContextMap[message.invocationId] ? _this._setResult(message.invocationId, result) : CustomFunctionsLogger.logEvent(CustomFunctionProxy.CustomFunctionAlreadyCancelled, message.functionName);
+                    }, setError = function(error) {
+                        _this._invocationContextMap[message.invocationId] ? _this._setError(message.invocationId, error.message, _this._getCustomFunctionResultErrorCodeFromErrorCode(error.code)) : CustomFunctionsLogger.logEvent(CustomFunctionProxy.CustomFunctionAlreadyCancelled, message.functionName);
+                    }), invocationContext = new InvocationContext(message.functionName, message.address, setResult, setError), 
+                    this_1._invocationContextMap[message.invocationId] = invocationContext;
+                } else invocationContext = new InvocationContext(message.functionName, message.address);
+                message.parameterValues.push(invocationContext), batchArray.push({
+                    call: call,
+                    isBatching: !1,
+                    isStreaming: isStreaming,
+                    invocationIds: [ message.invocationId ],
+                    parameterValueSets: [ message.parameterValues ],
+                    functionName: message.functionName
+                });
+            }, this_1 = this, i = 0; i < entryArray.length; i++) _loop_1(i);
+            return batchArray;
+        }, CustomFunctionProxy.prototype._invokeFunctionUsingInvoker = function(message) {
+            var _this = this, isCancelable = 0 != (1 & message.flags), isStreaming = 0 != (2 & message.flags), invocationId = message.invocationId, setResult = void 0, setError = void 0;
+            if (isStreaming) setResult = function(result) {
+                _this._invocationContextMap[invocationId] && _this._setResult(invocationId, result);
+            }, setError = function(error) {
+                _this._invocationContextMap[invocationId] && _this._setError(invocationId, error.message, _this._getCustomFunctionResultErrorCodeFromErrorCode(error.code));
+            }; else {
+                var setResultCalled_1 = !1;
+                setResult = function(result) {
+                    setResultCalled_1 || _this._setResult(invocationId, result), setResultCalled_1 = !0;
+                }, setError = function(error) {
+                    setResultCalled_1 || _this._setError(invocationId, error.message, _this._getCustomFunctionResultErrorCodeFromErrorCode(error.code)), 
+                    setResultCalled_1 = !0;
+                };
+            }
+            var invocationContext = new InvocationContext(message.functionName, message.address, setResult, setError);
+            (isStreaming || isCancelable) && (this._invocationContextMap[invocationId] = invocationContext), 
+            this._invoker.invoke(message.functionName, message.parameterValues, invocationContext);
+        }, CustomFunctionProxy.prototype._ensureCustomFunctionMappingsUpperCase = function() {
+            if (_isNullOrUndefined(this._customFunctionMappingsUpperCase)) {
+                if (this._customFunctionMappingsUpperCase = {}, "object" == typeof CustomFunctionMappings) for (var key in OfficeExtension.CoreUtility.log("CustomFunctionMappings.Keys=" + JSON.stringify(Object.keys(CustomFunctionMappings))), 
+                CustomFunctionMappings) this._customFunctionMappingsUpperCase[key.toUpperCase()] && CustomFunctionsLogger.logEvent(CustomFunctionProxy.CustomFunctionDuplicatedName, key), 
+                this._customFunctionMappingsUpperCase[key.toUpperCase()] = CustomFunctionMappings[key];
+                if (this._association) for (var key in OfficeExtension.CoreUtility.log("CustomFunctionAssociateMappings.Keys=" + JSON.stringify(Object.keys(this._association.mappings))), 
+                this._association.mappings) this._customFunctionMappingsUpperCase[key.toUpperCase()] && CustomFunctionsLogger.logEvent(CustomFunctionProxy.CustomFunctionDuplicatedName, key), 
+                this._customFunctionMappingsUpperCase[key.toUpperCase()] = this._association.mappings[key];
+            }
+        }, CustomFunctionProxy.prototype._customFunctionMappingsContains = function(functionName) {
+            this._ensureCustomFunctionMappingsUpperCase();
+            var functionNameUpperCase = functionName.toUpperCase();
+            if (!_isNullOrUndefined(this._customFunctionMappingsUpperCase[functionNameUpperCase])) return !0;
+            if ("undefined" != typeof window) {
+                for (var functionParent = window, functionNameSegments = functionName.split("."), i = 0; i < functionNameSegments.length - 1; i++) if (functionParent = functionParent[functionNameSegments[i]], 
+                _isNullOrUndefined(functionParent) || "object" != typeof functionParent) return !1;
+                if ("function" == typeof functionParent[functionNameSegments[functionNameSegments.length - 1]]) return !0;
+            }
+            return !1;
+        }, CustomFunctionProxy.prototype._getCustomFunctionMappings = function(functionName) {
+            this._ensureCustomFunctionMappingsUpperCase();
+            var functionNameUpperCase = functionName.toUpperCase();
+            if (!_isNullOrUndefined(this._customFunctionMappingsUpperCase[functionNameUpperCase])) {
+                if ("function" == typeof this._customFunctionMappingsUpperCase[functionNameUpperCase]) return this._customFunctionMappingsUpperCase[functionNameUpperCase];
+                throw OfficeExtension.Utility.createRuntimeError(CustomFunctionRuntimeErrorCode.invalidOperation, OfficeExtension.Utility._getResourceString(OfficeExtension.ResourceStrings.customFunctionInvalidFunctionMapping, functionName), "CustomFunctionProxy._getCustomFunctionMappings");
+            }
+        }, CustomFunctionProxy.prototype._getFunction = function(functionName) {
+            var call = this._getCustomFunctionMappings(functionName);
+            if (!_isNullOrUndefined(call)) return call;
+            if (_isNullOrUndefined(window)) throw OfficeExtension.Utility.createRuntimeError(CustomFunctionRuntimeErrorCode.invalidOperation, OfficeExtension.Utility._getResourceString(OfficeExtension.ResourceStrings.customFunctionWindowMissing), "CustomFunctionProxy._getFunction");
+            for (var functionParent = window, functionNameSegments = functionName.split("."), i = 0; i < functionNameSegments.length - 1; i++) if (functionParent = functionParent[functionNameSegments[i]], 
+            _isNullOrUndefined(functionParent) || "object" != typeof functionParent) throw OfficeExtension.Utility.createRuntimeError(CustomFunctionRuntimeErrorCode.invalidOperation, OfficeExtension.Utility._getResourceString(OfficeExtension.ResourceStrings.customFunctionDefintionMissingOnWindow, functionName), "CustomFunctionProxy._getFunction");
+            if ("function" != typeof (call = functionParent[functionNameSegments[functionNameSegments.length - 1]])) throw OfficeExtension.Utility.createRuntimeError(CustomFunctionRuntimeErrorCode.invalidOperation, OfficeExtension.Utility._getResourceString(OfficeExtension.ResourceStrings.customFunctionInvalidFunction, functionName), "CustomFunctionProxy._getFunction");
+            return call;
+        }, CustomFunctionProxy.prototype._invokeRemainingBatchEntries = function(batchArray, startIndex) {
+            OfficeExtension.Utility.log("CustomFunctionProxy._invokeRemainingBatchEntries");
+            for (var startTimeMillis = Date.now(), i = startIndex; i < batchArray.length; i++) {
+                if (!(Date.now() - startTimeMillis < this._batchQuotaMillis)) {
+                    OfficeExtension.Utility.log("setTimeout(CustomFunctionProxy._invokeRemainingBatchEntries)"), 
+                    setTimeout(this._invokeRemainingBatchEntries.bind(this), 0, batchArray, i);
+                    break;
+                }
+                this._invokeFunctionAndSetResult(batchArray[i]);
+            }
+        }, CustomFunctionProxy.prototype._invokeFunctionAndSetResult = function(batch) {
+            var results, _this = this;
+            CustomFunctionsLogger.logEvent(CustomFunctionProxy.CustomFunctionExecutionStartLog, batch.functionName);
+            try {
+                results = batch.isBatching ? batch.call.call(null, batch.parameterValueSets) : [ batch.call.apply(null, batch.parameterValueSets[0]) ];
+            } catch (ex) {
+                for (var i = 0; i < batch.invocationIds.length; i++) ex instanceof CustomFunctionError ? this._setError(batch.invocationIds[i], ex.message, this._getCustomFunctionResultErrorCodeFromErrorCode(ex.code)) : this._setError(batch.invocationIds[i], ex, 2);
+                return void CustomFunctionsLogger.logEvent(CustomFunctionProxy.CustomFunctionExecutionExceptionThrownLog, batch.functionName, CustomFunctionProxy.toLogMessage(ex));
+            }
+            if (batch.isStreaming) ; else if (results.length === batch.parameterValueSets.length) {
+                var _loop_2 = function(i) {
+                    _isNullOrUndefined(results[i]) || "object" != typeof results[i] || "function" != typeof results[i].then ? (CustomFunctionsLogger.logEvent(CustomFunctionProxy.CustomFunctionExecutionFinishLog, batch.functionName), 
+                    this_2._setResult(batch.invocationIds[i], results[i])) : results[i].then(function(value) {
+                        CustomFunctionsLogger.logEvent(CustomFunctionProxy.CustomFunctionExecutionFinishLog, batch.functionName), 
+                        _this._setResult(batch.invocationIds[i], value);
+                    }, function(reason) {
+                        CustomFunctionsLogger.logEvent(CustomFunctionProxy.CustomFunctionExecutionRejectedPromoseLog, batch.functionName, CustomFunctionProxy.toLogMessage(reason)), 
+                        _this._setError(batch.invocationIds[i], reason, 3);
+                    });
+                }, this_2 = this;
+                for (i = 0; i < results.length; i++) _loop_2(i);
+            } else {
+                CustomFunctionsLogger.logEvent(CustomFunctionProxy.CustomFunctionExecutionBatchMismatchLog, batch.functionName);
+                for (i = 0; i < batch.invocationIds.length; i++) this._setError(batch.invocationIds[i], OfficeExtension.Utility._getResourceString(OfficeExtension.ResourceStrings.customFunctionUnexpectedNumberOfEntriesInResultBatch), 4);
+            }
+        }, CustomFunctionProxy.prototype._setResult = function(invocationId, result) {
+            var invocationResult = {
+                id: invocationId,
+                value: result
+            };
+            "number" == typeof result ? isNaN(result) ? (invocationResult.failed = !0, invocationResult.value = "NaN") : isFinite(result) || (invocationResult.failed = !0, 
+            invocationResult.value = "Infinity", invocationResult.errorCode = 6) : result instanceof Error && (invocationResult.failed = !0, 
+            invocationResult.value = CustomFunctionProxy.toLogMessage(result), invocationResult.errorCode = 0);
+            var timeNow = Date.now();
+            this._resultEntryBuffer[invocationId] = {
+                timeCreated: timeNow,
+                result: invocationResult
+            }, this._ensureSetResultsTaskIsScheduled(timeNow);
+        }, CustomFunctionProxy.prototype._setError = function(invocationId, error, errorCode) {
+            var message = "";
+            _isNullOrUndefined(error) || (error instanceof CustomFunctionError && !_isNullOrUndefined(error.message) ? message = error.message : "string" == typeof error && (message = error));
+            var result = {
+                id: invocationId,
+                failed: !0,
+                value: message,
+                errorCode: errorCode
+            }, timeNow = Date.now();
+            this._resultEntryBuffer[invocationId] = {
+                timeCreated: timeNow,
+                result: result
+            }, this._ensureSetResultsTaskIsScheduled(timeNow);
+        }, CustomFunctionProxy.prototype._getCustomFunctionResultErrorCodeFromErrorCode = function(errorCode) {
+            var internalCode;
+            switch (errorCode) {
+              case ErrorCode.notAvailable:
+                internalCode = 1;
+                break;
+
+              case ErrorCode.divisionByZero:
+                internalCode = 5;
+                break;
+
+              case ErrorCode.invalidValue:
+                internalCode = 7;
+                break;
+
+              case ErrorCode.invalidNumber:
+                internalCode = 6;
+                break;
+
+              case ErrorCode.nullReference:
+                internalCode = 8;
+                break;
+
+              default:
+                internalCode = 7;
+            }
+            return internalCode;
+        }, CustomFunctionProxy.prototype._ensureSetResultsTaskIsScheduled = function(timeNow) {
+            if (this._setResultsTaskOverdueTime > 0 && timeNow > this._setResultsTaskOverdueTime) return OfficeExtension.Utility.log("SetResultsTask overdue"), 
+            void this._executeSetResultsTask();
+            this._isSetResultsTaskScheduled || (OfficeExtension.Utility.log("setTimeout(CustomFunctionProxy._executeSetResultsTask)"), 
+            setTimeout(this._executeSetResultsTask.bind(this), this._setResultsDelayMillis), 
+            this._isSetResultsTaskScheduled = !0, this._setResultsTaskOverdueTime = timeNow + this._setResultsDelayMillis + this._setResultsOverdueDelayMillis);
+        }, CustomFunctionProxy.prototype._convertCustomFunctionInvocationResultToArray = function(result) {
+            var ret = [];
+            return ret.push(result.id), ret.push(!result.failed), OfficeExtension.CoreUtility.isUndefined(result.value) ? ret.push(null) : ret.push(result.value), 
+            result.failed && (OfficeExtension.CoreUtility.isUndefined(result.errorCode) ? ret.push(0) : ret.push(result.errorCode)), 
+            ret;
+        }, CustomFunctionProxy.prototype._executeSetResultsTask = function() {
+            var _this = this;
+            OfficeExtension.Utility.log("CustomFunctionProxy._executeSetResultsTask");
+            var timeNow = Date.now();
+            if (this._inProgressContextSyncExpectedFinishTime > 0 && this._inProgressContextSyncExpectedFinishTime > timeNow) return OfficeExtension.Utility.log("context.sync() is in progress. setTimeout(CustomFunctionProxy._executeSetResultsTask)"), 
+            setTimeout(this._executeSetResultsTask.bind(this), this._setResultsDelayMillis), 
+            void (this._setResultsTaskOverdueTime = timeNow + this._setResultsDelayMillis + this._setResultsOverdueDelayMillis);
+            this._isSetResultsTaskScheduled = !1, this._setResultsTaskOverdueTime = 0;
+            var resultEntryBufferCopy = this._resultEntryBuffer;
+            this._resultEntryBuffer = {};
+            var useArrayResult = OfficeExtension.Utility.isSetSupported("CustomFunctions", "1.7"), invocationResults = [];
+            for (var key in resultEntryBufferCopy) useArrayResult ? invocationResults.push(this._convertCustomFunctionInvocationResultToArray(resultEntryBufferCopy[key].result)) : invocationResults.push(resultEntryBufferCopy[key].result);
+            if (0 !== invocationResults.length) {
+                var context = new CustomFunctionRequestContext();
+                useArrayResult ? context.customFunctions.setInvocationArrayResults(invocationResults) : context.customFunctions.setInvocationResults(invocationResults);
+                var contextSyncStartTime = Date.now();
+                this._inProgressContextSyncExpectedFinishTime = contextSyncStartTime + this._maxContextSyncExecutionDurationMills, 
+                context.sync().then(function(value) {
+                    _this._clearInProgressContextSyncExpectedFinishTimeAfterMinInterval(Date.now() - contextSyncStartTime);
+                }, function(reason) {
+                    var timeNow = Date.now();
+                    _this._clearInProgressContextSyncExpectedFinishTimeAfterMinInterval(timeNow - contextSyncStartTime), 
+                    _this._restoreResultEntries(timeNow, resultEntryBufferCopy), _this._ensureSetResultsTaskIsScheduled(timeNow);
+                });
+            }
+        }, CustomFunctionProxy.prototype._restoreResultEntries = function(timeNow, resultEntryBufferCopy) {
+            for (var key in resultEntryBufferCopy) {
+                var resultSetter = resultEntryBufferCopy[key];
+                timeNow - resultSetter.timeCreated <= this._setResultsLifeMillis && (this._resultEntryBuffer[key] || (this._resultEntryBuffer[key] = resultSetter));
+            }
+        }, CustomFunctionProxy.prototype._clearInProgressContextSyncExpectedFinishTimeAfterMinInterval = function(lastContextSyncDurationMills) {
+            var _this = this, interval = Math.max(this._minContextSyncIntervalMills, 2 * lastContextSyncDurationMills);
+            OfficeExtension.Utility.log("setTimeout(clearInProgressContestSyncExpectedFinishedTime," + interval + ")"), 
+            setTimeout(function() {
+                OfficeExtension.Utility.log("clearInProgressContestSyncExpectedFinishedTime"), _this._inProgressContextSyncExpectedFinishTime = 0;
+            }, interval);
+        }, CustomFunctionProxy.CustomFunctionExecutionStartLog = new CustomFunctionLog(CustomFunctionLoggingSeverity.Verbose, "CustomFunctions [Execution] [Begin] Function="), 
+        CustomFunctionProxy.CustomFunctionExecutionFailureLog = new CustomFunctionLog(CustomFunctionLoggingSeverity.Error, "CustomFunctions [Execution] [End] [Failure] Function="), 
+        CustomFunctionProxy.CustomFunctionExecutionRejectedPromoseLog = new CustomFunctionLog(CustomFunctionLoggingSeverity.Error, "CustomFunctions [Execution] [End] [Failure] [RejectedPromise] Function="), 
+        CustomFunctionProxy.CustomFunctionExecutionExceptionThrownLog = new CustomFunctionLog(CustomFunctionLoggingSeverity.Error, "CustomFunctions [Execution] [End] [Failure] [ExceptionThrown] Function="), 
+        CustomFunctionProxy.CustomFunctionExecutionBatchMismatchLog = new CustomFunctionLog(CustomFunctionLoggingSeverity.Error, "CustomFunctions [Execution] [End] [Failure] [BatchMismatch] Function="), 
+        CustomFunctionProxy.CustomFunctionExecutionFinishLog = new CustomFunctionLog(CustomFunctionLoggingSeverity.Info, "CustomFunctions [Execution] [End] [Success] Function="), 
+        CustomFunctionProxy.CustomFunctionExecutionNotFoundLog = new CustomFunctionLog(CustomFunctionLoggingSeverity.Error, "CustomFunctions [Execution] [NotFound] Function="), 
+        CustomFunctionProxy.CustomFunctionCancellation = new CustomFunctionLog(CustomFunctionLoggingSeverity.Info, "CustomFunctions [Cancellation] Function="), 
+        CustomFunctionProxy.CustomFunctionAlreadyCancelled = new CustomFunctionLog(CustomFunctionLoggingSeverity.Info, "CustomFunctions [AlreadyCancelled] Function="), 
+        CustomFunctionProxy.CustomFunctionDuplicatedName = new CustomFunctionLog(CustomFunctionLoggingSeverity.Error, "CustomFunctions [DuplicatedName] Function="), 
+        CustomFunctionProxy.CustomFunctionInvalidArg = new CustomFunctionLog(CustomFunctionLoggingSeverity.Error, "CustomFunctions [InvalidArg] Name="), 
+        CustomFunctionProxy;
+    }();
+    exports.CustomFunctionProxy = CustomFunctionProxy, exports.customFunctionProxy = new CustomFunctionProxy(), 
+    exports.setCustomFunctionAssociation = exports.customFunctionProxy.setCustomFunctionAssociation.bind(exports.customFunctionProxy), 
+    exports.setCustomFunctionInvoker = exports.customFunctionProxy.setCustomFunctionInvoker.bind(exports.customFunctionProxy), 
+    Core.HostBridge.onInited(function(hostBridge) {
+        exports.customFunctionProxy._initFromHostBridge(hostBridge);
+    });
+    var CustomFunctions = function(_super) {
+        function CustomFunctions() {
+            return null !== _super && _super.apply(this, arguments) || this;
+        }
+        return __extends(CustomFunctions, _super), Object.defineProperty(CustomFunctions.prototype, "_className", {
+            get: function() {
+                return "CustomFunctions";
+            },
+            enumerable: !0,
+            configurable: !0
+        }), CustomFunctions.initialize = function() {
+            var context = new CustomFunctionRequestContext();
+            return exports.customFunctionProxy.ensureInit(context).then(function() {
+                return context.customFunctions._SetOsfControlContainerReadyForCustomFunctions(), 
+                context._customData = "SetOsfControlContainerReadyForCustomFunctions", context.sync().catch(function(error) {
+                    return function(error, rethrowOtherError) {
+                        var isCellEditModeError = error instanceof OfficeExtension.Error && error.code === CustomFunctionRuntimeErrorCode.invalidOperationInCellEditMode;
+                        if (OfficeExtension.CoreUtility.log("Error on starting custom functions: " + error), 
+                        isCellEditModeError) {
+                            OfficeExtension.CoreUtility.log("Was in cell-edit mode, will try again");
+                            var delay_1 = exports.customFunctionProxy._ensureInitRetryDelayMillis;
+                            return new OfficeExtension.CoreUtility.Promise(function(resolve) {
+                                return setTimeout(resolve, delay_1);
+                            }).then(function() {
+                                return CustomFunctions.initialize();
+                            });
+                        }
+                        if (rethrowOtherError) throw error;
+                    }(error, !0);
+                });
+            });
+        }, CustomFunctions.prototype.setInvocationArrayResults = function(results) {
+            _throwIfApiNotSupported("CustomFunctions.setInvocationArrayResults", "CustomFunctions", "1.4", "Excel"), 
+            _invokeMethod(this, "SetInvocationArrayResults", 0, [ results ], 2, 0);
+        }, CustomFunctions.prototype.setInvocationResults = function(results) {
+            _invokeMethod(this, "SetInvocationResults", 0, [ results ], 2, 0);
+        }, CustomFunctions.prototype._SetInvocationError = function(invocationId, message) {
+            _invokeMethod(this, "_SetInvocationError", 0, [ invocationId, message ], 2, 0);
+        }, CustomFunctions.prototype._SetInvocationResult = function(invocationId, result) {
+            _invokeMethod(this, "_SetInvocationResult", 0, [ invocationId, result ], 2, 0);
+        }, CustomFunctions.prototype._SetOsfControlContainerReadyForCustomFunctions = function() {
+            _invokeMethod(this, "_SetOsfControlContainerReadyForCustomFunctions", 0, [], 10, 0);
+        }, CustomFunctions.prototype._handleResult = function(value) {
+            (_super.prototype._handleResult.call(this, value), _isNullOrUndefined(value)) || _fixObjectPathIfNecessary(this, value);
+        }, CustomFunctions.prototype._handleRetrieveResult = function(value, result) {
+            _super.prototype._handleRetrieveResult.call(this, value, result), _processRetrieveResult(this, value, result);
+        }, CustomFunctions.newObject = function(context) {
+            return _createTopLevelServiceObject(CustomFunctions, context, "Microsoft.ExcelServices.CustomFunctions", !1, 4);
+        }, CustomFunctions.prototype.toJSON = function() {
+            return _toJson(this, {}, {});
+        }, CustomFunctions;
+    }(OfficeExtension.ClientObject);
+    exports.CustomFunctions = CustomFunctions;
+    var CustomFunctionRuntimeErrorCode, CustomFunctionsContainer = function(_super) {
+        function CustomFunctionsContainer() {
+            return null !== _super && _super.apply(this, arguments) || this;
+        }
+        return __extends(CustomFunctionsContainer, _super), Object.defineProperty(CustomFunctionsContainer.prototype, "_className", {
+            get: function() {
+                return "CustomFunctionsContainer";
+            },
+            enumerable: !0,
+            configurable: !0
+        }), Object.defineProperty(CustomFunctionsContainer.prototype, "_navigationPropertyNames", {
+            get: function() {
+                return [ "customFunctions" ];
+            },
+            enumerable: !0,
+            configurable: !0
+        }), Object.defineProperty(CustomFunctionsContainer.prototype, "customFunctions", {
+            get: function() {
+                return _throwIfApiNotSupported("CustomFunctionsContainer.customFunctions", "CustomFunctions", "1.2", "Excel"), 
+                this._C || (this._C = _createPropertyObject(CustomFunctions, this, "CustomFunctions", !1, 4)), 
+                this._C;
+            },
+            enumerable: !0,
+            configurable: !0
+        }), CustomFunctionsContainer.prototype._handleResult = function(value) {
+            if (_super.prototype._handleResult.call(this, value), !_isNullOrUndefined(value)) {
+                var obj = value;
+                _fixObjectPathIfNecessary(this, obj), _handleNavigationPropertyResults(this, obj, [ "customFunctions", "CustomFunctions" ]);
+            }
+        }, CustomFunctionsContainer.prototype.load = function(option) {
+            return _load(this, option);
+        }, CustomFunctionsContainer.prototype._handleRetrieveResult = function(value, result) {
+            _super.prototype._handleRetrieveResult.call(this, value, result), _processRetrieveResult(this, value, result);
+        }, CustomFunctionsContainer.prototype.toJSON = function() {
+            return _toJson(this, {}, {});
+        }, CustomFunctionsContainer;
+    }(OfficeExtension.ClientObject);
+    exports.CustomFunctionsContainer = CustomFunctionsContainer, function(CustomFunctionRuntimeErrorCode) {
+        CustomFunctionRuntimeErrorCode.generalException = "GeneralException", CustomFunctionRuntimeErrorCode.invalidOperation = "InvalidOperation", 
+        CustomFunctionRuntimeErrorCode.invalidOperationInCellEditMode = "InvalidOperationInCellEditMode";
+    }(CustomFunctionRuntimeErrorCode || (CustomFunctionRuntimeErrorCode = {}));
 } ]);

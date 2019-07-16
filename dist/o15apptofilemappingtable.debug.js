@@ -1,5 +1,5 @@
 /* Excel specific API library */
-/* Version: 15.0.4980.3004 */
+/* Version: 15.0.5155.3001 */
 /*
 	Copyright (c) Microsoft Corporation.  All rights reserved.
 */
@@ -6451,6 +6451,131 @@ window.OSF=OSF;
 AriaLogger=(function() {
 	var _basePath=null;
 	var _ALogger;
+	var TelemetryEventAppActivated={ name: "AppActivated", enabled: true, basic: true, critical: true, points: [
+		{ name: "Browser", type: "string" },
+		{ name: "Message", type: "string" },
+		{ name: "AppURL", type: "string" },
+		{ name: "Host", type: "string" },
+		{ name: "AppSizeWidth", type: "int64" },
+		{ name: "AppSizeHeight", type: "int64" },
+		{ name: "IsFromWacAutomation", type: "string" },
+	] };
+	var TelemetryEventScriptLoad={ name: "ScriptLoad", enabled: true, basic: false, critical: false, points: [
+		{ name: "ScriptId", type: "string" },
+		{ name: "StartTime", type: "double" },
+		{ name: "ResponseTime", type: "double" },
+	] };
+	var TelemetryEventApiUsage={ name: "APIUsage", enabled: false, basic: false, critical: false, points: [
+		{ name: "APIType", type: "string" },
+		{ name: "APIID", type: "int64" },
+		{ name: "Parameters", type: "string" },
+		{ name: "ResponseTime", type: "int64" },
+		{ name: "ErrorType", type: "int64" },
+	] };
+	var TelemetryEventAppInitialization={ name: "AppInitialization", enabled: true, basic: false, critical: false, points: [
+		{ name: "SuccessCode", type: "int64" },
+		{ name: "Message", type: "string" },
+	] };
+	var TelemetryEventAppClosed={ name: "AppClosed", enabled: true, basic: false, critical: false, points: [
+		{ name: "FocusTime", type: "int64" },
+		{ name: "AppSizeFinalWidth", type: "int64" },
+		{ name: "AppSizeFinalHeight", type: "int64" },
+		{ name: "OpenTime", type: "int64" },
+	] };
+	var TelemetryEvents=[
+		TelemetryEventAppActivated,
+		TelemetryEventScriptLoad,
+		TelemetryEventApiUsage,
+		TelemetryEventAppInitialization,
+		TelemetryEventAppClosed,
+	];
+	function createDataField(value, point) {
+		var key=point.rename===undefined ? point.name : point.rename;
+		var type=point.type;
+		var field=undefined;
+		switch (type) {
+			case "string":
+				field=oteljs.makeStringDataField(key, value);
+				break;
+			case "double":
+				if (typeof value==="string") {
+					value=parseFloat(value);
+				}
+				field=oteljs.makeDoubleDataField(key, value);
+				break;
+			case "int64":
+				if (typeof value==="string") {
+					value=parseInt(value);
+				}
+				field=oteljs.makeInt64DataField(key, value);
+				break;
+			case "boolean":
+				if (typeof value==="string") {
+					value=value==="true";
+				}
+				field=oteljs.makeBooleanDataField(key, value);
+				break;
+		}
+		return field;
+	}
+	function getEventDefinition(eventName) {
+		for (var _i=0; _i < TelemetryEvents.length; _i++) {
+			var event_1=TelemetryEvents[_i];
+			if (event_1.name===eventName) {
+				return event_1;
+			}
+		}
+		return undefined;
+	}
+	function eventEnabled(eventName) {
+		var eventDefinition=getEventDefinition(eventName);
+		if (eventDefinition===undefined) {
+			return false;
+		}
+		return eventDefinition.enabled;
+	}
+	function generateTelemetryEvent(eventName, telemetryData) {
+		var eventDefinition=getEventDefinition(eventName);
+		if (eventDefinition===undefined) {
+			return undefined;
+		}
+		var dataFields=[];
+		for (var _i=0, _a=eventDefinition.points; _i < _a.length; _i++) {
+			var point=_a[_i];
+			var key=point.name;
+			var value=telemetryData[key];
+			if (value===undefined) {
+				continue;
+			}
+			var field=createDataField(value, point);
+			if (field !==undefined) {
+				dataFields.push(field);
+			}
+		}
+		var flags={ dataCategories: oteljs.DataCategories.ProductServiceUsage };
+		if (eventDefinition.critical) {
+			flags.samplingPolicy=oteljs.SamplingPolicy.CriticalBusinessImpact;
+		}
+		if (eventDefinition.basic) {
+			flags.diagnosticLevel=oteljs.DiagnosticLevel.BasicEvent;
+		}
+		var eventNameFull="Office.Extensibility.OfficeJs."+eventName+"X";
+		var event={ eventName: eventNameFull, dataFields: dataFields, eventFlags: flags };
+		return event;
+	}
+	function sendOtelTelemetryEvent(eventName, telemetryData) {
+		if (eventEnabled(eventName)) {
+			if (typeof OTel !=="undefined") {
+				OTel.OTelLogger.onTelemetryLoaded(function () {
+					var event=generateTelemetryEvent(eventName, telemetryData);
+					if (event===undefined) {
+						return;
+					}
+					Microsoft.Office.WebExtension.sendTelemetryEvent(event);
+				});
+			}
+		}
+	}
 	function _isIUsageData(arg) {
 		return arg["Fields"] !==undefined;
 	}
@@ -6490,30 +6615,35 @@ AriaLogger=(function() {
 	}
 	function _loadAriaScriptAndLog(tableName, telemetryData) {
 		var startAfterMs=1000;
-		OSF.OUtil.loadScript (
-			_getAriaCDNLocation(),
-				function() {
-					try {
-						if(!_ALogger) {
-							var OfficeExtensibilityTenantID="db334b301e7b474db5e0f02f07c51a47-a1b5bc36-1bbe-482f-a64a-c2d9cb606706-7439";
-							_ALogger=AWTLogManager.initialize(OfficeExtensibilityTenantID);
-						}
-						var eventProperties=new AWTEventProperties();
-						eventProperties.setName("Office.Extensibility.OfficeJS."+tableName);
-						for(var key in telemetryData) {
-							if(key.toLowerCase() !=="table") {
-								eventProperties.setProperty(key, telemetryData[key]);
+		if (AriaLogger.EnableSendingTelemetryWithLegacyAria) {
+			OSF.OUtil.loadScript (
+				_getAriaCDNLocation(),
+					function() {
+						try {
+							if(!_ALogger) {
+								var OfficeExtensibilityTenantID="db334b301e7b474db5e0f02f07c51a47-a1b5bc36-1bbe-482f-a64a-c2d9cb606706-7439";
+								_ALogger=AWTLogManager.initialize(OfficeExtensibilityTenantID);
 							}
+							var eventProperties=new AWTEventProperties();
+							eventProperties.setName("Office.Extensibility.OfficeJS."+tableName);
+							for(var key in telemetryData) {
+								if(key.toLowerCase() !=="table") {
+									eventProperties.setProperty(key, telemetryData[key]);
+								}
+							}
+							var today=new Date();
+							eventProperties.setProperty("Date", today.toISOString());
+							_ALogger.logEvent(eventProperties);
 						}
-						var today=new Date();
-						eventProperties.setProperty("Date", today.toISOString());
-						_ALogger.logEvent(eventProperties);
-					}
-					catch (e) {
-					}
-				},
-				startAfterMs
-			);
+						catch (e) {
+						}
+					},
+					startAfterMs
+				);
+		}
+		if (AriaLogger.EnableSendingTelemetryWithOTel) {
+			sendOtelTelemetryEvent(tableName, telemetryData);
+		}
 	};
 	return {
 		logData: function AriaLogger$LogData(data) {
@@ -6523,7 +6653,9 @@ AriaLogger=(function() {
 			else {
 				_loadAriaScriptAndLog(data["Table"], data);
 			}
-		}
+		},
+		EnableSendingTelemetryWithLegacyAria: true,
+		EnableSendingTelemetryWithOTel: true
 	}
 })();
 var __extends=this.__extends || function (d, b) {
@@ -7122,6 +7254,7 @@ var OSFAppTelemetry;
 	var appInfo;
 	var sessionId=OSF.OUtil.Guid.generateNewGuid();
 	var osfControlAppCorrelationId="";
+	OSFAppTelemetry.enableTelemetry=true;
 	;
 	var AppInfo=(function () {
 		function AppInfo() {
@@ -7223,6 +7356,85 @@ var OSFAppTelemetry;
 		};
 		return AppLogger;
 	})();
+	var UrlFilter=(function () {
+		function UrlFilter() {
+		}
+		UrlFilter.hashString=function (s) {
+			var hash=0;
+			if (s.length===0) {
+				return hash;
+			}
+			for (var i=0; i < s.length; i++) {
+				var c=s.charCodeAt(i);
+				hash=((hash << 5) - hash)+c;
+				hash |=0;
+			}
+			return hash;
+		};
+		;
+		UrlFilter.stringToHash=function (s) {
+			var hash=UrlFilter.hashString(s);
+			var stringHash=hash.toString();
+			if (hash < 0) {
+				stringHash="1"+stringHash.substring(1);
+			}
+			else {
+				stringHash="0"+stringHash;
+			}
+			return stringHash;
+		};
+		UrlFilter.startsWith=function (s, prefix) {
+			return s.indexOf(prefix)==-0;
+		};
+		UrlFilter.isFileUrl=function (url) {
+			return UrlFilter.startsWith(url.toLowerCase(), "file:");
+		};
+		UrlFilter.removeHttpPrefix=function (url) {
+			var prefix="";
+			if (UrlFilter.startsWith(url.toLowerCase(), UrlFilter.httpsPrefix)) {
+				prefix=UrlFilter.httpsPrefix;
+			}
+			else if (UrlFilter.startsWith(url.toLowerCase(), UrlFilter.httpPrefix)) {
+				prefix=UrlFilter.httpPrefix;
+			}
+			var clean=url.slice(prefix.length);
+			return clean;
+		};
+		UrlFilter.getUrlDomain=function (url) {
+			var domain=UrlFilter.removeHttpPrefix(url);
+			domain=domain.split("/")[0];
+			domain=domain.split(":")[0];
+			return domain;
+		};
+		UrlFilter.isIp4Address=function (domain) {
+			var ipv4Regex=/^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
+			return ipv4Regex.test(domain);
+		};
+		UrlFilter.filter=function (url) {
+			if (UrlFilter.isFileUrl(url)) {
+				var hash=UrlFilter.stringToHash(url);
+				return "file://"+hash;
+			}
+			var domain=UrlFilter.getUrlDomain(url);
+			if (UrlFilter.isIp4Address(domain)) {
+				var hash=UrlFilter.stringToHash(url);
+				if (UrlFilter.startsWith(domain, "10.")) {
+					return "IP10Range_"+hash;
+				}
+				else if (UrlFilter.startsWith(domain, "192.")) {
+					return "IP192Range_"+hash;
+				}
+				else if (UrlFilter.startsWith(domain, "127.")) {
+					return "IP127Range_"+hash;
+				}
+				return "IPOther_"+hash;
+			}
+			return domain;
+		};
+		UrlFilter.httpPrefix="http://";
+		UrlFilter.httpsPrefix="https://";
+		return UrlFilter;
+	})();
 	function initialize(context) {
 		if (!OSF.Logger) {
 			return;
@@ -7248,7 +7460,7 @@ var OSFAppTelemetry;
 		if (url) {
 			url=url.split("?")[0].split("#")[0];
 		}
-		appInfo.appURL=url;
+		appInfo.appURL=UrlFilter.filter(url);
 		(function getUserIdAndAssetIdFromToken(token, appInfo) {
 			var xmlContent;
 			var parser;
@@ -7268,6 +7480,22 @@ var OSFAppTelemetry;
 				parser=null;
 			}
 		})(context.get_eToken(), appInfo);
+		if (typeof OTel !=="undefined") {
+			var hostName=OfficeExt.HostName.Host.getInstance().getHost(appInfo.host);
+			var hostPlatform=OfficeExt.HostName.Host.getInstance().getPlatform(appInfo.host);
+			OTel.OTelLogger.getHost=function() {
+				return hostName;
+			}
+			OTel.OTelLogger.getFlavor=function() {
+				if (hostPlatform==="PC") {
+					hostPlatform="Win32";
+				} else if (hostPlatform==="WebApp") {
+					hostPlatform="Web";
+				}
+				return hostPlatform;
+			}
+			OTel.OTelLogger.initialize(appInfo);
+		}
 		(function handleLifecycle() {
 			var startTime=new Date();
 			var lastFocus=null;
@@ -7797,16 +8025,6 @@ OSF.InitializationHelper.prototype.loadAppSpecificScriptAndCreateOM=function OSF
 				OsfMsAjaxFactory.msAjaxDebug.trace("no script override through window.external.");
 			}
 			postScriptOverrideCheckAction(customizedScriptPath);
-		} else {
-			try{
-				clientEndPoint.invoke("getCustomizedScriptPathAsync",
-					function OSF$getCustomizedScriptPathAsyncCallback(errorCode, scriptPath) {
-						postScriptOverrideCheckAction( errorCode===0  ? scriptPath : null);
-					},
-					{__timeout__ : 1000});
-			} catch(ex) {
-				OsfMsAjaxFactory.msAjaxDebug.trace("no script override through cross frame communication.");
-			}
 		}
 	};
 	OSF.DDA.ErrorCodeManager.initializeErrorMessages(Strings.OfficeOM);

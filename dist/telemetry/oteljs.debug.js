@@ -890,7 +890,7 @@ var oteljs = function(modules) {
         }
         TenantTokenManager.clear = clear;
     })(TenantTokenManager_TenantTokenManager || (TenantTokenManager_TenantTokenManager = {}));
-    var oteljsVersion = "3.1.9";
+    var oteljsVersion = "3.1.11";
     var SuppressNexus = -1;
     var SimpleTelemetryLogger_SimpleTelemetryLogger = function() {
         function SimpleTelemetryLogger(parent, persistentDataFields) {
@@ -972,12 +972,15 @@ var oteljs = function(modules) {
         return SimpleTelemetryLogger;
     }();
     var __extends = undefined && undefined.__extends || function() {
-        var extendStatics = Object.setPrototypeOf || {
-            __proto__: []
-        } instanceof Array && function(d, b) {
-            d.__proto__ = b;
-        } || function(d, b) {
-            for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+        var extendStatics = function(d, b) {
+            extendStatics = Object.setPrototypeOf || {
+                __proto__: []
+            } instanceof Array && function(d, b) {
+                d.__proto__ = b;
+            } || function(d, b) {
+                for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+            };
+            return extendStatics(d, b);
         };
         return function(d, b) {
             extendStatics(d, b);

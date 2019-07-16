@@ -17,9 +17,9 @@
 
 // Sources:
 // osfweb: none
-// runtime: 16.0.11609.30001
-// core: 16.0\11616.10000
-// host: visio 16.0.11617.34950
+// runtime: 16.0.11617.30000
+// core: 16.0\11620.10000
+// host: visio 16.0.11618.34951
 
 var __extends=(this && this.__extends) || (function () {
 	var extendStatics=function (d, b) {

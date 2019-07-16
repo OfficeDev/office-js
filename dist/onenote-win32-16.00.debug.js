@@ -16,10 +16,10 @@
 
 
 // Sources:
-// osfweb: custom
-// runtime: 16.0.11609.30004
-// core: 16.0\11616.10000
-// host: 16.0\11616.10000
+// osfweb: 16.0\11619.10000
+// runtime: 16.0.11617.30000
+// core: 16.0\11620.10000
+// host: 16.0\11620.10000
 
 var __extends=(this && this.__extends) || function (d, b) {
 	for (var p in b)
@@ -5427,7 +5427,7 @@ var OSFAppTelemetry;
 		}
 		appInfo.message=context.get_hostCustomMessage();
 		appInfo.officeJSVersion=OSF.ConstantNames.FileVersion;
-		appInfo.hostJSVersion="16.0.11616.10000";
+		appInfo.hostJSVersion="16.0.11620.10000";
 		if (context._wacHostEnvironment) {
 			appInfo.wacHostEnvironment=context._wacHostEnvironment;
 		}

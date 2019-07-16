@@ -1,5 +1,5 @@
 /* Outlook rich client specific API library */
-/* Version: 16.0.11616.10000 */
+/* Version: 16.0.11804.10000 */
 /*!
 Copyright (c) Microsoft Corporation.  All rights reserved.
 */
@@ -2134,7 +2134,7 @@ var OfficeExt;
                                 var minVersionNum = this._getVersion(minVersion);
                                 if(setMaxVersionNum.major > 0 && setMaxVersionNum.major > minVersionNum.major)
                                     return true;
-                                if(setMaxVersionNum.minor > 0 && setMaxVersionNum.minor > 0 && setMaxVersionNum.major == minVersionNum.major && setMaxVersionNum.minor >= minVersionNum.minor)
+                                if(setMaxVersionNum.major > 0 && setMaxVersionNum.minor >= 0 && setMaxVersionNum.major == minVersionNum.major && setMaxVersionNum.minor >= minVersionNum.minor)
                                     return true
                             }
                             catch(e)
@@ -6877,7 +6877,7 @@ var OSFAppTelemetry;
             appInfo.appInstanceId = appInfo.appInstanceId.replace(/[{}]/g,"").toLowerCase();
         appInfo.message = context.get_hostCustomMessage();
         appInfo.officeJSVersion = OSF.ConstantNames.FileVersion;
-        appInfo.hostJSVersion = "16.0.11616.10000";
+        appInfo.hostJSVersion = "16.0.11804.10000";
         if(context._wacHostEnvironment)
             appInfo.wacHostEnvironment = context._wacHostEnvironment;
         if(context._isFromWacAutomation !== undefined && context._isFromWacAutomation !== null)
@@ -7514,6 +7514,78 @@ OSF.DDA.SafeArray.Delegate.ParameterMap.define({
     toHost: [{
             name: Microsoft.Office.WebExtension.Parameters.Tcid,
             value: 0
+        }]
+});
+OSF.DDA.AsyncMethodNames.addNames({ExecuteRichApiRequestAsync: "executeRichApiRequestAsync"});
+OSF.DDA.AsyncMethodCalls.define({
+    method: OSF.DDA.AsyncMethodNames.ExecuteRichApiRequestAsync,
+    requiredArguments: [{
+            name: Microsoft.Office.WebExtension.Parameters.Data,
+            types: ["object"]
+        }],
+    supportedOptions: []
+});
+OSF.OUtil.setNamespace("RichApi",OSF.DDA);
+OSF.DDA.SafeArray.Delegate.ParameterMap.define({
+    type: OSF.DDA.MethodDispId.dispidExecuteRichApiRequestMethod,
+    toHost: [{
+            name: Microsoft.Office.WebExtension.Parameters.Data,
+            value: 0
+        }],
+    fromHost: [{
+            name: Microsoft.Office.WebExtension.Parameters.Data,
+            value: OSF.DDA.SafeArray.Delegate.ParameterMap.self
+        }]
+});
+OSF.OUtil.augmentList(Microsoft.Office.WebExtension.EventType,{RichApiMessage: "richApiMessage"});
+OSF.DDA.RichApiMessageEventArgs = function OSF_DDA_RichApiMessageEventArgs(eventType, eventProperties)
+{
+    var entryArray = eventProperties[Microsoft.Office.WebExtension.Parameters.Data];
+    var entries = [];
+    if(entryArray)
+        for(var i = 0; i < entryArray.length; i++)
+        {
+            var elem = entryArray[i];
+            if(elem.toArray)
+                elem = elem.toArray();
+            entries.push({
+                messageCategory: elem[0],
+                messageType: elem[1],
+                targetId: elem[2],
+                message: elem[3],
+                id: elem[4],
+                isRemoteOverride: elem[5]
+            })
+        }
+    OSF.OUtil.defineEnumerableProperties(this,{
+        type: {value: Microsoft.Office.WebExtension.EventType.RichApiMessage},
+        entries: {value: entries}
+    })
+};
+var OfficeExt;
+(function(OfficeExt)
+{
+    var RichApiMessageManager = function()
+        {
+            function RichApiMessageManager()
+            {
+                this._eventDispatch = null;
+                this._eventDispatch = new OSF.EventDispatch([Microsoft.Office.WebExtension.EventType.RichApiMessage,]);
+                OSF.DDA.DispIdHost.addEventSupport(this,this._eventDispatch)
+            }
+            return RichApiMessageManager
+        }();
+    OfficeExt.RichApiMessageManager = RichApiMessageManager
+})(OfficeExt || (OfficeExt = {}));
+OSF.DDA.SafeArray.Delegate.ParameterMap.define({
+    type: OSF.DDA.EventDispId.dispidRichApiMessageEvent,
+    toHost: [{
+            name: Microsoft.Office.WebExtension.Parameters.Data,
+            value: 0
+        }],
+    fromHost: [{
+            name: Microsoft.Office.WebExtension.Parameters.Data,
+            value: OSF.DDA.SafeArray.Delegate.ParameterMap.sourceData
         }]
 });
 var OfficeJsClient_OutlookWin32;
@@ -8520,6 +8592,7 @@ OSF.InitializationHelper.prototype.loadAppSpecificScriptAndCreateOM = function O
                 case 154:
                 case 157:
                 case 160:
+                case 164:
                     break;
                 case 12:
                     optionalParameters["isRest"] = data["isRest"];
@@ -10035,6 +10108,15 @@ OSF.InitializationHelper.prototype.loadAppSpecificScriptAndCreateOM = function O
         window["OSF"]["DDA"]["OutlookAppOm"]._instance$p._throwOnMethodCallForInsufficientPermission$i$0(2,"saveAsync");
         var parameters = $h.CommonParameters.parse(args,false);
         window["OSF"]["DDA"]["OutlookAppOm"]._instance$p._standardInvokeHostMethod$i$0(32,null,null,parameters._asyncContext$p$0,parameters._callback$p$0)
+    };
+    $h.ComposeItem.prototype.getItemIdAsync = function()
+    {
+        var args = [];
+        for(var $$pai_2 = 0; $$pai_2 < arguments["length"]; ++$$pai_2)
+            args[$$pai_2] = arguments[$$pai_2];
+        window["OSF"]["DDA"]["OutlookAppOm"]._instance$p._throwOnMethodCallForInsufficientPermission$i$0(1,"getItemIdAsync");
+        var parameters = $h.CommonParameters.parse(args,false);
+        window["OSF"]["DDA"]["OutlookAppOm"]._instance$p._standardInvokeHostMethod$i$0(164,null,null,parameters._asyncContext$p$0,parameters._callback$p$0)
     };
     $h.ComposeRecipient = function(type, propertyName)
     {
@@ -12344,6 +12426,7 @@ OSF.InitializationHelper.prototype.loadAppSpecificScriptAndCreateOM = function O
         $h.OutlookErrorManager._addErrorMessage$p(9043,"AttachmentTypeNotSupported",window["_u"]["ExtensibilityStrings"]["l_AttachmentNotSupported_Text"]);
         $h.OutlookErrorManager._addErrorMessage$p(9044,"InvalidCategory",window["_u"]["ExtensibilityStrings"]["l_Invalid_Category_Error_Text"]);
         $h.OutlookErrorManager._addErrorMessage$p(9045,"DuplicateCategory",window["_u"]["ExtensibilityStrings"]["l_Duplicate_Category_Error_Text"]);
+        $h.OutlookErrorManager._addErrorMessage$p(9046,"ItemNotSaved",window["_u"]["ExtensibilityStrings"]["l_Item_Not_Saved_Error_Text"]);
         $h.OutlookErrorManager._isInitialized$p = true
     };
     $h.OutlookErrorManager._addErrorMessage$p = function(errorCode, errorName, errorMessage)
@@ -12512,6 +12595,7 @@ OSF.InitializationHelper.prototype.loadAppSpecificScriptAndCreateOM = function O
         addMasterCategoriesAsync: 161,
         removeMasterCategoriesAsync: 162,
         logTelemetry: 163,
+        getItemIdAsync: 164,
         trackCtq: 400,
         recordTrace: 401,
         recordDataPoint: 402,
@@ -13349,6 +13433,7 @@ OSF.InitializationHelper.prototype.loadAppSpecificScriptAndCreateOM = function O
     $h.OutlookErrorManager.OutlookErrorCodes.attachmentTypeNotSupported = 9043;
     $h.OutlookErrorManager.OutlookErrorCodes.olkInvalidCategoryError = 9044;
     $h.OutlookErrorManager.OutlookErrorCodes.duplicateCategoryError = 9045;
+    $h.OutlookErrorManager.OutlookErrorCodes.itemNotSavedError = 9046;
     $h.OutlookErrorManager.OsfDdaErrorCodes.ooeCoercionTypeNotSupported = 1e3;
     $h.OutlookErrorManager.OsfDdaErrorCodes.ooeOperationNotSupported = 5e3;
     $h.CommonParameters.asyncContextKeyName = "asyncContext";
@@ -13356,6 +13441,11 @@ OSF.InitializationHelper.prototype.loadAppSpecificScriptAndCreateOM = function O
     $h.InitialData.userProfileTypeKey = "userProfileType";
     $h.ScriptHelpers.emptyString = "";
     OSF.DDA.ErrorCodeManager.initializeErrorMessages(Strings.OfficeOM);
+    if(appContext.get_appName() == OSF.AppName.Outlook)
+    {
+        OSF.DDA.DispIdHost.addAsyncMethods(OSF.DDA.RichApi,[OSF.DDA.AsyncMethodNames.ExecuteRichApiRequestAsync]);
+        OSF.DDA.RichApi.richApiMessageManager = new OfficeExt.RichApiMessageManager
+    }
     if(appContext.get_appName() == OSF.AppName.OutlookWebApp || appContext.get_appName() == OSF.AppName.OutlookIOS || appContext.get_appName() == OSF.AppName.OutlookAndroid)
         this._settings = this._initializeSettings(appContext,false);
     else

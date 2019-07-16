@@ -1664,8 +1664,8 @@ var OfficeExt;
                             if (setMaxVersionNum.major > 0 && setMaxVersionNum.major > minVersionNum.major) {
                                 return true;
                             }
-                            if (setMaxVersionNum.minor > 0 &&
-                                setMaxVersionNum.minor > 0 &&
+                            if (setMaxVersionNum.major > 0 &&
+                                setMaxVersionNum.minor >= 0 &&
                                 setMaxVersionNum.major == minVersionNum.major &&
                                 setMaxVersionNum.minor >= minVersionNum.minor) {
                                 return true;
@@ -3678,8 +3678,20 @@ var OfficeExt;
             function CacheConstants() {
             }
             CacheConstants.GatedCacheKeyPrefix = "__OSF_GATED_OMEX.";
-            CacheConstants.AuthenticatedAppInstallInfoCacheKey = CacheConstants.GatedCacheKeyPrefix + "appinstall_authenticated.{0}.{1}.{2}.{3}";
-            CacheConstants.EntitlementsKey = "entitle.{0}.{1}";
+            CacheConstants.AnonymousCacheKeyPrefix = "__OSF_ANONYMOUS_OMEX.";
+            CacheConstants.UngatedCacheKeyPrefix = "__OSF_OMEX.";
+            CacheConstants.ActivatedCacheKeyPrefix = "__OSF_RUNTIME_.Activated.";
+            CacheConstants.AppinstallAuthenticated = "appinstall_authenticated.";
+            CacheConstants.Entitlement = "entitle.";
+            CacheConstants.AppState = "appState.";
+            CacheConstants.AppDetails = "appDetails.";
+            CacheConstants.AppInstallInfo = "appInstallInfo.";
+            CacheConstants.AuthenticatedAppInstallInfoCacheKey = CacheConstants.GatedCacheKeyPrefix + CacheConstants.AppinstallAuthenticated + "{0}.{1}.{2}.{3}";
+            CacheConstants.EntitlementsKey = CacheConstants.Entitlement + "{0}.{1}";
+            CacheConstants.AppStateCacheKey = "{0}" + CacheConstants.AppState + "{1}.{2}";
+            CacheConstants.AppDetailKey = "{0}" + CacheConstants.AppDetails + "{1}";
+            CacheConstants.AppInstallInfoKey = "{0}" + CacheConstants.AppInstallInfo + "{1}.{2}";
+            CacheConstants.ActivatedCacheKey = CacheConstants.ActivatedCacheKeyPrefix + "{0}.{1}.{2}";
             return CacheConstants;
         })();
         WACUtils.CacheConstants = CacheConstants;
@@ -4151,7 +4163,6 @@ Microsoft.Office.Common.ServiceEndPoint = function Microsoft_Office_Common_Servi
     this._policyManager = null;
     this._appDomains = {};
     this._onHandleRequestError = null;
-    this._addInSourceLocationSubdomainAllowedIsEnabled = false;
 };
 Microsoft.Office.Common.ServiceEndPoint.prototype = {
     registerMethod: function Microsoft_Office_Common_ServiceEndPoint$registerMethod(methodName, method, invokeType, blockingOthers) {
@@ -4207,20 +4218,16 @@ Microsoft.Office.Common.ServiceEndPoint.prototype = {
             throw e;
         this.unregisterMethod(eventName);
     },
-    registerConversation: function Microsoft_Office_Common_ServiceEndPoint$registerConversation(conversationId, conversationUrl, appDomains, serializerVersion, addInSourceLocationSubdomainAllowedIsEnabled) {
+    registerConversation: function Microsoft_Office_Common_ServiceEndPoint$registerConversation(conversationId, conversationUrl, appDomains, serializerVersion) {
         var e = Function._validateParams(arguments, [
             { name: "conversationId", type: String, mayBeNull: false },
             { name: "conversationUrl", type: String, mayBeNull: false, optional: true },
             { name: "appDomains", type: Object, mayBeNull: true, optional: true },
-            { name: "serializerVersion", type: Number, mayBeNull: true, optional: true },
-            { name: "addInSourceLocationSubdomainAllowedIsEnabled", type: Boolean, mayBeNull: true, optional: true }
+            { name: "serializerVersion", type: Number, mayBeNull: true, optional: true }
         ]);
         if (e)
             throw e;
         ;
-        if (addInSourceLocationSubdomainAllowedIsEnabled) {
-            this._addInSourceLocationSubdomainAllowedIsEnabled = addInSourceLocationSubdomainAllowedIsEnabled;
-        }
         if (appDomains) {
             if (!(appDomains instanceof Array)) {
                 throw OsfMsAjaxFactory.msAjaxError.argument("appDomains");
@@ -4551,6 +4558,11 @@ Microsoft.Office.Common.XdmCommunicationManager = (function () {
         delete org_parser, app_domain_parser;
         return res;
     }
+    function _isHostNameValidWacDomain(hostName) {
+        var regexHostNameStringArray = new Array("^office-int\\.com$", "^officeapps\\.live-int\\.com$", "^.*\\.dod\\.online\\.office365\\.us$", "^.*\\.gov\\.online\\.office365\\.us$", "^.*\\.officeapps\\.live\\.com$", "^.*\\.officeapps\\.live-int\\.com$", "^.*\\.officeapps-df\\.live\\.com$", "^.*\\.online\\.office\\.de$", "^.*\\.partner\\.officewebapps\\.cn$", "^" + document.domain.replace(new RegExp("\\.", "g"), "\\.") + "$");
+        var regexHostName = new RegExp(regexHostNameStringArray.join("|"));
+        return regexHostName.test(hostName);
+    }
     function _isTargetSubdomainOfSourceLocation(sourceLocation, messageOrigin) {
         if (!sourceLocation || !messageOrigin) {
             return false;
@@ -4602,7 +4614,7 @@ Microsoft.Office.Common.XdmCommunicationManager = (function () {
                     var allowedDomains = [conversation.url].concat(serviceEndPoint._appDomains[messageObject._conversationId]);
                     if (!_checkOriginWithAppDomains(allowedDomains, e.origin)) {
                         if (!OfficeExt.appSpecificCheckOrigin(allowedDomains, e, messageObject._origin, _checkOriginWithAppDomains)) {
-                            var isOriginSubdomain = serviceEndPoint._addInSourceLocationSubdomainAllowedIsEnabled && _isTargetSubdomainOfSourceLocation(conversation.url, e.origin);
+                            var isOriginSubdomain = _isTargetSubdomainOfSourceLocation(conversation.url, e.origin);
                             if (!isOriginSubdomain) {
                                 throw "Failed origin check";
                             }
@@ -4645,12 +4657,36 @@ Microsoft.Office.Common.XdmCommunicationManager = (function () {
                     }
                     catch (ex) {
                     }
-                    if (canPostMessage) {
+                    var isOriginValid = false;
+                    if (window.location.href && e.origin && _isTargetSubdomainOfSourceLocation(window.location.href, e.origin)) {
+                        isOriginValid = true;
+                    }
+                    else {
+                        if (e.origin) {
+                            var parser = document.createElement("a");
+                            parser.href = e.origin;
+                            isOriginValid = _isHostNameValidWacDomain(parser.hostname);
+                        }
+                    }
+                    if (canPostMessage && isOriginValid) {
                         e.source.postMessage(envelopedResult, requesterUrl);
                     }
                 }
             }
             else if (messageObject._messageType === Microsoft.Office.Common.MessageType.response) {
+                if (messageObject._actionName == "ContextActivationManager_getAppContextAsync") {
+                    try {
+                        var wacorigin = e.origin;
+                        var parser = document.createElement("a");
+                        parser.href = wacorigin;
+                        var isOriginValid = _isHostNameValidWacDomain(parser.hostname);
+                        var isWacKnownHost = isOriginValid ? 1 : 0;
+                        var hostInfo = OSF._OfficeAppFactory.getHostInfo();
+                        OSF.AppTelemetry.onCheckWACHost(isWacKnownHost, messageObject._data._id, hostInfo.hostType, hostInfo.hostPlatform, messageObject._data._correlationId, wacorigin);
+                    }
+                    catch (ex) {
+                    }
+                }
                 var clientEndPoint = _lookupClientEndPoint(messageObject._conversationId);
                 if (!clientEndPoint) {
                     return;
@@ -5904,6 +5940,58 @@ var OSFLog;
         return AppInitializationUsageData;
     })(BaseUsageData);
     OSFLog.AppInitializationUsageData = AppInitializationUsageData;
+    var CheckWACHostUsageData = (function (_super) {
+        __extends(CheckWACHostUsageData, _super);
+        function CheckWACHostUsageData() {
+            _super.call(this, "CheckWACHost");
+        }
+        Object.defineProperty(CheckWACHostUsageData.prototype, "isWacKnownHost", {
+            get: function () { return this.Fields["isWacKnownHost"]; },
+            set: function (value) { this.Fields["isWacKnownHost"] = value; },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(CheckWACHostUsageData.prototype, "solutionId", {
+            get: function () { return this.Fields["solutionId"]; },
+            set: function (value) { this.Fields["solutionId"] = value; },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(CheckWACHostUsageData.prototype, "hostType", {
+            get: function () { return this.Fields["hostType"]; },
+            set: function (value) { this.Fields["hostType"] = value; },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(CheckWACHostUsageData.prototype, "hostPlatform", {
+            get: function () { return this.Fields["hostPlatform"]; },
+            set: function (value) { this.Fields["hostPlatform"] = value; },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(CheckWACHostUsageData.prototype, "wacDomain", {
+            get: function () { return this.Fields["wacDomain"]; },
+            set: function (value) { this.Fields["wacDomain"] = value; },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(CheckWACHostUsageData.prototype, "correlationId", {
+            get: function () { return this.Fields["correlationId"]; },
+            set: function (value) { this.Fields["correlationId"] = value; },
+            enumerable: true,
+            configurable: true
+        });
+        CheckWACHostUsageData.prototype.SerializeFields = function () {
+            this.SetSerializedField("isWacKnownHost", this.isWacKnownHost);
+            this.SetSerializedField("solutionId", this.solutionId);
+            this.SetSerializedField("hostType", this.hostType);
+            this.SetSerializedField("hostPlatform", this.hostPlatform);
+            this.SetSerializedField("wacDomain", this.wacDomain);
+            this.SetSerializedField("correlationId", this.correlationId);
+        };
+        return CheckWACHostUsageData;
+    })(BaseUsageData);
+    OSFLog.CheckWACHostUsageData = CheckWACHostUsageData;
 })(OSFLog || (OSFLog = {}));
 var Logger;
 (function (Logger) {
@@ -5980,12 +6068,21 @@ var OSFAriaLogger;
             { name: "AppSizeFinalHeight", type: "int64" },
             { name: "OpenTime", type: "int64" },
         ] };
+    var TelemetryEventCheckWACHost = { name: "CheckWACHost", enabled: true, basic: false, critical: false, points: [
+            { name: "isWacKnownHost", type: "int64" },
+            { name: "solutionId", type: "string" },
+            { name: "hostType", type: "string" },
+            { name: "hostPlatform", type: "string" },
+            { name: "correlationId", type: "string" },
+            { name: "wacDomain", type: "string" },
+        ] };
     var TelemetryEvents = [
         TelemetryEventAppActivated,
         TelemetryEventScriptLoad,
         TelemetryEventApiUsage,
         TelemetryEventAppInitialization,
         TelemetryEventAppClosed,
+        TelemetryEventCheckWACHost,
     ];
     function createDataField(value, point) {
         var key = point.rename === undefined ? point.name : point.rename;
@@ -6101,8 +6198,8 @@ var OSFAriaLogger;
             else if (flavor.toLowerCase() !== "win32") {
                 return true;
             }
-            if (window.external && window.external.GetContext && window.external.GetContext().GetHostVersion) {
-                version = window.external.GetContext().GetHostVersion();
+            if (window.external && typeof window.external.GetContext !== "undefined" && typeof window.external.GetContext().GetHostFullVersion !== "undefined") {
+                version = window.external.GetContext().GetHostFullVersion();
             }
             var BASE10 = 10;
             var MAX_MAJOR_VERSION = 16;
@@ -6576,6 +6673,17 @@ var OSFAppTelemetry;
         OSF.AppTelemetry.onCallDone("property", -1, propertyName, msResponseTime);
     }
     OSFAppTelemetry.onPropertyDone = onPropertyDone;
+    function onCheckWACHost(isWacKnownHost, solutionId, hostType, hostPlatform, correlationId, wacDomain) {
+        var data = new OSFLog.CheckWACHostUsageData();
+        data.isWacKnownHost = isWacKnownHost;
+        data.solutionId = solutionId;
+        data.hostType = hostType;
+        data.hostPlatform = hostPlatform;
+        data.correlationId = correlationId;
+        data.wacDomain = UrlFilter.filter(wacDomain);
+        (new AppLogger()).LogData(data);
+    }
+    OSFAppTelemetry.onCheckWACHost = onCheckWACHost;
     function onEventDone(id, errorType) {
         OSF.AppTelemetry.onCallDone("event", id, null, 0, errorType);
     }
@@ -7794,8 +7902,7 @@ var OfficeExt;
                 var url = dialogInfo[OSF.ShowWindowDialogParameterKeys.Url];
                 var fInDomain = Microsoft.Office.Common.XdmCommunicationManager.checkUrlWithAppDomains(appDomains, url);
                 if (!fInDomain) {
-                    return OSF._OfficeAppFactory.getInitializationHelper()._appContext._addInSourceLocationSubdomainAllowedIsEnabled
-                        && OSF._OfficeAppFactory.getInitializationHelper()._appContext._addInSourceUrl
+                    return OSF._OfficeAppFactory.getInitializationHelper()._appContext._addInSourceUrl
                         && Microsoft.Office.Common.XdmCommunicationManager.isTargetSubdomainOfSourceLocation(OSF._OfficeAppFactory.getInitializationHelper()._appContext._addInSourceUrl, url);
                 }
                 return fInDomain;
@@ -8191,11 +8298,26 @@ OSF.InitializationHelper.prototype.prepareApiSurface = function OSF_Initializati
     Object.defineProperty(exports, "__esModule", {
         value: !0
     });
-    var AsyncStorage = __webpack_require__(1), DialogApi = __webpack_require__(2), officeruntime_storage_web_1 = __webpack_require__(4);
+    var office_apiinformation_web_1 = __webpack_require__(1), AsyncStorage = __webpack_require__(2), DialogApi = __webpack_require__(3), officeruntime_storage_web_1 = __webpack_require__(5), Experimentation = __webpack_require__(6);
     window._OfficeRuntimeWeb = {
         displayWebDialog: DialogApi.displayWebDialog,
         AsyncStorage: AsyncStorage,
-        storage: officeruntime_storage_web_1.storage
+        storage: officeruntime_storage_web_1.storage,
+        experimentation: Experimentation.experimentation,
+        apiInformation: office_apiinformation_web_1.apiInformation
+    };
+}, function(module, exports, __webpack_require__) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", {
+        value: !0
+    }), exports.apiInformation = {
+        isSetSupported: function(capability, version) {
+            try {
+                return !!(Office && Office.context && Office.context.requirements) && Office.context.requirements.isSetSupported(capability, Number(version));
+            } catch (e) {
+                return !1;
+            }
+        }
     };
 }, function(module, exports, __webpack_require__) {
     "use strict";
@@ -8301,7 +8423,7 @@ OSF.InitializationHelper.prototype.prepareApiSurface = function OSF_Initializati
     Object.defineProperty(exports, "__esModule", {
         value: !0
     });
-    var OfficeExtension = __webpack_require__(3), Dialog = function() {
+    var OfficeExtension = __webpack_require__(4), Dialog = function() {
         function Dialog(_dialog) {
             this._dialog = _dialog;
         }
@@ -8456,4 +8578,41 @@ OSF.InitializationHelper.prototype.prepareApiSurface = function OSF_Initializati
             });
         }
     };
+}, function(module, exports, __webpack_require__) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", {
+        value: !0
+    });
+    var ExperimentationWeb = function() {
+        function ExperimentationWeb() {}
+        return ExperimentationWeb.prototype.getBooleanFeatureGate = function(featureName, defaultValue) {
+            try {
+                var featureGateValue = Microsoft.Office.WebExtension.FeatureGates[featureName];
+                return void 0 === featureGateValue || null === featureGateValue ? defaultValue : "true" === featureGateValue.toString().toLowerCase();
+            } catch (error) {
+                return defaultValue;
+            }
+        }, ExperimentationWeb.prototype.getIntFeatureGate = function(featureName, defaultValue) {
+            try {
+                var featureGateValue = parseInt(Microsoft.Office.WebExtension.FeatureGates[featureName]);
+                return isNaN(featureGateValue) ? defaultValue : featureGateValue;
+            } catch (error) {
+                return defaultValue;
+            }
+        }, ExperimentationWeb.prototype.getStringFeatureGate = function(featureName, defaultValue) {
+            try {
+                var featureGateValue = Microsoft.Office.WebExtension.FeatureGates[featureName];
+                return void 0 === featureGateValue || null === featureGateValue ? defaultValue : featureGateValue;
+            } catch (error) {
+                return defaultValue;
+            }
+        }, ExperimentationWeb.prototype.getBooleanFeatureGateAsync = function(featureName, defaultValue) {
+            return Promise.resolve(this.getBooleanFeatureGate(featureName, defaultValue));
+        }, ExperimentationWeb.prototype.getIntFeatureGateAsync = function(featureName, defaultValue) {
+            return Promise.resolve(this.getIntFeatureGate(featureName, defaultValue));
+        }, ExperimentationWeb.prototype.getStringFeatureGateAsync = function(featureName, defaultValue) {
+            return Promise.resolve(this.getStringFeatureGate(featureName, defaultValue));
+        }, ExperimentationWeb;
+    }();
+    exports.experimentation = new ExperimentationWeb();
 } ]);

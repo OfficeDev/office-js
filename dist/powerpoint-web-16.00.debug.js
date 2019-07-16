@@ -16,10 +16,10 @@
 
 
 // Sources:
-// osfweb: custom
-// runtime: 16.0.11609.30004
-// core: 16.0\11616.10000
-// host: 16.0\11616.10000
+// osfweb: 16.0\11619.10000
+// runtime: 16.0.11617.30000
+// core: 16.0\11620.10000
+// host: 16.0\11620.10000
 
 var __extends=(this && this.__extends) || function (d, b) {
 	for (var p in b)
@@ -6424,7 +6424,7 @@ var OSFAppTelemetry;
 		}
 		appInfo.message=context.get_hostCustomMessage();
 		appInfo.officeJSVersion=OSF.ConstantNames.FileVersion;
-		appInfo.hostJSVersion="16.0.11616.10000";
+		appInfo.hostJSVersion="16.0.11620.10000";
 		if (context._wacHostEnvironment) {
 			appInfo.wacHostEnvironment=context._wacHostEnvironment;
 		}
@@ -18909,11 +18909,26 @@ window.OfficeExtensionBatch = window.OfficeExtension;
     Object.defineProperty(exports, "__esModule", {
         value: !0
     });
-    var AsyncStorage = __webpack_require__(1), DialogApi = __webpack_require__(2), officeruntime_storage_web_1 = __webpack_require__(4);
+    var office_apiinformation_web_1 = __webpack_require__(1), AsyncStorage = __webpack_require__(2), DialogApi = __webpack_require__(3), officeruntime_storage_web_1 = __webpack_require__(5), Experimentation = __webpack_require__(6);
     window._OfficeRuntimeWeb = {
         displayWebDialog: DialogApi.displayWebDialog,
         AsyncStorage: AsyncStorage,
-        storage: officeruntime_storage_web_1.storage
+        storage: officeruntime_storage_web_1.storage,
+        experimentation: Experimentation.experimentation,
+        apiInformation: office_apiinformation_web_1.apiInformation
+    };
+}, function(module, exports, __webpack_require__) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", {
+        value: !0
+    }), exports.apiInformation = {
+        isSetSupported: function(capability, version) {
+            try {
+                return !!(Office && Office.context && Office.context.requirements) && Office.context.requirements.isSetSupported(capability, Number(version));
+            } catch (e) {
+                return !1;
+            }
+        }
     };
 }, function(module, exports, __webpack_require__) {
     "use strict";
@@ -19019,7 +19034,7 @@ window.OfficeExtensionBatch = window.OfficeExtension;
     Object.defineProperty(exports, "__esModule", {
         value: !0
     });
-    var OfficeExtension = __webpack_require__(3), Dialog = function() {
+    var OfficeExtension = __webpack_require__(4), Dialog = function() {
         function Dialog(_dialog) {
             this._dialog = _dialog;
         }
@@ -19174,6 +19189,43 @@ window.OfficeExtensionBatch = window.OfficeExtension;
             });
         }
     };
+}, function(module, exports, __webpack_require__) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", {
+        value: !0
+    });
+    var ExperimentationWeb = function() {
+        function ExperimentationWeb() {}
+        return ExperimentationWeb.prototype.getBooleanFeatureGate = function(featureName, defaultValue) {
+            try {
+                var featureGateValue = Microsoft.Office.WebExtension.FeatureGates[featureName];
+                return void 0 === featureGateValue || null === featureGateValue ? defaultValue : "true" === featureGateValue.toString().toLowerCase();
+            } catch (error) {
+                return defaultValue;
+            }
+        }, ExperimentationWeb.prototype.getIntFeatureGate = function(featureName, defaultValue) {
+            try {
+                var featureGateValue = parseInt(Microsoft.Office.WebExtension.FeatureGates[featureName]);
+                return isNaN(featureGateValue) ? defaultValue : featureGateValue;
+            } catch (error) {
+                return defaultValue;
+            }
+        }, ExperimentationWeb.prototype.getStringFeatureGate = function(featureName, defaultValue) {
+            try {
+                var featureGateValue = Microsoft.Office.WebExtension.FeatureGates[featureName];
+                return void 0 === featureGateValue || null === featureGateValue ? defaultValue : featureGateValue;
+            } catch (error) {
+                return defaultValue;
+            }
+        }, ExperimentationWeb.prototype.getBooleanFeatureGateAsync = function(featureName, defaultValue) {
+            return Promise.resolve(this.getBooleanFeatureGate(featureName, defaultValue));
+        }, ExperimentationWeb.prototype.getIntFeatureGateAsync = function(featureName, defaultValue) {
+            return Promise.resolve(this.getIntFeatureGate(featureName, defaultValue));
+        }, ExperimentationWeb.prototype.getStringFeatureGateAsync = function(featureName, defaultValue) {
+            return Promise.resolve(this.getStringFeatureGate(featureName, defaultValue));
+        }, ExperimentationWeb;
+    }();
+    exports.experimentation = new ExperimentationWeb();
 } ]);
 
 

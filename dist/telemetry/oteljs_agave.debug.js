@@ -109,6 +109,7 @@ var oteljs_agave = function(modules) {
     (function(AWTEventsDroppedReason) {
         AWTEventsDroppedReason[AWTEventsDroppedReason["NonRetryableStatus"] = 1] = "NonRetryableStatus";
         AWTEventsDroppedReason[AWTEventsDroppedReason["QueueFull"] = 3] = "QueueFull";
+        AWTEventsDroppedReason[AWTEventsDroppedReason["MaxRetryLimit"] = 4] = "MaxRetryLimit";
     })(AWTEventsDroppedReason = exports.AWTEventsDroppedReason || (exports.AWTEventsDroppedReason = {}));
     var AWTEventsRejectedReason;
     (function(AWTEventsRejectedReason) {
@@ -1258,6 +1259,7 @@ var oteljs_agave = function(modules) {
     var AWTTransmissionManagerCore_1 = __webpack_require__(3);
     var AWTRecordBatcher_1 = __webpack_require__(35);
     var AWTNotificationManager_1 = __webpack_require__(4);
+    var Utils = __webpack_require__(2);
     var UploadNowCheckTimer = 250;
     var MaxNumberEventPerBatch = 500;
     var MaxSendAttempts = 6;
@@ -1279,6 +1281,9 @@ var oteljs_agave = function(modules) {
             this._httpManager = new AWTHttpManager_1.default(this._outboundQueue, collectorUrl, this, xhrOverride, clockSkewRefreshDurationInMins);
         }
         AWTQueueManager.prototype.addEvent = function(event) {
+            if (!Utils.isPriority(event.priority)) {
+                event.priority = Enums_1.AWTEventPriority.Normal;
+            }
             if (event.priority === Enums_1.AWTEventPriority.Immediate_sync) {
                 this._httpManager.sendSynchronousRequest(this._batcher.addEventToBatch(event), event.apiKey);
             } else if (this._queueSize < this._queueSizeLimit) {
@@ -1306,7 +1311,7 @@ var oteljs_agave = function(modules) {
                             if (request[token][i].sendAttempt < MaxSendAttempts) {
                                 this.addEvent(request[token][i]);
                             } else {
-                                AWTNotificationManager_1.default.eventsDropped([ request[token][i] ], Enums_1.AWTEventsDroppedReason.NonRetryableStatus);
+                                AWTNotificationManager_1.default.eventsDropped([ request[token][i] ], Enums_1.AWTEventsDroppedReason.MaxRetryLimit);
                             }
                         }
                     }
@@ -1734,6 +1739,11 @@ var oteljs_agave = function(modules) {
                         _this._addStat("records_dropped_count", events.length, events[0].apiKey);
                         break;
 
+                      case Enums_1.AWTEventsDroppedReason.MaxRetryLimit:
+                        _this._addStat("d_retry_limit", events.length, events[0].apiKey);
+                        _this._addStat("records_dropped_count", events.length, events[0].apiKey);
+                        break;
+
                       case Enums_1.AWTEventsDroppedReason.QueueFull:
                         _this._addStat("d_queue_full", events.length, events[0].apiKey);
                         break;
@@ -1855,6 +1865,7 @@ var oteljs_agave = function(modules) {
                                 requestDictionary[token] = dataPackage.splice(0, i);
                                 remainingRequest[token] = dataPackage;
                                 this._addNewDataPackageSize(requestDictionary[token].length, stream, dpSizeSerialized, dpSizePos);
+                                requestFull = true;
                                 break;
                             }
                         }
@@ -2047,7 +2058,7 @@ var oteljs_agave = function(modules) {
     Object.defineProperty(exports, "__esModule", {
         value: true
     });
-    exports.Version = "1.8.1";
+    exports.Version = "1.8.4";
     exports.FullVersionString = "AWT-Web-JS-" + exports.Version;
 }, function(module, exports, __webpack_require__) {
     "use strict";
@@ -3279,11 +3290,10 @@ var oteljs_agave = function(modules) {
                     if (_this._onSendFirstEvent) {
                         _this._onSendFirstEvent(false);
                     }
-                } else {
-                    logNotification(LogLevel.Error, Category.Sink, function() {
-                        return JSON.stringify(e);
-                    });
                 }
+                logNotification(LogLevel.Error, Category.Sink, function() {
+                    return JSON.stringify(e);
+                });
             });
         };
         RichApiTelemetryQueue.prototype.addDataFields = function(richApiDataFields, dataFields) {
@@ -3366,7 +3376,7 @@ var oteljs_agave = function(modules) {
             return IsSupportedState.Unsupported;
         }
         if (isTelemetryApiSetSupported()) {
-            return IsSupportedState.Supported;
+            return IsSupportedState.NotDetermined;
         }
         return IsSupportedState.NotDetermined;
     }
@@ -3685,12 +3695,15 @@ var oteljs_agave = function(modules) {
         }
         Utils.newGuid = newGuid;
     })(Utils_Utils || (Utils_Utils = {}));
-    var __assign = undefined && undefined.__assign || Object.assign || function(t) {
-        for (var s, i = 1, n = arguments.length; i < n; i++) {
-            s = arguments[i];
-            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p)) t[p] = s[p];
-        }
-        return t;
+    var __assign = undefined && undefined.__assign || function() {
+        __assign = Object.assign || function(t) {
+            for (var s, i = 1, n = arguments.length; i < n; i++) {
+                s = arguments[i];
+                for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p)) t[p] = s[p];
+            }
+            return t;
+        };
+        return __assign.apply(this, arguments);
     };
     var defaultAriaContext = {
         "App.Name": "TBD",
@@ -3707,9 +3720,8 @@ var oteljs_agave = function(modules) {
         "Release.Fork": "TBD"
     };
     var BASE10 = 10;
-    var MAX_MAJOR_VERSION = 16;
-    var MAX_MINOR_VERSION = 0;
-    var MAX_BUILD_VERSION = 11601;
+    var MAX_SUPPORTED_WIN32_VERSION = [ 16, 0, 11599 ];
+    var MAX_SUPPORTED_MAC_VERSION = [ 16, 26 ];
     var _additionalContext;
     var _sendEventEnabled;
     function AriaHelper_initialize(additionalContext, sendEventEnabled) {
@@ -3740,11 +3752,34 @@ var oteljs_agave = function(modules) {
         }
         var platform = _additionalContext["App.Platform"];
         var version = _additionalContext["App.Version"];
-        if (platform !== "Win32" || !version) {
+        return isSupportedVersion(version, platform);
+    }
+    function isSupportedVersion(version, platform) {
+        if (!version) {
             return true;
         }
-        var versionTokens = version.split(".");
-        return versionTokens.length < 3 || !(parseInt(versionTokens[0], BASE10) >= MAX_MAJOR_VERSION) || !(parseInt(versionTokens[1], BASE10) >= MAX_MINOR_VERSION) || !(parseInt(versionTokens[2], BASE10) >= MAX_BUILD_VERSION);
+        var versionArray = version.split(".");
+        var maxVersion;
+        if (platform === "Win32") {
+            maxVersion = MAX_SUPPORTED_WIN32_VERSION;
+        } else if (platform === "Mac") {
+            maxVersion = MAX_SUPPORTED_MAC_VERSION;
+        } else {
+            return true;
+        }
+        for (var i = 0; i < maxVersion.length && i < versionArray.length; i++) {
+            var versionToken = parseInt(versionArray[i], BASE10);
+            if (isNaN(versionToken)) {
+                return false;
+            }
+            if (versionToken < maxVersion[i]) {
+                return true;
+            }
+            if (versionToken > maxVersion[i]) {
+                return false;
+            }
+        }
+        return true;
     }
     function getSessionId() {
         return Utils_Utils.newGuid();
