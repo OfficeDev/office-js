@@ -35,10 +35,7 @@ Best practices for using the Office.js NPM package include:
 
 ### Support
 
-The Office.js CDN is the official, supported source for Office Add-ins. For the NPM package sourced through this repository, only the latest version of the package is supported. We'll not support nor apply any patches to previous versions of the package. In addition, the following are guaranteed for the NPM package.
-
-- Timely resolution of issues and bugs. 
-- Frequency of updates to match the CDN version. 
+The Office.js CDN is the official, supported source for Office Add-ins. For the NPM package sourced through this repository, only the latest version of the package is supported. We'll not support nor apply any patches to previous versions of the package. In addition, the frequency of the updates to this repository and related NPM package to match the CDN version is not guaranteed. 
 
 Also, Outlook add-ins do not support hosting Office.js offline due to a network access requirement for dependencies like the Microsoft Ajax library.
 
