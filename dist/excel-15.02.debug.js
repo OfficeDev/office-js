@@ -1,5 +1,5 @@
 /* Excel specific API library */
-/* Version: 15.0.4777.3000 */
+/* Version: 15.0.5155.1000 */
 /*
 	Copyright (c) Microsoft Corporation.  All rights reserved.
 */
@@ -30,7 +30,13 @@ OSF.DDA.RichClientSettingsManager={
 		if (onCalling) {
 			onCalling();
 		}
-		window.external.GetContext().GetSettings().Read(keys, values);
+		if (typeof OsfOMToken !='undefined' && OsfOMToken) {
+			window.external.GetContext().GetSettings(OsfOMToken).Read(keys, values);
+		}
+		else
+		{
+			window.external.GetContext().GetSettings().Read(keys, values);
+		}
 		if (onReceiving) {
 			onReceiving();
 		}
@@ -50,7 +56,12 @@ OSF.DDA.RichClientSettingsManager={
 		if (onCalling) {
 			onCalling();
 		}
-		window.external.GetContext().GetSettings().Write(keys, values);
+		if (typeof OsfOMToken !='undefined' && OsfOMToken) {
+			window.external.GetContext().GetSettings(OsfOMToken).Write(keys, values);
+		}
+		else {
+			window.external.GetContext().GetSettings().Write(keys, values);
+		}
 		if (onReceiving) {
 			onReceiving();
 		}
@@ -61,6 +72,7 @@ OSF.DDA.DispIdHost.getRichClientDelegateMethods=function (actionId) {
 	delegateMethods[OSF.DDA.DispIdHost.Delegates.ExecuteAsync]=OSF.DDA.SafeArray.Delegate.executeAsync;
 	delegateMethods[OSF.DDA.DispIdHost.Delegates.RegisterEventAsync]=OSF.DDA.SafeArray.Delegate.registerEventAsync;
 	delegateMethods[OSF.DDA.DispIdHost.Delegates.UnregisterEventAsync]=OSF.DDA.SafeArray.Delegate.unregisterEventAsync;
+	delegateMethods[OSF.DDA.DispIdHost.Delegates.MessageParent]=OSF.DDA.SafeArray.Delegate.MessageParent;
 	function getSettingsExecuteMethod(hostDelegateMethod) {
 		return function (args) {
 			var status, response;
@@ -96,6 +108,26 @@ OSF.DDA.DispIdHost.getRichClientDelegateMethods=function (actionId) {
 			break;
 		default:
 			break;
+	}
+	return delegateMethods;
+}
+OSF.DDA.DispIdHost.getClientDelegateMethods=function (actionId) {
+	var delegateMethods={};
+	delegateMethods[OSF.DDA.DispIdHost.Delegates.ExecuteAsync]=OSF.DDA.SafeArray.Delegate.executeAsync;
+	delegateMethods[OSF.DDA.DispIdHost.Delegates.RegisterEventAsync]=OSF.DDA.SafeArray.Delegate.registerEventAsync;
+	delegateMethods[OSF.DDA.DispIdHost.Delegates.UnregisterEventAsync]=OSF.DDA.SafeArray.Delegate.unregisterEventAsync;
+	delegateMethods[OSF.DDA.DispIdHost.Delegates.MessageParent]=OSF.DDA.SafeArray.Delegate.MessageParent;
+	if (OSF.DDA.AsyncMethodNames.RefreshAsync && actionId==OSF.DDA.AsyncMethodNames.RefreshAsync.id) {
+		var readSerializedSettings=function (hostCallArgs, onCalling, onReceiving) {
+			return OSF.DDA.ClientSettingsManager.read(onCalling, onReceiving);
+		};
+		delegateMethods[OSF.DDA.DispIdHost.Delegates.ExecuteAsync]=OSF.DDA.ClientSettingsManager.getSettingsExecuteMethod(readSerializedSettings);
+	}
+	if (OSF.DDA.AsyncMethodNames.SaveAsync && actionId==OSF.DDA.AsyncMethodNames.SaveAsync.id) {
+		var writeSerializedSettings=function (hostCallArgs, onCalling, onReceiving) {
+			return OSF.DDA.ClientSettingsManager.write(hostCallArgs[OSF.DDA.SettingsManager.SerializedSettings], hostCallArgs[Microsoft.Office.WebExtension.Parameters.OverwriteIfStale], onCalling, onReceiving);
+		};
+		delegateMethods[OSF.DDA.DispIdHost.Delegates.ExecuteAsync]=OSF.DDA.ClientSettingsManager.getSettingsExecuteMethod(writeSerializedSettings);
 	}
 	return delegateMethods;
 }
@@ -303,6 +335,7 @@ OSF.DDA.SafeArray.Delegate.SpecialProcessor=function OSF_DDA_SafeArray_Delegate_
 		OSF.DDA.EventDescriptors.DocumentThemeChangedEvent,
 		OSF.DDA.EventDescriptors.OfficeThemeChangedEvent,
 		OSF.DDA.EventDescriptors.ActiveViewChangedEvent,
+		OSF.DDA.EventDescriptors.AppCommandInvokedEvent,
 		OSF.DDA.DataNodeEventProperties.OldNode,
 		OSF.DDA.DataNodeEventProperties.NewNode,
 		OSF.DDA.DataNodeEventProperties.NextSiblingNode,
@@ -1187,37 +1220,73 @@ OSF.DDA.SafeArray.Delegate.executeAsync=function OSF_DDA_SafeArray_Delegate$Exec
 			return arrArgs;
 		}
 		var startTime=(new Date()).getTime();
-		window.external.Execute(
-			args.dispId,
-			toArray(args.hostCallArgs),
-			function OSF_DDA_SafeArrayFacade$Execute_OnResponse(hostResponseArgs) {
-				if (args.onReceiving) {
-					args.onReceiving();
-				}
-				var result=hostResponseArgs.toArray();
-				var status=result[OSF.DDA.SafeArray.Response.Status];
-				if (args.onComplete) {
-					var payload;
-					if (status==OSF.DDA.ErrorCodeManager.errorCodes.ooeSuccess) {
-						if (result.length > 2) {
-							payload=[];
-							for (var i=1; i < result.length; i++)
-								payload[i - 1]=result[i];
+		if (typeof OsfOMToken !='undefined' && OsfOMToken) {
+			window.external.Execute(
+				args.dispId,
+				toArray(args.hostCallArgs),
+				function OSF_DDA_SafeArrayFacade$Execute_OnResponse(hostResponseArgs) {
+					if (args.onReceiving) {
+						args.onReceiving();
+					}
+					var result=hostResponseArgs.toArray();
+					var status=result[OSF.DDA.SafeArray.Response.Status];
+					if (args.onComplete) {
+						var payload;
+						if (status==OSF.DDA.ErrorCodeManager.errorCodes.ooeSuccess) {
+							if (result.length > 2) {
+								payload=[];
+								for (var i=1; i < result.length; i++)
+									payload[i - 1]=result[i];
+							}
+							else {
+								payload=result[OSF.DDA.SafeArray.Response.Payload];
+							}
 						}
 						else {
 							payload=result[OSF.DDA.SafeArray.Response.Payload];
 						}
+						args.onComplete(status, payload);
 					}
-					else {
-						payload=result[OSF.DDA.SafeArray.Response.Payload];
+					if (OSF.AppTelemetry) {
+						OSF.AppTelemetry.onMethodDone(args.dispId, args.hostCallArgs, Math.abs((new Date()).getTime() -  startTime), status);
 					}
-					args.onComplete(status, payload);
+				},
+				OsfOMToken
+			);
+		}
+		else {
+			window.external.Execute(
+				args.dispId,
+				toArray(args.hostCallArgs),
+				function OSF_DDA_SafeArrayFacade$Execute_OnResponse1(hostResponseArgs) {
+					if (args.onReceiving) {
+						args.onReceiving();
+					}
+					var result=hostResponseArgs.toArray();
+					var status=result[OSF.DDA.SafeArray.Response.Status];
+					if (args.onComplete) {
+						var payload;
+						if (status==OSF.DDA.ErrorCodeManager.errorCodes.ooeSuccess) {
+							if (result.length > 2) {
+								payload=[];
+								for (var i=1; i < result.length; i++)
+									payload[i - 1]=result[i];
+							}
+							else {
+								payload=result[OSF.DDA.SafeArray.Response.Payload];
+							}
+						}
+						else {
+							payload=result[OSF.DDA.SafeArray.Response.Payload];
+						}
+						args.onComplete(status, payload);
+					}
+					if (OSF.AppTelemetry) {
+						OSF.AppTelemetry.onMethodDone(args.dispId, args.hostCallArgs, Math.abs((new Date()).getTime() -  startTime), status);
+					}
 				}
-				if (OSF.AppTelemetry) {
-					OSF.AppTelemetry.onMethodDone(args.dispId, args.hostCallArgs, Math.abs((new Date()).getTime() -  startTime), status);
-				}
-			}
-		);
+			);
+		}
 	}
 	catch (ex) {
 		OSF.DDA.SafeArray.Delegate._onException(ex, args);
@@ -1244,19 +1313,37 @@ OSF.DDA.SafeArray.Delegate.registerEventAsync=function OSF_DDA_SafeArray_Delegat
 	}
 	var callback=OSF.DDA.SafeArray.Delegate._getOnAfterRegisterEvent(true, args);
 	try {
-		window.external.RegisterEvent(
-			args.dispId,
-			args.targetId,
-			function OSF_DDA_SafeArrayDelegate$RegisterEventAsync_OnEvent(eventDispId, payload) {
-				if (args.onEvent) {
-					args.onEvent(payload);
-				}
-				if (OSF.AppTelemetry) {
-					OSF.AppTelemetry.onEventDone(args.dispId);
-				}
-			},
-			callback
-		);
+		if (typeof OsfOMToken !='undefined' && OsfOMToken) {
+			window.external.RegisterEvent(
+				args.dispId,
+				args.targetId,
+				function OSF_DDA_SafeArrayDelegate$RegisterEventAsync_OnEvent(eventDispId, payload) {
+					if (args.onEvent) {
+						args.onEvent(payload);
+					}
+					if (OSF.AppTelemetry) {
+						OSF.AppTelemetry.onEventDone(args.dispId);
+					}
+				},
+				callback,
+				OsfOMToken
+			);
+		}
+		else {
+			window.external.RegisterEvent(
+				args.dispId,
+				args.targetId,
+				function OSF_DDA_SafeArrayDelegate$RegisterEventAsync_OnEvent1(eventDispId, payload) {
+					if (args.onEvent) {
+						args.onEvent(payload);
+					}
+					if (OSF.AppTelemetry) {
+						OSF.AppTelemetry.onEventDone(args.dispId);
+					}
+				},
+				callback
+			);
+		}
 	}
 	catch (ex) {
 		OSF.DDA.SafeArray.Delegate._onException(ex, args);
@@ -1268,16 +1355,59 @@ OSF.DDA.SafeArray.Delegate.unregisterEventAsync=function OSF_DDA_SafeArray_Deleg
 	}
 	var callback=OSF.DDA.SafeArray.Delegate._getOnAfterRegisterEvent(false, args);
 	try {
-		window.external.UnregisterEvent(
-			args.dispId,
-			args.targetId,
-			callback
-		);
+		  if (typeof OsfOMToken !='undefined' && OsfOMToken) {
+				window.external.UnregisterEvent(
+					args.dispId,
+					args.targetId,
+					callback,
+					OsfOMToken
+				);
+		}
+		else{
+				window.external.UnregisterEvent(
+					args.dispId,
+					args.targetId,
+					callback
+				);
+		}
 	}
 	catch (ex) {
 		OSF.DDA.SafeArray.Delegate._onException(ex, args);
 	}
 };
+OSF.DDA.SafeArray.Delegate.MessageParent=function OSF_DDA_SafeArray_Delegate$MessageParent(args){
+	try {
+		if (args.onCalling) {
+			args.onCalling();
+		}
+		var startTime=(new Date()).getTime();
+		var message=args.hostCallArgs[Microsoft.Office.WebExtension.Parameters.MessageToParent];
+		window.external.MessageParent(message);
+		if (args.onReceiving) {
+			args.onReceiving();
+		}
+		if (OSF.AppTelemetry) {
+			OSF.AppTelemetry.onMethodDone(args.dispId, args.hostCallArgs, Math.abs((new Date()).getTime() - startTime), result);
+		}
+		return result;
+	}
+	catch (ex) {
+		var status;
+		var number=ex.number;
+		if (number) {
+		switch (number) {
+			case -2146828218:
+				status=OSF.DDA.ErrorCodeManager.errorCodes.ooeNoCapability;
+				break;
+			case -2146827850:
+			default:
+				status=OSF.DDA.ErrorCodeManager.errorCodes.ooeInternalError;
+				break;
+			}
+		}
+		return status || OSF.DDA.ErrorCodeManager.errorCodes.ooeInternalError;
+	}
+}
 delete Microsoft.Office.WebExtension.FileType;
 OSF.DDA.ExcelDocument=function OSF_DDA_ExcelDocument(officeAppContext, settings) {
 	var bf=new OSF.DDA.BindingFacade(this);

@@ -1,5 +1,6 @@
 /* Outlook specific API library */
 /* Version: 16.0.6807.1000 */
+/* Update: 1 */
 /*
 	Copyright (c) Microsoft Corporation.  All rights reserved.
 */
@@ -3750,27 +3751,35 @@ OSF.DDA.DispIdHost.getClientDelegateMethods=function(actionId)
 var OSFRichclient;
 (function(OSFRichclient)
 {
-	var RichClientHostController=function()
-		{
-			function RichClientHostController(){}
-			RichClientHostController.prototype.execute=function(id, params, callback)
-			{
-				window.external.Execute(id,params,callback)
-			};
-			RichClientHostController.prototype.registerEvent=function(id, targetId, handler, callback)
-			{
-				window.external.RegisterEvent(id,targetId,handler,callback)
-			};
-			RichClientHostController.prototype.unregisterEvent=function(id, targetId, callback)
-			{
-				window.external.UnregisterEvent(id,targetId,callback)
-			};
-			RichClientHostController.prototype.messageParent=function(message)
-			{
-				window.external.MessageParent(message)
-			};
-			return RichClientHostController
-		}();
+	var RichClientHostController = (function () {
+        function RichClientHostController() {
+        }
+        RichClientHostController.prototype.execute = function (id, params, callback) {
+            if (typeof OsfOMToken != 'undefined' && OsfOMToken) {
+                window.external.Execute(id, params, callback, OsfOMToken);
+            }
+            else {
+                window.external.Execute(id, params, callback);
+            }
+        };
+        RichClientHostController.prototype.registerEvent = function (id, targetId, handler, callback) {
+            if (typeof OsfOMToken != 'undefined' && OsfOMToken) {
+                window.external.RegisterEvent(id, targetId, handler, callback, OsfOMToken);
+            }
+            else {
+                window.external.RegisterEvent(id, targetId, handler, callback);
+            }
+        };
+        RichClientHostController.prototype.unregisterEvent = function (id, targetId, callback) {
+            if (typeof OsfOMToken != 'undefined' && OsfOMToken) {
+                window.external.UnregisterEvent(id, targetId, callback, OsfOMToken);
+            }
+            else {
+                window.external.UnregisterEvent(id, targetId, callback);
+            }
+        };
+        return RichClientHostController;
+    })();
 	OSFRichclient.RichClientHostController=RichClientHostController
 })(OSFRichclient || (OSFRichclient={}));
 OSF.ClientHostController=new OSFRichclient.RichClientHostController;
@@ -3826,60 +3835,65 @@ var OfficeExt;
 		OSF.DDA.OfficeTheme.getOfficeTheme=OfficeExt.OfficeTheme.OfficeThemeManager.instance().getOfficeTheme
 	})(OfficeTheme=OfficeExt.OfficeTheme || (OfficeExt.OfficeTheme={}))
 })(OfficeExt || (OfficeExt={}));
-OSF.DDA.ClientSettingsManager={
-	getSettingsExecuteMethod: function OSF_DDA_ClientSettingsManager$getSettingsExecuteMethod(hostDelegateMethod)
-	{
-		return function(args)
-			{
-				var status,
-					response;
-				try
-				{
-					response=hostDelegateMethod(args.hostCallArgs,args.onCalling,args.onReceiving);
-					status=OSF.DDA.ErrorCodeManager.errorCodes.ooeSuccess
-				}
-				catch(ex)
-				{
-					status=OSF.DDA.ErrorCodeManager.errorCodes.ooeInternalError;
-					response={
-						name: Strings.OfficeOM.L_InternalError,
-						message: ex
-					}
-				}
-				if(args.onComplete)
-					args.onComplete(status,response)
+OSF.DDA.ClientSettingsManager = {
+	getSettingsExecuteMethod: function OSF_DDA_ClientSettingsManager$getSettingsExecuteMethod(hostDelegateMethod) {
+		return function (args) {
+			var status, response;
+			try {
+				response = hostDelegateMethod(args.hostCallArgs, args.onCalling, args.onReceiving);
+				status = OSF.DDA.ErrorCodeManager.errorCodes.ooeSuccess;
 			}
+			catch (ex) {
+				status = OSF.DDA.ErrorCodeManager.errorCodes.ooeInternalError;
+				response = { name: Strings.OfficeOM.L_InternalError, message: ex };
+			}
+			if (args.onComplete) {
+				args.onComplete(status, response);
+			}
+		};
 	},
-	read: function OSF_DDA_ClientSettingsManager$read(onCalling, onReceiving)
-	{
-		var keys=[];
-		var values=[];
-		if(onCalling)
+	read: function OSF_DDA_ClientSettingsManager$read(onCalling, onReceiving) {
+		var keys = [];
+		var values = [];
+		if (onCalling) {
 			onCalling();
-		OSF.DDA._OsfControlContext.GetSettings().Read(keys,values);
-		if(onReceiving)
-			onReceiving();
-		var serializedSettings={};
-		for(var index=0; index < keys.length; index++)
-			serializedSettings[keys[index]]=values[index];
-		return serializedSettings
-	},
-	write: function OSF_DDA_ClientSettingsManager$write(serializedSettings, overwriteIfStale, onCalling, onReceiving)
-	{
-		var keys=[];
-		var values=[];
-		for(var key in serializedSettings)
-		{
-			keys.push(key);
-			values.push(serializedSettings[key])
 		}
-		if(onCalling)
+		if (typeof OsfOMToken != 'undefined' && OsfOMToken) {
+			OSF.DDA._OsfControlContext.GetSettings(OsfOMToken).Read(keys, values);
+		}
+		else {
+			OSF.DDA._OsfControlContext.GetSettings().Read(keys, values);
+		}
+		if (onReceiving) {
+			onReceiving();
+		}
+		var serializedSettings = {};
+		for (var index = 0; index < keys.length; index++) {
+			serializedSettings[keys[index]] = values[index];
+		}
+		return serializedSettings;
+	},
+	write: function OSF_DDA_ClientSettingsManager$write(serializedSettings, overwriteIfStale, onCalling, onReceiving) {
+		var keys = [];
+		var values = [];
+		for (var key in serializedSettings) {
+			keys.push(key);
+			values.push(serializedSettings[key]);
+		}
+		if (onCalling) {
 			onCalling();
-		OSF.DDA._OsfControlContext.GetSettings().Write(keys,values);
-		if(onReceiving)
-			onReceiving()
+		}
+		if (typeof OsfOMToken != 'undefined' && OsfOMToken) {
+			OSF.DDA._OsfControlContext.GetSettings(OsfOMToken).Write(keys, values);
+		}
+		else {
+			OSF.DDA._OsfControlContext.GetSettings().Write(keys, values);
+		}
+		if (onReceiving) {
+			onReceiving();
+		}
 	}
-};
+}
 OSF.InitializationHelper.prototype.initializeSettings=function OSF_InitializationHelper$initializeSettings(refreshSupported)
 {
 	var serializedSettings=OSF.DDA.ClientSettingsManager.read();

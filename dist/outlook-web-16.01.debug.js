@@ -10310,6 +10310,7 @@ OSF.InitializationHelper.prototype.loadAppSpecificScriptAndCreateOM = function O
                 case 154:
                 case 157:
                 case 160:
+                case 164:
                     break;
                 case 12:
                     optionalParameters["isRest"] = data["isRest"];
@@ -11825,6 +11826,15 @@ OSF.InitializationHelper.prototype.loadAppSpecificScriptAndCreateOM = function O
         window["OSF"]["DDA"]["OutlookAppOm"]._instance$p._throwOnMethodCallForInsufficientPermission$i$0(2,"saveAsync");
         var parameters = $h.CommonParameters.parse(args,false);
         window["OSF"]["DDA"]["OutlookAppOm"]._instance$p._standardInvokeHostMethod$i$0(32,null,null,parameters._asyncContext$p$0,parameters._callback$p$0)
+    };
+    $h.ComposeItem.prototype.getItemIdAsync = function()
+    {
+        var args = [];
+        for(var $$pai_2 = 0; $$pai_2 < arguments["length"]; ++$$pai_2)
+            args[$$pai_2] = arguments[$$pai_2];
+        window["OSF"]["DDA"]["OutlookAppOm"]._instance$p._throwOnMethodCallForInsufficientPermission$i$0(1,"getItemIdAsync");
+        var parameters = $h.CommonParameters.parse(args,false);
+        window["OSF"]["DDA"]["OutlookAppOm"]._instance$p._standardInvokeHostMethod$i$0(164,null,null,parameters._asyncContext$p$0,parameters._callback$p$0)
     };
     $h.ComposeRecipient = function(type, propertyName)
     {
@@ -14134,6 +14144,7 @@ OSF.InitializationHelper.prototype.loadAppSpecificScriptAndCreateOM = function O
         $h.OutlookErrorManager._addErrorMessage$p(9043,"AttachmentTypeNotSupported",window["_u"]["ExtensibilityStrings"]["l_AttachmentNotSupported_Text"]);
         $h.OutlookErrorManager._addErrorMessage$p(9044,"InvalidCategory",window["_u"]["ExtensibilityStrings"]["l_Invalid_Category_Error_Text"]);
         $h.OutlookErrorManager._addErrorMessage$p(9045,"DuplicateCategory",window["_u"]["ExtensibilityStrings"]["l_Duplicate_Category_Error_Text"]);
+        $h.OutlookErrorManager._addErrorMessage$p(9046,"ItemNotSaved",window["_u"]["ExtensibilityStrings"]["l_Item_Not_Saved_Error_Text"]);
         $h.OutlookErrorManager._isInitialized$p = true
     };
     $h.OutlookErrorManager._addErrorMessage$p = function(errorCode, errorName, errorMessage)
@@ -14302,6 +14313,7 @@ OSF.InitializationHelper.prototype.loadAppSpecificScriptAndCreateOM = function O
         addMasterCategoriesAsync: 161,
         removeMasterCategoriesAsync: 162,
         logTelemetry: 163,
+        getItemIdAsync: 164,
         trackCtq: 400,
         recordTrace: 401,
         recordDataPoint: 402,
@@ -15139,6 +15151,7 @@ OSF.InitializationHelper.prototype.loadAppSpecificScriptAndCreateOM = function O
     $h.OutlookErrorManager.OutlookErrorCodes.attachmentTypeNotSupported = 9043;
     $h.OutlookErrorManager.OutlookErrorCodes.olkInvalidCategoryError = 9044;
     $h.OutlookErrorManager.OutlookErrorCodes.duplicateCategoryError = 9045;
+    $h.OutlookErrorManager.OutlookErrorCodes.itemNotSavedError = 9046;
     $h.OutlookErrorManager.OsfDdaErrorCodes.ooeCoercionTypeNotSupported = 1e3;
     $h.OutlookErrorManager.OsfDdaErrorCodes.ooeOperationNotSupported = 5e3;
     $h.CommonParameters.asyncContextKeyName = "asyncContext";

@@ -1,4 +1,4 @@
-/* Version: 16.0.11609.30000 */
+/* Version: 16.0.11619.10000 */
 /*
 	Copyright (c) Microsoft Corporation.  All rights reserved.
 */
@@ -4083,7 +4083,7 @@ var Excel;
 			/// <field name="left" type="Number">The distance, in points, from the left side of the chart to the worksheet origin. [Api set: ExcelApi 1.1]</field>
 			/// <field name="legend" type="Excel.ChartLegend">Represents the legend for the chart. Read-only. [Api set: ExcelApi 1.1]</field>
 			/// <field name="name" type="String">Represents the name of a chart object. [Api set: ExcelApi 1.1]</field>
-			/// <field name="pivotOptions" type="Excel.ChartPivotOptions">Encapsulates the options for the pivot chart. Read-only. [Api set: ExcelApi 1.9]</field>
+			/// <field name="pivotOptions" type="Excel.ChartPivotOptions">Encapsulates the options for a pivot chart. Read-only. [Api set: ExcelApi 1.9]</field>
 			/// <field name="plotArea" type="Excel.ChartPlotArea">Represents the plotArea for the chart. [Api set: ExcelApi 1.8]</field>
 			/// <field name="plotBy" type="String">Returns or sets the way columns or rows are used as data series on the chart. Read/Write. [Api set: ExcelApi 1.8]</field>
 			/// <field name="plotVisibleOnly" type="Boolean">True if only visible cells are plotted. False if both visible and hidden cells are plotted. Read/Write. [Api set: ExcelApi 1.8]</field>
@@ -4124,7 +4124,7 @@ var Excel;
 		}
 		Chart.prototype.activate = function() {
 			/// <summary>
-			/// Activate the chart in the Excel UI. [Api set: ExcelApi 1.9]
+			/// Activates the chart in the Excel UI. [Api set: ExcelApi 1.9]
 			/// </summary>
 			/// <returns ></returns>
 		}
@@ -4243,10 +4243,10 @@ var Excel;
 			/// <field name="context" type="Excel.RequestContext">The request context associated with this object.</field>
 			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
 			/// <field name="border" type="Excel.ChartBorder">Represents the border format of chart area, which includes color, linestyle, and weight. Read-only. [Api set: ExcelApi 1.7]</field>
-			/// <field name="colorScheme" type="String">Returns or sets an integer that represents the color scheme for the chart. Read/Write. [Api set: ExcelApi 1.9]</field>
+			/// <field name="colorScheme" type="String">Returns or sets color scheme of the chart. Read/Write. [Api set: ExcelApi 1.9]</field>
 			/// <field name="fill" type="Excel.ChartFill">Represents the fill format of an object, which includes background formatting information. Read-only. [Api set: ExcelApi 1.1]</field>
 			/// <field name="font" type="Excel.ChartFont">Represents the font attributes (font name, font size, color, etc.) for the current object. Read-only. [Api set: ExcelApi 1.1]</field>
-			/// <field name="roundedCorners" type="Boolean">True if the chart area of the chart has rounded corners. Read/Write. [Api set: ExcelApi 1.9]</field>
+			/// <field name="roundedCorners" type="Boolean">Specifies whether or not chart area of the chart has rounded corners. Read/Write. [Api set: ExcelApi 1.9]</field>
 		}
 
 		ChartAreaFormat.prototype.load = function(option) {
@@ -4344,7 +4344,7 @@ var Excel;
 			/// <field name="height" type="Number">Represents the height, in points, of the chart axis. Null if the axis is not visible. Read-only. [Api set: ExcelApi 1.7]</field>
 			/// <field name="isBetweenCategories" type="Boolean">Represents whether value axis crosses the category axis between categories. [Api set: ExcelApi 1.8]</field>
 			/// <field name="left" type="Number">Represents the distance, in points, from the left edge of the axis to the left of chart area. Null if the axis is not visible. Read-only. [Api set: ExcelApi 1.7]</field>
-			/// <field name="linkNumberFormat" type="Boolean">Represents whether the number format is linked to the cells (so that the number format changes in the labels when it changes in the cells). [Api set: ExcelApi 1.9]</field>
+			/// <field name="linkNumberFormat" type="Boolean">Represents whether or not the number format is linked to the cells. If true, the number format will change in the labels when it changes in the cells. [Api set: ExcelApi 1.9]</field>
 			/// <field name="logBase" type="Number">Represents the base of the logarithm when using logarithmic scales. [Api set: ExcelApi 1.7]</field>
 			/// <field name="majorGridlines" type="Excel.ChartGridlines">Returns a Gridlines object that represents the major gridlines for the specified axis. Read-only. [Api set: ExcelApi 1.1]</field>
 			/// <field name="majorTickMark" type="String">Represents the type of major tick mark for the specified axis. See Excel.ChartAxisTickMark for details. [Api set: ExcelApi 1.7]</field>
@@ -4677,16 +4677,16 @@ var Excel;
 	var ChartBinOptions = (function(_super) {
 		__extends(ChartBinOptions, _super);
 		function ChartBinOptions() {
-			/// <summary> Encapsulates the bon options only for histogram chart and pareto chart. [Api set: ExcelApi 1.9] </summary>
+			/// <summary> Encapsulates the bin options for histogram charts and pareto charts. [Api set: ExcelApi 1.9] </summary>
 			/// <field name="context" type="Excel.RequestContext">The request context associated with this object.</field>
 			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
-			/// <field name="allowOverflow" type="Boolean">Returns or sets if bin overflow enabled in a histogram chart or pareto chart. Read/Write. [Api set: ExcelApi 1.9]</field>
-			/// <field name="allowUnderflow" type="Boolean">Returns or sets if bin underflow enabled in a histogram chart or pareto chart. Read/Write. [Api set: ExcelApi 1.9]</field>
-			/// <field name="count" type="Number">Returns or sets count of bin of a histogram chart or pareto chart. Read/Write. [Api set: ExcelApi 1.9]</field>
-			/// <field name="overflowValue" type="Number">Returns or sets bin overflow value of a histogram chart or pareto chart. Read/Write. [Api set: ExcelApi 1.9]</field>
-			/// <field name="type" type="String">Returns or sets bin type of a histogram chart or pareto chart. Read/Write. [Api set: ExcelApi 1.9]</field>
-			/// <field name="underflowValue" type="Number">Returns or sets bin underflow value of a histogram chart or pareto chart. Read/Write. [Api set: ExcelApi 1.9]</field>
-			/// <field name="width" type="Number">Returns or sets bin width value of a histogram chart or pareto chart. Read/Write. [Api set: ExcelApi 1.9]</field>
+			/// <field name="allowOverflow" type="Boolean">Specifies whether or not the bin overflow is enabled in a histogram chart or pareto chart. Read/Write. [Api set: ExcelApi 1.9]</field>
+			/// <field name="allowUnderflow" type="Boolean">Specifies whether or not the bin underflow is enabled in a histogram chart or pareto chart. Read/Write. [Api set: ExcelApi 1.9]</field>
+			/// <field name="count" type="Number">Returns or sets the bin count of a histogram chart or pareto chart. Read/Write. [Api set: ExcelApi 1.9]</field>
+			/// <field name="overflowValue" type="Number">Returns or sets the bin overflow value of a histogram chart or pareto chart. Read/Write. [Api set: ExcelApi 1.9]</field>
+			/// <field name="type" type="String">Returns or sets the bin&apos;s type for a histogram chart or pareto chart. Read/Write. [Api set: ExcelApi 1.9]</field>
+			/// <field name="underflowValue" type="Number">Returns or sets the bin underflow value of a histogram chart or pareto chart. Read/Write. [Api set: ExcelApi 1.9]</field>
+			/// <field name="width" type="Number">Returns or sets the bin width value of a histogram chart or pareto chart. Read/Write. [Api set: ExcelApi 1.9]</field>
 		}
 
 		ChartBinOptions.prototype.load = function(option) {
@@ -4719,7 +4719,7 @@ var Excel;
 
 var Excel;
 (function (Excel) {
-	/// <summary> Specifies the bins type of the Histogram chart series. [Api set: ExcelApi 1.9] </summary>
+	/// <summary> Specifies the bin&apos;s type of a histogram chart or pareto chart series. [Api set: ExcelApi 1.9] </summary>
 	var ChartBinType = {
 		__proto__: null,
 		"category": "category",
@@ -4779,7 +4779,7 @@ var Excel;
 
 var Excel;
 (function (Excel) {
-	/// <summary> Represents the quartile calculation type of chart series layout, only applicable in Box &amp; Whisker chart. [Api set: ExcelApi 1.9] </summary>
+	/// <summary> Represents the quartile calculation type of chart series layout. Only applies to a box and whisker chart. [Api set: ExcelApi 1.9] </summary>
 	var ChartBoxQuartileCalculation = {
 		__proto__: null,
 		"inclusive": "inclusive",
@@ -4793,14 +4793,14 @@ var Excel;
 	var ChartBoxwhiskerOptions = (function(_super) {
 		__extends(ChartBoxwhiskerOptions, _super);
 		function ChartBoxwhiskerOptions() {
-			/// <summary> Represents the properties for Box &amp; Whisker chart. [Api set: ExcelApi 1.9] </summary>
+			/// <summary> Represents the properties of a box and whisker chart. [Api set: ExcelApi 1.9] </summary>
 			/// <field name="context" type="Excel.RequestContext">The request context associated with this object.</field>
 			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
-			/// <field name="quartileCalculation" type="String">Returns or sets quartile calculation type of a Box &amp; whisker chart. Read/Write. [Api set: ExcelApi 1.9]</field>
-			/// <field name="showInnerPoints" type="Boolean">Returns or sets if inner points showed in a Box &amp; whisker chart. Read/Write. [Api set: ExcelApi 1.9]</field>
-			/// <field name="showMeanLine" type="Boolean">Returns or sets if mean line showed in a Box &amp; whisker chart. Read/Write. [Api set: ExcelApi 1.9]</field>
-			/// <field name="showMeanMarker" type="Boolean">Returns or sets if mean marker showed in a Box &amp; whisker chart. Read/Write. [Api set: ExcelApi 1.9]</field>
-			/// <field name="showOutlierPoints" type="Boolean">Returns or sets if outlier points showed in a Box &amp; whisker chart. Read/Write. [Api set: ExcelApi 1.9]</field>
+			/// <field name="quartileCalculation" type="String">Returns or sets the quartile calculation type of a box and whisker chart. Read/Write. [Api set: ExcelApi 1.9]</field>
+			/// <field name="showInnerPoints" type="Boolean">Specifies whether or not the inner points are shown in a box and whisker chart. Read/Write. [Api set: ExcelApi 1.9]</field>
+			/// <field name="showMeanLine" type="Boolean">Specifies whether or not the mean line is shown in a box and whisker chart. Read/Write. [Api set: ExcelApi 1.9]</field>
+			/// <field name="showMeanMarker" type="Boolean">Specifies whether or not the mean marker is shown in a box and whisker chart. Read/Write. [Api set: ExcelApi 1.9]</field>
+			/// <field name="showOutlierPoints" type="Boolean">Specifies whether or not outlier points are shown in a box and whisker chart. Read/Write. [Api set: ExcelApi 1.9]</field>
 		}
 
 		ChartBoxwhiskerOptions.prototype.load = function(option) {
@@ -5114,7 +5114,7 @@ var Excel;
 			/// <field name="autoText" type="Boolean">Represents whether data labels automatically generate appropriate text based on context. [Api set: ExcelApi 1.8]</field>
 			/// <field name="format" type="Excel.ChartDataLabelFormat">Represents the format of chart data labels, which includes fill and font formatting. Read-only. [Api set: ExcelApi 1.1]</field>
 			/// <field name="horizontalAlignment" type="String">Represents the horizontal alignment for chart data label. See Excel.ChartTextHorizontalAlignment for details.              This property is valid only when TextOrientation of data label is 0. [Api set: ExcelApi 1.8]</field>
-			/// <field name="linkNumberFormat" type="Boolean">Represents whether the number format is linked to the cells (so that the number format changes in the labels when it changes in the cells). [Api set: ExcelApi 1.9]</field>
+			/// <field name="linkNumberFormat" type="Boolean">Represents whether or not the number format is linked to the cells. If true, the number format will change in the labels when it changes in the cells [Api set: ExcelApi 1.9]</field>
 			/// <field name="numberFormat" type="String">Represents the format code for data labels. [Api set: ExcelApi 1.8]</field>
 			/// <field name="position" type="String">DataLabelPosition value that represents the position of the data label. See Excel.ChartDataLabelPosition for details. [Api set: ExcelApi 1.1]</field>
 			/// <field name="separator" type="String">String representing the separator used for the data labels on a chart. [Api set: ExcelApi 1.1]</field>
@@ -5210,14 +5210,14 @@ var Excel;
 	var ChartErrorBars = (function(_super) {
 		__extends(ChartErrorBars, _super);
 		function ChartErrorBars() {
-			/// <summary> This object represents the attributes for chart error bars object. [Api set: ExcelApi 1.9] </summary>
+			/// <summary> This object represents the attributes for a chart&apos;s error bars. [Api set: ExcelApi 1.9] </summary>
 			/// <field name="context" type="Excel.RequestContext">The request context associated with this object.</field>
 			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
-			/// <field name="endStyleCap" type="Boolean">Represents whether have the end style cap for the error bars. [Api set: ExcelApi 1.9]</field>
-			/// <field name="format" type="Excel.ChartErrorBarsFormat">Represents the formatting of chart ErrorBars. [Api set: ExcelApi 1.9]</field>
-			/// <field name="include" type="String">Represents which error-bar parts to include. See Excel.ChartErrorBarsInclude for details. [Api set: ExcelApi 1.9]</field>
-			/// <field name="type" type="String">Represents the range marked by error bars. See Excel.ChartErrorBarsType for details. [Api set: ExcelApi 1.9]</field>
-			/// <field name="visible" type="Boolean">Represents whether shown error bars. [Api set: ExcelApi 1.9]</field>
+			/// <field name="endStyleCap" type="Boolean">Specifies whether or not the error bars have an end style cap. [Api set: ExcelApi 1.9]</field>
+			/// <field name="format" type="Excel.ChartErrorBarsFormat">Specifies the formatting type of the error bars. [Api set: ExcelApi 1.9]</field>
+			/// <field name="include" type="String">Specifies which parts of the error bars to include. [Api set: ExcelApi 1.9]</field>
+			/// <field name="type" type="String">The type of range marked by the error bars. [Api set: ExcelApi 1.9]</field>
+			/// <field name="visible" type="Boolean">Specifies whether or not the error bars are displayed. [Api set: ExcelApi 1.9]</field>
 		}
 
 		ChartErrorBars.prototype.load = function(option) {
@@ -5256,7 +5256,7 @@ var Excel;
 			/// <summary> Encapsulates the format properties for chart error bars. [Api set: ExcelApi 1.9] </summary>
 			/// <field name="context" type="Excel.RequestContext">The request context associated with this object.</field>
 			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
-			/// <field name="line" type="Excel.ChartLineFormat">Represents chart line formatting. [Api set: ExcelApi 1.9]</field>
+			/// <field name="line" type="Excel.ChartLineFormat">Represents the chart line formatting. [Api set: ExcelApi 1.9]</field>
 		}
 
 		ChartErrorBarsFormat.prototype.load = function(option) {
@@ -5289,7 +5289,7 @@ var Excel;
 
 var Excel;
 (function (Excel) {
-	/// <summary> Represents which error-bar parts to include. [Api set: ExcelApi 1.9] </summary>
+	/// <summary> Represents which parts of the error bar to include. [Api set: ExcelApi 1.9] </summary>
 	var ChartErrorBarsInclude = {
 		__proto__: null,
 		"both": "both",
@@ -5434,7 +5434,7 @@ var Excel;
 
 var Excel;
 (function (Excel) {
-	/// <summary> Represents the Gradient Style of chart series, only applicable in RegionMap chart. [Api set: ExcelApi 1.9] </summary>
+	/// <summary> Represents the gradient style of a chart series. This is only applicable for region map charts. [Api set: ExcelApi 1.9] </summary>
 	var ChartGradientStyle = {
 		__proto__: null,
 		"twoPhaseColor": "twoPhaseColor",
@@ -5445,7 +5445,7 @@ var Excel;
 
 var Excel;
 (function (Excel) {
-	/// <summary> Represents the Gradient Style of chart series, only applicable in RegionMap chart. [Api set: ExcelApi 1.9] </summary>
+	/// <summary> Represents the gradient style type of a chart series. This is only applicable for region map charts. [Api set: ExcelApi 1.9] </summary>
 	var ChartGradientStyleType = {
 		__proto__: null,
 		"extremeValue": "extremeValue",
@@ -5793,7 +5793,7 @@ var Excel;
 
 var Excel;
 (function (Excel) {
-	/// <summary> Represents the mapping level of chart series, only applicable in RegionMap chart. [Api set: ExcelApi 1.9] </summary>
+	/// <summary> Represents the mapping level of a chart series. This only applies to region map charts. [Api set: ExcelApi 1.9] </summary>
 	var ChartMapAreaLevel = {
 		__proto__: null,
 		"automatic": "automatic",
@@ -5810,7 +5810,7 @@ var Excel;
 
 var Excel;
 (function (Excel) {
-	/// <summary> Represents the region label strategy of chart series layout, only applicable in RegionMap chart. [Api set: ExcelApi 1.9] </summary>
+	/// <summary> Represents the region level of a chart series layout. This only applies to region map charts. [Api set: ExcelApi 1.9] </summary>
 	var ChartMapLabelStrategy = {
 		__proto__: null,
 		"none": "none",
@@ -5825,12 +5825,12 @@ var Excel;
 	var ChartMapOptions = (function(_super) {
 		__extends(ChartMapOptions, _super);
 		function ChartMapOptions() {
-			/// <summary> Encapsulates the properties for Map chart. [Api set: ExcelApi 1.9] </summary>
+			/// <summary> Encapsulates the properties for a region map chart. [Api set: ExcelApi 1.9] </summary>
 			/// <field name="context" type="Excel.RequestContext">The request context associated with this object.</field>
 			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
-			/// <field name="labelStrategy" type="String">Returns or sets series map labels strategy of a region map chart. Read/Write. [Api set: ExcelApi 1.9]</field>
-			/// <field name="level" type="String">Returns or sets series map area of a region map chart. Read/Write. [Api set: ExcelApi 1.9]</field>
-			/// <field name="projectionType" type="String">Returns or sets series projection type of a region map chart. Read/Write. [Api set: ExcelApi 1.9]</field>
+			/// <field name="labelStrategy" type="String">Returns or sets the series map labels strategy of a region map chart. Read/Write. [Api set: ExcelApi 1.9]</field>
+			/// <field name="level" type="String">Returns or sets the series mapping level of a region map chart. Read/Write. [Api set: ExcelApi 1.9]</field>
+			/// <field name="projectionType" type="String">Returns or sets the series projection type of a region map chart. Read/Write. [Api set: ExcelApi 1.9]</field>
 		}
 
 		ChartMapOptions.prototype.load = function(option) {
@@ -5863,7 +5863,7 @@ var Excel;
 
 var Excel;
 (function (Excel) {
-	/// <summary> Represents the region projection type of chart series layout, only applicable in RegionMap chart. [Api set: ExcelApi 1.9] </summary>
+	/// <summary> Represents the region projection type of a chart series layout. This only applies to region map charts. [Api set: ExcelApi 1.9] </summary>
 	var ChartMapProjectionType = {
 		__proto__: null,
 		"automatic": "automatic",
@@ -5899,7 +5899,7 @@ var Excel;
 
 var Excel;
 (function (Excel) {
-	/// <summary> Represents the parent lable strategy type of chart series layout, only applicable in Treemap chart. [Api set: ExcelApi 1.9] </summary>
+	/// <summary> Represents the parent label strategy of the chart series layout. This only applies to treemap charts [Api set: ExcelApi 1.9] </summary>
 	var ChartParentLabelStrategy = {
 		__proto__: null,
 		"none": "none",
@@ -5917,10 +5917,10 @@ var Excel;
 			/// <summary> Encapsulates the options for the pivot chart. [Api set: ExcelApi 1.9] </summary>
 			/// <field name="context" type="Excel.RequestContext">The request context associated with this object.</field>
 			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
-			/// <field name="showAxisFieldButtons" type="Boolean">Represents whether to display axis field buttons on a PivotChart.              The ShowAxisFieldButtons property corresponds to the Show Axis Field Buttons command on the Field Buttons drop-down list of the Analyze tab, which is available when a PivotChart is selected. [Api set: ExcelApi 1.9]</field>
-			/// <field name="showLegendFieldButtons" type="Boolean">Represents whether to display legend field buttons on a PivotChart. [Api set: ExcelApi 1.9]</field>
-			/// <field name="showReportFilterFieldButtons" type="Boolean">Represents whether to display report filter field buttons on a PivotChart. [Api set: ExcelApi 1.9]</field>
-			/// <field name="showValueFieldButtons" type="Boolean">Represents whether to display show value field buttons on a PivotChart. [Api set: ExcelApi 1.9]</field>
+			/// <field name="showAxisFieldButtons" type="Boolean">Specifies whether or not to display the axis field buttons on a PivotChart. The ShowAxisFieldButtons property corresponds to the &quot;Show Axis Field Buttons&quot; command on the &quot;Field Buttons&quot; drop-down list of the &quot;Analyze&quot; tab, which is available when a PivotChart is selected. [Api set: ExcelApi 1.9]</field>
+			/// <field name="showLegendFieldButtons" type="Boolean">Specifies whether or not to display the legend field buttons on a PivotChart [Api set: ExcelApi 1.9]</field>
+			/// <field name="showReportFilterFieldButtons" type="Boolean">Specifies whether or not to display the report filter field buttons on a PivotChart. [Api set: ExcelApi 1.9]</field>
+			/// <field name="showValueFieldButtons" type="Boolean">Specifies whether or not to display the show value field buttons on a PivotChart [Api set: ExcelApi 1.9]</field>
 		}
 
 		ChartPivotOptions.prototype.load = function(option) {
@@ -6198,9 +6198,9 @@ var Excel;
 			/// <field name="context" type="Excel.RequestContext">The request context associated with this object.</field>
 			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
 			/// <field name="axisGroup" type="String">Returns or sets the group for the specified series. Read/Write [Api set: ExcelApi 1.8]</field>
-			/// <field name="binOptions" type="Excel.ChartBinOptions">Encapsulates the bin options only for histogram chart and pareto chart. Read-only. [Api set: ExcelApi 1.9]</field>
-			/// <field name="boxwhiskerOptions" type="Excel.ChartBoxwhiskerOptions">Encapsulates the options for the Box &amp; Whisker chart. Read-only. [Api set: ExcelApi 1.9]</field>
-			/// <field name="bubbleScale" type="Number">Returns or sets the scale factor for bubbles in the specified chart group. Can be an integer value from 0 (zero) to 300, corresponding to a percentage of the default size. Applies only to bubble charts. Read/Write. [Api set: ExcelApi 1.9]</field>
+			/// <field name="binOptions" type="Excel.ChartBinOptions">Encapsulates the bin options for histogram charts and pareto charts. Read-only. [Api set: ExcelApi 1.9]</field>
+			/// <field name="boxwhiskerOptions" type="Excel.ChartBoxwhiskerOptions">Encapsulates the options for the box and whisker charts. Read-only. [Api set: ExcelApi 1.9]</field>
+			/// <field name="bubbleScale" type="Number">This can be an integer value from 0 (zero) to 300, representing the percentage of the default size. This property only applies to bubble charts. Read/Write. [Api set: ExcelApi 1.9]</field>
 			/// <field name="chartType" type="String">Represents the chart type of a series. See Excel.ChartType for details. [Api set: ExcelApi 1.7]</field>
 			/// <field name="dataLabels" type="Excel.ChartDataLabels">Represents a collection of all dataLabels in the series. [Api set: ExcelApi 1.8]</field>
 			/// <field name="doughnutHoleSize" type="Number">Represents the doughnut hole size of a chart series.  Only valid on doughnut and doughnutExploded charts.              Throws an invalid argument exception on invalid charts. [Api set: ExcelApi 1.7]</field>
@@ -6209,40 +6209,40 @@ var Excel;
 			/// <field name="firstSliceAngle" type="Number">Returns or sets the angle of the first pie-chart or doughnut-chart slice, in degrees (clockwise from vertical). Applies only to pie, 3-D pie, and doughnut charts. Can be a value from 0 through 360. Read/Write [Api set: ExcelApi 1.8]</field>
 			/// <field name="format" type="Excel.ChartSeriesFormat">Represents the formatting of a chart series, which includes fill and line formatting. Read-only. [Api set: ExcelApi 1.1]</field>
 			/// <field name="gapWidth" type="Number">Represents the gap width of a chart series.  Only valid on bar and column charts, as well as              specific classes of line and pie charts.  Throws an invalid argument exception on invalid charts. [Api set: ExcelApi 1.7]</field>
-			/// <field name="gradientMaximumColor" type="String">Returns or sets the Color for maximum value of a region map chart series. Read/Write. [Api set: ExcelApi 1.9]</field>
+			/// <field name="gradientMaximumColor" type="String">Returns or sets the color for maximum value of a region map chart series. Read/Write. [Api set: ExcelApi 1.9]</field>
 			/// <field name="gradientMaximumType" type="String">Returns or sets the type for maximum value of a region map chart series. Read/Write. [Api set: ExcelApi 1.9]</field>
 			/// <field name="gradientMaximumValue" type="Number">Returns or sets the maximum value of a region map chart series. Read/Write. [Api set: ExcelApi 1.9]</field>
-			/// <field name="gradientMidpointColor" type="String">Returns or sets the Color for midpoint value of a region map chart series. Read/Write. [Api set: ExcelApi 1.9]</field>
+			/// <field name="gradientMidpointColor" type="String">Returns or sets the color for midpoint value of a region map chart series. Read/Write. [Api set: ExcelApi 1.9]</field>
 			/// <field name="gradientMidpointType" type="String">Returns or sets the type for midpoint value of a region map chart series. Read/Write. [Api set: ExcelApi 1.9]</field>
 			/// <field name="gradientMidpointValue" type="Number">Returns or sets the midpoint value of a region map chart series. Read/Write. [Api set: ExcelApi 1.9]</field>
-			/// <field name="gradientMinimumColor" type="String">Returns or sets the Color for minimum value of a region map chart series. Read/Write. [Api set: ExcelApi 1.9]</field>
+			/// <field name="gradientMinimumColor" type="String">Returns or sets the color for minimum value of a region map chart series. Read/Write. [Api set: ExcelApi 1.9]</field>
 			/// <field name="gradientMinimumType" type="String">Returns or sets the type for minimum value of a region map chart series. Read/Write. [Api set: ExcelApi 1.9]</field>
 			/// <field name="gradientMinimumValue" type="Number">Returns or sets the minimum value of a region map chart series. Read/Write. [Api set: ExcelApi 1.9]</field>
 			/// <field name="gradientStyle" type="String">Returns or sets series gradient style of a region map chart. Read/Write. [Api set: ExcelApi 1.9]</field>
 			/// <field name="hasDataLabels" type="Boolean">Boolean value representing if the series has data labels or not. [Api set: ExcelApi 1.7]</field>
 			/// <field name="invertColor" type="String">Returns or sets the fill color for negative data points in a series. Read/Write. [Api set: ExcelApi 1.9]</field>
 			/// <field name="invertIfNegative" type="Boolean">True if Microsoft Excel inverts the pattern in the item when it corresponds to a negative number. Read/Write. [Api set: ExcelApi 1.8]</field>
-			/// <field name="mapOptions" type="Excel.ChartMapOptions">Encapsulates the options for the Map chart. Read-only. [Api set: ExcelApi 1.9]</field>
+			/// <field name="mapOptions" type="Excel.ChartMapOptions">Encapsulates the options for a region map chart. Read-only. [Api set: ExcelApi 1.9]</field>
 			/// <field name="markerBackgroundColor" type="String">Represents markers background color of a chart series. [Api set: ExcelApi 1.7]</field>
 			/// <field name="markerForegroundColor" type="String">Represents markers foreground color of a chart series. [Api set: ExcelApi 1.7]</field>
 			/// <field name="markerSize" type="Number">Represents marker size of a chart series. [Api set: ExcelApi 1.7]</field>
 			/// <field name="markerStyle" type="String">Represents marker style of a chart series. See Excel.ChartMarkerStyle for details. [Api set: ExcelApi 1.7]</field>
 			/// <field name="name" type="String">Represents the name of a series in a chart. [Api set: ExcelApi 1.1]</field>
 			/// <field name="overlap" type="Number">Specifies how bars and columns are positioned. Can be a value between –100 and 100. Applies only to 2-D bar and 2-D column charts. Read/Write. [Api set: ExcelApi 1.8]</field>
-			/// <field name="parentLabelStrategy" type="String">Returns or sets series parent label strategy area of a treemap chart. Read/Write. [Api set: ExcelApi 1.9]</field>
+			/// <field name="parentLabelStrategy" type="String">Returns or sets the series parent label strategy area for a treemap chart. Read/Write. [Api set: ExcelApi 1.9]</field>
 			/// <field name="plotOrder" type="Number">Represents the plot order of a chart series within the chart group. [Api set: ExcelApi 1.7]</field>
 			/// <field name="points" type="Excel.ChartPointsCollection">Represents a collection of all points in the series. Read-only. [Api set: ExcelApi 1.1]</field>
 			/// <field name="secondPlotSize" type="Number">Returns or sets the size of the secondary section of either a pie of pie chart or a bar of pie chart, as a percentage of the size of the primary pie. Can be a value from 5 to 200. Read/Write. [Api set: ExcelApi 1.8]</field>
-			/// <field name="showConnectorLines" type="Boolean">Returns or sets if connector lines show in a waterfall chart. Read/Write. [Api set: ExcelApi 1.9]</field>
-			/// <field name="showLeaderLines" type="Boolean">True if Microsoft Excel show leaderlines for each datalabel in series. Read/Write. [Api set: ExcelApi 1.9]</field>
+			/// <field name="showConnectorLines" type="Boolean">Specifies whether or not connector lines are shown in waterfall charts. Read/Write. [Api set: ExcelApi 1.9]</field>
+			/// <field name="showLeaderLines" type="Boolean">Specifies whether or not leader lines are displayed for each data label in the series. Read/Write. [Api set: ExcelApi 1.9]</field>
 			/// <field name="showShadow" type="Boolean">Boolean value representing if the series has a shadow or not. [Api set: ExcelApi 1.7]</field>
 			/// <field name="smooth" type="Boolean">Boolean value representing if the series is smooth or not. Only applicable to line and scatter charts. [Api set: ExcelApi 1.7]</field>
 			/// <field name="splitType" type="String">Returns or sets the way the two sections of either a pie of pie chart or a bar of pie chart are split. Read/Write. [Api set: ExcelApi 1.8]</field>
-			/// <field name="splitValue" type="Number">Returns or sets the threshold value separating the two sections of either a pie of pie chart or a bar of pie chart. Read/Write. [Api set: ExcelApi 1.9]</field>
+			/// <field name="splitValue" type="Number">Returns or sets the threshold value that separates two sections of either a pie-of-pie chart or a bar-of-pie chart. Read/Write. [Api set: ExcelApi 1.9]</field>
 			/// <field name="trendlines" type="Excel.ChartTrendlineCollection">Represents a collection of trendlines in the series. Read-only. [Api set: ExcelApi 1.7]</field>
 			/// <field name="varyByCategories" type="Boolean">True if Microsoft Excel assigns a different color or pattern to each data marker. The chart must contain only one series. Read/Write. [Api set: ExcelApi 1.8]</field>
-			/// <field name="xErrorBars" type="Excel.ChartErrorBars">Represents the error bar object for a chart series. [Api set: ExcelApi 1.9]</field>
-			/// <field name="yErrorBars" type="Excel.ChartErrorBars">Represents the error bar object for a chart series. [Api set: ExcelApi 1.9]</field>
+			/// <field name="xErrorBars" type="Excel.ChartErrorBars">Represents the error bar object of a chart series. [Api set: ExcelApi 1.9]</field>
+			/// <field name="yErrorBars" type="Excel.ChartErrorBars">Represents the error bar object of a chart series. [Api set: ExcelApi 1.9]</field>
 		}
 
 		ChartSeries.prototype.load = function(option) {
@@ -8793,6 +8793,7 @@ var Excel;
 		"worksheetRowSorted": "worksheetRowSorted",
 		"worksheetColumnSorted": "worksheetColumnSorted",
 		"worksheetSingleClicked": "worksheetSingleClicked",
+		"worksheetRowHiddenChanged": "worksheetRowHiddenChanged",
 	}
 	Excel.EventType = EventType;
 })(Excel || (Excel = {__proto__: null}));
@@ -14195,16 +14196,16 @@ var Excel;
 			/// <summary>
 			/// Finds the given string based on the criteria specified.              If the current range is larger than a single cell, then the search will be limited to that range, else the search will cover the entire sheet starting after that cell. [Api set: ExcelApi 1.9]
 			/// </summary>
-			/// <param name="text" type="String">String to find.</param>
-			/// <param name="criteria" type="Excel.Interfaces.SearchCriteria">Additional Criteria.</param>
+			/// <param name="text" type="String">The string to find.</param>
+			/// <param name="criteria" type="Excel.Interfaces.SearchCriteria">Additional search criteria, including the search direction and whether the search needs to match the entire cell or be case sensitive.</param>
 			/// <returns type="Excel.Range">The Range which matched the search criteria.</returns>
 		}
 		Range.prototype.findOrNullObject = function(text, criteria) {
 			/// <summary>
 			/// Finds the given string based on the criteria specified.              If the current range is larger than a single cell, then the search will be limited to that range, else the search will cover the entire sheet starting after that cell.              If there are no matches, this function will return a null object. [Api set: ExcelApi 1.9]
 			/// </summary>
-			/// <param name="text" type="String">String to find.</param>
-			/// <param name="criteria" type="Excel.Interfaces.SearchCriteria">Additional Criteria.</param>
+			/// <param name="text" type="String">The string to find.</param>
+			/// <param name="criteria" type="Excel.Interfaces.SearchCriteria">Additional search criteria, including the search direction and whether the search needs to match the entire cell or be case sensitive.</param>
 			/// <returns type="Excel.Range">The Range which matched the search criteria.</returns>
 		}
 		Range.prototype.flashFill = function() {
@@ -15460,7 +15461,7 @@ var Excel;
 		var SearchCriteria = (function() {
 			function SearchCriteria() {
 				/// <summary> Represents the search criteria to be used. [Api set: ExcelApi 1.9] </summary>
-				/// <field name="completeMatch" type="Boolean">Specifies whether the match needs to be complete or partial. Default is false (partial). [Api set: ExcelApi 1.9]</field>
+				/// <field name="completeMatch" type="Boolean">Specifies whether the match needs to be complete or partial. A complete match matches the entire contents of the cell. Default is false (partial). [Api set: ExcelApi 1.9]</field>
 				/// <field name="matchCase" type="Boolean">Specifies whether the match is case sensitive. Default is false (insensitive). [Api set: ExcelApi 1.9]</field>
 				/// <field name="searchDirection" type="String">Specifies the search direction. Default is forward. See Excel.SearchDirection. [Api set: ExcelApi 1.9]</field>
 			}
@@ -16660,7 +16661,7 @@ var Excel;
 			/// <field name="showHeaders" type="Boolean">Indicates whether the header row is visible or not. This value can be set to show or remove the header row. [Api set: ExcelApi 1.1]</field>
 			/// <field name="showTotals" type="Boolean">Indicates whether the total row is visible or not. This value can be set to show or remove the total row. [Api set: ExcelApi 1.1]</field>
 			/// <field name="sort" type="Excel.TableSort">Represents the sorting for the table. Read-only. [Api set: ExcelApi 1.2]</field>
-			/// <field name="style" type="String">Constant value that represents the Table style. Possible values are: TableStyleLight1 thru TableStyleLight21, TableStyleMedium1 thru TableStyleMedium28, TableStyleStyleDark1 thru TableStyleStyleDark11. A custom user-defined style present in the workbook can also be specified. [Api set: ExcelApi 1.1]</field>
+			/// <field name="style" type="String">Constant value that represents the Table style. Possible values are: &quot;TableStyleLight1&quot; through &quot;TableStyleLight21&quot;, &quot;TableStyleMedium1&quot; through &quot;TableStyleMedium28&quot;, &quot;TableStyleStyleDark1&quot; through &quot;TableStyleStyleDark11&quot;. A custom user-defined style present in the workbook can also be specified. [Api set: ExcelApi 1.1]</field>
 			/// <field name="worksheet" type="Excel.Worksheet">The worksheet containing the current table. Read-only. [Api set: ExcelApi 1.2]</field>
 			/// <field name="onChanged" type="OfficeExtension.EventHandlers">Occurs when data in cells changes on a specific table. [Api set: ExcelApi 1.7]</field>
 			/// <field name="onSelectionChanged" type="OfficeExtension.EventHandlers">Occurs when the selection changes on a specific table. [Api set: ExcelApi 1.7]</field>
@@ -16802,7 +16803,7 @@ var Excel;
 				/// <field name="tableId" type="String">Gets the id of the table in which the data changed. [Api set: ExcelApi 1.7]</field>
 				/// <field name="type" type="String">Gets the type of the event. See Excel.EventType for details. [Api set: ExcelApi 1.7]</field>
 				/// <field name="worksheetId" type="String">Gets the id of the worksheet in which the data changed. [Api set: ExcelApi 1.7]</field>
-				/// <field name="details" type="Excel.Interfaces.ChangedEventDetail">Represents the information about the change detail [Api set: ExcelApi 1.9]</field>
+				/// <field name="details" type="Excel.Interfaces.ChangedEventDetail">Represents the information about the change detail. This property can be retrieved when the Changed event is triggered on single cell. If the Changed event is triggered on multiple cells, this property can not be retrieved. [Api set: ExcelApi 1.9]</field>
 			}
 			return TableChangedEventArgs;
 		})();
@@ -17582,13 +17583,13 @@ var Excel;
 		}
 		Workbook.prototype.getActiveChart = function() {
 			/// <summary>
-			/// Gets the currently active chart in the workbook. If there is no active chart, will throw exception when invoke this statement [Api set: ExcelApi 1.9]
+			/// Gets the currently active chart in the workbook. If there is no active chart, an `ItemNotFound` exception is thrown. [Api set: ExcelApi 1.9]
 			/// </summary>
 			/// <returns type="Excel.Chart"></returns>
 		}
 		Workbook.prototype.getActiveChartOrNullObject = function() {
 			/// <summary>
-			/// Gets the currently active chart in the workbook. If there is no active chart, will return null object [Api set: ExcelApi 1.9]
+			/// Gets the currently active chart in the workbook. If there is no active chart, a null object is returned. [Api set: ExcelApi 1.9]
 			/// </summary>
 			/// <returns type="Excel.Chart"></returns>
 		}
@@ -17807,7 +17808,7 @@ var Excel;
 		}
 		Worksheet.prototype.delete = function() {
 			/// <summary>
-			/// Deletes the worksheet from the workbook. [Api set: ExcelApi 1.1]
+			/// Deletes the worksheet from the workbook. Note that if the worksheet&apos;s visibility is set to &quot;VeryHidden&quot;, the delete operation will fail with an `InvalidOperation` exception. You should first change its visibility to hidden or visible before deleting it. [Api set: ExcelApi 1.1]
 			/// </summary>
 			/// <returns ></returns>
 		}
@@ -17815,16 +17816,16 @@ var Excel;
 			/// <summary>
 			/// Finds all occurrences of the given string based on the criteria specified and returns them as a RangeAreas object, comprising one or more rectangular ranges. [Api set: ExcelApi 1.9]
 			/// </summary>
-			/// <param name="text" type="String">String to find.</param>
-			/// <param name="criteria" type="Excel.Interfaces.WorksheetSearchCriteria">Additional Criteria.</param>
+			/// <param name="text" type="String">The string to find.</param>
+			/// <param name="criteria" type="Excel.Interfaces.WorksheetSearchCriteria">Additional search criteria, including whether the search needs to match the entire cell or be case sensitive.</param>
 			/// <returns type="Excel.RangeAreas">A RangeArea object, comprising one or more rectangular ranges, that matches the search criteria. If no cells meet this criteria, an ItemNotFound error will be thrown.</returns>
 		}
 		Worksheet.prototype.findAllOrNullObject = function(text, criteria) {
 			/// <summary>
 			/// Finds all occurrences of the given string based on the criteria specified and returns them as a RangeAreas object, comprising one or more rectangular ranges. [Api set: ExcelApi 1.9]
 			/// </summary>
-			/// <param name="text" type="String">String to find.</param>
-			/// <param name="criteria" type="Excel.Interfaces.WorksheetSearchCriteria">Additional Criteria.</param>
+			/// <param name="text" type="String">The string to find.</param>
+			/// <param name="criteria" type="Excel.Interfaces.WorksheetSearchCriteria">Additional search criteria, including whether the search needs to match the entire cell or be case sensitive.</param>
 			/// <returns type="Excel.RangeAreas">A RangeArea object, comprising one or more rectangular ranges, that matches the search criteria. If there are no matches, this function will return a null object.</returns>
 		}
 		Worksheet.prototype.getCell = function(row, column) {
@@ -18065,7 +18066,7 @@ var Excel;
 				/// <summary> Provides information about the worksheet that raised the Changed event. [Api set: ExcelApi 1.7] </summary>
 				/// <field name="address" type="String">Gets the range address that represents the changed area of a specific worksheet. [Api set: ExcelApi 1.7]</field>
 				/// <field name="changeType" type="String">Gets the change type that represents how the Changed event is triggered. See Excel.DataChangeType for details. [Api set: ExcelApi 1.7]</field>
-				/// <field name="details" type="Excel.Interfaces.ChangedEventDetail">Represents the information about the change detail [Api set: ExcelApi 1.9]</field>
+				/// <field name="details" type="Excel.Interfaces.ChangedEventDetail">Represents the information about the change detail. This property can be retrieved when the Changed event is triggered on single cell. If the Changed event is triggered on multiple cells, this property can not be retrieved. [Api set: ExcelApi 1.9]</field>
 				/// <field name="source" type="String">Gets the source of the event. See Excel.EventSource for details. [Api set: ExcelApi 1.7]</field>
 				/// <field name="type" type="String">Gets the type of the event. See Excel.EventType for details. [Api set: ExcelApi 1.7]</field>
 				/// <field name="worksheetId" type="String">Gets the id of the worksheet in which the data changed. [Api set: ExcelApi 1.7]</field>
@@ -18479,7 +18480,7 @@ var Excel;
 		var WorksheetSearchCriteria = (function() {
 			function WorksheetSearchCriteria() {
 				/// <summary> Represents the worksheet search criteria to be used. [Api set: ExcelApi 1.9] </summary>
-				/// <field name="completeMatch" type="Boolean">Specifies whether the match needs to be complete or partial. Default is false (partial). [Api set: ExcelApi 1.9]</field>
+				/// <field name="completeMatch" type="Boolean">Specifies whether the match needs to be complete or partial. A complete match matches the entire contents of the cell. Default is false (partial). [Api set: ExcelApi 1.9]</field>
 				/// <field name="matchCase" type="Boolean">Specifies whether the match is case sensitive. Default is false (insensitive). [Api set: ExcelApi 1.9]</field>
 			}
 			return WorksheetSearchCriteria;
@@ -18716,7 +18717,7 @@ var Excel;
 				/// <field name="showFilterButton" type="Boolean">Indicates whether the filter buttons are visible at the top of each column header. Setting this is only allowed if the table contains a header row. [Api set: ExcelApi 1.3]</field>;
 				/// <field name="showHeaders" type="Boolean">Indicates whether the header row is visible or not. This value can be set to show or remove the header row. [Api set: ExcelApi 1.1]</field>;
 				/// <field name="showTotals" type="Boolean">Indicates whether the total row is visible or not. This value can be set to show or remove the total row. [Api set: ExcelApi 1.1]</field>;
-				/// <field name="style" type="String">Constant value that represents the Table style. Possible values are: TableStyleLight1 thru TableStyleLight21, TableStyleMedium1 thru TableStyleMedium28, TableStyleStyleDark1 thru TableStyleStyleDark11. A custom user-defined style present in the workbook can also be specified. [Api set: ExcelApi 1.1]</field>;
+				/// <field name="style" type="String">Constant value that represents the Table style. Possible values are: &quot;TableStyleLight1&quot; through &quot;TableStyleLight21&quot;, &quot;TableStyleMedium1&quot; through &quot;TableStyleMedium28&quot;, &quot;TableStyleStyleDark1&quot; through &quot;TableStyleStyleDark11&quot;. A custom user-defined style present in the workbook can also be specified. [Api set: ExcelApi 1.1]</field>;
 			}
 			return TableUpdateData;
 		})();
@@ -18916,7 +18917,7 @@ var Excel;
 				/// <field name="dataLabels" type="Excel.Interfaces.ChartDataLabelsUpdateData">Represents the datalabels on the chart. [Api set: ExcelApi 1.1]</field>
 				/// <field name="format" type="Excel.Interfaces.ChartAreaFormatUpdateData">Encapsulates the format properties for the chart area. [Api set: ExcelApi 1.1]</field>
 				/// <field name="legend" type="Excel.Interfaces.ChartLegendUpdateData">Represents the legend for the chart. [Api set: ExcelApi 1.1]</field>
-				/// <field name="pivotOptions" type="Excel.Interfaces.ChartPivotOptionsUpdateData">Encapsulates the options for the pivot chart. [Api set: ExcelApi 1.9]</field>
+				/// <field name="pivotOptions" type="Excel.Interfaces.ChartPivotOptionsUpdateData">Encapsulates the options for a pivot chart. [Api set: ExcelApi 1.9]</field>
 				/// <field name="plotArea" type="Excel.Interfaces.ChartPlotAreaUpdateData">Represents the plotArea for the chart. [Api set: ExcelApi 1.8]</field>
 				/// <field name="title" type="Excel.Interfaces.ChartTitleUpdateData">Represents the title of the specified chart, including the text, visibility, position, and formatting of the title. [Api set: ExcelApi 1.1]</field>
 				/// <field name="categoryLabelLevel" type="Number">Returns or sets a ChartCategoryLabelLevel enumeration constant referring to              the level of where the category labels are being sourced from. Read/Write. [Api set: ExcelApi 1.8]</field>;
@@ -18948,10 +18949,10 @@ var Excel;
 		var ChartPivotOptionsUpdateData = (function() {
 			function ChartPivotOptionsUpdateData() {
 				/// <summary>An interface for updating data on the ChartPivotOptions object, for use in "chartPivotOptions.set({ ... })".</summary>
-				/// <field name="showAxisFieldButtons" type="Boolean">Represents whether to display axis field buttons on a PivotChart.              The ShowAxisFieldButtons property corresponds to the Show Axis Field Buttons command on the Field Buttons drop-down list of the Analyze tab, which is available when a PivotChart is selected. [Api set: ExcelApi 1.9]</field>;
-				/// <field name="showLegendFieldButtons" type="Boolean">Represents whether to display legend field buttons on a PivotChart. [Api set: ExcelApi 1.9]</field>;
-				/// <field name="showReportFilterFieldButtons" type="Boolean">Represents whether to display report filter field buttons on a PivotChart. [Api set: ExcelApi 1.9]</field>;
-				/// <field name="showValueFieldButtons" type="Boolean">Represents whether to display show value field buttons on a PivotChart. [Api set: ExcelApi 1.9]</field>;
+				/// <field name="showAxisFieldButtons" type="Boolean">Specifies whether or not to display the axis field buttons on a PivotChart. The ShowAxisFieldButtons property corresponds to the &quot;Show Axis Field Buttons&quot; command on the &quot;Field Buttons&quot; drop-down list of the &quot;Analyze&quot; tab, which is available when a PivotChart is selected. [Api set: ExcelApi 1.9]</field>;
+				/// <field name="showLegendFieldButtons" type="Boolean">Specifies whether or not to display the legend field buttons on a PivotChart [Api set: ExcelApi 1.9]</field>;
+				/// <field name="showReportFilterFieldButtons" type="Boolean">Specifies whether or not to display the report filter field buttons on a PivotChart. [Api set: ExcelApi 1.9]</field>;
+				/// <field name="showValueFieldButtons" type="Boolean">Specifies whether or not to display the show value field buttons on a PivotChart [Api set: ExcelApi 1.9]</field>;
 			}
 			return ChartPivotOptionsUpdateData;
 		})();
@@ -18969,8 +18970,8 @@ var Excel;
 				/// <summary>An interface for updating data on the ChartAreaFormat object, for use in "chartAreaFormat.set({ ... })".</summary>
 				/// <field name="border" type="Excel.Interfaces.ChartBorderUpdateData">Represents the border format of chart area, which includes color, linestyle, and weight. [Api set: ExcelApi 1.7]</field>
 				/// <field name="font" type="Excel.Interfaces.ChartFontUpdateData">Represents the font attributes (font name, font size, color, etc.) for the current object. [Api set: ExcelApi 1.1]</field>
-				/// <field name="colorScheme" type="String">Returns or sets an integer that represents the color scheme for the chart. Read/Write. [Api set: ExcelApi 1.9]</field>;
-				/// <field name="roundedCorners" type="Boolean">True if the chart area of the chart has rounded corners. Read/Write. [Api set: ExcelApi 1.9]</field>;
+				/// <field name="colorScheme" type="String">Returns or sets color scheme of the chart. Read/Write. [Api set: ExcelApi 1.9]</field>;
+				/// <field name="roundedCorners" type="Boolean">Specifies whether or not chart area of the chart has rounded corners. Read/Write. [Api set: ExcelApi 1.9]</field>;
 			}
 			return ChartAreaFormatUpdateData;
 		})();
@@ -18986,28 +18987,28 @@ var Excel;
 		var ChartSeriesUpdateData = (function() {
 			function ChartSeriesUpdateData() {
 				/// <summary>An interface for updating data on the ChartSeries object, for use in "chartSeries.set({ ... })".</summary>
-				/// <field name="binOptions" type="Excel.Interfaces.ChartBinOptionsUpdateData">Encapsulates the bin options only for histogram chart and pareto chart. [Api set: ExcelApi 1.9]</field>
-				/// <field name="boxwhiskerOptions" type="Excel.Interfaces.ChartBoxwhiskerOptionsUpdateData">Encapsulates the options for the Box &amp; Whisker chart. [Api set: ExcelApi 1.9]</field>
+				/// <field name="binOptions" type="Excel.Interfaces.ChartBinOptionsUpdateData">Encapsulates the bin options for histogram charts and pareto charts. [Api set: ExcelApi 1.9]</field>
+				/// <field name="boxwhiskerOptions" type="Excel.Interfaces.ChartBoxwhiskerOptionsUpdateData">Encapsulates the options for the box and whisker charts. [Api set: ExcelApi 1.9]</field>
 				/// <field name="dataLabels" type="Excel.Interfaces.ChartDataLabelsUpdateData">Represents a collection of all dataLabels in the series. [Api set: ExcelApi 1.8]</field>
 				/// <field name="format" type="Excel.Interfaces.ChartSeriesFormatUpdateData">Represents the formatting of a chart series, which includes fill and line formatting. [Api set: ExcelApi 1.1]</field>
-				/// <field name="mapOptions" type="Excel.Interfaces.ChartMapOptionsUpdateData">Encapsulates the options for the Map chart. [Api set: ExcelApi 1.9]</field>
-				/// <field name="xErrorBars" type="Excel.Interfaces.ChartErrorBarsUpdateData">Represents the error bar object for a chart series. [Api set: ExcelApi 1.9]</field>
-				/// <field name="yErrorBars" type="Excel.Interfaces.ChartErrorBarsUpdateData">Represents the error bar object for a chart series. [Api set: ExcelApi 1.9]</field>
+				/// <field name="mapOptions" type="Excel.Interfaces.ChartMapOptionsUpdateData">Encapsulates the options for a region map chart. [Api set: ExcelApi 1.9]</field>
+				/// <field name="xErrorBars" type="Excel.Interfaces.ChartErrorBarsUpdateData">Represents the error bar object of a chart series. [Api set: ExcelApi 1.9]</field>
+				/// <field name="yErrorBars" type="Excel.Interfaces.ChartErrorBarsUpdateData">Represents the error bar object of a chart series. [Api set: ExcelApi 1.9]</field>
 				/// <field name="axisGroup" type="String">Returns or sets the group for the specified series. Read/Write [Api set: ExcelApi 1.8]</field>;
-				/// <field name="bubbleScale" type="Number">Returns or sets the scale factor for bubbles in the specified chart group. Can be an integer value from 0 (zero) to 300, corresponding to a percentage of the default size. Applies only to bubble charts. Read/Write. [Api set: ExcelApi 1.9]</field>;
+				/// <field name="bubbleScale" type="Number">This can be an integer value from 0 (zero) to 300, representing the percentage of the default size. This property only applies to bubble charts. Read/Write. [Api set: ExcelApi 1.9]</field>;
 				/// <field name="chartType" type="String">Represents the chart type of a series. See Excel.ChartType for details. [Api set: ExcelApi 1.7]</field>;
 				/// <field name="doughnutHoleSize" type="Number">Represents the doughnut hole size of a chart series.  Only valid on doughnut and doughnutExploded charts.              Throws an invalid argument exception on invalid charts. [Api set: ExcelApi 1.7]</field>;
 				/// <field name="explosion" type="Number">Returns or sets the explosion value for a pie-chart or doughnut-chart slice. Returns 0 (zero) if there&apos;s no explosion (the tip of the slice is in the center of the pie). Read/Write. [Api set: ExcelApi 1.8]</field>;
 				/// <field name="filtered" type="Boolean">Boolean value representing if the series is filtered or not. Not applicable for surface charts. [Api set: ExcelApi 1.7]</field>;
 				/// <field name="firstSliceAngle" type="Number">Returns or sets the angle of the first pie-chart or doughnut-chart slice, in degrees (clockwise from vertical). Applies only to pie, 3-D pie, and doughnut charts. Can be a value from 0 through 360. Read/Write [Api set: ExcelApi 1.8]</field>;
 				/// <field name="gapWidth" type="Number">Represents the gap width of a chart series.  Only valid on bar and column charts, as well as              specific classes of line and pie charts.  Throws an invalid argument exception on invalid charts. [Api set: ExcelApi 1.7]</field>;
-				/// <field name="gradientMaximumColor" type="String">Returns or sets the Color for maximum value of a region map chart series. Read/Write. [Api set: ExcelApi 1.9]</field>;
+				/// <field name="gradientMaximumColor" type="String">Returns or sets the color for maximum value of a region map chart series. Read/Write. [Api set: ExcelApi 1.9]</field>;
 				/// <field name="gradientMaximumType" type="String">Returns or sets the type for maximum value of a region map chart series. Read/Write. [Api set: ExcelApi 1.9]</field>;
 				/// <field name="gradientMaximumValue" type="Number">Returns or sets the maximum value of a region map chart series. Read/Write. [Api set: ExcelApi 1.9]</field>;
-				/// <field name="gradientMidpointColor" type="String">Returns or sets the Color for midpoint value of a region map chart series. Read/Write. [Api set: ExcelApi 1.9]</field>;
+				/// <field name="gradientMidpointColor" type="String">Returns or sets the color for midpoint value of a region map chart series. Read/Write. [Api set: ExcelApi 1.9]</field>;
 				/// <field name="gradientMidpointType" type="String">Returns or sets the type for midpoint value of a region map chart series. Read/Write. [Api set: ExcelApi 1.9]</field>;
 				/// <field name="gradientMidpointValue" type="Number">Returns or sets the midpoint value of a region map chart series. Read/Write. [Api set: ExcelApi 1.9]</field>;
-				/// <field name="gradientMinimumColor" type="String">Returns or sets the Color for minimum value of a region map chart series. Read/Write. [Api set: ExcelApi 1.9]</field>;
+				/// <field name="gradientMinimumColor" type="String">Returns or sets the color for minimum value of a region map chart series. Read/Write. [Api set: ExcelApi 1.9]</field>;
 				/// <field name="gradientMinimumType" type="String">Returns or sets the type for minimum value of a region map chart series. Read/Write. [Api set: ExcelApi 1.9]</field>;
 				/// <field name="gradientMinimumValue" type="Number">Returns or sets the minimum value of a region map chart series. Read/Write. [Api set: ExcelApi 1.9]</field>;
 				/// <field name="gradientStyle" type="String">Returns or sets series gradient style of a region map chart. Read/Write. [Api set: ExcelApi 1.9]</field>;
@@ -19020,15 +19021,15 @@ var Excel;
 				/// <field name="markerStyle" type="String">Represents marker style of a chart series. See Excel.ChartMarkerStyle for details. [Api set: ExcelApi 1.7]</field>;
 				/// <field name="name" type="String">Represents the name of a series in a chart. [Api set: ExcelApi 1.1]</field>;
 				/// <field name="overlap" type="Number">Specifies how bars and columns are positioned. Can be a value between –100 and 100. Applies only to 2-D bar and 2-D column charts. Read/Write. [Api set: ExcelApi 1.8]</field>;
-				/// <field name="parentLabelStrategy" type="String">Returns or sets series parent label strategy area of a treemap chart. Read/Write. [Api set: ExcelApi 1.9]</field>;
+				/// <field name="parentLabelStrategy" type="String">Returns or sets the series parent label strategy area for a treemap chart. Read/Write. [Api set: ExcelApi 1.9]</field>;
 				/// <field name="plotOrder" type="Number">Represents the plot order of a chart series within the chart group. [Api set: ExcelApi 1.7]</field>;
 				/// <field name="secondPlotSize" type="Number">Returns or sets the size of the secondary section of either a pie of pie chart or a bar of pie chart, as a percentage of the size of the primary pie. Can be a value from 5 to 200. Read/Write. [Api set: ExcelApi 1.8]</field>;
-				/// <field name="showConnectorLines" type="Boolean">Returns or sets if connector lines show in a waterfall chart. Read/Write. [Api set: ExcelApi 1.9]</field>;
-				/// <field name="showLeaderLines" type="Boolean">True if Microsoft Excel show leaderlines for each datalabel in series. Read/Write. [Api set: ExcelApi 1.9]</field>;
+				/// <field name="showConnectorLines" type="Boolean">Specifies whether or not connector lines are shown in waterfall charts. Read/Write. [Api set: ExcelApi 1.9]</field>;
+				/// <field name="showLeaderLines" type="Boolean">Specifies whether or not leader lines are displayed for each data label in the series. Read/Write. [Api set: ExcelApi 1.9]</field>;
 				/// <field name="showShadow" type="Boolean">Boolean value representing if the series has a shadow or not. [Api set: ExcelApi 1.7]</field>;
 				/// <field name="smooth" type="Boolean">Boolean value representing if the series is smooth or not. Only applicable to line and scatter charts. [Api set: ExcelApi 1.7]</field>;
 				/// <field name="splitType" type="String">Returns or sets the way the two sections of either a pie of pie chart or a bar of pie chart are split. Read/Write. [Api set: ExcelApi 1.8]</field>;
-				/// <field name="splitValue" type="Number">Returns or sets the threshold value separating the two sections of either a pie of pie chart or a bar of pie chart. Read/Write. [Api set: ExcelApi 1.9]</field>;
+				/// <field name="splitValue" type="Number">Returns or sets the threshold value that separates two sections of either a pie-of-pie chart or a bar-of-pie chart. Read/Write. [Api set: ExcelApi 1.9]</field>;
 				/// <field name="varyByCategories" type="Boolean">True if Microsoft Excel assigns a different color or pattern to each data marker. The chart must contain only one series. Read/Write. [Api set: ExcelApi 1.8]</field>;
 			}
 			return ChartSeriesUpdateData;
@@ -19127,7 +19128,7 @@ var Excel;
 				/// <field name="crosses" type="String">Represents the specified axis where the other axis crosses. See Excel.ChartAxisPosition for details. [Api set: ExcelApi 1.7]</field>;
 				/// <field name="displayUnit" type="String">Represents the axis display unit. See Excel.ChartAxisDisplayUnit for details. [Api set: ExcelApi 1.7]</field>;
 				/// <field name="isBetweenCategories" type="Boolean">Represents whether value axis crosses the category axis between categories. [Api set: ExcelApi 1.8]</field>;
-				/// <field name="linkNumberFormat" type="Boolean">Represents whether the number format is linked to the cells (so that the number format changes in the labels when it changes in the cells). [Api set: ExcelApi 1.9]</field>;
+				/// <field name="linkNumberFormat" type="Boolean">Represents whether or not the number format is linked to the cells. If true, the number format will change in the labels when it changes in the cells. [Api set: ExcelApi 1.9]</field>;
 				/// <field name="logBase" type="Number">Represents the base of the logarithm when using logarithmic scales. [Api set: ExcelApi 1.7]</field>;
 				/// <field name="majorTickMark" type="String">Represents the type of major tick mark for the specified axis. See Excel.ChartAxisTickMark for details. [Api set: ExcelApi 1.7]</field>;
 				/// <field name="majorTimeUnitScale" type="String">Returns or sets the major unit scale value for the category axis when the CategoryType property is set to TimeScale. [Api set: ExcelApi 1.7]</field>;
@@ -19219,7 +19220,7 @@ var Excel;
 				/// <field name="format" type="Excel.Interfaces.ChartDataLabelFormatUpdateData">Represents the format of chart data labels, which includes fill and font formatting. [Api set: ExcelApi 1.1]</field>
 				/// <field name="autoText" type="Boolean">Represents whether data labels automatically generate appropriate text based on context. [Api set: ExcelApi 1.8]</field>;
 				/// <field name="horizontalAlignment" type="String">Represents the horizontal alignment for chart data label. See Excel.ChartTextHorizontalAlignment for details.              This property is valid only when TextOrientation of data label is 0. [Api set: ExcelApi 1.8]</field>;
-				/// <field name="linkNumberFormat" type="Boolean">Represents whether the number format is linked to the cells (so that the number format changes in the labels when it changes in the cells). [Api set: ExcelApi 1.9]</field>;
+				/// <field name="linkNumberFormat" type="Boolean">Represents whether or not the number format is linked to the cells. If true, the number format will change in the labels when it changes in the cells [Api set: ExcelApi 1.9]</field>;
 				/// <field name="numberFormat" type="String">Represents the format code for data labels. [Api set: ExcelApi 1.8]</field>;
 				/// <field name="position" type="String">DataLabelPosition value that represents the position of the data label. See Excel.ChartDataLabelPosition for details. [Api set: ExcelApi 1.1]</field>;
 				/// <field name="separator" type="String">String representing the separator used for the data labels on a chart. [Api set: ExcelApi 1.1]</field>;
@@ -19297,11 +19298,11 @@ var Excel;
 		var ChartErrorBarsUpdateData = (function() {
 			function ChartErrorBarsUpdateData() {
 				/// <summary>An interface for updating data on the ChartErrorBars object, for use in "chartErrorBars.set({ ... })".</summary>
-				/// <field name="format" type="Excel.Interfaces.ChartErrorBarsFormatUpdateData">Represents the formatting of chart ErrorBars. [Api set: ExcelApi 1.9]</field>
-				/// <field name="endStyleCap" type="Boolean">Represents whether have the end style cap for the error bars. [Api set: ExcelApi 1.9]</field>;
-				/// <field name="include" type="String">Represents which error-bar parts to include. See Excel.ChartErrorBarsInclude for details. [Api set: ExcelApi 1.9]</field>;
-				/// <field name="type" type="String">Represents the range marked by error bars. See Excel.ChartErrorBarsType for details. [Api set: ExcelApi 1.9]</field>;
-				/// <field name="visible" type="Boolean">Represents whether shown error bars. [Api set: ExcelApi 1.9]</field>;
+				/// <field name="format" type="Excel.Interfaces.ChartErrorBarsFormatUpdateData">Specifies the formatting type of the error bars. [Api set: ExcelApi 1.9]</field>
+				/// <field name="endStyleCap" type="Boolean">Specifies whether or not the error bars have an end style cap. [Api set: ExcelApi 1.9]</field>;
+				/// <field name="include" type="String">Specifies which parts of the error bars to include. [Api set: ExcelApi 1.9]</field>;
+				/// <field name="type" type="String">The type of range marked by the error bars. [Api set: ExcelApi 1.9]</field>;
+				/// <field name="visible" type="Boolean">Specifies whether or not the error bars are displayed. [Api set: ExcelApi 1.9]</field>;
 			}
 			return ChartErrorBarsUpdateData;
 		})();
@@ -19317,7 +19318,7 @@ var Excel;
 		var ChartErrorBarsFormatUpdateData = (function() {
 			function ChartErrorBarsFormatUpdateData() {
 				/// <summary>An interface for updating data on the ChartErrorBarsFormat object, for use in "chartErrorBarsFormat.set({ ... })".</summary>
-				/// <field name="line" type="Excel.Interfaces.ChartLineFormatUpdateData">Represents chart line formatting. [Api set: ExcelApi 1.9]</field>
+				/// <field name="line" type="Excel.Interfaces.ChartLineFormatUpdateData">Represents the chart line formatting. [Api set: ExcelApi 1.9]</field>
 			}
 			return ChartErrorBarsFormatUpdateData;
 		})();
@@ -19423,9 +19424,9 @@ var Excel;
 		var ChartMapOptionsUpdateData = (function() {
 			function ChartMapOptionsUpdateData() {
 				/// <summary>An interface for updating data on the ChartMapOptions object, for use in "chartMapOptions.set({ ... })".</summary>
-				/// <field name="labelStrategy" type="String">Returns or sets series map labels strategy of a region map chart. Read/Write. [Api set: ExcelApi 1.9]</field>;
-				/// <field name="level" type="String">Returns or sets series map area of a region map chart. Read/Write. [Api set: ExcelApi 1.9]</field>;
-				/// <field name="projectionType" type="String">Returns or sets series projection type of a region map chart. Read/Write. [Api set: ExcelApi 1.9]</field>;
+				/// <field name="labelStrategy" type="String">Returns or sets the series map labels strategy of a region map chart. Read/Write. [Api set: ExcelApi 1.9]</field>;
+				/// <field name="level" type="String">Returns or sets the series mapping level of a region map chart. Read/Write. [Api set: ExcelApi 1.9]</field>;
+				/// <field name="projectionType" type="String">Returns or sets the series projection type of a region map chart. Read/Write. [Api set: ExcelApi 1.9]</field>;
 			}
 			return ChartMapOptionsUpdateData;
 		})();
@@ -19518,13 +19519,13 @@ var Excel;
 		var ChartBinOptionsUpdateData = (function() {
 			function ChartBinOptionsUpdateData() {
 				/// <summary>An interface for updating data on the ChartBinOptions object, for use in "chartBinOptions.set({ ... })".</summary>
-				/// <field name="allowOverflow" type="Boolean">Returns or sets if bin overflow enabled in a histogram chart or pareto chart. Read/Write. [Api set: ExcelApi 1.9]</field>;
-				/// <field name="allowUnderflow" type="Boolean">Returns or sets if bin underflow enabled in a histogram chart or pareto chart. Read/Write. [Api set: ExcelApi 1.9]</field>;
-				/// <field name="count" type="Number">Returns or sets count of bin of a histogram chart or pareto chart. Read/Write. [Api set: ExcelApi 1.9]</field>;
-				/// <field name="overflowValue" type="Number">Returns or sets bin overflow value of a histogram chart or pareto chart. Read/Write. [Api set: ExcelApi 1.9]</field>;
-				/// <field name="type" type="String">Returns or sets bin type of a histogram chart or pareto chart. Read/Write. [Api set: ExcelApi 1.9]</field>;
-				/// <field name="underflowValue" type="Number">Returns or sets bin underflow value of a histogram chart or pareto chart. Read/Write. [Api set: ExcelApi 1.9]</field>;
-				/// <field name="width" type="Number">Returns or sets bin width value of a histogram chart or pareto chart. Read/Write. [Api set: ExcelApi 1.9]</field>;
+				/// <field name="allowOverflow" type="Boolean">Specifies whether or not the bin overflow is enabled in a histogram chart or pareto chart. Read/Write. [Api set: ExcelApi 1.9]</field>;
+				/// <field name="allowUnderflow" type="Boolean">Specifies whether or not the bin underflow is enabled in a histogram chart or pareto chart. Read/Write. [Api set: ExcelApi 1.9]</field>;
+				/// <field name="count" type="Number">Returns or sets the bin count of a histogram chart or pareto chart. Read/Write. [Api set: ExcelApi 1.9]</field>;
+				/// <field name="overflowValue" type="Number">Returns or sets the bin overflow value of a histogram chart or pareto chart. Read/Write. [Api set: ExcelApi 1.9]</field>;
+				/// <field name="type" type="String">Returns or sets the bin&apos;s type for a histogram chart or pareto chart. Read/Write. [Api set: ExcelApi 1.9]</field>;
+				/// <field name="underflowValue" type="Number">Returns or sets the bin underflow value of a histogram chart or pareto chart. Read/Write. [Api set: ExcelApi 1.9]</field>;
+				/// <field name="width" type="Number">Returns or sets the bin width value of a histogram chart or pareto chart. Read/Write. [Api set: ExcelApi 1.9]</field>;
 			}
 			return ChartBinOptionsUpdateData;
 		})();
@@ -19540,11 +19541,11 @@ var Excel;
 		var ChartBoxwhiskerOptionsUpdateData = (function() {
 			function ChartBoxwhiskerOptionsUpdateData() {
 				/// <summary>An interface for updating data on the ChartBoxwhiskerOptions object, for use in "chartBoxwhiskerOptions.set({ ... })".</summary>
-				/// <field name="quartileCalculation" type="String">Returns or sets quartile calculation type of a Box &amp; whisker chart. Read/Write. [Api set: ExcelApi 1.9]</field>;
-				/// <field name="showInnerPoints" type="Boolean">Returns or sets if inner points showed in a Box &amp; whisker chart. Read/Write. [Api set: ExcelApi 1.9]</field>;
-				/// <field name="showMeanLine" type="Boolean">Returns or sets if mean line showed in a Box &amp; whisker chart. Read/Write. [Api set: ExcelApi 1.9]</field>;
-				/// <field name="showMeanMarker" type="Boolean">Returns or sets if mean marker showed in a Box &amp; whisker chart. Read/Write. [Api set: ExcelApi 1.9]</field>;
-				/// <field name="showOutlierPoints" type="Boolean">Returns or sets if outlier points showed in a Box &amp; whisker chart. Read/Write. [Api set: ExcelApi 1.9]</field>;
+				/// <field name="quartileCalculation" type="String">Returns or sets the quartile calculation type of a box and whisker chart. Read/Write. [Api set: ExcelApi 1.9]</field>;
+				/// <field name="showInnerPoints" type="Boolean">Specifies whether or not the inner points are shown in a box and whisker chart. Read/Write. [Api set: ExcelApi 1.9]</field>;
+				/// <field name="showMeanLine" type="Boolean">Specifies whether or not the mean line is shown in a box and whisker chart. Read/Write. [Api set: ExcelApi 1.9]</field>;
+				/// <field name="showMeanMarker" type="Boolean">Specifies whether or not the mean marker is shown in a box and whisker chart. Read/Write. [Api set: ExcelApi 1.9]</field>;
+				/// <field name="showOutlierPoints" type="Boolean">Specifies whether or not outlier points are shown in a box and whisker chart. Read/Write. [Api set: ExcelApi 1.9]</field>;
 			}
 			return ChartBoxwhiskerOptionsUpdateData;
 		})();
@@ -21540,7 +21541,7 @@ var Word;
 			/// <field name="lastSaveTime" type="Date">Gets the last save time of the document. Read only. [Api set: WordApi 1.3]</field>
 			/// <field name="manager" type="String">Gets or sets the manager of the document. [Api set: WordApi 1.3]</field>
 			/// <field name="revisionNumber" type="String">Gets the revision number of the document. Read only. [Api set: WordApi 1.3]</field>
-			/// <field name="security" type="Number">Gets the security of the document. Read only. [Api set: WordApi 1.3]</field>
+			/// <field name="security" type="Number">Gets security settings of the document. Read only. Some are access restrictions on the file on disk. Others are Document Protection settings. Some possible values are 0 = File on disk is read/write; 1 = Protect Document: File is encrypted and requires a password to open; 2 = Protect Document: Always Open as Read-Only; 3 = Protect Document: Both #1 and #2; 4 = File on disk is read only; 5 = Both #1 and #4; 6 = Both #2 and #4; 7 = All of #1, #2, and #4; 8 = Protect Document: Restrict Edit to read-only; 9 = Both #1 and #8; 10 = Both #2 and #8; 11 = All of #1, #2, and #8; 12 = Both #4 and #8; 13 = All of #1, #4, and #8; 14 = All of #2, #4, and #8; 15 = All of #1, #2, #4, and #8. [Api set: WordApi 1.3]</field>
 			/// <field name="subject" type="String">Gets or sets the subject of the document. [Api set: WordApi 1.3]</field>
 			/// <field name="template" type="String">Gets the template of the document. Read only. [Api set: WordApi 1.3]</field>
 			/// <field name="title" type="String">Gets or sets the title of the document. [Api set: WordApi 1.3]</field>
