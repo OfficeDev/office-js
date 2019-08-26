@@ -5765,44 +5765,52 @@ var OSFAriaLogger;
         AriaLogger.prototype.isIUsageData = function (arg) {
             return arg["Fields"] !== undefined;
         };
-        AriaLogger.prototype.shouldSendDirectToAria = function () {
-            var flavor;
-            var version;
-            if (OSF._OfficeAppFactory && OSF._OfficeAppFactory.getHostInfo) {
-                flavor = OSF._OfficeAppFactory.getHostInfo()["hostPlatform"];
-            }
+        AriaLogger.prototype.shouldSendDirectToAria = function (flavor, version) {
+            var BASE10 = 10;
+            var MAX_VERSION_WIN32 = [16, 0, 11601];
+            var MAX_VERSION_MAC = [16, 28];
+            var max_version;
             if (!flavor) {
                 return false;
             }
-            else if (flavor.toLowerCase() !== "win32") {
+            else if (flavor.toLowerCase() === "win32") {
+                max_version = MAX_VERSION_WIN32;
+            }
+            else if (flavor.toLowerCase() === "mac") {
+                max_version = MAX_VERSION_MAC;
+            }
+            else {
                 return true;
             }
-            if (window.external && typeof window.external.GetContext !== "undefined" && typeof window.external.GetContext().GetHostFullVersion !== "undefined") {
-                version = window.external.GetContext().GetHostFullVersion();
+            if (!version) {
+                return false;
             }
-            var BASE10 = 10;
-            var MAX_MAJOR_VERSION = 16;
-            var MAX_MINOR_VERSION = 0;
-            var MAX_BUILD_VERSION = 11601;
-            if (version) {
-                var versionTokens = version.split('.');
-                if (versionTokens.length < 3) {
+            var versionTokens = version.split('.');
+            for (var i = 0; i < max_version.length && i < versionTokens.length; i++) {
+                var versionToken = parseInt(versionTokens[i], BASE10);
+                if (isNaN(versionToken)) {
                     return false;
                 }
-                else if (parseInt(versionTokens[0], BASE10) >= MAX_MAJOR_VERSION &&
-                    parseInt(versionTokens[1], BASE10) >= MAX_MINOR_VERSION &&
-                    parseInt(versionTokens[2], BASE10) >= MAX_BUILD_VERSION) {
-                    return false;
-                }
-                else {
+                if (versionToken < max_version[i]) {
                     return true;
+                }
+                if (versionToken > max_version[i]) {
+                    return false;
                 }
             }
             return false;
         };
         AriaLogger.prototype.isDirectToAriaEnabled = function () {
             if (this.EnableDirectToAria === undefined || this.EnableDirectToAria === null) {
-                this.EnableDirectToAria = this.shouldSendDirectToAria();
+                var flavor;
+                var version;
+                if (OSF._OfficeAppFactory && OSF._OfficeAppFactory.getHostInfo) {
+                    flavor = OSF._OfficeAppFactory.getHostInfo()["hostPlatform"];
+                }
+                if (window.external && typeof window.external.GetContext !== "undefined" && typeof window.external.GetContext().GetHostFullVersion !== "undefined") {
+                    version = window.external.GetContext().GetHostFullVersion();
+                }
+                this.EnableDirectToAria = this.shouldSendDirectToAria(flavor, version);
             }
             return this.EnableDirectToAria;
         };

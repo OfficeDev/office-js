@@ -1,6 +1,6 @@
 /* Outlook specific API library */
 /* Version: 16.0.6807.1000 */
-/* Update: 1 */
+/* Update: 2 */
 /*
 	Copyright (c) Microsoft Corporation.  All rights reserved.
 */
@@ -3777,6 +3777,9 @@ var OSFRichclient;
             else {
                 window.external.UnregisterEvent(id, targetId, callback);
             }
+        };
+        RichClientHostController.prototype.messageParent=function (message) {
+            window.external.MessageParent(message);
         };
         return RichClientHostController;
     })();

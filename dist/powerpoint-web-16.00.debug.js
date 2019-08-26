@@ -16,10 +16,10 @@
 
 
 // Sources:
-// osfweb: 16.0\11619.10000
-// runtime: 16.0.11617.30000
-// core: 16.0\11620.10000
-// host: 16.0\11620.10000
+// osfweb: 16.0\11919.10000
+// runtime: 16.0.11916.30004
+// core: 16.0\11920.10000
+// host: 16.0\11920.10000
 
 var __extends=(this && this.__extends) || function (d, b) {
 	for (var p in b)
@@ -1672,8 +1672,8 @@ var OfficeExt;
 							if (setMaxVersionNum.major > 0 && setMaxVersionNum.major > minVersionNum.major) {
 								return true;
 							}
-							if (setMaxVersionNum.minor > 0 &&
-								setMaxVersionNum.minor > 0 &&
+							if (setMaxVersionNum.major > 0 &&
+								setMaxVersionNum.minor >=0 &&
 								setMaxVersionNum.major==minVersionNum.major &&
 								setMaxVersionNum.minor >=minVersionNum.minor) {
 								return true;
@@ -3637,7 +3637,8 @@ var OfficeExt;
 				var osList=[
 					"Windows NT 6.1",
 					"Windows NT 6.2",
-					"Windows NT 6.3"
+					"Windows NT 6.3",
+					"Windows NT 10.0"
 				];
 				var userAgent=window.navigator.userAgent;
 				for (var i=0, len=osList.length; i < len; i++) {
@@ -3686,8 +3687,20 @@ var OfficeExt;
 			function CacheConstants() {
 			}
 			CacheConstants.GatedCacheKeyPrefix="__OSF_GATED_OMEX.";
-			CacheConstants.AuthenticatedAppInstallInfoCacheKey=CacheConstants.GatedCacheKeyPrefix+"appinstall_authenticated.{0}.{1}.{2}.{3}";
-			CacheConstants.EntitlementsKey="entitle.{0}.{1}";
+			CacheConstants.AnonymousCacheKeyPrefix="__OSF_ANONYMOUS_OMEX.";
+			CacheConstants.UngatedCacheKeyPrefix="__OSF_OMEX.";
+			CacheConstants.ActivatedCacheKeyPrefix="__OSF_RUNTIME_.Activated.";
+			CacheConstants.AppinstallAuthenticated="appinstall_authenticated.";
+			CacheConstants.Entitlement="entitle.";
+			CacheConstants.AppState="appState.";
+			CacheConstants.AppDetails="appDetails.";
+			CacheConstants.AppInstallInfo="appInstallInfo.";
+			CacheConstants.AuthenticatedAppInstallInfoCacheKey=CacheConstants.GatedCacheKeyPrefix+CacheConstants.AppinstallAuthenticated+"{0}.{1}.{2}.{3}";
+			CacheConstants.EntitlementsKey=CacheConstants.Entitlement+"{0}.{1}";
+			CacheConstants.AppStateCacheKey="{0}"+CacheConstants.AppState+"{1}.{2}";
+			CacheConstants.AppDetailKey="{0}"+CacheConstants.AppDetails+"{1}";
+			CacheConstants.AppInstallInfoKey="{0}"+CacheConstants.AppInstallInfo+"{1}.{2}";
+			CacheConstants.ActivatedCacheKey=CacheConstants.ActivatedCacheKeyPrefix+"{0}.{1}.{2}";
 			return CacheConstants;
 		})();
 		WACUtils.CacheConstants=CacheConstants;
@@ -4159,7 +4172,6 @@ Microsoft.Office.Common.ServiceEndPoint=function Microsoft_Office_Common_Service
 	this._policyManager=null;
 	this._appDomains={};
 	this._onHandleRequestError=null;
-	this._addInSourceLocationSubdomainAllowedIsEnabled=false;
 };
 Microsoft.Office.Common.ServiceEndPoint.prototype={
 	registerMethod: function Microsoft_Office_Common_ServiceEndPoint$registerMethod(methodName, method, invokeType, blockingOthers) {
@@ -4215,20 +4227,16 @@ Microsoft.Office.Common.ServiceEndPoint.prototype={
 			throw e;
 		this.unregisterMethod(eventName);
 	},
-	registerConversation: function Microsoft_Office_Common_ServiceEndPoint$registerConversation(conversationId, conversationUrl, appDomains, serializerVersion, addInSourceLocationSubdomainAllowedIsEnabled) {
+	registerConversation: function Microsoft_Office_Common_ServiceEndPoint$registerConversation(conversationId, conversationUrl, appDomains, serializerVersion) {
 		var e=Function._validateParams(arguments, [
 			{ name: "conversationId", type: String, mayBeNull: false },
 			{ name: "conversationUrl", type: String, mayBeNull: false, optional: true },
 			{ name: "appDomains", type: Object, mayBeNull: true, optional: true },
-			{ name: "serializerVersion", type: Number, mayBeNull: true, optional: true },
-			{ name: "addInSourceLocationSubdomainAllowedIsEnabled", type: Boolean, mayBeNull: true, optional: true }
+			{ name: "serializerVersion", type: Number, mayBeNull: true, optional: true }
 		]);
 		if (e)
 			throw e;
 		;
-		if (addInSourceLocationSubdomainAllowedIsEnabled) {
-			this._addInSourceLocationSubdomainAllowedIsEnabled=addInSourceLocationSubdomainAllowedIsEnabled;
-		}
 		if (appDomains) {
 			if (!(appDomains instanceof Array)) {
 				throw OsfMsAjaxFactory.msAjaxError.argument("appDomains");
@@ -4615,7 +4623,7 @@ Microsoft.Office.Common.XdmCommunicationManager=(function () {
 					var allowedDomains=[conversation.url].concat(serviceEndPoint._appDomains[messageObject._conversationId]);
 					if (!_checkOriginWithAppDomains(allowedDomains, e.origin)) {
 						if (!OfficeExt.appSpecificCheckOrigin(allowedDomains, e, messageObject._origin, _checkOriginWithAppDomains)) {
-							var isOriginSubdomain=serviceEndPoint._addInSourceLocationSubdomainAllowedIsEnabled && _isTargetSubdomainOfSourceLocation(conversation.url, e.origin);
+							var isOriginSubdomain=_isTargetSubdomainOfSourceLocation(conversation.url, e.origin);
 							if (!isOriginSubdomain) {
 								throw "Failed origin check";
 							}
@@ -4675,6 +4683,19 @@ Microsoft.Office.Common.XdmCommunicationManager=(function () {
 				}
 			}
 			else if (messageObject._messageType===Microsoft.Office.Common.MessageType.response) {
+				if (messageObject._actionName=="ContextActivationManager_getAppContextAsync") {
+					try {
+						var wacorigin=e.origin;
+						var parser=document.createElement("a");
+						parser.href=wacorigin;
+						var isOriginValid=_isHostNameValidWacDomain(parser.hostname);
+						var isWacKnownHost=isOriginValid ? 1 : 0;
+						var hostInfo=OSF._OfficeAppFactory.getHostInfo();
+						OSF.AppTelemetry.onCheckWACHost(isWacKnownHost, messageObject._data._id, hostInfo.hostType, hostInfo.hostPlatform, messageObject._data._correlationId, wacorigin);
+					}
+					catch (ex) {
+					}
+				}
 				var clientEndPoint=_lookupClientEndPoint(messageObject._conversationId);
 				if (!clientEndPoint) {
 					return;
@@ -5932,6 +5953,58 @@ var OSFLog;
 		return AppInitializationUsageData;
 	})(BaseUsageData);
 	OSFLog.AppInitializationUsageData=AppInitializationUsageData;
+	var CheckWACHostUsageData=(function (_super) {
+		__extends(CheckWACHostUsageData, _super);
+		function CheckWACHostUsageData() {
+			_super.call(this, "CheckWACHost");
+		}
+		Object.defineProperty(CheckWACHostUsageData.prototype, "isWacKnownHost", {
+			get: function () { return this.Fields["isWacKnownHost"]; },
+			set: function (value) { this.Fields["isWacKnownHost"]=value; },
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(CheckWACHostUsageData.prototype, "solutionId", {
+			get: function () { return this.Fields["solutionId"]; },
+			set: function (value) { this.Fields["solutionId"]=value; },
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(CheckWACHostUsageData.prototype, "hostType", {
+			get: function () { return this.Fields["hostType"]; },
+			set: function (value) { this.Fields["hostType"]=value; },
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(CheckWACHostUsageData.prototype, "hostPlatform", {
+			get: function () { return this.Fields["hostPlatform"]; },
+			set: function (value) { this.Fields["hostPlatform"]=value; },
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(CheckWACHostUsageData.prototype, "wacDomain", {
+			get: function () { return this.Fields["wacDomain"]; },
+			set: function (value) { this.Fields["wacDomain"]=value; },
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(CheckWACHostUsageData.prototype, "correlationId", {
+			get: function () { return this.Fields["correlationId"]; },
+			set: function (value) { this.Fields["correlationId"]=value; },
+			enumerable: true,
+			configurable: true
+		});
+		CheckWACHostUsageData.prototype.SerializeFields=function () {
+			this.SetSerializedField("isWacKnownHost", this.isWacKnownHost);
+			this.SetSerializedField("solutionId", this.solutionId);
+			this.SetSerializedField("hostType", this.hostType);
+			this.SetSerializedField("hostPlatform", this.hostPlatform);
+			this.SetSerializedField("wacDomain", this.wacDomain);
+			this.SetSerializedField("correlationId", this.correlationId);
+		};
+		return CheckWACHostUsageData;
+	})(BaseUsageData);
+	OSFLog.CheckWACHostUsageData=CheckWACHostUsageData;
 })(OSFLog || (OSFLog={}));
 var Logger;
 (function (Logger) {
@@ -6008,12 +6081,21 @@ var OSFAriaLogger;
 			{ name: "AppSizeFinalHeight", type: "int64" },
 			{ name: "OpenTime", type: "int64" },
 		] };
+	var TelemetryEventCheckWACHost={ name: "CheckWACHost", enabled: true, basic: false, critical: false, points: [
+			{ name: "isWacKnownHost", type: "int64" },
+			{ name: "solutionId", type: "string" },
+			{ name: "hostType", type: "string" },
+			{ name: "hostPlatform", type: "string" },
+			{ name: "correlationId", type: "string" },
+			{ name: "wacDomain", type: "string" },
+		] };
 	var TelemetryEvents=[
 		TelemetryEventAppActivated,
 		TelemetryEventScriptLoad,
 		TelemetryEventApiUsage,
 		TelemetryEventAppInitialization,
 		TelemetryEventAppClosed,
+		TelemetryEventCheckWACHost,
 	];
 	function createDataField(value, point) {
 		var key=point.rename===undefined ? point.name : point.rename;
@@ -6117,44 +6199,52 @@ var OSFAriaLogger;
 		AriaLogger.prototype.isIUsageData=function (arg) {
 			return arg["Fields"] !==undefined;
 		};
-		AriaLogger.prototype.shouldSendDirectToAria=function () {
-			var flavor;
-			var version;
-			if (OSF._OfficeAppFactory && OSF._OfficeAppFactory.getHostInfo) {
-				flavor=OSF._OfficeAppFactory.getHostInfo()["hostPlatform"];
-			}
+		AriaLogger.prototype.shouldSendDirectToAria=function (flavor, version) {
+			var BASE10=10;
+			var MAX_VERSION_WIN32=[16, 0, 11601];
+			var MAX_VERSION_MAC=[16, 28];
+			var max_version;
 			if (!flavor) {
 				return false;
 			}
-			else if (flavor.toLowerCase() !=="win32") {
+			else if (flavor.toLowerCase()==="win32") {
+				max_version=MAX_VERSION_WIN32;
+			}
+			else if (flavor.toLowerCase()==="mac") {
+				max_version=MAX_VERSION_MAC;
+			}
+			else {
 				return true;
 			}
-			if (window.external && typeof window.external.GetContext !=="undefined" && typeof window.external.GetContext().GetHostFullVersion !=="undefined") {
-				version=window.external.GetContext().GetHostFullVersion();
+			if (!version) {
+				return false;
 			}
-			var BASE10=10;
-			var MAX_MAJOR_VERSION=16;
-			var MAX_MINOR_VERSION=0;
-			var MAX_BUILD_VERSION=11601;
-			if (version) {
-				var versionTokens=version.split('.');
-				if (versionTokens.length < 3) {
+			var versionTokens=version.split('.');
+			for (var i=0; i < max_version.length && i < versionTokens.length; i++) {
+				var versionToken=parseInt(versionTokens[i], BASE10);
+				if (isNaN(versionToken)) {
 					return false;
 				}
-				else if (parseInt(versionTokens[0], BASE10) >=MAX_MAJOR_VERSION &&
-					parseInt(versionTokens[1], BASE10) >=MAX_MINOR_VERSION &&
-					parseInt(versionTokens[2], BASE10) >=MAX_BUILD_VERSION) {
-					return false;
-				}
-				else {
+				if (versionToken < max_version[i]) {
 					return true;
+				}
+				if (versionToken > max_version[i]) {
+					return false;
 				}
 			}
 			return false;
 		};
 		AriaLogger.prototype.isDirectToAriaEnabled=function () {
 			if (this.EnableDirectToAria===undefined || this.EnableDirectToAria===null) {
-				this.EnableDirectToAria=this.shouldSendDirectToAria();
+				var flavor;
+				var version;
+				if (OSF._OfficeAppFactory && OSF._OfficeAppFactory.getHostInfo) {
+					flavor=OSF._OfficeAppFactory.getHostInfo()["hostPlatform"];
+				}
+				if (window.external && typeof window.external.GetContext !=="undefined" && typeof window.external.GetContext().GetHostFullVersion !=="undefined") {
+					version=window.external.GetContext().GetHostFullVersion();
+				}
+				this.EnableDirectToAria=this.shouldSendDirectToAria(flavor, version);
 			}
 			return this.EnableDirectToAria;
 		};
@@ -6424,7 +6514,7 @@ var OSFAppTelemetry;
 		}
 		appInfo.message=context.get_hostCustomMessage();
 		appInfo.officeJSVersion=OSF.ConstantNames.FileVersion;
-		appInfo.hostJSVersion="16.0.11620.10000";
+		appInfo.hostJSVersion="16.0.11920.10000";
 		if (context._wacHostEnvironment) {
 			appInfo.wacHostEnvironment=context._wacHostEnvironment;
 		}
@@ -6604,6 +6694,17 @@ var OSFAppTelemetry;
 		OSF.AppTelemetry.onCallDone("property", -1, propertyName, msResponseTime);
 	}
 	OSFAppTelemetry.onPropertyDone=onPropertyDone;
+	function onCheckWACHost(isWacKnownHost, solutionId, hostType, hostPlatform, correlationId, wacDomain) {
+		var data=new OSFLog.CheckWACHostUsageData();
+		data.isWacKnownHost=isWacKnownHost;
+		data.solutionId=solutionId;
+		data.hostType=hostType;
+		data.hostPlatform=hostPlatform;
+		data.correlationId=correlationId;
+		data.wacDomain=UrlFilter.filter(wacDomain);
+		(new AppLogger()).LogData(data);
+	}
+	OSFAppTelemetry.onCheckWACHost=onCheckWACHost;
 	function onEventDone(id, errorType) {
 		OSF.AppTelemetry.onCallDone("event", id, null, 0, errorType);
 	}
@@ -10084,8 +10185,7 @@ var OfficeExt;
 				var url=dialogInfo[OSF.ShowWindowDialogParameterKeys.Url];
 				var fInDomain=Microsoft.Office.Common.XdmCommunicationManager.checkUrlWithAppDomains(appDomains, url);
 				if (!fInDomain) {
-					return OSF._OfficeAppFactory.getInitializationHelper()._appContext._addInSourceLocationSubdomainAllowedIsEnabled
-						&& OSF._OfficeAppFactory.getInitializationHelper()._appContext._addInSourceUrl
+					return OSF._OfficeAppFactory.getInitializationHelper()._appContext._addInSourceUrl
 						&& Microsoft.Office.Common.XdmCommunicationManager.isTargetSubdomainOfSourceLocation(OSF._OfficeAppFactory.getInitializationHelper()._appContext._addInSourceUrl, url);
 				}
 				return fInDomain;
@@ -11443,9 +11543,9 @@ var OfficeExtension;
 				var index=request.url.indexOf('?');
 				if (index >=0) {
 					var query=request.url.substr(index+1);
-					var flagsInQueryString=CoreUtility._parseRequestFlagsFromQueryStringIfAny(query);
-					if (flagsInQueryString >=0) {
-						requestFlags=flagsInQueryString;
+					var flagsAndCustomData=CoreUtility._parseRequestFlagsAndCustomDataFromQueryStringIfAny(query);
+					if (flagsAndCustomData.flags >=0) {
+						requestFlags=flagsAndCustomData.flags;
 					}
 				}
 				var bridgeMessage={
@@ -11620,6 +11720,7 @@ var OfficeExtension;
 		CoreConstants.processQuery='ProcessQuery';
 		CoreConstants.localDocument='http://document.localhost/';
 		CoreConstants.localDocumentApiPrefix='http://document.localhost/_api/';
+		CoreConstants.customData='customdata';
 		return CoreConstants;
 	}());
 	OfficeExtension_1.CoreConstants=CoreConstants;
@@ -11939,17 +12040,21 @@ var OfficeExtension;
 				body: request.body
 			};
 		};
-		CoreUtility._parseRequestFlagsFromQueryStringIfAny=function (queryString) {
+		CoreUtility._parseRequestFlagsAndCustomDataFromQueryStringIfAny=function (queryString) {
+			var ret={ flags: -1, customData: '' };
 			var parts=queryString.split('&');
 			for (var i=0; i < parts.length; i++) {
 				var keyvalue=parts[i].split('=');
 				if (keyvalue[0].toLowerCase()===CoreConstants.flags) {
 					var flags=parseInt(keyvalue[1]);
 					flags=flags & 511;
-					return flags;
+					ret.flags=flags;
+				}
+				else if (keyvalue[0].toLowerCase()===CoreConstants.customData) {
+					ret.customData=decodeURIComponent(keyvalue[1]);
 				}
 			}
-			return -1;
+			return ret;
 		};
 		CoreUtility._getRequestBodyText=function (request) {
 			var body='';
@@ -11975,17 +12080,19 @@ var OfficeExtension;
 			if (!CoreUtility.isReadonlyRestRequest(request.method)) {
 				requestFlags=1;
 			}
+			var customData='';
 			if (request.url.substr(0, CoreConstants.processQuery.length).toLowerCase()===				CoreConstants.processQuery.toLowerCase()) {
 				var index=request.url.indexOf('?');
 				if (index > 0) {
 					var queryString=request.url.substr(index+1);
-					var flagsInQueryString=CoreUtility._parseRequestFlagsFromQueryStringIfAny(queryString);
-					if (flagsInQueryString >=0) {
-						requestFlags=flagsInQueryString;
+					var flagsAndCustomData=CoreUtility._parseRequestFlagsAndCustomDataFromQueryStringIfAny(queryString);
+					if (flagsAndCustomData.flags >=0) {
+						requestFlags=flagsAndCustomData.flags;
 					}
+					customData=flagsAndCustomData.customData;
 				}
 			}
-			return RichApiMessageUtility.buildRequestMessageSafeArray('', requestFlags, request.method, request.url, request.headers, CoreUtility._getRequestBodyText(request));
+			return RichApiMessageUtility.buildRequestMessageSafeArray(customData, requestFlags, request.method, request.url, request.headers, CoreUtility._getRequestBodyText(request));
 		};
 		CoreUtility._parseHttpResponseHeaders=function (allResponseHeaders) {
 			var responseHeaders={};
@@ -12305,6 +12412,39 @@ var OfficeExtension;
 			this.m_operationType=operationType;
 			this.m_flags=flags;
 		}
+		Object.defineProperty(ObjectPath.prototype, "id", {
+			get: function () {
+				var argumentInfo=this.m_objectPathInfo.ArgumentInfo;
+				if (!argumentInfo) {
+					return undefined;
+				}
+				var argument=argumentInfo.Arguments;
+				if (!argument) {
+					return undefined;
+				}
+				return argument[0];
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(ObjectPath.prototype, "parent", {
+			get: function () {
+				var parent=this.m_parentObjectPath;
+				if (!parent) {
+					return undefined;
+				}
+				return parent;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(ObjectPath.prototype, "parentId", {
+			get: function () {
+				return this.parent ? this.parent.id : undefined;
+			},
+			enumerable: true,
+			configurable: true
+		});
 		Object.defineProperty(ObjectPath.prototype, "objectPathInfo", {
 			get: function () {
 				return this.m_objectPathInfo;
@@ -13065,13 +13205,16 @@ var OfficeExtension;
 	var HttpRequestExecutor=(function () {
 		function HttpRequestExecutor() {
 		}
-		HttpRequestExecutor.prototype.executeAsync=function (customData, requestFlags, requestMessage) {
-			var url=requestMessage.Url;
-			if (url.charAt(url.length - 1) !='/') {
-				url=url+'/';
+		HttpRequestExecutor.prototype.getRequestUrl=function (baseUrl, requestFlags) {
+			if (baseUrl.charAt(baseUrl.length - 1) !='/') {
+				baseUrl=baseUrl+'/';
 			}
-			url=url+CoreConstants.processQuery;
-			url=url+'?'+CoreConstants.flags+'='+requestFlags.toString();
+			baseUrl=baseUrl+CoreConstants.processQuery;
+			baseUrl=baseUrl+'?'+CoreConstants.flags+'='+requestFlags.toString();
+			return baseUrl;
+		};
+		HttpRequestExecutor.prototype.executeAsync=function (customData, requestFlags, requestMessage) {
+			var url=this.getRequestUrl(requestMessage.Url, requestFlags);
 			var requestInfo={
 				method: 'POST',
 				url: url,
@@ -13467,6 +13610,20 @@ var OfficeExtension;
 		return ClientRetrieveResult;
 	}(ClientResult));
 	OfficeExtension_1.ClientRetrieveResult=ClientRetrieveResult;
+	var ClientResultCallback=(function (_super) {
+		__extends(ClientResultCallback, _super);
+		function ClientResultCallback(callback) {
+			var _this=_super.call(this) || this;
+			_this.callback=callback;
+			return _this;
+		}
+		ClientResultCallback.prototype._handleResult=function (value) {
+			_super.prototype._handleResult.call(this, value);
+			this.callback();
+		};
+		return ClientResultCallback;
+	}(ClientResult));
+	OfficeExtension_1.ClientResultCallback=ClientResultCallback;
 	var OperationalApiHelper=(function () {
 		function OperationalApiHelper() {
 		}
@@ -13485,6 +13642,26 @@ var OfficeExtension;
 			}
 			return CoreUtility.createPromise(function (resolve, reject) {
 				var result=new ClientResult();
+				var actionInfo={
+					Id: obj._context._nextId(),
+					ActionType: 3,
+					Name: methodName,
+					ObjectPathId: obj._objectPath.objectPathInfo.Id,
+					ArgumentInfo: {}
+				};
+				var referencedArgumentObjectPaths=CommonUtility.setMethodArguments(obj._context, actionInfo.ArgumentInfo, args);
+				var action=new Action(actionInfo, operationType, flags);
+				action.referencedObjectPath=obj._objectPath;
+				action.referencedArgumentObjectPaths=referencedArgumentObjectPaths;
+				obj._context._addServiceApiAction(action, result, resolve, reject);
+			});
+		};
+		OperationalApiHelper.invokeMethodWithClientResultCallback=function (callback, obj, methodName) {
+			var operationType=0;
+			var args=[];
+			var flags=0;
+			return CoreUtility.createPromise(function (resolve, reject) {
+				var result=new ClientResultCallback(callback);
 				var actionInfo={
 					Id: obj._context._nextId(),
 					ActionType: 3,
@@ -13592,8 +13769,9 @@ var OfficeExtension;
 			return new type(parent._context, objectPath);
 		};
 		OperationalApiHelper.createMethodObject=function (type, parent, methodName, operationType, args, isCollection, isInvalidAfterRequest, getByIdMethodName, flags) {
+			var id=parent._context._nextId();
 			var objectPathInfo={
-				Id: parent._context._nextId(),
+				Id: id,
 				ObjectPathType: 3,
 				Name: methodName,
 				ParentObjectPathId: parent._objectPath.objectPathInfo.Id,
@@ -13603,7 +13781,8 @@ var OfficeExtension;
 			var objectPath=new ObjectPath(objectPathInfo, parent._objectPath, isCollection, isInvalidAfterRequest, operationType, flags);
 			objectPath.argumentObjectPaths=argumentObjectPaths;
 			objectPath.getByIdMethodName=getByIdMethodName;
-			return new type(parent._context, objectPath);
+			var o=new type(parent._context, objectPath);
+			return o;
 		};
 		OperationalApiHelper.createAndInstantiateMethodObject=function (type, parent, methodName, operationType, args, isCollection, isInvalidAfterRequest, getByIdMethodName, flags) {
 			return CoreUtility.createPromise(function (resolve, reject) {
@@ -13635,6 +13814,101 @@ var OfficeExtension;
 		return OperationalApiHelper;
 	}());
 	OfficeExtension_1.OperationalApiHelper=OperationalApiHelper;
+	var GenericEventHandlerOperational=(function () {
+		function GenericEventHandlerOperational(genericEventInfo) {
+			var _this=this;
+			this.genericEventInfo=genericEventInfo;
+			this.handlers=[];
+			this.callback=function (args) {
+				_this.genericEventInfo.eventArgsTransformFunc(args).then(function (newArgs) { return _this.fireEvent(newArgs); });
+			};
+		}
+		GenericEventHandlerOperational.prototype.add=function (handler) {
+			this.register();
+			this.handlers.push(handler);
+		};
+		GenericEventHandlerOperational.prototype.remove=function (handler) {
+			var handlers=this.handlers;
+			for (var index=handlers.length - 1; index >=0; index--) {
+				if (handlers[index]===handler) {
+					handlers.splice(index, 1);
+					break;
+				}
+			}
+			this.unregister();
+		};
+		GenericEventHandlerOperational.prototype.removeAll=function () {
+			this.handlers=[];
+			this.unregister();
+		};
+		GenericEventHandlerOperational.prototype.register=function () {
+			var _this=this;
+			if (this.handlers.length===0) {
+				var registerCallback=function () {
+					GenericEventRegistration.getGenericEventRegistration().register(_this.genericEventInfo.eventType, _this.genericEventInfo.getTargetIdFunc(), _this.callback);
+				};
+				OperationalApiHelper.invokeMethodWithClientResultCallback(registerCallback, this.genericEventInfo.object, this.genericEventInfo.register);
+			}
+			if (!GenericEventRegistration.getGenericEventRegistration().isReady) {
+				GenericEventRegistration.getGenericEventRegistration().ready();
+			}
+		};
+		GenericEventHandlerOperational.prototype.unregister=function () {
+			if (this.handlers.length===0) {
+				GenericEventRegistration.getGenericEventRegistration().unregister(this.genericEventInfo.eventType, this.genericEventInfo.getTargetIdFunc(), this.callback);
+				OperationalApiHelper.invokeMethod(this.genericEventInfo.object, this.genericEventInfo.unregister);
+			}
+		};
+		GenericEventHandlerOperational.prototype.fireEvent=function (args) {
+			var promises=[];
+			for (var i=0; i < this.handlers.length; i++) {
+				var handler=this.handlers[i];
+				var p=CoreUtility._createPromiseFromResult(null)
+					.then(this.createFireOneEventHandlerFunc(handler, args))["catch"](function (ex) {
+					CoreUtility.log('Error when invoke handler: '+JSON.stringify(ex));
+				});
+				promises.push(p);
+			}
+			CoreUtility.Promise.all(promises);
+		};
+		GenericEventHandlerOperational.prototype.createFireOneEventHandlerFunc=function (handler, args) {
+			return function () { return handler(args); };
+		};
+		return GenericEventHandlerOperational;
+	}());
+	OfficeExtension_1.GenericEventHandlerOperational=GenericEventHandlerOperational;
+	var EventHelper=(function () {
+		function EventHelper() {
+		}
+		EventHelper.invokeOn=function (eventHandler, callback, options) {
+			eventHandler.add(callback);
+			return CoreUtility._createPromiseFromResult({});
+		};
+		EventHelper.invokeOff=function (genericEventHandlersOpObj, eventHandler, eventName, callback) {
+			if (!eventName && !callback) {
+				var allGenericEventHandlersOp=Object.keys(genericEventHandlersOpObj).map(function (eventName) { return genericEventHandlersOpObj[eventName]; });
+				return EventHelper.invokeAllOff(allGenericEventHandlersOp);
+			}
+			if (!eventName) {
+				return CoreUtility._createPromiseFromException(eventName+" must be supplied if handler is supplied.");
+			}
+			if (callback) {
+				eventHandler.remove(callback);
+			}
+			else {
+				eventHandler.removeAll();
+			}
+			return CoreUtility.createPromise(function (resolve, reject) { return resolve(); });
+		};
+		EventHelper.invokeAllOff=function (allGenericEventHandlersOperational) {
+			allGenericEventHandlersOperational.forEach(function (genericEventHandlerOperational) {
+				genericEventHandlerOperational.removeAll();
+			});
+			return CoreUtility.createPromise(function (resolve, reject) { return resolve(); });
+		};
+		return EventHelper;
+	}());
+	OfficeExtension_1.EventHelper=EventHelper;
 	var ErrorCodes=(function (_super) {
 		__extends(ErrorCodes, _super);
 		function ErrorCodes() {
@@ -15071,10 +15345,14 @@ var OfficeExtension;
 			this.m_registerEventImpl=registerEventImpl;
 			this.m_unregisterEventImpl=unregisterEventImpl;
 		}
-		EventRegistration.prototype.getHandlers=function (eventId, targetId) {
+		EventRegistration.getTargetIdOrDefault=function (targetId) {
 			if (Utility.isNullOrUndefined(targetId)) {
-				targetId='';
+				return '';
 			}
+			return targetId;
+		};
+		EventRegistration.prototype.getHandlers=function (eventId, targetId) {
+			targetId=EventRegistration.getTargetIdOrDefault(targetId);
 			var handlersById=this.m_handlersByEventByTarget[eventId];
 			if (!handlersById) {
 				handlersById={};
@@ -15086,6 +15364,15 @@ var OfficeExtension;
 				handlersById[targetId]=handlers;
 			}
 			return handlers;
+		};
+		EventRegistration.prototype.callHandlers=function (eventId, targetId, argument) {
+			var funcs=this.getHandlers(eventId, targetId);
+			for (var i=0; i < funcs.length; i++) {
+				funcs[i](argument);
+			}
+		};
+		EventRegistration.prototype.hasHandlers=function (eventId, targetId) {
+			return this.getHandlers(eventId, targetId).length > 0;
 		};
 		EventRegistration.prototype.register=function (eventId, targetId, handler) {
 			if (!handler) {
@@ -15174,15 +15461,15 @@ var OfficeExtension;
 						if (CoreUtility._logEnabled) {
 							CoreUtility.log(JSON.stringify(entry));
 						}
-						var funcs=this.m_eventRegistration.getHandlers(entry.messageType, entry.targetId);
-						if (funcs.length > 0) {
+						var eventId=entry.messageType;
+						var targetId=entry.targetId;
+						var hasHandlers=this.m_eventRegistration.hasHandlers(eventId, targetId);
+						if (hasHandlers) {
 							var arg=JSON.parse(entry.message);
 							if (entry.isRemoteOverride) {
 								arg.source=Constants.eventSourceRemote;
 							}
-							for (var i=0; i < funcs.length; i++) {
-								funcs[i](arg);
-							}
+							this.m_eventRegistration.callHandlers(eventId, targetId, arg);
 						}
 					}
 				}
@@ -15197,6 +15484,7 @@ var OfficeExtension;
 		GenericEventRegistration.richApiMessageEventCategory=65536;
 		return GenericEventRegistration;
 	}());
+	OfficeExtension_1.GenericEventRegistration=GenericEventRegistration;
 	function _testSetRichApiMessageReadyImpl(impl) {
 		GenericEventRegistration._testReadyImpl=impl;
 	}
@@ -16717,6 +17005,16 @@ var OfficeCore;
 		function FirstPartyApis(context) {
 			this.context=context;
 		}
+		Object.defineProperty(FirstPartyApis.prototype, "serviceContext", {
+			get: function () {
+				if (!this.m_serviceConext) {
+					this.m_serviceConext=OfficeCore.ServiceContext.newObject(this.context);
+				}
+				return this.m_serviceConext;
+			},
+			enumerable: true,
+			configurable: true
+		});
 		Object.defineProperty(FirstPartyApis.prototype, "roamingSettings", {
 			get: function () {
 				if (!this.m_roamingSettings) {
@@ -16747,16 +17045,33 @@ var OfficeCore;
 			enumerable: true,
 			configurable: true
 		});
-		Object.defineProperty(FirstPartyApis.prototype, "personaFactory", {
-			get: function () {
-				if (!this.m_personaFactory) {
-					this.m_personaFactory=OfficeCore.PersonaFactory.newObject(this.context);
-				}
-				return this.m_personaFactory;
-			},
-			enumerable: true,
-			configurable: true
-		});
+		FirstPartyApis.prototype.getPersonaLifetime=function () {
+			var _this=this;
+			return new OfficeExtension.CoreUtility.Promise(function (resolve, reject) {
+				var lifetime=_this.serviceContext.getPersonaLifetime();
+				_this.context.sync().then(function () {
+					resolve(lifetime);
+				});
+			});
+		};
+		FirstPartyApis.prototype.getInitialPersona=function () {
+			var _this=this;
+			return new OfficeExtension.CoreUtility.Promise(function (resolve, reject) {
+				var persona=_this.serviceContext.getInitialPersona();
+				_this.context.sync().then(function () {
+					resolve(persona);
+				});
+			});
+		};
+		FirstPartyApis.prototype.getLokiTokenProvider=function () {
+			var _this=this;
+			return new OfficeExtension.CoreUtility.Promise(function (resolve, reject) {
+				var provider=_this.serviceContext.getLokiTokenProvider();
+				_this.context.sync().then(function () {
+					resolve(provider);
+				});
+			});
+		};
 		return FirstPartyApis;
 	}());
 	OfficeCore.FirstPartyApis=FirstPartyApis;
@@ -17149,6 +17464,13 @@ var OfficeFirstPartyAuth;
 		return context.sync().then(function () { return result.value; });
 	}
 	OfficeFirstPartyAuth.getPrimaryIdentityInfo=getPrimaryIdentityInfo;
+	function getIdentities() {
+		var context=new OfficeCore.RequestContext();
+		var auth_service=OfficeCore.AuthenticationService.newObject(context);
+		var result=auth_service.getIdentities();
+		return context.sync().then(function () { return result.value; });
+	}
+	OfficeFirstPartyAuth.getIdentities=getIdentities;
 	function logLoadEvent(result) {
 		if (OfficeFirstPartyAuth.debugging) {
 			console.log("Logging Implicit load event");
@@ -17215,7 +17537,9 @@ var OfficeFirstPartyAuth;
 			load();
 		}
 	}
-	loadWebAuthForReplyPage();
+	if (window.OSF) {
+		loadWebAuthForReplyPage();
+	}
 })(OfficeFirstPartyAuth || (OfficeFirstPartyAuth={}));
 var OfficeCore;
 (function (OfficeCore) {
@@ -17245,6 +17569,7 @@ var OfficeCore;
 	(function (IdentityType) {
 		IdentityType["organizationAccount"]="OrganizationAccount";
 		IdentityType["microsoftAccount"]="MicrosoftAccount";
+		IdentityType["unsupported"]="Unsupported";
 	})(IdentityType=OfficeCore.IdentityType || (OfficeCore.IdentityType={}));
 	var _typeAuthenticationService="AuthenticationService";
 	var AuthenticationService=(function (_super) {
@@ -17788,12 +18113,164 @@ var OfficeCore;
 		CommentTextFormat["markdown"]="Markdown";
 		CommentTextFormat["delta"]="Delta";
 	})(CommentTextFormat=OfficeCore.CommentTextFormat || (OfficeCore.CommentTextFormat={}));
+	var UnifiedCommunicationAvailability;
+	(function (UnifiedCommunicationAvailability) {
+		UnifiedCommunicationAvailability["notSet"]="NotSet";
+		UnifiedCommunicationAvailability["free"]="Free";
+		UnifiedCommunicationAvailability["idle"]="Idle";
+		UnifiedCommunicationAvailability["busy"]="Busy";
+		UnifiedCommunicationAvailability["idleBusy"]="IdleBusy";
+		UnifiedCommunicationAvailability["doNotDisturb"]="DoNotDisturb";
+		UnifiedCommunicationAvailability["unalertable"]="Unalertable";
+		UnifiedCommunicationAvailability["unavailable"]="Unavailable";
+	})(UnifiedCommunicationAvailability=OfficeCore.UnifiedCommunicationAvailability || (OfficeCore.UnifiedCommunicationAvailability={}));
+	var UnifiedCommunicationStatus;
+	(function (UnifiedCommunicationStatus) {
+		UnifiedCommunicationStatus["online"]="Online";
+		UnifiedCommunicationStatus["notOnline"]="NotOnline";
+		UnifiedCommunicationStatus["away"]="Away";
+		UnifiedCommunicationStatus["busy"]="Busy";
+		UnifiedCommunicationStatus["beRightBack"]="BeRightBack";
+		UnifiedCommunicationStatus["onThePhone"]="OnThePhone";
+		UnifiedCommunicationStatus["outToLunch"]="OutToLunch";
+		UnifiedCommunicationStatus["inAMeeting"]="InAMeeting";
+		UnifiedCommunicationStatus["outOfOffice"]="OutOfOffice";
+		UnifiedCommunicationStatus["doNotDisturb"]="DoNotDisturb";
+		UnifiedCommunicationStatus["inAConference"]="InAConference";
+		UnifiedCommunicationStatus["getting"]="Getting";
+		UnifiedCommunicationStatus["notABuddy"]="NotABuddy";
+		UnifiedCommunicationStatus["disconnected"]="Disconnected";
+		UnifiedCommunicationStatus["notInstalled"]="NotInstalled";
+		UnifiedCommunicationStatus["urgentInterruptionsOnly"]="UrgentInterruptionsOnly";
+		UnifiedCommunicationStatus["mayBeAvailable"]="MayBeAvailable";
+		UnifiedCommunicationStatus["idle"]="Idle";
+		UnifiedCommunicationStatus["inPresentation"]="InPresentation";
+	})(UnifiedCommunicationStatus=OfficeCore.UnifiedCommunicationStatus || (OfficeCore.UnifiedCommunicationStatus={}));
+	var PersonaType;
+	(function (PersonaType) {
+		PersonaType["unknown"]="Unknown";
+		PersonaType["enterprise"]="Enterprise";
+		PersonaType["contact"]="Contact";
+		PersonaType["bot"]="Bot";
+		PersonaType["phoneOnly"]="PhoneOnly";
+		PersonaType["oneOff"]="OneOff";
+		PersonaType["distributionList"]="DistributionList";
+		PersonaType["personalDistributionList"]="PersonalDistributionList";
+		PersonaType["anonymous"]="Anonymous";
+		PersonaType["unifiedGroup"]="UnifiedGroup";
+	})(PersonaType=OfficeCore.PersonaType || (OfficeCore.PersonaType={}));
+	var PhoneType;
+	(function (PhoneType) {
+		PhoneType["workPhone"]="WorkPhone";
+		PhoneType["homePhone"]="HomePhone";
+		PhoneType["mobilePhone"]="MobilePhone";
+		PhoneType["businessFax"]="BusinessFax";
+		PhoneType["otherPhone"]="OtherPhone";
+	})(PhoneType=OfficeCore.PhoneType || (OfficeCore.PhoneType={}));
+	var AddressType;
+	(function (AddressType) {
+		AddressType["workAddress"]="WorkAddress";
+		AddressType["homeAddress"]="HomeAddress";
+		AddressType["otherAddress"]="OtherAddress";
+	})(AddressType=OfficeCore.AddressType || (OfficeCore.AddressType={}));
+	var MemberType;
+	(function (MemberType) {
+		MemberType["unknown"]="Unknown";
+		MemberType["individual"]="Individual";
+		MemberType["group"]="Group";
+	})(MemberType=OfficeCore.MemberType || (OfficeCore.MemberType={}));
+	var _typeMemberInfoList="MemberInfoList";
+	var MemberInfoList=(function (_super) {
+		__extends(MemberInfoList, _super);
+		function MemberInfoList() {
+			return _super !==null && _super.apply(this, arguments) || this;
+		}
+		Object.defineProperty(MemberInfoList.prototype, "_className", {
+			get: function () {
+				return "MemberInfoList";
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(MemberInfoList.prototype, "_scalarPropertyNames", {
+			get: function () {
+				return ["isWarmedUp", "isWarmingUp"];
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(MemberInfoList.prototype, "isWarmedUp", {
+			get: function () {
+				_throwIfNotLoaded("isWarmedUp", this._I, _typeMemberInfoList, this._isNull);
+				return this._I;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(MemberInfoList.prototype, "isWarmingUp", {
+			get: function () {
+				_throwIfNotLoaded("isWarmingUp", this._Is, _typeMemberInfoList, this._isNull);
+				return this._Is;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		MemberInfoList.prototype.getPersonaForMember=function (memberSmtp) {
+			return _createMethodObject(OfficeCore.Persona, this, "GetPersonaForMember", 0, [memberSmtp], false, false, null, 0);
+		};
+		MemberInfoList.prototype.items=function () {
+			return _invokeMethod(this, "Items", 0, [], 0, 0);
+		};
+		MemberInfoList.prototype._handleResult=function (value) {
+			_super.prototype._handleResult.call(this, value);
+			if (_isNullOrUndefined(value))
+				return;
+			var obj=value;
+			_fixObjectPathIfNecessary(this, obj);
+			if (!_isUndefined(obj["IsWarmedUp"])) {
+				this._I=obj["IsWarmedUp"];
+			}
+			if (!_isUndefined(obj["IsWarmingUp"])) {
+				this._Is=obj["IsWarmingUp"];
+			}
+		};
+		MemberInfoList.prototype.load=function (option) {
+			return _load(this, option);
+		};
+		MemberInfoList.prototype.retrieve=function (option) {
+			return _retrieve(this, option);
+		};
+		MemberInfoList.prototype._handleRetrieveResult=function (value, result) {
+			_super.prototype._handleRetrieveResult.call(this, value, result);
+			_processRetrieveResult(this, value, result);
+		};
+		MemberInfoList.prototype.toJSON=function () {
+			return _toJson(this, {
+				"isWarmedUp": this._I,
+				"isWarmingUp": this._Is
+			}, {});
+		};
+		MemberInfoList.prototype.ensureUnchanged=function (data) {
+			_invokeEnsureUnchanged(this, data);
+			return;
+		};
+		return MemberInfoList;
+	}(OfficeExtension.ClientObject));
+	OfficeCore.MemberInfoList=MemberInfoList;
 	var PersonaDataUpdated;
 	(function (PersonaDataUpdated) {
-		PersonaDataUpdated["noUpdate"]="NoUpdate";
+		PersonaDataUpdated["hostId"]="HostId";
+		PersonaDataUpdated["type"]="Type";
+		PersonaDataUpdated["summary"]="Summary";
+		PersonaDataUpdated["photo"]="Photo";
 		PersonaDataUpdated["personaInfo"]="PersonaInfo";
-		PersonaDataUpdated["photoInfo"]="PhotoInfo";
-		PersonaDataUpdated["ucinfo"]="UCInfo";
+		PersonaDataUpdated["unifiedCommunicationInfo"]="UnifiedCommunicationInfo";
+		PersonaDataUpdated["organization"]="Organization";
+		PersonaDataUpdated["unifiedGroupInfo"]="UnifiedGroupInfo";
+		PersonaDataUpdated["members"]="Members";
+		PersonaDataUpdated["membership"]="Membership";
+		PersonaDataUpdated["capabilities"]="Capabilities";
+		PersonaDataUpdated["customizations"]="Customizations";
 	})(PersonaDataUpdated=OfficeCore.PersonaDataUpdated || (OfficeCore.PersonaDataUpdated={}));
 	var _typePersonaActions="PersonaActions";
 	var PersonaActions=(function (_super) {
@@ -17852,6 +18329,270 @@ var OfficeCore;
 		return PersonaActions;
 	}(OfficeExtension.ClientObject));
 	OfficeCore.PersonaActions=PersonaActions;
+	var _typePersonaInfoSource="PersonaInfoSource";
+	var PersonaInfoSource=(function (_super) {
+		__extends(PersonaInfoSource, _super);
+		function PersonaInfoSource() {
+			return _super !==null && _super.apply(this, arguments) || this;
+		}
+		Object.defineProperty(PersonaInfoSource.prototype, "_className", {
+			get: function () {
+				return "PersonaInfoSource";
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(PersonaInfoSource.prototype, "_scalarPropertyNames", {
+			get: function () {
+				return ["displayName", "email", "emailAddresses", "sipAddresses", "birthday", "birthdays", "title", "jobInfoDepartment", "companyName", "office", "linkedTitles", "linkedDepartments", "linkedCompanyNames", "linkedOffices", "phones", "addresses", "webSites", "notes"];
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(PersonaInfoSource.prototype, "addresses", {
+			get: function () {
+				_throwIfNotLoaded("addresses", this._A, _typePersonaInfoSource, this._isNull);
+				return this._A;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(PersonaInfoSource.prototype, "birthday", {
+			get: function () {
+				_throwIfNotLoaded("birthday", this._B, _typePersonaInfoSource, this._isNull);
+				return this._B;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(PersonaInfoSource.prototype, "birthdays", {
+			get: function () {
+				_throwIfNotLoaded("birthdays", this._Bi, _typePersonaInfoSource, this._isNull);
+				return this._Bi;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(PersonaInfoSource.prototype, "companyName", {
+			get: function () {
+				_throwIfNotLoaded("companyName", this._C, _typePersonaInfoSource, this._isNull);
+				return this._C;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(PersonaInfoSource.prototype, "displayName", {
+			get: function () {
+				_throwIfNotLoaded("displayName", this._D, _typePersonaInfoSource, this._isNull);
+				return this._D;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(PersonaInfoSource.prototype, "email", {
+			get: function () {
+				_throwIfNotLoaded("email", this._E, _typePersonaInfoSource, this._isNull);
+				return this._E;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(PersonaInfoSource.prototype, "emailAddresses", {
+			get: function () {
+				_throwIfNotLoaded("emailAddresses", this._Em, _typePersonaInfoSource, this._isNull);
+				return this._Em;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(PersonaInfoSource.prototype, "jobInfoDepartment", {
+			get: function () {
+				_throwIfNotLoaded("jobInfoDepartment", this._J, _typePersonaInfoSource, this._isNull);
+				return this._J;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(PersonaInfoSource.prototype, "linkedCompanyNames", {
+			get: function () {
+				_throwIfNotLoaded("linkedCompanyNames", this._L, _typePersonaInfoSource, this._isNull);
+				return this._L;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(PersonaInfoSource.prototype, "linkedDepartments", {
+			get: function () {
+				_throwIfNotLoaded("linkedDepartments", this._Li, _typePersonaInfoSource, this._isNull);
+				return this._Li;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(PersonaInfoSource.prototype, "linkedOffices", {
+			get: function () {
+				_throwIfNotLoaded("linkedOffices", this._Lin, _typePersonaInfoSource, this._isNull);
+				return this._Lin;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(PersonaInfoSource.prototype, "linkedTitles", {
+			get: function () {
+				_throwIfNotLoaded("linkedTitles", this._Link, _typePersonaInfoSource, this._isNull);
+				return this._Link;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(PersonaInfoSource.prototype, "notes", {
+			get: function () {
+				_throwIfNotLoaded("notes", this._N, _typePersonaInfoSource, this._isNull);
+				return this._N;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(PersonaInfoSource.prototype, "office", {
+			get: function () {
+				_throwIfNotLoaded("office", this._O, _typePersonaInfoSource, this._isNull);
+				return this._O;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(PersonaInfoSource.prototype, "phones", {
+			get: function () {
+				_throwIfNotLoaded("phones", this._P, _typePersonaInfoSource, this._isNull);
+				return this._P;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(PersonaInfoSource.prototype, "sipAddresses", {
+			get: function () {
+				_throwIfNotLoaded("sipAddresses", this._S, _typePersonaInfoSource, this._isNull);
+				return this._S;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(PersonaInfoSource.prototype, "title", {
+			get: function () {
+				_throwIfNotLoaded("title", this._T, _typePersonaInfoSource, this._isNull);
+				return this._T;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(PersonaInfoSource.prototype, "webSites", {
+			get: function () {
+				_throwIfNotLoaded("webSites", this._W, _typePersonaInfoSource, this._isNull);
+				return this._W;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		PersonaInfoSource.prototype._handleResult=function (value) {
+			_super.prototype._handleResult.call(this, value);
+			if (_isNullOrUndefined(value))
+				return;
+			var obj=value;
+			_fixObjectPathIfNecessary(this, obj);
+			if (!_isUndefined(obj["Addresses"])) {
+				this._A=obj["Addresses"];
+			}
+			if (!_isUndefined(obj["Birthday"])) {
+				this._B=obj["Birthday"];
+			}
+			if (!_isUndefined(obj["Birthdays"])) {
+				this._Bi=obj["Birthdays"];
+			}
+			if (!_isUndefined(obj["CompanyName"])) {
+				this._C=obj["CompanyName"];
+			}
+			if (!_isUndefined(obj["DisplayName"])) {
+				this._D=obj["DisplayName"];
+			}
+			if (!_isUndefined(obj["Email"])) {
+				this._E=obj["Email"];
+			}
+			if (!_isUndefined(obj["EmailAddresses"])) {
+				this._Em=obj["EmailAddresses"];
+			}
+			if (!_isUndefined(obj["JobInfoDepartment"])) {
+				this._J=obj["JobInfoDepartment"];
+			}
+			if (!_isUndefined(obj["LinkedCompanyNames"])) {
+				this._L=obj["LinkedCompanyNames"];
+			}
+			if (!_isUndefined(obj["LinkedDepartments"])) {
+				this._Li=obj["LinkedDepartments"];
+			}
+			if (!_isUndefined(obj["LinkedOffices"])) {
+				this._Lin=obj["LinkedOffices"];
+			}
+			if (!_isUndefined(obj["LinkedTitles"])) {
+				this._Link=obj["LinkedTitles"];
+			}
+			if (!_isUndefined(obj["Notes"])) {
+				this._N=obj["Notes"];
+			}
+			if (!_isUndefined(obj["Office"])) {
+				this._O=obj["Office"];
+			}
+			if (!_isUndefined(obj["Phones"])) {
+				this._P=obj["Phones"];
+			}
+			if (!_isUndefined(obj["SipAddresses"])) {
+				this._S=obj["SipAddresses"];
+			}
+			if (!_isUndefined(obj["Title"])) {
+				this._T=obj["Title"];
+			}
+			if (!_isUndefined(obj["WebSites"])) {
+				this._W=obj["WebSites"];
+			}
+		};
+		PersonaInfoSource.prototype.load=function (option) {
+			return _load(this, option);
+		};
+		PersonaInfoSource.prototype.retrieve=function (option) {
+			return _retrieve(this, option);
+		};
+		PersonaInfoSource.prototype._handleRetrieveResult=function (value, result) {
+			_super.prototype._handleRetrieveResult.call(this, value, result);
+			_processRetrieveResult(this, value, result);
+		};
+		PersonaInfoSource.prototype.toJSON=function () {
+			return _toJson(this, {
+				"addresses": this._A,
+				"birthday": this._B,
+				"birthdays": this._Bi,
+				"companyName": this._C,
+				"displayName": this._D,
+				"email": this._E,
+				"emailAddresses": this._Em,
+				"jobInfoDepartment": this._J,
+				"linkedCompanyNames": this._L,
+				"linkedDepartments": this._Li,
+				"linkedOffices": this._Lin,
+				"linkedTitles": this._Link,
+				"notes": this._N,
+				"office": this._O,
+				"phones": this._P,
+				"sipAddresses": this._S,
+				"title": this._T,
+				"webSites": this._W
+			}, {});
+		};
+		PersonaInfoSource.prototype.ensureUnchanged=function (data) {
+			_invokeEnsureUnchanged(this, data);
+			return;
+		};
+		return PersonaInfoSource;
+	}(OfficeExtension.ClientObject));
+	OfficeCore.PersonaInfoSource=PersonaInfoSource;
 	var _typePersonaInfo="PersonaInfo";
 	var PersonaInfo=(function (_super) {
 		__extends(PersonaInfo, _super);
@@ -17867,31 +18608,24 @@ var OfficeCore;
 		});
 		Object.defineProperty(PersonaInfo.prototype, "_scalarPropertyNames", {
 			get: function () {
-				return ["displayName", "email", "allEmailAddresses", "sip", "allSipAddresses", "birthday", "allBirthdays", "title", "department", "companyName", "office", "linkedTitles", "linkedDepartments", "linkedCompanyNames", "linkedOffices", "workPhones", "timeZone", "homePhones", "mobilePhones", "otherPhones", "workFaxPhones", "workAddresses", "homeAddresses", "otherAddresses", "webSites", "notes"];
+				return ["displayName", "email", "emailAddresses", "sipAddresses", "birthday", "birthdays", "title", "jobInfoDepartment", "companyName", "office", "linkedTitles", "linkedDepartments", "linkedCompanyNames", "linkedOffices", "webSites", "notes", "isPersonResolved"];
 			},
 			enumerable: true,
 			configurable: true
 		});
-		Object.defineProperty(PersonaInfo.prototype, "allBirthdays", {
+		Object.defineProperty(PersonaInfo.prototype, "_navigationPropertyNames", {
 			get: function () {
-				_throwIfNotLoaded("allBirthdays", this._A, _typePersonaInfo, this._isNull);
-				return this._A;
+				return ["sources"];
 			},
 			enumerable: true,
 			configurable: true
 		});
-		Object.defineProperty(PersonaInfo.prototype, "allEmailAddresses", {
+		Object.defineProperty(PersonaInfo.prototype, "sources", {
 			get: function () {
-				_throwIfNotLoaded("allEmailAddresses", this._Al, _typePersonaInfo, this._isNull);
-				return this._Al;
-			},
-			enumerable: true,
-			configurable: true
-		});
-		Object.defineProperty(PersonaInfo.prototype, "allSipAddresses", {
-			get: function () {
-				_throwIfNotLoaded("allSipAddresses", this._All, _typePersonaInfo, this._isNull);
-				return this._All;
+				if (!this._So) {
+					this._So=_createPropertyObject(OfficeCore.PersonaInfoSource, this, "Sources", false, 4);
+				}
+				return this._So;
 			},
 			enumerable: true,
 			configurable: true
@@ -17904,6 +18638,14 @@ var OfficeCore;
 			enumerable: true,
 			configurable: true
 		});
+		Object.defineProperty(PersonaInfo.prototype, "birthdays", {
+			get: function () {
+				_throwIfNotLoaded("birthdays", this._Bi, _typePersonaInfo, this._isNull);
+				return this._Bi;
+			},
+			enumerable: true,
+			configurable: true
+		});
 		Object.defineProperty(PersonaInfo.prototype, "companyName", {
 			get: function () {
 				_throwIfNotLoaded("companyName", this._C, _typePersonaInfo, this._isNull);
@@ -17912,18 +18654,10 @@ var OfficeCore;
 			enumerable: true,
 			configurable: true
 		});
-		Object.defineProperty(PersonaInfo.prototype, "department", {
-			get: function () {
-				_throwIfNotLoaded("department", this._D, _typePersonaInfo, this._isNull);
-				return this._D;
-			},
-			enumerable: true,
-			configurable: true
-		});
 		Object.defineProperty(PersonaInfo.prototype, "displayName", {
 			get: function () {
-				_throwIfNotLoaded("displayName", this._Di, _typePersonaInfo, this._isNull);
-				return this._Di;
+				_throwIfNotLoaded("displayName", this._D, _typePersonaInfo, this._isNull);
+				return this._D;
 			},
 			enumerable: true,
 			configurable: true
@@ -17936,18 +18670,26 @@ var OfficeCore;
 			enumerable: true,
 			configurable: true
 		});
-		Object.defineProperty(PersonaInfo.prototype, "homeAddresses", {
+		Object.defineProperty(PersonaInfo.prototype, "emailAddresses", {
 			get: function () {
-				_throwIfNotLoaded("homeAddresses", this._H, _typePersonaInfo, this._isNull);
-				return this._H;
+				_throwIfNotLoaded("emailAddresses", this._Em, _typePersonaInfo, this._isNull);
+				return this._Em;
 			},
 			enumerable: true,
 			configurable: true
 		});
-		Object.defineProperty(PersonaInfo.prototype, "homePhones", {
+		Object.defineProperty(PersonaInfo.prototype, "isPersonResolved", {
 			get: function () {
-				_throwIfNotLoaded("homePhones", this._Ho, _typePersonaInfo, this._isNull);
-				return this._Ho;
+				_throwIfNotLoaded("isPersonResolved", this._I, _typePersonaInfo, this._isNull);
+				return this._I;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(PersonaInfo.prototype, "jobInfoDepartment", {
+			get: function () {
+				_throwIfNotLoaded("jobInfoDepartment", this._J, _typePersonaInfo, this._isNull);
+				return this._J;
 			},
 			enumerable: true,
 			configurable: true
@@ -17984,14 +18726,6 @@ var OfficeCore;
 			enumerable: true,
 			configurable: true
 		});
-		Object.defineProperty(PersonaInfo.prototype, "mobilePhones", {
-			get: function () {
-				_throwIfNotLoaded("mobilePhones", this._M, _typePersonaInfo, this._isNull);
-				return this._M;
-			},
-			enumerable: true,
-			configurable: true
-		});
 		Object.defineProperty(PersonaInfo.prototype, "notes", {
 			get: function () {
 				_throwIfNotLoaded("notes", this._N, _typePersonaInfo, this._isNull);
@@ -18008,42 +18742,18 @@ var OfficeCore;
 			enumerable: true,
 			configurable: true
 		});
-		Object.defineProperty(PersonaInfo.prototype, "otherAddresses", {
+		Object.defineProperty(PersonaInfo.prototype, "sipAddresses", {
 			get: function () {
-				_throwIfNotLoaded("otherAddresses", this._Ot, _typePersonaInfo, this._isNull);
-				return this._Ot;
-			},
-			enumerable: true,
-			configurable: true
-		});
-		Object.defineProperty(PersonaInfo.prototype, "otherPhones", {
-			get: function () {
-				_throwIfNotLoaded("otherPhones", this._Oth, _typePersonaInfo, this._isNull);
-				return this._Oth;
-			},
-			enumerable: true,
-			configurable: true
-		});
-		Object.defineProperty(PersonaInfo.prototype, "sip", {
-			get: function () {
-				_throwIfNotLoaded("sip", this._S, _typePersonaInfo, this._isNull);
+				_throwIfNotLoaded("sipAddresses", this._S, _typePersonaInfo, this._isNull);
 				return this._S;
-			},
-			enumerable: true,
-			configurable: true
-		});
-		Object.defineProperty(PersonaInfo.prototype, "timeZone", {
-			get: function () {
-				_throwIfNotLoaded("timeZone", this._T, _typePersonaInfo, this._isNull);
-				return this._T;
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(PersonaInfo.prototype, "title", {
 			get: function () {
-				_throwIfNotLoaded("title", this._Ti, _typePersonaInfo, this._isNull);
-				return this._Ti;
+				_throwIfNotLoaded("title", this._T, _typePersonaInfo, this._isNull);
+				return this._T;
 			},
 			enumerable: true,
 			configurable: true
@@ -18056,65 +18766,41 @@ var OfficeCore;
 			enumerable: true,
 			configurable: true
 		});
-		Object.defineProperty(PersonaInfo.prototype, "workAddresses", {
-			get: function () {
-				_throwIfNotLoaded("workAddresses", this._Wo, _typePersonaInfo, this._isNull);
-				return this._Wo;
-			},
-			enumerable: true,
-			configurable: true
-		});
-		Object.defineProperty(PersonaInfo.prototype, "workFaxPhones", {
-			get: function () {
-				_throwIfNotLoaded("workFaxPhones", this._Wor, _typePersonaInfo, this._isNull);
-				return this._Wor;
-			},
-			enumerable: true,
-			configurable: true
-		});
-		Object.defineProperty(PersonaInfo.prototype, "workPhones", {
-			get: function () {
-				_throwIfNotLoaded("workPhones", this._Work, _typePersonaInfo, this._isNull);
-				return this._Work;
-			},
-			enumerable: true,
-			configurable: true
-		});
+		PersonaInfo.prototype.getAddresses=function () {
+			return _invokeMethod(this, "GetAddresses", 1, [], 4, 0);
+		};
+		PersonaInfo.prototype.getPhones=function () {
+			return _invokeMethod(this, "GetPhones", 1, [], 4, 0);
+		};
 		PersonaInfo.prototype._handleResult=function (value) {
 			_super.prototype._handleResult.call(this, value);
 			if (_isNullOrUndefined(value))
 				return;
 			var obj=value;
 			_fixObjectPathIfNecessary(this, obj);
-			if (!_isUndefined(obj["AllBirthdays"])) {
-				this._A=_adjustToDateTime(obj["AllBirthdays"]);
-			}
-			if (!_isUndefined(obj["AllEmailAddresses"])) {
-				this._Al=obj["AllEmailAddresses"];
-			}
-			if (!_isUndefined(obj["AllSipAddresses"])) {
-				this._All=obj["AllSipAddresses"];
-			}
 			if (!_isUndefined(obj["Birthday"])) {
 				this._B=_adjustToDateTime(obj["Birthday"]);
+			}
+			if (!_isUndefined(obj["Birthdays"])) {
+				this._Bi=_adjustToDateTime(obj["Birthdays"]);
 			}
 			if (!_isUndefined(obj["CompanyName"])) {
 				this._C=obj["CompanyName"];
 			}
-			if (!_isUndefined(obj["Department"])) {
-				this._D=obj["Department"];
-			}
 			if (!_isUndefined(obj["DisplayName"])) {
-				this._Di=obj["DisplayName"];
+				this._D=obj["DisplayName"];
 			}
 			if (!_isUndefined(obj["Email"])) {
 				this._E=obj["Email"];
 			}
-			if (!_isUndefined(obj["HomeAddresses"])) {
-				this._H=obj["HomeAddresses"];
+			if (!_isUndefined(obj["EmailAddresses"])) {
+				this._Em=obj["EmailAddresses"];
 			}
-			if (!_isUndefined(obj["HomePhones"])) {
-				this._Ho=obj["HomePhones"];
+			if (!_isUndefined(obj["IsPersonResolved"])) {
+				this._I=obj["IsPersonResolved"];
+			}
+			if (!_isUndefined(obj["JobInfoDepartment"])) {
+				this._J=obj["JobInfoDepartment"];
 			}
 			if (!_isUndefined(obj["LinkedCompanyNames"])) {
 				this._L=obj["LinkedCompanyNames"];
@@ -18128,42 +18814,22 @@ var OfficeCore;
 			if (!_isUndefined(obj["LinkedTitles"])) {
 				this._Link=obj["LinkedTitles"];
 			}
-			if (!_isUndefined(obj["MobilePhones"])) {
-				this._M=obj["MobilePhones"];
-			}
 			if (!_isUndefined(obj["Notes"])) {
 				this._N=obj["Notes"];
 			}
 			if (!_isUndefined(obj["Office"])) {
 				this._O=obj["Office"];
 			}
-			if (!_isUndefined(obj["OtherAddresses"])) {
-				this._Ot=obj["OtherAddresses"];
-			}
-			if (!_isUndefined(obj["OtherPhones"])) {
-				this._Oth=obj["OtherPhones"];
-			}
-			if (!_isUndefined(obj["Sip"])) {
-				this._S=obj["Sip"];
-			}
-			if (!_isUndefined(obj["TimeZone"])) {
-				this._T=obj["TimeZone"];
+			if (!_isUndefined(obj["SipAddresses"])) {
+				this._S=obj["SipAddresses"];
 			}
 			if (!_isUndefined(obj["Title"])) {
-				this._Ti=obj["Title"];
+				this._T=obj["Title"];
 			}
 			if (!_isUndefined(obj["WebSites"])) {
 				this._W=obj["WebSites"];
 			}
-			if (!_isUndefined(obj["WorkAddresses"])) {
-				this._Wo=obj["WorkAddresses"];
-			}
-			if (!_isUndefined(obj["WorkFaxPhones"])) {
-				this._Wor=obj["WorkFaxPhones"];
-			}
-			if (!_isUndefined(obj["WorkPhones"])) {
-				this._Work=obj["WorkPhones"];
-			}
+			_handleNavigationPropertyResults(this, obj, ["sources", "Sources"]);
 		};
 		PersonaInfo.prototype.load=function (option) {
 			return _load(this, option);
@@ -18176,43 +18842,36 @@ var OfficeCore;
 			if (_isNullOrUndefined(value))
 				return;
 			var obj=value;
-			if (!_isUndefined(obj["AllBirthdays"])) {
-				obj["allBirthdays"]=_adjustToDateTime(obj["allBirthdays"]);
-			}
 			if (!_isUndefined(obj["Birthday"])) {
 				obj["birthday"]=_adjustToDateTime(obj["birthday"]);
+			}
+			if (!_isUndefined(obj["Birthdays"])) {
+				obj["birthdays"]=_adjustToDateTime(obj["birthdays"]);
 			}
 			_processRetrieveResult(this, value, result);
 		};
 		PersonaInfo.prototype.toJSON=function () {
 			return _toJson(this, {
-				"allBirthdays": this._A,
-				"allEmailAddresses": this._Al,
-				"allSipAddresses": this._All,
 				"birthday": this._B,
+				"birthdays": this._Bi,
 				"companyName": this._C,
-				"department": this._D,
-				"displayName": this._Di,
+				"displayName": this._D,
 				"email": this._E,
-				"homeAddresses": this._H,
-				"homePhones": this._Ho,
+				"emailAddresses": this._Em,
+				"isPersonResolved": this._I,
+				"jobInfoDepartment": this._J,
 				"linkedCompanyNames": this._L,
 				"linkedDepartments": this._Li,
 				"linkedOffices": this._Lin,
 				"linkedTitles": this._Link,
-				"mobilePhones": this._M,
 				"notes": this._N,
 				"office": this._O,
-				"otherAddresses": this._Ot,
-				"otherPhones": this._Oth,
-				"sip": this._S,
-				"timeZone": this._T,
-				"title": this._Ti,
-				"webSites": this._W,
-				"workAddresses": this._Wo,
-				"workFaxPhones": this._Wor,
-				"workPhones": this._Work
-			}, {});
+				"sipAddresses": this._S,
+				"title": this._T,
+				"webSites": this._W
+			}, {
+				"sources": this._So
+			});
 		};
 		PersonaInfo.prototype.ensureUnchanged=function (data) {
 			_invokeEnsureUnchanged(this, data);
@@ -18221,52 +18880,171 @@ var OfficeCore;
 		return PersonaInfo;
 	}(OfficeExtension.ClientObject));
 	OfficeCore.PersonaInfo=PersonaInfo;
-	var _typePersonaUCInfo="PersonaUCInfo";
-	var PersonaUCInfo=(function (_super) {
-		__extends(PersonaUCInfo, _super);
-		function PersonaUCInfo() {
+	var _typePersonaUnifiedCommunicationInfo="PersonaUnifiedCommunicationInfo";
+	var PersonaUnifiedCommunicationInfo=(function (_super) {
+		__extends(PersonaUnifiedCommunicationInfo, _super);
+		function PersonaUnifiedCommunicationInfo() {
 			return _super !==null && _super.apply(this, arguments) || this;
 		}
-		Object.defineProperty(PersonaUCInfo.prototype, "_className", {
+		Object.defineProperty(PersonaUnifiedCommunicationInfo.prototype, "_className", {
 			get: function () {
-				return "PersonaUCInfo";
+				return "PersonaUnifiedCommunicationInfo";
 			},
 			enumerable: true,
 			configurable: true
 		});
-		Object.defineProperty(PersonaUCInfo.prototype, "_scalarPropertyNames", {
+		Object.defineProperty(PersonaUnifiedCommunicationInfo.prototype, "_scalarPropertyNames", {
 			get: function () {
-				return ["availability"];
+				return ["availability", "status", "isSelf", "isTagged", "customStatusString", "isBlocked", "presenceTooltip", "isOutOfOffice", "outOfOfficeNote", "timezone", "meetingLocation", "meetingSubject", "timezoneBias", "idleStartTime", "overallCapability", "isOnBuddyList", "presenceNote", "voiceMailUri"];
 			},
 			enumerable: true,
 			configurable: true
 		});
-		Object.defineProperty(PersonaUCInfo.prototype, "_scalarPropertyUpdateable", {
+		Object.defineProperty(PersonaUnifiedCommunicationInfo.prototype, "availability", {
 			get: function () {
-				return [true];
-			},
-			enumerable: true,
-			configurable: true
-		});
-		Object.defineProperty(PersonaUCInfo.prototype, "availability", {
-			get: function () {
-				_throwIfNotLoaded("availability", this._A, _typePersonaUCInfo, this._isNull);
+				_throwIfNotLoaded("availability", this._A, _typePersonaUnifiedCommunicationInfo, this._isNull);
 				return this._A;
 			},
-			set: function (value) {
-				this._A=value;
-				_invokeSetProperty(this, "Availability", value, 0);
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(PersonaUnifiedCommunicationInfo.prototype, "customStatusString", {
+			get: function () {
+				_throwIfNotLoaded("customStatusString", this._C, _typePersonaUnifiedCommunicationInfo, this._isNull);
+				return this._C;
 			},
 			enumerable: true,
 			configurable: true
 		});
-		PersonaUCInfo.prototype.set=function (properties, options) {
-			this._recursivelySet(properties, options, ["availability"], [], []);
-		};
-		PersonaUCInfo.prototype.update=function (properties) {
-			this._recursivelyUpdate(properties);
-		};
-		PersonaUCInfo.prototype._handleResult=function (value) {
+		Object.defineProperty(PersonaUnifiedCommunicationInfo.prototype, "idleStartTime", {
+			get: function () {
+				_throwIfNotLoaded("idleStartTime", this._I, _typePersonaUnifiedCommunicationInfo, this._isNull);
+				return this._I;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(PersonaUnifiedCommunicationInfo.prototype, "isBlocked", {
+			get: function () {
+				_throwIfNotLoaded("isBlocked", this._Is, _typePersonaUnifiedCommunicationInfo, this._isNull);
+				return this._Is;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(PersonaUnifiedCommunicationInfo.prototype, "isOnBuddyList", {
+			get: function () {
+				_throwIfNotLoaded("isOnBuddyList", this._IsO, _typePersonaUnifiedCommunicationInfo, this._isNull);
+				return this._IsO;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(PersonaUnifiedCommunicationInfo.prototype, "isOutOfOffice", {
+			get: function () {
+				_throwIfNotLoaded("isOutOfOffice", this._IsOu, _typePersonaUnifiedCommunicationInfo, this._isNull);
+				return this._IsOu;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(PersonaUnifiedCommunicationInfo.prototype, "isSelf", {
+			get: function () {
+				_throwIfNotLoaded("isSelf", this._IsS, _typePersonaUnifiedCommunicationInfo, this._isNull);
+				return this._IsS;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(PersonaUnifiedCommunicationInfo.prototype, "isTagged", {
+			get: function () {
+				_throwIfNotLoaded("isTagged", this._IsT, _typePersonaUnifiedCommunicationInfo, this._isNull);
+				return this._IsT;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(PersonaUnifiedCommunicationInfo.prototype, "meetingLocation", {
+			get: function () {
+				_throwIfNotLoaded("meetingLocation", this._M, _typePersonaUnifiedCommunicationInfo, this._isNull);
+				return this._M;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(PersonaUnifiedCommunicationInfo.prototype, "meetingSubject", {
+			get: function () {
+				_throwIfNotLoaded("meetingSubject", this._Me, _typePersonaUnifiedCommunicationInfo, this._isNull);
+				return this._Me;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(PersonaUnifiedCommunicationInfo.prototype, "outOfOfficeNote", {
+			get: function () {
+				_throwIfNotLoaded("outOfOfficeNote", this._O, _typePersonaUnifiedCommunicationInfo, this._isNull);
+				return this._O;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(PersonaUnifiedCommunicationInfo.prototype, "overallCapability", {
+			get: function () {
+				_throwIfNotLoaded("overallCapability", this._Ov, _typePersonaUnifiedCommunicationInfo, this._isNull);
+				return this._Ov;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(PersonaUnifiedCommunicationInfo.prototype, "presenceNote", {
+			get: function () {
+				_throwIfNotLoaded("presenceNote", this._P, _typePersonaUnifiedCommunicationInfo, this._isNull);
+				return this._P;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(PersonaUnifiedCommunicationInfo.prototype, "presenceTooltip", {
+			get: function () {
+				_throwIfNotLoaded("presenceTooltip", this._Pr, _typePersonaUnifiedCommunicationInfo, this._isNull);
+				return this._Pr;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(PersonaUnifiedCommunicationInfo.prototype, "status", {
+			get: function () {
+				_throwIfNotLoaded("status", this._S, _typePersonaUnifiedCommunicationInfo, this._isNull);
+				return this._S;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(PersonaUnifiedCommunicationInfo.prototype, "timezone", {
+			get: function () {
+				_throwIfNotLoaded("timezone", this._T, _typePersonaUnifiedCommunicationInfo, this._isNull);
+				return this._T;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(PersonaUnifiedCommunicationInfo.prototype, "timezoneBias", {
+			get: function () {
+				_throwIfNotLoaded("timezoneBias", this._Ti, _typePersonaUnifiedCommunicationInfo, this._isNull);
+				return this._Ti;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(PersonaUnifiedCommunicationInfo.prototype, "voiceMailUri", {
+			get: function () {
+				_throwIfNotLoaded("voiceMailUri", this._V, _typePersonaUnifiedCommunicationInfo, this._isNull);
+				return this._V;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		PersonaUnifiedCommunicationInfo.prototype._handleResult=function (value) {
 			_super.prototype._handleResult.call(this, value);
 			if (_isNullOrUndefined(value))
 				return;
@@ -18275,102 +19053,708 @@ var OfficeCore;
 			if (!_isUndefined(obj["Availability"])) {
 				this._A=obj["Availability"];
 			}
+			if (!_isUndefined(obj["CustomStatusString"])) {
+				this._C=obj["CustomStatusString"];
+			}
+			if (!_isUndefined(obj["IdleStartTime"])) {
+				this._I=_adjustToDateTime(obj["IdleStartTime"]);
+			}
+			if (!_isUndefined(obj["IsBlocked"])) {
+				this._Is=obj["IsBlocked"];
+			}
+			if (!_isUndefined(obj["IsOnBuddyList"])) {
+				this._IsO=obj["IsOnBuddyList"];
+			}
+			if (!_isUndefined(obj["IsOutOfOffice"])) {
+				this._IsOu=obj["IsOutOfOffice"];
+			}
+			if (!_isUndefined(obj["IsSelf"])) {
+				this._IsS=obj["IsSelf"];
+			}
+			if (!_isUndefined(obj["IsTagged"])) {
+				this._IsT=obj["IsTagged"];
+			}
+			if (!_isUndefined(obj["MeetingLocation"])) {
+				this._M=obj["MeetingLocation"];
+			}
+			if (!_isUndefined(obj["MeetingSubject"])) {
+				this._Me=obj["MeetingSubject"];
+			}
+			if (!_isUndefined(obj["OutOfOfficeNote"])) {
+				this._O=obj["OutOfOfficeNote"];
+			}
+			if (!_isUndefined(obj["OverallCapability"])) {
+				this._Ov=obj["OverallCapability"];
+			}
+			if (!_isUndefined(obj["PresenceNote"])) {
+				this._P=obj["PresenceNote"];
+			}
+			if (!_isUndefined(obj["PresenceTooltip"])) {
+				this._Pr=obj["PresenceTooltip"];
+			}
+			if (!_isUndefined(obj["Status"])) {
+				this._S=obj["Status"];
+			}
+			if (!_isUndefined(obj["Timezone"])) {
+				this._T=obj["Timezone"];
+			}
+			if (!_isUndefined(obj["TimezoneBias"])) {
+				this._Ti=obj["TimezoneBias"];
+			}
+			if (!_isUndefined(obj["VoiceMailUri"])) {
+				this._V=obj["VoiceMailUri"];
+			}
 		};
-		PersonaUCInfo.prototype.load=function (option) {
+		PersonaUnifiedCommunicationInfo.prototype.load=function (option) {
 			return _load(this, option);
 		};
-		PersonaUCInfo.prototype.retrieve=function (option) {
+		PersonaUnifiedCommunicationInfo.prototype.retrieve=function (option) {
 			return _retrieve(this, option);
 		};
-		PersonaUCInfo.prototype._handleRetrieveResult=function (value, result) {
+		PersonaUnifiedCommunicationInfo.prototype._handleRetrieveResult=function (value, result) {
 			_super.prototype._handleRetrieveResult.call(this, value, result);
+			if (_isNullOrUndefined(value))
+				return;
+			var obj=value;
+			if (!_isUndefined(obj["IdleStartTime"])) {
+				obj["idleStartTime"]=_adjustToDateTime(obj["idleStartTime"]);
+			}
 			_processRetrieveResult(this, value, result);
 		};
-		PersonaUCInfo.prototype.toJSON=function () {
+		PersonaUnifiedCommunicationInfo.prototype.toJSON=function () {
 			return _toJson(this, {
-				"availability": this._A
+				"availability": this._A,
+				"customStatusString": this._C,
+				"idleStartTime": this._I,
+				"isBlocked": this._Is,
+				"isOnBuddyList": this._IsO,
+				"isOutOfOffice": this._IsOu,
+				"isSelf": this._IsS,
+				"isTagged": this._IsT,
+				"meetingLocation": this._M,
+				"meetingSubject": this._Me,
+				"outOfOfficeNote": this._O,
+				"overallCapability": this._Ov,
+				"presenceNote": this._P,
+				"presenceTooltip": this._Pr,
+				"status": this._S,
+				"timezone": this._T,
+				"timezoneBias": this._Ti,
+				"voiceMailUri": this._V
 			}, {});
 		};
-		PersonaUCInfo.prototype.ensureUnchanged=function (data) {
+		PersonaUnifiedCommunicationInfo.prototype.ensureUnchanged=function (data) {
 			_invokeEnsureUnchanged(this, data);
 			return;
 		};
-		return PersonaUCInfo;
+		return PersonaUnifiedCommunicationInfo;
 	}(OfficeExtension.ClientObject));
-	OfficeCore.PersonaUCInfo=PersonaUCInfo;
-	var _typePhotoInfo="PhotoInfo";
-	var PhotoInfo=(function (_super) {
-		__extends(PhotoInfo, _super);
-		function PhotoInfo() {
+	OfficeCore.PersonaUnifiedCommunicationInfo=PersonaUnifiedCommunicationInfo;
+	var _typePersonaPhotoInfo="PersonaPhotoInfo";
+	var PersonaPhotoInfo=(function (_super) {
+		__extends(PersonaPhotoInfo, _super);
+		function PersonaPhotoInfo() {
 			return _super !==null && _super.apply(this, arguments) || this;
 		}
-		Object.defineProperty(PhotoInfo.prototype, "_className", {
+		Object.defineProperty(PersonaPhotoInfo.prototype, "_className", {
 			get: function () {
-				return "PhotoInfo";
+				return "PersonaPhotoInfo";
 			},
 			enumerable: true,
 			configurable: true
 		});
-		Object.defineProperty(PhotoInfo.prototype, "_scalarPropertyNames", {
+		Object.defineProperty(PersonaPhotoInfo.prototype, "_scalarPropertyNames", {
 			get: function () {
-				return ["type", "data"];
+				return ["url"];
 			},
 			enumerable: true,
 			configurable: true
 		});
-		Object.defineProperty(PhotoInfo.prototype, "data", {
+		Object.defineProperty(PersonaPhotoInfo.prototype, "url", {
 			get: function () {
-				_throwIfNotLoaded("data", this._D, _typePhotoInfo, this._isNull);
-				return this._D;
+				_throwIfNotLoaded("url", this._U, _typePersonaPhotoInfo, this._isNull);
+				return this._U;
 			},
 			enumerable: true,
 			configurable: true
 		});
-		Object.defineProperty(PhotoInfo.prototype, "type", {
-			get: function () {
-				_throwIfNotLoaded("type", this._T, _typePhotoInfo, this._isNull);
-				return this._T;
-			},
-			enumerable: true,
-			configurable: true
-		});
-		PhotoInfo.prototype._handleResult=function (value) {
+		PersonaPhotoInfo.prototype._handleResult=function (value) {
 			_super.prototype._handleResult.call(this, value);
 			if (_isNullOrUndefined(value))
 				return;
 			var obj=value;
 			_fixObjectPathIfNecessary(this, obj);
-			if (!_isUndefined(obj["Data"])) {
-				this._D=obj["Data"];
-			}
-			if (!_isUndefined(obj["Type"])) {
-				this._T=obj["Type"];
+			if (!_isUndefined(obj["Url"])) {
+				this._U=obj["Url"];
 			}
 		};
-		PhotoInfo.prototype.load=function (option) {
+		PersonaPhotoInfo.prototype.load=function (option) {
 			return _load(this, option);
 		};
-		PhotoInfo.prototype.retrieve=function (option) {
+		PersonaPhotoInfo.prototype.retrieve=function (option) {
 			return _retrieve(this, option);
 		};
-		PhotoInfo.prototype._handleRetrieveResult=function (value, result) {
+		PersonaPhotoInfo.prototype._handleRetrieveResult=function (value, result) {
 			_super.prototype._handleRetrieveResult.call(this, value, result);
 			_processRetrieveResult(this, value, result);
 		};
-		PhotoInfo.prototype.toJSON=function () {
+		PersonaPhotoInfo.prototype.toJSON=function () {
 			return _toJson(this, {
-				"data": this._D,
-				"type": this._T
+				"url": this._U
 			}, {});
 		};
-		PhotoInfo.prototype.ensureUnchanged=function (data) {
+		PersonaPhotoInfo.prototype.ensureUnchanged=function (data) {
 			_invokeEnsureUnchanged(this, data);
 			return;
 		};
-		return PhotoInfo;
+		return PersonaPhotoInfo;
 	}(OfficeExtension.ClientObject));
-	OfficeCore.PhotoInfo=PhotoInfo;
+	OfficeCore.PersonaPhotoInfo=PersonaPhotoInfo;
+	var _typePersonaCapabilities="PersonaCapabilities";
+	var PersonaCapabilities=(function (_super) {
+		__extends(PersonaCapabilities, _super);
+		function PersonaCapabilities() {
+			return _super !==null && _super.apply(this, arguments) || this;
+		}
+		Object.defineProperty(PersonaCapabilities.prototype, "_className", {
+			get: function () {
+				return "PersonaCapabilities";
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(PersonaCapabilities.prototype, "_scalarPropertyNames", {
+			get: function () {
+				return ["canAddContact", "canEditContact", "hasCustomizations"];
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(PersonaCapabilities.prototype, "canAddContact", {
+			get: function () {
+				_throwIfNotLoaded("canAddContact", this._C, _typePersonaCapabilities, this._isNull);
+				return this._C;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(PersonaCapabilities.prototype, "canEditContact", {
+			get: function () {
+				_throwIfNotLoaded("canEditContact", this._Ca, _typePersonaCapabilities, this._isNull);
+				return this._Ca;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(PersonaCapabilities.prototype, "hasCustomizations", {
+			get: function () {
+				_throwIfNotLoaded("hasCustomizations", this._H, _typePersonaCapabilities, this._isNull);
+				return this._H;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		PersonaCapabilities.prototype._handleResult=function (value) {
+			_super.prototype._handleResult.call(this, value);
+			if (_isNullOrUndefined(value))
+				return;
+			var obj=value;
+			_fixObjectPathIfNecessary(this, obj);
+			if (!_isUndefined(obj["CanAddContact"])) {
+				this._C=obj["CanAddContact"];
+			}
+			if (!_isUndefined(obj["CanEditContact"])) {
+				this._Ca=obj["CanEditContact"];
+			}
+			if (!_isUndefined(obj["HasCustomizations"])) {
+				this._H=obj["HasCustomizations"];
+			}
+		};
+		PersonaCapabilities.prototype.load=function (option) {
+			return _load(this, option);
+		};
+		PersonaCapabilities.prototype.retrieve=function (option) {
+			return _retrieve(this, option);
+		};
+		PersonaCapabilities.prototype._handleRetrieveResult=function (value, result) {
+			_super.prototype._handleRetrieveResult.call(this, value, result);
+			_processRetrieveResult(this, value, result);
+		};
+		PersonaCapabilities.prototype.toJSON=function () {
+			return _toJson(this, {
+				"canAddContact": this._C,
+				"canEditContact": this._Ca,
+				"hasCustomizations": this._H
+			}, {});
+		};
+		PersonaCapabilities.prototype.ensureUnchanged=function (data) {
+			_invokeEnsureUnchanged(this, data);
+			return;
+		};
+		return PersonaCapabilities;
+	}(OfficeExtension.ClientObject));
+	OfficeCore.PersonaCapabilities=PersonaCapabilities;
+	var _typePersonaCollection="PersonaCollection";
+	var PersonaCollection=(function (_super) {
+		__extends(PersonaCollection, _super);
+		function PersonaCollection() {
+			return _super !==null && _super.apply(this, arguments) || this;
+		}
+		Object.defineProperty(PersonaCollection.prototype, "_className", {
+			get: function () {
+				return "PersonaCollection";
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(PersonaCollection.prototype, "_isCollection", {
+			get: function () {
+				return true;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(PersonaCollection.prototype, "items", {
+			get: function () {
+				_throwIfNotLoaded("items", this.m__items, _typePersonaCollection, this._isNull);
+				return this.m__items;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		PersonaCollection.prototype.getCount=function () {
+			return _invokeMethod(this, "GetCount", 1, [], 4, 0);
+		};
+		PersonaCollection.prototype.getItem=function (index) {
+			return _createIndexerObject(OfficeCore.Persona, this, [index]);
+		};
+		PersonaCollection.prototype._handleResult=function (value) {
+			_super.prototype._handleResult.call(this, value);
+			if (_isNullOrUndefined(value))
+				return;
+			var obj=value;
+			_fixObjectPathIfNecessary(this, obj);
+			if (!_isNullOrUndefined(obj[OfficeExtension.Constants.items])) {
+				this.m__items=[];
+				var _data=obj[OfficeExtension.Constants.items];
+				for (var i=0; i < _data.length; i++) {
+					var _item=_createChildItemObject(OfficeCore.Persona, true, this, _data[i], i);
+					_item._handleResult(_data[i]);
+					this.m__items.push(_item);
+				}
+			}
+		};
+		PersonaCollection.prototype.load=function (option) {
+			return _load(this, option);
+		};
+		PersonaCollection.prototype.retrieve=function (option) {
+			return _retrieve(this, option);
+		};
+		PersonaCollection.prototype._handleRetrieveResult=function (value, result) {
+			var _this=this;
+			_super.prototype._handleRetrieveResult.call(this, value, result);
+			_processRetrieveResult(this, value, result, function (childItemData, index) { return _createChildItemObject(OfficeCore.Persona, true, _this, childItemData, index); });
+		};
+		PersonaCollection.prototype.toJSON=function () {
+			return _toJson(this, {}, {}, this.m__items);
+		};
+		return PersonaCollection;
+	}(OfficeExtension.ClientObject));
+	OfficeCore.PersonaCollection=PersonaCollection;
+	var _typePersonaOrganizationInfo="PersonaOrganizationInfo";
+	var PersonaOrganizationInfo=(function (_super) {
+		__extends(PersonaOrganizationInfo, _super);
+		function PersonaOrganizationInfo() {
+			return _super !==null && _super.apply(this, arguments) || this;
+		}
+		Object.defineProperty(PersonaOrganizationInfo.prototype, "_className", {
+			get: function () {
+				return "PersonaOrganizationInfo";
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(PersonaOrganizationInfo.prototype, "_scalarPropertyNames", {
+			get: function () {
+				return ["isWarmedUp", "isWarmingUp"];
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(PersonaOrganizationInfo.prototype, "_navigationPropertyNames", {
+			get: function () {
+				return ["hierarchy", "manager", "directReports"];
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(PersonaOrganizationInfo.prototype, "directReports", {
+			get: function () {
+				if (!this._D) {
+					this._D=_createPropertyObject(OfficeCore.PersonaCollection, this, "DirectReports", true, 4);
+				}
+				return this._D;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(PersonaOrganizationInfo.prototype, "hierarchy", {
+			get: function () {
+				if (!this._H) {
+					this._H=_createPropertyObject(OfficeCore.PersonaCollection, this, "Hierarchy", true, 4);
+				}
+				return this._H;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(PersonaOrganizationInfo.prototype, "manager", {
+			get: function () {
+				if (!this._M) {
+					this._M=_createPropertyObject(OfficeCore.Persona, this, "Manager", false, 4);
+				}
+				return this._M;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(PersonaOrganizationInfo.prototype, "isWarmedUp", {
+			get: function () {
+				_throwIfNotLoaded("isWarmedUp", this._I, _typePersonaOrganizationInfo, this._isNull);
+				return this._I;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(PersonaOrganizationInfo.prototype, "isWarmingUp", {
+			get: function () {
+				_throwIfNotLoaded("isWarmingUp", this._Is, _typePersonaOrganizationInfo, this._isNull);
+				return this._Is;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		PersonaOrganizationInfo.prototype._handleResult=function (value) {
+			_super.prototype._handleResult.call(this, value);
+			if (_isNullOrUndefined(value))
+				return;
+			var obj=value;
+			_fixObjectPathIfNecessary(this, obj);
+			if (!_isUndefined(obj["IsWarmedUp"])) {
+				this._I=obj["IsWarmedUp"];
+			}
+			if (!_isUndefined(obj["IsWarmingUp"])) {
+				this._Is=obj["IsWarmingUp"];
+			}
+			_handleNavigationPropertyResults(this, obj, ["directReports", "DirectReports", "hierarchy", "Hierarchy", "manager", "Manager"]);
+		};
+		PersonaOrganizationInfo.prototype.load=function (option) {
+			return _load(this, option);
+		};
+		PersonaOrganizationInfo.prototype.retrieve=function (option) {
+			return _retrieve(this, option);
+		};
+		PersonaOrganizationInfo.prototype._handleRetrieveResult=function (value, result) {
+			_super.prototype._handleRetrieveResult.call(this, value, result);
+			_processRetrieveResult(this, value, result);
+		};
+		PersonaOrganizationInfo.prototype.toJSON=function () {
+			return _toJson(this, {
+				"isWarmedUp": this._I,
+				"isWarmingUp": this._Is
+			}, {});
+		};
+		PersonaOrganizationInfo.prototype.ensureUnchanged=function (data) {
+			_invokeEnsureUnchanged(this, data);
+			return;
+		};
+		return PersonaOrganizationInfo;
+	}(OfficeExtension.ClientObject));
+	OfficeCore.PersonaOrganizationInfo=PersonaOrganizationInfo;
+	var CustomizedData;
+	(function (CustomizedData) {
+		CustomizedData["email"]="Email";
+		CustomizedData["workPhone"]="WorkPhone";
+		CustomizedData["workPhone2"]="WorkPhone2";
+		CustomizedData["workFax"]="WorkFax";
+		CustomizedData["mobilePhone"]="MobilePhone";
+		CustomizedData["homePhone"]="HomePhone";
+		CustomizedData["homePhone2"]="HomePhone2";
+		CustomizedData["otherPhone"]="OtherPhone";
+		CustomizedData["sipAddress"]="SipAddress";
+		CustomizedData["profile"]="Profile";
+		CustomizedData["office"]="Office";
+		CustomizedData["company"]="Company";
+		CustomizedData["workAddress"]="WorkAddress";
+		CustomizedData["homeAddress"]="HomeAddress";
+		CustomizedData["otherAddress"]="OtherAddress";
+		CustomizedData["birthday"]="Birthday";
+	})(CustomizedData=OfficeCore.CustomizedData || (OfficeCore.CustomizedData={}));
+	var _typeUnifiedGroupInfo="UnifiedGroupInfo";
+	var UnifiedGroupInfo=(function (_super) {
+		__extends(UnifiedGroupInfo, _super);
+		function UnifiedGroupInfo() {
+			return _super !==null && _super.apply(this, arguments) || this;
+		}
+		Object.defineProperty(UnifiedGroupInfo.prototype, "_className", {
+			get: function () {
+				return "UnifiedGroupInfo";
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(UnifiedGroupInfo.prototype, "_scalarPropertyNames", {
+			get: function () {
+				return ["isWarmedUp", "displayName", "email", "description", "oneDrive", "oneNote", "isPublic", "amIOwner", "amIMember", "amISubscribed", "memberCount", "ownerCount", "hasGuests", "site", "planner", "classification", "subscriptionEnabled"];
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(UnifiedGroupInfo.prototype, "amIMember", {
+			get: function () {
+				_throwIfNotLoaded("amIMember", this._A, _typeUnifiedGroupInfo, this._isNull);
+				return this._A;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(UnifiedGroupInfo.prototype, "amIOwner", {
+			get: function () {
+				_throwIfNotLoaded("amIOwner", this._Am, _typeUnifiedGroupInfo, this._isNull);
+				return this._Am;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(UnifiedGroupInfo.prototype, "amISubscribed", {
+			get: function () {
+				_throwIfNotLoaded("amISubscribed", this._AmI, _typeUnifiedGroupInfo, this._isNull);
+				return this._AmI;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(UnifiedGroupInfo.prototype, "classification", {
+			get: function () {
+				_throwIfNotLoaded("classification", this._C, _typeUnifiedGroupInfo, this._isNull);
+				return this._C;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(UnifiedGroupInfo.prototype, "description", {
+			get: function () {
+				_throwIfNotLoaded("description", this._D, _typeUnifiedGroupInfo, this._isNull);
+				return this._D;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(UnifiedGroupInfo.prototype, "displayName", {
+			get: function () {
+				_throwIfNotLoaded("displayName", this._Di, _typeUnifiedGroupInfo, this._isNull);
+				return this._Di;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(UnifiedGroupInfo.prototype, "email", {
+			get: function () {
+				_throwIfNotLoaded("email", this._E, _typeUnifiedGroupInfo, this._isNull);
+				return this._E;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(UnifiedGroupInfo.prototype, "hasGuests", {
+			get: function () {
+				_throwIfNotLoaded("hasGuests", this._H, _typeUnifiedGroupInfo, this._isNull);
+				return this._H;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(UnifiedGroupInfo.prototype, "isPublic", {
+			get: function () {
+				_throwIfNotLoaded("isPublic", this._I, _typeUnifiedGroupInfo, this._isNull);
+				return this._I;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(UnifiedGroupInfo.prototype, "isWarmedUp", {
+			get: function () {
+				_throwIfNotLoaded("isWarmedUp", this._Is, _typeUnifiedGroupInfo, this._isNull);
+				return this._Is;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(UnifiedGroupInfo.prototype, "memberCount", {
+			get: function () {
+				_throwIfNotLoaded("memberCount", this._M, _typeUnifiedGroupInfo, this._isNull);
+				return this._M;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(UnifiedGroupInfo.prototype, "oneDrive", {
+			get: function () {
+				_throwIfNotLoaded("oneDrive", this._O, _typeUnifiedGroupInfo, this._isNull);
+				return this._O;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(UnifiedGroupInfo.prototype, "oneNote", {
+			get: function () {
+				_throwIfNotLoaded("oneNote", this._On, _typeUnifiedGroupInfo, this._isNull);
+				return this._On;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(UnifiedGroupInfo.prototype, "ownerCount", {
+			get: function () {
+				_throwIfNotLoaded("ownerCount", this._Ow, _typeUnifiedGroupInfo, this._isNull);
+				return this._Ow;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(UnifiedGroupInfo.prototype, "planner", {
+			get: function () {
+				_throwIfNotLoaded("planner", this._P, _typeUnifiedGroupInfo, this._isNull);
+				return this._P;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(UnifiedGroupInfo.prototype, "site", {
+			get: function () {
+				_throwIfNotLoaded("site", this._S, _typeUnifiedGroupInfo, this._isNull);
+				return this._S;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(UnifiedGroupInfo.prototype, "subscriptionEnabled", {
+			get: function () {
+				_throwIfNotLoaded("subscriptionEnabled", this._Su, _typeUnifiedGroupInfo, this._isNull);
+				return this._Su;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		UnifiedGroupInfo.prototype._handleResult=function (value) {
+			_super.prototype._handleResult.call(this, value);
+			if (_isNullOrUndefined(value))
+				return;
+			var obj=value;
+			_fixObjectPathIfNecessary(this, obj);
+			if (!_isUndefined(obj["AmIMember"])) {
+				this._A=obj["AmIMember"];
+			}
+			if (!_isUndefined(obj["AmIOwner"])) {
+				this._Am=obj["AmIOwner"];
+			}
+			if (!_isUndefined(obj["AmISubscribed"])) {
+				this._AmI=obj["AmISubscribed"];
+			}
+			if (!_isUndefined(obj["Classification"])) {
+				this._C=obj["Classification"];
+			}
+			if (!_isUndefined(obj["Description"])) {
+				this._D=obj["Description"];
+			}
+			if (!_isUndefined(obj["DisplayName"])) {
+				this._Di=obj["DisplayName"];
+			}
+			if (!_isUndefined(obj["Email"])) {
+				this._E=obj["Email"];
+			}
+			if (!_isUndefined(obj["HasGuests"])) {
+				this._H=obj["HasGuests"];
+			}
+			if (!_isUndefined(obj["IsPublic"])) {
+				this._I=obj["IsPublic"];
+			}
+			if (!_isUndefined(obj["IsWarmedUp"])) {
+				this._Is=obj["IsWarmedUp"];
+			}
+			if (!_isUndefined(obj["MemberCount"])) {
+				this._M=obj["MemberCount"];
+			}
+			if (!_isUndefined(obj["OneDrive"])) {
+				this._O=obj["OneDrive"];
+			}
+			if (!_isUndefined(obj["OneNote"])) {
+				this._On=obj["OneNote"];
+			}
+			if (!_isUndefined(obj["OwnerCount"])) {
+				this._Ow=obj["OwnerCount"];
+			}
+			if (!_isUndefined(obj["Planner"])) {
+				this._P=obj["Planner"];
+			}
+			if (!_isUndefined(obj["Site"])) {
+				this._S=obj["Site"];
+			}
+			if (!_isUndefined(obj["SubscriptionEnabled"])) {
+				this._Su=obj["SubscriptionEnabled"];
+			}
+		};
+		UnifiedGroupInfo.prototype.load=function (option) {
+			return _load(this, option);
+		};
+		UnifiedGroupInfo.prototype.retrieve=function (option) {
+			return _retrieve(this, option);
+		};
+		UnifiedGroupInfo.prototype._handleRetrieveResult=function (value, result) {
+			_super.prototype._handleRetrieveResult.call(this, value, result);
+			_processRetrieveResult(this, value, result);
+		};
+		UnifiedGroupInfo.prototype.toJSON=function () {
+			return _toJson(this, {
+				"amIMember": this._A,
+				"amIOwner": this._Am,
+				"amISubscribed": this._AmI,
+				"classification": this._C,
+				"description": this._D,
+				"displayName": this._Di,
+				"email": this._E,
+				"hasGuests": this._H,
+				"isPublic": this._I,
+				"isWarmedUp": this._Is,
+				"memberCount": this._M,
+				"oneDrive": this._O,
+				"oneNote": this._On,
+				"ownerCount": this._Ow,
+				"planner": this._P,
+				"site": this._S,
+				"subscriptionEnabled": this._Su
+			}, {});
+		};
+		UnifiedGroupInfo.prototype.ensureUnchanged=function (data) {
+			_invokeEnsureUnchanged(this, data);
+			return;
+		};
+		return UnifiedGroupInfo;
+	}(OfficeExtension.ClientObject));
+	OfficeCore.UnifiedGroupInfo=UnifiedGroupInfo;
 	var _typePersona="Persona";
+	var PersonaPromiseType;
+	(function (PersonaPromiseType) {
+		PersonaPromiseType[PersonaPromiseType["immediate"]=0]="immediate";
+		PersonaPromiseType[PersonaPromiseType["load"]=3]="load";
+	})(PersonaPromiseType=OfficeCore.PersonaPromiseType || (OfficeCore.PersonaPromiseType={}));
+	var PersonaInfoAndSource=(function () {
+		function PersonaInfoAndSource() {
+		}
+		return PersonaInfoAndSource;
+	}());
+	OfficeCore.PersonaInfoAndSource=PersonaInfoAndSource;
+	;
 	var Persona=(function (_super) {
 		__extends(Persona, _super);
 		function Persona() {
@@ -18385,24 +19769,283 @@ var OfficeCore;
 		});
 		Object.defineProperty(Persona.prototype, "_scalarPropertyNames", {
 			get: function () {
-				return ["eventTargetId"];
+				return ["hostId", "type", "diagnosticId"];
 			},
 			enumerable: true,
 			configurable: true
 		});
 		Object.defineProperty(Persona.prototype, "_navigationPropertyNames", {
 			get: function () {
-				return ["personaInfo", "ucinfo", "photo", "actions"];
+				return ["photo", "personaInfo", "unifiedCommunicationInfo", "organization", "unifiedGroupInfo", "capabilities", "actions"];
 			},
 			enumerable: true,
 			configurable: true
 		});
+		Persona.prototype.performAsyncOperation=function (type, waitFor, action, check) {
+			var _this=this;
+			if (type==PersonaPromiseType.immediate) {
+				action();
+				return;
+			}
+			check().then(function (isWarmedUp) {
+				if (isWarmedUp) {
+					action();
+				}
+				else {
+					_this.load("hostId");
+					_this.context.sync().then(function () {
+						var hostId=_this.hostId;
+						var personaLifetime=_this.getPersonaLifetime();
+						_this.context.sync().then(function () {
+							var eventHandler=function (args) {
+								return new OfficeExtension.CoreUtility.Promise(function (resolve, reject) {
+									if (args.sendingPersonaHostId==hostId) {
+										for (var index=0; index < args.dataUpdated.length;++index) {
+											var updated=args.dataUpdated[index];
+											if (waitFor==updated) {
+												check().then(function (isWarmedUp) {
+													if (isWarmedUp) {
+														action();
+														personaLifetime.onPersonaUpdated.remove(eventHandler);
+														_this.context.sync();
+													}
+													resolve(isWarmedUp);
+												});
+												return;
+											}
+										}
+									}
+									resolve(false);
+								});
+							};
+							personaLifetime.onPersonaUpdated.add(eventHandler);
+							_this.context.sync();
+						});
+					});
+				}
+			});
+		};
+		Persona.prototype.getOrganizationAsync=function (type) {
+			var _this=this;
+			return new OfficeExtension.CoreUtility.Promise(function (resolve, reject) {
+				var action=function () {
+					var organization=_this.organization;
+					organization.load("*");
+					_this.context.sync().then(function () {
+						resolve(organization);
+					});
+				};
+				var check=function () {
+					return new OfficeExtension.CoreUtility.Promise(function (isWarmedUpResolve, isWarmedUpReject) {
+						var organization=_this.organization;
+						organization.load("isWarmedUp");
+						_this.context.sync().then(function () {
+							isWarmedUpResolve(organization.isWarmedUp);
+						});
+					});
+				};
+				_this.performAsyncOperation(type, PersonaDataUpdated.organization, action, check);
+			});
+		};
+		Persona.prototype.getIsPersonaInfoResolvedCheck=function () {
+			var _this=this;
+			return new OfficeExtension.CoreUtility.Promise(function (resolve, reject) {
+				var info=_this.personaInfo;
+				info.load("isPersonResolved");
+				_this.context.sync().then(function () {
+					resolve(info.isPersonResolved);
+				});
+			});
+		};
+		Persona.prototype.getPersonaInfoAsync=function (type) {
+			var _this=this;
+			return new OfficeExtension.CoreUtility.Promise(function (resolve, reject) {
+				var action=function () {
+					var info=_this.personaInfo;
+					info.load();
+					_this.context.sync().then(function () {
+						resolve(info);
+					});
+				};
+				var check=function () {
+					return _this.getIsPersonaInfoResolvedCheck();
+				};
+				_this.performAsyncOperation(type, PersonaDataUpdated.personaInfo, action, check);
+			});
+		};
+		Persona.prototype.getPersonaInfoWithSourceAsync=function (type) {
+			var _this=this;
+			return new OfficeExtension.CoreUtility.Promise(function (resolve, reject) {
+				var action=function () {
+					var result=new PersonaInfoAndSource();
+					result.info=_this.personaInfo;
+					result.info.load();
+					result.source=_this.personaInfo.sources;
+					result.source.load();
+					_this.context.sync().then(function () {
+						resolve(result);
+					});
+				};
+				var check=function () {
+					return _this.getIsPersonaInfoResolvedCheck();
+				};
+				_this.performAsyncOperation(type, PersonaDataUpdated.personaInfo, action, check);
+			});
+		};
+		Persona.prototype.getPotoAsync=function (type) {
+			var _this=this;
+			return new OfficeExtension.CoreUtility.Promise(function (resolve, reject) {
+				var action=function () {
+					var photoInfo=_this.photo;
+					photoInfo.load("*");
+					_this.context.sync().then(function () {
+						resolve(photoInfo);
+					});
+				};
+				var check=function () {
+					return _this.getIsPersonaInfoResolvedCheck();
+				};
+				_this.performAsyncOperation(type, PersonaDataUpdated.personaInfo, action, check);
+			});
+		};
+		Persona.prototype.getUnifiedCommunicationInfo=function (type) {
+			var _this=this;
+			return new OfficeExtension.CoreUtility.Promise(function (resolve, reject) {
+				var action=function () {
+					var ucInfo=_this.unifiedCommunicationInfo;
+					ucInfo.load("*");
+					_this.context.sync().then(function () {
+						resolve(ucInfo);
+					});
+				};
+				var check=function () {
+					return _this.getIsPersonaInfoResolvedCheck();
+				};
+				_this.performAsyncOperation(type, PersonaDataUpdated.personaInfo, action, check);
+			});
+		};
+		Persona.prototype.getUnifiedGroupInfo=function (type) {
+			var _this=this;
+			return new OfficeExtension.CoreUtility.Promise(function (resolve, reject) {
+				var action=function () {
+					var group=_this.unifiedGroupInfo;
+					group.load("*");
+					_this.context.sync().then(function () {
+						resolve(group);
+					});
+				};
+				var check=function () {
+					return new OfficeExtension.CoreUtility.Promise(function (isWarmedUpResolve) {
+						var group=_this.unifiedGroupInfo;
+						group.load("isWarmedUp");
+						_this.context.sync().then(function () {
+							isWarmedUpResolve(group.isWarmedUp);
+						});
+					});
+				};
+				_this.performAsyncOperation(type, PersonaDataUpdated.unifiedGroupInfo, action, check);
+			});
+		};
+		Persona.prototype.getTypeAsync=function (type) {
+			var _this=this;
+			return new OfficeExtension.CoreUtility.Promise(function (resolve, reject) {
+				var action=function () {
+					_this.load("type");
+					_this.context.sync().then(function () {
+						resolve(OfficeCore.PersonaType[_this.type.valueOf()]);
+					});
+				};
+				var check=function () {
+					return _this.getIsPersonaInfoResolvedCheck();
+				};
+				_this.performAsyncOperation(type, PersonaDataUpdated.personaInfo, action, check);
+			});
+		};
+		Persona.prototype.getCustomizationsAsync=function (type) {
+			var _this=this;
+			return new OfficeExtension.CoreUtility.Promise(function (resolve, reject) {
+				var action=function () {
+					var customizations=_this.getCustomizations();
+					_this.context.sync().then(function () {
+						resolve(customizations.value);
+					});
+				};
+				var check=function () {
+					return _this.getIsPersonaInfoResolvedCheck();
+				};
+				_this.performAsyncOperation(type, PersonaDataUpdated.personaInfo, action, check);
+			});
+		};
+		Persona.prototype.getMembersAsync=function (type) {
+			var _this=this;
+			return new OfficeExtension.CoreUtility.Promise(function (resolve, rejcet) {
+				var action=function () {
+					var members=_this.getMembers();
+					members.load("isWarmedUp");
+					_this.context.sync().then(function () {
+						resolve(members);
+					});
+				};
+				var check=function () {
+					return new OfficeExtension.CoreUtility.Promise(function (isWarmedUpResolve, isWarmedUpReject) {
+						var members=_this.getMembers();
+						members.load("isWarmedUp");
+						_this.context.sync().then(function () {
+							isWarmedUpResolve(members.isWarmedUp);
+						});
+					});
+				};
+				_this.performAsyncOperation(type, PersonaDataUpdated.members, action, check);
+			});
+		};
+		Persona.prototype.getMembershipAsync=function (type) {
+			var _this=this;
+			return new OfficeExtension.CoreUtility.Promise(function (resolve, reject) {
+				var action=function () {
+					var membership=_this.getMembership();
+					membership.load("*");
+					_this.context.sync().then(function () {
+						resolve(membership);
+					});
+				};
+				var check=function () {
+					return new OfficeExtension.CoreUtility.Promise(function (isWarmedUpResolve) {
+						var membership=_this.getMembership();
+						membership.load("isWarmedUp");
+						_this.context.sync().then(function () {
+							isWarmedUpResolve(membership.isWarmedUp);
+						});
+					});
+				};
+				_this.performAsyncOperation(type, PersonaDataUpdated.membership, action, check);
+			});
+		};
 		Object.defineProperty(Persona.prototype, "actions", {
 			get: function () {
 				if (!this._A) {
 					this._A=_createPropertyObject(OfficeCore.PersonaActions, this, "Actions", false, 4);
 				}
 				return this._A;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(Persona.prototype, "capabilities", {
+			get: function () {
+				if (!this._C) {
+					this._C=_createPropertyObject(OfficeCore.PersonaCapabilities, this, "Capabilities", false, 4);
+				}
+				return this._C;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(Persona.prototype, "organization", {
+			get: function () {
+				if (!this._O) {
+					this._O=_createPropertyObject(OfficeCore.PersonaOrganizationInfo, this, "Organization", false, 4);
+				}
+				return this._O;
 			},
 			enumerable: true,
 			configurable: true
@@ -18420,40 +20063,74 @@ var OfficeCore;
 		Object.defineProperty(Persona.prototype, "photo", {
 			get: function () {
 				if (!this._Ph) {
-					this._Ph=_createPropertyObject(OfficeCore.PhotoInfo, this, "Photo", false, 4);
+					this._Ph=_createPropertyObject(OfficeCore.PersonaPhotoInfo, this, "Photo", false, 4);
 				}
 				return this._Ph;
 			},
 			enumerable: true,
 			configurable: true
 		});
-		Object.defineProperty(Persona.prototype, "ucinfo", {
+		Object.defineProperty(Persona.prototype, "unifiedCommunicationInfo", {
 			get: function () {
 				if (!this._U) {
-					this._U=_createPropertyObject(OfficeCore.PersonaUCInfo, this, "UCInfo", false, 4);
+					this._U=_createPropertyObject(OfficeCore.PersonaUnifiedCommunicationInfo, this, "UnifiedCommunicationInfo", false, 4);
 				}
 				return this._U;
 			},
 			enumerable: true,
 			configurable: true
 		});
-		Object.defineProperty(Persona.prototype, "eventTargetId", {
+		Object.defineProperty(Persona.prototype, "unifiedGroupInfo", {
 			get: function () {
-				_throwIfNotLoaded("eventTargetId", this._E, _typePersona, this._isNull);
-				return this._E;
+				if (!this._Un) {
+					this._Un=_createPropertyObject(OfficeCore.UnifiedGroupInfo, this, "UnifiedGroupInfo", false, 4);
+				}
+				return this._Un;
 			},
 			enumerable: true,
 			configurable: true
 		});
-		Persona.prototype.set=function (properties, options) {
-			this._recursivelySet(properties, options, [], ["ucinfo"], [
-				"actions",
-				"personaInfo",
-				"photo"
-			]);
+		Object.defineProperty(Persona.prototype, "diagnosticId", {
+			get: function () {
+				_throwIfNotLoaded("diagnosticId", this._D, _typePersona, this._isNull);
+				return this._D;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(Persona.prototype, "hostId", {
+			get: function () {
+				_throwIfNotLoaded("hostId", this._H, _typePersona, this._isNull);
+				return this._H;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(Persona.prototype, "type", {
+			get: function () {
+				_throwIfNotLoaded("type", this._T, _typePersona, this._isNull);
+				return this._T;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Persona.prototype.dispose=function () {
+			_invokeMethod(this, "Dispose", 0, [], 0, 0);
 		};
-		Persona.prototype.update=function (properties) {
-			this._recursivelyUpdate(properties);
+		Persona.prototype.getCustomizations=function () {
+			return _invokeMethod(this, "GetCustomizations", 0, [], 0, 0);
+		};
+		Persona.prototype.getMembers=function () {
+			return _createMethodObject(OfficeCore.MemberInfoList, this, "GetMembers", 0, [], false, false, null, 0);
+		};
+		Persona.prototype.getMembership=function () {
+			return _createMethodObject(OfficeCore.MemberInfoList, this, "GetMembership", 0, [], false, false, null, 0);
+		};
+		Persona.prototype.getPersonaLifetime=function () {
+			return _createMethodObject(OfficeCore.PersonaLifetime, this, "GetPersonaLifetime", 0, [], false, false, null, 0);
+		};
+		Persona.prototype.warmup=function (dataToWarmUp) {
+			_invokeMethod(this, "Warmup", 0, [dataToWarmUp], 0, 0);
 		};
 		Persona.prototype._handleResult=function (value) {
 			_super.prototype._handleResult.call(this, value);
@@ -18461,10 +20138,16 @@ var OfficeCore;
 				return;
 			var obj=value;
 			_fixObjectPathIfNecessary(this, obj);
-			if (!_isUndefined(obj["EventTargetId"])) {
-				this._E=obj["EventTargetId"];
+			if (!_isUndefined(obj["DiagnosticId"])) {
+				this._D=obj["DiagnosticId"];
 			}
-			_handleNavigationPropertyResults(this, obj, ["actions", "Actions", "personaInfo", "PersonaInfo", "photo", "Photo", "ucinfo", "UCInfo"]);
+			if (!_isUndefined(obj["HostId"])) {
+				this._H=obj["HostId"];
+			}
+			if (!_isUndefined(obj["Type"])) {
+				this._T=obj["Type"];
+			}
+			_handleNavigationPropertyResults(this, obj, ["actions", "Actions", "capabilities", "Capabilities", "organization", "Organization", "personaInfo", "PersonaInfo", "photo", "Photo", "unifiedCommunicationInfo", "UnifiedCommunicationInfo", "unifiedGroupInfo", "UnifiedGroupInfo"]);
 		};
 		Persona.prototype.load=function (option) {
 			return _load(this, option);
@@ -18476,18 +20159,71 @@ var OfficeCore;
 			_super.prototype._handleRetrieveResult.call(this, value, result);
 			_processRetrieveResult(this, value, result);
 		};
-		Object.defineProperty(Persona.prototype, "onPersonaUpdated", {
+		Persona.prototype.toJSON=function () {
+			return _toJson(this, {
+				"diagnosticId": this._D,
+				"hostId": this._H,
+				"type": this._T
+			}, {
+				"capabilities": this._C,
+				"organization": this._O,
+				"personaInfo": this._P,
+				"photo": this._Ph,
+				"unifiedCommunicationInfo": this._U,
+				"unifiedGroupInfo": this._Un
+			});
+		};
+		Persona.prototype.ensureUnchanged=function (data) {
+			_invokeEnsureUnchanged(this, data);
+			return;
+		};
+		return Persona;
+	}(OfficeExtension.ClientObject));
+	OfficeCore.Persona=Persona;
+	var _typePersonaLifetime="PersonaLifetime";
+	var PersonaLifetime=(function (_super) {
+		__extends(PersonaLifetime, _super);
+		function PersonaLifetime() {
+			return _super !==null && _super.apply(this, arguments) || this;
+		}
+		Object.defineProperty(PersonaLifetime.prototype, "_className", {
 			get: function () {
-				var _this=this;
+				return "PersonaLifetime";
+			},
+			enumerable: true,
+			configurable: true
+		});
+		PersonaLifetime.prototype.getPersona=function (hostId) {
+			return _createMethodObject(OfficeCore.Persona, this, "GetPersona", 0, [hostId], false, false, null, 0);
+		};
+		PersonaLifetime.prototype.getPersonaForOrgEntry=function (name, sip, smtp, entryId) {
+			return _createMethodObject(OfficeCore.Persona, this, "GetPersonaForOrgEntry", 0, [name, sip, smtp, entryId], false, false, null, 0);
+		};
+		PersonaLifetime.prototype.getPolicies=function () {
+			return _invokeMethod(this, "GetPolicies", 0, [], 0, 0);
+		};
+		PersonaLifetime.prototype._handleResult=function (value) {
+			_super.prototype._handleResult.call(this, value);
+			if (_isNullOrUndefined(value))
+				return;
+			var obj=value;
+			_fixObjectPathIfNecessary(this, obj);
+		};
+		PersonaLifetime.prototype._handleRetrieveResult=function (value, result) {
+			_super.prototype._handleRetrieveResult.call(this, value, result);
+			_processRetrieveResult(this, value, result);
+		};
+		Object.defineProperty(PersonaLifetime.prototype, "onPersonaUpdated", {
+			get: function () {
 				if (!this.m_personaUpdated) {
 					this.m_personaUpdated=new OfficeExtension.GenericEventHandlers(this.context, this, "PersonaUpdated", {
-						eventType: 4001,
+						eventType: 3502,
 						registerFunc: function () { },
 						unregisterFunc: function () { },
-						getTargetIdFunc: function () { return _this.eventTargetId; },
+						getTargetIdFunc: function () { return "PersonaUpdated"; },
 						eventArgsTransformFunc: function (value) {
 							var newArgs={
-								sendingPersona: value.sendingPersona,
+								sendingPersonaHostId: value.sendingPersonaHostId,
 								dataUpdated: value.dataUpdated
 							};
 							return OfficeExtension.Utility._createPromiseFromResult(newArgs);
@@ -18499,63 +20235,143 @@ var OfficeCore;
 			enumerable: true,
 			configurable: true
 		});
-		Persona.prototype.toJSON=function () {
-			return _toJson(this, {
-				"eventTargetId": this._E
-			}, {
-				"personaInfo": this._P,
-				"ucinfo": this._U
-			});
+		PersonaLifetime.prototype.toJSON=function () {
+			return _toJson(this, {}, {});
 		};
-		Persona.prototype.ensureUnchanged=function (data) {
-			_invokeEnsureUnchanged(this, data);
-			return;
-		};
-		return Persona;
+		return PersonaLifetime;
 	}(OfficeExtension.ClientObject));
-	OfficeCore.Persona=Persona;
-	var _typePersonaFactory="PersonaFactory";
-	var PersonaFactory=(function (_super) {
-		__extends(PersonaFactory, _super);
-		function PersonaFactory() {
+	OfficeCore.PersonaLifetime=PersonaLifetime;
+	var _typeLokiTokenProvider="LokiTokenProvider";
+	var LokiTokenProvider=(function (_super) {
+		__extends(LokiTokenProvider, _super);
+		function LokiTokenProvider() {
 			return _super !==null && _super.apply(this, arguments) || this;
 		}
-		Object.defineProperty(PersonaFactory.prototype, "_className", {
+		Object.defineProperty(LokiTokenProvider.prototype, "_className", {
 			get: function () {
-				return "PersonaFactory";
+				return "LokiTokenProvider";
 			},
 			enumerable: true,
 			configurable: true
 		});
-		PersonaFactory.prototype.disposePersonaToken=function (token) {
-			_invokeMethod(this, "DisposePersonaToken", 0, [token], 0, 0);
+		Object.defineProperty(LokiTokenProvider.prototype, "_scalarPropertyNames", {
+			get: function () {
+				return ["emailOrUpn"];
+			},
+			enumerable: true,
+			configurable: true
+		});
+		Object.defineProperty(LokiTokenProvider.prototype, "emailOrUpn", {
+			get: function () {
+				_throwIfNotLoaded("emailOrUpn", this._E, _typeLokiTokenProvider, this._isNull);
+				return this._E;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		LokiTokenProvider.prototype.requestToken=function () {
+			_invokeMethod(this, "RequestToken", 0, [], 0, 0);
 		};
-		PersonaFactory.prototype.getPersonaFromToken=function (token) {
-			return _createMethodObject(OfficeCore.Persona, this, "GetPersonaFromToken", 0, [token], false, false, null, 0);
+		LokiTokenProvider.prototype._handleResult=function (value) {
+			_super.prototype._handleResult.call(this, value);
+			if (_isNullOrUndefined(value))
+				return;
+			var obj=value;
+			_fixObjectPathIfNecessary(this, obj);
+			if (!_isUndefined(obj["EmailOrUpn"])) {
+				this._E=obj["EmailOrUpn"];
+			}
 		};
-		PersonaFactory.prototype.getPersonaTokenForCurrentUser=function () {
-			return _invokeMethod(this, "GetPersonaTokenForCurrentUser", 0, [], 0, 0);
+		LokiTokenProvider.prototype.load=function (option) {
+			return _load(this, option);
 		};
-		PersonaFactory.prototype._handleResult=function (value) {
+		LokiTokenProvider.prototype.retrieve=function (option) {
+			return _retrieve(this, option);
+		};
+		LokiTokenProvider.prototype._handleRetrieveResult=function (value, result) {
+			_super.prototype._handleRetrieveResult.call(this, value, result);
+			_processRetrieveResult(this, value, result);
+		};
+		Object.defineProperty(LokiTokenProvider.prototype, "onLokiTokenAvailable", {
+			get: function () {
+				if (!this.m_lokiTokenAvailable) {
+					this.m_lokiTokenAvailable=new OfficeExtension.GenericEventHandlers(this.context, this, "LokiTokenAvailable", {
+						eventType: 3503,
+						registerFunc: function () { },
+						unregisterFunc: function () { },
+						getTargetIdFunc: function () { return "LokiTokenAvailable"; },
+						eventArgsTransformFunc: function (value) {
+							var newArgs={
+								isAvailable: value.isAvailable,
+								lokiAutoDiscoverUrl: value.lokiAutoDiscoverUrl,
+								lokiToken: value.lokiToken
+							};
+							return OfficeExtension.Utility._createPromiseFromResult(newArgs);
+						}
+					});
+				}
+				return this.m_lokiTokenAvailable;
+			},
+			enumerable: true,
+			configurable: true
+		});
+		LokiTokenProvider.prototype.toJSON=function () {
+			return _toJson(this, {
+				"emailOrUpn": this._E
+			}, {});
+		};
+		LokiTokenProvider.prototype.ensureUnchanged=function (data) {
+			_invokeEnsureUnchanged(this, data);
+			return;
+		};
+		return LokiTokenProvider;
+	}(OfficeExtension.ClientObject));
+	OfficeCore.LokiTokenProvider=LokiTokenProvider;
+	var _typeServiceContext="ServiceContext";
+	var ServiceContext=(function (_super) {
+		__extends(ServiceContext, _super);
+		function ServiceContext() {
+			return _super !==null && _super.apply(this, arguments) || this;
+		}
+		Object.defineProperty(ServiceContext.prototype, "_className", {
+			get: function () {
+				return "ServiceContext";
+			},
+			enumerable: true,
+			configurable: true
+		});
+		ServiceContext.prototype.dispose=function (instance) {
+			_invokeMethod(this, "Dispose", 0, [instance], 0, 0);
+		};
+		ServiceContext.prototype.getInitialPersona=function () {
+			return _createMethodObject(OfficeCore.Persona, this, "GetInitialPersona", 0, [], false, false, null, 0);
+		};
+		ServiceContext.prototype.getLokiTokenProvider=function () {
+			return _createMethodObject(OfficeCore.LokiTokenProvider, this, "GetLokiTokenProvider", 0, [], false, false, null, 0);
+		};
+		ServiceContext.prototype.getPersonaLifetime=function () {
+			return _createMethodObject(OfficeCore.PersonaLifetime, this, "GetPersonaLifetime", 0, [], false, false, null, 0);
+		};
+		ServiceContext.prototype._handleResult=function (value) {
 			_super.prototype._handleResult.call(this, value);
 			if (_isNullOrUndefined(value))
 				return;
 			var obj=value;
 			_fixObjectPathIfNecessary(this, obj);
 		};
-		PersonaFactory.prototype._handleRetrieveResult=function (value, result) {
+		ServiceContext.prototype._handleRetrieveResult=function (value, result) {
 			_super.prototype._handleRetrieveResult.call(this, value, result);
 			_processRetrieveResult(this, value, result);
 		};
-		PersonaFactory.newObject=function (context) {
-			return _createTopLevelServiceObject(OfficeCore.PersonaFactory, context, "Microsoft.People.PersonaFactory", false, 4);
+		ServiceContext.newObject=function (context) {
+			return _createTopLevelServiceObject(OfficeCore.ServiceContext, context, "Microsoft.People.ServiceContext", false, 4);
 		};
-		PersonaFactory.prototype.toJSON=function () {
+		ServiceContext.prototype.toJSON=function () {
 			return _toJson(this, {}, {});
 		};
-		return PersonaFactory;
+		return ServiceContext;
 	}(OfficeExtension.ClientObject));
-	OfficeCore.PersonaFactory=PersonaFactory;
+	OfficeCore.ServiceContext=ServiceContext;
 	var _typeTap="Tap";
 	var Tap=(function (_super) {
 		__extends(Tap, _super);
@@ -18632,6 +20448,7 @@ var OfficeCore;
 		ErrorCodes["ticketInvalidParams"]="TicketInvalidParams";
 		ErrorCodes["ticketNetworkError"]="TicketNetworkError";
 		ErrorCodes["ticketUnauthorized"]="TicketUnauthorized";
+		ErrorCodes["ticketUninitialized"]="TicketUninitialized";
 		ErrorCodes["ticketUnknownError"]="TicketUnknownError";
 		ErrorCodes["unsupportedUserIdentity"]="UnsupportedUserIdentity";
 		ErrorCodes["userNotSignedIn"]="UserNotSignedIn";

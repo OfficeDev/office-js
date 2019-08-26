@@ -1,5 +1,5 @@
 /* Outlook web application specific API library */
-/* Version: 16.0.11527.30000 */
+/* Version: 16.0.11905.10000 */
 /*
 /*!
 Copyright (c) Microsoft Corporation.  All rights reserved.
@@ -1202,7 +1202,7 @@ OSF.DialogMessageType = {
     DialogParentMessageReceived: 1,
     DialogClosed: 12006
 };
-OSF.OfficeAppContext = function OSF_OfficeAppContext(id, appName, appVersion, appUILocale, dataLocale, docUrl, clientMode, settings, reason, osfControlType, eToken, correlationId, appInstanceId, touchEnabled, commerceAllowed, appMinorVersion, requirementMatrix, hostCustomMessage, hostFullVersion, clientWindowHeight, clientWindowWidth, addinName, appDomains, dialogRequirementMatrix)
+OSF.OfficeAppContext = function OSF_OfficeAppContext(id, appName, appVersion, appUILocale, dataLocale, docUrl, clientMode, settings, reason, osfControlType, eToken, correlationId, appInstanceId, touchEnabled, commerceAllowed, appMinorVersion, requirementMatrix, hostCustomMessage, hostFullVersion, clientWindowHeight, clientWindowWidth, addinName, appDomains, dialogRequirementMatrix, featureGates)
 {
     this._id = id;
     this._appName = appName;
@@ -1229,6 +1229,7 @@ OSF.OfficeAppContext = function OSF_OfficeAppContext(id, appName, appVersion, ap
     this._addinName = addinName;
     this._appDomains = appDomains;
     this._dialogRequirementMatrix = dialogRequirementMatrix;
+    this._featureGates = featureGates;
     this.get_id = function get_id()
     {
         return this._id
@@ -1332,6 +1333,10 @@ OSF.OfficeAppContext = function OSF_OfficeAppContext(id, appName, appVersion, ap
     this.get_appDomains = function get_appDomains()
     {
         return this._appDomains
+    };
+    this.get_featureGates = function get_featureGates()
+    {
+        return this._featureGates
     }
 };
 OSF.OsfControlType = {
@@ -2130,7 +2135,7 @@ var OfficeExt;
                                 var minVersionNum = this._getVersion(minVersion);
                                 if(setMaxVersionNum.major > 0 && setMaxVersionNum.major > minVersionNum.major)
                                     return true;
-                                if(setMaxVersionNum.minor > 0 && setMaxVersionNum.minor > 0 && setMaxVersionNum.major == minVersionNum.major && setMaxVersionNum.minor >= minVersionNum.minor)
+                                if(setMaxVersionNum.major > 0 && setMaxVersionNum.minor >= 0 && setMaxVersionNum.major == minVersionNum.major && setMaxVersionNum.minor >= minVersionNum.minor)
                                     return true
                             }
                             catch(e)
@@ -4127,7 +4132,7 @@ var OfficeExt;
         {
             try
             {
-                var osList = ["Windows NT 6.1","Windows NT 6.2","Windows NT 6.3"];
+                var osList = ["Windows NT 6.1","Windows NT 6.2","Windows NT 6.3","Windows NT 10.0"];
                 var userAgent = window.navigator.userAgent;
                 for(var i = 0, len = osList.length; i < len; i++)
                     if(userAgent.indexOf(osList[i]) > -1)
@@ -4180,8 +4185,20 @@ var OfficeExt;
             {
                 function CacheConstants(){}
                 CacheConstants.GatedCacheKeyPrefix = "__OSF_GATED_OMEX.";
-                CacheConstants.AuthenticatedAppInstallInfoCacheKey = CacheConstants.GatedCacheKeyPrefix + "appinstall_authenticated.{0}.{1}.{2}.{3}";
-                CacheConstants.EntitlementsKey = "entitle.{0}.{1}";
+                CacheConstants.AnonymousCacheKeyPrefix = "__OSF_ANONYMOUS_OMEX.";
+                CacheConstants.UngatedCacheKeyPrefix = "__OSF_OMEX.";
+                CacheConstants.ActivatedCacheKeyPrefix = "__OSF_RUNTIME_.Activated.";
+                CacheConstants.AppinstallAuthenticated = "appinstall_authenticated.";
+                CacheConstants.Entitlement = "entitle.";
+                CacheConstants.AppState = "appState.";
+                CacheConstants.AppDetails = "appDetails.";
+                CacheConstants.AppInstallInfo = "appInstallInfo.";
+                CacheConstants.AuthenticatedAppInstallInfoCacheKey = CacheConstants.GatedCacheKeyPrefix + CacheConstants.AppinstallAuthenticated + "{0}.{1}.{2}.{3}";
+                CacheConstants.EntitlementsKey = CacheConstants.Entitlement + "{0}.{1}";
+                CacheConstants.AppStateCacheKey = "{0}" + CacheConstants.AppState + "{1}.{2}";
+                CacheConstants.AppDetailKey = "{0}" + CacheConstants.AppDetails + "{1}";
+                CacheConstants.AppInstallInfoKey = "{0}" + CacheConstants.AppInstallInfo + "{1}.{2}";
+                CacheConstants.ActivatedCacheKey = CacheConstants.ActivatedCacheKeyPrefix + "{0}.{1}.{2}";
                 return CacheConstants
             }();
         WACUtils.CacheConstants = CacheConstants
@@ -4291,8 +4308,7 @@ Microsoft.Office.Common.ServiceEndPoint = function Microsoft_Office_Common_Servi
     this._conversations = {};
     this._policyManager = null;
     this._appDomains = {};
-    this._onHandleRequestError = null;
-    this._addInSourceLocationSubdomainAllowedIsEnabled = false
+    this._onHandleRequestError = null
 };
 Microsoft.Office.Common.ServiceEndPoint.prototype = {
     registerMethod: function Microsoft_Office_Common_ServiceEndPoint$registerMethod(methodName, method, invokeType, blockingOthers)
@@ -4391,7 +4407,7 @@ Microsoft.Office.Common.ServiceEndPoint.prototype = {
             throw e;
         this.unregisterMethod(eventName)
     },
-    registerConversation: function Microsoft_Office_Common_ServiceEndPoint$registerConversation(conversationId, conversationUrl, appDomains, serializerVersion, addInSourceLocationSubdomainAllowedIsEnabled)
+    registerConversation: function Microsoft_Office_Common_ServiceEndPoint$registerConversation(conversationId, conversationUrl, appDomains, serializerVersion)
     {
         var e = Function._validateParams(arguments,[{
                     name: "conversationId",
@@ -4412,16 +4428,9 @@ Microsoft.Office.Common.ServiceEndPoint.prototype = {
                     type: Number,
                     mayBeNull: true,
                     optional: true
-                },{
-                    name: "addInSourceLocationSubdomainAllowedIsEnabled",
-                    type: Boolean,
-                    mayBeNull: true,
-                    optional: true
                 }]);
         if(e)
             throw e;
-        if(addInSourceLocationSubdomainAllowedIsEnabled)
-            this._addInSourceLocationSubdomainAllowedIsEnabled = addInSourceLocationSubdomainAllowedIsEnabled;
         if(appDomains)
         {
             if(!(appDomains instanceof Array))
@@ -4822,7 +4831,13 @@ Microsoft.Office.Common.XdmCommunicationManager = function()
         delete org_parser,app_domain_parser;
         return res
     }
-    function IsOriginSubdomainOfSourceLocation(sourceLocation, messageOrigin)
+    function _isHostNameValidWacDomain(hostName)
+    {
+        var regexHostNameStringArray = new Array("^office-int\\.com$","^officeapps\\.live-int\\.com$","^.*\\.dod\\.online\\.office365\\.us$","^.*\\.gov\\.online\\.office365\\.us$","^.*\\.officeapps\\.live\\.com$","^.*\\.officeapps\\.live-int\\.com$","^.*\\.officeapps-df\\.live\\.com$","^.*\\.online\\.office\\.de$","^.*\\.partner\\.officewebapps\\.cn$","^" + document.domain.replace(new RegExp("\\.","g"),"\\.") + "$");
+        var regexHostName = new RegExp(regexHostNameStringArray.join("|"));
+        return regexHostName.test(hostName)
+    }
+    function _isTargetSubdomainOfSourceLocation(sourceLocation, messageOrigin)
     {
         if(!sourceLocation || !messageOrigin)
             return false;
@@ -4875,7 +4890,7 @@ Microsoft.Office.Common.XdmCommunicationManager = function()
                     if(!_checkOriginWithAppDomains(allowedDomains,e.origin))
                         if(!OfficeExt.appSpecificCheckOrigin(allowedDomains,e,messageObject._origin,_checkOriginWithAppDomains))
                         {
-                            var isOriginSubdomain = serviceEndPoint._addInSourceLocationSubdomainAllowedIsEnabled && IsOriginSubdomainOfSourceLocation(conversation.url,e.origin);
+                            var isOriginSubdomain = _isTargetSubdomainOfSourceLocation(conversation.url,e.origin);
                             if(!isOriginSubdomain)
                                 throw"Failed origin check";
                         }
@@ -4912,12 +4927,33 @@ Microsoft.Office.Common.XdmCommunicationManager = function()
                         canPostMessage = !!(e.source && e.source.postMessage)
                     }
                     catch(ex){}
-                    if(canPostMessage)
+                    var isOriginValid = false;
+                    if(window.location.href && e.origin && _isTargetSubdomainOfSourceLocation(window.location.href,e.origin))
+                        isOriginValid = true;
+                    else if(e.origin)
+                    {
+                        var parser = document.createElement("a");
+                        parser.href = e.origin;
+                        isOriginValid = _isHostNameValidWacDomain(parser.hostname)
+                    }
+                    if(canPostMessage && isOriginValid)
                         e.source.postMessage(envelopedResult,requesterUrl)
                 }
             }
             else if(messageObject._messageType === Microsoft.Office.Common.MessageType.response)
             {
+                if(messageObject._actionName == "ContextActivationManager_getAppContextAsync")
+                    try
+                    {
+                        var wacorigin = e.origin;
+                        var parser = document.createElement("a");
+                        parser.href = wacorigin;
+                        var isOriginValid = _isHostNameValidWacDomain(parser.hostname);
+                        var isWacKnownHost = isOriginValid ? 1 : 0;
+                        var hostInfo = OSF._OfficeAppFactory.getHostInfo();
+                        OSF.AppTelemetry.onCheckWACHost(isWacKnownHost,messageObject._data._id,hostInfo.hostType,hostInfo.hostPlatform,messageObject._data._correlationId,wacorigin)
+                    }
+                    catch(ex){}
                 var clientEndPoint = _lookupClientEndPoint(messageObject._conversationId);
                 if(!clientEndPoint)
                     return;
@@ -5023,6 +5059,10 @@ Microsoft.Office.Common.XdmCommunicationManager = function()
             checkUrlWithAppDomains: function Microsoft_Office_Common_XdmCommunicationManager$_checkUrlWithAppDomains(appDomains, origin)
             {
                 return _checkOriginWithAppDomains(appDomains,origin)
+            },
+            isTargetSubdomainOfSourceLocation: function Microsoft_Office_Common_XdmCommunicationManager$_isTargetSubdomainOfSourceLocation(sourceLocation, messageOrigin)
+            {
+                return _isTargetSubdomainOfSourceLocation(sourceLocation,messageOrigin)
             },
             _setMethodTimeout: function Microsoft_Office_Common_XdmCommunicationManager$_setMethodTimeout(methodTimeout)
             {
@@ -5640,7 +5680,7 @@ OSF.InitializationHelper.prototype.getAppContext = function OSF_InitializationHe
                 if(appContext._requirementMatrix != undefined)
                     requirementMatrix = appContext._requirementMatrix;
                 appContext.eToken = appContext.eToken ? appContext.eToken : "";
-                var returnedContext = new OSF.OfficeAppContext(appContext._id,appContext._appName,appContext._appVersion,appContext._appUILocale,appContext._dataLocale,appContext._docUrl,appContext._clientMode,settings,appContext._reason,appContext._osfControlType,appContext._eToken,appContext._correlationId,appInstanceId,touchEnabled,commerceAllowed,minorVersion,requirementMatrix,appContext._hostCustomMessage,appContext._hostFullVersion,appContext._clientWindowHeight,appContext._clientWindowWidth,appContext._addinName,appContext._appDomains,appContext._dialogRequirementMatrix);
+                var returnedContext = new OSF.OfficeAppContext(appContext._id,appContext._appName,appContext._appVersion,appContext._appUILocale,appContext._dataLocale,appContext._docUrl,appContext._clientMode,settings,appContext._reason,appContext._osfControlType,appContext._eToken,appContext._correlationId,appInstanceId,touchEnabled,commerceAllowed,minorVersion,requirementMatrix,appContext._hostCustomMessage,appContext._hostFullVersion,appContext._clientWindowHeight,appContext._clientWindowWidth,appContext._addinName,appContext._appDomains,appContext._dialogRequirementMatrix,appContext._featureGates);
                 returnedContext._wacHostEnvironment = appContext._wacHostEnvironment || "0";
                 returnedContext._isFromWacAutomation = !!appContext._isFromWacAutomation;
                 if(OSF.AppTelemetry)
@@ -5927,18 +5967,6 @@ OSF.InitializationHelper.prototype.prepareRightAfterWebExtensionInitialize = fun
                 }
                 postScriptOverrideCheckAction(customizedScriptPath)
             }
-            else
-                try
-                {
-                    clientEndPoint.invoke("getCustomizedScriptPathAsync",function OSF$getCustomizedScriptPathAsyncCallback(errorCode, scriptPath)
-                    {
-                        postScriptOverrideCheckAction(errorCode === 0 ? scriptPath : null)
-                    },{__timeout__: 1e3})
-                }
-                catch(ex)
-                {
-                    OsfMsAjaxFactory.msAjaxDebug.trace("no script override through cross frame communication.")
-                }
         };
     var requiresMsAjax = true;
     if(requiresMsAjax && !OsfMsAjaxFactory.isMsAjaxLoaded())
@@ -6607,7 +6635,98 @@ var OSFLog;
             };
             return AppInitializationUsageData
         }(BaseUsageData);
-    OSFLog.AppInitializationUsageData = AppInitializationUsageData
+    OSFLog.AppInitializationUsageData = AppInitializationUsageData;
+    var CheckWACHostUsageData = function(_super)
+        {
+            __extends(CheckWACHostUsageData,_super);
+            function CheckWACHostUsageData()
+            {
+                _super.call(this,"CheckWACHost")
+            }
+            Object.defineProperty(CheckWACHostUsageData.prototype,"isWacKnownHost",{
+                get: function()
+                {
+                    return this.Fields["isWacKnownHost"]
+                },
+                set: function(value)
+                {
+                    this.Fields["isWacKnownHost"] = value
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(CheckWACHostUsageData.prototype,"solutionId",{
+                get: function()
+                {
+                    return this.Fields["solutionId"]
+                },
+                set: function(value)
+                {
+                    this.Fields["solutionId"] = value
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(CheckWACHostUsageData.prototype,"hostType",{
+                get: function()
+                {
+                    return this.Fields["hostType"]
+                },
+                set: function(value)
+                {
+                    this.Fields["hostType"] = value
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(CheckWACHostUsageData.prototype,"hostPlatform",{
+                get: function()
+                {
+                    return this.Fields["hostPlatform"]
+                },
+                set: function(value)
+                {
+                    this.Fields["hostPlatform"] = value
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(CheckWACHostUsageData.prototype,"wacDomain",{
+                get: function()
+                {
+                    return this.Fields["wacDomain"]
+                },
+                set: function(value)
+                {
+                    this.Fields["wacDomain"] = value
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(CheckWACHostUsageData.prototype,"correlationId",{
+                get: function()
+                {
+                    return this.Fields["correlationId"]
+                },
+                set: function(value)
+                {
+                    this.Fields["correlationId"] = value
+                },
+                enumerable: true,
+                configurable: true
+            });
+            CheckWACHostUsageData.prototype.SerializeFields = function()
+            {
+                this.SetSerializedField("isWacKnownHost",this.isWacKnownHost);
+                this.SetSerializedField("solutionId",this.solutionId);
+                this.SetSerializedField("hostType",this.hostType);
+                this.SetSerializedField("hostPlatform",this.hostPlatform);
+                this.SetSerializedField("wacDomain",this.wacDomain);
+                this.SetSerializedField("correlationId",this.correlationId)
+            };
+            return CheckWACHostUsageData
+        }(BaseUsageData);
+    OSFLog.CheckWACHostUsageData = CheckWACHostUsageData
 })(OSFLog || (OSFLog = {}));
 var Logger;
 (function(Logger)
@@ -6753,7 +6872,32 @@ var OSFAriaLogger;
                     type: "int64"
                 },]
         };
-    var TelemetryEvents = [TelemetryEventAppActivated,TelemetryEventScriptLoad,TelemetryEventApiUsage,TelemetryEventAppInitialization,TelemetryEventAppClosed,];
+    var TelemetryEventCheckWACHost = {
+            name: "CheckWACHost",
+            enabled: true,
+            basic: false,
+            critical: false,
+            points: [{
+                    name: "isWacKnownHost",
+                    type: "int64"
+                },{
+                    name: "solutionId",
+                    type: "string"
+                },{
+                    name: "hostType",
+                    type: "string"
+                },{
+                    name: "hostPlatform",
+                    type: "string"
+                },{
+                    name: "correlationId",
+                    type: "string"
+                },{
+                    name: "wacDomain",
+                    type: "string"
+                },]
+        };
+    var TelemetryEvents = [TelemetryEventAppActivated,TelemetryEventScriptLoad,TelemetryEventApiUsage,TelemetryEventAppInitialization,TelemetryEventAppClosed,TelemetryEventCheckWACHost,];
     function createDataField(value, point)
     {
         var key = point.rename === undefined ? point.name : point.rename;
@@ -6858,10 +7002,45 @@ var OSFAriaLogger;
             {
                 return arg["Fields"] !== undefined
             };
+            AriaLogger.prototype.shouldSendDirectToAria = function()
+            {
+                var flavor;
+                var version;
+                if(OSF._OfficeAppFactory && OSF._OfficeAppFactory.getHostInfo)
+                    flavor = OSF._OfficeAppFactory.getHostInfo()["hostPlatform"];
+                if(!flavor)
+                    return false;
+                else if(flavor.toLowerCase() !== "win32")
+                    return true;
+                if(window.external && typeof window.external.GetContext !== "undefined" && typeof window.external.GetContext().GetHostFullVersion !== "undefined")
+                    version = window.external.GetContext().GetHostFullVersion();
+                var BASE10 = 10;
+                var MAX_MAJOR_VERSION = 16;
+                var MAX_MINOR_VERSION = 0;
+                var MAX_BUILD_VERSION = 11601;
+                if(version)
+                {
+                    var versionTokens = version.split(".");
+                    if(versionTokens.length < 3)
+                        return false;
+                    else if(parseInt(versionTokens[0],BASE10) >= MAX_MAJOR_VERSION && parseInt(versionTokens[1],BASE10) >= MAX_MINOR_VERSION && parseInt(versionTokens[2],BASE10) >= MAX_BUILD_VERSION)
+                        return false;
+                    else
+                        return true
+                }
+                return false
+            };
+            AriaLogger.prototype.isDirectToAriaEnabled = function()
+            {
+                if(this.EnableDirectToAria === undefined || this.EnableDirectToAria === null)
+                    this.EnableDirectToAria = this.shouldSendDirectToAria();
+                return this.EnableDirectToAria
+            };
             AriaLogger.prototype.sendTelemetry = function(tableName, telemetryData)
             {
                 var startAfterMs = 1e3;
-                if(AriaLogger.EnableSendingTelemetryWithLegacyAria)
+                var sendAriaEnabled = AriaLogger.EnableSendingTelemetryWithLegacyAria && this.isDirectToAriaEnabled();
+                if(sendAriaEnabled)
                     OSF.OUtil.loadScript(this.getAriaCDNLocation(),function()
                     {
                         try
@@ -6893,7 +7072,7 @@ var OSFAriaLogger;
                     this.sendTelemetry(data["Table"],data)
             };
             AriaLogger.EnableSendingTelemetryWithOTel = true;
-            AriaLogger.EnableSendingTelemetryWithLegacyAria = true;
+            AriaLogger.EnableSendingTelemetryWithLegacyAria = false;
             return AriaLogger
         }();
     OSFAriaLogger.AriaLogger = AriaLogger
@@ -7127,7 +7306,7 @@ var OSFAppTelemetry;
             appInfo.appInstanceId = appInfo.appInstanceId.replace(/[{}]/g,"").toLowerCase();
         appInfo.message = context.get_hostCustomMessage();
         appInfo.officeJSVersion = OSF.ConstantNames.FileVersion;
-        appInfo.hostJSVersion = "16.0.11527.30000";
+        appInfo.hostJSVersion = "16.0.11905.10000";
         if(context._wacHostEnvironment)
             appInfo.wacHostEnvironment = context._wacHostEnvironment;
         if(context._isFromWacAutomation !== undefined && context._isFromWacAutomation !== null)
@@ -7304,6 +7483,18 @@ var OSFAppTelemetry;
         OSF.AppTelemetry.onCallDone("property",-1,propertyName,msResponseTime)
     }
     OSFAppTelemetry.onPropertyDone = onPropertyDone;
+    function onCheckWACHost(isWacKnownHost, solutionId, hostType, hostPlatform, correlationId, wacDomain)
+    {
+        var data = new OSFLog.CheckWACHostUsageData;
+        data.isWacKnownHost = isWacKnownHost;
+        data.solutionId = solutionId;
+        data.hostType = hostType;
+        data.hostPlatform = hostPlatform;
+        data.correlationId = correlationId;
+        data.wacDomain = UrlFilter.filter(wacDomain);
+        (new AppLogger).LogData(data)
+    }
+    OSFAppTelemetry.onCheckWACHost = onCheckWACHost;
     function onEventDone(id, errorType)
     {
         OSF.AppTelemetry.onCallDone("event",id,null,0,errorType)
@@ -8520,7 +8711,12 @@ var OfficeExt;
                     var appDomains = OSF._OfficeAppFactory.getInitializationHelper()._appContext._appDomains;
                     if(appDomains)
                         for(var i = 0; i < appDomains.length && appDomains[i].indexOf("://") !== -1; i++)
-                            window.opener.postMessage(message,appDomains[i])
+                            window.opener.postMessage(message,appDomains[i]);
+                    var dialogOrigin = window.location.origin;
+                    if(!dialogOrigin)
+                        dialogOrigin = window.location.protocol + "//" + window.location.hostname + (window.location.port ? ":" + window.location.port : "");
+                    if(!Microsoft.Office.Common.XdmCommunicationManager.checkUrlWithAppDomains(appDomains,dialogOrigin))
+                        window.opener.postMessage(message,dialogOrigin)
                 }
             }
             Dialog.messageParent = messageParent;
@@ -8677,7 +8873,10 @@ var OfficeExt;
             {
                 var appDomains = OSF._OfficeAppFactory.getInitializationHelper()._appContext._appDomains;
                 var url = dialogInfo[OSF.ShowWindowDialogParameterKeys.Url];
-                return Microsoft.Office.Common.XdmCommunicationManager.checkUrlWithAppDomains(appDomains,url)
+                var fInDomain = Microsoft.Office.Common.XdmCommunicationManager.checkUrlWithAppDomains(appDomains,url);
+                if(!fInDomain)
+                    return OSF._OfficeAppFactory.getInitializationHelper()._appContext._addInSourceUrl && Microsoft.Office.Common.XdmCommunicationManager.isTargetSubdomainOfSourceLocation(OSF._OfficeAppFactory.getInitializationHelper()._appContext._addInSourceUrl,url);
+                return fInDomain
             }
             function showDialog(dialogInfo)
             {
@@ -15159,6 +15358,11 @@ OSF.InitializationHelper.prototype.loadAppSpecificScriptAndCreateOM = function O
     $h.InitialData.userProfileTypeKey = "userProfileType";
     $h.ScriptHelpers.emptyString = "";
     OSF.DDA.ErrorCodeManager.initializeErrorMessages(Strings.OfficeOM);
+    if(appContext.get_appName() == OSF.AppName.Outlook)
+    {
+        OSF.DDA.DispIdHost.addAsyncMethods(OSF.DDA.RichApi,[OSF.DDA.AsyncMethodNames.ExecuteRichApiRequestAsync]);
+        OSF.DDA.RichApi.richApiMessageManager = new OfficeExt.RichApiMessageManager
+    }
     if(appContext.get_appName() == OSF.AppName.OutlookWebApp || appContext.get_appName() == OSF.AppName.OutlookIOS || appContext.get_appName() == OSF.AppName.OutlookAndroid)
         this._settings = this._initializeSettings(appContext,false);
     else

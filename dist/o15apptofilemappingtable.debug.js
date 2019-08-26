@@ -1,5 +1,5 @@
 /* Excel specific API library */
-/* Version: 15.0.5155.3001 */
+/* Version: 15.0.5159.3003 */
 /*
 	Copyright (c) Microsoft Corporation.  All rights reserved.
 */
@@ -7448,6 +7448,9 @@ var OSFAppTelemetry;
 		appInfo.host=context.get_appName();
 		appInfo.browser=window.navigator.userAgent;
 		appInfo.correlationId=context.get_correlationId();
+		if (appInfo.correlationId) {
+			appInfo.correlationId=appInfo.correlationId.replace(/[{}]/g, "").toLowerCase();
+		}
 		appInfo.clientId=(new AppStorage()).getClientId();
 		appInfo.appInstanceId=context.get_appInstanceId();
 		if (appInfo.appInstanceId) {
@@ -7487,9 +7490,9 @@ var OSFAppTelemetry;
 				return hostName;
 			}
 			OTel.OTelLogger.getFlavor=function() {
-				if (hostPlatform==="PC") {
+				if (hostPlatform===Microsoft.Office.WebExtension.PlatformType.PC) {
 					hostPlatform="Win32";
-				} else if (hostPlatform==="WebApp") {
+				} else if (hostPlatform===Microsoft.Office.WebExtension.PlatformType.OfficeOnline) {
 					hostPlatform="Web";
 				}
 				return hostPlatform;

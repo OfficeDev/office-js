@@ -1,4 +1,4 @@
-/* Version: 16.0.11619.10000 */
+/* Version: 16.0.11927.10000 */
 /*
 	Copyright (c) Microsoft Corporation.  All rights reserved.
 */
@@ -8395,7 +8395,7 @@ var Excel;
 			/// <summary>
 			/// Gets a DataPivotHierarchy by its name or id. [Api set: ExcelApi 1.8]
 			/// </summary>
-			/// <param name="name" type="String">Name of the PivotTable to be retrieved.</param>
+			/// <param name="name" type="String">Name of the DataPivotHierarchy to be retrieved.</param>
 			/// <returns type="Excel.DataPivotHierarchy"></returns>
 		}
 		DataPivotHierarchyCollection.prototype.getItemOrNullObject = function(name) {
@@ -9110,7 +9110,7 @@ var Excel;
 			/// <summary>
 			/// Gets a FilterPivotHierarchy by its name or id. [Api set: ExcelApi 1.8]
 			/// </summary>
-			/// <param name="name" type="String">Name of the PivotTable to be retrieved.</param>
+			/// <param name="name" type="String">Name of the FilterPivotHierarchy to be retrieved.</param>
 			/// <returns type="Excel.FilterPivotHierarchy"></returns>
 		}
 		FilterPivotHierarchyCollection.prototype.getItemOrNullObject = function(name) {
@@ -13493,7 +13493,7 @@ var Excel;
 	var PivotFieldCollection = (function(_super) {
 		__extends(PivotFieldCollection, _super);
 		function PivotFieldCollection() {
-			/// <summary> Represents a collection of all the PivotTables that are part of the workbook or worksheet. [Api set: ExcelApi 1.8] </summary>
+			/// <summary> Represents a collection of all the PivotFields that are part of a PivotTable&apos;s hierarchy. [Api set: ExcelApi 1.8] </summary>
 			/// <field name="context" type="Excel.RequestContext">The request context associated with this object.</field>
 			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
 			/// <field name="items" type="Array" elementType="Excel.PivotField">Gets the loaded child items in this collection.</field>
@@ -13508,7 +13508,7 @@ var Excel;
 		}
 		PivotFieldCollection.prototype.getCount = function() {
 			/// <summary>
-			/// Gets the number of pivot hierarchies in the collection. [Api set: ExcelApi 1.8]
+			/// Gets the number of pivot fields in the collection. [Api set: ExcelApi 1.8]
 			/// </summary>
 			/// <returns type="OfficeExtension.ClientResult&lt;number&gt;"></returns>
 			var result = new OfficeExtension.ClientResult();
@@ -13518,16 +13518,16 @@ var Excel;
 		}
 		PivotFieldCollection.prototype.getItem = function(name) {
 			/// <summary>
-			/// Gets a PivotHierarchy by its name or id. [Api set: ExcelApi 1.8]
+			/// Gets a PivotField by its name or id. [Api set: ExcelApi 1.8]
 			/// </summary>
-			/// <param name="name" type="String">Name of the PivotTable to be retrieved.</param>
+			/// <param name="name" type="String">Name of the PivotField to be retrieved.</param>
 			/// <returns type="Excel.PivotField"></returns>
 		}
 		PivotFieldCollection.prototype.getItemOrNullObject = function(name) {
 			/// <summary>
-			/// Gets a PivotHierarchy by name. If the PivotHierarchy does not exist, will return a null object. [Api set: ExcelApi 1.8]
+			/// Gets a PivotField by name. If the PivotField does not exist, will return a null object. [Api set: ExcelApi 1.8]
 			/// </summary>
-			/// <param name="name" type="String">Name of the PivotHierarchy to be retrieved.</param>
+			/// <param name="name" type="String">Name of the PivotField to be retrieved.</param>
 			/// <returns type="Excel.PivotField"></returns>
 		}
 
@@ -13598,7 +13598,7 @@ var Excel;
 	var PivotHierarchyCollection = (function(_super) {
 		__extends(PivotHierarchyCollection, _super);
 		function PivotHierarchyCollection() {
-			/// <summary> Represents a collection of all the PivotTables that are part of the workbook or worksheet. [Api set: ExcelApi 1.8] </summary>
+			/// <summary> Represents a collection of all the PivotHierarchies that are part of the PivotTable. [Api set: ExcelApi 1.8] </summary>
 			/// <field name="context" type="Excel.RequestContext">The request context associated with this object.</field>
 			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
 			/// <field name="items" type="Array" elementType="Excel.PivotHierarchy">Gets the loaded child items in this collection.</field>
@@ -13625,7 +13625,7 @@ var Excel;
 			/// <summary>
 			/// Gets a PivotHierarchy by its name or id. [Api set: ExcelApi 1.8]
 			/// </summary>
-			/// <param name="name" type="String">Name of the PivotTable to be retrieved.</param>
+			/// <param name="name" type="String">Name of the PivotHierarchy to be retrieved.</param>
 			/// <returns type="Excel.PivotHierarchy"></returns>
 		}
 		PivotHierarchyCollection.prototype.getItemOrNullObject = function(name) {
@@ -13688,7 +13688,7 @@ var Excel;
 	var PivotItemCollection = (function(_super) {
 		__extends(PivotItemCollection, _super);
 		function PivotItemCollection() {
-			/// <summary> Represents a collection of all the Pivot Items related to their parent PivotField. [Api set: ExcelApi 1.8] </summary>
+			/// <summary> Represents a collection of all the PivotItems related to their parent PivotField. [Api set: ExcelApi 1.8] </summary>
 			/// <field name="context" type="Excel.RequestContext">The request context associated with this object.</field>
 			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
 			/// <field name="items" type="Array" elementType="Excel.PivotItem">Gets the loaded child items in this collection.</field>
@@ -13703,7 +13703,7 @@ var Excel;
 		}
 		PivotItemCollection.prototype.getCount = function() {
 			/// <summary>
-			/// Gets the number of pivot hierarchies in the collection. [Api set: ExcelApi 1.8]
+			/// Gets the number of PivotItems in the collection. [Api set: ExcelApi 1.8]
 			/// </summary>
 			/// <returns type="OfficeExtension.ClientResult&lt;number&gt;"></returns>
 			var result = new OfficeExtension.ClientResult();
@@ -13713,16 +13713,16 @@ var Excel;
 		}
 		PivotItemCollection.prototype.getItem = function(name) {
 			/// <summary>
-			/// Gets a PivotHierarchy by its name or id. [Api set: ExcelApi 1.8]
+			/// Gets a PivotItem by its name or id. [Api set: ExcelApi 1.8]
 			/// </summary>
-			/// <param name="name" type="String">Name of the PivotTable to be retrieved.</param>
+			/// <param name="name" type="String">Name of the PivotItem to be retrieved.</param>
 			/// <returns type="Excel.PivotItem"></returns>
 		}
 		PivotItemCollection.prototype.getItemOrNullObject = function(name) {
 			/// <summary>
-			/// Gets a PivotHierarchy by name. If the PivotHierarchy does not exist, will return a null object. [Api set: ExcelApi 1.8]
+			/// Gets a PivotItem by name. If the PivotItem does not exist, will return a null object. [Api set: ExcelApi 1.8]
 			/// </summary>
-			/// <param name="name" type="String">Name of the PivotHierarchy to be retrieved.</param>
+			/// <param name="name" type="String">Name of the PivotItem to be retrieved.</param>
 			/// <returns type="Excel.PivotItem"></returns>
 		}
 
@@ -15382,7 +15382,7 @@ var Excel;
 			/// <summary>
 			/// Gets a RowColumnPivotHierarchy by its name or id. [Api set: ExcelApi 1.8]
 			/// </summary>
-			/// <param name="name" type="String">Name of the PivotTable to be retrieved.</param>
+			/// <param name="name" type="String">Name of the RowColumnPivotHierarchy to be retrieved.</param>
 			/// <returns type="Excel.RowColumnPivotHierarchy"></returns>
 		}
 		RowColumnPivotHierarchyCollection.prototype.getItemOrNullObject = function(name) {
