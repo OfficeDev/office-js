@@ -243,7 +243,6 @@ declare namespace Office {
      * *Supported hosts, by platform*
      *  <table>
      *   <tr><th>                             </th><th> Office on Windows </th><th> Office in web browser </th><th> Office on iPad </th><th> Outlook on mobile devices </th><th> Office on Mac </th></tr>
-     *   <tr><td><strong> Access     </strong></td><td>                   </td><td> Y                     </td><td>                </td><td>                           </td><td>               </td></tr>
      *   <tr><td><strong> Excel      </strong></td><td> Y                 </td><td> Y                     </td><td> Y              </td><td>                           </td><td>               </td></tr>
      *   <tr><td><strong> Outlook    </strong></td><td> Y                 </td><td> Y                     </td><td>                </td><td> Y                         </td><td> Y             </td></tr>
      *   <tr><td><strong> PowerPoint </strong></td><td> Y                 </td><td> Y                     </td><td> Y              </td><td>                           </td><td>               </td></tr>
@@ -279,7 +278,6 @@ declare namespace Office {
      * *Supported hosts, by platform*
      *  <table>
      *   <tr><th>                             </th><th> Office on Windows </th><th> Office in web browser </th><th> Office on iPad </th><th> Outlook on mobile devices </th><th> Office on Mac </th></tr>
-     *   <tr><td><strong> Access     </strong></td><td>                   </td><td> Y                     </td><td>                </td><td>                           </td><td>               </td></tr>
      *   <tr><td><strong> Excel      </strong></td><td> Y                 </td><td> Y                     </td><td> Y              </td><td>                           </td><td>               </td></tr>
      *   <tr><td><strong> Outlook    </strong></td><td> Y                 </td><td> Y                     </td><td>                </td><td> Y                         </td><td> Y             </td></tr>
      *   <tr><td><strong> PowerPoint </strong></td><td> Y                 </td><td> Y                     </td><td> Y              </td><td>                           </td><td>               </td></tr>
@@ -317,7 +315,6 @@ declare namespace Office {
      * *Supported hosts, by platform*
      *  <table>
      *   <tr><th>                             </th><th> Office on Windows </th><th> Office in web browser </th><th> Office on iPad </th><th> Outlook on mobile devices </th><th> Office on Mac </th></tr>
-     *   <tr><td><strong> Access     </strong></td><td>                   </td><td> Y                          </td><td>           </td><td>                           </td><td>               </td></tr>
      *   <tr><td><strong> Excel      </strong></td><td> Y                 </td><td> Y                          </td><td> Y         </td><td>                           </td><td>               </td></tr>
      *   <tr><td><strong> Outlook    </strong></td><td> Y                 </td><td> Y                          </td><td>           </td><td> Y                         </td><td> Y             </td></tr>
      *   <tr><td><strong> PowerPoint </strong></td><td> Y                 </td><td> Y                          </td><td> Y         </td><td>                           </td><td>               </td></tr>
@@ -389,6 +386,10 @@ declare namespace Office {
         Project,
         /**
          * The Office host is Microsoft Access.
+         * 
+         * **Important**: We no longer recommend that you create and use Access web apps and databases in SharePoint.
+         * As an alternative, we recommend that you use {@link https://powerapps.microsoft.com/ | Microsoft PowerApps}
+         * to build no-code business solutions for web and mobile devices.
          */
         Access
     }
@@ -451,8 +452,8 @@ declare namespace Office {
         *   <tr><td><strong>InternalServerError</strong></td><td>The Exchange server returned an error. Please look at the diagnostics object for more information.</td><td>The error message from the Exchange server in a JSON object e.g., `{"ErrorText": "The mailbox database is temporarily unavailable"}`</td></tr>
         * </table>
         */
-       diagnostics: any;
-       /**
+        diagnostics: any;
+        /**
         * Gets an {@link Office.Error} object that provides a description of the error, if any error occurred.
         */
         error: Office.Error;
@@ -477,7 +478,7 @@ declare namespace Office {
      * The current context exists as a property of Office. It is accessed using `Office.context`.
      *
      * @remarks 
-     * **Hosts**: Access, Excel, Outlook, PowerPoint, Project, Word
+     * **Hosts**: Excel, Outlook, PowerPoint, Project, Word
      */     
     interface Context {
         /**
@@ -500,8 +501,6 @@ declare namespace Office {
         * The `contentLanguage` value reflects the **Editing Language** setting specified with **File \> Options \> Language** in the Office host 
         * application.
         * 
-        * In content add-ins for Access web apps, the `contentLanguage` property gets the add-in culture (e.g., "en-GB").
-        * 
         * **Support details**
         * 
         * A capital Y in the following matrix indicates that this property is supported in the corresponding Office host application. 
@@ -513,7 +512,6 @@ declare namespace Office {
         * *Supported hosts, by platform*
         *  <table>
         *   <tr><th>                             </th><th> Office on Windows </th><th> Office in web browser </th><th> Office on iPad </th><th> Outlook on mobile devices </th><th> Office on Mac </th></tr>
-        *   <tr><td><strong> Access     </strong></td><td>                   </td><td> Y                     </td><td>                </td><td>                           </td><td>               </td></tr>
         *   <tr><td><strong> Excel      </strong></td><td> Y                 </td><td> Y                     </td><td> Y              </td><td>                           </td><td>               </td></tr>
         *   <tr><td><strong> Outlook    </strong></td><td> Y                 </td><td> Y                     </td><td>                </td><td> Y                         </td><td> Y             </td></tr>
         *   <tr><td><strong> PowerPoint </strong></td><td> Y                 </td><td> Y                     </td><td> Y              </td><td>                           </td><td>               </td></tr>
@@ -536,8 +534,6 @@ declare namespace Office {
         * The `displayLanguage` value reflects the current **Display Language** setting specified with **File \> Options \> Language** in the Office 
         * host application.
         * 
-        * In content add-ins for Access web apps, the `displayLanguage property` gets the add-in language (e.g., "en-US").
-        * 
         * When using in Outlook, the applicable modes are Compose or Read.
         * 
         * **Support details**
@@ -551,7 +547,6 @@ declare namespace Office {
         * *Supported hosts, by platform*
         *  <table>
         *   <tr><th>                             </th><th> Office on Windows </th><th> Office in web browser </th><th> Office on iPad </th><th> Outlook on mobile devices </th><th> Office on Mac </th></tr>
-        *   <tr><td><strong> Access     </strong></td><td> Y                 </td><td>                       </td><td>                </td><td>                           </td><td>               </td></tr>
         *   <tr><td><strong> Excel      </strong></td><td> Y                 </td><td> Y                     </td><td> Y              </td><td>                           </td><td>               </td></tr>
         *   <tr><td><strong> Outlook    </strong></td><td> Y                 </td><td> Y                     </td><td>                </td><td> Y                         </td><td> Y             </td></tr>
         *   <tr><td><strong> PowerPoint </strong></td><td> Y                 </td><td> Y                     </td><td> Y              </td><td>                           </td><td>               </td></tr>
@@ -982,9 +977,9 @@ declare namespace Office {
         /**
         * Check if the specified requirement set is supported by the host Office application.
         * @param name - Set name; e.g., "MatrixBindings".
-        * @param minVersion - The minimum required version; e.g., "1.4".
+        * @param minVersion - The minimum required version; e.g., "1.4". Note: String type is recommended data type for this parameter. The use of number type is deprecated and will not be compatible with recent requirement sets.
         */
-       isSetSupported(name: string, minVersion?: number): boolean;
+       isSetSupported(name: string, minVersion?: string | number): boolean;
     }
 
     /**
@@ -1084,6 +1079,10 @@ declare namespace Office {
         filterType?: Office.FilterType | string
         /**
         * Only for table bindings in content add-ins for Access. Specifies the pre-defined string "thisRow" to get data in the currently selected row.
+        * 
+        * **Important**: We no longer recommend that you create and use Access web apps and databases in SharePoint.
+        * As an alternative, we recommend that you use {@link https://powerapps.microsoft.com/ | Microsoft PowerApps}
+        * to build no-code business solutions for web and mobile devices.
         */
         rows?: string
         /**
@@ -1111,10 +1110,18 @@ declare namespace Office {
         coercionType?: Office.CoercionType | string
         /**
         * Only for table bindings in content add-ins for Access. Array of strings. Specifies the column names.
+        * 
+        * **Important**: We no longer recommend that you create and use Access web apps and databases in SharePoint.
+        * As an alternative, we recommend that you use {@link https://powerapps.microsoft.com/ | Microsoft PowerApps}
+        * to build no-code business solutions for web and mobile devices.
         */
         columns?: string[]
         /**
         * Only for table bindings in content add-ins for Access. Specifies the pre-defined string "thisRow" to get data in the currently selected row.
+        * 
+        * **Important**: We no longer recommend that you create and use Access web apps and databases in SharePoint.
+        * As an alternative, we recommend that you use {@link https://powerapps.microsoft.com/ | Microsoft PowerApps}
+        * to build no-code business solutions for web and mobile devices.
         */
         rows?: string
         /**
@@ -1206,8 +1213,13 @@ declare namespace Office {
         promptText?: string
         /**
          * Specifies a table of sample data displayed in the prompt UI as an example of the kinds of fields (columns) that can be bound by your add-in. 
-         * The headers provided in the TableData object specify the labels used in the field selection UI. 
+         * The headers provided in the TableData object specify the labels used in the field selection UI.
+         * 
          * **Note**: This parameter is used only in add-ins for Access. It is ignored if provided when calling the method in an add-in for Excel.
+         * 
+         * **Important**: We no longer recommend that you create and use Access web apps and databases in SharePoint.
+         * As an alternative, we recommend that you use {@link https://powerapps.microsoft.com/ | Microsoft PowerApps}
+         * to build no-code business solutions for web and mobile devices.
          */
         sampleData?: Office.TableData
         /**
@@ -1423,7 +1435,6 @@ declare namespace Office {
      * *Supported hosts, by platform*
      *  <table>
      *   <tr><th>                         </th><th> Office on Windows </th><th> Office in web browser </th><th> Office on iPad </th></tr>
-     *   <tr><td><strong> Access </strong></td><td>                   </td><td> Y                     </td><td>                </td></tr>
      *   <tr><td><strong> Excel  </strong></td><td> Y                 </td><td> Y                     </td><td> Y              </td></tr>
      *   <tr><td><strong> Word   </strong></td><td> Y                 </td><td>                       </td><td> Y              </td></tr>
      *  </table>
@@ -1487,7 +1498,7 @@ declare namespace Office {
         /**
          * Return or set data as tabular data with optional headers. Data is returned or set as an array of arrays with optional headers.
          * 
-         * **Note**: Only applies to data in Access, Excel, and Word.
+         * **Note**: Only applies to data in Excel and Word.
          */
         Table,
         /**
@@ -1577,9 +1588,11 @@ declare namespace Office {
      * Add-ins for Project support the `Office.EventType.ResourceSelectionChanged`, `Office.EventType.TaskSelectionChanged`, and 
      * `Office.EventType.ViewSelectionChanged` event types.
      * 
+     * Only task pane add-ins for Outlook support Mailbox API set event types.
+     * 
      * @remarks
      * 
-     * **`BindingDataChanged` and `BindingSelectionChanged` hosts**: Access, Excel, Word.
+     * **`BindingDataChanged` and `BindingSelectionChanged` hosts**: Excel, Word.
      * 
      */
     enum EventType {
@@ -1591,13 +1604,13 @@ declare namespace Office {
          */
         ActiveViewChanged,
         /**
-         * Triggers when any date or time of the selected appointment or series is changed in Outlook.
+         * Triggers when any date or time of the selected appointment or series is changed in Outlook. Supported with task pane only.
          * 
          * [Api set: Mailbox 1.7]
          */
         AppointmentTimeChanged,
         /**
-         * Triggers when an attachment is added to or removed from an item.
+         * Triggers when an attachment is added to or removed from an item. Supported with task pane only.
          * 
          * [Api set: Mailbox Preview]
          * 
@@ -1610,7 +1623,7 @@ declare namespace Office {
          * The event handler receives an argument of type {@link Office.BindingDataChangedEventArgs}.
          * 
          * @remarks 
-         * **Hosts**: Access, Excel, Word
+         * **Hosts**: Excel, Word
          */
         BindingDataChanged,
         /**
@@ -1618,7 +1631,7 @@ declare namespace Office {
          * the addHandlerAsync method of the Binding object. The event handler receives an argument of type {@link Office.BindingSelectionChangedEventArgs}.
          * 
          * @remarks 
-         * **Hosts**: Access, Excel, Word 
+         * **Hosts**: Excel, Word 
          */
         BindingSelectionChanged,
         /**
@@ -1637,13 +1650,13 @@ declare namespace Office {
          */
         DocumentSelectionChanged,
         /**
-         * Triggers when a different Outlook item is selected for viewing while the task pane is pinned.
+         * Triggers when a different Outlook item is selected for viewing while the task pane is pinned. Supported with task pane only.
          * 
          * [Api set: Mailbox 1.5]
          */
         ItemChanged,
         /**
-         * Triggers when the appointment location is changed in Outlook.
+         * Triggers when the appointment location is changed in Outlook. Supported with task pane only.
          * 
          * [Api set: Mailbox Preview]
          */
@@ -1661,7 +1674,7 @@ declare namespace Office {
          */
         NodeReplaced,
         /**
-         * Triggers when the OfficeTheme is changed in Outlook.
+         * Triggers when the OfficeTheme is changed in Outlook. Supported with task pane only.
          * 
          * [Api set: Mailbox Preview]
          * 
@@ -1669,13 +1682,13 @@ declare namespace Office {
          */
         OfficeThemeChanged,
         /**
-         * Triggers when the recipient list of the selected item or the appointment location is changed in Outlook.
+         * Triggers when the recipient list of the selected item or the appointment location is changed in Outlook. Supported with task pane only.
          * 
          * [Api set: Mailbox 1.7]
          */
         RecipientsChanged,
         /**
-         * Triggers when the recurrence pattern of the selected series is changed in Outlook.
+         * Triggers when the recurrence pattern of the selected series is changed in Outlook. Supported with task pane only.
          * 
          * [Api set: Mailbox 1.7]
          */
@@ -1688,7 +1701,7 @@ declare namespace Office {
          * A Settings.settingsChanged event was raised.
          * 
          * @remarks 
-         * **Hosts**: Access, Excel, PowerPoint, Word
+         * **Hosts**: Excel, PowerPoint, Word
          */
         SettingsChanged,
         /**
@@ -1830,7 +1843,7 @@ declare namespace Office {
     *
     * @remarks
     * 
-    * **Hosts**: Access, Excel, Word
+    * **Hosts**: Excel, Word
     * 
     * **Requirement sets**: 
     * 
@@ -2106,7 +2119,7 @@ declare namespace Office {
          *
          *        array of arrays: Excel and Word only
          *
-         *        `TableData`: Access, Excel, and Word only
+         *        `TableData`: Excel and Word only
          *
          *        HTML: Word on the web and Windows only
          *
@@ -2253,7 +2266,7 @@ declare namespace Office {
          *
          *        array of arrays: Excel and Word only
          *
-         *        `TableData`: Access, Excel, and Word only
+         *        `TableData`: Excel and Word only
          *
          *        HTML: Word on the web and Windows only
          *
@@ -3162,7 +3175,7 @@ declare namespace Office {
      * An abstract class that represents the document the add-in is interacting with.
      *
      * @remarks
-     * **Hosts**: Access, Excel, PowerPoint, Project, Word
+     * **Hosts**: Excel, PowerPoint, Project, Word
      */
     interface Document {
         /**
@@ -3402,7 +3415,7 @@ declare namespace Office {
          *     <td>`Office.CoercionType.Matrix` (array of arrays)</td>
          *   </tr>
          *   <tr>
-         *     <td>Access, Excel, and Word</td>
+         *     <td>Excel and Word</td>
          *     <td>`Office.CoercionType.Table` (TableData object)</td>
          *   </tr>
          *   <tr>
@@ -3494,7 +3507,7 @@ declare namespace Office {
          *     <td>`Office.CoercionType.Matrix` (array of arrays)</td>
          *   </tr>
          *   <tr>
-         *     <td>Access, Excel, and Word</td>
+         *     <td>Excel and Word</td>
          *     <td>`Office.CoercionType.Table` (TableData object)</td>
          *   </tr>
          *   <tr>
@@ -3603,7 +3616,7 @@ declare namespace Office {
          * 
          * - {@link https://docs.microsoft.com/office/dev/add-ins/reference/requirement-sets/office-add-in-requirement-sets#htmlcoercion | HtmlCoercion}, (when using `Office.CoercionType.Html`)
          * 
-         * - {@link https://docs.microsoft.com/office/dev/add-ins/reference/requirement-sets/office-add-in-requirement-sets#imagecoercion | ImageCoercion} (when using `Office.CoercionType.Image`)
+         * - {@link https://docs.microsoft.com/office/dev/add-ins/reference/requirement-sets/image-coercion-requirement-sets | ImageCoercion} (when using `Office.CoercionType.Image`)
          * 
          * - {@link https://docs.microsoft.com/office/dev/add-ins/reference/requirement-sets/office-add-in-requirement-sets#matrixcoercion | MatrixCoercion} (when using `Office.CoercionType.Matrix`)
          * 
@@ -3614,6 +3627,8 @@ declare namespace Office {
          * - {@link https://docs.microsoft.com/office/dev/add-ins/reference/requirement-sets/office-add-in-requirement-sets#tablecoercion | TableCoercion} (when using `Office.CoercionType.Table`)
          * 
          * - {@link https://docs.microsoft.com/office/dev/add-ins/reference/requirement-sets/office-add-in-requirement-sets#textcoercion | TextCoercion} (when using `Office.CoercionType.Text`)
+         * 
+         * - {@link https://docs.microsoft.com/office/dev/add-ins/reference/requirement-sets/image-coercion-requirement-sets#imagecoercion-12 | ImageCoercion 1.2} (when using `Office.CoercionType.XmlSvg`)
          * 
          * **Application-specific behaviors**
          * 
@@ -3726,7 +3741,7 @@ declare namespace Office {
          *     <td>`Office.CoercionType.Matrix` (array of arrays)</td>
          *   </tr>
          *   <tr>
-         *     <td>Access, Excel, and Word</td>
+         *     <td>Excel and Word</td>
          *     <td>`Office.CoercionType.Table` (TableData object)</td>
          *   </tr>
          *   <tr>
@@ -3789,7 +3804,7 @@ declare namespace Office {
          * 
          * - {@link https://docs.microsoft.com/office/dev/add-ins/reference/requirement-sets/office-add-in-requirement-sets#htmlcoercion | HtmlCoercion}, (when using `Office.CoercionType.Html`)
          * 
-         * - {@link https://docs.microsoft.com/office/dev/add-ins/reference/requirement-sets/office-add-in-requirement-sets#imagecoercion | ImageCoercion} (when using `Office.CoercionType.Image`)
+         * - {@link https://docs.microsoft.com/office/dev/add-ins/reference/requirement-sets/image-coercion-requirement-sets | ImageCoercion} (when using `Office.CoercionType.Image`)
          * 
          * - {@link https://docs.microsoft.com/office/dev/add-ins/reference/requirement-sets/office-add-in-requirement-sets#matrixcoercion | MatrixCoercion} (when using `Office.CoercionType.Matrix`)
          * 
@@ -3800,6 +3815,8 @@ declare namespace Office {
          * - {@link https://docs.microsoft.com/office/dev/add-ins/reference/requirement-sets/office-add-in-requirement-sets#tablecoercion | TableCoercion} (when using `Office.CoercionType.Table`)
          * 
          * - {@link https://docs.microsoft.com/office/dev/add-ins/reference/requirement-sets/office-add-in-requirement-sets#textcoercion | TextCoercion} (when using `Office.CoercionType.Text`)
+         * 
+         * - {@link https://docs.microsoft.com/office/dev/add-ins/reference/requirement-sets/image-coercion-requirement-sets#imagecoercion-12 | ImageCoercion 1.2} (when using `Office.CoercionType.XmlSvg`)
          * 
          * **Application-specific behaviors**
          * 
@@ -3911,7 +3928,7 @@ declare namespace Office {
          *     <td>`Office.CoercionType.Matrix` (array of arrays)</td>
          *   </tr>
          *   <tr>
-         *     <td>Access, Excel, and Word</td>
+         *     <td>Excel and Word</td>
          *     <td>`Office.CoercionType.Table` (TableData object)</td>
          *   </tr>
          *   <tr>
@@ -4380,7 +4397,7 @@ declare namespace Office {
      * Represents custom settings for a task pane or content add-in that are stored in the host document as name/value pairs.
      *
      * @remarks
-     * **Hosts**: Access, Excel, PowerPoint, Word
+     * **Hosts**: Excel, PowerPoint, Word
      * 
      * The settings created by using the methods of the Settings object are saved per add-in and per document. 
      * That is, they are available only to the add-in that created them, and only from the document in which they are saved.
@@ -4768,8 +4785,6 @@ declare namespace Office {
         *
         * You can work around this difference in your script by checking if rowCount == 1, and if so, then checking if the row contains all empty 
         * strings.
-        *
-        * In content add-ins for Access, for performance reasons the rowCount property always returns -1.
         */
         rowCount: number;
         /**
@@ -10150,7 +10165,7 @@ declare namespace Office {
          */
         addFileAttachmentFromBase64Async(base64File: string, attachmentName: string, callback?: (asyncResult: Office.AsyncResult<string>) => void): void;
         /**
-         * Adds an event handler for a supported event.
+         * Adds an event handler for a supported event. **Note**: Events are available only with task pane.
          * 
          * Currently the supported event types are `Office.EventType.AppointmentTimeChanged`, `Office.EventType.RecipientsChanged`, and
          * `Office.EventType.RecurrenceChanged`.
@@ -10174,7 +10189,7 @@ declare namespace Office {
          */
         addHandlerAsync(eventType: Office.EventType | string, handler: any, options?: Office.AsyncContextOptions, callback?: (asyncResult: Office.AsyncResult<void>) => void): void;
         /**
-         * Adds an event handler for a supported event.
+         * Adds an event handler for a supported event. **Note**: Events are available only with task pane.
          * 
          * Currently the supported event types are `Office.EventType.AppointmentTimeChanged`, `Office.EventType.RecipientsChanged`, and 
          * `Office.EventType.RecurrenceChanged`.
@@ -10500,7 +10515,7 @@ declare namespace Office {
          */
         removeAttachmentAsync(attachmentId: string, callback?: (asyncResult: Office.AsyncResult<void>) => void): void;
        /**
-        * Removes the event handlers for a supported event type.
+        * Removes the event handlers for a supported event type. **Note**: Events are available only with task pane.
         * 
         * Currently the supported event types are `Office.EventType.AppointmentTimeChanged`, `Office.EventType.RecipientsChanged`, and 
         * `Office.EventType.RecurrenceChanged`.
@@ -10522,7 +10537,7 @@ declare namespace Office {
         */
        removeHandlerAsync(eventType: Office.EventType | string, options?: Office.AsyncContextOptions, callback?: (asyncResult: Office.AsyncResult<void>) => void): void;
        /**
-        * Removes the event handlers for a supported event type.
+        * Removes the event handlers for a supported event type. **Note**: Events are available only with task pane.
         * 
         * Currently the supported event types are `Office.EventType.AppointmentTimeChanged`, `Office.EventType.RecipientsChanged`, and 
         * `Office.EventType.RecurrenceChanged`.
@@ -11004,7 +11019,7 @@ declare namespace Office {
         subject: string;
 
         /**
-         * Adds an event handler for a supported event.
+         * Adds an event handler for a supported event. **Note**: Events are available only with task pane.
          * 
          * Currently the supported event types are `Office.EventType.AppointmentTimeChanged`, `Office.EventType.RecipientsChanged`, and 
          * `Office.EventType.RecurrenceChanged`.
@@ -11028,7 +11043,7 @@ declare namespace Office {
          */
         addHandlerAsync(eventType: Office.EventType | string, handler: any, options?: Office.AsyncContextOptions, callback?: (asyncResult: Office.AsyncResult<void>) => void): void;
         /**
-         * Adds an event handler for a supported event.
+         * Adds an event handler for a supported event. **Note**: Events are available only with task pane.
          * 
          * Currently the supported event types are `Office.EventType.AppointmentTimeChanged`, `Office.EventType.RecipientsChanged`, and 
          * `Office.EventType.RecurrenceChanged`.
@@ -11382,7 +11397,7 @@ declare namespace Office {
        loadCustomPropertiesAsync(callback: (asyncResult: Office.AsyncResult<CustomProperties>) => void, userContext?: any): void;
 
        /**
-        * Removes the event handlers for a supported event type.
+        * Removes the event handlers for a supported event type. **Note**: Events are available only with task pane.
         * 
         * Currently the supported event types are `Office.EventType.AppointmentTimeChanged`, `Office.EventType.RecipientsChanged`, and 
         * `Office.EventType.RecurrenceChanged`.
@@ -11404,7 +11419,7 @@ declare namespace Office {
         */
        removeHandlerAsync(eventType: Office.EventType | string, options?: Office.AsyncContextOptions, callback?: (asyncResult: Office.AsyncResult<void>) => void): void;
        /**
-        * Removes the event handlers for a supported event type.
+        * Removes the event handlers for a supported event type. **Note**: Events are available only with task pane.
         * 
         * Currently the supported event types are `Office.EventType.AppointmentTimeChanged`, `Office.EventType.RecipientsChanged`, and 
         * `Office.EventType.RecurrenceChanged`.
@@ -11502,7 +11517,7 @@ declare namespace Office {
         seriesId: string;
 
         /**
-         * Adds an event handler for a supported event.
+         * Adds an event handler for a supported event. **Note**: Events are available only with task pane.
          * 
          * Currently the supported event types are `Office.EventType.AppointmentTimeChanged`, `Office.EventType.RecipientsChanged`, and 
          * `Office.EventType.RecurrenceChanged`.
@@ -11527,7 +11542,7 @@ declare namespace Office {
         addHandlerAsync(eventType: Office.EventType | string, handler: any, options?: Office.AsyncContextOptions, callback?: (asyncResult: Office.AsyncResult<void>) => void): void;
 
         /**
-         * Adds an event handler for a supported event.
+         * Adds an event handler for a supported event. **Note**: Events are available only with task pane.
          * 
          * Currently the supported event types are `Office.EventType.AppointmentTimeChanged`, `Office.EventType.RecipientsChanged`, and 
          * `Office.EventType.RecurrenceChanged`.
@@ -11729,7 +11744,7 @@ declare namespace Office {
 
 
        /**
-        * Removes the event handlers for a supported event type.
+        * Removes the event handlers for a supported event type. **Note**: Events are available only with task pane.
         * 
         * Currently the supported event types are `Office.EventType.AppointmentTimeChanged`, `Office.EventType.RecipientsChanged`, and 
         * `Office.EventType.RecurrenceChanged`.
@@ -11752,7 +11767,7 @@ declare namespace Office {
        removeHandlerAsync(eventType: Office.EventType | string, options?: Office.AsyncContextOptions, callback?: (asyncResult: Office.AsyncResult<void>) => void): void;
 
        /**
-        * Removes the event handlers for a supported event type.
+        * Removes the event handlers for a supported event type. **Note**: Events are available only with task pane.
         * 
         * Currently the supported event types are `Office.EventType.AppointmentTimeChanged`, `Office.EventType.RecipientsChanged`, and 
         * `Office.EventType.RecurrenceChanged`.
@@ -13125,7 +13140,7 @@ declare namespace Office {
          */
         addFileAttachmentFromBase64Async(base64File: string, attachmentName: string, callback?: (asyncResult: Office.AsyncResult<string>) => void): void;
         /**
-         * Adds an event handler for a supported event.
+         * Adds an event handler for a supported event. **Note**: Events are available only with task pane.
          * 
          * Currently the supported event types are `Office.EventType.AppointmentTimeChanged`, `Office.EventType.RecipientsChanged`, and 
          * `Office.EventType.RecurrenceChanged`.
@@ -13149,7 +13164,7 @@ declare namespace Office {
          */
         addHandlerAsync(eventType: Office.EventType | string, handler: any, options?: Office.AsyncContextOptions, callback?: (asyncResult: Office.AsyncResult<void>) => void): void;
         /**
-         * Adds an event handler for a supported event.
+         * Adds an event handler for a supported event. **Note**: Events are available only with task pane.
          * 
          * Currently the supported event types are `Office.EventType.AppointmentTimeChanged`, `Office.EventType.RecipientsChanged`, and 
          * `Office.EventType.RecurrenceChanged`.
@@ -13484,7 +13499,7 @@ declare namespace Office {
          */
         removeAttachmentAsync(attachmentId: string, callback?: (asyncResult: Office.AsyncResult<void>) => void): void;
         /**
-         * Removes the event handlers for a supported event type.
+         * Removes the event handlers for a supported event type. **Note**: Events are available only with task pane.
          * 
          * Currently the supported event types are `Office.EventType.AppointmentTimeChanged`, `Office.EventType.RecipientsChanged`, and 
          * `Office.EventType.RecurrenceChanged`.
@@ -13506,7 +13521,7 @@ declare namespace Office {
          */
         removeHandlerAsync(eventType: Office.EventType | string, options?: Office.AsyncContextOptions, callback?: (asyncResult: Office.AsyncResult<void>) => void): void;
         /**
-         * Removes the event handlers for a supported event type.
+         * Removes the event handlers for a supported event type. **Note**: Events are available only with task pane.
          * 
          * Currently the supported event types are `Office.EventType.AppointmentTimeChanged`, `Office.EventType.RecipientsChanged`, and 
          * `Office.EventType.RecurrenceChanged`.
@@ -14004,7 +14019,7 @@ declare namespace Office {
         to: EmailAddressDetails[];
 
         /**
-         * Adds an event handler for a supported event.
+         * Adds an event handler for a supported event. **Note**: Events are available only with task pane.
          * 
          * Currently the supported event types are `Office.EventType.AppointmentTimeChanged`, `Office.EventType.RecipientsChanged`, and 
          * `Office.EventType.RecurrenceChanged`.
@@ -14028,7 +14043,7 @@ declare namespace Office {
          */
         addHandlerAsync(eventType: Office.EventType | string, handler: any, options?: Office.AsyncContextOptions, callback?: (asyncResult: Office.AsyncResult<void>) => void): void;
         /**
-         * Adds an event handler for a supported event.
+         * Adds an event handler for a supported event. **Note**: Events are available only with task pane.
          * 
          * Currently the supported event types are `Office.EventType.AppointmentTimeChanged`, `Office.EventType.RecipientsChanged`, and 
          * `Office.EventType.RecurrenceChanged`.
@@ -14385,7 +14400,7 @@ declare namespace Office {
          */
         loadCustomPropertiesAsync(callback: (asyncResult: Office.AsyncResult<CustomProperties>) => void, userContext?: any): void;
         /**
-         * Removes the event handlers for a supported event type.
+         * Removes the event handlers for a supported event type. **Note**: Events are available only with task pane.
          * 
          * Currently the supported event types are `Office.EventType.AppointmentTimeChanged`, `Office.EventType.RecipientsChanged`, and 
          * `Office.EventType.RecurrenceChanged`.
@@ -14407,7 +14422,7 @@ declare namespace Office {
          */
         removeHandlerAsync(eventType: Office.EventType | string, options?: Office.AsyncContextOptions, callback?: (asyncResult: Office.AsyncResult<void>) => void): void;
         /**
-         * Removes the event handlers for a supported event type.
+         * Removes the event handlers for a supported event type. **Note**: Events are available only with task pane.
          * 
          * Currently the supported event types are `Office.EventType.AppointmentTimeChanged`, `Office.EventType.RecipientsChanged`, and 
          * `Office.EventType.RecurrenceChanged`.
@@ -14674,7 +14689,7 @@ declare namespace Office {
          */
         userProfile: UserProfile;
         /**
-         * Adds an event handler for a supported event.
+         * Adds an event handler for a supported event. **Note**: Events are available only with task pane.
          *
          * Currently, the only supported event type is `Office.EventType.ItemChanged`.
          * In Preview, `Office.EventType.OfficeThemeChanged` is also supported.
@@ -14696,7 +14711,7 @@ declare namespace Office {
          */
         addHandlerAsync(eventType: Office.EventType | string, handler: (type: Office.EventType) => void, options?: Office.AsyncContextOptions, callback?: (asyncResult: Office.AsyncResult<void>) => void): void;
         /**
-         * Adds an event handler for a supported event.
+         * Adds an event handler for a supported event. **Note**: Events are available only with task pane.
          *
          * Currently, the only supported event type is `Office.EventType.ItemChanged`.
          * In Preview, `Office.EventType.OfficeThemeChanged` is also supported.
@@ -15075,7 +15090,7 @@ declare namespace Office {
          */
         makeEwsRequestAsync(data: any, callback: (asyncResult: Office.AsyncResult<string>) => void, userContext?: any): void;
         /**
-         * Removes the event handlers for a supported event type.
+         * Removes the event handlers for a supported event type. **Note**: Events are available only with task pane.
          *
          * Currently, the only supported event type is `Office.EventType.ItemChanged`.
          * In Preview, `Office.EventType.OfficeThemeChanged` is also supported.
@@ -15095,7 +15110,7 @@ declare namespace Office {
          */
         removeHandlerAsync(eventType: Office.EventType | string, options?: Office.AsyncContextOptions, callback?: (asyncResult: Office.AsyncResult<void>) => void): void;
         /**
-         * Removes the event handlers for a supported event type.
+         * Removes the event handlers for a supported event type. **Note**: Events are available only with task pane.
          *
          * Currently, the only supported event type is `Office.EventType.ItemChanged`.
          * In Preview, `Office.EventType.OfficeThemeChanged` is also supported.
@@ -15185,6 +15200,8 @@ declare namespace Office {
         /**
          * A reference to an icon that is defined in the manifest in the Resources section. It appears in the infobar area. 
          * It is only applicable if the type is InformationalMessage. Specifying this parameter for an unsupported type results in an exception.
+         * 
+         * **Note**: At present, the custom icon is displayed in Outlook on Windows only and not on other platforms (e.g., Mac).
          */
         icon?: string;
         /**
@@ -17006,11 +17023,14 @@ declare namespace OfficeCore {
 declare namespace OfficeCore {
     class FirstPartyApis {
         private context;
+        private readonly serviceContext;
         constructor(context: RequestContext);
         readonly roamingSettings: RoamingSettingCollection;
         readonly tap: Tap;
         readonly skill: Skill;
-        readonly personaFactory: PersonaFactory;
+        getPersonaLifetime(): Promise<OfficeCore.PersonaLifetime>;
+        getInitialPersona(): Promise<OfficeCore.Persona>;
+        getLokiTokenProvider(): Promise<OfficeCore.LokiTokenProvider>;
     }
     interface RequestContext extends OfficeExtension.ClientRequestContext {
         constructor(url?: string | OfficeExtension.RequestUrlAndHeaderInfo | any);
@@ -17257,7 +17277,7 @@ declare namespace OfficeFirstPartyAuth {
          */
         message?: string;
     }
-    function load(replyUrl?: string): boolean;
+    function load(replyUrl?: string): Promise<AuthResult>;
     function getAccessToken(options: OfficeCore.TokenParameters, behaviorOption?: BehaviorOption): Promise<AuthResult>;
     function getPrimaryIdentityInfo(): Promise<OfficeCore.OfficeIdentityInfo>;
     function getIdentities(): Promise<OfficeCore.OfficeIdentityInfo[]>;
@@ -17968,41 +17988,6 @@ declare namespace OfficeCore {
     /**
      * [Api set: People 1.2]
      */
-    class PersonaSummary extends OfficeExtension.ClientObject {
-        /** The request context associated with the object. This connects the add-in's process to the Office host application's process. */
-        context: RequestContext; 
-        readonly displayName: string;
-        readonly status: string;
-        /**
-         * Queues up a command to load the specified properties of the object. You must call "context.sync()" before reading the properties.
-         *
-         * @remarks
-         *
-         * In addition to this signature, this method has the following signatures:
-         *
-         * `load(option?: string | string[]): OfficeCore.PersonaSummary` - Where option is a comma-delimited string or an array of strings that specify the properties to load.
-         *
-         * `load(option?: { select?: string; expand?: string; }): OfficeCore.PersonaSummary` - Where option.select is a comma-delimited string that specifies the properties to load, and options.expand is a comma-delimited string that specifies the navigation properties to load.
-         *
-         * `load(option?: { select?: string; expand?: string; top?: number; skip?: number }): OfficeCore.PersonaSummary` - Only available on collection types. It is similar to the preceding signature. Option.top specifies the maximum number of collection items that can be included in the result. Option.skip specifies the number of items that are to be skipped and not included in the result. If option.top is specified, the result set will start after skipping the specified number of items.
-         *
-         * @param options Provides options for which properties of the object to load.
-         */
-        load(option?: OfficeCore.Interfaces.PersonaSummaryLoadOptions): OfficeCore.PersonaSummary;
-        load(option?: string | string[]): OfficeCore.PersonaSummary;
-        load(option?: {
-            select?: string;
-            expand?: string;
-        }): OfficeCore.PersonaSummary;
-        /**
-        * Overrides the JavaScript `toJSON()` method in order to provide more useful output when an API object is passed to `JSON.stringify()`. (`JSON.stringify`, in turn, calls the `toJSON` method of the object that is passed to it.)
-        * Whereas the original OfficeCore.PersonaSummary object is an API object, the `toJSON` method returns a plain JavaScript object (typed as `OfficeCore.Interfaces.PersonaSummaryData`) that contains shallow copies of any loaded child properties from the original object.
-        */
-        toJSON(): OfficeCore.Interfaces.PersonaSummaryData;
-    }
-    /**
-     * [Api set: People 1.2]
-     */
     enum MemberType {
         unknown = "Unknown",
         individual = "Individual",
@@ -18023,6 +18008,43 @@ declare namespace OfficeCore {
     /**
      * [Api set: People 1.2]
      */
+    class MemberInfoList extends OfficeExtension.ClientObject {
+        /** The request context associated with the object. This connects the add-in's process to the Office host application's process. */
+        context: RequestContext; 
+        readonly isWarmedUp: boolean;
+        readonly isWarmingUp: boolean;
+        getPersonaForMember(memberSmtp: string): OfficeCore.Persona;
+        items(): OfficeExtension.ClientResult<OfficeCore.MemberInfo[]>;
+        /**
+         * Queues up a command to load the specified properties of the object. You must call "context.sync()" before reading the properties.
+         *
+         * @remarks
+         *
+         * In addition to this signature, this method has the following signatures:
+         *
+         * `load(option?: string | string[]): OfficeCore.MemberInfoList` - Where option is a comma-delimited string or an array of strings that specify the properties to load.
+         *
+         * `load(option?: { select?: string; expand?: string; }): OfficeCore.MemberInfoList` - Where option.select is a comma-delimited string that specifies the properties to load, and options.expand is a comma-delimited string that specifies the navigation properties to load.
+         *
+         * `load(option?: { select?: string; expand?: string; top?: number; skip?: number }): OfficeCore.MemberInfoList` - Only available on collection types. It is similar to the preceding signature. Option.top specifies the maximum number of collection items that can be included in the result. Option.skip specifies the number of items that are to be skipped and not included in the result. If option.top is specified, the result set will start after skipping the specified number of items.
+         *
+         * @param options Provides options for which properties of the object to load.
+         */
+        load(option?: OfficeCore.Interfaces.MemberInfoListLoadOptions): OfficeCore.MemberInfoList;
+        load(option?: string | string[]): OfficeCore.MemberInfoList;
+        load(option?: {
+            select?: string;
+            expand?: string;
+        }): OfficeCore.MemberInfoList;
+        /**
+        * Overrides the JavaScript `toJSON()` method in order to provide more useful output when an API object is passed to `JSON.stringify()`. (`JSON.stringify`, in turn, calls the `toJSON` method of the object that is passed to it.)
+        * Whereas the original OfficeCore.MemberInfoList object is an API object, the `toJSON` method returns a plain JavaScript object (typed as `OfficeCore.Interfaces.MemberInfoListData`) that contains shallow copies of any loaded child properties from the original object.
+        */
+        toJSON(): OfficeCore.Interfaces.MemberInfoListData;
+    }
+    /**
+     * [Api set: People 1.2]
+     */
     enum PersonaDataUpdated {
         hostId = "HostId",
         type = "Type",
@@ -18034,7 +18056,7 @@ declare namespace OfficeCore {
         unifiedGroupInfo = "UnifiedGroupInfo",
         members = "Members",
         membership = "Membership",
-        capabilites = "Capabilites",
+        capabilities = "Capabilities",
         customizations = "Customizations",
     }
     /**
@@ -18068,15 +18090,15 @@ declare namespace OfficeCore {
     class PersonaActions extends OfficeExtension.ClientObject {
         /** The request context associated with the object. This connects the add-in's process to the Office host application's process. */
         context: RequestContext; 
-        addContact(personaHostId: string): void;
-        callPhoneNumber(personaHostId: string, contactNumber: string): void;
-        composeEmail(personaHostId: string, emailAddress: string): void;
-        composeInstantMessage(personaHostId: string, sipAddress: string): void;
-        editContact(personaHostId: string): void;
-        openLinkContactUx(personaHostId: string): void;
-        pinPersonaToQuickContacts(personaHostId: string): void;
-        scheduleMeeting(personaHostId: string): void;
-        toggleTagForAlerts(personaHostId: string): void;
+        addContact(): void;
+        callPhoneNumber(contactNumber: string): void;
+        composeEmail(emailAddress: string): void;
+        composeInstantMessage(sipAddress: string): void;
+        editContact(): void;
+        openLinkContactUx(): void;
+        pinPersonaToQuickContacts(): void;
+        scheduleMeeting(): void;
+        toggleTagForAlerts(): void;
         /**
         * Overrides the JavaScript `toJSON()` method in order to provide more useful output when an API object is passed to `JSON.stringify()`. (`JSON.stringify`, in turn, calls the `toJSON` method of the object that is passed to it.)
         * Whereas the original OfficeCore.PersonaActions object is an API object, the `toJSON` method returns a plain JavaScript object (typed as `OfficeCore.Interfaces.PersonaActionsData`) that contains shallow copies of any loaded child properties from the original object.
@@ -18292,7 +18314,7 @@ declare namespace OfficeCore {
      *
      * [Api set: People 1.2]
      */
-    class PersonaCapabilites extends OfficeExtension.ClientObject {
+    class PersonaCapabilities extends OfficeExtension.ClientObject {
         /** The request context associated with the object. This connects the add-in's process to the Office host application's process. */
         context: RequestContext; 
         readonly canAddContact: boolean;
@@ -18305,25 +18327,62 @@ declare namespace OfficeCore {
          *
          * In addition to this signature, this method has the following signatures:
          *
-         * `load(option?: string | string[]): OfficeCore.PersonaCapabilites` - Where option is a comma-delimited string or an array of strings that specify the properties to load.
+         * `load(option?: string | string[]): OfficeCore.PersonaCapabilities` - Where option is a comma-delimited string or an array of strings that specify the properties to load.
          *
-         * `load(option?: { select?: string; expand?: string; }): OfficeCore.PersonaCapabilites` - Where option.select is a comma-delimited string that specifies the properties to load, and options.expand is a comma-delimited string that specifies the navigation properties to load.
+         * `load(option?: { select?: string; expand?: string; }): OfficeCore.PersonaCapabilities` - Where option.select is a comma-delimited string that specifies the properties to load, and options.expand is a comma-delimited string that specifies the navigation properties to load.
          *
-         * `load(option?: { select?: string; expand?: string; top?: number; skip?: number }): OfficeCore.PersonaCapabilites` - Only available on collection types. It is similar to the preceding signature. Option.top specifies the maximum number of collection items that can be included in the result. Option.skip specifies the number of items that are to be skipped and not included in the result. If option.top is specified, the result set will start after skipping the specified number of items.
+         * `load(option?: { select?: string; expand?: string; top?: number; skip?: number }): OfficeCore.PersonaCapabilities` - Only available on collection types. It is similar to the preceding signature. Option.top specifies the maximum number of collection items that can be included in the result. Option.skip specifies the number of items that are to be skipped and not included in the result. If option.top is specified, the result set will start after skipping the specified number of items.
          *
          * @param options Provides options for which properties of the object to load.
          */
-        load(option?: OfficeCore.Interfaces.PersonaCapabilitesLoadOptions): OfficeCore.PersonaCapabilites;
-        load(option?: string | string[]): OfficeCore.PersonaCapabilites;
+        load(option?: OfficeCore.Interfaces.PersonaCapabilitiesLoadOptions): OfficeCore.PersonaCapabilities;
+        load(option?: string | string[]): OfficeCore.PersonaCapabilities;
         load(option?: {
             select?: string;
             expand?: string;
-        }): OfficeCore.PersonaCapabilites;
+        }): OfficeCore.PersonaCapabilities;
         /**
         * Overrides the JavaScript `toJSON()` method in order to provide more useful output when an API object is passed to `JSON.stringify()`. (`JSON.stringify`, in turn, calls the `toJSON` method of the object that is passed to it.)
-        * Whereas the original OfficeCore.PersonaCapabilites object is an API object, the `toJSON` method returns a plain JavaScript object (typed as `OfficeCore.Interfaces.PersonaCapabilitesData`) that contains shallow copies of any loaded child properties from the original object.
+        * Whereas the original OfficeCore.PersonaCapabilities object is an API object, the `toJSON` method returns a plain JavaScript object (typed as `OfficeCore.Interfaces.PersonaCapabilitiesData`) that contains shallow copies of any loaded child properties from the original object.
         */
-        toJSON(): OfficeCore.Interfaces.PersonaCapabilitesData;
+        toJSON(): OfficeCore.Interfaces.PersonaCapabilitiesData;
+    }
+    /**
+     *
+     * Represents a collection of personas
+     *
+     * [Api set: People 1.2]
+     */
+    class PersonaCollection extends OfficeExtension.ClientObject {
+        /** The request context associated with the object. This connects the add-in's process to the Office host application's process. */
+        context: RequestContext; 
+        /** Gets the loaded child items in this collection. */
+        readonly items: OfficeCore.Persona[];
+        getCount(): OfficeExtension.ClientResult<number>;
+        getItem(index: number): OfficeCore.Persona;
+        /**
+         * Queues up a command to load the specified properties of the object. You must call "context.sync()" before reading the properties.
+         *
+         * @remarks
+         *
+         * In addition to this signature, this method has the following signatures:
+         *
+         * `load(option?: string | string[]): OfficeCore.PersonaCollection` - Where option is a comma-delimited string or an array of strings that specify the properties to load.
+         *
+         * `load(option?: { select?: string; expand?: string; }): OfficeCore.PersonaCollection` - Where option.select is a comma-delimited string that specifies the properties to load, and options.expand is a comma-delimited string that specifies the navigation properties to load.
+         *
+         * `load(option?: { select?: string; expand?: string; top?: number; skip?: number }): OfficeCore.PersonaCollection` - Only available on collection types. It is similar to the preceding signature. Option.top specifies the maximum number of collection items that can be included in the result. Option.skip specifies the number of items that are to be skipped and not included in the result. If option.top is specified, the result set will start after skipping the specified number of items.
+         *
+         * @param options Provides options for which properties of the object to load.
+         */
+        load(option?: OfficeCore.Interfaces.PersonaCollectionLoadOptions & OfficeCore.Interfaces.CollectionLoadOptions): OfficeCore.PersonaCollection;
+        load(option?: string | string[]): OfficeCore.PersonaCollection;
+        load(option?: OfficeExtension.LoadOption): OfficeCore.PersonaCollection;
+        /**
+        * Overrides the JavaScript `toJSON()` method in order to provide more useful output when an API object is passed to `JSON.stringify()`. (`JSON.stringify`, in turn, calls the `toJSON` method of the object that is passed to it.)
+        * Whereas the original `OfficeCore.PersonaCollection` object is an API object, the `toJSON` method returns a plain JavaScript object (typed as `OfficeCore.Interfaces.PersonaCollectionData`) that contains an "items" array with shallow copies of any loaded properties from the collection's items.
+        */
+        toJSON(): OfficeCore.Interfaces.PersonaCollectionData;
     }
     /**
      * [Api set: People 1.2]
@@ -18331,13 +18390,11 @@ declare namespace OfficeCore {
     class PersonaOrganizationInfo extends OfficeExtension.ClientObject {
         /** The request context associated with the object. This connects the add-in's process to the Office host application's process. */
         context: RequestContext; 
+        readonly directReports: OfficeCore.PersonaCollection;
+        readonly hierarchy: OfficeCore.PersonaCollection;
         readonly manager: OfficeCore.Persona;
-        readonly directReportsCount: number;
-        readonly hierarchyCount: number;
-        readonly isLoaded: boolean;
-        readonly isLoading: boolean;
-        getDirectReportsItem(index: number): OfficeCore.Persona;
-        getHierarchyItem(index: number): OfficeCore.Persona;
+        readonly isWarmedUp: boolean;
+        readonly isWarmingUp: boolean;
         /**
          * Queues up a command to load the specified properties of the object. You must call "context.sync()" before reading the properties.
          *
@@ -18409,6 +18466,7 @@ declare namespace OfficeCore {
         readonly email: string;
         readonly hasGuests: boolean;
         readonly isPublic: boolean;
+        readonly isWarmedUp: boolean;
         readonly memberCount: number;
         readonly oneDrive: string;
         readonly oneNote: string;
@@ -18443,6 +18501,14 @@ declare namespace OfficeCore {
         */
         toJSON(): OfficeCore.Interfaces.UnifiedGroupInfoData;
     }
+    enum PersonaPromiseType {
+        immediate = 0,
+        load = 3,
+    }
+    class PersonaInfoAndSource {
+        info: OfficeCore.PersonaInfo;
+        source: OfficeCore.PersonaInfoSource;
+    }
     /**
      *
      * Represents the interface for a persona entry
@@ -18452,19 +18518,33 @@ declare namespace OfficeCore {
     class Persona extends OfficeExtension.ClientObject {
         /** The request context associated with the object. This connects the add-in's process to the Office host application's process. */
         context: RequestContext; 
-        readonly capabilites: OfficeCore.PersonaCapabilites;
+        private performAsyncOperation(type, waitFor, action, check);
+        getOrganizationAsync(type?: PersonaPromiseType): Promise<OfficeCore.PersonaOrganizationInfo>;
+        private getIsPersonaInfoResolvedCheck();
+        getPersonaInfoAsync(type?: PersonaPromiseType): Promise<OfficeCore.PersonaInfo>;
+        getPersonaInfoWithSourceAsync(type?: PersonaPromiseType): Promise<PersonaInfoAndSource>;
+        getPotoAsync(type?: PersonaPromiseType): Promise<OfficeCore.PersonaPhotoInfo>;
+        getUnifiedCommunicationInfo(type?: PersonaPromiseType): Promise<OfficeCore.PersonaUnifiedCommunicationInfo>;
+        getUnifiedGroupInfo(type?: PersonaPromiseType): Promise<OfficeCore.UnifiedGroupInfo>;
+        getTypeAsync(type?: PersonaPromiseType): Promise<OfficeCore.PersonaType>;
+        getCustomizationsAsync(type?: PersonaPromiseType): Promise<OfficeCore.ContactCardCustomization[]>;
+        getMembersAsync(type?: PersonaPromiseType): Promise<OfficeCore.MemberInfoList>;
+        getMembershipAsync(type?: PersonaPromiseType): Promise<OfficeCore.MemberInfoList>;
+        readonly actions: OfficeCore.PersonaActions;
+        readonly capabilities: OfficeCore.PersonaCapabilities;
         readonly organization: OfficeCore.PersonaOrganizationInfo;
         readonly personaInfo: OfficeCore.PersonaInfo;
         readonly photo: OfficeCore.PersonaPhotoInfo;
-        readonly summary: OfficeCore.PersonaSummary;
         readonly unifiedCommunicationInfo: OfficeCore.PersonaUnifiedCommunicationInfo;
         readonly unifiedGroupInfo: OfficeCore.UnifiedGroupInfo;
         readonly diagnosticId: string;
         readonly hostId: string;
         readonly type: OfficeCore.PersonaType | "Unknown" | "Enterprise" | "Contact" | "Bot" | "PhoneOnly" | "OneOff" | "DistributionList" | "PersonalDistributionList" | "Anonymous" | "UnifiedGroup";
+        dispose(): void;
         getCustomizations(): OfficeExtension.ClientResult<OfficeCore.ContactCardCustomization[]>;
-        getMembers(): OfficeExtension.ClientResult<OfficeCore.MemberInfo[]>;
-        getMembership(): OfficeExtension.ClientResult<OfficeCore.MemberInfo[]>;
+        getMembers(): OfficeCore.MemberInfoList;
+        getMembership(): OfficeCore.MemberInfoList;
+        getPersonaLifetime(): OfficeCore.PersonaLifetime;
         warmup(dataToWarmUp: OfficeCore.PersonaDataUpdated[]): void;
         /**
          * Queues up a command to load the specified properties of the object. You must call "context.sync()" before reading the properties.
@@ -18496,40 +18576,20 @@ declare namespace OfficeCore {
     /**
      * [Api set: People 1.2]
      */
-    class PersonaOperations extends OfficeExtension.ClientObject {
+    class PersonaLifetime extends OfficeExtension.ClientObject {
         /** The request context associated with the object. This connects the add-in's process to the Office host application's process. */
         context: RequestContext; 
-        readonly actions: OfficeCore.PersonaActions;
-        getPersona(personaCookie: string): OfficeCore.Persona;
+        getPersona(hostId: string): OfficeCore.Persona;
+        getPersonaForOrgEntry(name: string, sip: string, smtp: string, entryId: string): OfficeCore.Persona;
         getPolicies(): OfficeExtension.ClientResult<OfficeCore.PersonaPolicies>;
-        track(persona: OfficeCore.Persona): void;
-        untrack(personaHostId: string): void;
-        /**
-         * Queues up a command to load the specified properties of the object. You must call "context.sync()" before reading the properties.
-         *
-         * @remarks
-         *
-         * In addition to this signature, this method has the following signatures:
-         *
-         * `load(option?: string | string[]): OfficeCore.PersonaOperations` - Where option is a comma-delimited string or an array of strings that specify the properties to load.
-         *
-         * `load(option?: { select?: string; expand?: string; }): OfficeCore.PersonaOperations` - Where option.select is a comma-delimited string that specifies the properties to load, and options.expand is a comma-delimited string that specifies the navigation properties to load.
-         *
-         * `load(option?: { select?: string; expand?: string; top?: number; skip?: number }): OfficeCore.PersonaOperations` - Only available on collection types. It is similar to the preceding signature. Option.top specifies the maximum number of collection items that can be included in the result. Option.skip specifies the number of items that are to be skipped and not included in the result. If option.top is specified, the result set will start after skipping the specified number of items.
-         *
-         * @param options Provides options for which properties of the object to load.
-         */
-        load(option?: string | string[]): OfficeCore.PersonaOperations;
-        load(option?: {
-            select?: string;
-            expand?: string;
-        }): OfficeCore.PersonaOperations;
         readonly onPersonaUpdated: OfficeExtension.EventHandlers<OfficeCore.PersonaDataUpdatedEventArgs>;
         /**
         * Overrides the JavaScript `toJSON()` method in order to provide more useful output when an API object is passed to `JSON.stringify()`. (`JSON.stringify`, in turn, calls the `toJSON` method of the object that is passed to it.)
-        * Whereas the original OfficeCore.PersonaOperations object is an API object, the `toJSON` method returns a plain JavaScript object (typed as `OfficeCore.Interfaces.PersonaOperationsData`) that contains shallow copies of any loaded child properties from the original object.
+        * Whereas the original OfficeCore.PersonaLifetime object is an API object, the `toJSON` method returns a plain JavaScript object (typed as `OfficeCore.Interfaces.PersonaLifetimeData`) that contains shallow copies of any loaded child properties from the original object.
         */
-        toJSON(): OfficeCore.Interfaces.PersonaOperationsData;
+        toJSON(): {
+            [key: string]: string;
+        };
     }
     /**
      * [Api set: People 1.2]
@@ -18555,25 +18615,71 @@ declare namespace OfficeCore {
         allowVoiceAndVideoCalls: boolean;
     }
     /**
+     * [Api set: People 1.2]
+     */
+    interface LokiTokenEventArgs {
+        isAvailable: boolean;
+        lokiAutoDiscoverUrl: string;
+        lokiToken: string;
+    }
+    /**
+     * [Api set: People 1.2]
+     */
+    class LokiTokenProvider extends OfficeExtension.ClientObject {
+        /** The request context associated with the object. This connects the add-in's process to the Office host application's process. */
+        context: RequestContext; 
+        readonly emailOrUpn: string;
+        requestToken(): void;
+        /**
+         * Queues up a command to load the specified properties of the object. You must call "context.sync()" before reading the properties.
+         *
+         * @remarks
+         *
+         * In addition to this signature, this method has the following signatures:
+         *
+         * `load(option?: string | string[]): OfficeCore.LokiTokenProvider` - Where option is a comma-delimited string or an array of strings that specify the properties to load.
+         *
+         * `load(option?: { select?: string; expand?: string; }): OfficeCore.LokiTokenProvider` - Where option.select is a comma-delimited string that specifies the properties to load, and options.expand is a comma-delimited string that specifies the navigation properties to load.
+         *
+         * `load(option?: { select?: string; expand?: string; top?: number; skip?: number }): OfficeCore.LokiTokenProvider` - Only available on collection types. It is similar to the preceding signature. Option.top specifies the maximum number of collection items that can be included in the result. Option.skip specifies the number of items that are to be skipped and not included in the result. If option.top is specified, the result set will start after skipping the specified number of items.
+         *
+         * @param options Provides options for which properties of the object to load.
+         */
+        load(option?: OfficeCore.Interfaces.LokiTokenProviderLoadOptions): OfficeCore.LokiTokenProvider;
+        load(option?: string | string[]): OfficeCore.LokiTokenProvider;
+        load(option?: {
+            select?: string;
+            expand?: string;
+        }): OfficeCore.LokiTokenProvider;
+        readonly onLokiTokenAvailable: OfficeExtension.EventHandlers<OfficeCore.LokiTokenEventArgs>;
+        /**
+        * Overrides the JavaScript `toJSON()` method in order to provide more useful output when an API object is passed to `JSON.stringify()`. (`JSON.stringify`, in turn, calls the `toJSON` method of the object that is passed to it.)
+        * Whereas the original OfficeCore.LokiTokenProvider object is an API object, the `toJSON` method returns a plain JavaScript object (typed as `OfficeCore.Interfaces.LokiTokenProviderData`) that contains shallow copies of any loaded child properties from the original object.
+        */
+        toJSON(): OfficeCore.Interfaces.LokiTokenProviderData;
+    }
+    /**
      *
-     * Represents the interface for opening a persona entry
+     * The ServiceContext class provides support for getting the objects for the specified
+            instance. When an instance is no longer in use call the Dispose method to cleanup
+            all of the data associated with the instance.
      *
      * [Api set: People 1.2]
      */
-    class PersonaFactory extends OfficeExtension.ClientObject {
+    class ServiceContext extends OfficeExtension.ClientObject {
         /** The request context associated with the object. This connects the add-in's process to the Office host application's process. */
         context: RequestContext; 
-        getPersonaForCurrentUser(): OfficeCore.Persona;
-        getPersonaForPersonaSpy(): OfficeCore.Persona;
-        getPersonaFromHostId(hostId: string): OfficeCore.Persona;
-        getPersonaOperations(): OfficeCore.PersonaOperations;
+        dispose(instance: string): void;
+        getInitialPersona(): OfficeCore.Persona;
+        getLokiTokenProvider(): OfficeCore.LokiTokenProvider;
+        getPersonaLifetime(): OfficeCore.PersonaLifetime;
         /**
-         * Create a new instance of OfficeCore.PersonaFactory object
+         * Create a new instance of OfficeCore.ServiceContext object
          */
-        static newObject(context: OfficeExtension.ClientRequestContext): OfficeCore.PersonaFactory;
+        static newObject(context: OfficeExtension.ClientRequestContext): OfficeCore.ServiceContext;
         /**
         * Overrides the JavaScript `toJSON()` method in order to provide more useful output when an API object is passed to `JSON.stringify()`. (`JSON.stringify`, in turn, calls the `toJSON` method of the object that is passed to it.)
-        * Whereas the original OfficeCore.PersonaFactory object is an API object, the `toJSON` method returns a plain JavaScript object (typed as `OfficeCore.Interfaces.PersonaFactoryData`) that contains shallow copies of any loaded child properties from the original object.
+        * Whereas the original OfficeCore.ServiceContext object is an API object, the `toJSON` method returns a plain JavaScript object (typed as `OfficeCore.Interfaces.ServiceContextData`) that contains shallow copies of any loaded child properties from the original object.
         */
         toJSON(): {
             [key: string]: string;
@@ -18769,6 +18875,10 @@ declare namespace OfficeCore {
         interface CommentCollectionUpdateData {
             items?: OfficeCore.Interfaces.CommentData[];
         }
+        /** An interface for updating data on the PersonaCollection object, for use in "personaCollection.set({ ... })". */
+        interface PersonaCollectionUpdateData {
+            items?: OfficeCore.Interfaces.PersonaData[];
+        }
         /** An interface describing the data returned by calling "authenticationService.toJSON()". */
         interface AuthenticationServiceData {
         }
@@ -18852,10 +18962,10 @@ declare namespace OfficeCore {
         interface CommentCollectionData {
             items?: OfficeCore.Interfaces.CommentData[];
         }
-        /** An interface describing the data returned by calling "personaSummary.toJSON()". */
-        interface PersonaSummaryData {
-            displayName?: string;
-            status?: string;
+        /** An interface describing the data returned by calling "memberInfoList.toJSON()". */
+        interface MemberInfoListData {
+            isWarmedUp?: boolean;
+            isWarmingUp?: boolean;
         }
         /** An interface describing the data returned by calling "personaInfoSource.toJSON()". */
         interface PersonaInfoSourceData {
@@ -18924,18 +19034,20 @@ declare namespace OfficeCore {
         interface PersonaPhotoInfoData {
             url?: string;
         }
-        /** An interface describing the data returned by calling "personaCapabilites.toJSON()". */
-        interface PersonaCapabilitesData {
+        /** An interface describing the data returned by calling "personaCapabilities.toJSON()". */
+        interface PersonaCapabilitiesData {
             canAddContact?: boolean;
             canEditContact?: boolean;
             hasCustomizations?: boolean;
         }
+        /** An interface describing the data returned by calling "personaCollection.toJSON()". */
+        interface PersonaCollectionData {
+            items?: OfficeCore.Interfaces.PersonaData[];
+        }
         /** An interface describing the data returned by calling "personaOrganizationInfo.toJSON()". */
         interface PersonaOrganizationInfoData {
-            directReportsCount?: number;
-            hierarchyCount?: number;
-            isLoaded?: boolean;
-            isLoading?: boolean;
+            isWarmedUp?: boolean;
+            isWarmingUp?: boolean;
         }
         /** An interface describing the data returned by calling "unifiedGroupInfo.toJSON()". */
         interface UnifiedGroupInfoData {
@@ -18948,6 +19060,7 @@ declare namespace OfficeCore {
             email?: string;
             hasGuests?: boolean;
             isPublic?: boolean;
+            isWarmedUp?: boolean;
             memberCount?: number;
             oneDrive?: string;
             oneNote?: string;
@@ -18958,19 +19071,19 @@ declare namespace OfficeCore {
         }
         /** An interface describing the data returned by calling "persona.toJSON()". */
         interface PersonaData {
-            capabilites?: OfficeCore.Interfaces.PersonaCapabilitesData;
+            capabilities?: OfficeCore.Interfaces.PersonaCapabilitiesData;
             organization?: OfficeCore.Interfaces.PersonaOrganizationInfoData;
             personaInfo?: OfficeCore.Interfaces.PersonaInfoData;
             photo?: OfficeCore.Interfaces.PersonaPhotoInfoData;
-            summary?: OfficeCore.Interfaces.PersonaSummaryData;
             unifiedCommunicationInfo?: OfficeCore.Interfaces.PersonaUnifiedCommunicationInfoData;
             unifiedGroupInfo?: OfficeCore.Interfaces.UnifiedGroupInfoData;
             diagnosticId?: string;
             hostId?: string;
             type?: OfficeCore.PersonaType | "Unknown" | "Enterprise" | "Contact" | "Bot" | "PhoneOnly" | "OneOff" | "DistributionList" | "PersonalDistributionList" | "Anonymous" | "UnifiedGroup";
         }
-        /** An interface describing the data returned by calling "personaOperations.toJSON()". */
-        interface PersonaOperationsData {
+        /** An interface describing the data returned by calling "lokiTokenProvider.toJSON()". */
+        interface LokiTokenProviderData {
+            emailOrUpn?: string;
         }
         /**
          *
@@ -19142,10 +19255,10 @@ declare namespace OfficeCore {
         /**
          * [Api set: People 1.2]
          */
-        interface PersonaSummaryLoadOptions {
+        interface MemberInfoListLoadOptions {
             $all?: boolean;
-            displayName?: boolean;
-            status?: boolean;
+            isWarmedUp?: boolean;
+            isWarmingUp?: boolean;
         }
         /**
          *
@@ -19244,11 +19357,56 @@ declare namespace OfficeCore {
          *
          * [Api set: People 1.2]
          */
-        interface PersonaCapabilitesLoadOptions {
+        interface PersonaCapabilitiesLoadOptions {
             $all?: boolean;
             canAddContact?: boolean;
             canEditContact?: boolean;
             hasCustomizations?: boolean;
+        }
+        /**
+         *
+         * Represents a collection of personas
+         *
+         * [Api set: People 1.2]
+         */
+        interface PersonaCollectionLoadOptions {
+            $all?: boolean;
+            /**
+            For EACH ITEM in the collection: Capabilities
+            */
+            capabilities?: OfficeCore.Interfaces.PersonaCapabilitiesLoadOptions;
+            /**
+            For EACH ITEM in the collection: Organization
+            */
+            organization?: OfficeCore.Interfaces.PersonaOrganizationInfoLoadOptions;
+            /**
+            For EACH ITEM in the collection: PersonaInfo
+            */
+            personaInfo?: OfficeCore.Interfaces.PersonaInfoLoadOptions;
+            /**
+            For EACH ITEM in the collection: Photo
+            */
+            photo?: OfficeCore.Interfaces.PersonaPhotoInfoLoadOptions;
+            /**
+            For EACH ITEM in the collection: UnifiedCommunicationInfo
+            */
+            unifiedCommunicationInfo?: OfficeCore.Interfaces.PersonaUnifiedCommunicationInfoLoadOptions;
+            /**
+            For EACH ITEM in the collection: UnifiedGroupInfo
+            */
+            unifiedGroupInfo?: OfficeCore.Interfaces.UnifiedGroupInfoLoadOptions;
+            /**
+            For EACH ITEM in the collection: DiagnosticId
+             */
+            diagnosticId?: boolean;
+            /**
+            For EACH ITEM in the collection: HostId
+             */
+            hostId?: boolean;
+            /**
+            For EACH ITEM in the collection: Type
+             */
+            type?: boolean;
         }
         /**
          * [Api set: People 1.2]
@@ -19256,10 +19414,8 @@ declare namespace OfficeCore {
         interface PersonaOrganizationInfoLoadOptions {
             $all?: boolean;
             manager?: OfficeCore.Interfaces.PersonaLoadOptions;
-            directReportsCount?: boolean;
-            hierarchyCount?: boolean;
-            isLoaded?: boolean;
-            isLoading?: boolean;
+            isWarmedUp?: boolean;
+            isWarmingUp?: boolean;
         }
         /**
          * [Api set: People 1.2]
@@ -19275,6 +19431,7 @@ declare namespace OfficeCore {
             email?: boolean;
             hasGuests?: boolean;
             isPublic?: boolean;
+            isWarmedUp?: boolean;
             memberCount?: boolean;
             oneDrive?: boolean;
             oneNote?: boolean;
@@ -19291,16 +19448,22 @@ declare namespace OfficeCore {
          */
         interface PersonaLoadOptions {
             $all?: boolean;
-            capabilites?: OfficeCore.Interfaces.PersonaCapabilitesLoadOptions;
+            capabilities?: OfficeCore.Interfaces.PersonaCapabilitiesLoadOptions;
             organization?: OfficeCore.Interfaces.PersonaOrganizationInfoLoadOptions;
             personaInfo?: OfficeCore.Interfaces.PersonaInfoLoadOptions;
             photo?: OfficeCore.Interfaces.PersonaPhotoInfoLoadOptions;
-            summary?: OfficeCore.Interfaces.PersonaSummaryLoadOptions;
             unifiedCommunicationInfo?: OfficeCore.Interfaces.PersonaUnifiedCommunicationInfoLoadOptions;
             unifiedGroupInfo?: OfficeCore.Interfaces.UnifiedGroupInfoLoadOptions;
             diagnosticId?: boolean;
             hostId?: boolean;
             type?: boolean;
+        }
+        /**
+         * [Api set: People 1.2]
+         */
+        interface LokiTokenProviderLoadOptions {
+            $all?: boolean;
+            emailOrUpn?: boolean;
         }
     }
 }
@@ -20429,7 +20592,7 @@ declare namespace Excel {
      *
      * Provides information about the table that raised the filter applied event.
      *
-     * [Api set: ExcelApi BETA (PREVIEW ONLY)]
+     * [Api set: ExcelApi BETA (PREVIEW ONLY).1]
      * @beta
      */
     interface TableFilteredEventArgs {
@@ -20437,7 +20600,7 @@ declare namespace Excel {
          *
          * Represents the id of the table in which the filter is applied..
          *
-         * [Api set: ExcelApi BETA (PREVIEW ONLY)]
+         * [Api set: ExcelApi BETA (PREVIEW ONLY).1]
          * @beta
          */
         tableId: string;
@@ -20445,7 +20608,7 @@ declare namespace Excel {
          *
          * Represents the type of the event. See Excel.EventType for details.
          *
-         * [Api set: ExcelApi BETA (PREVIEW ONLY)]
+         * [Api set: ExcelApi BETA (PREVIEW ONLY).1]
          * @beta
          */
         type: "TableFiltered";
@@ -20453,7 +20616,7 @@ declare namespace Excel {
          *
          * Represents the id of the worksheet which contains the table.
          *
-         * [Api set: ExcelApi BETA (PREVIEW ONLY)]
+         * [Api set: ExcelApi BETA (PREVIEW ONLY).1]
          * @beta
          */
         worksheetId: string;
@@ -20462,7 +20625,7 @@ declare namespace Excel {
      *
      * Provides information about the worksheet that raised the filter applied event.
      *
-     * [Api set: ExcelApi BETA (PREVIEW ONLY)]
+     * [Api set: ExcelApi BETA (PREVIEW ONLY).1]
      * @beta
      */
     interface WorksheetFilteredEventArgs {
@@ -20470,7 +20633,7 @@ declare namespace Excel {
          *
          * Represents the type of the event. See Excel.EventType for details.
          *
-         * [Api set: ExcelApi BETA (PREVIEW ONLY)]
+         * [Api set: ExcelApi BETA (PREVIEW ONLY).1]
          * @beta
          */
         type: "WorksheetFiltered";
@@ -20478,7 +20641,7 @@ declare namespace Excel {
          *
          * Represents the id of the worksheet in which the filter is applied.
          *
-         * [Api set: ExcelApi BETA (PREVIEW ONLY)]
+         * [Api set: ExcelApi BETA (PREVIEW ONLY).1]
          * @beta
          */
         worksheetId: string;
@@ -21582,7 +21745,7 @@ declare namespace Excel {
          *
          * True if the workbook uses the 1904 date system.
          *
-         * [Api set: ExcelApi BETA (PREVIEW ONLY)]
+         * [Api set: ExcelApi BETA (PREVIEW ONLY).1]
          * @beta
          */
         use1904DateSystem: boolean;
@@ -21612,7 +21775,7 @@ declare namespace Excel {
          *
          * Close current workbook.
          *
-         * [Api set: ExcelApi BETA (PREVIEW ONLY)]
+         * [Api set: ExcelApi BETA (PREVIEW ONLY).1]
          * @beta
          *
          * @param closeBehavior workbook close behavior.
@@ -21622,7 +21785,7 @@ declare namespace Excel {
          *
          * Close current workbook.
          *
-         * [Api set: ExcelApi BETA (PREVIEW ONLY)]
+         * [Api set: ExcelApi BETA (PREVIEW ONLY).1]
          *
          * @param closeBehavior workbook close behavior.
          */
@@ -21690,7 +21853,7 @@ declare namespace Excel {
          *
          * Save current workbook.
          *
-         * [Api set: ExcelApi BETA (PREVIEW ONLY)]
+         * [Api set: ExcelApi BETA (PREVIEW ONLY).1]
          * @beta
          *
          * @param saveBehavior workbook save behavior.
@@ -21700,7 +21863,7 @@ declare namespace Excel {
          *
          * Save current workbook.
          *
-         * [Api set: ExcelApi BETA (PREVIEW ONLY)]
+         * [Api set: ExcelApi BETA (PREVIEW ONLY).1]
          *
          * @param saveBehavior workbook save behavior.
          */
@@ -22220,6 +22383,21 @@ declare namespace Excel {
          */
         replaceAll(text: string, replacement: string, criteria: Excel.ReplaceCriteria): OfficeExtension.ClientResult<number>;
         /**
+         *
+         * Shows row or column groups by their outline levels.
+            Outlines group and summarize a list of data in the worksheet.
+            The `rowLevels` and `columnLevels` parameters specify how many levels of the outline will be displayed.
+            The acceptable argument range is between 0 and 8.
+            A value of 0 does not change the current display. A value greater than the current number of levels displays all the levels.
+         *
+         * [Api set: ExcelApi BETA (PREVIEW ONLY)]
+         * @beta
+         *
+         * @param rowLevels The number of row levels of an outline to display.
+         * @param columnLevels The number of column levels of an outline to display.
+         */
+        showOutlineLevels(rowLevels: number, columnLevels: number): void;
+        /**
          * Queues up a command to load the specified properties of the object. You must call "context.sync()" before reading the properties.
          *
          * @remarks
@@ -22290,7 +22468,7 @@ declare namespace Excel {
          *
          * Occurs when filter is applied on a specific worksheet.
          *
-         * [Api set: ExcelApi BETA (PREVIEW ONLY)]
+         * [Api set: ExcelApi BETA (PREVIEW ONLY).1]
          *
          * @eventproperty
          * @beta
@@ -22336,7 +22514,9 @@ declare namespace Excel {
         readonly onSelectionChanged: OfficeExtension.EventHandlers<Excel.WorksheetSelectionChangedEventArgs>;
         /**
          *
-         * Occurs when left-clicked/tapped operation happens in the worksheet.
+         * Occurs when left-clicked/tapped operation happens in the worksheet. This event will not be fired when clicking in the following cases:
+                    - The user drags the mouse for multi-selection.
+                    - The user selects a cell in the mode when cell arguments are selected for formula references.
          *
          * [Api set: ExcelApi BETA (PREVIEW ONLY)]
          *
@@ -22374,7 +22554,7 @@ declare namespace Excel {
          *
          * Inserts the specified worksheets of a workbook into the current workbook.
          *
-         * [Api set: ExcelApi BETA (PREVIEW ONLY)]
+         * [Api set: ExcelApi BETA (PREVIEW ONLY).1]
          * @beta
          *
          * @param base64File Required. The base64-encoded string representing the source workbook file.
@@ -22388,7 +22568,7 @@ declare namespace Excel {
          *
          * Inserts the specified worksheets of a workbook into the current workbook.
          *
-         * [Api set: ExcelApi BETA (PREVIEW ONLY)]
+         * [Api set: ExcelApi BETA (PREVIEW ONLY).1]
          *
          * @param base64File Required. The base64-encoded string representing the source workbook file.
          * @param sheetNamesToInsert Optional. The names of individual worksheets to insert. By default, all the worksheets from the source workbook are inserted.
@@ -22535,7 +22715,7 @@ declare namespace Excel {
          *
          * Occurs when any worksheet's filter is applied in the workbook.
          *
-         * [Api set: ExcelApi BETA (PREVIEW ONLY)]
+         * [Api set: ExcelApi BETA (PREVIEW ONLY).1]
          *
          * @eventproperty
          * @beta
@@ -22581,7 +22761,9 @@ declare namespace Excel {
         readonly onSelectionChanged: OfficeExtension.EventHandlers<Excel.WorksheetSelectionChangedEventArgs>;
         /**
          *
-         * Occurs when left-clicked/tapped operation happens in the worksheet collection.
+         * Occurs when left-clicked/tapped operation happens in the worksheet collection.This event will not be fired when clicking in the following cases:
+                    - The user drags the mouse for multi-selection.
+                    - The user selects a cell in the mode when cell arguments are selected for formula references.
          *
          * [Api set: ExcelApi BETA (PREVIEW ONLY)]
          *
@@ -22952,7 +23134,7 @@ declare namespace Excel {
             Returns true if all cells have a spill border, or false if all cells do not have a spill border.
             Returns null if there are cells both with and without spill borders within the range.
          *
-         * [Api set: ExcelApi BETA (PREVIEW ONLY)]
+         * [Api set: ExcelApi BETA (PREVIEW ONLY).1]
          * @beta
          */
         readonly hasSpill: boolean;
@@ -23050,7 +23232,7 @@ declare namespace Excel {
             Returns true if ALL cells would be saved as an array, or false if ALL cells would NOT be saved as an array formula.
             Returns null if there are cells both which would be saved as an array formula and would not be
          *
-         * [Api set: ExcelApi BETA (PREVIEW ONLY)]
+         * [Api set: ExcelApi BETA (PREVIEW ONLY).1]
          * @beta
          */
         readonly savedAsArray: boolean;
@@ -23496,7 +23678,7 @@ declare namespace Excel {
          *
          * Gets the range object containing the anchor cell for a cell getting spilled into. Fails if applied to a range with more than one cell. Read-only.
          *
-         * [Api set: ExcelApi BETA (PREVIEW ONLY)]
+         * [Api set: ExcelApi BETA (PREVIEW ONLY).1]
          * @beta
          */
         getSpillParent(): Excel.Range;
@@ -23505,7 +23687,7 @@ declare namespace Excel {
          * Gets the range object containing the anchor cell for a cell getting spilled into. Read-only.
             If it is not a spill cell or more than once cells are give, a null object will be returned.
          *
-         * [Api set: ExcelApi BETA (PREVIEW ONLY)]
+         * [Api set: ExcelApi BETA (PREVIEW ONLY).1]
          * @beta
          */
         getSpillParentOrNullObject(): Excel.Range;
@@ -23513,7 +23695,7 @@ declare namespace Excel {
          *
          * Gets the range object containing the spill range when called on an anchor cell. Fails if applied to a range with more than one cell. Read-only.
          *
-         * [Api set: ExcelApi BETA (PREVIEW ONLY)]
+         * [Api set: ExcelApi BETA (PREVIEW ONLY).1]
          * @beta
          */
         getSpillingToRange(): Excel.Range;
@@ -23522,7 +23704,7 @@ declare namespace Excel {
          * Gets the range object containing the spill range when called on an anchor cell. Read-only.
             If the range is not an anchor cell or spill range can't be found, a null object will be returned.
          *
-         * [Api set: ExcelApi BETA (PREVIEW ONLY)]
+         * [Api set: ExcelApi BETA (PREVIEW ONLY).1]
          * @beta
          */
         getSpillingToRangeOrNullObject(): Excel.Range;
@@ -23567,6 +23749,50 @@ declare namespace Excel {
          * [Api set: ExcelApi 1.3]
          */
         getVisibleView(): Excel.RangeView;
+        /**
+         *
+         * Groups columns and rows for an outline.
+         *
+         * [Api set: ExcelApi BETA (PREVIEW ONLY)]
+         * @beta
+         *
+         * @param groupOption Specifies how the range can be grouped by rows or columns.
+            An `InvalidArgument` error is thrown when the group option differs from the range's
+            `isEntireRow` or `isEntireColumn` property (i.e., `range.isEntireRow` is true and `groupOption` is "ByColumns"
+            or `range.isEntireColumn` is true and `groupOption` is "ByRows").
+         */
+        group(groupOption: Excel.GroupOption): void;
+        /**
+         *
+         * Groups columns and rows for an outline.
+         *
+         * [Api set: ExcelApi BETA (PREVIEW ONLY)]
+         *
+         * @param groupOption Specifies how the range can be grouped by rows or columns.
+            An `InvalidArgument` error is thrown when the group option differs from the range's
+            `isEntireRow` or `isEntireColumn` property (i.e., `range.isEntireRow` is true and `groupOption` is "ByColumns"
+            or `range.isEntireColumn` is true and `groupOption` is "ByRows").
+         */
+        group(groupOption: "ByRows" | "ByColumns"): void;
+        /**
+         *
+         * Hide details of the row or column group.
+         *
+         * [Api set: ExcelApi BETA (PREVIEW ONLY)]
+         * @beta
+         *
+         * @param groupOption Specifies whether to hide details of grouped rows or grouped columns.
+         */
+        hideGroupDetails(groupOption: Excel.GroupOption): void;
+        /**
+         *
+         * Hide details of the row or column group.
+         *
+         * [Api set: ExcelApi BETA (PREVIEW ONLY)]
+         *
+         * @param groupOption Specifies whether to hide details of grouped rows or grouped columns.
+         */
+        hideGroupDetails(groupOption: "ByRows" | "ByColumns"): void;
         /**
          *
          * Inserts a cell or a range of cells into the worksheet in place of this range, and shifts the other cells to make space. Returns a new Range object at the now blank space.
@@ -23667,12 +23893,50 @@ declare namespace Excel {
         showCard(): void;
         /**
          *
+         * Show details of the row or column group.
+         *
+         * [Api set: ExcelApi BETA (PREVIEW ONLY)]
+         * @beta
+         *
+         * @param groupOption Specifies whether to show details of grouped rows or grouped columns.
+         */
+        showGroupDetails(groupOption: Excel.GroupOption): void;
+        /**
+         *
+         * Show details of the row or column group.
+         *
+         * [Api set: ExcelApi BETA (PREVIEW ONLY)]
+         *
+         * @param groupOption Specifies whether to show details of grouped rows or grouped columns.
+         */
+        showGroupDetails(groupOption: "ByRows" | "ByColumns"): void;
+        /**
+         *
          * Shows a teaching callout next to the range.
             Title of the teaching callout.Body message of the teaching callout.
          *
          * [Api set: ExcelApi 1.9]
          */
         showTeachingCallout(title: string, message: string): void;
+        /**
+         *
+         * Ungroups columns and rows for an outline.
+         *
+         * [Api set: ExcelApi BETA (PREVIEW ONLY)]
+         * @beta
+         *
+         * @param groupOption Specifies how the range can be ungrouped by rows or columns.
+         */
+        ungroup(groupOption: Excel.GroupOption): void;
+        /**
+         *
+         * Ungroups columns and rows for an outline.
+         *
+         * [Api set: ExcelApi BETA (PREVIEW ONLY)]
+         *
+         * @param groupOption Specifies how the range can be ungrouped by rows or columns.
+         */
+        ungroup(groupOption: "ByRows" | "ByColumns"): void;
         /**
          *
          * Unmerge the range cells into separate cells.
@@ -25540,7 +25804,7 @@ declare namespace Excel {
          *
          * Occurs when filter is applied on any table in a workbook, or a worksheet.
          *
-         * [Api set: ExcelApi BETA (PREVIEW ONLY)]
+         * [Api set: ExcelApi BETA (PREVIEW ONLY).1]
          *
          * @eventproperty
          * @beta
@@ -25756,7 +26020,7 @@ declare namespace Excel {
          *
          * Changes the table to use the default table style.
          *
-         * [Api set: ExcelApi BETA (PREVIEW ONLY)]
+         * [Api set: ExcelApi BETA (PREVIEW ONLY).1]
          * @beta
          */
         clearStyle(): void;
@@ -25843,7 +26107,7 @@ declare namespace Excel {
          *
          * Occurs when filter is applied on a specific table.
          *
-         * [Api set: ExcelApi BETA (PREVIEW ONLY)]
+         * [Api set: ExcelApi BETA (PREVIEW ONLY).1]
          *
          * @eventproperty
          * @beta
@@ -32948,7 +33212,7 @@ declare namespace Excel {
          *
          * Gets a unique cell in the PivotTable based on a data hierarchy and the row and column items of their respective hierarchies. The returned cell is the intersection of the given row and column that contains the data from the given hierarchy. This method is the inverse of calling getPivotItems and getDataHierarchy on a particular cell.
          *
-         * [Api set: ExcelApi BETA (PREVIEW ONLY)]
+         * [Api set: ExcelApi BETA (PREVIEW ONLY).1]
          * @beta
          *
          * @param dataHierarchy The dataHierarchy that provides the data item to find.
@@ -33073,7 +33337,7 @@ declare namespace Excel {
     }
     /**
      *
-     * Represents a collection of all the PivotTables that are part of the workbook or worksheet.
+     * Represents a collection of all the PivotHierarchies that are part of the PivotTable.
      *
      * [Api set: ExcelApi 1.8]
      */
@@ -33095,7 +33359,7 @@ declare namespace Excel {
          *
          * [Api set: ExcelApi 1.8]
          *
-         * @param name Name of the PivotTable to be retrieved.
+         * @param name Name of the PivotHierarchy to be retrieved.
          */
         getItem(name: string): Excel.PivotHierarchy;
         /**
@@ -33234,7 +33498,7 @@ declare namespace Excel {
          *
          * [Api set: ExcelApi 1.8]
          *
-         * @param name Name of the PivotTable to be retrieved.
+         * @param name Name of the RowColumnPivotHierarchy to be retrieved.
          */
         getItem(name: string): Excel.RowColumnPivotHierarchy;
         /**
@@ -33394,7 +33658,7 @@ declare namespace Excel {
          *
          * [Api set: ExcelApi 1.8]
          *
-         * @param name Name of the PivotTable to be retrieved.
+         * @param name Name of the FilterPivotHierarchy to be retrieved.
          */
         getItem(name: string): Excel.FilterPivotHierarchy;
         /**
@@ -33560,7 +33824,7 @@ declare namespace Excel {
          *
          * [Api set: ExcelApi 1.8]
          *
-         * @param name Name of the PivotTable to be retrieved.
+         * @param name Name of the DataPivotHierarchy to be retrieved.
          */
         getItem(name: string): Excel.DataPivotHierarchy;
         /**
@@ -33737,7 +34001,7 @@ declare namespace Excel {
     }
     /**
      *
-     * Represents a collection of all the PivotTables that are part of the workbook or worksheet.
+     * Represents a collection of all the PivotFields that are part of a PivotTable's hierarchy.
      *
      * [Api set: ExcelApi 1.8]
      */
@@ -33748,27 +34012,27 @@ declare namespace Excel {
         readonly items: Excel.PivotField[];
         /**
          *
-         * Gets the number of pivot hierarchies in the collection.
+         * Gets the number of pivot fields in the collection.
          *
          * [Api set: ExcelApi 1.8]
          */
         getCount(): OfficeExtension.ClientResult<number>;
         /**
          *
-         * Gets a PivotHierarchy by its name or id.
+         * Gets a PivotField by its name or id.
          *
          * [Api set: ExcelApi 1.8]
          *
-         * @param name Name of the PivotTable to be retrieved.
+         * @param name Name of the PivotField to be retrieved.
          */
         getItem(name: string): Excel.PivotField;
         /**
          *
-         * Gets a PivotHierarchy by name. If the PivotHierarchy does not exist, will return a null object.
+         * Gets a PivotField by name. If the PivotField does not exist, will return a null object.
          *
          * [Api set: ExcelApi 1.8]
          *
-         * @param name Name of the PivotHierarchy to be retrieved.
+         * @param name Name of the PivotField to be retrieved.
          */
         getItemOrNullObject(name: string): Excel.PivotField;
         /**
@@ -33921,7 +34185,7 @@ declare namespace Excel {
     }
     /**
      *
-     * Represents a collection of all the Pivot Items related to their parent PivotField.
+     * Represents a collection of all the PivotItems related to their parent PivotField.
      *
      * [Api set: ExcelApi 1.8]
      */
@@ -33932,27 +34196,27 @@ declare namespace Excel {
         readonly items: Excel.PivotItem[];
         /**
          *
-         * Gets the number of pivot hierarchies in the collection.
+         * Gets the number of PivotItems in the collection.
          *
          * [Api set: ExcelApi 1.8]
          */
         getCount(): OfficeExtension.ClientResult<number>;
         /**
          *
-         * Gets a PivotHierarchy by its name or id.
+         * Gets a PivotItem by its name or id.
          *
          * [Api set: ExcelApi 1.8]
          *
-         * @param name Name of the PivotTable to be retrieved.
+         * @param name Name of the PivotItem to be retrieved.
          */
         getItem(name: string): Excel.PivotItem;
         /**
          *
-         * Gets a PivotHierarchy by name. If the PivotHierarchy does not exist, will return a null object.
+         * Gets a PivotItem by name. If the PivotItem does not exist, will return a null object.
          *
          * [Api set: ExcelApi 1.8]
          *
-         * @param name Name of the PivotHierarchy to be retrieved.
+         * @param name Name of the PivotItem to be retrieved.
          */
         getItemOrNullObject(name: string): Excel.PivotItem;
         /**
@@ -36907,7 +37171,7 @@ declare namespace Excel {
         name: string;
         /**
          *
-         * True means that this TableStyle object is read-only. Read-only.
+         * Specifies whether this TableStyle object is read-only. Read-only.
          *
          * [Api set: ExcelApi BETA (PREVIEW ONLY)]
          * @beta
@@ -37088,7 +37352,7 @@ declare namespace Excel {
         name: string;
         /**
          *
-         * True means that this PivotTableStyle object is read-only. Read-only.
+         * Specifies whether this PivotTableStyle object is read-only. Read-only.
          *
          * [Api set: ExcelApi BETA (PREVIEW ONLY)]
          * @beta
@@ -37269,7 +37533,7 @@ declare namespace Excel {
         name: string;
         /**
          *
-         * True means that this SlicerStyle object is read-only. Read-only.
+         * Specifies whether this SlicerStyle object is read-only. Read-only.
          *
          * [Api set: ExcelApi BETA (PREVIEW ONLY)]
          * @beta
@@ -37450,7 +37714,7 @@ declare namespace Excel {
         name: string;
         /**
          *
-         * True means that this TimelineStyle object is read-only. Read-only.
+         * Specifies whether this TimelineStyle object is read-only. Read-only.
          *
          * [Api set: ExcelApi BETA (PREVIEW ONLY)]
          * @beta
@@ -38423,6 +38687,14 @@ declare namespace Excel {
          * @beta
          */
         readonly id: string;
+        /**
+         *
+         * Gets or sets the comment thread status. A value of "true" means the comment thread is in the resolved state.
+         *
+         * [Api set: ExcelApi BETA (PREVIEW ONLY).1]
+         * @beta
+         */
+        resolved: boolean;
         /** Sets multiple properties of an object at the same time. You can pass either a plain object with the appropriate properties, or another API object of the same type.
          *
          * @remarks
@@ -38616,6 +38888,14 @@ declare namespace Excel {
          * @beta
          */
         readonly id: string;
+        /**
+         *
+         * Gets or sets the comment reply status. A value of "true" means the comment reply is in the resolved state.
+         *
+         * [Api set: ExcelApi BETA (PREVIEW ONLY).1]
+         * @beta
+         */
+        readonly resolved: boolean;
         /** Sets multiple properties of an object at the same time. You can pass either a plain object with the appropriate properties, or another API object of the same type.
          *
          * @remarks
@@ -38758,7 +39038,7 @@ declare namespace Excel {
          *
          * Creates a scalable vector graphic (SVG) from an XML string and adds it to the worksheet. Returns a Shape object that represents the new image.
          *
-         * [Api set: ExcelApi BETA (PREVIEW ONLY)]
+         * [Api set: ExcelApi BETA (PREVIEW ONLY).1]
          * @beta
          *
          * @param xml An XML string that represents the SVG.
@@ -42860,6 +43140,24 @@ declare namespace Excel {
         linearTrend = "LinearTrend",
         growthTrend = "GrowthTrend",
         flashFill = "FlashFill"
+    }
+    /**
+     * [Api set: ExcelApi BETA (PREVIEW ONLY)]
+     * @beta
+     */
+    enum GroupOption {
+        /**
+         *
+         * Group by rows.
+         *
+         */
+        byRows = "ByRows",
+        /**
+         *
+         * Group by columns.
+         *
+         */
+        byColumns = "ByColumns"
     }
     /**
      * [Api set: ExcelApi 1.9]
@@ -47398,7 +47696,7 @@ declare namespace Excel {
              *
              * True if the workbook uses the 1904 date system.
              *
-             * [Api set: ExcelApi BETA (PREVIEW ONLY)]
+             * [Api set: ExcelApi BETA (PREVIEW ONLY).1]
              * @beta
              */
             use1904DateSystem?: boolean;
@@ -51449,6 +51747,14 @@ declare namespace Excel {
              * @beta
              */
             content?: string;
+            /**
+             *
+             * Gets or sets the comment thread status. A value of "true" means the comment thread is in the resolved state.
+             *
+             * [Api set: ExcelApi BETA (PREVIEW ONLY).1]
+             * @beta
+             */
+            resolved?: boolean;
         }
         /** An interface for updating data on the CommentReplyCollection object, for use in "commentReplyCollection.set({ ... })". */
         interface CommentReplyCollectionUpdateData {
@@ -52202,7 +52508,7 @@ declare namespace Excel {
              *
              * True if the workbook uses the 1904 date system.
              *
-             * [Api set: ExcelApi BETA (PREVIEW ONLY)]
+             * [Api set: ExcelApi BETA (PREVIEW ONLY).1]
              * @beta
              */
             use1904DateSystem?: boolean;
@@ -52509,7 +52815,7 @@ declare namespace Excel {
             Returns true if all cells have a spill border, or false if all cells do not have a spill border.
             Returns null if there are cells both with and without spill borders within the range.
              *
-             * [Api set: ExcelApi BETA (PREVIEW ONLY)]
+             * [Api set: ExcelApi BETA (PREVIEW ONLY).1]
              * @beta
              */
             hasSpill?: boolean;
@@ -52607,7 +52913,7 @@ declare namespace Excel {
             Returns true if ALL cells would be saved as an array, or false if ALL cells would NOT be saved as an array formula.
             Returns null if there are cells both which would be saved as an array formula and would not be
              *
-             * [Api set: ExcelApi BETA (PREVIEW ONLY)]
+             * [Api set: ExcelApi BETA (PREVIEW ONLY).1]
              * @beta
              */
             savedAsArray?: boolean;
@@ -56929,7 +57235,7 @@ declare namespace Excel {
             name?: string;
             /**
              *
-             * True means that this TableStyle object is read-only. Read-only.
+             * Specifies whether this TableStyle object is read-only. Read-only.
              *
              * [Api set: ExcelApi BETA (PREVIEW ONLY)]
              * @beta
@@ -56952,7 +57258,7 @@ declare namespace Excel {
             name?: string;
             /**
              *
-             * True means that this PivotTableStyle object is read-only. Read-only.
+             * Specifies whether this PivotTableStyle object is read-only. Read-only.
              *
              * [Api set: ExcelApi BETA (PREVIEW ONLY)]
              * @beta
@@ -56975,7 +57281,7 @@ declare namespace Excel {
             name?: string;
             /**
              *
-             * True means that this SlicerStyle object is read-only. Read-only.
+             * Specifies whether this SlicerStyle object is read-only. Read-only.
              *
              * [Api set: ExcelApi BETA (PREVIEW ONLY)]
              * @beta
@@ -56998,7 +57304,7 @@ declare namespace Excel {
             name?: string;
             /**
              *
-             * True means that this TimelineStyle object is read-only. Read-only.
+             * Specifies whether this TimelineStyle object is read-only. Read-only.
              *
              * [Api set: ExcelApi BETA (PREVIEW ONLY)]
              * @beta
@@ -57330,6 +57636,14 @@ declare namespace Excel {
              * @beta
              */
             id?: string;
+            /**
+             *
+             * Gets or sets the comment thread status. A value of "true" means the comment thread is in the resolved state.
+             *
+             * [Api set: ExcelApi BETA (PREVIEW ONLY).1]
+             * @beta
+             */
+            resolved?: boolean;
         }
         /** An interface describing the data returned by calling "commentReplyCollection.toJSON()". */
         interface CommentReplyCollectionData {
@@ -57377,6 +57691,14 @@ declare namespace Excel {
              * @beta
              */
             id?: string;
+            /**
+             *
+             * Gets or sets the comment reply status. A value of "true" means the comment reply is in the resolved state.
+             *
+             * [Api set: ExcelApi BETA (PREVIEW ONLY).1]
+             * @beta
+             */
+            resolved?: boolean;
         }
         /** An interface describing the data returned by calling "shapeCollection.toJSON()". */
         interface ShapeCollectionData {
@@ -58249,7 +58571,7 @@ declare namespace Excel {
              *
              * True if the workbook uses the 1904 date system.
              *
-             * [Api set: ExcelApi BETA (PREVIEW ONLY)]
+             * [Api set: ExcelApi BETA (PREVIEW ONLY).1]
              * @beta
              */
             use1904DateSystem?: boolean;
@@ -58642,7 +58964,7 @@ declare namespace Excel {
             Returns true if all cells have a spill border, or false if all cells do not have a spill border.
             Returns null if there are cells both with and without spill borders within the range.
              *
-             * [Api set: ExcelApi BETA (PREVIEW ONLY)]
+             * [Api set: ExcelApi BETA (PREVIEW ONLY).1]
              * @beta
              */
             hasSpill?: boolean;
@@ -58740,7 +59062,7 @@ declare namespace Excel {
             Returns true if ALL cells would be saved as an array, or false if ALL cells would NOT be saved as an array formula.
             Returns null if there are cells both which would be saved as an array formula and would not be
              *
-             * [Api set: ExcelApi BETA (PREVIEW ONLY)]
+             * [Api set: ExcelApi BETA (PREVIEW ONLY).1]
              * @beta
              */
             savedAsArray?: boolean;
@@ -63623,7 +63945,7 @@ declare namespace Excel {
         }
         /**
          *
-         * Represents a collection of all the PivotTables that are part of the workbook or worksheet.
+         * Represents a collection of all the PivotHierarchies that are part of the PivotTable.
          *
          * [Api set: ExcelApi 1.8]
          */
@@ -63919,7 +64241,7 @@ declare namespace Excel {
         }
         /**
          *
-         * Represents a collection of all the PivotTables that are part of the workbook or worksheet.
+         * Represents a collection of all the PivotFields that are part of a PivotTable's hierarchy.
          *
          * [Api set: ExcelApi 1.8]
          */
@@ -63993,7 +64315,7 @@ declare namespace Excel {
         }
         /**
          *
-         * Represents a collection of all the Pivot Items related to their parent PivotField.
+         * Represents a collection of all the PivotItems related to their parent PivotField.
          *
          * [Api set: ExcelApi 1.8]
          */
@@ -65402,7 +65724,7 @@ declare namespace Excel {
             name?: boolean;
             /**
              *
-             * For EACH ITEM in the collection: True means that this TableStyle object is read-only. Read-only.
+             * For EACH ITEM in the collection: Specifies whether this TableStyle object is read-only. Read-only.
              *
              * [Api set: ExcelApi BETA (PREVIEW ONLY)]
              * @beta
@@ -65428,7 +65750,7 @@ declare namespace Excel {
             name?: boolean;
             /**
              *
-             * True means that this TableStyle object is read-only. Read-only.
+             * Specifies whether this TableStyle object is read-only. Read-only.
              *
              * [Api set: ExcelApi BETA (PREVIEW ONLY)]
              * @beta
@@ -65454,7 +65776,7 @@ declare namespace Excel {
             name?: boolean;
             /**
              *
-             * For EACH ITEM in the collection: True means that this PivotTableStyle object is read-only. Read-only.
+             * For EACH ITEM in the collection: Specifies whether this PivotTableStyle object is read-only. Read-only.
              *
              * [Api set: ExcelApi BETA (PREVIEW ONLY)]
              * @beta
@@ -65480,7 +65802,7 @@ declare namespace Excel {
             name?: boolean;
             /**
              *
-             * True means that this PivotTableStyle object is read-only. Read-only.
+             * Specifies whether this PivotTableStyle object is read-only. Read-only.
              *
              * [Api set: ExcelApi BETA (PREVIEW ONLY)]
              * @beta
@@ -65506,7 +65828,7 @@ declare namespace Excel {
             name?: boolean;
             /**
              *
-             * For EACH ITEM in the collection: True means that this SlicerStyle object is read-only. Read-only.
+             * For EACH ITEM in the collection: Specifies whether this SlicerStyle object is read-only. Read-only.
              *
              * [Api set: ExcelApi BETA (PREVIEW ONLY)]
              * @beta
@@ -65532,7 +65854,7 @@ declare namespace Excel {
             name?: boolean;
             /**
              *
-             * True means that this SlicerStyle object is read-only. Read-only.
+             * Specifies whether this SlicerStyle object is read-only. Read-only.
              *
              * [Api set: ExcelApi BETA (PREVIEW ONLY)]
              * @beta
@@ -65558,7 +65880,7 @@ declare namespace Excel {
             name?: boolean;
             /**
              *
-             * For EACH ITEM in the collection: True means that this TimelineStyle object is read-only. Read-only.
+             * For EACH ITEM in the collection: Specifies whether this TimelineStyle object is read-only. Read-only.
              *
              * [Api set: ExcelApi BETA (PREVIEW ONLY)]
              * @beta
@@ -65584,7 +65906,7 @@ declare namespace Excel {
             name?: boolean;
             /**
              *
-             * True means that this TimelineStyle object is read-only. Read-only.
+             * Specifies whether this TimelineStyle object is read-only. Read-only.
              *
              * [Api set: ExcelApi BETA (PREVIEW ONLY)]
              * @beta
@@ -65984,7 +66306,7 @@ declare namespace Excel {
             Returns true if all cells have a spill border, or false if all cells do not have a spill border.
             Returns null if there are cells both with and without spill borders within the range.
              *
-             * [Api set: ExcelApi BETA (PREVIEW ONLY)]
+             * [Api set: ExcelApi BETA (PREVIEW ONLY).1]
              * @beta
              */
             hasSpill?: boolean;
@@ -66082,7 +66404,7 @@ declare namespace Excel {
             Returns true if ALL cells would be saved as an array, or false if ALL cells would NOT be saved as an array formula.
             Returns null if there are cells both which would be saved as an array formula and would not be
              *
-             * [Api set: ExcelApi BETA (PREVIEW ONLY)]
+             * [Api set: ExcelApi BETA (PREVIEW ONLY).1]
              * @beta
              */
             savedAsArray?: boolean;
@@ -66183,6 +66505,14 @@ declare namespace Excel {
              * @beta
              */
             id?: boolean;
+            /**
+             *
+             * For EACH ITEM in the collection: Gets or sets the comment thread status. A value of "true" means the comment thread is in the resolved state.
+             *
+             * [Api set: ExcelApi BETA (PREVIEW ONLY).1]
+             * @beta
+             */
+            resolved?: boolean;
         }
         /**
          *
@@ -66233,6 +66563,14 @@ declare namespace Excel {
              * @beta
              */
             id?: boolean;
+            /**
+             *
+             * Gets or sets the comment thread status. A value of "true" means the comment thread is in the resolved state.
+             *
+             * [Api set: ExcelApi BETA (PREVIEW ONLY).1]
+             * @beta
+             */
+            resolved?: boolean;
         }
         /**
          *
@@ -66283,6 +66621,14 @@ declare namespace Excel {
              * @beta
              */
             id?: boolean;
+            /**
+             *
+             * For EACH ITEM in the collection: Gets or sets the comment reply status. A value of "true" means the comment reply is in the resolved state.
+             *
+             * [Api set: ExcelApi BETA (PREVIEW ONLY).1]
+             * @beta
+             */
+            resolved?: boolean;
         }
         /**
          *
@@ -66333,6 +66679,14 @@ declare namespace Excel {
              * @beta
              */
             id?: boolean;
+            /**
+             *
+             * Gets or sets the comment reply status. A value of "true" means the comment reply is in the resolved state.
+             *
+             * [Api set: ExcelApi BETA (PREVIEW ONLY).1]
+             * @beta
+             */
+            resolved?: boolean;
         }
         /**
          *
@@ -70056,7 +70410,7 @@ declare namespace Word {
         readonly revisionNumber: string;
         /**
          *
-         * Gets the security of the document. Read only.
+         * Gets security settings of the document. Read only. Some are access restrictions on the file on disk. Others are Document Protection settings. Some possible values are 0 = File on disk is read/write; 1 = Protect Document: File is encrypted and requires a password to open; 2 = Protect Document: Always Open as Read-Only; 3 = Protect Document: Both #1 and #2; 4 = File on disk is read only; 5 = Both #1 and #4; 6 = Both #2 and #4; 7 = All of #1, #2, and #4; 8 = Protect Document: Restrict Edit to read-only; 9 = Both #1 and #8; 10 = Both #2 and #8; 11 = All of #1, #2, and #8; 12 = Both #4 and #8; 13 = All of #1, #4, and #8; 14 = All of #2, #4, and #8; 15 = All of #1, #2, #4, and #8.
          *
          * [Api set: WordApi 1.3]
          */
@@ -75246,6 +75600,40 @@ declare namespace Word {
          */
         annotation = "Annotation",
     }
+    /**
+     *
+     * Level of interaciton user has had with the annotation
+            NOTE: 0-2 reserved for internal states
+     *
+     * [Api set: WordApi BETA (PREVIEW ONLY)]
+     * @beta
+     */
+    enum AnnotationState {
+        /**
+         *
+         * Annotation has been shown to user
+         *
+         */
+        seen = "Seen",
+        /**
+         *
+         * User has done a 'deep dive' into the annotation options
+         *
+         */
+        tried = "Tried",
+        /**
+         *
+         * User has applied the annotation
+         *
+         */
+        kept = "Kept",
+        /**
+         *
+         * User has chosen to 'ignore' or 'reject' the annotation
+         *
+         */
+        rejected = "Rejected",
+    }
     enum ErrorCodes {
         accessDenied = "AccessDenied",
         generalException = "GeneralException",
@@ -76635,7 +77023,7 @@ declare namespace Word {
             revisionNumber?: string;
             /**
              *
-             * Gets the security of the document. Read only.
+             * Gets security settings of the document. Read only. Some are access restrictions on the file on disk. Others are Document Protection settings. Some possible values are 0 = File on disk is read/write; 1 = Protect Document: File is encrypted and requires a password to open; 2 = Protect Document: Always Open as Read-Only; 3 = Protect Document: Both #1 and #2; 4 = File on disk is read only; 5 = Both #1 and #4; 6 = Both #2 and #4; 7 = All of #1, #2, and #4; 8 = Protect Document: Restrict Edit to read-only; 9 = Both #1 and #8; 10 = Both #2 and #8; 11 = All of #1, #2, and #8; 12 = Both #4 and #8; 13 = All of #1, #4, and #8; 14 = All of #2, #4, and #8; 15 = All of #1, #2, #4, and #8.
              *
              * [Api set: WordApi 1.3]
              */
@@ -78241,7 +78629,7 @@ declare namespace Word {
             revisionNumber?: boolean;
             /**
              *
-             * Gets the security of the document. Read only.
+             * Gets security settings of the document. Read only. Some are access restrictions on the file on disk. Others are Document Protection settings. Some possible values are 0 = File on disk is read/write; 1 = Protect Document: File is encrypted and requires a password to open; 2 = Protect Document: Always Open as Read-Only; 3 = Protect Document: Both #1 and #2; 4 = File on disk is read only; 5 = Both #1 and #4; 6 = Both #2 and #4; 7 = All of #1, #2, and #4; 8 = Protect Document: Restrict Edit to read-only; 9 = Both #1 and #8; 10 = Both #2 and #8; 11 = All of #1, #2, and #8; 12 = Both #4 and #8; 13 = All of #1, #4, and #8; 14 = All of #2, #4, and #8; 15 = All of #1, #2, #4, and #8.
              *
              * [Api set: WordApi 1.3]
              */

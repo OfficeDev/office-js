@@ -4627,18 +4627,6 @@ OSF.getClientEndPoint = function OSF$getClientEndPoint()
                 }
                 postScriptOverrideCheckAction(customizedScriptPath)
             }
-            else
-                try
-                {
-                    clientEndPoint.invoke("getCustomizedScriptPathAsync",function OSF$getCustomizedScriptPathAsyncCallback(errorCode, scriptPath)
-                    {
-                        postScriptOverrideCheckAction(errorCode === 0 ? scriptPath : null)
-                    },{__timeout__: 1e3})
-                }
-                catch(ex)
-                {
-                    OsfMsAjaxFactory.msAjaxDebug.trace("no script override through cross frame communication.")
-                }
         };
     if(OSF._OfficeAppFactory.getLoadScriptHelper)
         OSF._OfficeAppFactory.getLoadScriptHelper().waitForScripts([OSF.ConstantNames.MicrosoftAjaxId],checkScriptOverride)
