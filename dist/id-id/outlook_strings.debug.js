@@ -1,5 +1,3 @@
-/* Version: 16.0.10827.10000 */
-
 Type.registerNamespace("_u");
 _u.ExtensibilityStrings = function()
 {
@@ -26,6 +24,7 @@ _u.ExtensibilityStrings.l_DeleteAttachmentDoesNotExist_Text = "Lampiran tidak da
 _u.ExtensibilityStrings.l_DisplayNameTooLong_Text = "Satu atau beberapa nama tampilan yang disediakan terlalu panjang.";
 _u.ExtensibilityStrings.l_DisplayReplyFormHtmlBodyRequired_Text = "'htmlBody' diperlukan.";
 _u.ExtensibilityStrings.l_DuplicateNotificationKey_Text = "Pemberitahuan dengan tombol yang disediakan sudah ada.";
+_u.ExtensibilityStrings.l_Duplicate_Category_Error_Text = "Salah satu kategori yang tersedia sudah di daftar kategori master.";
 _u.ExtensibilityStrings.l_ElevatedPermissionNeededForMethod_Text = "Izin yang ditinggikan diperlukan untuk memanggil metode: '{0}'.";
 _u.ExtensibilityStrings.l_ElevatedPermissionNeeded_Text = "Izin yang ditinggikan diperlukan untuk mengakss anggota terproteksi dari JavaScript API untuk Office.";
 _u.ExtensibilityStrings.l_EmailAddressTooLong_Text = "Satu atau beberapa alamat email yang disediakan terlalu panjang.";
@@ -47,6 +46,8 @@ _u.ExtensibilityStrings.l_InvalidEventDates_Text = "Tanggal selesai diatur terja
 _u.ExtensibilityStrings.l_InvalidParameterValueError_Text = "Nilai parameter '{0}' tidak valid.";
 _u.ExtensibilityStrings.l_InvalidSelection_Text = "Pilihan tidak valid.";
 _u.ExtensibilityStrings.l_InvalidTime_Text = "Input tidak ditetapkan ke tanggal yang valid.";
+_u.ExtensibilityStrings.l_Invalid_Category_Error_Text = "Kategori yang diberikan tidak valid.";
+_u.ExtensibilityStrings.l_Item_Not_Saved_Error_Text = "ID tidak dapat diambil hingga item disimpan.";
 _u.ExtensibilityStrings.l_MessageInDifferentStoreError_Text = "ID EWS tidak dapat diambil karena pesan disimpan di bursa yang berbeda.";
 _u.ExtensibilityStrings.l_NoValidRecipientsProvided_Text = "Tidak tersedia penerima valid.";
 _u.ExtensibilityStrings.l_NotificationKeyNotFound_Text = "Tidak ada pemberitahuan dengan tombol yang disediakan.";

@@ -1,5 +1,3 @@
-/* Version: 16.0.10827.10000 */
-
 Type.registerNamespace("Strings");
 Strings.OfficeOM = function()
 {
@@ -51,7 +49,7 @@ Strings.OfficeOM.L_DataReadError = "Datalesefeil";
 Strings.OfficeOM.L_DataStale = "Dataene er ikke oppdaterte";
 Strings.OfficeOM.L_DataWriteError = "Dataskrivefeil";
 Strings.OfficeOM.L_DataWriteReminder = "Påminnelse om dataskriving";
-Strings.OfficeOM.L_DialogAddressNotTrusted = "Domenet for nettadressen er ikke inkludert i AppDomains-elementet i manifestet.";
+Strings.OfficeOM.L_DialogAddressNotTrusted = "Domenet for URL-adressen er ikke inkludert i AppDomains-elementet i manifestet, og er ikke under domene av kilde plasseringen.";
 Strings.OfficeOM.L_DialogAlreadyOpened = "Operasjonen mislyktes fordi dette tillegget allerede har en aktiv dialog.";
 Strings.OfficeOM.L_DialogInvalidScheme = "Oppsettet for nettadressen støttes ikke. Bruk HTTPS i stedet.";
 Strings.OfficeOM.L_DialogNavigateError = "Navigasjonsfeil i dialogboks";
@@ -72,6 +70,8 @@ Strings.OfficeOM.L_GetDataIsTooLarge = "Det forespurte datasettet er for stort."
 Strings.OfficeOM.L_GetDataParametersConflict = "De angitte parameterne er i konflikt.";
 Strings.OfficeOM.L_GetSelectionNotSupported = "Gjeldende utvalg støttes ikke.";
 Strings.OfficeOM.L_HostError = "Vertsfeil";
+Strings.OfficeOM.L_ImplicitGetAuthContextMissing = "Funksjonen for å hente godkjenningskontekst mangler";
+Strings.OfficeOM.L_ImplicitNotLoaded = "Modulen lastes ikke inn før det hentes et token";
 Strings.OfficeOM.L_InValidOptionalArgument = "ugyldig valgfritt argument";
 Strings.OfficeOM.L_IndexOutOfRange = "Indeksen er utenfor området.";
 Strings.OfficeOM.L_InitializeNotReady = "Office.js er ikke fullstendig lastet inn ennå. Prøv på nytt senere, eller kontroller at du legger til initialiseringskoden din i Office.initialize-funksjonen.";
@@ -103,7 +103,7 @@ Strings.OfficeOM.L_InvalidNode = "Ugyldig node";
 Strings.OfficeOM.L_InvalidObjectPath = "Objektbanen {0} fungerer ikke for det du prøver å gjøre. Hvis du bruker objektet på tvers av flere «context.sync»-kall og utenfor den sekvensielle utføringen av en satsvis «.run»-jobb, bruker du metodene «context.trackedObjects.add()» og «context.trackedObjects.remove()» til å administrere objektets levetid.";
 Strings.OfficeOM.L_InvalidOperationInCellEditMode = "Excel er i celleredigeringsmodus. Avslutt redigeringsmodus ved å trykke på Enter eller Tab, eller ved å velge en annen celle og deretter prøve på nytt.";
 Strings.OfficeOM.L_InvalidOrTimedOutSession = "Ugyldig eller tidsavbrutt økt";
-Strings.OfficeOM.L_InvalidOrTimedOutSessionMessage = "Office Online-økten er utløpt eller er ugyldig. Oppdater siden for å fortsette.";
+Strings.OfficeOM.L_InvalidOrTimedOutSessionMessage = "Office-økten er utløpt eller ugyldig. Oppdater siden for å fortsette.";
 Strings.OfficeOM.L_InvalidParameters = "Funksjonen {0} har ugyldige parametere.";
 Strings.OfficeOM.L_InvalidReadForBlankRow = "Angitt rad er tom.";
 Strings.OfficeOM.L_InvalidRequestContext = "Kan ikke bruke objektet på tvers av ulike forespørselskontekster.";
@@ -191,3 +191,4 @@ Strings.OfficeOM.L_UserAbortedMessage = "Brukeren samtykket ikke til tillatelsen
 Strings.OfficeOM.L_UserClickIgnore = "Brukeren valgte å ignorere dialogboksen.";
 Strings.OfficeOM.L_UserNotSignedIn = "Ingen påloggede brukere i Office.";
 Strings.OfficeOM.L_ValueNotLoaded = 'Verdien for resultatobjektet er ikke lastet inn ennå. Før du leser value-egenskapen, kan du ringe opp "context.sync()" på den tilknyttede forespørselskonteksten.';
+Strings.OfficeOM.L_WorkbookHiddenMessage = "JavaScript API-forespørselen mislyktes fordi arbeids boken ble skjult. Ta frem arbeids boken, og prøv på nytt.";

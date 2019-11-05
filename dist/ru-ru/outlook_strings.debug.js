@@ -1,5 +1,3 @@
-/* Version: 16.0.10827.10000 */
-
 Type.registerNamespace("_u");
 _u.ExtensibilityStrings = function()
 {
@@ -26,6 +24,7 @@ _u.ExtensibilityStrings.l_DeleteAttachmentDoesNotExist_Text = "Вложение 
 _u.ExtensibilityStrings.l_DisplayNameTooLong_Text = "Одно или несколько указанных отображаемых имен имеют слишком большую длину.";
 _u.ExtensibilityStrings.l_DisplayReplyFormHtmlBodyRequired_Text = "Наличие htmlBody обязательно.";
 _u.ExtensibilityStrings.l_DuplicateNotificationKey_Text = "Уведомление с указанным ключом уже существует.";
+_u.ExtensibilityStrings.l_Duplicate_Category_Error_Text = "Одна из указанных категорий уже добавлена в основной список категорий.";
 _u.ExtensibilityStrings.l_ElevatedPermissionNeededForMethod_Text = 'Для вызова метода "{0}" требуются повышенные привилегии.';
 _u.ExtensibilityStrings.l_ElevatedPermissionNeeded_Text = "Для доступа к защищенным элементам JavaScript API для Office требуются повышенные привилегии.";
 _u.ExtensibilityStrings.l_EmailAddressTooLong_Text = "Один или несколько указанных адресов электронной почты имеют слишком большую длину.";
@@ -47,6 +46,8 @@ _u.ExtensibilityStrings.l_InvalidEventDates_Text = "Дата окончания 
 _u.ExtensibilityStrings.l_InvalidParameterValueError_Text = "Параметр {0} имеет недопустимое значение.";
 _u.ExtensibilityStrings.l_InvalidSelection_Text = "Недопустимый выбор.";
 _u.ExtensibilityStrings.l_InvalidTime_Text = "Не удается преобразовать входные данные в допустимое значение времени.";
+_u.ExtensibilityStrings.l_Invalid_Category_Error_Text = "Указаны недопустимые категории.";
+_u.ExtensibilityStrings.l_Item_Not_Saved_Error_Text = "Чтобы получить идентификатор, сначала необходимо сохранить элемент.";
 _u.ExtensibilityStrings.l_MessageInDifferentStoreError_Text = "Не удалось получить ИД EWS, так как сообщение сохранено в другом хранилище.";
 _u.ExtensibilityStrings.l_NoValidRecipientsProvided_Text = "Не указаны допустимые получатели.";
 _u.ExtensibilityStrings.l_NotificationKeyNotFound_Text = "Уведомления с указанным ключом не найдены.";

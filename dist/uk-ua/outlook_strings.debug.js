@@ -1,5 +1,3 @@
-/* Version: 16.0.10827.10000 */
-
 Type.registerNamespace("_u");
 _u.ExtensibilityStrings = function()
 {
@@ -26,6 +24,7 @@ _u.ExtensibilityStrings.l_DeleteAttachmentDoesNotExist_Text = "Вкладенн�
 _u.ExtensibilityStrings.l_DisplayNameTooLong_Text = "Принаймні одне вказане коротке ім’я задовге.";
 _u.ExtensibilityStrings.l_DisplayReplyFormHtmlBodyRequired_Text = 'Необхідно обов’язково вказати "htmlBody".';
 _u.ExtensibilityStrings.l_DuplicateNotificationKey_Text = "Сповіщення з указаним ключем уже існує.";
+_u.ExtensibilityStrings.l_Duplicate_Category_Error_Text = "Одну з категорій за умови уже в шаблон списку.";
 _u.ExtensibilityStrings.l_ElevatedPermissionNeededForMethod_Text = 'Для виклику методу "{0}" потрібен дозвіл вищого рівня.';
 _u.ExtensibilityStrings.l_ElevatedPermissionNeeded_Text = "Для доступу до захищених учасників інтерфейсу API JavaScript для Office потрібен дозвіл вищого рівня.";
 _u.ExtensibilityStrings.l_EmailAddressTooLong_Text = "Принаймні одна вказана адреса електронної пошти задовга.";
@@ -47,6 +46,8 @@ _u.ExtensibilityStrings.l_InvalidEventDates_Text = "Дата завершенн�
 _u.ExtensibilityStrings.l_InvalidParameterValueError_Text = 'Значення параметра "{0}" неприпустиме.';
 _u.ExtensibilityStrings.l_InvalidSelection_Text = "Неприпустиме виділення.";
 _u.ExtensibilityStrings.l_InvalidTime_Text = "Введене значення не відповідає припустимому часу.";
+_u.ExtensibilityStrings.l_Invalid_Category_Error_Text = "Надані недійсні категорії.";
+_u.ExtensibilityStrings.l_Item_Not_Saved_Error_Text = "Щоб отримати ідентифікатор, спочатку збережіть елемент.";
 _u.ExtensibilityStrings.l_MessageInDifferentStoreError_Text = "Не вдалось отримати ідентифікатор EWS, тому що повідомлення збережено в іншому сховищі.";
 _u.ExtensibilityStrings.l_NoValidRecipientsProvided_Text = "Не вказано жодного припустимого одержувача.";
 _u.ExtensibilityStrings.l_NotificationKeyNotFound_Text = "Немає сповіщень із наданим ключем.";

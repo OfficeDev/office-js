@@ -1,5 +1,3 @@
-/* Version: 16.0.10827.10000 */
-
 Type.registerNamespace("Strings");
 Strings.OfficeOM = function()
 {
@@ -51,7 +49,7 @@ Strings.OfficeOM.L_DataReadError = "خطای خواندن داده";
 Strings.OfficeOM.L_DataStale = "داد به روز نیست";
 Strings.OfficeOM.L_DataWriteError = "خطای نوشتن داده";
 Strings.OfficeOM.L_DataWriteReminder = "یادآور نوشتن داده";
-Strings.OfficeOM.L_DialogAddressNotTrusted = "دامنه آدرس اینترنتی در عنصر AppDomains در مانیفست گنجانده نشده است.";
+Strings.OfficeOM.L_DialogAddressNotTrusted = "دامنه URL در عنصر AppDomains در مانیفست گنجانده نشده است، و دامنه فرعی مکان مبدأ نیست.";
 Strings.OfficeOM.L_DialogAlreadyOpened = "عملیات ناموفق بود زیرا افزونه از قبل پنجره فعال دارد.";
 Strings.OfficeOM.L_DialogInvalidScheme = "طرح نشانی اینترنتی پشتیبانی نمی‌شود. به جای آن، از HTTPS استفاده کنید.";
 Strings.OfficeOM.L_DialogNavigateError = "خطا در پیمایش پنجره";
@@ -72,6 +70,8 @@ Strings.OfficeOM.L_GetDataIsTooLarge = "مجموعه داده درخواستی �
 Strings.OfficeOM.L_GetDataParametersConflict = "پارامترهای معین شده با هم در تناقض هستند.";
 Strings.OfficeOM.L_GetSelectionNotSupported = "مورد انتخابی پشتیبانی نمی شود.";
 Strings.OfficeOM.L_HostError = "خطای میزبان";
+Strings.OfficeOM.L_ImplicitGetAuthContextMissing = "تابع دریافت بافتار تأیید اعتبار موجود نیست";
+Strings.OfficeOM.L_ImplicitNotLoaded = "پودمان قبل از به دست آوردن رمز بارگیری نشد";
 Strings.OfficeOM.L_InValidOptionalArgument = "آرگومان اختیاری نامعتبر";
 Strings.OfficeOM.L_IndexOutOfRange = "فهرست خارج از محدوده است.";
 Strings.OfficeOM.L_InitializeNotReady = "Office.js هنوز به‌طور کامل بارگیری نشده است. لطفاً دوباره تلاش کنید یا حتماً کل ارزش دهی اولیه را در کارکرد Office.initialize اضافه کنید.";
@@ -103,7 +103,7 @@ Strings.OfficeOM.L_InvalidNode = "گره نامعتبر";
 Strings.OfficeOM.L_InvalidObjectPath = "مسیر شئ «{0}» برای هدف شما کار نمی‌کند. اگر می‌خواهید از شئ در چندین فراخوانی «context.sync» و در خارج از اجرای ترتیبی دسته «.run» استفاده کنید، لطفاً از متدهای «context.trackedObjects.add()» و «context.trackedObjects.remove()» برای مدیریت چرخه عمر شئ استفاده کنید.";
 Strings.OfficeOM.L_InvalidOperationInCellEditMode = "Excel در حالت ویرایش سلول است. لطفاً با فشار دادن «ENTER» یا «TAB» یا انتخاب یک سلول دیگر، از حالت ویرایش خارج شوید و سپس دوباره امتحان کنید.";
 Strings.OfficeOM.L_InvalidOrTimedOutSession = "جلسه نامعتبر یا به پایان رسیده";
-Strings.OfficeOM.L_InvalidOrTimedOutSessionMessage = "جلسه آنلاین Office شما منقضی شده است یا نامعتبر است. برای ادامه، صفحه را تازه‌سازی کنید.";
+Strings.OfficeOM.L_InvalidOrTimedOutSessionMessage = "جلسه Office شما منقضی شده است یا نامعتبر است. برای ادامه، صفحه را تازه‌سازی کنید.";
 Strings.OfficeOM.L_InvalidParameters = "کارکرد {0} دارای پارامیترهای نامعتبر است.";
 Strings.OfficeOM.L_InvalidReadForBlankRow = "ردیف معین شده خالی است.";
 Strings.OfficeOM.L_InvalidRequestContext = "شئ در بین موضوع‌های درخواست مختلف استفاده نمی‌شود.";
@@ -191,3 +191,4 @@ Strings.OfficeOM.L_UserAbortedMessage = "کاربر برای مجوزهای اف
 Strings.OfficeOM.L_UserClickIgnore = "کاربر پنجره را نادیده گرفت.";
 Strings.OfficeOM.L_UserNotSignedIn = "هیچ کاربر Office وارد نشده است.";
 Strings.OfficeOM.L_ValueNotLoaded = "مقدار شئ نتیجه هنوز بارگیری نشده است. قبل از خواندن ویژگی مقدار، با «context.sync()» در زمینه درخواست مرتبط تماس بگیرید.";
+Strings.OfficeOM.L_WorkbookHiddenMessage = "درخواست API جاوا اسکریپت انجام نشد زیرا کتاب کار پنهان بود. لطفاً کتاب کار را از حالت پنهان در آورید و مجدداً امتحان کنید.";

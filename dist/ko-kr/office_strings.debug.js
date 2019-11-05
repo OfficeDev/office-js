@@ -1,5 +1,3 @@
-/* Version: 16.0.10827.10000 */
-
 Type.registerNamespace("Strings");
 Strings.OfficeOM = function()
 {
@@ -51,7 +49,7 @@ Strings.OfficeOM.L_DataReadError = "데이터 읽기 오류";
 Strings.OfficeOM.L_DataStale = "최신 상태가 아닌 데이터";
 Strings.OfficeOM.L_DataWriteError = "데이터 쓰기 오류";
 Strings.OfficeOM.L_DataWriteReminder = "데이터 쓰기 알림";
-Strings.OfficeOM.L_DialogAddressNotTrusted = "URL의 도메인이 매니페스트의 AppDomains 요소에 포함되어 있지 않습니다.";
+Strings.OfficeOM.L_DialogAddressNotTrusted = "URL의 도메인은 매니페스트의 AppDomains 요소에 포함되지 않으며 원본 위치의 하위 도메인이 아닙니다.";
 Strings.OfficeOM.L_DialogAlreadyOpened = "이 추가 기능에 활성 대화 상자가 이미 있기 때문에 작업을 수행하지 못했습니다.";
 Strings.OfficeOM.L_DialogInvalidScheme = "URL 스키마가 지원되지 않습니다. 대신 HTTPS를 사용하세요.";
 Strings.OfficeOM.L_DialogNavigateError = "탐색 오류 대화 상자";
@@ -72,6 +70,8 @@ Strings.OfficeOM.L_GetDataIsTooLarge = "요청한 데이터 집합이 너무 큽
 Strings.OfficeOM.L_GetDataParametersConflict = "지정된 매개 변수가 충돌합니다.";
 Strings.OfficeOM.L_GetSelectionNotSupported = "현재 선택 항목은 지원되지 않습니다.";
 Strings.OfficeOM.L_HostError = "호스트 오류";
+Strings.OfficeOM.L_ImplicitGetAuthContextMissing = "인증 컨텍스트를 가져오는 함수 누락";
+Strings.OfficeOM.L_ImplicitNotLoaded = "토큰을 취득하기 전에 모듈이 로드되지 않음";
 Strings.OfficeOM.L_InValidOptionalArgument = "잘못된 선택적 인수입니다.";
 Strings.OfficeOM.L_IndexOutOfRange = "인덱스가 범위를 벗어났습니다.";
 Strings.OfficeOM.L_InitializeNotReady = "Office.js가 완전히 로드되지 않았습니다. 나중에 다시 시도하거나 Office.initialize 함수에 초기화 코드를 추가하세요.";
@@ -103,7 +103,7 @@ Strings.OfficeOM.L_InvalidNode = "잘못된 노드";
 Strings.OfficeOM.L_InvalidObjectPath = '개체 경로 \'{0}\'이(가) 수행하려는 작업에 대해 작동하지 않습니다. 개체를 여러 "context.sync" 호출에서 ".run" 일괄 처리의 순차적 실행을 벗어나 사용하는 경우 "context.trackedObjects.add()" 및 "context.trackedObjects.remove()" 메서드를 사용하여 개체의 수명 주기를 관리하세요.';
 Strings.OfficeOM.L_InvalidOperationInCellEditMode = "Excel 셀 편집 모드입니다. &lt;Enter&gt; 또는 &lt;Tab&gt; 키를 누르거나 다른 셀을 선택하여 편집 모드를 종료한 다음 다시 시도하세요.";
 Strings.OfficeOM.L_InvalidOrTimedOutSession = "유효하지 않거나 시간 초과된 세션";
-Strings.OfficeOM.L_InvalidOrTimedOutSessionMessage = "Office Online 세션이 만료되었거나 유효하지 않습니다. 계속하려면 페이지를 새로 고치세요.";
+Strings.OfficeOM.L_InvalidOrTimedOutSessionMessage = "Office 세션이 만료되었거나 유효하지 않습니다. 계속하려면 페이지를 새로 고치세요.";
 Strings.OfficeOM.L_InvalidParameters = "함수 {0}에 잘못된 매개 변수가 있습니다.";
 Strings.OfficeOM.L_InvalidReadForBlankRow = "지정된 행이 비어 있습니다.";
 Strings.OfficeOM.L_InvalidRequestContext = "다른 요청 컨텍스트에서 개체를 사용할 수 없습니다.";
@@ -191,3 +191,4 @@ Strings.OfficeOM.L_UserAbortedMessage = "사용자가 추가 기능 권한을 �
 Strings.OfficeOM.L_UserClickIgnore = "사용자가 대화 상자를 무시하도록 선택했습니다.";
 Strings.OfficeOM.L_UserNotSignedIn = "Office에 로그인한 사용자가 없습니다.";
 Strings.OfficeOM.L_ValueNotLoaded = '결과 개체의 값이 아직 로드되지 않았습니다. 값 속성을 읽기 전에 연관된 요청 컨텍스트에서 "context.sync()"를 호출하세요.';
+Strings.OfficeOM.L_WorkbookHiddenMessage = "통합 문서가 숨김으로 설정되어 있어서 JavaScript API 요청에 실패했습니다. 통합 문서를 숨김 해제하고 다시 시도하세요.";

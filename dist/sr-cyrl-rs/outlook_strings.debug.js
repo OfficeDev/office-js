@@ -1,5 +1,3 @@
-/* Version: 16.0.10827.10000 */
-
 Type.registerNamespace("_u");
 _u.ExtensibilityStrings = function()
 {
@@ -26,6 +24,7 @@ _u.ExtensibilityStrings.l_DeleteAttachmentDoesNotExist_Text = "Није могу
 _u.ExtensibilityStrings.l_DisplayNameTooLong_Text = "Нека од пружених имена за приказ су предугачка.";
 _u.ExtensibilityStrings.l_DisplayReplyFormHtmlBodyRequired_Text = "„htmlBody“ је обавезан.";
 _u.ExtensibilityStrings.l_DuplicateNotificationKey_Text = "Обавештење са обезбеђеним кључем већ постоји.";
+_u.ExtensibilityStrings.l_Duplicate_Category_Error_Text = "Једна од обезбеђених категорија је већ на списку главних категорија.";
 _u.ExtensibilityStrings.l_ElevatedPermissionNeededForMethod_Text = "Пуна дозвола је потребна за позивање овог метода : '{0}'.";
 _u.ExtensibilityStrings.l_ElevatedPermissionNeeded_Text = "Пуна дозвола је потребна за приступ заштићеним члановима апликације JavaScript API за Office.";
 _u.ExtensibilityStrings.l_EmailAddressTooLong_Text = "Неке од пружених е-адреса су предугачке.";
@@ -47,6 +46,8 @@ _u.ExtensibilityStrings.l_InvalidEventDates_Text = "Датум завршетк�
 _u.ExtensibilityStrings.l_InvalidParameterValueError_Text = "Вредност параметра „{0}“ је неважећа.";
 _u.ExtensibilityStrings.l_InvalidSelection_Text = "Избор је неважећи.";
 _u.ExtensibilityStrings.l_InvalidTime_Text = "Унос се не разрешава на важеће време.";
+_u.ExtensibilityStrings.l_Invalid_Category_Error_Text = "Обезбеђене су неважеће категорије.";
+_u.ExtensibilityStrings.l_Item_Not_Saved_Error_Text = "Није могуће преузети ID док се ставка не сачува.";
 _u.ExtensibilityStrings.l_MessageInDifferentStoreError_Text = "Није могуће преузети EWS ID зато што је порука сачувана у другом складишту.";
 _u.ExtensibilityStrings.l_NoValidRecipientsProvided_Text = "Нису пружени важећи примаоци.";
 _u.ExtensibilityStrings.l_NotificationKeyNotFound_Text = "Не постоји ниједно обавештење са обезбеђеним кључем.";

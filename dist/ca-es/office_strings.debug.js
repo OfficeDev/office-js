@@ -1,5 +1,3 @@
-/* Version: 16.0.10827.10000 */
-
 Type.registerNamespace("Strings");
 Strings.OfficeOM = function()
 {
@@ -51,7 +49,7 @@ Strings.OfficeOM.L_DataReadError = "Error de lectura de dades";
 Strings.OfficeOM.L_DataStale = "Les dades no són actuals";
 Strings.OfficeOM.L_DataWriteError = "Error d'escriptura de dades";
 Strings.OfficeOM.L_DataWriteReminder = "Recordatori d'escriptura de dades";
-Strings.OfficeOM.L_DialogAddressNotTrusted = "El domini de l'adreça URL no s'inclou a l'element AppDomains del manifest.";
+Strings.OfficeOM.L_DialogAddressNotTrusted = "El domini de l'URL no està inclòs en l'element disponibles en el manifest i no és el subdomini d'ubicació d'origen.";
 Strings.OfficeOM.L_DialogAlreadyOpened = "Ha fallat l'operació perquè aquest complement ja té un diàleg actiu.";
 Strings.OfficeOM.L_DialogInvalidScheme = "L'esquema de l'adreça URL no és compatible. Utilitzeu el protocol HTTPS.";
 Strings.OfficeOM.L_DialogNavigateError = "Error de navegació per diàleg";
@@ -72,6 +70,8 @@ Strings.OfficeOM.L_GetDataIsTooLarge = "El conjunt de dades sol·licitat és mas
 Strings.OfficeOM.L_GetDataParametersConflict = "Els paràmetres especificats estan en conflicte.";
 Strings.OfficeOM.L_GetSelectionNotSupported = "La selecció actual no s'admet.";
 Strings.OfficeOM.L_HostError = "Error d'amfitrió";
+Strings.OfficeOM.L_ImplicitGetAuthContextMissing = "No hi és la funció per aconseguir el context d'autenticació";
+Strings.OfficeOM.L_ImplicitNotLoaded = "El mòdul no es carrega abans d'adquirir un testimoni";
 Strings.OfficeOM.L_InValidOptionalArgument = "argument opcional no vàlid";
 Strings.OfficeOM.L_IndexOutOfRange = "Índex fora de l'Interval.";
 Strings.OfficeOM.L_InitializeNotReady = "Office.js encara no s'ha carregat completament. Torneu-ho a provar més tard o assegureu-vos d'afegir el vostre codi d'inicialització a la funció Office.initialize.";
@@ -103,7 +103,7 @@ Strings.OfficeOM.L_InvalidNode = "Node no vàlid";
 Strings.OfficeOM.L_InvalidObjectPath = 'La ruta de l\'objecte "{0}" no s\'admet per a l\'acció que esteu provat de realitzar. Si esteu utilitzant l\'objecte en diverses crides de "context.sync" i fora de l\'execució seqüencial d\'un lot de ".run", utilitzeu els mètodes "context.trackedObjects.add()" i "context.trackedObjects.remove()" per administrar el cicle de vida de l\'objecte.';
 Strings.OfficeOM.L_InvalidOperationInCellEditMode = "L'Excel té activat el mode d'edició de cel·les. Sortiu del mode d'edició prement la tecla Retorn o el Tabulador, o bé seleccionant una altra cel·la i, a continuació, torneu-ho a provar.";
 Strings.OfficeOM.L_InvalidOrTimedOutSession = "La sessió no és vàlida o s'ha esgotat el temps d'espera";
-Strings.OfficeOM.L_InvalidOrTimedOutSessionMessage = "La vostra sessió de l'Office Online ha caducat o bé no és vàlida. Actualitzeu la pàgina per continuar.";
+Strings.OfficeOM.L_InvalidOrTimedOutSessionMessage = "La vostra sessió de l'Office ha caducat o bé no és vàlida. Actualitzeu la pàgina per continuar.";
 Strings.OfficeOM.L_InvalidParameters = "La funció {0} té paràmetres no vàlids.";
 Strings.OfficeOM.L_InvalidReadForBlankRow = "La fila especificada és buida.";
 Strings.OfficeOM.L_InvalidRequestContext = "No es pot utilitzar l'objecte en contextos de sol·licitud diferents.";
@@ -191,3 +191,4 @@ Strings.OfficeOM.L_UserAbortedMessage = "L'usuari no ha acceptat els permisos de
 Strings.OfficeOM.L_UserClickIgnore = "L'usuari ha decidit ignorar el quadre de diàleg.";
 Strings.OfficeOM.L_UserNotSignedIn = "No hi ha cap usuari amb la sessió iniciada a l'Office.";
 Strings.OfficeOM.L_ValueNotLoaded = "El valor de l'objecte resultant encara no s'ha calculat. Abans de llegir la propietat del valor, feu una crida a \"context.sync()\" al context de sol·licitud associat.";
+Strings.OfficeOM.L_WorkbookHiddenMessage = "La sol·licitud de l'API de JavaScript ha fallat perquè el llibre de treball estava amagat. Mostreu-lo i torneu-ho a provar.";

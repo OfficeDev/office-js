@@ -1,5 +1,3 @@
-/* Version: 16.0.10827.10000 */
-
 Type.registerNamespace("Strings");
 Strings.OfficeOM = function()
 {
@@ -51,7 +49,7 @@ Strings.OfficeOM.L_DataReadError = "Hitilafu ya Kusoma Data";
 Strings.OfficeOM.L_DataStale = "Dada Si Ya Sasa";
 Strings.OfficeOM.L_DataWriteError = "Hiilafu ya Kuandika Data";
 Strings.OfficeOM.L_DataWriteReminder = "Kikumbusho cha Kuandika Data";
-Strings.OfficeOM.L_DialogAddressNotTrusted = "Kikoa cha URL hakijajumuishwa katika kipengee cha AppDomains katika maelezo mafupi.";
+Strings.OfficeOM.L_DialogAddressNotTrusted = "Kikoa cha URL hakijajumuishwa katika kipengee cha AppDomains katika maelezo mafupi na si kikoa kidogo cha eneo la chanzo.";
 Strings.OfficeOM.L_DialogAlreadyOpened = "Uendeshaji haukufaulu kwa sababu programu-jalizi hii ina kumbukumbu amilifu.";
 Strings.OfficeOM.L_DialogInvalidScheme = "Mfumo wa URL hauauniwi. Tumia HTTPS badala yake.";
 Strings.OfficeOM.L_DialogNavigateError = "Hitilafu ya Uabiri wa Kumbukumbu";
@@ -72,6 +70,8 @@ Strings.OfficeOM.L_GetDataIsTooLarge = "Seti ya data iliyoombwa ni refu sana.";
 Strings.OfficeOM.L_GetDataParametersConflict = "Mgogoro wa paramita zilizobainishwa.";
 Strings.OfficeOM.L_GetSelectionNotSupported = "Uteuzi wa sasa hauauniwi.";
 Strings.OfficeOM.L_HostError = "Hitilafu ya Kipangishi";
+Strings.OfficeOM.L_ImplicitGetAuthContextMissing = "Kipengele cha kupata muktadha wa uhalalishaji kinakosekana";
+Strings.OfficeOM.L_ImplicitNotLoaded = "Moduli haipakiwi kabla ya kupata tokeni";
 Strings.OfficeOM.L_InValidOptionalArgument = "hoja ya hiari batili";
 Strings.OfficeOM.L_IndexOutOfRange = "Kielezo kiko nje ya masafa.";
 Strings.OfficeOM.L_InitializeNotReady = "Office.js haijapakiwa yote bado. Tafadhali jaribu tena baadaye au hakikisha kuwa umeongeza msimbo wako wa mwanzo kwenye kitendaji cha Office.initialize.";
@@ -103,7 +103,7 @@ Strings.OfficeOM.L_InvalidNode = "Fundo Batili";
 Strings.OfficeOM.L_InvalidObjectPath = 'Kijia cha kipengee \'{0}\' hakifanyi kazi kwa kile unachojaribu kufanya. Ikiwa unatumia kipengee kwenye simu anuwai za "context.sync" na nje ya utekelezaji endelevu wa bechi ya ".run", tafadhali tumia mbinu za "context.trackedObjects.add()" na "context.trackedObjects.remove()" kudhibiti muda wa kipengee.';
 Strings.OfficeOM.L_InvalidOperationInCellEditMode = "Excel iko katika hali ya kuhariri seli. Tafadhali ondoka katika hali ya kuhariri kwa kubonyeza ENTER au TAB au kuteua seli nyingine, na kisha ujaribu tena.";
 Strings.OfficeOM.L_InvalidOrTimedOutSession = "Kipindi Si Sahihi Au Kimekatizwa";
-Strings.OfficeOM.L_InvalidOrTimedOutSessionMessage = "Kipindi chako cha Office Online kimekwisha muda au si sahihi. Ili kuendelea, onyesha upya ukurasa.";
+Strings.OfficeOM.L_InvalidOrTimedOutSessionMessage = "Kipindi chako cha Office kimekwisha muda au si sahihi. Ili kuendelea, onyesha upya ukurasa.";
 Strings.OfficeOM.L_InvalidParameters = "Kitendaji {0} kina paramita batili.";
 Strings.OfficeOM.L_InvalidReadForBlankRow = "Safumlalo iliyobainishwa ni tupu.";
 Strings.OfficeOM.L_InvalidRequestContext = "Haiwezi kutumia kipengee kwenye miktadha tofauti ya ombi.";
@@ -191,3 +191,4 @@ Strings.OfficeOM.L_UserAbortedMessage = "Mtumiaji hakuridhia vibali vya nyongeza
 Strings.OfficeOM.L_UserClickIgnore = "Mtumiaji aliamua kupuuza kisanduku kidadisi.";
 Strings.OfficeOM.L_UserNotSignedIn = "Hakuna mtumiaji aliyeingia katika Office.";
 Strings.OfficeOM.L_ValueNotLoaded = 'Thamani ya kipengee cha matokeo haijapakiwa. Kabla ya kusoma sifa ya thamani, ita "context.sync()" kwenye muktadha wa ombi unaohusishwa.';
+Strings.OfficeOM.L_WorkbookHiddenMessage = "Ombi la JavaScript API halijafaulu kwa sababu kitabukazi kilifichwa. Tafadhali fichua kitabukazi na ujaribu tena.";

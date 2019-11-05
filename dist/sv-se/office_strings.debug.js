@@ -1,5 +1,3 @@
-/* Version: 16.0.10827.10000 */
-
 Type.registerNamespace("Strings");
 Strings.OfficeOM = function()
 {
@@ -51,7 +49,7 @@ Strings.OfficeOM.L_DataReadError = "Dataläsningsfel";
 Strings.OfficeOM.L_DataStale = "Data är inte aktuella";
 Strings.OfficeOM.L_DataWriteError = "Dataskrivningsfel";
 Strings.OfficeOM.L_DataWriteReminder = "Påminnelse om dataskrivning";
-Strings.OfficeOM.L_DialogAddressNotTrusted = "URL-adressens domän ingår inte i AppDomains-elementet i manifestet.";
+Strings.OfficeOM.L_DialogAddressNotTrusted = "URL-adressen ingår inte i AppDomains-elementet i manifestet, och är inte under domänen för käll platsen.";
 Strings.OfficeOM.L_DialogAlreadyOpened = "Åtgärden misslyckades eftersom tillägget redan har en aktiv dialogruta.";
 Strings.OfficeOM.L_DialogInvalidScheme = "URL-schemat stöds inte. Använd HTTPS i stället.";
 Strings.OfficeOM.L_DialogNavigateError = "Fel i dialogrutenavigering";
@@ -72,6 +70,8 @@ Strings.OfficeOM.L_GetDataIsTooLarge = "Den begärda datauppsättningen är för
 Strings.OfficeOM.L_GetDataParametersConflict = "De angivna parametrarna är i konflikt.";
 Strings.OfficeOM.L_GetSelectionNotSupported = "Den aktuella markeringen stöds inte.";
 Strings.OfficeOM.L_HostError = "Värdfel";
+Strings.OfficeOM.L_ImplicitGetAuthContextMissing = "Funktionen för att hämta kontext för autentisering saknas";
+Strings.OfficeOM.L_ImplicitNotLoaded = "Modulen lästes inte in innan token förvärvades";
 Strings.OfficeOM.L_InValidOptionalArgument = "ogiltigt argument som tillval";
 Strings.OfficeOM.L_IndexOutOfRange = "Index är utanför intervallet.";
 Strings.OfficeOM.L_InitializeNotReady = "Office.js har inte lästs in helt ännu. Försök igen senare eller lägg till din initieringskod för funktionen Office.initialize.";
@@ -103,7 +103,7 @@ Strings.OfficeOM.L_InvalidNode = "Ogiltig nod";
 Strings.OfficeOM.L_InvalidObjectPath = 'Objektsökvägen {0} fungerar inte för det du försöker göra. Om du använder objektet i flera "context.sync"-anrop och utanför den sekventiella körningen av en ".run"-batch använder du metoderna "context.trackedObjects.add()" och "context.trackedObjects.remove()" för att hantera objektets livstid.';
 Strings.OfficeOM.L_InvalidOperationInCellEditMode = "Excel är i cellredigeringsläge. Avsluta redigeringsläget genom att trycka på RETUR eller TABB eller genom att markera en annan cell och sedan försöka igen.";
 Strings.OfficeOM.L_InvalidOrTimedOutSession = "Sessionen är ogiltig eller har upphört";
-Strings.OfficeOM.L_InvalidOrTimedOutSessionMessage = "Din Office Online-session har upphört eller är ogiltig. Uppdatera sidan om du vill fortsätta.";
+Strings.OfficeOM.L_InvalidOrTimedOutSessionMessage = "Office-sessionen har upphört att gälla eller är ogiltig. Uppdatera sidan om du vill fortsätta.";
 Strings.OfficeOM.L_InvalidParameters = "Funktionen {0} har ogiltiga parametrar.";
 Strings.OfficeOM.L_InvalidReadForBlankRow = "Den angivna raden är tom.";
 Strings.OfficeOM.L_InvalidRequestContext = "Det går inte att använda objektet i flera olika begärankontexter.";
@@ -191,3 +191,4 @@ Strings.OfficeOM.L_UserAbortedMessage = "Användaren har inte godkänt behörigh
 Strings.OfficeOM.L_UserClickIgnore = "Användaren valde att ignorera dialogrutan.";
 Strings.OfficeOM.L_UserNotSignedIn = "Ingen användare är inloggad i Office.";
 Strings.OfficeOM.L_ValueNotLoaded = 'Värdet för ett resultatobjekt har inte lästs in ännu. Anropa "context.sync()" i den associerade begärandekontexten innan du läser värdeegenskapen.';
+Strings.OfficeOM.L_WorkbookHiddenMessage = "JavaScript-API-begäran misslyckades eftersom arbetsboken har dolts. Ta fram arbetsboken och försök igen.";

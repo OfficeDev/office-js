@@ -1,5 +1,3 @@
-/* Version: 16.0.10827.10000 */
-
 Type.registerNamespace("Strings");
 Strings.OfficeOM = function()
 {
@@ -51,7 +49,7 @@ Strings.OfficeOM.L_DataReadError = "Veri Okuma Hatası";
 Strings.OfficeOM.L_DataStale = "Veriler Güncel Değil";
 Strings.OfficeOM.L_DataWriteError = "Veri Yazma Hatası";
 Strings.OfficeOM.L_DataWriteReminder = "Veri Yazma Anımsatıcısı";
-Strings.OfficeOM.L_DialogAddressNotTrusted = "URL'nin etki alanı, bildirimdeki AppDomains öğesine eklenmemiş.";
+Strings.OfficeOM.L_DialogAddressNotTrusted = "URL'nin etki alanı bildirimdeki AppDomains öğesine dahil değildir ve kaynak konumun alt etki alanı değildir.";
 Strings.OfficeOM.L_DialogAlreadyOpened = "Bu eklentide zaten etkin bir iletişim kutusu olduğundan işlem başarısız oldu.";
 Strings.OfficeOM.L_DialogInvalidScheme = "URL düzeni desteklenmiyor. Bunun yerine HTTPS kullanın.";
 Strings.OfficeOM.L_DialogNavigateError = "İletişim Kutusu Gezinti Hatası";
@@ -72,6 +70,8 @@ Strings.OfficeOM.L_GetDataIsTooLarge = "İstenen veri kümesi çok büyük.";
 Strings.OfficeOM.L_GetDataParametersConflict = "Belirtilen parametreler çakışıyor.";
 Strings.OfficeOM.L_GetSelectionNotSupported = "Geçerli seçim desteklenmiyor.";
 Strings.OfficeOM.L_HostError = "Ana Bilgisayar Hatası";
+Strings.OfficeOM.L_ImplicitGetAuthContextMissing = "Kimlik doğrulama içeriğini almak için işlev eksik";
+Strings.OfficeOM.L_ImplicitNotLoaded = "Bir belirteç alınmadan modül yüklenmez";
 Strings.OfficeOM.L_InValidOptionalArgument = "geçersiz isteğe bağlı bağımsız değişken";
 Strings.OfficeOM.L_IndexOutOfRange = "Dizin aralık dışında.";
 Strings.OfficeOM.L_InitializeNotReady = "Office.js henüz tam olarak yüklenmedi. Lütfen daha sonra tekrar deneyin veya Office.initialize işlevine başlatma kodunuzu eklediğinizden emin olun.";
@@ -103,7 +103,7 @@ Strings.OfficeOM.L_InvalidNode = "Geçersiz Düğüm";
 Strings.OfficeOM.L_InvalidObjectPath = '\'{0}\' nesne yolu yapmak istediğiniz işlem için kullanılamaz. Nesneyi birden çok "context.sync" çağrısında ve ".run" toplu işleminin sıralı yürütülmesi dışında kullanıyorsanız, nesnenin yaşam süresini yönetirken lütfen "context.trackedObjects.add()" ve "context.trackedObjects.remove()" yöntemlerini kullanın.';
 Strings.OfficeOM.L_InvalidOperationInCellEditMode = "Excel, hücre düzenleme modunda. Lütfen ENTER veya SEKME tuşuna basarak ya da başka bir hücreyi seçerek düzenleme modundan çıkın ve sonra yeniden deneyin.";
 Strings.OfficeOM.L_InvalidOrTimedOutSession = "Geçersiz veya Zaman Aşımına Uğramış Oturum";
-Strings.OfficeOM.L_InvalidOrTimedOutSessionMessage = "Office Online oturumunuzun süresi doldu veya oturum geçersiz. Devam etmek için sayfayı yenileyin.";
+Strings.OfficeOM.L_InvalidOrTimedOutSessionMessage = "Office oturumunuz sona ermiş veya geçersiz. Devam etmek için sayfayı yenileyin.";
 Strings.OfficeOM.L_InvalidParameters = "{0} işlevi geçersiz parametrelere sahip.";
 Strings.OfficeOM.L_InvalidReadForBlankRow = "Belirtilen satır boş.";
 Strings.OfficeOM.L_InvalidRequestContext = "Nesne farklı istek bağlamlarında kullanılamıyor.";
@@ -191,3 +191,4 @@ Strings.OfficeOM.L_UserAbortedMessage = "Kullanıcı, eklenti izinlerini onaylam
 Strings.OfficeOM.L_UserClickIgnore = "Kullanıcı iletişim kutusunu yoksaymayı seçti.";
 Strings.OfficeOM.L_UserNotSignedIn = "Office oturumu açmış kullanıcı yok.";
 Strings.OfficeOM.L_ValueNotLoaded = 'Sonuç nesnesinin değeri henüz yüklenmedi. Değer özelliğini okumadan önce ilişkili istek bağlamında "context.sync()" öğesini çağırın.';
+Strings.OfficeOM.L_WorkbookHiddenMessage = "Çalışma kitabı gizli olduğu için JavaScript API isteği başarısız oldu. Lütfen çalışma kitabını Göster ve yeniden deneyin.";

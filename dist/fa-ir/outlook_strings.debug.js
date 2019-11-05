@@ -1,5 +1,3 @@
-/* Version: 16.0.10827.10000 */
-
 Type.registerNamespace("_u");
 _u.ExtensibilityStrings = function()
 {
@@ -26,6 +24,7 @@ _u.ExtensibilityStrings.l_DeleteAttachmentDoesNotExist_Text = "پیوست را �
 _u.ExtensibilityStrings.l_DisplayNameTooLong_Text = "یک یا چند نام نمایشی ارائه شده بیش از حد طولانی است.";
 _u.ExtensibilityStrings.l_DisplayReplyFormHtmlBodyRequired_Text = "'htmlBody' مورد نیاز است.";
 _u.ExtensibilityStrings.l_DuplicateNotificationKey_Text = "اعلان با کلید ارائه‌شده از قبل وجود دارد.";
+_u.ExtensibilityStrings.l_Duplicate_Category_Error_Text = "یکی از رده‌های ارائه‌شده در حال حاضر در فهرست مقوله اصلی است.";
 _u.ExtensibilityStrings.l_ElevatedPermissionNeededForMethod_Text = "برای درخواست این روش به مجوز ویژه نیاز است: '{0}'.";
 _u.ExtensibilityStrings.l_ElevatedPermissionNeeded_Text = "برای دسترسی به اعضای محافظت شده JavaScript API برای Office به مجوز ویژه نیاز است.";
 _u.ExtensibilityStrings.l_EmailAddressTooLong_Text = "یک یا چند آدرس ایمیل ارائه شده بیش از حد طولانی است.";
@@ -47,6 +46,8 @@ _u.ExtensibilityStrings.l_InvalidEventDates_Text = "تاریخ پایان قبل
 _u.ExtensibilityStrings.l_InvalidParameterValueError_Text = "مقدار پارامتر '{0}' نامعتبر است.";
 _u.ExtensibilityStrings.l_InvalidSelection_Text = "حالت انتخاب نامعتبر است.";
 _u.ExtensibilityStrings.l_InvalidTime_Text = "ورودی به زمان معتبری تبدیل نمی‌شود.";
+_u.ExtensibilityStrings.l_Invalid_Category_Error_Text = "رده‌های نامعتبری ارائه شد.";
+_u.ExtensibilityStrings.l_Item_Not_Saved_Error_Text = "تا زمانی که آیتم ذخیره نشده باشد، امکان بازیابی شناسه وجود ندارد.";
 _u.ExtensibilityStrings.l_MessageInDifferentStoreError_Text = "شناسه EWS قابل بازیابی نیست زیرا پیام در حافظه ذخیره‌سازی دیگری دخیره شده است.";
 _u.ExtensibilityStrings.l_NoValidRecipientsProvided_Text = "گیرنده معتبری ارائه نشده است.";
 _u.ExtensibilityStrings.l_NotificationKeyNotFound_Text = "هیچ اعلانی همراه با کلید ارائه‌شده وجود ندارد.";

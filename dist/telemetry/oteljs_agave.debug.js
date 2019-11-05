@@ -243,6 +243,10 @@ var oteljs_agave = function(modules) {
         return useXDR;
     }
     exports.useXDomainRequest = useXDomainRequest;
+    function useFetchRequest() {
+        return isReactNative() || isServiceWorkerGlobalScope();
+    }
+    exports.useFetchRequest = useFetchRequest;
     function isReactNative() {
         if (typeof navigator !== "undefined" && navigator.product) {
             return navigator.product === "ReactNative";
@@ -250,6 +254,13 @@ var oteljs_agave = function(modules) {
         return false;
     }
     exports.isReactNative = isReactNative;
+    function isServiceWorkerGlobalScope() {
+        if (typeof self === "object") {
+            return self.constructor.name === "ServiceWorkerGlobalScope";
+        }
+        return false;
+    }
+    exports.isServiceWorkerGlobalScope = isServiceWorkerGlobalScope;
     function twoDigit(n) {
         return n < 10 ? "0" + n : n.toString();
     }
@@ -1073,7 +1084,7 @@ var oteljs_agave = function(modules) {
             if (this._userAgentContainsString(BROWSERS.PHANTOMJS, userAgent)) {
                 return BROWSERS.PHANTOMJS;
             }
-            if (this._userAgentContainsString(BROWSERS.EDGE, userAgent)) {
+            if (this._userAgentContainsString(BROWSERS.EDGE, userAgent) || this._userAgentContainsString("Edg", userAgent)) {
                 return BROWSERS.EDGE;
             }
             if (this._userAgentContainsString(BROWSERS.ELECTRON, userAgent)) {
@@ -2058,7 +2069,7 @@ var oteljs_agave = function(modules) {
     Object.defineProperty(exports, "__esModule", {
         value: true
     });
-    exports.Version = "1.8.4";
+    exports.Version = "1.8.5";
     exports.FullVersionString = "AWT-Web-JS-" + exports.Version;
 }, function(module, exports, __webpack_require__) {
     "use strict";
@@ -2320,20 +2331,7 @@ var oteljs_agave = function(modules) {
                 this._httpInterface = {
                     sendPOST: function(urlString, data, ontimeout, onerror, onload, sync) {
                         try {
-                            if (Utils.useXDomainRequest()) {
-                                var xdr = new XDomainRequest();
-                                xdr.open(Method, urlString);
-                                xdr.onload = function() {
-                                    onload(200, null);
-                                };
-                                xdr.onerror = function() {
-                                    onerror(400, null);
-                                };
-                                xdr.ontimeout = function() {
-                                    ontimeout(500, null);
-                                };
-                                xdr.send(data);
-                            } else if (Utils.isReactNative()) {
+                            if (Utils.useFetchRequest()) {
                                 fetch(urlString, {
                                     body: data,
                                     method: Method
@@ -2348,6 +2346,19 @@ var oteljs_agave = function(modules) {
                                 }).catch(function(error) {
                                     onerror(0, {});
                                 });
+                            } else if (Utils.useXDomainRequest()) {
+                                var xdr = new XDomainRequest();
+                                xdr.open(Method, urlString);
+                                xdr.onload = function() {
+                                    onload(200, null);
+                                };
+                                xdr.onerror = function() {
+                                    onerror(400, null);
+                                };
+                                xdr.ontimeout = function() {
+                                    ontimeout(500, null);
+                                };
+                                xdr.send(data);
                             } else {
                                 var xhr_1 = new XMLHttpRequest();
                                 xhr_1.open(Method, urlString, !sync);
@@ -3376,12 +3387,12 @@ var oteljs_agave = function(modules) {
             return IsSupportedState.Unsupported;
         }
         if (isTelemetryApiSetSupported()) {
-            return IsSupportedState.NotDetermined;
+            return IsSupportedState.Supported;
         }
         return IsSupportedState.NotDetermined;
     }
     function isTelemetryApiSetSupported() {
-        return Office.context.requirements.isSetSupported("Telemetry", 1.1);
+        return Office.context.requirements.isSetSupported("Telemetry", 1.2);
     }
     function isSupportedAsync(onGetRichApiSink) {
         var testEvent = {
@@ -3485,7 +3496,7 @@ var oteljs_agave = function(modules) {
     function addDataFields(ariaEvent, fields, prependDataToken) {
         if (fields) {
             fields.forEach(function(field) {
-                if (field.classification && field.classification !== DataClassification.SystemMetadata) {
+                if (field.classification && !(field.classification === DataClassification.SystemMetadata || field.classification === DataClassification.EssentialServiceMetadata)) {
                     return;
                 }
                 var _a = [ "", "", field.name ], metadataPrefix = _a[0], dataToken = _a[1], fieldName = _a[2];
@@ -3621,19 +3632,40 @@ var oteljs_agave = function(modules) {
         };
         return FullEventProcessor;
     }();
+    var AriaSinkType;
+    (function(AriaSinkType) {
+        AriaSinkType[AriaSinkType["Aria"] = 0] = "Aria";
+        AriaSinkType[AriaSinkType["AriaSE"] = 1] = "AriaSE";
+    })(AriaSinkType || (AriaSinkType = {}));
     var AriaSink_AriaSink = function() {
-        function AriaSink(additionalDataFields, cacheMemorySizeLimitInNumberOfEvents) {
+        function AriaSink(additionalDataFields, cacheMemorySizeLimitInNumberOfEvents, ariaSinkProperties) {
             if (additionalDataFields === void 0) {
                 additionalDataFields = [];
             }
             this._preprocessors = [];
-            this._additionalDataFields = additionalDataFields;
+            this.additionalDataFields = additionalDataFields;
             this._fullEventProcessor = new FullEventProcessor_FullEventProcessor();
             this.addPreprocessor(this._fullEventProcessor);
-            initialize({
-                cacheMemorySizeLimitInNumberOfEvents: cacheMemorySizeLimitInNumberOfEvents
-            });
+            if (AriaSink.ariaSinkType === undefined) {
+                AriaSink.ariaSinkType = this.getSinkType();
+            } else if (AriaSink.ariaSinkType !== this.getSinkType()) {
+                throw new Error("Multiple Aria Configurations are not allowed");
+            }
+            initialize(this.getAWTLogConfiguration(cacheMemorySizeLimitInNumberOfEvents, ariaSinkProperties));
         }
+        AriaSink.prototype.getSinkType = function() {
+            return AriaSinkType.Aria;
+        };
+        AriaSink.prototype.getAWTLogConfiguration = function(cacheMemorySizeLimitInNumberOfEvents, ariaSinkProperties) {
+            var awtLogConfiguration = {
+                cacheMemorySizeLimitInNumberOfEvents: cacheMemorySizeLimitInNumberOfEvents,
+                disableCookiesUsage: true
+            };
+            if (ariaSinkProperties !== undefined) {
+                awtLogConfiguration.collectorUri = ariaSinkProperties.endpointUrl;
+            }
+            return awtLogConfiguration;
+        };
         AriaSink.prototype.sendTelemetryEvent = function(event, timestamp) {
             try {
                 for (var i = 0; i < this._preprocessors.length; i++) {
@@ -3641,7 +3673,7 @@ var oteljs_agave = function(modules) {
                         return;
                     }
                 }
-                sendEvent(event, this._additionalDataFields, timestamp);
+                sendEvent(event, this.additionalDataFields, timestamp);
             } catch (error) {
                 logNotification(LogLevel.Error, Category.Sink, function() {
                     var errorMessage;
@@ -3653,6 +3685,9 @@ var oteljs_agave = function(modules) {
                     return "AriaSink caught an error : " + errorMessage;
                 });
             }
+        };
+        AriaSink.prototype.getAdditionalDataFields = function() {
+            return this.additionalDataFields;
         };
         AriaSink.prototype.addPreprocessor = function(preprocessor) {
             this._preprocessors.push(preprocessor);
@@ -3674,7 +3709,11 @@ var oteljs_agave = function(modules) {
             this.supportsAllEvents = Office.context.requirements.isSetSupported("OutlookTelemetry", 1.1);
         }
         OutlookSink.isSupported = function() {
-            return !!Office && Office.context.requirements.isSetSupported("OutlookTelemetry");
+            try {
+                return Office.context.requirements.isSetSupported("OutlookTelemetry");
+            } catch (_a) {
+                return false;
+            }
         };
         OutlookSink.prototype.sendTelemetryEvent = function(event) {
             if (!this.supportsAllEvents && !event.eventName.match(/^Office\.Extensibility\.OfficeJs\.[a-zA-Z]*$/)) {
@@ -3722,6 +3761,7 @@ var oteljs_agave = function(modules) {
     var BASE10 = 10;
     var MAX_SUPPORTED_WIN32_VERSION = [ 16, 0, 11599 ];
     var MAX_SUPPORTED_MAC_VERSION = [ 16, 26 ];
+    var MAX_SUPPORTED_IOS_WXP_VERSION = [ 2, 29 ];
     var _additionalContext;
     var _sendEventEnabled;
     function AriaHelper_initialize(additionalContext, sendEventEnabled) {
@@ -3729,7 +3769,7 @@ var oteljs_agave = function(modules) {
         _sendEventEnabled = sendEventEnabled;
     }
     function convertContextToTypedDataFields() {
-        var context = __assign({}, defaultAriaContext, _additionalContext);
+        var context = __assign(__assign({}, defaultAriaContext), _additionalContext);
         var additionalDataFields = [];
         Object.keys(context).forEach(function(key) {
             additionalDataFields.push({
@@ -3752,20 +3792,26 @@ var oteljs_agave = function(modules) {
         }
         var platform = _additionalContext["App.Platform"];
         var version = _additionalContext["App.Version"];
-        return isSupportedVersion(version, platform);
+        var appName = _additionalContext["App.Name"];
+        return isSupportedVersion(version, platform, appName);
     }
-    function isSupportedVersion(version, platform) {
+    function isSupportedVersion(version, platform, appName) {
         if (!version) {
             return true;
         }
-        var versionArray = version.split(".");
+        var versionArray = String(version).split(".");
         var maxVersion;
         if (platform === "Win32") {
             maxVersion = MAX_SUPPORTED_WIN32_VERSION;
         } else if (platform === "Mac") {
             maxVersion = MAX_SUPPORTED_MAC_VERSION;
+        } else if (platform === "iOS") {
+            if (appName === "Outlook") {
+                return true;
+            }
+            maxVersion = MAX_SUPPORTED_IOS_WXP_VERSION;
         } else {
-            return true;
+            return false;
         }
         for (var i = 0; i < maxVersion.length && i < versionArray.length; i++) {
             var versionToken = parseInt(versionArray[i], BASE10);
@@ -3800,8 +3846,11 @@ var oteljs_agave = function(modules) {
             if (ariaSendEventEnabled === void 0) {
                 ariaSendEventEnabled = true;
             }
-            var sink = new AgaveSink(ariaAdditionalContext, ariaSendEventEnabled);
-            return sink;
+            var agaveSink = new AgaveSink(ariaAdditionalContext, ariaSendEventEnabled);
+            if (!agaveSink._isUsable) {
+                return undefined;
+            }
+            return agaveSink;
         };
         AgaveSink.prototype.initialize = function() {
             if (!this.isTelemetryEnabled()) {
@@ -3843,7 +3892,6 @@ var oteljs_agave = function(modules) {
             logNotification(LogLevel.Error, Category.Sink, function() {
                 return errorMessage;
             });
-            throw new Error(errorMessage);
         };
         AgaveSink.prototype.sendTelemetryEvent = function(event) {
             if (this._awaitingInitialization && this._isUsable) {

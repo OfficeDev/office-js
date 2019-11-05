@@ -1,5 +1,3 @@
-/* Version: 16.0.10827.10000 */
-
 Type.registerNamespace("Strings");
 Strings.OfficeOM = function()
 {
@@ -51,7 +49,7 @@ Strings.OfficeOM.L_DataReadError = "Σφάλμα ανάγνωσης δεδομέ
 Strings.OfficeOM.L_DataStale = "Μη ενημερωμένα δεδομένα";
 Strings.OfficeOM.L_DataWriteError = "Σφάλμα εγγραφής δεδομένων";
 Strings.OfficeOM.L_DataWriteReminder = "Υπενθύμιση εγγραφής δεδομένων";
-Strings.OfficeOM.L_DialogAddressNotTrusted = "Ο τομέας του URL δεν περιλαμβάνεται στο στοιχείο AppDomains στη διακήρυξη.";
+Strings.OfficeOM.L_DialogAddressNotTrusted = "Ο τομέας της ΔΙΕΎΘΥΝΣΗς URL δεν περιλαμβάνεται στο στοιχείο AppDomain στη διακήρυξη και δεν είναι δευτερεύων τομέας της θέσης προέλευσης.";
 Strings.OfficeOM.L_DialogAlreadyOpened = "Η λειτουργία απέτυχε, επειδή αυτό το πρόσθετο έχει ήδη ένα ενεργό παράθυρο διαλόγου.";
 Strings.OfficeOM.L_DialogInvalidScheme = "Ο συνδυασμός διευθύνσεων URL δεν υποστηρίζεται. Χρησιμοποιήστε εναλλακτικά το HTTPS.";
 Strings.OfficeOM.L_DialogNavigateError = "Σφάλμα περιήγησης παραθύρου διαλόγου";
@@ -72,6 +70,8 @@ Strings.OfficeOM.L_GetDataIsTooLarge = "Το σύνολο δεδομένων π�
 Strings.OfficeOM.L_GetDataParametersConflict = "Οι καθορισμένες παράμετροι παρουσιάζουν διένεξη.";
 Strings.OfficeOM.L_GetSelectionNotSupported = "Η τρέχουσα επιλογή δεν υποστηρίζεται.";
 Strings.OfficeOM.L_HostError = "Σφάλμα υποδοχής";
+Strings.OfficeOM.L_ImplicitGetAuthContextMissing = "Λείπει η συνάρτηση για να λάβετε το περιβάλλον ελέγχου ταυτότητας";
+Strings.OfficeOM.L_ImplicitNotLoaded = "Η λειτουργική μονάδα δεν φορτώνει πριν την απόκτηση διακριτικού ";
 Strings.OfficeOM.L_InValidOptionalArgument = "μη έγκυρο προαιρετικό όρισμα";
 Strings.OfficeOM.L_IndexOutOfRange = "Δείκτης εκτός περιοχής.";
 Strings.OfficeOM.L_InitializeNotReady = "Η φόρτωση του Office.js δεν έχει ολοκληρωθεί ακόμη. Προσπαθήστε ξανά αργότερα ή προσθέστε τον κώδικα προετοιμασίας στη συνάρτηση Office.initialize.";
@@ -103,7 +103,7 @@ Strings.OfficeOM.L_InvalidNode = "Μη έγκυρος κόμβος";
 Strings.OfficeOM.L_InvalidObjectPath = "Η διαδρομή αντικειμένου {0} δεν λειτουργεί για την ενέργεια που προσπαθείτε να κάνετε. Αν χρησιμοποιείτε το αντικείμενο σε πολλές κλήσεις context.sync και εκτός της σειριακής εκτέλεσης μιας δέσμης .run, χρησιμοποιήστε τις μεθόδους context.trackedObjects.add() και context.trackedObjects.remove() για να διαχειριστείτε τη διάρκεια ζωής του αντικειμένου.";
 Strings.OfficeOM.L_InvalidOperationInCellEditMode = "Το Excel βρίσκεται σε λειτουργία επεξεργασίας κελιού. Τερματίστε τη λειτουργία επεξεργασίας, πατώντας το πλήκτρο ENTER ή TAB ή επιλέγοντας ένα άλλο κελί και, στη συνέχεια, προσπαθήστε ξανά.";
 Strings.OfficeOM.L_InvalidOrTimedOutSession = "Μη έγκυρη περίοδος λειτουργίας ή λήξη χρονικού ορίου περιόδου λειτουργίας";
-Strings.OfficeOM.L_InvalidOrTimedOutSessionMessage = "Η περίοδος λειτουργίας του Office Online έχει λήξει ή δεν είναι έγκυρη. Για να συνεχίσετε, ανανεώστε τη σελίδα.";
+Strings.OfficeOM.L_InvalidOrTimedOutSessionMessage = "Η περίοδος λειτουργίας του Office έχει λήξει ή δεν είναι έγκυρη. Για να συνεχίσετε, ανανεώστε τη σελίδα.";
 Strings.OfficeOM.L_InvalidParameters = "Η συνάρτηση {0} έχει μη έγκυρες παραμέτρους.";
 Strings.OfficeOM.L_InvalidReadForBlankRow = "Η καθορισμένη γραμμή είναι κενή.";
 Strings.OfficeOM.L_InvalidRequestContext = "Δεν είναι δυνατή η χρήση του αντικειμένου σε διαφορετικά περιβάλλοντα αίτησης.";
@@ -154,7 +154,7 @@ Strings.OfficeOM.L_RunMustReturnPromise = "Η συνάρτηση δέσμης π
 Strings.OfficeOM.L_SSOClientError = "Παρουσιάστηκε σφάλμα στην αίτηση ελέγχου ταυτότητας από το Office.";
 Strings.OfficeOM.L_SSOClientErrorMessage = "Παρουσιάστηκε μη αναμενόμενο σφάλμα στο πρόγραμμα-πελάτη.";
 Strings.OfficeOM.L_SSOConnectionLostError = "Μια σύνδεση χάθηκε κατά τη διαδικασία εισόδου.";
-Strings.OfficeOM.L_SSOConnectionLostErrorMessage = "Μια σύνδεση χάθηκε κατά τη διαδικασία εισόδου και ο χρήστης ενδέχεται να μην έχει εισέλθει. Η πιθανότερη αιτία είναι οι ρυθμίσεις του προγράμματος περιήγησης του χρήστη, για παράδειγμα, οι ζώνες ασφάλειας.";
+Strings.OfficeOM.L_SSOConnectionLostErrorMessage = "Μια σύνδεση χάθηκε κατά τη διαδικασία εισόδου και ο χρήστης ενδέχεται να μην έχει εισέλθει. Η πιθανότερη αιτία είναι η ρύθμιση παραμέτρων του προγράμματος περιήγησης του χρήστη, για παράδειγμα, οι ζώνες ασφάλειας.";
 Strings.OfficeOM.L_SSOServerError = "Παρουσιάστηκε σφάλμα στην υπηρεσία παροχής ελέγχου ταυτότητας.";
 Strings.OfficeOM.L_SSOServerErrorMessage = "Παρουσιάστηκε μη αναμενόμενο σφάλμα στο διακομιστή.";
 Strings.OfficeOM.L_SSOUnsupportedPlatform = "Το API δεν υποστηρίζεται σε αυτήν την πλατφόρμα.";
@@ -191,3 +191,4 @@ Strings.OfficeOM.L_UserAbortedMessage = "Ο χρήστης δεν εκχώρησ
 Strings.OfficeOM.L_UserClickIgnore = "Ο χρήστης επέλεξε να παραβλέψει το παράθυρο διαλόγου.";
 Strings.OfficeOM.L_UserNotSignedIn = "Κανένας χρήστης δεν έχει συνδεθεί στο Office.";
 Strings.OfficeOM.L_ValueNotLoaded = "Η τιμή του αντικειμένου αποτελέσματος δεν έχει φορτωθεί ακόμη. Πριν από την ανάγνωση της ιδιότητας τιμής, καλέστε το context.sync() στο συσχετισμένο περιβάλλον αίτησης.";
+Strings.OfficeOM.L_WorkbookHiddenMessage = "Η αίτηση JavaScript API απέτυχε επειδή το βιβλίο εργασίας είναι κρυφή. Παρακαλώ εμφανίστε το βιβλίο εργασίας και προσπαθήστε ξανά.";

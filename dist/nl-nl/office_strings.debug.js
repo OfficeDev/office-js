@@ -1,5 +1,3 @@
-/* Version: 16.0.10827.10000 */
-
 Type.registerNamespace("Strings");
 Strings.OfficeOM = function()
 {
@@ -30,7 +28,7 @@ Strings.OfficeOM.L_CellFormatAmountBeyondLimits = "Opmerking: het is raadzaam he
 Strings.OfficeOM.L_CloseFileBeforeRetrieve = "Roep closeAsync op het huidige bestand aan voordat u een ander bestand ophaalt.";
 Strings.OfficeOM.L_CoercionTypeNotMatchBinding = "Het opgegeven forceringstype is niet compatibel met dit bindingstype.";
 Strings.OfficeOM.L_CoercionTypeNotSupported = "Het opgegeven forceringstype wordt niet ondersteund.";
-Strings.OfficeOM.L_ColIndexOutOfRange = "De kolom-indexwaarde ligt buiten het toegestane bereik. Gebruik een waarde (0 of hoger) die lager is dan het aantal kolommen.";
+Strings.OfficeOM.L_ColIndexOutOfRange = "De kolomindexwaarde ligt buiten het toegestane bereik. Gebruik een waarde (0 of hoger) die kleiner is dan het aantal kolommen.";
 Strings.OfficeOM.L_ConnectionFailureWithDetails = "De aanvraag is mislukt met statuscode {0}, foutcode {1} en het volgende foutbericht: {2}";
 Strings.OfficeOM.L_ConnectionFailureWithStatus = "De aanvraag is mislukt met statuscode {0}.";
 Strings.OfficeOM.L_CustomFunctionDefinitionMissing = "Er moet een eigenschap met deze naam voorkomen in Excel.Script.CustomFunctions die de definitie van de functie vertegenwoordigd.";
@@ -51,7 +49,7 @@ Strings.OfficeOM.L_DataReadError = "Fout bij het lezen van gegevens";
 Strings.OfficeOM.L_DataStale = "De gegevens zijn niet actueel";
 Strings.OfficeOM.L_DataWriteError = "Fout bij het schrijven van gegevens";
 Strings.OfficeOM.L_DataWriteReminder = "Herinnering voor gegevens schrijven";
-Strings.OfficeOM.L_DialogAddressNotTrusted = "Het domein van de URL is niet opgenomen in het element AppDomains in het manifest.";
+Strings.OfficeOM.L_DialogAddressNotTrusted = "Het domein van de URL is niet opgenomen in het AppDomains element in het manifest en is geen subdomein van de bronlocatie.";
 Strings.OfficeOM.L_DialogAlreadyOpened = "De bewerking is mislukt omdat deze invoegtoepassing al een actief dialoogvenster heeft.";
 Strings.OfficeOM.L_DialogInvalidScheme = "Het URL-schema wordt niet ondersteund. Gebruik in plaats hiervan HTTPS.";
 Strings.OfficeOM.L_DialogNavigateError = "Fout bij het navigeren naar het dialoogvenster";
@@ -72,6 +70,8 @@ Strings.OfficeOM.L_GetDataIsTooLarge = "De gevraagde gegevensset is te groot.";
 Strings.OfficeOM.L_GetDataParametersConflict = "Er is een conflict tussen de opgegeven parameters.";
 Strings.OfficeOM.L_GetSelectionNotSupported = "De huidige selectie wordt niet ondersteund.";
 Strings.OfficeOM.L_HostError = "Host-fout";
+Strings.OfficeOM.L_ImplicitGetAuthContextMissing = "De functie voor verificatie van context ontbreekt";
+Strings.OfficeOM.L_ImplicitNotLoaded = "De module is niet vooraf geladen haal een token op";
 Strings.OfficeOM.L_InValidOptionalArgument = "ongeldig optioneel argument";
 Strings.OfficeOM.L_IndexOutOfRange = "Index buiten bereik.";
 Strings.OfficeOM.L_InitializeNotReady = "Office.js is nog niet volledig geladen. Probeer het later opnieuw of zorg ervoor dat uw initialisatiecode is toegevoegd aan de functie Office.initialize.";
@@ -103,7 +103,7 @@ Strings.OfficeOM.L_InvalidNode = "Ongeldige knooppunt";
 Strings.OfficeOM.L_InvalidObjectPath = "Het objectpad {0} werkt niet voor wat u wilt doen. Als u het object gebruikt in combinatie met meerdere aanroepen van context.sync en buiten de sequentiële uitvoering van een batch '.run', gebruikt u de methoden context.trackedObjects.add() en context.trackedObjects.remove() voor het beheren van de levensduur van het object.";
 Strings.OfficeOM.L_InvalidOperationInCellEditMode = "Excel is in de celbewerkingsmodus. Sluit de bewerkingsmodus door op ENTER of TAB te drukken of een andere cel te selecteren. Probeer het vervolgens opnieuw.";
 Strings.OfficeOM.L_InvalidOrTimedOutSession = "Ongeldige sessie of sessie met time-out";
-Strings.OfficeOM.L_InvalidOrTimedOutSessionMessage = "De Office Online-sessie is verlopen of is ongeldig. Vernieuw de pagina om door te gaan.";
+Strings.OfficeOM.L_InvalidOrTimedOutSessionMessage = "Uw Office-sessie is verlopen of is ongeldig. Vernieuw de pagina om door te gaan.";
 Strings.OfficeOM.L_InvalidParameters = "Functie {0} heeft ongeldige parameters.";
 Strings.OfficeOM.L_InvalidReadForBlankRow = "De opgegeven rij is leeg.";
 Strings.OfficeOM.L_InvalidRequestContext = "Kan het object niet gebruiken in combinatie met verschillende aanvraagcontexten.";
@@ -191,3 +191,4 @@ Strings.OfficeOM.L_UserAbortedMessage = "De gebruiker heeft geen toestemming geg
 Strings.OfficeOM.L_UserClickIgnore = "De gebruiker heeft het dialoogvenster genegeerd.";
 Strings.OfficeOM.L_UserNotSignedIn = "Er is geen gebruiker aangemeld bij Office.";
 Strings.OfficeOM.L_ValueNotLoaded = "De waarde van het resultaatobject is nog niet geladen. Roep context.sync() in de context van de bijbehorende aanvraag aan voordat u de waarde-eigenschap leest.";
+Strings.OfficeOM.L_WorkbookHiddenMessage = "De aanvraag van de JavaScript-API is mislukt omdat de werkmap is verborgen. De werkmap zichtbaar maken en probeer het opnieuw.";

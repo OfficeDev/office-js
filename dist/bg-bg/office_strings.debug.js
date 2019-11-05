@@ -1,5 +1,3 @@
-/* Version: 16.0.10827.10000 */
-
 Type.registerNamespace("Strings");
 Strings.OfficeOM = function()
 {
@@ -51,7 +49,7 @@ Strings.OfficeOM.L_DataReadError = "Грешка при четене на дан
 Strings.OfficeOM.L_DataStale = "Данните не са актуални";
 Strings.OfficeOM.L_DataWriteError = "Грешка при запис на данни";
 Strings.OfficeOM.L_DataWriteReminder = "Напомняне за запис на данни";
-Strings.OfficeOM.L_DialogAddressNotTrusted = "Домейнът на URL адреса не е включен в елемента AppDomain в манифеста.";
+Strings.OfficeOM.L_DialogAddressNotTrusted = "Домейнът на URL адреса не е включен в елемента AppDomain в манифеста и не е поддомейн на местоположението на източника.";
 Strings.OfficeOM.L_DialogAlreadyOpened = "Операцията е неуспешна, защото тази добавка вече има активен диалогов прозорец.";
 Strings.OfficeOM.L_DialogInvalidScheme = "Схемата на URL адреса не се поддържа. Вместо това използвайте HTTPS.";
 Strings.OfficeOM.L_DialogNavigateError = "Грешка в навигацията в диалоговия прозорец";
@@ -72,6 +70,8 @@ Strings.OfficeOM.L_GetDataIsTooLarge = "Заявеният набор данни
 Strings.OfficeOM.L_GetDataParametersConflict = "Посочените параметри са в конфликт.";
 Strings.OfficeOM.L_GetSelectionNotSupported = "Текущата селекция не се поддържа.";
 Strings.OfficeOM.L_HostError = "Грешка на хоста";
+Strings.OfficeOM.L_ImplicitGetAuthContextMissing = "Функцията за получаване на контекст на удостоверяване липсва";
+Strings.OfficeOM.L_ImplicitNotLoaded = "Модулът не е зареден преди получаване на маркер";
 Strings.OfficeOM.L_InValidOptionalArgument = "невалиден незадължителен аргумент";
 Strings.OfficeOM.L_IndexOutOfRange = "Индексът е извън обхват.";
 Strings.OfficeOM.L_InitializeNotReady = "Office.js не е още напълно зареден. Опитайте отново по-късно или се уверете, че сте добавили кода за инициализация във функцията Office.initialize.";
@@ -103,7 +103,7 @@ Strings.OfficeOM.L_InvalidNode = "Невалиден възел";
 Strings.OfficeOM.L_InvalidObjectPath = 'Пътят на обекта "{0}" не работи за това, което се опитвате да направите. Ако използвате обекта в няколко различни повиквания на "context.sync" и извън последователно изпълнение на партида ".run", използвайте методите "context.trackedObjects.add()" и "context.trackedObjects.remove()" за управление на времето на живот на обекта.';
 Strings.OfficeOM.L_InvalidOperationInCellEditMode = "Excel е в режим на редактиране на клетка. Излезте от режим на редактиране, като натиснете ENTER или TAB, или изберете друга клетка и след това опитайте отново.";
 Strings.OfficeOM.L_InvalidOrTimedOutSession = "Невалидна или изтекла сесия";
-Strings.OfficeOM.L_InvalidOrTimedOutSessionMessage = "Сесията ви на Office Online е с изтекъл срок или е невалидна. За да продължите, обновете страницата.";
+Strings.OfficeOM.L_InvalidOrTimedOutSessionMessage = "Вашата сесия на Office е изтекла или е невалидна. За да продължите, обновете страницата.";
 Strings.OfficeOM.L_InvalidParameters = "Функцията {0} има невалиден параметри.";
 Strings.OfficeOM.L_InvalidReadForBlankRow = "Указаният ред е празен.";
 Strings.OfficeOM.L_InvalidRequestContext = "Не може да се използва обектът в контекста на различни заявки.";
@@ -191,3 +191,4 @@ Strings.OfficeOM.L_UserAbortedMessage = "Потребителят не се съ
 Strings.OfficeOM.L_UserClickIgnore = "Потребителят избра да игнорира диалоговия прозорец.";
 Strings.OfficeOM.L_UserNotSignedIn = "Нито един потребител не е влязъл в Office.";
 Strings.OfficeOM.L_ValueNotLoaded = 'Стойността на обекта резултат още не е заредена. Преди четене на свойството на стойността, повикайте "context.sync()" в контекста на съответната заявка.';
+Strings.OfficeOM.L_WorkbookHiddenMessage = "Искането за API на JavaScript е неуспешно, защото работната книга е скрита. Покажете работната книга и опитайте отново.";

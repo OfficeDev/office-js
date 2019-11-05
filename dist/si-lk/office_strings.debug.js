@@ -1,5 +1,3 @@
-/* Version: 16.0.10827.10000 */
-
 if (window.Type && window.Type.registerNamespace) {
 Type.registerNamespace('Strings');} else {
 if(typeof(window['Strings']) == 'undefined') {
@@ -57,7 +55,7 @@ Strings.OfficeOM.L_DataReadError='Data Read Error';
 Strings.OfficeOM.L_DataStale='Data Not Current';
 Strings.OfficeOM.L_DataWriteError='Data Write Error';
 Strings.OfficeOM.L_DataWriteReminder='Data Write Reminder';
-Strings.OfficeOM.L_DialogAddressNotTrusted='The domain of the URL is not included in the AppDomains element in the manifest.';
+Strings.OfficeOM.L_DialogAddressNotTrusted='The domain of the URL is not included in the AppDomains element in the manifest, and is not subdomain of source location.';
 Strings.OfficeOM.L_DialogAlreadyOpened='The operation failed because this add-in already has an active dialog.';
 Strings.OfficeOM.L_DialogInvalidScheme='The URL scheme is not supported. Use HTTPS instead.';
 Strings.OfficeOM.L_DialogNavigateError='Dialog Navigation Error';
@@ -78,6 +76,8 @@ Strings.OfficeOM.L_GetDataIsTooLarge='The requested data set is too large.';
 Strings.OfficeOM.L_GetDataParametersConflict='The specified parameters conflict.';
 Strings.OfficeOM.L_GetSelectionNotSupported='The current selection is not supported.';
 Strings.OfficeOM.L_HostError='Host Error';
+Strings.OfficeOM.L_ImplicitGetAuthContextMissing='The function to get authentication context is missing';
+Strings.OfficeOM.L_ImplicitNotLoaded='The module is not loaded before acquire a token';
 Strings.OfficeOM.L_InValidOptionalArgument='invalid optional argument';
 Strings.OfficeOM.L_IndexOutOfRange='Index out of range.';
 Strings.OfficeOM.L_InitializeNotReady='Office.js has not been fully loaded yet. Please try again later or make sure to add your initialization code on the Office.initialize function.';
@@ -109,7 +109,7 @@ Strings.OfficeOM.L_InvalidNode='Invalid Node';
 Strings.OfficeOM.L_InvalidObjectPath='The object path \'{0}\' isn\'t working for what you\'re trying to do. If you\'re using the object across multiple \"context.sync\" calls and outside the sequential execution of a \".run\" batch, please use the \"context.trackedObjects.add()\" and \"context.trackedObjects.remove()\" methods to manage the object\'s lifetime.';
 Strings.OfficeOM.L_InvalidOperationInCellEditMode='Excel is in cell-editing mode. Please exit the edit mode by pressing ENTER or TAB or selecting another cell, and then try again.';
 Strings.OfficeOM.L_InvalidOrTimedOutSession='Invalid Or Timed Out Session';
-Strings.OfficeOM.L_InvalidOrTimedOutSessionMessage='Your Office Online session has expired or is invalid. To continue, refresh the page.';
+Strings.OfficeOM.L_InvalidOrTimedOutSessionMessage='Your Office session has expired or is invalid. To continue, refresh the page.';
 Strings.OfficeOM.L_InvalidParameters='Function {0} has invalid parameters.';
 Strings.OfficeOM.L_InvalidReadForBlankRow='The specified row is blank.';
 Strings.OfficeOM.L_InvalidRequestContext='Cannot use the object across different request contexts.';
@@ -197,3 +197,4 @@ Strings.OfficeOM.L_UserAbortedMessage='The user did not consent the add-in permi
 Strings.OfficeOM.L_UserClickIgnore='The user chose to ignore the dialog box.';
 Strings.OfficeOM.L_UserNotSignedIn='No user is signed into Office.';
 Strings.OfficeOM.L_ValueNotLoaded='The value of the result object has not been loaded yet. Before reading the value property, call \"context.sync()\" on the associated request context.';
+Strings.OfficeOM.L_WorkbookHiddenMessage='The JavaScript API request failed because the workbook was hidden. Please unhide the workbook and try again.';

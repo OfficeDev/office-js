@@ -1,5 +1,3 @@
-/* Version: 16.0.10827.10000 */
-
 Type.registerNamespace("Strings");
 Strings.OfficeOM = function()
 {
@@ -51,7 +49,7 @@ Strings.OfficeOM.L_DataReadError = "Datu-irakurketaren errorea";
 Strings.OfficeOM.L_DataStale = "Datuak ez dira unekoak";
 Strings.OfficeOM.L_DataWriteError = "Datu-idazketaren errorea";
 Strings.OfficeOM.L_DataWriteReminder = "Datuak idazteari buruzko abisua";
-Strings.OfficeOM.L_DialogAddressNotTrusted = "URLaren domeinua ez dago manifestuaren AppDomains elementuan.";
+Strings.OfficeOM.L_DialogAddressNotTrusted = "URLaren domeinua ez dago manifestuaren AppDomains elementuan, eta ez da iturburuko kokalekuaren azpidomeinua.";
 Strings.OfficeOM.L_DialogAlreadyOpened = "Ezin izan da gauzatu eragiketa, osagarriak elkarrizketa-koadro bat aktibo duelako jada.";
 Strings.OfficeOM.L_DialogInvalidScheme = "URL eskema ez da onartzen. Erabili HTTPS.";
 Strings.OfficeOM.L_DialogNavigateError = "Elkarrizketa-koadroaren nabigazio-errorea";
@@ -72,6 +70,8 @@ Strings.OfficeOM.L_GetDataIsTooLarge = "Eskatutako datu multzoa handiegia da.";
 Strings.OfficeOM.L_GetDataParametersConflict = "Zehaztutako parametroak gatazkan daude.";
 Strings.OfficeOM.L_GetSelectionNotSupported = "Ez da uneko hautapena onartzen.";
 Strings.OfficeOM.L_HostError = "Ostalariaren errorea";
+Strings.OfficeOM.L_ImplicitGetAuthContextMissing = "Autentifikazioaren testuingurua eskuratzeko funtzioa ez dago";
+Strings.OfficeOM.L_ImplicitNotLoaded = "Ez da kargatu modulua tokena eskuratu aurretik";
 Strings.OfficeOM.L_InValidOptionalArgument = "aukerako argumentu baliogabea";
 Strings.OfficeOM.L_IndexOutOfRange = "Indizea barrutitik kanpo dago.";
 Strings.OfficeOM.L_InitializeNotReady = "Office.js oraindik ez da erabat kargatu. Saiatu berriro geroago edo ziurtatu hasieratze-kodea Office.initialize funtzioan gehitu duzula.";
@@ -103,7 +103,7 @@ Strings.OfficeOM.L_InvalidNode = "Nodo baliogabea";
 Strings.OfficeOM.L_InvalidObjectPath = 'Objektuaren "{0}" bide-izenak ez du balio egin behar duzunerako. Objektua hainbat "context.sync" deitan erabiltzen ari bazara eta ".run" sortaren exekuzio sekuentzialetik kanpo, erabili "context.trackedObjects.add()" eta "context.trackedObjects.remove()" metodoak objektuaren iraupena kudeatzeko.';
 Strings.OfficeOM.L_InvalidOperationInCellEditMode = "Gelaxkak editatzeko moduan dago Excel. Irten modu horretatik SARTU edo TAB sakatuta edo beste gelaxka bat hautatuta, eta saiatu berriro.";
 Strings.OfficeOM.L_InvalidOrTimedOutSession = "Saioak ez du balio edo iraungi egin da";
-Strings.OfficeOM.L_InvalidOrTimedOutSessionMessage = "Office Online saioa iraungi egin da edo ez du balio. Aurrera egiteko, freskatu orria.";
+Strings.OfficeOM.L_InvalidOrTimedOutSessionMessage = "Office saioa iraungi egin da edo ez du balio. Aurrera egiteko, freskatu orria.";
 Strings.OfficeOM.L_InvalidParameters = "{0} funtzioak parametro baliogabeak ditu.";
 Strings.OfficeOM.L_InvalidReadForBlankRow = "Adierazitako errenkada hutsik dago.";
 Strings.OfficeOM.L_InvalidRequestContext = "Ezin da erabili objektua eskaera-testuinguru desberdinetan.";
@@ -191,3 +191,4 @@ Strings.OfficeOM.L_UserAbortedMessage = "Erabiltzaileak ez ditu onartu osagarria
 Strings.OfficeOM.L_UserClickIgnore = "Erabiltzaileak ez ikusi egin dio elkarrizketa-koadroari.";
 Strings.OfficeOM.L_UserNotSignedIn = "Ez dago Office-n saioa hasita duen erabiltzailerik.";
 Strings.OfficeOM.L_ValueNotLoaded = 'Emaitza-objektuaren balioa ez da oraindik kargatu. Balioaren propietatea irakurri aurretik, deitu "context.sync()" funtzioari erlazionatutako eskaeraren testuinguruan.';
+Strings.OfficeOM.L_WorkbookHiddenMessage = "JavaScript APIaren eskaerak huts egin du, laneko liburua ezkutatuta dagoelako. Jarri laneko liburua ikusgai eta saiatu berriro.";

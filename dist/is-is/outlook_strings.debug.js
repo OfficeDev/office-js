@@ -1,5 +1,3 @@
-/* Version: 16.0.10827.10000 */
-
 Type.registerNamespace("_u");
 _u.ExtensibilityStrings = function()
 {
@@ -26,6 +24,7 @@ _u.ExtensibilityStrings.l_DeleteAttachmentDoesNotExist_Text = "Ekki var hægt a�
 _u.ExtensibilityStrings.l_DisplayNameTooLong_Text = "Eitt eða fleiri af nöfnum til birtingar sem eru gefin upp eru of löng.";
 _u.ExtensibilityStrings.l_DisplayReplyFormHtmlBodyRequired_Text = "„htmlBody“ er áskilið.";
 _u.ExtensibilityStrings.l_DuplicateNotificationKey_Text = "Tilkynning með þessum lykli er þegar til.";
+_u.ExtensibilityStrings.l_Duplicate_Category_Error_Text = "Einn af flokkunum sem var gefinn upp er nú þegar á aðalflokkalistanum.";
 _u.ExtensibilityStrings.l_ElevatedPermissionNeededForMethod_Text = "Þörf er á aukinni heimild til að framkvæma aðferð: '{0}'.";
 _u.ExtensibilityStrings.l_ElevatedPermissionNeeded_Text = "Þörf er á aukinni heimild til að komast að vernduðum meðlimum í JavaScript API for Office.";
 _u.ExtensibilityStrings.l_EmailAddressTooLong_Text = "Eitt eða fleiri af tölvupóstföngum sem eru gefin upp eru of löng.";
@@ -47,6 +46,8 @@ _u.ExtensibilityStrings.l_InvalidEventDates_Text = "Lokadagsetning á sér stað
 _u.ExtensibilityStrings.l_InvalidParameterValueError_Text = "Gildi færibreytunnar „{0}“ er ógilt.";
 _u.ExtensibilityStrings.l_InvalidSelection_Text = "Valið er ógilt.";
 _u.ExtensibilityStrings.l_InvalidTime_Text = "Inntakið skilaði ekki gildum tíma.";
+_u.ExtensibilityStrings.l_Invalid_Category_Error_Text = "Ógildir flokkar voru gefnir upp.";
+_u.ExtensibilityStrings.l_Item_Not_Saved_Error_Text = "Ekki er hægt að sækja auðkennið fyrr en atriðið hefur verið vistað.";
 _u.ExtensibilityStrings.l_MessageInDifferentStoreError_Text = "Ekki er hægt að sækja EWS-auðkennið vegna þess að atriðið er vistað í annarri geymslu.";
 _u.ExtensibilityStrings.l_NoValidRecipientsProvided_Text = "Engir gildir viðtakendur voru gefnir upp.";
 _u.ExtensibilityStrings.l_NotificationKeyNotFound_Text = "Engar tilkynningar með þessum lykli eru til staðar.";

@@ -1,5 +1,3 @@
-/* Version: 16.0.10827.10000 */
-
 Type.registerNamespace("_u");
 _u.ExtensibilityStrings = function()
 {
@@ -26,6 +24,7 @@ _u.ExtensibilityStrings.l_DeleteAttachmentDoesNotExist_Text = "አባሪው ሊ�
 _u.ExtensibilityStrings.l_DisplayNameTooLong_Text = "ከማሳያ ስሞቹ አንዱ ወይም ከዛ በላይ በጣም ረዥሞች ናቸው።";
 _u.ExtensibilityStrings.l_DisplayReplyFormHtmlBodyRequired_Text = "'htmlBody' ያስፈልጋል።";
 _u.ExtensibilityStrings.l_DuplicateNotificationKey_Text = "የቀረበውን ቁልፍ የያዘ ማሳወቂያ ቀድሞም ይገኛል።";
+_u.ExtensibilityStrings.l_Duplicate_Category_Error_Text = "ከቀረቡት ምድቦች አንዱ ቀድሞም በዋናው ምድብ ውስጥ አለ።";
 _u.ExtensibilityStrings.l_ElevatedPermissionNeededForMethod_Text = "ዘዴውን ለመጥራት ከፍተኛ ፈቃድ ያስፈልጋል: '{0}'.";
 _u.ExtensibilityStrings.l_ElevatedPermissionNeeded_Text = "የተጠበቁ የ JavaScript API አባሎችን ለ Office ለመጠቀም ከፍተኛ ፈቃድ ያስፈልጋል።";
 _u.ExtensibilityStrings.l_EmailAddressTooLong_Text = "ከቀረቡት የኢሜይል አድራሻዎች ውስጥ አንዱ ወይም ከዛ በላይ የሆኑት ረዥም ናቸው።";
@@ -47,6 +46,8 @@ _u.ExtensibilityStrings.l_InvalidEventDates_Text = "የመጨረሻው ቀን �
 _u.ExtensibilityStrings.l_InvalidParameterValueError_Text = "የ '{0}' ልኬት እሴት ልክ አይደለም።";
 _u.ExtensibilityStrings.l_InvalidSelection_Text = "የአመራረጥ ሁኔታው ትክክል አይደለም።";
 _u.ExtensibilityStrings.l_InvalidTime_Text = "ግቤቱ ወደ ትክክለኛ ቀን ሊቀየር አልቻም።";
+_u.ExtensibilityStrings.l_Invalid_Category_Error_Text = "ልክ ያልሆኑ ምድቦች ቀርበው ነበር።";
+_u.ExtensibilityStrings.l_Item_Not_Saved_Error_Text = "ንጥሉ እስኪቀመጥ ድረስ መታወቂያው መገኘት አይችልም።";
 _u.ExtensibilityStrings.l_MessageInDifferentStoreError_Text = "የ EWS ID መገኘት አይችልም ምክንያቱም መልዕክቱ በተለየ ማከማቻ ውስጥ ተቀምጧል።";
 _u.ExtensibilityStrings.l_NoValidRecipientsProvided_Text = "ምንም ተቀባይነት ያላቸው ተቀባዮች አልቀረቡም።";
 _u.ExtensibilityStrings.l_NotificationKeyNotFound_Text = "በቀረበው ቁልፍ ላይ ምንም ማሳወቂያዎች የሉም።";

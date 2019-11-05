@@ -1,5 +1,3 @@
-/* Version: 16.0.10827.10000 */
-
 Type.registerNamespace("_u");
 _u.ExtensibilityStrings = function()
 {
@@ -26,6 +24,7 @@ _u.ExtensibilityStrings.l_DeleteAttachmentDoesNotExist_Text = "The attachment ca
 _u.ExtensibilityStrings.l_DisplayNameTooLong_Text = "One or more of the display names provided is too long.";
 _u.ExtensibilityStrings.l_DisplayReplyFormHtmlBodyRequired_Text = "The 'htmlBody' is required.";
 _u.ExtensibilityStrings.l_DuplicateNotificationKey_Text = "A notification with the provided key already exists.";
+_u.ExtensibilityStrings.l_Duplicate_Category_Error_Text = "One of the categories provided is already in the master category list.";
 _u.ExtensibilityStrings.l_ElevatedPermissionNeededForMethod_Text = "Elevated permission is required to call the method: '{0}'.";
 _u.ExtensibilityStrings.l_ElevatedPermissionNeeded_Text = "Elevated permission is required to access protected members of the JavaScript API for Office.";
 _u.ExtensibilityStrings.l_EmailAddressTooLong_Text = "One or more of the email addresses provided is too long.";
@@ -47,6 +46,8 @@ _u.ExtensibilityStrings.l_InvalidEventDates_Text = "The end date occurs before t
 _u.ExtensibilityStrings.l_InvalidParameterValueError_Text = "The value of the '{0}' parameter is invalid.";
 _u.ExtensibilityStrings.l_InvalidSelection_Text = "The selection is invalid.";
 _u.ExtensibilityStrings.l_InvalidTime_Text = "The input doesn't resolve to a valid time.";
+_u.ExtensibilityStrings.l_Invalid_Category_Error_Text = "Invalid categories were provided.";
+_u.ExtensibilityStrings.l_Item_Not_Saved_Error_Text = "The id can't be retrieved until the item is saved.";
 _u.ExtensibilityStrings.l_MessageInDifferentStoreError_Text = "The EWS ID can't be retrieved because the message is saved in a different store.";
 _u.ExtensibilityStrings.l_NoValidRecipientsProvided_Text = "No valid recipients were provided.";
 _u.ExtensibilityStrings.l_NotificationKeyNotFound_Text = "There are no notifications with the provided key.";

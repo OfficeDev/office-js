@@ -1,5 +1,3 @@
-/* Version: 16.0.10827.10000 */
-
 Type.registerNamespace("Strings");
 Strings.OfficeOM = function()
 {
@@ -51,7 +49,7 @@ Strings.OfficeOM.L_DataReadError = "Деректерді оқудағы қате
 Strings.OfficeOM.L_DataStale = "Ағымдағы емес деректер";
 Strings.OfficeOM.L_DataWriteError = "Деректерді жазудағы қате";
 Strings.OfficeOM.L_DataWriteReminder = "Деректерді жазу еске салғышы";
-Strings.OfficeOM.L_DialogAddressNotTrusted = "URL мекенжайының домені манифесттегі AppDomains элементінде қамтылмаған.";
+Strings.OfficeOM.L_DialogAddressNotTrusted = "URL мекенжайының домені манифесттегі AppDomains элементінде қамтылмаған және бастапқы орынның ішкі домені емес.";
 Strings.OfficeOM.L_DialogAlreadyOpened = "Операция сәтсіз аяқталды, себебі бұл қондырмада белсенді диалог бұрыннан бар.";
 Strings.OfficeOM.L_DialogInvalidScheme = "URL схемасына қолдау көрсетілмейді. Оның орнына HTTPS протоколын пайдаланыңыз.";
 Strings.OfficeOM.L_DialogNavigateError = "Диалог навигациясы қатесі";
@@ -72,6 +70,8 @@ Strings.OfficeOM.L_GetDataIsTooLarge = "Сұралған деректер жиы
 Strings.OfficeOM.L_GetDataParametersConflict = "Көрсетілген параметрлердің қайшылықтары.";
 Strings.OfficeOM.L_GetSelectionNotSupported = "Ағымдағы таңдауға қолдау көрсетілмейді.";
 Strings.OfficeOM.L_HostError = "Хост қатесі";
+Strings.OfficeOM.L_ImplicitGetAuthContextMissing = "Аутентификация контекстін алу функциясы жоқ";
+Strings.OfficeOM.L_ImplicitNotLoaded = "Таңбалауыш алынбайынша модуль жүктелмейді";
 Strings.OfficeOM.L_InValidOptionalArgument = "жарамсыз қосымша аргумент";
 Strings.OfficeOM.L_IndexOutOfRange = "Индекс ауқымнан тыс.";
 Strings.OfficeOM.L_InitializeNotReady = "Office.js толығымен жүктелмеді. Әрекетті кейін қайталаңыз немесе инициализация кодын Office.initialize функциясына қосуды тексеріңіз.";
@@ -103,7 +103,7 @@ Strings.OfficeOM.L_InvalidNode = "Жарамсыз түйін";
 Strings.OfficeOM.L_InvalidObjectPath = 'Сіз орындағалы жатқан әрекет үшін "{0}" нысан жолы жұмыс істемейді. Егер нысанды бірнеше "context.sync" қоңырауы бойынша және ".run" жиынтығының реттік орындалу режимінен тыс пайдаланып жатсаңыз, нысанның жарамдылық мерзімін басқару үшін, "context.trackedObjects.add()" және "context.trackedObjects.remove()" әдістерін пайдаланыңыз.';
 Strings.OfficeOM.L_InvalidOperationInCellEditMode = "Excel бағдарламасы ұяшықты өңдеу режимінде. Өңдеу режимінен ENTER немесе TAB пернесін басу арқылы немесе басқа ұяшықты таңдау арқылы шығып, содан кейін әрекетті қайталап көріңіз.";
 Strings.OfficeOM.L_InvalidOrTimedOutSession = "Жарамсыз немесе күту уақыты өтіп кеткен сеанс";
-Strings.OfficeOM.L_InvalidOrTimedOutSessionMessage = "Office Online сеансының мерзімі өткен немесе жарамсыз. Жалғастыру үшін, бетті жаңартыңыз.";
+Strings.OfficeOM.L_InvalidOrTimedOutSessionMessage = "Office сеансының мерзімі өткен немесе жарамсыз. Жалғастыру үшін, бетті жаңартыңыз.";
 Strings.OfficeOM.L_InvalidParameters = "{0} функциясының параметрлері жарамсыз.";
 Strings.OfficeOM.L_InvalidReadForBlankRow = "Көрсетілген қатар бос.";
 Strings.OfficeOM.L_InvalidRequestContext = "Нысанды әртүрлі сұрау контексттері бойынша пайдалану мүмкін емес.";
@@ -191,3 +191,4 @@ Strings.OfficeOM.L_UserAbortedMessage = "Пайдаланушы қондырма
 Strings.OfficeOM.L_UserClickIgnore = "Пайдаланушы диалогтық терезені елемеуді таңдады.";
 Strings.OfficeOM.L_UserNotSignedIn = "Office жүйесіне ешбір пайдаланушы кірмеген.";
 Strings.OfficeOM.L_ValueNotLoaded = 'Нәтиже нысанының мәні әлі жүктелмеді. Мән сипатын оқымас бұрын, тиісті сұрау контекстінде "context.sync()" мәнін шақырыңыз.';
+Strings.OfficeOM.L_WorkbookHiddenMessage = "JavaScript API сұрауы орындалмады, себебі жұмыс кітабы жасырылған. Жұмыс кітабын көрсетіп ашып, әрекетті қайталаңыз.";

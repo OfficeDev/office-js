@@ -1,5 +1,3 @@
-/* Version: 16.0.10827.10000 */
-
 Type.registerNamespace("_u");
 _u.ExtensibilityStrings = function()
 {
@@ -26,6 +24,7 @@ _u.ExtensibilityStrings.l_DeleteAttachmentDoesNotExist_Text = "Không thể xóa
 _u.ExtensibilityStrings.l_DisplayNameTooLong_Text = "Một hoặc nhiều tên hiển thị được cung cấp quá dài.";
 _u.ExtensibilityStrings.l_DisplayReplyFormHtmlBodyRequired_Text = "Yêu cầu có 'htmlBody'.";
 _u.ExtensibilityStrings.l_DuplicateNotificationKey_Text = "Đã tồn tại thông báo chứa khóa được cung cấp.";
+_u.ExtensibilityStrings.l_Duplicate_Category_Error_Text = "Một trong số các thể loại được cung cấp đã có trong danh sách thể loại chủ.";
 _u.ExtensibilityStrings.l_ElevatedPermissionNeededForMethod_Text = "Yêu cầu có mức quyền cáo để có thể gọi phương pháp: '{0}'.";
 _u.ExtensibilityStrings.l_ElevatedPermissionNeeded_Text = "Yêu cầu có mức quyền cao để có thể truy nhập các phần tử được bảo vệ của JavaScript API cho Office.";
 _u.ExtensibilityStrings.l_EmailAddressTooLong_Text = "Một hoặc nhiều địa chỉ email được cung cấp quá dài.";
@@ -47,6 +46,8 @@ _u.ExtensibilityStrings.l_InvalidEventDates_Text = "Ngày kết thúc xảy ra t
 _u.ExtensibilityStrings.l_InvalidParameterValueError_Text = "Giá trị của tham số '{0}' không hợp lệ.";
 _u.ExtensibilityStrings.l_InvalidSelection_Text = "Lựa chọn không hợp lệ.";
 _u.ExtensibilityStrings.l_InvalidTime_Text = "Đầu vào không tạo thời gian hợp lệ.";
+_u.ExtensibilityStrings.l_Invalid_Category_Error_Text = "Đã cung cấp thể loại không hợp lệ.";
+_u.ExtensibilityStrings.l_Item_Not_Saved_Error_Text = "Không thể truy xuất ID cho đến khi mục được lưu.";
 _u.ExtensibilityStrings.l_MessageInDifferentStoreError_Text = "Không thể truy xuất ID EWS do thư được lưu trong một kho khác.";
 _u.ExtensibilityStrings.l_NoValidRecipientsProvided_Text = "Chưa có thông tin về người nhận hợp lệ.";
 _u.ExtensibilityStrings.l_NotificationKeyNotFound_Text = "Không có thông báo nào chứa khóa được cung cấp.";

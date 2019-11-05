@@ -1,5 +1,3 @@
-/* Version: 16.0.10827.10000 */
-
 Type.registerNamespace("Strings");
 Strings.OfficeOM = function()
 {
@@ -51,7 +49,7 @@ Strings.OfficeOM.L_DataReadError = "Fehler beim Lesen von Daten.";
 Strings.OfficeOM.L_DataStale = "Nicht aktuelle Daten";
 Strings.OfficeOM.L_DataWriteError = "Fehler beim Schreiben von Daten.";
 Strings.OfficeOM.L_DataWriteReminder = "Erinnerung zum Schreiben von Daten";
-Strings.OfficeOM.L_DialogAddressNotTrusted = 'Die Domäne der URL ist nicht im "AppDomains"-Element im Manifest enthalten.';
+Strings.OfficeOM.L_DialogAddressNotTrusted = "Die Domäne der URL ist nicht im AppDomains-Element im Manifest enthalten und ist keine Unterdomäne des Quellspeicherorts.";
 Strings.OfficeOM.L_DialogAlreadyOpened = "Der Vorgang ist fehlgeschlagen, weil für dieses Add-In bereits ein Dialogfeld aktiv ist.";
 Strings.OfficeOM.L_DialogInvalidScheme = "Das URL-Schema wird nicht unterstützt. Verwenden Sie stattdessen HTTPS.";
 Strings.OfficeOM.L_DialogNavigateError = "Dialognavigationsfehler";
@@ -72,6 +70,8 @@ Strings.OfficeOM.L_GetDataIsTooLarge = "Der angeforderte Datensatz ist zu groß.
 Strings.OfficeOM.L_GetDataParametersConflict = "Die angegebenen Parameter stehen in Konflikt.";
 Strings.OfficeOM.L_GetSelectionNotSupported = "Die aktuelle Auswahl wird nicht unterstützt.";
 Strings.OfficeOM.L_HostError = "Hostfehler";
+Strings.OfficeOM.L_ImplicitGetAuthContextMissing = "Die Funktion zum Abrufen des Authentifizierungskontexts fehlt.";
+Strings.OfficeOM.L_ImplicitNotLoaded = "Das Modul wird erst geladen, nachdem ein Token abgerufen wurde.";
 Strings.OfficeOM.L_InValidOptionalArgument = "ungültiges optionales Argument";
 Strings.OfficeOM.L_IndexOutOfRange = "Index außerhalb des Gültigkeitsbereichs.";
 Strings.OfficeOM.L_InitializeNotReady = "Office.js wurde noch nicht vollständig geladen. Versuchen Sie es bitte später erneut, oder stellen Sie sicher, dass Ihr Initialisierungscode der Office.initialize-Funktion hinzugefügt wird.";
@@ -103,7 +103,7 @@ Strings.OfficeOM.L_InvalidNode = "Ungültiger Knoten.";
 Strings.OfficeOM.L_InvalidObjectPath = 'Der Objektpfad "{0}" funktioniert nicht für den von Ihnen versuchten Vorgang. Wenn Sie das Objekt über mehrere Aufrufe von "context.sync" und außerhalb der sequenziellen Ausführung eines ".run"-Batchs verwenden, verwenden Sie die Methoden "context.trackedObjects.add()" und "context.trackedObjects.remove()", um die Lebensdauer des Objekts zu verwalten.';
 Strings.OfficeOM.L_InvalidOperationInCellEditMode = "Excel befindet sich im Zellbearbeitungsmodus. Beenden Sie den Bearbeitungsmodus, indem Sie die EINGABE- oder TAB-TASTE drücken, oder indem eine andere Zelle auswählen, und versuchen Sie es dann noch mal.";
 Strings.OfficeOM.L_InvalidOrTimedOutSession = "Ungültige Sitzung oder Timeout.";
-Strings.OfficeOM.L_InvalidOrTimedOutSessionMessage = "Ihre Office Online-Sitzung ist abgelaufen oder ungültig. Um fortzufahren, aktualisieren Sie die Seite.";
+Strings.OfficeOM.L_InvalidOrTimedOutSessionMessage = "Ihre Office-Sitzung ist abgelaufen oder ungültig. Aktualisieren Sie die Seite, um fortzufahren.";
 Strings.OfficeOM.L_InvalidParameters = "Funktion {0} hat ungültige Parameter.";
 Strings.OfficeOM.L_InvalidReadForBlankRow = "Die angegebene Zeile ist leer.";
 Strings.OfficeOM.L_InvalidRequestContext = "Das Objekt kann nicht in verschiedenen Anforderungskontexten verwendet werden.";
@@ -191,3 +191,4 @@ Strings.OfficeOM.L_UserAbortedMessage = "Der Benutzer hat den Add-In-Berechtigun
 Strings.OfficeOM.L_UserClickIgnore = "Der Benutzer hat sich entschlossen, das Dialogfeld zu ignorieren.";
 Strings.OfficeOM.L_UserNotSignedIn = "Kein Benutzer ist bei Office angemeldet.";
 Strings.OfficeOM.L_ValueNotLoaded = 'Der Wert des Ergebnisobjekts wurde noch nicht geladen. Rufen Sie vor dem Lesen der "value"-Eigenschaft "context.sync()" für den zugeordneten Anforderungskontext auf.';
+Strings.OfficeOM.L_WorkbookHiddenMessage = "Fehler bei der JavaScript-API-Anforderung, weil die Arbeitsmappe ausgeblendet war. Blenden Sie die Arbeitsmappe ein, und versuchen Sie es noch mal.";

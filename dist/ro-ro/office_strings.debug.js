@@ -1,5 +1,3 @@
-/* Version: 16.0.10827.10000 */
-
 Type.registerNamespace("Strings");
 Strings.OfficeOM = function()
 {
@@ -51,7 +49,7 @@ Strings.OfficeOM.L_DataReadError = "Eroare de citire a datelor";
 Strings.OfficeOM.L_DataStale = "Date neactuale";
 Strings.OfficeOM.L_DataWriteError = "Eroare de scriere a datelor";
 Strings.OfficeOM.L_DataWriteReminder = "Memento de scriere a datelor";
-Strings.OfficeOM.L_DialogAddressNotTrusted = "Domeniul adresei URL nu este inclus în elementul AppDomains din manifest.";
+Strings.OfficeOM.L_DialogAddressNotTrusted = "Domeniul URL nu este inclus în elementul domenii AppDomain din manifest și nu este subdomeniul locației sursă.";
 Strings.OfficeOM.L_DialogAlreadyOpened = "Operațiunea nu a reușit, deoarece acest program de completare are deja un dialog activ.";
 Strings.OfficeOM.L_DialogInvalidScheme = "Schema adresei URL nu este acceptată. Utilizați în schimb HTTPS.";
 Strings.OfficeOM.L_DialogNavigateError = "Eroare de navigare în dialog";
@@ -72,6 +70,8 @@ Strings.OfficeOM.L_GetDataIsTooLarge = "Setul de date solicitat este prea mare."
 Strings.OfficeOM.L_GetDataParametersConflict = "Parametrii specificați sunt în conflict.";
 Strings.OfficeOM.L_GetSelectionNotSupported = "Selecția curentă nu este acceptată.";
 Strings.OfficeOM.L_HostError = "Eroare gazdă";
+Strings.OfficeOM.L_ImplicitGetAuthContextMissing = "Lipsește funcția de obținere a contextului de autentificare";
+Strings.OfficeOM.L_ImplicitNotLoaded = "Modulul nu se încarcă înainte de a dobândi un simbol";
 Strings.OfficeOM.L_InValidOptionalArgument = "argument opțional incorect";
 Strings.OfficeOM.L_IndexOutOfRange = "Index în afara intervalului.";
 Strings.OfficeOM.L_InitializeNotReady = "Office.js încă nu s-a încărcat complet. Încercați din nou mai târziu sau asigurați-vă că adăugați codul de inițializare în funcția Office.initialize.";
@@ -103,7 +103,7 @@ Strings.OfficeOM.L_InvalidNode = "Nod nevalid";
 Strings.OfficeOM.L_InvalidObjectPath = "Calea obiectului „{0}” nu funcționează pentru ceea ce încercați să faceți. Dacă utilizați obiectul în mai multe apeluri „context.sync” și în afara execuției secvențiale a unui lot „.run”, utilizați metodele „context.trackedObjects.add()” și „context.trackedObjects.remove()” pentru a gestiona durata de viață a obiectului.";
 Strings.OfficeOM.L_InvalidOperationInCellEditMode = "Excel este în modul de editare a celulelor. Ieșiți din modul de editare apăsând ENTER sau TAB sau selectând o altă celulă, apoi încercați din nou.";
 Strings.OfficeOM.L_InvalidOrTimedOutSession = "Sesiune nevalidă sau expirată";
-Strings.OfficeOM.L_InvalidOrTimedOutSessionMessage = "Sesiunea dvs. Office Online a expirat sau nu este validă. Pentru a continua, reîmprospătați pagina.";
+Strings.OfficeOM.L_InvalidOrTimedOutSessionMessage = "Sesiunea Office a expirat sau este nevalidă. Pentru a continua, reîmprospătați pagina.";
 Strings.OfficeOM.L_InvalidParameters = "Funcția {0} are parametri nevalizi.";
 Strings.OfficeOM.L_InvalidReadForBlankRow = "Rândul specificat este necompletat.";
 Strings.OfficeOM.L_InvalidRequestContext = "Obiectul nu se poate utiliza în contexte de solicitări diferite.";
@@ -191,3 +191,4 @@ Strings.OfficeOM.L_UserAbortedMessage = "Utilizatorul nu a fost de acord cu perm
 Strings.OfficeOM.L_UserClickIgnore = "Utilizatorul a ales să ignore caseta de dialog.";
 Strings.OfficeOM.L_UserNotSignedIn = "Niciun utilizator nu este conectat la Office.";
 Strings.OfficeOM.L_ValueNotLoaded = "Valoarea obiectului rezultat nu a fost încărcată încă. Înainte de a citi proprietatea valoare, apelați „context.sync()” în contextul asociat solicitat.";
+Strings.OfficeOM.L_WorkbookHiddenMessage = "Solicitarea API JavaScript nu a reușit, deoarece registrul de lucru a fost ascuns. Reafișați registrul de lucru și încercați din nou.";

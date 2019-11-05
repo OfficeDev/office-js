@@ -1,5 +1,3 @@
-/* Version: 16.0.10827.10000 */
-
 Type.registerNamespace("Strings");
 Strings.OfficeOM = function()
 {
@@ -51,7 +49,7 @@ Strings.OfficeOM.L_DataReadError = "［O6ydk］‏‏أبع[Data Read Error]לף
 Strings.OfficeOM.L_DataStale = "［CPq31］‏‏أبع[Data Not Current]לף";
 Strings.OfficeOM.L_DataWriteError = "［Xc0RN］‏‏أبع[Data Write Error]לף";
 Strings.OfficeOM.L_DataWriteReminder = "［6x3Rl］‏‏أبع[Data Write Reminder]לף";
-Strings.OfficeOM.L_DialogAddressNotTrusted = "［giVvL］‏‏أبع[The domain of the URL is not included in the AppDomains element in the manifest.]לף";
+Strings.OfficeOM.L_DialogAddressNotTrusted = "［giVvL］‏‏أبع[The domain of the URL is not included in the AppDomains element in the manifest, and is not subdomain of source location.]לף";
 Strings.OfficeOM.L_DialogAlreadyOpened = "［0B7Sm］‏‏أبع[The operation failed because this add-in already has an active dialog.]לף";
 Strings.OfficeOM.L_DialogInvalidScheme = "［bewBN］‏‏أبع[The URL scheme is not supported. Use HTTPS instead.]לף";
 Strings.OfficeOM.L_DialogNavigateError = "［uzg7N］‏‏أبع[Dialog Navigation Error]לף";
@@ -72,6 +70,8 @@ Strings.OfficeOM.L_GetDataIsTooLarge = "［3wF2f］‏‏أبع[The requested da
 Strings.OfficeOM.L_GetDataParametersConflict = "［tUoF2］‏‏أبع[The specified parameters conflict.]לף";
 Strings.OfficeOM.L_GetSelectionNotSupported = "［zo4sV］‏‏أبع[The current selection is not supported.]לף";
 Strings.OfficeOM.L_HostError = "［JvjsU］‏‏أبع[Host Error]לף";
+Strings.OfficeOM.L_ImplicitGetAuthContextMissing = "［UCttS］‏‏أبع[The function to get authentication context is missing]לף";
+Strings.OfficeOM.L_ImplicitNotLoaded = "［TEGkn］‏‏أبع[The module is not loaded before acquire a token]לף";
 Strings.OfficeOM.L_InValidOptionalArgument = "［jH9Lh］‏‏أبع[invalid optional argument]לף";
 Strings.OfficeOM.L_IndexOutOfRange = "［2bW7M］‏‏أبع[Index out of range.]לף";
 Strings.OfficeOM.L_InitializeNotReady = "［DxSvU］‏‏أبع[Office.js has not been fully loaded yet. Please try again later or make sure to add your initialization code on the Office.initialize function.]לף";
@@ -103,7 +103,7 @@ Strings.OfficeOM.L_InvalidNode = "［gLELC］‏‏أبع[Invalid Node]לף";
 Strings.OfficeOM.L_InvalidObjectPath = '［Zg5om］‏‏أبع[The object path \'{0}\' isn\'t working for what you\'re trying to do. If you\'re using the object across multiple "context.sync" calls and outside the sequential execution of a ".run" batch, please use the "context.trackedObjects.add()" and "context.trackedObjects.remove()" methods to manage the object\'s lifetime.]לף';
 Strings.OfficeOM.L_InvalidOperationInCellEditMode = "［cvg0M］‏‏أبع[Excel is in cell-editing mode. Please exit the edit mode by pressing ENTER or TAB or selecting another cell, and then try again.]לף";
 Strings.OfficeOM.L_InvalidOrTimedOutSession = "［qvnk3］‏‏أبع[Invalid Or Timed Out Session]לף";
-Strings.OfficeOM.L_InvalidOrTimedOutSessionMessage = "［e6MqN］‏‏أبع[Your Office Online session has expired or is invalid. To continue, refresh the page.]לף";
+Strings.OfficeOM.L_InvalidOrTimedOutSessionMessage = "［e6MqN］‏‏أبع[Your Office session has expired or is invalid. To continue, refresh the page.]לף";
 Strings.OfficeOM.L_InvalidParameters = "［KDV1q］‏‏أبع[Function {0} has invalid parameters.]לף";
 Strings.OfficeOM.L_InvalidReadForBlankRow = "［O14g9］‏‏أبع[The specified row is blank.]לף";
 Strings.OfficeOM.L_InvalidRequestContext = "［EU97A］‏‏أبع[Cannot use the object across different request contexts.]לף";
@@ -191,3 +191,4 @@ Strings.OfficeOM.L_UserAbortedMessage = "［u0vEn］‏‏أبع[The user did no
 Strings.OfficeOM.L_UserClickIgnore = "［jeIUr］‏‏أبع[The user chose to ignore the dialog box.]לף";
 Strings.OfficeOM.L_UserNotSignedIn = "［1L2Tr］‏‏أبع[No user is signed into Office.]לף";
 Strings.OfficeOM.L_ValueNotLoaded = '［yUa7O］‏‏أبع[The value of the result object has not been loaded yet. Before reading the value property, call "context.sync()" on the associated request context.]לף';
+Strings.OfficeOM.L_WorkbookHiddenMessage = "［IHOef］‏‏أبع[The JavaScript API request failed because the workbook was hidden. Please unhide the workbook and try again.]לף";

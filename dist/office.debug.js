@@ -1,3 +1,26 @@
+var OSFPerformance;
+(function (OSFPerformance) {
+    OSFPerformance.officeExecuteStart = 0;
+    OSFPerformance.officeExecuteEnd = 0;
+    OSFPerformance.hostInitializationStart = 0;
+    OSFPerformance.hostInitializationEnd = 0;
+    OSFPerformance.createOMEnd = 0;
+    OSFPerformance.hostSpecificFileName = "";
+    function now() {
+        if (performance && performance.now) {
+            return performance.now();
+        }
+        else {
+            return 0;
+        }
+    }
+    OSFPerformance.now = now;
+})(OSFPerformance || (OSFPerformance = {}));
+;
+OSFPerformance.officeExecuteStart = OSFPerformance.now();
+
+
+
 /* Office JavaScript API library */
 
 /*
@@ -1806,6 +1829,9 @@ OSF._OfficeAppFactory = (function OSF__OfficeAppFactory() {
                 +
                     ".debug.js";
             _loadScriptHelper.loadScript(basePath + hostSpecificFileName.toLowerCase(), OSF.ConstantNames.HostFileId, onAppCodeReady);
+            if (typeof OSFPerformance !== "undefined") {
+                OSFPerformance.hostSpecificFileName = hostSpecificFileName;
+            }
         }
         if (_hostInfo.hostLocale) {
             loadLocaleStrings(_hostInfo.hostLocale);
@@ -2350,6 +2376,11 @@ var oteljs = function(modules) {
         });
     }
     var __awaiter = undefined && undefined.__awaiter || function(thisArg, _arguments, P, generator) {
+        function adopt(value) {
+            return value instanceof P ? value : new P(function(resolve) {
+                resolve(value);
+            });
+        }
         return new (P || (P = Promise))(function(resolve, reject) {
             function fulfilled(value) {
                 try {
@@ -2366,9 +2397,7 @@ var oteljs = function(modules) {
                 }
             }
             function step(result) {
-                result.done ? resolve(result.value) : new P(function(resolve) {
-                    resolve(result.value);
-                }).then(fulfilled, rejected);
+                result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected);
             }
             step((generator = generator.apply(thisArg, _arguments || [])).next());
         });
@@ -2775,7 +2804,7 @@ var oteljs = function(modules) {
         }
         TenantTokenManager.clear = clear;
     })(TenantTokenManager_TenantTokenManager || (TenantTokenManager_TenantTokenManager = {}));
-    var oteljsVersion = "3.1.17";
+    var oteljsVersion = "3.1.24";
     var SuppressNexus = -1;
     var SimpleTelemetryLogger_SimpleTelemetryLogger = function() {
         function SimpleTelemetryLogger(parent, persistentDataFields) {
@@ -2876,6 +2905,11 @@ var oteljs = function(modules) {
         };
     }();
     var TelemetryLogger_awaiter = undefined && undefined.__awaiter || function(thisArg, _arguments, P, generator) {
+        function adopt(value) {
+            return value instanceof P ? value : new P(function(resolve) {
+                resolve(value);
+            });
+        }
         return new (P || (P = Promise))(function(resolve, reject) {
             function fulfilled(value) {
                 try {
@@ -2892,9 +2926,7 @@ var oteljs = function(modules) {
                 }
             }
             function step(result) {
-                result.done ? resolve(result.value) : new P(function(resolve) {
-                    resolve(result.value);
-                }).then(fulfilled, rejected);
+                result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected);
             }
             step((generator = generator.apply(thisArg, _arguments || [])).next());
         });
@@ -3100,3 +3132,7 @@ var oteljs = function(modules) {
         return TelemetryLogger_TelemetryLogger;
     });
 } ]);
+
+
+
+OSFPerformance.officeExecuteEnd = OSFPerformance.now();

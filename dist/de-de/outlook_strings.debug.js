@@ -1,5 +1,3 @@
-/* Version: 16.0.10827.10000 */
-
 Type.registerNamespace("_u");
 _u.ExtensibilityStrings = function()
 {
@@ -26,6 +24,7 @@ _u.ExtensibilityStrings.l_DeleteAttachmentDoesNotExist_Text = "Die Anlage kann n
 _u.ExtensibilityStrings.l_DisplayNameTooLong_Text = "Mindestens einer der angegebenen Anzeigenamen ist zu lang.";
 _u.ExtensibilityStrings.l_DisplayReplyFormHtmlBodyRequired_Text = 'Der "htmlBody" ist erforderlich.';
 _u.ExtensibilityStrings.l_DuplicateNotificationKey_Text = "Eine Benachrichtigung mit dem angegebenen Schlüssel ist bereits vorhanden.";
+_u.ExtensibilityStrings.l_Duplicate_Category_Error_Text = "Eine der bereitgestellten Kategorien ist bereits in der Hauptkategorienliste enthalten.";
 _u.ExtensibilityStrings.l_ElevatedPermissionNeededForMethod_Text = "Für den Aufruf der Methode '{0}' sind erhöhte Rechte erforderlich.";
 _u.ExtensibilityStrings.l_ElevatedPermissionNeeded_Text = "Für den Zugriff auf geschützte Elemente des JavaScript-APIs für Office sind erhöhte Rechte erforderlich.";
 _u.ExtensibilityStrings.l_EmailAddressTooLong_Text = "Mindestens eine der angegebenen E-Mail-Adressen ist zu lang.";
@@ -47,6 +46,8 @@ _u.ExtensibilityStrings.l_InvalidEventDates_Text = "Das Ende liegt vor dem Begin
 _u.ExtensibilityStrings.l_InvalidParameterValueError_Text = 'Der Wert des Parameters "{0}" ist ungültig.';
 _u.ExtensibilityStrings.l_InvalidSelection_Text = "Die Auswahl ist ungültig.";
 _u.ExtensibilityStrings.l_InvalidTime_Text = "Die Eingabe kann nicht zu einer gültigen Uhrzeit aufgelöst werden.";
+_u.ExtensibilityStrings.l_Invalid_Category_Error_Text = "Ungültige Kategorien wurden angegeben.";
+_u.ExtensibilityStrings.l_Item_Not_Saved_Error_Text = "Die ID kann erst abgerufen werden, nachdem das Element gespeichert wurde.";
 _u.ExtensibilityStrings.l_MessageInDifferentStoreError_Text = "Die EWS-ID kann nicht abgerufen werden, weil die Nachricht in einem anderen Informationsspeicher gespeichert ist.";
 _u.ExtensibilityStrings.l_NoValidRecipientsProvided_Text = "Es wurden keine gültigen Empfänger angegeben.";
 _u.ExtensibilityStrings.l_NotificationKeyNotFound_Text = "Es gibt keine Benachrichtigungen mit dem angegebenen Schlüssel.";

@@ -1,5 +1,3 @@
-/* Version: 16.0.10827.10000 */
-
 Type.registerNamespace("Strings");
 Strings.OfficeOM = function()
 {
@@ -51,7 +49,7 @@ Strings.OfficeOM.L_DataReadError = "Gwall Darllen Data";
 Strings.OfficeOM.L_DataStale = "Dydy'r Data ddim yn Gyfredol";
 Strings.OfficeOM.L_DataWriteError = "Gwall Ysgrifennu Data";
 Strings.OfficeOM.L_DataWriteReminder = "Notyn Atgoffa Ysgrifennu Data";
-Strings.OfficeOM.L_DialogAddressNotTrusted = "Dydy parth yr URL ddim wedi'i gynnwys yn yr elfen AppDomains yn y maniffest.";
+Strings.OfficeOM.L_DialogAddressNotTrusted = "Dydy parth yr URL ddim wedi'i gynnwys yn yr elfen AppDomains yn y maniffest, ac nid yw'n is-barth lleoliad y ffynhonnell.";
 Strings.OfficeOM.L_DialogAlreadyOpened = "Wedi methu gwneud hyn oherwydd bod gan yr ategyn hwn flwch deialog gweithredol yn barod.";
 Strings.OfficeOM.L_DialogInvalidScheme = "Does dim modd i ni ddelio â'r cynllun URL. Defnyddiwch HTTPS yn lle.";
 Strings.OfficeOM.L_DialogNavigateError = "Gwall Blwch Deialog Llywio";
@@ -72,6 +70,8 @@ Strings.OfficeOM.L_GetDataIsTooLarge = "Mae'r set data roedd cais amdani'n rhy f
 Strings.OfficeOM.L_GetDataParametersConflict = "Mae'r paramedrau a bennwyd yn gwrthdaro.";
 Strings.OfficeOM.L_GetSelectionNotSupported = "Does dim modd delio â'r dewis dan sylw.";
 Strings.OfficeOM.L_HostError = "Gwall Lletywr";
+Strings.OfficeOM.L_ImplicitGetAuthContextMissing = "Mae'r ffwythiant i gael cyd-destun dilysu ar goll";
+Strings.OfficeOM.L_ImplicitNotLoaded = "Heb lwytho'r modiwl cyn caffael tocyn";
 Strings.OfficeOM.L_InValidOptionalArgument = "arg dewisol annilys";
 Strings.OfficeOM.L_IndexOutOfRange = "Mynegai allan o'r ystod.";
 Strings.OfficeOM.L_InitializeNotReady = "Dydy Office.js ddim wedi cael ei lwytho'n llawn eto. Rhowch gynnig arall arni rywbryd eto neu gwnewch yn siŵr eich bod yn ychwanegu eich cod ymgychwyn ar y swyddogaeth Office.initialize.";
@@ -103,7 +103,7 @@ Strings.OfficeOM.L_InvalidNode = "Cwgn Annilys";
 Strings.OfficeOM.L_InvalidObjectPath = 'Dydy llwybr y gwrthrych \'{0}\' ddim yn gweithio ar gyfer yr hyn rydych chi\'n ceisio ei wneud. Os ydych chi\'n defnyddio\'r gwrthrych ar draws sawl galwad "context.sync" a\'r tu allan i weithrediad dilynol swp ".run", dylech ddefnyddio\'r dulliau "context.trackedObjects.add()" a "context.trackedObjects.remove()" i reoli oes y gwrthrych.';
 Strings.OfficeOM.L_InvalidOperationInCellEditMode = "Mae Excel yn y modd golygu celloedd. Dylech chi adael y modd golygu drwy bwyso ENTER neu TAB neu drwy ddewis cell wahanol, a rhoi cynnig arall arni.";
 Strings.OfficeOM.L_InvalidOrTimedOutSession = "Sesiwn Annilys neu'r Amser wedi Dod i Ben";
-Strings.OfficeOM.L_InvalidOrTimedOutSessionMessage = "Mae eich sesiwn Office Ar-lein wedi dod i ben neu mae'n annilys. I fwrw ymlaen, dylech adnewyddu'r dudalen.";
+Strings.OfficeOM.L_InvalidOrTimedOutSessionMessage = "Mae eich sesiwn Office wedi dod i ben neu mae'n annilys. I fwrw ymlaen, dylech adnewyddu'r dudalen.";
 Strings.OfficeOM.L_InvalidParameters = "Mae gan y swyddogaeth {0} baramedrau annilys.";
 Strings.OfficeOM.L_InvalidReadForBlankRow = "Mae'r rhes a bennwyd yn wag.";
 Strings.OfficeOM.L_InvalidRequestContext = "Does dim modd defnyddio'r gwrthrych ar draws cyd-destunau cais gwahanol.";
@@ -191,3 +191,4 @@ Strings.OfficeOM.L_UserAbortedMessage = "Dydy'r defnyddiwr ddim wedi caniatáu h
 Strings.OfficeOM.L_UserClickIgnore = "Mae'r defnyddiwr wedi dewis anwybyddu'r blwch deialog.";
 Strings.OfficeOM.L_UserNotSignedIn = "Does dim defnyddiwr wedi mewngofnodi i Office.";
 Strings.OfficeOM.L_ValueNotLoaded = 'Dydy gwerth y gwrthrych canlyniad ddim wedi\'i lwytho eto. Cyn darllen priodwedd y gwerth, galwch "context.sync()" ar y cyd-destun cais cysylltiedig.';
+Strings.OfficeOM.L_WorkbookHiddenMessage = "Methodd y cais API JavaScript oherwydd roedd y llyfr gwaith yn gudd. Rhaid i chi datguddio'r llyfr gwaith a rhoi cynnig arall arni.";

@@ -1,5 +1,3 @@
-/* Version: 16.0.10827.10000 */
-
 Type.registerNamespace("Strings");
 Strings.OfficeOM = function()
 {
@@ -51,7 +49,7 @@ Strings.OfficeOM.L_DataReadError = "خطأ في قراءة البيانات";
 Strings.OfficeOM.L_DataStale = "البيانات غير حديثة";
 Strings.OfficeOM.L_DataWriteError = "خطأ في كتابة البيانات";
 Strings.OfficeOM.L_DataWriteReminder = "تذكير بكتابة البيانات";
-Strings.OfficeOM.L_DialogAddressNotTrusted = "لم يتم تضمين مجال عنوان URL في عنصر AppDomains في البيان.";
+Strings.OfficeOM.L_DialogAddressNotTrusted = "لم يتم تضمين مجال عنوان URL في عنصر AppDomains في البيان، وليس مجالًا فرعيًا لموقع المصدر.";
 Strings.OfficeOM.L_DialogAlreadyOpened = "فشلت العملية لأن هذه الوظيفة الإضافية بها مربع حوار نشط بالفعل.";
 Strings.OfficeOM.L_DialogInvalidScheme = "نظام عنوان URL غير مدعوم. استخدم HTTPS بدلاً من ذلك.";
 Strings.OfficeOM.L_DialogNavigateError = "خطأ في التنقل في مربع الحوار";
@@ -72,6 +70,8 @@ Strings.OfficeOM.L_GetDataIsTooLarge = "مجموعة البيانات المطل
 Strings.OfficeOM.L_GetDataParametersConflict = "تعارض المعلمات المحددة.";
 Strings.OfficeOM.L_GetSelectionNotSupported = "التحديد الحالي غير معتمد.";
 Strings.OfficeOM.L_HostError = "خطأ المضيف";
+Strings.OfficeOM.L_ImplicitGetAuthContextMissing = "دالة الحصول على سياق المصادقة مفقودة";
+Strings.OfficeOM.L_ImplicitNotLoaded = "لم يتم تحميل الوحدة النمطية قبل الحصول على رمز مميز";
 Strings.OfficeOM.L_InValidOptionalArgument = "وسيطة اختيارية غير صالحة";
 Strings.OfficeOM.L_IndexOutOfRange = "الفهرس خارج النطاق.";
 Strings.OfficeOM.L_InitializeNotReady = "لم يتم تحميل Office.js بشكل كامل بعد. يرجى إعادة المحاولة لاحقاً للتأكد من إضافة رمز التهيئة في وظيفة Office.initialize.";
@@ -103,7 +103,7 @@ Strings.OfficeOM.L_InvalidNode = "العقدة غير صالحة";
 Strings.OfficeOM.L_InvalidObjectPath = 'لا يعمل مسار العنصر "{0}" لما تحاول القيام به. إذا كنت تستخدم العنصر عبر عدة استدعاءات "context.sync" وخارج التنفيذ المتسلسل لدفعة "‎.run"، يرجى استخدام الأسلوبين "context.trackedObjects.add()‎" و"context.trackedObjects.remove()‎" لإدارة مدة بقاء العنصر.';
 Strings.OfficeOM.L_InvalidOperationInCellEditMode = "Excel الآن في وضع تحرير الخلية. الرجاء إنهاء وضع التحرير بالضغط على مفتاح الإدخال ENTER أو مفتاح TAB أو تحديد خلية أخرى، ثم إعادة المحاولة.";
 Strings.OfficeOM.L_InvalidOrTimedOutSession = "جلسة عمل غير صالحة أو انتهت مهلتها";
-Strings.OfficeOM.L_InvalidOrTimedOutSessionMessage = "انتهت مدة صلاحية جلسة عمل Office Online أو تعتبر غير صالحة. للمتابعة، قم بتحديث الصفحة.";
+Strings.OfficeOM.L_InvalidOrTimedOutSessionMessage = "انتهت صلاحيه جلسة عمل Office أو انها غير صالحه. للمتابعة ، قم بتحديث الصفحة.";
 Strings.OfficeOM.L_InvalidParameters = "للدالة {0} معلمات غير صالحة.";
 Strings.OfficeOM.L_InvalidReadForBlankRow = "إن الصف المحدد فارغ.";
 Strings.OfficeOM.L_InvalidRequestContext = "لا يمكن استخدام العنصر عبر سياقات طلب مختلفة.";
@@ -191,3 +191,4 @@ Strings.OfficeOM.L_UserAbortedMessage = "لم يوافق المستخدم على
 Strings.OfficeOM.L_UserClickIgnore = "اختار المستخدم تجاهل مربع الحوار.";
 Strings.OfficeOM.L_UserNotSignedIn = "لم يسجل أي مستخدم دخوله إلى Office.";
 Strings.OfficeOM.L_ValueNotLoaded = 'لم يتم تحميل قيمة عنصر النتيجة بعد. قم باستدعاء "context.sync()" في سياق الطلب المقترن قبل قراءة خاصية القيمة.';
+Strings.OfficeOM.L_WorkbookHiddenMessage = "فشل طلب JavaScript API لأنه تم إخفاء المصنف. الرجاء قم بإظهار المصنف، ثم أعد المحاولة.";

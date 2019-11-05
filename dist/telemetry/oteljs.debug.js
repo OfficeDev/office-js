@@ -192,6 +192,9 @@ var oteljs = function(modules) {
             if (contract.tag !== undefined) {
                 dataFields.push(makeInt64DataField(instanceName + ".Tag", contract.tag));
             }
+            if (contract.isExpected !== undefined) {
+                dataFields.push(makeBooleanDataField(instanceName + ".IsExpected", contract.isExpected));
+            }
             addContractField(dataFields, instanceName, contractName);
             return dataFields;
         }
@@ -239,6 +242,34 @@ var oteljs = function(modules) {
         }
         Host.getFields = getFields;
     })(officeeventschema_tml_Host || (officeeventschema_tml_Host = {}));
+    var officeeventschema_tml_User;
+    (function(User) {
+        var contractName = "Office.System.User";
+        function getFields(instanceName, contract) {
+            var dataFields = [];
+            if (contract.alias !== undefined) {
+                dataFields.push(makeStringDataField(instanceName + ".Alias", contract.alias));
+            }
+            if (contract.primaryIdentityHash !== undefined) {
+                dataFields.push(makeStringDataField(instanceName + ".PrimaryIdentityHash", contract.primaryIdentityHash));
+            }
+            if (contract.primaryIdentitySpace !== undefined) {
+                dataFields.push(makeStringDataField(instanceName + ".PrimaryIdentitySpace", contract.primaryIdentitySpace));
+            }
+            if (contract.tenantId !== undefined) {
+                dataFields.push(makeStringDataField(instanceName + ".TenantId", contract.tenantId));
+            }
+            if (contract.tenantGroup !== undefined) {
+                dataFields.push(makeStringDataField(instanceName + ".TenantGroup", contract.tenantGroup));
+            }
+            if (contract.isAnonymous !== undefined) {
+                dataFields.push(makeBooleanDataField(instanceName + ".IsAnonymous", contract.isAnonymous));
+            }
+            addContractField(dataFields, instanceName, contractName);
+            return dataFields;
+        }
+        User.getFields = getFields;
+    })(officeeventschema_tml_User || (officeeventschema_tml_User = {}));
     var officeeventschema_tml_SDX;
     (function(SDX) {
         var contractName = "Office.System.SDX";
@@ -282,9 +313,6 @@ var oteljs = function(modules) {
             }
             if (contract.type !== undefined) {
                 dataFields.push(makeStringDataField(instanceName + ".Type", contract.type));
-            }
-            if (contract.url !== undefined) {
-                dataFields.push(makeStringDataField(instanceName + ".Url", contract.url));
             }
             addContractField(dataFields, instanceName, contractName);
             return dataFields;
@@ -363,6 +391,7 @@ var oteljs = function(modules) {
     var _Host = officeeventschema_tml_Host;
     var _SDX = officeeventschema_tml_SDX;
     var _UserAction = officeeventschema_tml_UserAction;
+    var _User = officeeventschema_tml_User;
     var Contracts;
     (function(Contracts) {
         var Office;
@@ -375,6 +404,7 @@ var oteljs = function(modules) {
                 System.Funnel = _Funnel;
                 System.Host = _Host;
                 System.SDX = _SDX;
+                System.User = _User;
                 System.UserAction = _UserAction;
             })(System = Office.System || (Office.System = {}));
         })(Office = Contracts.Office || (Contracts.Office = {}));
@@ -465,6 +495,11 @@ var oteljs = function(modules) {
         });
     }
     var __awaiter = undefined && undefined.__awaiter || function(thisArg, _arguments, P, generator) {
+        function adopt(value) {
+            return value instanceof P ? value : new P(function(resolve) {
+                resolve(value);
+            });
+        }
         return new (P || (P = Promise))(function(resolve, reject) {
             function fulfilled(value) {
                 try {
@@ -481,9 +516,7 @@ var oteljs = function(modules) {
                 }
             }
             function step(result) {
-                result.done ? resolve(result.value) : new P(function(resolve) {
-                    resolve(result.value);
-                }).then(fulfilled, rejected);
+                result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected);
             }
             step((generator = generator.apply(thisArg, _arguments || [])).next());
         });
@@ -890,7 +923,7 @@ var oteljs = function(modules) {
         }
         TenantTokenManager.clear = clear;
     })(TenantTokenManager_TenantTokenManager || (TenantTokenManager_TenantTokenManager = {}));
-    var oteljsVersion = "3.1.11";
+    var oteljsVersion = "3.1.24";
     var SuppressNexus = -1;
     var SimpleTelemetryLogger_SimpleTelemetryLogger = function() {
         function SimpleTelemetryLogger(parent, persistentDataFields) {
@@ -991,6 +1024,11 @@ var oteljs = function(modules) {
         };
     }();
     var TelemetryLogger_awaiter = undefined && undefined.__awaiter || function(thisArg, _arguments, P, generator) {
+        function adopt(value) {
+            return value instanceof P ? value : new P(function(resolve) {
+                resolve(value);
+            });
+        }
         return new (P || (P = Promise))(function(resolve, reject) {
             function fulfilled(value) {
                 try {
@@ -1007,9 +1045,7 @@ var oteljs = function(modules) {
                 }
             }
             function step(result) {
-                result.done ? resolve(result.value) : new P(function(resolve) {
-                    resolve(result.value);
-                }).then(fulfilled, rejected);
+                result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected);
             }
             step((generator = generator.apply(thisArg, _arguments || [])).next());
         });

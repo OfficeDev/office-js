@@ -1,5 +1,3 @@
-/* Version: 16.0.10827.10000 */
-
 Type.registerNamespace("Strings");
 Strings.OfficeOM = function()
 {
@@ -36,7 +34,7 @@ Strings.OfficeOM.L_ConnectionFailureWithStatus = "Error en la solicitud; código
 Strings.OfficeOM.L_CustomFunctionDefinitionMissing = "Debe existir una propiedad con este nombre que represente la definición de la función en Excel.Script.CustomFunctions.";
 Strings.OfficeOM.L_CustomFunctionImplementationMissing = 'La propiedad con este nombre en Excel.Script.CustomFunctions que representa la definición de la función debe contener una propiedad "call" que implemente la función.';
 Strings.OfficeOM.L_CustomFunctionNameCannotSplit = "El nombre de la función debe contener un espacio de nombres no vacío y un nombre corto no vacío.";
-Strings.OfficeOM.L_CustomFunctionNameContainsBadChars = "El nombre de función solo puede contener letras, números, guiones bajos y puntos.";
+Strings.OfficeOM.L_CustomFunctionNameContainsBadChars = "El nombre de función solo puede contener letras, dígitos, guiones bajos y puntos.";
 Strings.OfficeOM.L_CustomXmlError = "Error de XML personalizado.";
 Strings.OfficeOM.L_CustomXmlExceedQuotaMessage = "XPath limita la selección a 1024 elementos.";
 Strings.OfficeOM.L_CustomXmlExceedQuotaName = "Se alcanzó el límite de selección";
@@ -51,7 +49,7 @@ Strings.OfficeOM.L_DataReadError = "Error de lectura de datos";
 Strings.OfficeOM.L_DataStale = "Datos obsoletos";
 Strings.OfficeOM.L_DataWriteError = "Error de escritura de datos";
 Strings.OfficeOM.L_DataWriteReminder = "Aviso de escritura de datos";
-Strings.OfficeOM.L_DialogAddressNotTrusted = "El dominio de la URL no está incluido en el elemento AppDomains en el manifiesto.";
+Strings.OfficeOM.L_DialogAddressNotTrusted = "El dominio de la dirección URL no está incluido en el elemento AppDomains del manifiesto y no es un subdominio de la ubicación de origen.";
 Strings.OfficeOM.L_DialogAlreadyOpened = "No se pudo realizar la operación porque este complemento ya tiene un diálogo activo.";
 Strings.OfficeOM.L_DialogInvalidScheme = "No se admite el esquema de dirección URL. Use HTTPS en su lugar.";
 Strings.OfficeOM.L_DialogNavigateError = "Error de navegación por diálogo";
@@ -72,6 +70,8 @@ Strings.OfficeOM.L_GetDataIsTooLarge = "El conjunto de datos solicitado es demas
 Strings.OfficeOM.L_GetDataParametersConflict = "Hay un conflicto en los parámetros especificados.";
 Strings.OfficeOM.L_GetSelectionNotSupported = "No se admite la selección actual.";
 Strings.OfficeOM.L_HostError = "Error de host";
+Strings.OfficeOM.L_ImplicitGetAuthContextMissing = "No existe la función para obtener el contexto de autenticación";
+Strings.OfficeOM.L_ImplicitNotLoaded = "El módulo no está cargado antes de adquirir un token";
 Strings.OfficeOM.L_InValidOptionalArgument = "argumento opcional no válido";
 Strings.OfficeOM.L_IndexOutOfRange = "Índice fuera del intervalo.";
 Strings.OfficeOM.L_InitializeNotReady = "Office.js no se ha cargado todavía por completo. Inténtelo de nuevo más tarde o asegúrese de agregar el código de inicialización en la función Office.initialize.";
@@ -103,7 +103,7 @@ Strings.OfficeOM.L_InvalidNode = "Nodo no válido";
 Strings.OfficeOM.L_InvalidObjectPath = 'La ruta del objeto "{0}" no funciona para lo que está intentando hacer. Si está usando el objeto en varias llamadas de "context.sync" y fuera de la ejecución secuencial de un lote ".run", use los métodos "context.trackedObjects.add()" y "context.trackedObjects.remove()" para administrar la duración de objeto.';
 Strings.OfficeOM.L_InvalidOperationInCellEditMode = "Excel está en modo de edición de celdas. Salga del modo de edición pulsando Entrar o Tab o seleccionando otra celda y después vuelva a intentarlo.";
 Strings.OfficeOM.L_InvalidOrTimedOutSession = "Sesión caducada o no válida";
-Strings.OfficeOM.L_InvalidOrTimedOutSessionMessage = "La sesión de Office Online ha caducado o no es válida. Para continuar, actualice la página.";
+Strings.OfficeOM.L_InvalidOrTimedOutSessionMessage = "Su sesión de Office ha expirado o no es válida. Para continuar, actualice la página.";
 Strings.OfficeOM.L_InvalidParameters = "La función {0} contiene parámetros no válidos.";
 Strings.OfficeOM.L_InvalidReadForBlankRow = "La fila especificada está en blanco.";
 Strings.OfficeOM.L_InvalidRequestContext = "No puede usar el objeto en distintos contextos de solicitudes.";
@@ -191,3 +191,4 @@ Strings.OfficeOM.L_UserAbortedMessage = "El usuario no ha aceptado los permisos 
 Strings.OfficeOM.L_UserClickIgnore = "El usuario decidió ignorar el cuadro de diálogo.";
 Strings.OfficeOM.L_UserNotSignedIn = "Ningún usuario ha iniciado sesión en Office.";
 Strings.OfficeOM.L_ValueNotLoaded = 'El valor del objeto de resultado aún no se ha cargado. Antes de leer la propiedad del valor, llame a "context.sync()" en el contexto de solicitud asociado.';
+Strings.OfficeOM.L_WorkbookHiddenMessage = "La solicitud de la API de JavaScript error porque se ha ocultado el libro. Muestre el libro y vuelva a intentarlo.";

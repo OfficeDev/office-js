@@ -1,5 +1,3 @@
-/* Version: 16.0.10827.10000 */
-
 Type.registerNamespace("Strings");
 Strings.OfficeOM = function()
 {
@@ -30,7 +28,7 @@ Strings.OfficeOM.L_CellFormatAmountBeyondLimits = "Megjegyzés: a formázási AP
 Strings.OfficeOM.L_CloseFileBeforeRetrieve = "Másik fájl lekérése előtt hívja meg a closeAsync metódust ezen a fájlon.";
 Strings.OfficeOM.L_CoercionTypeNotMatchBinding = "A megadott típuskonverzió nem kompatibilis ezzel a kötéstípussal.";
 Strings.OfficeOM.L_CoercionTypeNotSupported = "A megadott típuskonverzió nem támogatott.";
-Strings.OfficeOM.L_ColIndexOutOfRange = "Az oszlopindex értéke kívül esik a megengedett tartományon. Olyan értéket használjon (0-t vagy nagyobbat), amely kisebb, mint az oszlopok száma.";
+Strings.OfficeOM.L_ColIndexOutOfRange = "Az oszlopindex értéke kívül esik az engedélyezett tartományon. Csak az oszlopok számánál kisebb, nem negatív szám adható meg.";
 Strings.OfficeOM.L_ConnectionFailureWithDetails = "Sikertelen volt a kérelem. Állapotkód: {0}, hibakód: {1}. Hibaüzenet: {2}";
 Strings.OfficeOM.L_ConnectionFailureWithStatus = "Sikertelen volt a kérelem. Állapotkód: {0}.";
 Strings.OfficeOM.L_CustomFunctionDefinitionMissing = "Az Excel.Script.CustomFunctions osztályban léteznie kell egy ilyen nevű, a függvény definícióját jelző tulajdonságnak.";
@@ -51,7 +49,7 @@ Strings.OfficeOM.L_DataReadError = "Adatolvasási hiba";
 Strings.OfficeOM.L_DataStale = "Az adatok nem naprakészek";
 Strings.OfficeOM.L_DataWriteError = "Adatírási hiba";
 Strings.OfficeOM.L_DataWriteReminder = "Adatírási emlékeztető";
-Strings.OfficeOM.L_DialogAddressNotTrusted = "Az URL-ben szereplő tartomány nem található meg a jegyzékfájl AppDomains elemében.";
+Strings.OfficeOM.L_DialogAddressNotTrusted = "Az URL tartománya nem található meg a jegyzékfájl AppDomains elemében, és nem résztartománya a forráshelynek.";
 Strings.OfficeOM.L_DialogAlreadyOpened = "A művelet nem sikerült, mert már van aktív párbeszédpanele a bővítménynek.";
 Strings.OfficeOM.L_DialogInvalidScheme = "Az URL-séma nem támogatott. Használja helyette a HTTPS protokollt.";
 Strings.OfficeOM.L_DialogNavigateError = "Párbeszédpanel-navigációs hiba";
@@ -72,6 +70,8 @@ Strings.OfficeOM.L_GetDataIsTooLarge = "A kért adatkészlet túl nagy.";
 Strings.OfficeOM.L_GetDataParametersConflict = "A megadott paraméterek ütköznek.";
 Strings.OfficeOM.L_GetSelectionNotSupported = "A jelenlegi kijelölés nem támogatott.";
 Strings.OfficeOM.L_HostError = "Állomáshiba";
+Strings.OfficeOM.L_ImplicitGetAuthContextMissing = "A hitelesítési környezet lekérésére szolgáló függvény hiányzik";
+Strings.OfficeOM.L_ImplicitNotLoaded = "A token beszerzése előtt a modul nem töltődik be";
 Strings.OfficeOM.L_InValidOptionalArgument = "érvénytelen választható argumentum";
 Strings.OfficeOM.L_IndexOutOfRange = "Az index kívül esik az engedélyezett tartományon.";
 Strings.OfficeOM.L_InitializeNotReady = "Az Office.js fájl betöltése még nem fejeződött be. Próbálkozzon újra később, vagy ellenőrizze, hogy hozzáadta-e az inicializálási kódot az Office.initialize függvényhez.";
@@ -101,9 +101,9 @@ Strings.OfficeOM.L_InvalidGrantMessage = "Nem találjuk a bővítményhez tartoz
 Strings.OfficeOM.L_InvalidNamedItemForBindingType = "A megadott kötési típus nem kompatibilis a megadott névvel ellátott elemmel.";
 Strings.OfficeOM.L_InvalidNode = "Érvénytelen csomópont";
 Strings.OfficeOM.L_InvalidObjectPath = "Ez az objektumelérési út ({0}) nem alkalmas arra a célra, amelyre használni próbálja. Ha az objektumot több „context.sync” híváson keresztül, egy .run köteg szekvenciális végrehajtási rendjén kívül használja, akkor kérjük, a „context.trackedObjects.add()” és a „context.trackedObjects.remove()” metódus segítségével kezelje az objektum élettartamát.";
-Strings.OfficeOM.L_InvalidOperationInCellEditMode = "Cellaszerkesztési módban van az Excel. Kérjük, lépjen ki a szerkesztési módból az Enter vagy a Tab billentyű megnyomásával, és próbálkozzon újra.";
+Strings.OfficeOM.L_InvalidOperationInCellEditMode = "Cellaszerkesztőmódban van az Excel. Kérjük, lépjen ki a szerkesztőmódból az Enter vagy a Tab billentyű megnyomásával, és próbálkozzon újra.";
 Strings.OfficeOM.L_InvalidOrTimedOutSession = "Érvénytelen vagy lejárt időkorlátú munkamenet";
-Strings.OfficeOM.L_InvalidOrTimedOutSessionMessage = "Office Online-munkamenete lejárt vagy nem érvényes. A folytatáshoz frissítse a lapot.";
+Strings.OfficeOM.L_InvalidOrTimedOutSessionMessage = "Az Office-munkamenet elévült vagy érvénytelen. A folytatáshoz frissítse a lapot.";
 Strings.OfficeOM.L_InvalidParameters = "A(z) {0} függvénynek érvénytelen paraméterei vannak.";
 Strings.OfficeOM.L_InvalidReadForBlankRow = "A megadott sor üres.";
 Strings.OfficeOM.L_InvalidRequestContext = "Az objektum nem használható több különböző kérelemkontextusban.";
@@ -191,3 +191,4 @@ Strings.OfficeOM.L_UserAbortedMessage = "A felhasználó nem járult hozzá, hog
 Strings.OfficeOM.L_UserClickIgnore = "A felhasználó úgy döntött, hogy mellőzi a párbeszédpanelt.";
 Strings.OfficeOM.L_UserNotSignedIn = "Nincs felhasználó bejelentkezve az Office-ba.";
 Strings.OfficeOM.L_ValueNotLoaded = "Az eredményobjektum értéke még nem lett betöltve. Az értéktulajdonság olvasása előtt hívja meg a „context.sync()” függvényt a kapcsolódó kérelemkontextushoz.";
+Strings.OfficeOM.L_WorkbookHiddenMessage = "A JavaScript API-kérés nem sikerült, mert a munkafüzet rejtett. Jelenítse meg a munkafüzetet, majd próbálkozzon újra.";

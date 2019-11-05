@@ -1,5 +1,3 @@
-/* Version: 16.0.10827.10000 */
-
 Type.registerNamespace("_u");
 _u.ExtensibilityStrings = function()
 {
@@ -26,6 +24,7 @@ _u.ExtensibilityStrings.l_DeleteAttachmentDoesNotExist_Text = "Liitettä ei voi 
 _u.ExtensibilityStrings.l_DisplayNameTooLong_Text = "Vähintään yksi annettu näyttönimi on liian pitkä.";
 _u.ExtensibilityStrings.l_DisplayReplyFormHtmlBodyRequired_Text = "htmlBody on pakollinen tieto.";
 _u.ExtensibilityStrings.l_DuplicateNotificationKey_Text = "Ilmoitus, jolla on annettu avain, on jo olemassa.";
+_u.ExtensibilityStrings.l_Duplicate_Category_Error_Text = "Yksi annetuista luokista on jo pääluokkaluettelossa.";
 _u.ExtensibilityStrings.l_ElevatedPermissionNeededForMethod_Text = "Menetelmän kutsumiseen tarvitaan laajennetut oikeudet: {0}.";
 _u.ExtensibilityStrings.l_ElevatedPermissionNeeded_Text = "Officen JavaScript-ohjelmointirajapinnan suojattujen jäsenten käyttämiseen tarvitaan laajennetut oikeudet.";
 _u.ExtensibilityStrings.l_EmailAddressTooLong_Text = "Vähintään yksi annettu sähköpostiosoite on liian pitkä.";
@@ -47,6 +46,8 @@ _u.ExtensibilityStrings.l_InvalidEventDates_Text = "Päättymispäivä on ennen 
 _u.ExtensibilityStrings.l_InvalidParameterValueError_Text = "Parametrin {0} arvo on virheellinen.";
 _u.ExtensibilityStrings.l_InvalidSelection_Text = "Valinta on virheellinen.";
 _u.ExtensibilityStrings.l_InvalidTime_Text = "Syöte ei tuota kelvollista aikaa.";
+_u.ExtensibilityStrings.l_Invalid_Category_Error_Text = "Virheellisiä luokkia annettiin.";
+_u.ExtensibilityStrings.l_Item_Not_Saved_Error_Text = "Tunnusta ei voi noutaa, ennen kuin osa on tallennettu.";
 _u.ExtensibilityStrings.l_MessageInDifferentStoreError_Text = "EWS-tunnusta ei voi noutaa, koska viesti on tallennettu toiseen säilöön.";
 _u.ExtensibilityStrings.l_NoValidRecipientsProvided_Text = "Kelvollisia vastaanottajia ei ole määritetty.";
 _u.ExtensibilityStrings.l_NotificationKeyNotFound_Text = "Annetulla avaimella ei löydy ilmoituksia.";
