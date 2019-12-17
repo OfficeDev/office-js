@@ -1,5 +1,3 @@
-/* Version: 16.0.11030.10000 */
-
 Type.registerNamespace("_u");
 _u.ExtensibilityStrings = function()
 {
@@ -26,6 +24,7 @@ _u.ExtensibilityStrings.l_DeleteAttachmentDoesNotExist_Text = "अनुलग�
 _u.ExtensibilityStrings.l_DisplayNameTooLong_Text = "एक या अधिक प्रदान किए गए प्रदर्शन नाम बहुत लंबे हैं.";
 _u.ExtensibilityStrings.l_DisplayReplyFormHtmlBodyRequired_Text = "'htmlBody' आवश्यक है.";
 _u.ExtensibilityStrings.l_DuplicateNotificationKey_Text = "दी गई कुंजी के साथ कोई अधिसूचना पहले से मौजूद है.";
+_u.ExtensibilityStrings.l_Duplicate_Category_Error_Text = "प्रदान की गई श्रेणियों में से एक मास्टर श्रेणी सूची में पहले से ही है.";
 _u.ExtensibilityStrings.l_ElevatedPermissionNeededForMethod_Text = "इस पद्धति से करने के लिए उन्नत अनुमति आवश्यक है: '{0}'.";
 _u.ExtensibilityStrings.l_ElevatedPermissionNeeded_Text = "Office के लिए JavaScript API के सुरक्षित सदस्यों तक पहुँच प्राप्त करने के लिए उन्नत अनुमति आवश्‍यक है.";
 _u.ExtensibilityStrings.l_EmailAddressTooLong_Text = "एक या अधिक प्रदान किए गए ई-मेल पते बहुत लंबे हैं.";
@@ -47,6 +46,8 @@ _u.ExtensibilityStrings.l_InvalidEventDates_Text = "समाप्ति दि
 _u.ExtensibilityStrings.l_InvalidParameterValueError_Text = "'{0}' पैरामीटर का मान अमान्य है.";
 _u.ExtensibilityStrings.l_InvalidSelection_Text = "चयन मान्य नहीं है.";
 _u.ExtensibilityStrings.l_InvalidTime_Text = "इनपुट मान्य दिनांक को स्पष्ट नहीं करता.";
+_u.ExtensibilityStrings.l_Invalid_Category_Error_Text = "अमान्य श्रेणियाँ प्रदान की गई थीं.";
+_u.ExtensibilityStrings.l_Item_Not_Saved_Error_Text = "आइटम सहेजे जाने तक id को पुनर्प्राप्त नहीं किया जा सकता.";
 _u.ExtensibilityStrings.l_MessageInDifferentStoreError_Text = "EWS ID पुनर्प्राप्त नहीं की जा सकती क्योंकि संदेश किसी अन्य स्टोर में सहेजा जाता है.";
 _u.ExtensibilityStrings.l_NoValidRecipientsProvided_Text = "कोई मान्य प्राप्तकर्ता प्रदान नहीं किए गए थे.";
 _u.ExtensibilityStrings.l_NotificationKeyNotFound_Text = "दी गई कुंजी के साथ कोई अधिसूचना नहीं है.";

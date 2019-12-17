@@ -1,5 +1,3 @@
-/* Version: 16.0.11030.10000 */
-
 Type.registerNamespace("_u");
 _u.ExtensibilityStrings = function()
 {
@@ -26,6 +24,7 @@ _u.ExtensibilityStrings.l_DeleteAttachmentDoesNotExist_Text = "O anexo não pode
 _u.ExtensibilityStrings.l_DisplayNameTooLong_Text = "Um ou mais dos nomes de exibição fornecidos são muito longos.";
 _u.ExtensibilityStrings.l_DisplayReplyFormHtmlBodyRequired_Text = 'O "htmlBody" é necessário.';
 _u.ExtensibilityStrings.l_DuplicateNotificationKey_Text = "Já existe uma notificação com a chave fornecida.";
+_u.ExtensibilityStrings.l_Duplicate_Category_Error_Text = "Uma das categorias fornecidas já está na lista de categorias mestras.";
 _u.ExtensibilityStrings.l_ElevatedPermissionNeededForMethod_Text = "A permissão elevada é necessária para chamar o método: '{0}'.";
 _u.ExtensibilityStrings.l_ElevatedPermissionNeeded_Text = "A permissão elevada é necessária para acessar membros protegidos da API JavaScript para Office.";
 _u.ExtensibilityStrings.l_EmailAddressTooLong_Text = "Um ou mais endereços de email fornecidos são muito longos.";
@@ -47,6 +46,8 @@ _u.ExtensibilityStrings.l_InvalidEventDates_Text = "A data de término ocorre an
 _u.ExtensibilityStrings.l_InvalidParameterValueError_Text = 'O valor do parâmetro "{0}" é inválido.';
 _u.ExtensibilityStrings.l_InvalidSelection_Text = "A seleção é inválida.";
 _u.ExtensibilityStrings.l_InvalidTime_Text = "A entrada não resolve para uma hora válida.";
+_u.ExtensibilityStrings.l_Invalid_Category_Error_Text = "Foram fornecidas categorias inválidas.";
+_u.ExtensibilityStrings.l_Item_Not_Saved_Error_Text = "A ID não pode ser recuperada até que o item seja salvo.";
 _u.ExtensibilityStrings.l_MessageInDifferentStoreError_Text = "Não foi possível recuperar a ID do EWS porque a mensagem está salva em um repositório diferente.";
 _u.ExtensibilityStrings.l_NoValidRecipientsProvided_Text = "Não foram fornecidos destinatários válidos.";
 _u.ExtensibilityStrings.l_NotificationKeyNotFound_Text = "Não há nenhuma notificação com a chave fornecida.";

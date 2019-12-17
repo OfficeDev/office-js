@@ -1,5 +1,3 @@
-/* Version: 16.0.11030.10000 */
-
 Type.registerNamespace("Strings");
 Strings.OfficeOM = function()
 {
@@ -51,7 +49,7 @@ Strings.OfficeOM.L_DataReadError = "Errore di lettura dei dati";
 Strings.OfficeOM.L_DataStale = "Dati non correnti";
 Strings.OfficeOM.L_DataWriteError = "Errore di scrittura dei dati";
 Strings.OfficeOM.L_DataWriteReminder = "Promemoria di scrittura dati";
-Strings.OfficeOM.L_DialogAddressNotTrusted = "Il dominio dell'URL non è incluso nell'elemento AppDomains del manifesto.";
+Strings.OfficeOM.L_DialogAddressNotTrusted = "Il dominio dell'URL non è incluso nell'elemento AppDomains nel manifesto e non è un sottodominio del percorso di origine.";
 Strings.OfficeOM.L_DialogAlreadyOpened = "L'operazione non è riuscita perché il componente aggiuntivo ha già una finestra di dialogo attiva.";
 Strings.OfficeOM.L_DialogInvalidScheme = "Lo schema dell'URL non è supportato. Usare invece HTTPS.";
 Strings.OfficeOM.L_DialogNavigateError = "Errore di spostamento finestra di dialogo";
@@ -72,6 +70,8 @@ Strings.OfficeOM.L_GetDataIsTooLarge = "Il set di dati richiesto è troppo grand
 Strings.OfficeOM.L_GetDataParametersConflict = "I parametri specificati sono in conflitto.";
 Strings.OfficeOM.L_GetSelectionNotSupported = "La selezione corrente non è supportata.";
 Strings.OfficeOM.L_HostError = "Errore host";
+Strings.OfficeOM.L_ImplicitGetAuthContextMissing = "Funzione per ottenere il contesto di autenticazione mancante";
+Strings.OfficeOM.L_ImplicitNotLoaded = "Il modulo non viene caricato prima di acquisire un token";
 Strings.OfficeOM.L_InValidOptionalArgument = "argomento facoltativo non valido";
 Strings.OfficeOM.L_IndexOutOfRange = "Indice non compreso nell'intervallo.";
 Strings.OfficeOM.L_InitializeNotReady = "Office.js non è stato caricato completamente. Riprovare più tardi oppure aggiungere il codice di inizializzazione nella funzione Office.initialize.";
@@ -103,7 +103,7 @@ Strings.OfficeOM.L_InvalidNode = "Nodo non valido";
 Strings.OfficeOM.L_InvalidObjectPath = "Il percorso dell'oggetto '{0}' non funziona per l'operazione che si sta provando a eseguire. Se l'oggetto viene usato per più chiamate \"context.sync\" e all'esterno dell'esecuzione sequenziale di un batch \".run\", usare i metodi \"context.trackedObjects.add()\" e \"context.trackedObjects.remove()\" per gestire la durata dell'oggetto.";
 Strings.OfficeOM.L_InvalidOperationInCellEditMode = "Excel è in modalità di modifica cella. Uscire dalla modalità di modifica premendo INVIO o TAB oppure selezionando un'altra cella, quindi riprovare.";
 Strings.OfficeOM.L_InvalidOrTimedOutSession = "Sessione scaduta o non valida";
-Strings.OfficeOM.L_InvalidOrTimedOutSessionMessage = "La sessione di Office Online è scaduta o non è valida. Per continuare, aggiornare la pagina.";
+Strings.OfficeOM.L_InvalidOrTimedOutSessionMessage = "La sessione di Office è scaduta o non è valida. Per continuare, aggiornare la pagina.";
 Strings.OfficeOM.L_InvalidParameters = "La funzione {0} dispone di parametri non validi.";
 Strings.OfficeOM.L_InvalidReadForBlankRow = "La riga specificata è vuota.";
 Strings.OfficeOM.L_InvalidRequestContext = "Non è possibile usare l'oggetto in contesti di richiesta diversi.";
@@ -191,3 +191,4 @@ Strings.OfficeOM.L_UserAbortedMessage = "L'utente non ha concesso le autorizzazi
 Strings.OfficeOM.L_UserClickIgnore = "L'utente ha scelto di ignorare la finestra di dialogo.";
 Strings.OfficeOM.L_UserNotSignedIn = "Nessun utente ha effettuato l'accesso a Office.";
 Strings.OfficeOM.L_ValueNotLoaded = 'Il valore dell\'oggetto risultato non è stato ancora caricato. Prima di leggere il valore della proprietà, chiamare "context.sync()" nel contesto della richiesta associato.';
+Strings.OfficeOM.L_WorkbookHiddenMessage = "La richiesta di API JavaScript non riuscita perché la cartella di lavoro è stata nascosta. Per scoprire la cartella e riprovare.";

@@ -1,5 +1,3 @@
-/* Version: 16.0.11030.10000 */
-
 Type.registerNamespace("_u");
 _u.ExtensibilityStrings = function()
 {
@@ -26,6 +24,7 @@ _u.ExtensibilityStrings.l_DeleteAttachmentDoesNotExist_Text = "Lampiran tidak bo
 _u.ExtensibilityStrings.l_DisplayNameTooLong_Text = "Satu atau lebih nama paparan yang diberikan adalah terlalu panjang.";
 _u.ExtensibilityStrings.l_DisplayReplyFormHtmlBodyRequired_Text = "'htmlBody' diperlukan.";
 _u.ExtensibilityStrings.l_DuplicateNotificationKey_Text = "Pemberitahuan dengan kunci yang diberikan telah wujud.";
+_u.ExtensibilityStrings.l_Duplicate_Category_Error_Text = "Salah satu kategori yang disediakan sudah dalam senarai kategori induk.";
 _u.ExtensibilityStrings.l_ElevatedPermissionNeededForMethod_Text = "Kebenaran dipertingkat diperlukana untuk menentukan kaedah tersebut: '{0}'.";
 _u.ExtensibilityStrings.l_ElevatedPermissionNeeded_Text = "Kebenaran dipertingkat diperlukan untuk mencapai ahli dilindungi JavaScript API untuk Office.";
 _u.ExtensibilityStrings.l_EmailAddressTooLong_Text = "Satu atau lebih alamat e-mel yang diberikan adalah terlalu panjang.";
@@ -47,6 +46,8 @@ _u.ExtensibilityStrings.l_InvalidEventDates_Text = "Tarikh akhir berlaku sebelum
 _u.ExtensibilityStrings.l_InvalidParameterValueError_Text = "Nilai parameter '{0}' tidak sah.";
 _u.ExtensibilityStrings.l_InvalidSelection_Text = "Pemilihan tidak sah.";
 _u.ExtensibilityStrings.l_InvalidTime_Text = "Input tidak diselesaikan kepada masa yang sah.";
+_u.ExtensibilityStrings.l_Invalid_Category_Error_Text = "Kategori tidak sah telah disediakan.";
+_u.ExtensibilityStrings.l_Item_Not_Saved_Error_Text = "Id tidak boleh diambil sehingga item tersebut disimpan.";
 _u.ExtensibilityStrings.l_MessageInDifferentStoreError_Text = "ID EWS tidak dapat diambil kerana mesej disimpan dalam gedung yang berbeza.";
 _u.ExtensibilityStrings.l_NoValidRecipientsProvided_Text = "Tiada penerima sah diberikan.";
 _u.ExtensibilityStrings.l_NotificationKeyNotFound_Text = "Tiada pemberitahuan dengan kunci yang diberikan.";
@@ -61,7 +62,7 @@ _u.ExtensibilityStrings.l_PersistedNotificationArrayReadError_Text = "Panggilan 
 _u.ExtensibilityStrings.l_PersistedNotificationArraySaveError_Text = "Panggilan API yang anda lakukan gagal kerana pemberitahuan tidak dapat diteruskan.";
 _u.ExtensibilityStrings.l_RecurrenceErrorMaxOccurrences_Text = "Siri berulang melebihi had maksimum sebanyak 999 kejadian.";
 _u.ExtensibilityStrings.l_RecurrenceErrorZeroOccurrences_Text = "Siri berulang tidak mempunyai kejadian dalam julat tarikh yang ditentukan.";
-_u.ExtensibilityStrings.l_RecurrenceInvalidTimeZone_Text = "Zon masa yang ditentukan tidak disokong.";
+_u.ExtensibilityStrings.l_RecurrenceInvalidTimeZone_Text = "Zon waktu yang ditentukan tidak disokong.";
 _u.ExtensibilityStrings.l_RecurrenceUnsupportedAlternateCalendar_Text = "Corak perulangan telah disetkan oleh pengguna menggunakan kalendar alternatif yang tidak disokong.";
 _u.ExtensibilityStrings.l_Recurrence_Error_Instance_SetAsync_Text = "Corak perulangan tidak boleh disetkan untuk satu kejadian dalam satu siri.";
 _u.ExtensibilityStrings.l_Recurrence_Error_Properties_Invalid_Text = "Corak perulangan tidak sah. Sila semak bahawa sifat perulangan yang ditentukan sejajar dengan jenis perulangan.";

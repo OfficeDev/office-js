@@ -1,5 +1,3 @@
-/* Version: 16.0.11030.10000 */
-
 Type.registerNamespace("_u");
 _u.ExtensibilityStrings = function()
 {
@@ -26,6 +24,7 @@ _u.ExtensibilityStrings.l_DeleteAttachmentDoesNotExist_Text = "A melléklet nem 
 _u.ExtensibilityStrings.l_DisplayNameTooLong_Text = "Egy vagy több megadott megjelenítendő név túl hosszú.";
 _u.ExtensibilityStrings.l_DisplayReplyFormHtmlBodyRequired_Text = "A htmlBody tulajdonság megadása kötelező.";
 _u.ExtensibilityStrings.l_DuplicateNotificationKey_Text = "Már létezik a megadott kulccsal jelölt értesítés.";
+_u.ExtensibilityStrings.l_Duplicate_Category_Error_Text = "A megadott kategóriák egyike már szerepel az általános kategóriák listáján.";
 _u.ExtensibilityStrings.l_ElevatedPermissionNeededForMethod_Text = "Emelt szintű engedély szükséges a következő metódus hívásához: {0}.";
 _u.ExtensibilityStrings.l_ElevatedPermissionNeeded_Text = "Emelt szintű engedély szükséges az Office JavaScript API védett tagjainak eléréséhez.";
 _u.ExtensibilityStrings.l_EmailAddressTooLong_Text = "Egy vagy több megadott e-mail-cím túl hosszú.";
@@ -47,6 +46,8 @@ _u.ExtensibilityStrings.l_InvalidEventDates_Text = "A befejezési időpont megel
 _u.ExtensibilityStrings.l_InvalidParameterValueError_Text = "Érvénytelen a(z) {0} paraméter értéke.";
 _u.ExtensibilityStrings.l_InvalidSelection_Text = "Érvénytelen a kijelölt rész.";
 _u.ExtensibilityStrings.l_InvalidTime_Text = "A beírt érték nem értelmezhető érvényes időpontként.";
+_u.ExtensibilityStrings.l_Invalid_Category_Error_Text = "Érvénytelen kategóriák lettek megadva.";
+_u.ExtensibilityStrings.l_Item_Not_Saved_Error_Text = "Az azonosító nem olvasható be az elem mentésekor.";
 _u.ExtensibilityStrings.l_MessageInDifferentStoreError_Text = "Nem sikerült beolvasni az EWS-azonosítót, mert egy másik tárolóba lett mentve az üzenet.";
 _u.ExtensibilityStrings.l_NoValidRecipientsProvided_Text = "Nincs érvényes címzett megadva.";
 _u.ExtensibilityStrings.l_NotificationKeyNotFound_Text = "Nem találtunk a megadott kulccsal jelölt értesítést.";

@@ -1,5 +1,3 @@
-/* Version: 16.0.11030.10000 */
-
 Type.registerNamespace("_u");
 _u.ExtensibilityStrings = function()
 {
@@ -26,6 +24,7 @@ _u.ExtensibilityStrings.l_DeleteAttachmentDoesNotExist_Text = "Ezin da eranskina
 _u.ExtensibilityStrings.l_DisplayNameTooLong_Text = "Adierazitako bistaratzeko izenetako bat edo gehiago luzeegiak dira.";
 _u.ExtensibilityStrings.l_DisplayReplyFormHtmlBodyRequired_Text = '"htmlBody" beharrezkoa da.';
 _u.ExtensibilityStrings.l_DuplicateNotificationKey_Text = "Lehendik dago emandako gakoa duen jakinarazpen bat.";
+_u.ExtensibilityStrings.l_Duplicate_Category_Error_Text = "Emandako kategorietako bat kategoria nagusien zerrendan dago.";
 _u.ExtensibilityStrings.l_ElevatedPermissionNeededForMethod_Text = 'Goi-mailako baimena behar da metodoari deitzeko: "{0}".';
 _u.ExtensibilityStrings.l_ElevatedPermissionNeeded_Text = "Goi-mailako baimena behar da Office-rako JavaScript APIaren babestutako kideak atzitzeko.";
 _u.ExtensibilityStrings.l_EmailAddressTooLong_Text = "Adierazitako helbide elektronikoetako bat edo gehiago luzeegiak dira.";
@@ -47,6 +46,8 @@ _u.ExtensibilityStrings.l_InvalidEventDates_Text = "Amaiera-data hasiera-data ba
 _u.ExtensibilityStrings.l_InvalidParameterValueError_Text = '"{0}" parametroaren balioa ez da zuzena.';
 _u.ExtensibilityStrings.l_InvalidSelection_Text = "Hautapenak ez du balio.";
 _u.ExtensibilityStrings.l_InvalidTime_Text = "Idatzitako datuek ez dute balio ordu bat osatzeko.";
+_u.ExtensibilityStrings.l_Invalid_Category_Error_Text = "Kategoria baliogabeak eman dira.";
+_u.ExtensibilityStrings.l_Item_Not_Saved_Error_Text = "Elementua gorde arte, ezin da eskuratu IDa.";
 _u.ExtensibilityStrings.l_MessageInDifferentStoreError_Text = "Ezin da eskuratu EWS IDa, mezua beste biltegi batean dagoelako gordeta.";
 _u.ExtensibilityStrings.l_NoValidRecipientsProvided_Text = "Ez da baliozko hartzailerik adierazi.";
 _u.ExtensibilityStrings.l_NotificationKeyNotFound_Text = "Ez dago emandako gakoa duen jakinarazpenik.";

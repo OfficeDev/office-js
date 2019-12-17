@@ -1,5 +1,3 @@
-/* Version: 16.0.10827.10000 */
-
 Type.registerNamespace("Strings");
 Strings.OfficeOM = function()
 {
@@ -51,7 +49,7 @@ Strings.OfficeOM.L_DataReadError = "Lesvilla gagna";
 Strings.OfficeOM.L_DataStale = "Gögn ekki núgildandi";
 Strings.OfficeOM.L_DataWriteError = "Skrifvilla gagna";
 Strings.OfficeOM.L_DataWriteReminder = "Skrifáminning gagna";
-Strings.OfficeOM.L_DialogAddressNotTrusted = "Lén vefslóðarinnar kemur ekki fram í AppDomains-einingunni í upplýsingaskránni.";
+Strings.OfficeOM.L_DialogAddressNotTrusted = "Lén vefslóðarinnar kemur ekki fram í AppDomains-einingunni í upplýsingaskránni og er ekki undirlén upprunastaðar.";
 Strings.OfficeOM.L_DialogAlreadyOpened = "Aðgerðin mistókst vegna þess að svargluggi fyrir innbótina er þegar opinn.";
 Strings.OfficeOM.L_DialogInvalidScheme = "Skema vefslóðarinnar er ekki stutt. Notaðu HTTPS í staðinn.";
 Strings.OfficeOM.L_DialogNavigateError = "Villa í notkun svarglugga";
@@ -72,6 +70,8 @@ Strings.OfficeOM.L_GetDataIsTooLarge = "Umbeðin stilling gagna er of stór.";
 Strings.OfficeOM.L_GetDataParametersConflict = "Árekstur á milli skilgreindra breyta.";
 Strings.OfficeOM.L_GetSelectionNotSupported = "Núverandi val er ekki stutt.";
 Strings.OfficeOM.L_HostError = "Villa hýsils";
+Strings.OfficeOM.L_ImplicitGetAuthContextMissing = "Aðgerðina til að sækja sannvottunarupplýsingar vantar";
+Strings.OfficeOM.L_ImplicitNotLoaded = "Einingunni er ekki hlaðið áður en lykill er sóttur";
 Strings.OfficeOM.L_InValidOptionalArgument = "ógild valkvæð frumbreyta";
 Strings.OfficeOM.L_IndexOutOfRange = "Yfirlit utan sviðs.";
 Strings.OfficeOM.L_InitializeNotReady = "Office.js hefur ekki hlaðist að fullu enn. Reyndu aftur síðar eða vertu viss um að bæta við þínum frumstillingarkóða við aðgerðina Office.initialize.";
@@ -103,7 +103,7 @@ Strings.OfficeOM.L_InvalidNode = "Ógildur tengipunktur";
 Strings.OfficeOM.L_InvalidObjectPath = "Hlutarslóðin „{0}“ virkar ekki fyrir það sem þú ert að reyna að gera. Ef þú ert að nota hlutinn í mismunandi köllum fyrir „context.sync“ og fyrir utan raðaðgerðir í „.run“-runu þarftu að nota aðferðirnar „context.trackedObjects.add()“ og „context.trackedObjects.remove()“ til að stýra líftíma hlutarins.";
 Strings.OfficeOM.L_InvalidOperationInCellEditMode = "Excel er í stillingu fyrir breytingar á hólfum. Farðu úr þessari stillingu með því að ýta á færslulykilinn eða dálkalykillinn eða með því að velja annað hólf og reyndu svo aftur.";
 Strings.OfficeOM.L_InvalidOrTimedOutSession = "Lota ógild eða rann út á tíma";
-Strings.OfficeOM.L_InvalidOrTimedOutSessionMessage = "Office Online-lotan þín rann út á tíma eða er ógild. Uppfærðu síðuna til að halda áfram.";
+Strings.OfficeOM.L_InvalidOrTimedOutSessionMessage = "Office-lotan þín rann út á tíma eða er ógild. Uppfærðu síðuna til að halda áfram.";
 Strings.OfficeOM.L_InvalidParameters = "Aðgerð {0} er með ógildar breytur.";
 Strings.OfficeOM.L_InvalidReadForBlankRow = "Skilgreind röð er auð.";
 Strings.OfficeOM.L_InvalidRequestContext = "Ekki er hægt að nota hlutinn í mismunandi fyrirspurnasamhengi.";
@@ -191,3 +191,4 @@ Strings.OfficeOM.L_UserAbortedMessage = "Notandinn samþykkti ekki heimildir inn
 Strings.OfficeOM.L_UserClickIgnore = "Notandinn valdi að hunsa svargluggann.";
 Strings.OfficeOM.L_UserNotSignedIn = "Enginn notandi er innskráður í Office.";
 Strings.OfficeOM.L_ValueNotLoaded = "Gildi niðurstöðuhlutar hefur ekki verið hlaðið ennþá. Áður en gildi eiginleikans er lesið þarf að kalla á „context.sync()“ í samhengi við tengda fyrirspurn.";
+Strings.OfficeOM.L_WorkbookHiddenMessage = "JavaScript API-beiðni mistókst vegna þess að vinnubókin var falin. Birtu vinnubókina og reyndu aftur.";

@@ -1,5 +1,3 @@
-/* Version: 16.0.11030.10000 */
-
 Type.registerNamespace("_u");
 _u.ExtensibilityStrings = function()
 {
@@ -26,6 +24,7 @@ _u.ExtensibilityStrings.l_DeleteAttachmentDoesNotExist_Text = "No es pot suprimi
 _u.ExtensibilityStrings.l_DisplayNameTooLong_Text = "Un o més dels noms de visualització indicats és massa llarg.";
 _u.ExtensibilityStrings.l_DisplayReplyFormHtmlBodyRequired_Text = 'El valor "htmlBody" és obligatori.';
 _u.ExtensibilityStrings.l_DuplicateNotificationKey_Text = "Ja hi ha una notificació amb la clau que heu proporcionat.";
+_u.ExtensibilityStrings.l_Duplicate_Category_Error_Text = "Una de les categories que ja està a la llista Categoria Màster.";
 _u.ExtensibilityStrings.l_ElevatedPermissionNeededForMethod_Text = "Cal un permís elevat per cridar el mètode: '{0}'.";
 _u.ExtensibilityStrings.l_ElevatedPermissionNeeded_Text = "Per accedir als membres protegits de l'API Javascript per a Office cal un permís elevat.";
 _u.ExtensibilityStrings.l_EmailAddressTooLong_Text = "Una o més de les adreces electròniques indicades és massa llarga.";
@@ -47,6 +46,8 @@ _u.ExtensibilityStrings.l_InvalidEventDates_Text = "La data de finalització és
 _u.ExtensibilityStrings.l_InvalidParameterValueError_Text = 'El valor del paràmetre "{0}" no és vàlid.';
 _u.ExtensibilityStrings.l_InvalidSelection_Text = "La selecció no és vàlida.";
 _u.ExtensibilityStrings.l_InvalidTime_Text = "L'entrada no es resol en una hora vàlida.";
+_u.ExtensibilityStrings.l_Invalid_Category_Error_Text = "S'han proporcionat categories no vàlides.";
+_u.ExtensibilityStrings.l_Item_Not_Saved_Error_Text = "L'id no es poden recuperar fins que es desa l'element.";
 _u.ExtensibilityStrings.l_MessageInDifferentStoreError_Text = "L'identificador de l'EWS ID no es pot recuperar perquè el missatge està desat en un altre emmagatzematge.";
 _u.ExtensibilityStrings.l_NoValidRecipientsProvided_Text = "No s'han subministrat destinataris vàlids.";
 _u.ExtensibilityStrings.l_NotificationKeyNotFound_Text = "No hi ha cap notificació amb la clau que heu proporcionat.";

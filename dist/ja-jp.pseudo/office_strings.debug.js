@@ -1,5 +1,3 @@
-/* Version: 16.0.11030.10000 */
-
 Type.registerNamespace("Strings");
 Strings.OfficeOM = function()
 {
@@ -51,7 +49,7 @@ Strings.OfficeOM.L_DataReadError = "[:Ðâtà Rèàð Èrrör瑞갂偁略థ్�
 Strings.OfficeOM.L_DataStale = "[:Ðætã Ñõt Çûrrëñt瑞갂偁略థ్క لإَّ'Ii.]";
 Strings.OfficeOM.L_DataWriteError = "[:Ðªtª Wrìtè Èrrór瑞갂偁略థ్క لإَّ'Ii.]";
 Strings.OfficeOM.L_DataWriteReminder = "[OG:Ðátã Wríté Rëmìñðêr瑞갂偁略 థ్క لإَّ'Ii.]";
-Strings.OfficeOM.L_DialogAddressNotTrusted = "[OG:Thë ðømåïñ öf thê ÚR£ ìs ñót íñçlûðèð îñ thé ÆppÐòmäîñs ëlèmëñt ìñ thë måñîfést.瑞갂偁略 яšæẤßソ瑞갂偁略 яšæథ్క لإَّ'Ii.]";
+Strings.OfficeOM.L_DialogAddressNotTrusted = "[OG:Thë ðømåïñ öf thê ÚR£ ìs ñót íñçlûðèð îñ thé ÆppÐòmäîñs ëlèmëñt ìñ thë måñîfést, äñð ìs ñõt sûþðómªìñ øf sõúrçè lõ¢ätìòñ.瑞갂偁略 яšæẤßソ瑞갂偁略 яšæẤßソ瑞갂偁略 яథ్క لإَّ'Ii.]";
 Strings.OfficeOM.L_DialogAlreadyOpened = "[OG:Thê ôpërátìôñ fåílêð þéçåµsê thìs åðð-ìñ ålréæðÿ hás åñ ªçtîvë ðíælôg.瑞갂偁略 яšæẤßソ瑞갂偁略 яథ్క لإَّ'Ii.]";
 Strings.OfficeOM.L_DialogInvalidScheme = "[OG:Thë ÚR£ sçhëmè ís ñöt súppõrtéð. Úsé HTTP§ ìñstëáð.瑞갂偁略 яšæẤßソ瑞థ్క لإَّ'Ii.]";
 Strings.OfficeOM.L_DialogNavigateError = "[OG:Ðîælõg Ñãvígàtîôñ Èrrõr瑞갂偁略 яథ్క لإَّ'Ii.]";
@@ -72,6 +70,8 @@ Strings.OfficeOM.L_GetDataIsTooLarge = "[:Thê rèqûèstëð ðátä sèt ìs t
 Strings.OfficeOM.L_GetDataParametersConflict = "[OG:Thë spé¢ìfíéð päræmètèrs ¢ôñflîçt.瑞갂偁略 яšæథ్క لإَّ'Ii.]";
 Strings.OfficeOM.L_GetSelectionNotSupported = "[:Thê ¢úrréñt sèlê¢tîõñ ìs ñøt süppörtëð.瑞갂偁略 яšæẤథ్క لإَّ'Ii.]";
 Strings.OfficeOM.L_HostError = "[:Höst Érrör瑞갂థ్క لإَّ'Ii.]";
+Strings.OfficeOM.L_ImplicitGetAuthContextMissing = "[OG:Thè fûñ¢tîòñ tô gèt âúthèñtíçátíöñ çóñtéxt ìs mïssìñg瑞갂偁略 яšæẤßソ瑞థ్క لإَّ'Ii.]";
+Strings.OfficeOM.L_ImplicitNotLoaded = "[OG:Thè móðûlé ìs ñõt lóåðéð þèfóré ä¢qüîrë á tôkéñ瑞갂偁略 яšæẤßソథ్క لإَّ'Ii.]";
 Strings.OfficeOM.L_InValidOptionalArgument = "[:ìñválíð øptìõñàl ªrgümèñt瑞갂偁略 яథ్క لإَّ'Ii.]";
 Strings.OfficeOM.L_IndexOutOfRange = "[:Ïñðèx øút øf ræñgë.瑞갂偁略 థ్క لإَّ'Ii.]";
 Strings.OfficeOM.L_InitializeNotReady = "[:Óffíçë.js hãs ñöt þèéñ füllÿ lôªðèð ÿèt. Plêãsë trÿ ågªìñ lætër ôr mækë súrê tó åðð ÿòµr ïñîtíªlîzætíøñ çõðê õñ thë Ôffîçë.ìñîtïâlïzë fúñ¢tìøñ.瑞갂偁略 яšæẤßソ瑞갂偁略 яšæẤßソ瑞갂偁略 яšæẤßソథ్క لإَّ'Ii.]";
@@ -103,7 +103,7 @@ Strings.OfficeOM.L_InvalidNode = "[:Îñvãlíð Ñòðê瑞갂偁థ్క لإ
 Strings.OfficeOM.L_InvalidObjectPath = '[OG:Thé òþjè¢t pªth \'{0}\' ísñ\'t wõrkìñg fòr whât ÿöµ\'rë trÿïñg tõ ðø. Ìf ÿóú\'ré ûsïñg thè öþjëçt â¢röss múltîplé "¢øñtèxt.sýñ¢" çålls æñð õµtsìðé thé sëqùëñtìæl éxëçûtíòñ õf â ".rùñ" þåt¢h, plëäsë ùsë thè "¢õñtëxt.tràçkéðÔþjé¢ts.åðð()" ãñð "¢öñtèxt.tråçkëðÔþjêçts.rémøvë()" mëthôðs tø mªñªgê thè òþjë¢t\'s lìfétïmè.瑞갂偁略 яšæẤßソ瑞갂偁略 яšæẤßソ瑞갂偁略 яšæẤßソ瑞갂偁略 яšæẤßソ瑞갂偁略 яšæẤßソ瑞갂偁略 яšæẤßソ瑞갂偁略 яథ్క لإَّ\'Ii.]';
 Strings.OfficeOM.L_InvalidOperationInCellEditMode = "[OG:Ëxçêl ïs ìñ ¢èll-éðïtïñg møðë. Plëäsè èxìt thé ëðìt møðé þÿ prëssìñg ÊÑTÊR ôr TÅÞ ør sêlè¢tïñg ªñøthêr ¢êll, åñð théñ trý ægäìñ.瑞갂偁略 яšæẤßソ瑞갂偁略 яšæẤßソ瑞갂偁略 яšæథ్క لإَّ'Ii.]";
 Strings.OfficeOM.L_InvalidOrTimedOutSession = "[OG:Íñvælíð Ôr Tîmèð Öút §èssìôñ瑞갂偁略 яšథ్క لإَّ'Ii.]";
-Strings.OfficeOM.L_InvalidOrTimedOutSessionMessage = "[OG:Ýõùr Øffìçë Òñlíñé sèssïõñ hãs ëxpïréð õr îs ìñvâlìð. Tö çôñtîñúê, réfrèsh thê pägê.瑞갂偁略 яšæẤßソ瑞갂偁略 яšæẤథ్క لإَّ'Ii.]";
+Strings.OfficeOM.L_InvalidOrTimedOutSessionMessage = "[OG:Ýõùr Øffìçë sèssïóñ hâs èxpïrêð õr ïs ïñvàlîð. Tò ¢ôñtîñúé, rêfrêsh thé págê.瑞갂偁略 яšæẤßソ瑞갂偁略 яšథ్క لإَّ'Ii.]";
 Strings.OfficeOM.L_InvalidParameters = "[:Fúñçtïòñ {0} häs ïñvælíð pârámëtérs.瑞갂偁略 яšæẤథ్క لإَّ'Ii.]";
 Strings.OfficeOM.L_InvalidReadForBlankRow = "[OG:Thê spê¢îfíëð rów îs þlàñk.瑞갂偁略 яšథ్క لإَّ'Ii.]";
 Strings.OfficeOM.L_InvalidRequestContext = "[OG:Çæññøt ûsé thè øþjê¢t åçrõss ðìffêréñt rèqûêst ¢öñtêxts.瑞갂偁略 яšæẤßソ瑞갂థ్క لإَّ'Ii.]";
@@ -191,3 +191,4 @@ Strings.OfficeOM.L_UserAbortedMessage = "[OG:Thë ûsër ðíð ñøt ¢ôñsé�
 Strings.OfficeOM.L_UserClickIgnore = "[OG:Thê ûsër ¢hósê tô ïgñôrê thë ðïàlög þôx.瑞갂偁略 яšæẤథ్క لإَّ'Ii.]";
 Strings.OfficeOM.L_UserNotSignedIn = "[OG:Ñò µsèr ïs sìgñèð íñtó Ôffî¢ë.瑞갂偁略 яšæథ్క لإَّ'Ii.]";
 Strings.OfficeOM.L_ValueNotLoaded = '[OG:Thê vàlúë öf thé rêsûlt óþjë¢t hás ñøt þèëñ löáðëð ýêt. Þëfôrè rèãðïñg thë välµë própértý, ¢äll "çõñtèxt.sýñç()" ôñ thé åssóçîâtèð rêqµèst çóñtéxt.瑞갂偁略 яšæẤßソ瑞갂偁略 яšæẤßソ瑞갂偁略 яšæẤßソ瑞థ్క لإَّ\'Ii.]';
+Strings.OfficeOM.L_WorkbookHiddenMessage = "[OG:Thë Jävâ§¢rìpt ÅPÏ réqùést fáïlêð þè¢æµsê thé wörkþöõk wàs hìððêñ. Plëæsë ùñhíðê thë wórkþòôk ãñð trý ågâíñ.瑞갂偁略 яšæẤßソ瑞갂偁略 яšæẤßソ瑞갂偁థ్క لإَّ'Ii.]";

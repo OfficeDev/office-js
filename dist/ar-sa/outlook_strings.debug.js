@@ -1,5 +1,3 @@
-/* Version: 16.0.11030.10000 */
-
 Type.registerNamespace("_u");
 _u.ExtensibilityStrings = function()
 {
@@ -26,6 +24,7 @@ _u.ExtensibilityStrings.l_DeleteAttachmentDoesNotExist_Text = "لا يمكن ح�
 _u.ExtensibilityStrings.l_DisplayNameTooLong_Text = "إن اسماً واحداً أو أكثر من أسماء العرض التي قدمتها طويل(ة) جداً.";
 _u.ExtensibilityStrings.l_DisplayReplyFormHtmlBodyRequired_Text = "'htmlBody' مطلوب.";
 _u.ExtensibilityStrings.l_DuplicateNotificationKey_Text = "يوجد مسبقاً إعلام بالمفتاح المتوفر.";
+_u.ExtensibilityStrings.l_Duplicate_Category_Error_Text = "إحدى الفئات المتوفرة بالفعل في قائمة الفئات الرئيسية.";
 _u.ExtensibilityStrings.l_ElevatedPermissionNeededForMethod_Text = 'الإذن غير المقيّد مطلوب لاستدعاء الأسلوب: "{0}".';
 _u.ExtensibilityStrings.l_ElevatedPermissionNeeded_Text = "الإذن غير المقيّد مطلوب للوصول إلى الأعضاء المحميين لـ JavaScript API من Office.";
 _u.ExtensibilityStrings.l_EmailAddressTooLong_Text = "إن عنواناً واحد أو أكثر من عناوين البريد الإلكتروني التي قدمتها طويل(ة) جداً.";
@@ -47,6 +46,8 @@ _u.ExtensibilityStrings.l_InvalidEventDates_Text = "يقع تاريخ الانت
 _u.ExtensibilityStrings.l_InvalidParameterValueError_Text = "قيمة المعلمة '{0}' غير صالحة.";
 _u.ExtensibilityStrings.l_InvalidSelection_Text = "التحديد غير صالح.";
 _u.ExtensibilityStrings.l_InvalidTime_Text = "لا يتم حل الإدخال إلى تاريخ صالح.";
+_u.ExtensibilityStrings.l_Invalid_Category_Error_Text = "تم تقديم فئات غير صالحة.";
+_u.ExtensibilityStrings.l_Item_Not_Saved_Error_Text = "لا يمكن استرداد المعرف حتى يتم حفظ العنصر.";
 _u.ExtensibilityStrings.l_MessageInDifferentStoreError_Text = "لا يمكن استرداد معرّف EWS لأن الرسالة محفوظة في مخزن آخر.";
 _u.ExtensibilityStrings.l_NoValidRecipientsProvided_Text = "لم يتم توفير مستلمين صالحين.";
 _u.ExtensibilityStrings.l_NotificationKeyNotFound_Text = "لا توجد أية إعلامات بالمفتاح المتوفر.";

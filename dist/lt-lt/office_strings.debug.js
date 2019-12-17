@@ -1,5 +1,3 @@
-/* Version: 16.0.11030.10000 */
-
 Type.registerNamespace("Strings");
 Strings.OfficeOM = function()
 {
@@ -36,7 +34,7 @@ Strings.OfficeOM.L_ConnectionFailureWithStatus = "Užklausa nepavyko, būsenos k
 Strings.OfficeOM.L_CustomFunctionDefinitionMissing = "Excel.Script.CustomFunctions klasėje turi būti ypatybė su šiuo pavadinimu, kuris nurodo funkcijos apibrėžimą.";
 Strings.OfficeOM.L_CustomFunctionImplementationMissing = "Excel.Script.CustomFunctions klasės ypatybėje su šiuo pavadinimu, nurodančioje funkcijos apibrėžimą, turi būti ypatybė „call“, realizuojanti funkciją.";
 Strings.OfficeOM.L_CustomFunctionNameCannotSplit = "Funkcijos pavadinime negali būti tuščios vardų srities ir tuščio trumpo pavadinimo.";
-Strings.OfficeOM.L_CustomFunctionNameContainsBadChars = "Funkcijos pavadinime gali būti tik raidės, skaičiai, pabraukimo simboliai ir taškai.";
+Strings.OfficeOM.L_CustomFunctionNameContainsBadChars = "Funkcijos pavadinime gali būti tik raidės, skaitmenys, pabraukimo simboliai ir taškai.";
 Strings.OfficeOM.L_CustomXmlError = "Pasirinktinio XML klaida.";
 Strings.OfficeOM.L_CustomXmlExceedQuotaMessage = "„XPath“ leidžia pasirinkti ne daugiau nei 1024 elementus.";
 Strings.OfficeOM.L_CustomXmlExceedQuotaName = "Pasiektas pasirinkimo limitas";
@@ -51,7 +49,7 @@ Strings.OfficeOM.L_DataReadError = "Duomenų skaitymo klaida";
 Strings.OfficeOM.L_DataStale = "Duomenys neatnaujinti";
 Strings.OfficeOM.L_DataWriteError = "Duomenų rašymo klaida";
 Strings.OfficeOM.L_DataWriteReminder = "Duomenų įrašymo priminimas";
-Strings.OfficeOM.L_DialogAddressNotTrusted = "URL domenas neįtrauktas į deklaracijos „AppDomains“ elementą.";
+Strings.OfficeOM.L_DialogAddressNotTrusted = "URL domenas neįtrauktas į deklaracijos „AppDomains“ elementą ir nėra šaltinio vietos padomenis.";
 Strings.OfficeOM.L_DialogAlreadyOpened = "Operacija nepavyko, nes jau yra šio papildinio aktyvus dialogo langas.";
 Strings.OfficeOM.L_DialogInvalidScheme = "URL schema nepalaikoma. Vietoj jos naudokite HTTPS.";
 Strings.OfficeOM.L_DialogNavigateError = "Dialogo lango naršymo klaida";
@@ -72,6 +70,8 @@ Strings.OfficeOM.L_GetDataIsTooLarge = "Norimas duomenų rinkinys per didelis.";
 Strings.OfficeOM.L_GetDataParametersConflict = "Nurodyti parametrai nesuderinami.";
 Strings.OfficeOM.L_GetSelectionNotSupported = "Dabartinis žymėjimas nepalaikomas.";
 Strings.OfficeOM.L_HostError = "Pagrindinio kompiuterio klaida";
+Strings.OfficeOM.L_ImplicitGetAuthContextMissing = "Trūksta funkcijos, kad būtų galima gauti autentifikavimo kontekstą";
+Strings.OfficeOM.L_ImplicitNotLoaded = "Prieš įsigyjant atpažinimo ženklą, neįkeltas modulis";
 Strings.OfficeOM.L_InValidOptionalArgument = "neleistinas pasirinktinis argumentas";
 Strings.OfficeOM.L_IndexOutOfRange = "Indeksas yra už diapazono ribų.";
 Strings.OfficeOM.L_InitializeNotReady = "Office.js dar ne visiškai įkeltas. Bandykite vėliau arba įtraukite savo inicijavimo kodą Office.initialize funkcijoje.";
@@ -103,7 +103,7 @@ Strings.OfficeOM.L_InvalidNode = "Neleistinas mazgas";
 Strings.OfficeOM.L_InvalidObjectPath = 'Objekto kelias „{0}" netinka norint atlikti šį veiksmą. Jei naudojate objektą keliuose „context.sync" iškvietimuose, o „.run" paketas nevykdomas nuosekliai, objektų naudojimo trukmę valdykite naudodami metodus „context.trackedObjects.add()" ir „context.trackedObjects.remove()".';
 Strings.OfficeOM.L_InvalidOperationInCellEditMode = "„Excel“ veikia langelių redagavimo režimu. Išeikite iš redagavimo režimo paspausdami ENTER arba TAB arba pasirinkdami kitą langelį, tada bandykite dar kartą.";
 Strings.OfficeOM.L_InvalidOrTimedOutSession = "Neleistinas seansas arba seanso skirtasis laikas baigėsi";
-Strings.OfficeOM.L_InvalidOrTimedOutSessionMessage = "„Office Online“ seansas pasibaigė arba yra neleistinas. Norėdami tęsti, atnaujinkite puslapį.";
+Strings.OfficeOM.L_InvalidOrTimedOutSessionMessage = 'Jūsų "Office" seansas baigėsi arba negalioja. Norėdami tęsti, atnaujinkite puslapį.';
 Strings.OfficeOM.L_InvalidParameters = "Funkcija {0} turi netinkamų parametrų.";
 Strings.OfficeOM.L_InvalidReadForBlankRow = "Nurodyta eilutė yra tuščia.";
 Strings.OfficeOM.L_InvalidRequestContext = "Negalima naudoti objekto skirtinguose užklausos kontekstuose.";
@@ -149,7 +149,7 @@ Strings.OfficeOM.L_ReadSettingsError = "Parametrų skaitymo klaida";
 Strings.OfficeOM.L_RedundantCallbackSpecification = "Atgalinio iškvietimo negalima nurodyti tiek argumentų sąraše, tiek pasirinktiniame objekte.";
 Strings.OfficeOM.L_RequestTimeout = "Skambutis buvo per ilgas, kad būtų galima vykdyti.";
 Strings.OfficeOM.L_RequestTokenUnavailable = "Šis API buvo pertrauktas dėl lėto ryšio dažnio.";
-Strings.OfficeOM.L_RowIndexOutOfRange = "Eilučių indekso reikšmė nepriklauso leidžiamam diapazonui. Naudokite reikšmę (0 arba didesnę), kuri būtų mažesnė už eilučių skaičių.";
+Strings.OfficeOM.L_RowIndexOutOfRange = "Eilutės indekso reikšmė nepriklauso leidžiamam diapazonui. Naudokite reikšmę (0 arba didesnę), kuri būtų mažesnė už eilučių skaičių.";
 Strings.OfficeOM.L_RunMustReturnPromise = 'Paketinė funkcija, perduota „.run" metodui, negrąžino operacijos rezultato. Funkcija turi grąžinti rezultatą, kad visi automatiškai sekami objektai baigus paketinę operaciją būtų automatiškai atlaisvinti. Paprastai rezultatas grąžinamas gaunant atsakymą iš „context.sync()".';
 Strings.OfficeOM.L_SSOClientError = "Autentifikavimo užklausoje iš „Office“ įvyko klaida.";
 Strings.OfficeOM.L_SSOClientErrorMessage = "Kliento programoje įvyko netikėta klaida.";
@@ -191,3 +191,4 @@ Strings.OfficeOM.L_UserAbortedMessage = "Vartotojas nesuteikė papildinio teisi�
 Strings.OfficeOM.L_UserClickIgnore = "Vartotojas pasirinko nepaisyti dialogo lango.";
 Strings.OfficeOM.L_UserNotSignedIn = "Nė vienas vartotojas nėra prisijungęs prie „Office“.";
 Strings.OfficeOM.L_ValueNotLoaded = "Dar neįkelta rezultatų objekto reikšmė. Prieš skaitant reikšmės ypatybę susijusiame užklausos kontekste iškvieskite „context.sync()“.";
+Strings.OfficeOM.L_WorkbookHiddenMessage = "„JavaScript“ API užklausa nepavyko, nes darbaknygė paslėpta. Panaikinkite darbaknygės slėpimą ir bandykite dar kartą.";

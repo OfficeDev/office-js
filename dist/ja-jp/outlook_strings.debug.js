@@ -1,5 +1,3 @@
-/* Version: 16.0.11030.10000 */
-
 Type.registerNamespace("_u");
 _u.ExtensibilityStrings = function()
 {
@@ -26,6 +24,7 @@ _u.ExtensibilityStrings.l_DeleteAttachmentDoesNotExist_Text = "添付ファイ�
 _u.ExtensibilityStrings.l_DisplayNameTooLong_Text = "指定した表示名の中に、長すぎるものが 1 つ以上あります。";
 _u.ExtensibilityStrings.l_DisplayReplyFormHtmlBodyRequired_Text = "'htmlBody' は必須です。";
 _u.ExtensibilityStrings.l_DuplicateNotificationKey_Text = "指定したキーを持つ通知は既に存在します。";
+_u.ExtensibilityStrings.l_Duplicate_Category_Error_Text = "指定した分類のいずれかが、カテゴリマスターに既に登録されています。";
 _u.ExtensibilityStrings.l_ElevatedPermissionNeededForMethod_Text = "このメソッドを呼び出すには、管理者特権のアクセス許可が必要です: '{0}'。";
 _u.ExtensibilityStrings.l_ElevatedPermissionNeeded_Text = "JavaScript API for Office の保護されたメンバーにアクセスするには、管理者特権のアクセス許可が必要です。";
 _u.ExtensibilityStrings.l_EmailAddressTooLong_Text = "指定したメール アドレスの中に、長すぎるものが 1 つ以上あります。";
@@ -47,6 +46,8 @@ _u.ExtensibilityStrings.l_InvalidEventDates_Text = "終了日を開始日の前�
 _u.ExtensibilityStrings.l_InvalidParameterValueError_Text = "'{0}' パラメーターの値が無効です。";
 _u.ExtensibilityStrings.l_InvalidSelection_Text = "選択内容が正しくありません。";
 _u.ExtensibilityStrings.l_InvalidTime_Text = "有効な時刻に解決される入力ではありません。";
+_u.ExtensibilityStrings.l_Invalid_Category_Error_Text = "無効なカテゴリが指定されています。";
+_u.ExtensibilityStrings.l_Item_Not_Saved_Error_Text = "アイテムが保存されるまで id を取得できません。";
 _u.ExtensibilityStrings.l_MessageInDifferentStoreError_Text = "メッセージが別のストアに保存されているため、EWS ID を取得できません。";
 _u.ExtensibilityStrings.l_NoValidRecipientsProvided_Text = "有効な受信者が指定されていません。";
 _u.ExtensibilityStrings.l_NotificationKeyNotFound_Text = "指定したキーを持つ通知はありません。";

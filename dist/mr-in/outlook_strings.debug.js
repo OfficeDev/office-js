@@ -1,5 +1,3 @@
-/* Version: 16.0.10827.10000 */
-
 Type.registerNamespace("_u");
 _u.ExtensibilityStrings = function()
 {
@@ -26,6 +24,7 @@ _u.ExtensibilityStrings.l_DeleteAttachmentDoesNotExist_Text = "संलग्�
 _u.ExtensibilityStrings.l_DisplayNameTooLong_Text = "प्रदान केलेली एक किंवा अधिक प्रदर्शन नावे खूपच मोठी आहेत.";
 _u.ExtensibilityStrings.l_DisplayReplyFormHtmlBodyRequired_Text = "'htmlBody' ची आवश्यकता आहे.";
 _u.ExtensibilityStrings.l_DuplicateNotificationKey_Text = "प्रदान कळसह सूचना आधीपासून अस्तित्वात आहे.";
+_u.ExtensibilityStrings.l_Duplicate_Category_Error_Text = "प्रदान केलेल्‍या वर्गांपैकी एक आधीपासून मास्‍टर वर्ग यादीत आहे.";
 _u.ExtensibilityStrings.l_ElevatedPermissionNeededForMethod_Text = "पद्धत वापरण्यासाठी एलिव्हेटेड परवानगीची आवश्यकता आहे: '{0}'.";
 _u.ExtensibilityStrings.l_ElevatedPermissionNeeded_Text = "Office साठी JavaScript API च्या संरक्षित सदस्य ऍक्सेस करण्यासाठी एलिव्हेटेड परवानगीची आवश्यकता आहे.";
 _u.ExtensibilityStrings.l_EmailAddressTooLong_Text = "प्रदान केलेले एक किंवा अधिक ईमेल पत्ते खूपच मोठे आहेत.";
@@ -47,6 +46,8 @@ _u.ExtensibilityStrings.l_InvalidEventDates_Text = "समाप्ती ता
 _u.ExtensibilityStrings.l_InvalidParameterValueError_Text = "'{0}' परिमापनाचे मूल्य अवैध आहे.";
 _u.ExtensibilityStrings.l_InvalidSelection_Text = "निवड अवैध आहे.";
 _u.ExtensibilityStrings.l_InvalidTime_Text = "इनपुटचे वैध तारखेला निराकरण झाले नाही.";
+_u.ExtensibilityStrings.l_Invalid_Category_Error_Text = "अवैध वर्ग प्रदान केले होते.";
+_u.ExtensibilityStrings.l_Item_Not_Saved_Error_Text = "आयटम सुरक्षित होईपर्यंत id पुनर्प्राप्त होऊ शकत नाही.";
 _u.ExtensibilityStrings.l_MessageInDifferentStoreError_Text = "EWS ID प्राप्त होऊ शकत नाही कारण संदेश भिन्न संग्रहामध्ये सुरक्षित झाला.";
 _u.ExtensibilityStrings.l_NoValidRecipientsProvided_Text = "कोणतेही वैध प्राप्तकर्ते प्रदान केलेले नाहीत.";
 _u.ExtensibilityStrings.l_NotificationKeyNotFound_Text = "प्रदान कळसह कोणत्याही सूचना नाहीत.";

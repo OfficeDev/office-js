@@ -1,5 +1,3 @@
-/* Version: 16.0.11030.10000 */
-
 Type.registerNamespace("Strings");
 Strings.OfficeOM = function()
 {
@@ -51,7 +49,7 @@ Strings.OfficeOM.L_DataReadError = "Lỗi Đọc Dữ liệu";
 Strings.OfficeOM.L_DataStale = "Dữ liệu Không Cập nhật";
 Strings.OfficeOM.L_DataWriteError = "Lỗi Ghi Dữ liệu";
 Strings.OfficeOM.L_DataWriteReminder = "Lời nhắc Viết Dữ liệu";
-Strings.OfficeOM.L_DialogAddressNotTrusted = "Phần tử AppDomains trong tệp kê khai không chứa miền của URL.";
+Strings.OfficeOM.L_DialogAddressNotTrusted = "Tên miền của URL không được bao gồm trong phần tử AppDomains trong tệp kê khai và không phải là tên miền con của vị trí nguồn.";
 Strings.OfficeOM.L_DialogAlreadyOpened = "Hoạt động không thành công vì phần bổ trợ này đã có một hộp thoại hiện hoạt.";
 Strings.OfficeOM.L_DialogInvalidScheme = "Không hỗ trợ lược đồ URL. Sử dụng HTTPS thay thế.";
 Strings.OfficeOM.L_DialogNavigateError = "Lỗi Điều hướng Hộp thoại";
@@ -72,6 +70,8 @@ Strings.OfficeOM.L_GetDataIsTooLarge = "Bộ dữ liệu được yêu cầu qu�
 Strings.OfficeOM.L_GetDataParametersConflict = "Các tham biến đã xác định có xung đột.";
 Strings.OfficeOM.L_GetSelectionNotSupported = "Lựa chọn hiện tại không được hỗ trợ.";
 Strings.OfficeOM.L_HostError = "Lỗi Máy chủ";
+Strings.OfficeOM.L_ImplicitGetAuthContextMissing = "Thiếu chức năng tải ngữ cảnh xác thực";
+Strings.OfficeOM.L_ImplicitNotLoaded = "Không tải được mô-đun này trước khi nhận mã thông báo";
 Strings.OfficeOM.L_InValidOptionalArgument = "đối số tùy chọn không hợp lệ";
 Strings.OfficeOM.L_IndexOutOfRange = "Chỉ mục ngoài phạm vi.";
 Strings.OfficeOM.L_InitializeNotReady = "Office.js chưa được tải hết. Vui lòng thử lại sau hoặc đảm bảo thêm mã khởi tạo vào hàm Office.initialize.";
@@ -103,7 +103,7 @@ Strings.OfficeOM.L_InvalidNode = "Nút Không hợp lệ";
 Strings.OfficeOM.L_InvalidObjectPath = 'Đường dẫn đối tượng \'{0}\' không phù hợp với thao tác bạn đang cố gắng thực hiện. Nếu bạn đang sử dụng đối tượng trên nhiều cuộc gọi "context.sync" và không thuộc phạm vi thực thi chuỗi của lô ".run", vui lòng sử dụng các phương pháp "context.trackedObjects.add()" và "context.trackedObjects.remove()" để quản lý thời hạn của đối tượng.';
 Strings.OfficeOM.L_InvalidOperationInCellEditMode = "Excel đang ở chế độ chỉnh sửa ô. Vui lòng thoát chế độ chỉnh sửa bằng cách nhấn ENTER hoặc TAB hay chọn một ô khác, rồi thử lại.";
 Strings.OfficeOM.L_InvalidOrTimedOutSession = "Phiên Không hợp lệ hoặc Đã hết Thời gian chờ";
-Strings.OfficeOM.L_InvalidOrTimedOutSessionMessage = "Phiên Office Online của bạn đã hết hạn hoặc không hợp lệ. Để tiếp tục, hãy làm mới trang.";
+Strings.OfficeOM.L_InvalidOrTimedOutSessionMessage = "Phiên Office của bạn đã hết hạn hoặc không hợp lệ. Để tiếp tục, hãy làm mới trang.";
 Strings.OfficeOM.L_InvalidParameters = "Hàm {0} có các tham số không hợp lệ.";
 Strings.OfficeOM.L_InvalidReadForBlankRow = "Dòng đã nêu trống.";
 Strings.OfficeOM.L_InvalidRequestContext = "Không thể sử dụng đối tượng cho các ngữ cảnh yêu cầu khác nhau.";
@@ -191,3 +191,4 @@ Strings.OfficeOM.L_UserAbortedMessage = "Người dùng đã không chấp thu�
 Strings.OfficeOM.L_UserClickIgnore = "Người dùng đã chọn bỏ qua hộp thoại.";
 Strings.OfficeOM.L_UserNotSignedIn = "Không có người dùng nào đăng nhập vào Office.";
 Strings.OfficeOM.L_ValueNotLoaded = 'Chưa tải giá trị của đối tượng kết quả. Trước khi đọc thuộc tính giá trị, hãy gọi "context.sync()" trong ngữ cảnh yêu cầu có liên quan.';
+Strings.OfficeOM.L_WorkbookHiddenMessage = "Yêu cầu API không thành công vì sổ làm việc bị ẩn. Vui lòng bỏ ẩn sổ làm việc và thử lại.";

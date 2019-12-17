@@ -1,5 +1,3 @@
-/* Version: 16.0.11030.10000 */
-
 Type.registerNamespace("Strings");
 Strings.OfficeOM = function()
 {
@@ -51,7 +49,7 @@ Strings.OfficeOM.L_DataReadError = "数据读取错误";
 Strings.OfficeOM.L_DataStale = "数据不是最新的";
 Strings.OfficeOM.L_DataWriteError = "数据写入错误";
 Strings.OfficeOM.L_DataWriteReminder = "数据写入提醒";
-Strings.OfficeOM.L_DialogAddressNotTrusted = "清单中的 AppDomains 元素不包含 URL 的域。";
+Strings.OfficeOM.L_DialogAddressNotTrusted = "URL 的域不包括在清单中的 AppDomains 元素中，并且不是源位置的子域。";
 Strings.OfficeOM.L_DialogAlreadyOpened = "操作失败，因为此外接程序已具有一个活动对话框。";
 Strings.OfficeOM.L_DialogInvalidScheme = "URL 方案不受支持。请改用 HTTPS。";
 Strings.OfficeOM.L_DialogNavigateError = "对话框导航错误";
@@ -72,6 +70,8 @@ Strings.OfficeOM.L_GetDataIsTooLarge = "请求的数据集太大。";
 Strings.OfficeOM.L_GetDataParametersConflict = "指定的参数发生冲突。";
 Strings.OfficeOM.L_GetSelectionNotSupported = "不支持当前所选内容。";
 Strings.OfficeOM.L_HostError = "主机错误";
+Strings.OfficeOM.L_ImplicitGetAuthContextMissing = "缺少获取身份验证上下文的函数";
+Strings.OfficeOM.L_ImplicitNotLoaded = "在获取令牌之前未加载此模块 ";
 Strings.OfficeOM.L_InValidOptionalArgument = "可选参数无效";
 Strings.OfficeOM.L_IndexOutOfRange = "索引超出范围。";
 Strings.OfficeOM.L_InitializeNotReady = "Office.js 尚未完全加载。请稍后再试或者确保在 Office.initialize 函数上添加初始化代码。";
@@ -103,7 +103,7 @@ Strings.OfficeOM.L_InvalidNode = "无效的节点";
 Strings.OfficeOM.L_InvalidObjectPath = '对象路径“{0}”不适用于当前尝试执行的操作。如果跨多个 "context.sync" 调用以及在 ".run" 批处理的顺序执行之外使用该对象，请使用 "context.trackedObjects.add()" 和 "context.trackedObjects.remove()" 方法来管理该对象的生存期。';
 Strings.OfficeOM.L_InvalidOperationInCellEditMode = "Excel 处于单元格编辑模式。请按 Enter 或 Tab 或者选择其他单元格以退出编辑模式，然后重试。";
 Strings.OfficeOM.L_InvalidOrTimedOutSession = "无效或定时出会话";
-Strings.OfficeOM.L_InvalidOrTimedOutSessionMessage = "Office Online 会话已过期或无效。若要继续，请刷新页面。";
+Strings.OfficeOM.L_InvalidOrTimedOutSessionMessage = "你的 Office 会话已过期或无效。若要继续, 请刷新页面。";
 Strings.OfficeOM.L_InvalidParameters = "函数 {0} 包含无效参数。";
 Strings.OfficeOM.L_InvalidReadForBlankRow = "指定的行是空的。";
 Strings.OfficeOM.L_InvalidRequestContext = "不能跨不同的请求上下文使用该对象。";
@@ -191,3 +191,4 @@ Strings.OfficeOM.L_UserAbortedMessage = "用户没有允许外接程序的权限
 Strings.OfficeOM.L_UserClickIgnore = "用户已选择忽略对话框。";
 Strings.OfficeOM.L_UserNotSignedIn = "没有用户登录到 Office。";
 Strings.OfficeOM.L_ValueNotLoaded = '尚未加载结果对象的值。请先调用相关请求上下文上的 "context.sync()"，然后再读取值属性。';
+Strings.OfficeOM.L_WorkbookHiddenMessage = "JavaScript API 请求失败，因为工作簿已隐藏。请取消隐藏工作簿，然后重试。";

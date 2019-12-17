@@ -1,5 +1,3 @@
-/* Version: 16.0.11030.10000 */
-
 Type.registerNamespace("Strings");
 Strings.OfficeOM = function()
 {
@@ -51,7 +49,7 @@ Strings.OfficeOM.L_DataReadError = "Andmete lugemise tõrge";
 Strings.OfficeOM.L_DataStale = "Andmed pole ajakohased";
 Strings.OfficeOM.L_DataWriteError = "Andmete kirjutamise tõrge";
 Strings.OfficeOM.L_DataWriteReminder = "Andmekirjutuse meeldetuletus";
-Strings.OfficeOM.L_DialogAddressNotTrusted = "URL-i domeeni pole manifesti AppDomainsi elementi kaasatud.";
+Strings.OfficeOM.L_DialogAddressNotTrusted = "URL-i domeeni pole manifesti AppDomainsi elementi kaasatud ning see pole lähteasukoha alamdomeen.";
 Strings.OfficeOM.L_DialogAlreadyOpened = "Toiming nurjus, kuna sellel lisandmoodulil on juba aktiivne dialoog.";
 Strings.OfficeOM.L_DialogInvalidScheme = "URL-i skeemi ei toetata. Kasutage selle asemel HTTPS-i.";
 Strings.OfficeOM.L_DialogNavigateError = "Dialooginavigeerimistõrge";
@@ -72,6 +70,8 @@ Strings.OfficeOM.L_GetDataIsTooLarge = "Nõutud andmekomplekt on liiga mahukas."
 Strings.OfficeOM.L_GetDataParametersConflict = "Määratud parameetrid on vastuolus.";
 Strings.OfficeOM.L_GetSelectionNotSupported = "Praegune valik pole toetatud.";
 Strings.OfficeOM.L_HostError = "Hosti tõrge";
+Strings.OfficeOM.L_ImplicitGetAuthContextMissing = "Autentimiskonteksti toomise funktsioon on puudu";
+Strings.OfficeOM.L_ImplicitNotLoaded = "Moodulit ei laadita enne tõendi hankimist";
 Strings.OfficeOM.L_InValidOptionalArgument = "sobimatu valikuline argument";
 Strings.OfficeOM.L_IndexOutOfRange = "Indeks on väljaspool vahemikku.";
 Strings.OfficeOM.L_InitializeNotReady = "Office.js pole veel täielikult laaditud. Palun proovige hiljem uuesti või veenduge, et lähtestamiskood on lisatud funktsiooni Office.initialize.";
@@ -103,7 +103,7 @@ Strings.OfficeOM.L_InvalidNode = "Sobimatu sõlm";
 Strings.OfficeOM.L_InvalidObjectPath = 'Objektitee "{0}" ei sobi teie toimingu tegemiseks. Kui kasutate objekti mitmes context.sync-kutses ja väljaspool RUN-meetodi pakktöö järjestikkäitust, kasutage objekti eluea haldamiseks meetodeid "context.trackedObjects.add()" ja "context.trackedObjects.remove()".';
 Strings.OfficeOM.L_InvalidOperationInCellEditMode = "Excel töötab lahtriredigeerimisrežiimis. Vajutage redigeerimisrežiimist väljumiseks sisestusklahvi (ENTER) või tabeldusklahvi (TAB) või valige mõni muu lahter ja proovige siis uuesti.";
 Strings.OfficeOM.L_InvalidOrTimedOutSession = "Seanss ei sobi või on aegunud";
-Strings.OfficeOM.L_InvalidOrTimedOutSessionMessage = "Office Online'i seanss on aegunud või ei sobi. Jätkamiseks värskendage lehte.";
+Strings.OfficeOM.L_InvalidOrTimedOutSessionMessage = "Teie Office ' i seanss on aegunud või kehtetu. Jätkamiseks värskendage lehte.";
 Strings.OfficeOM.L_InvalidParameters = "Funktsiooni {0} parameetrid pole sobivad.";
 Strings.OfficeOM.L_InvalidReadForBlankRow = "Määratud rida on tühi.";
 Strings.OfficeOM.L_InvalidRequestContext = "Objekti ei saa kasutada mitmes eri päringukontekstis.";
@@ -191,3 +191,4 @@ Strings.OfficeOM.L_UserAbortedMessage = "Kasutaja ei nõustunud lisandmoodulile 
 Strings.OfficeOM.L_UserClickIgnore = "Kasutaja eiras dialoogiboksi.";
 Strings.OfficeOM.L_UserNotSignedIn = "Office'isse pole kasutajaid sisse logitud.";
 Strings.OfficeOM.L_ValueNotLoaded = 'Tulemiobjekti väärtust pole veel laaditud. Enne väärtuseatribuudi lugemist kutsuge seostatud päringukontekstis "context.sync()".';
+Strings.OfficeOM.L_WorkbookHiddenMessage = "JavaScripti API taotlus nurjus, kuna töövihik oli peidetud. Eemaldage töövihik ja proovige uuesti.";

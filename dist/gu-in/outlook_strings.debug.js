@@ -1,5 +1,3 @@
-/* Version: 16.0.10827.10000 */
-
 Type.registerNamespace("_u");
 _u.ExtensibilityStrings = function()
 {
@@ -26,6 +24,7 @@ _u.ExtensibilityStrings.l_DeleteAttachmentDoesNotExist_Text = "જોડાણ �
 _u.ExtensibilityStrings.l_DisplayNameTooLong_Text = "પ્રદાન કરેલા પ્રદર્શન નામોમાં એક કે વધુ ખૂબ લાંબાં છે.";
 _u.ExtensibilityStrings.l_DisplayReplyFormHtmlBodyRequired_Text = "'htmlBody' જરૂરી છે.";
 _u.ExtensibilityStrings.l_DuplicateNotificationKey_Text = "પ્રદાન કરાયેલ કી સાથે એક સૂચના પહેલાંથી હાજર છે.";
+_u.ExtensibilityStrings.l_Duplicate_Category_Error_Text = "પ્રદાન કરવામાં આવેલી શ્રેણીઓમાંથી એક પહેલાંથી જ માસ્ટર શ્રેણી સૂચીમાં છે.";
 _u.ExtensibilityStrings.l_ElevatedPermissionNeededForMethod_Text = "પદ્ધતિને કૉલ કરવા માટે ઉચ્ચ અનુમતિ આવશ્યક છે: '{0}'.";
 _u.ExtensibilityStrings.l_ElevatedPermissionNeeded_Text = "JavaScript API for Office ના સંરક્ષિત સભ્યોને ઍક્સેસ કરવા માટે ઉચ્ચ અનુમતિ આવશ્યક છે.";
 _u.ExtensibilityStrings.l_EmailAddressTooLong_Text = "પ્રદાન કરેલા ઈમેલ સરનામામાં એક કે વધુ ખૂબ લાંબાં છે.";
@@ -47,6 +46,8 @@ _u.ExtensibilityStrings.l_InvalidEventDates_Text = "સમાપ્તિ તા
 _u.ExtensibilityStrings.l_InvalidParameterValueError_Text = "'{0}' પેરામીટરનું મૂલ્ય અમાન્ય છે.";
 _u.ExtensibilityStrings.l_InvalidSelection_Text = "પસંદગી અમાન્ય છે.";
 _u.ExtensibilityStrings.l_InvalidTime_Text = "એક માન્ય સમયમાં ઇનપુટ ઉકેલતું નથી.";
+_u.ExtensibilityStrings.l_Invalid_Category_Error_Text = "અમાન્ય શ્રેણી પ્રદાન કરવામાં આવી હતી.";
+_u.ExtensibilityStrings.l_Item_Not_Saved_Error_Text = "જ્યાં સુધી આઇટમ સાચવવામાં આવતી નથી ત્યાં સુધી id પુનઃપ્રાપ્ત કરી શકાતી નથી.";
 _u.ExtensibilityStrings.l_MessageInDifferentStoreError_Text = "EWS ID ને પુનઃપ્રાપ્ત કરી શકાતું નથી કારણ કે સંદેશ એક ભિન્ન સ્ટોરમાં સાચવેલો છે.";
 _u.ExtensibilityStrings.l_NoValidRecipientsProvided_Text = "કોઈ માન્ય પ્રાપ્તકર્તાઓ પ્રદાન કરેલા ન હતાં.";
 _u.ExtensibilityStrings.l_NotificationKeyNotFound_Text = "પ્રદાન કરાયેલ કી સાથેની કોઈ સૂચનાઓ નથી.";

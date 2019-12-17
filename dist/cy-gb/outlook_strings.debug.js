@@ -1,5 +1,3 @@
-/* Version: 16.0.10827.10000 */
-
 Type.registerNamespace("_u");
 _u.ExtensibilityStrings = function()
 {
@@ -26,6 +24,7 @@ _u.ExtensibilityStrings.l_DeleteAttachmentDoesNotExist_Text = "Does dim modd dil
 _u.ExtensibilityStrings.l_DisplayNameTooLong_Text = "Mae un neu ragor o'r enwau arddangos sydd wedi cael eu rhoi yn rhy hir.";
 _u.ExtensibilityStrings.l_DisplayReplyFormHtmlBodyRequired_Text = "Mae 'htmlBody' yn ofynnol.";
 _u.ExtensibilityStrings.l_DuplicateNotificationKey_Text = "Mae hysbysiad gyda’r allwedd a roddwyd eisoes yn bodoli.";
+_u.ExtensibilityStrings.l_Duplicate_Category_Error_Text = "Mae un o'r categorïau a ddarparwyd eisoes yn y meistr restr categorïau.";
 _u.ExtensibilityStrings.l_ElevatedPermissionNeededForMethod_Text = "Rhaid cael caniatâd uwch i alw'r dull: '{0}'.";
 _u.ExtensibilityStrings.l_ElevatedPermissionNeeded_Text = "Rhaid cael caniatâd uwch i gael gafael ar aelodau wedi'u diogelu o'r API JavaScript ar gyfer Office.";
 _u.ExtensibilityStrings.l_EmailAddressTooLong_Text = "Mae un neu ragor o'r cyfeiriadau e-bost sydd wedi cael eu rhoi yn rhy hir.";
@@ -47,6 +46,8 @@ _u.ExtensibilityStrings.l_InvalidEventDates_Text = "Mae'r dyddiad gorffen yn dig
 _u.ExtensibilityStrings.l_InvalidParameterValueError_Text = "Mae gwerth y paramedr '{0}' yn annilys.";
 _u.ExtensibilityStrings.l_InvalidSelection_Text = "Mae'r dewis yn annilys.";
 _u.ExtensibilityStrings.l_InvalidTime_Text = "Dydy'r mewnbwn ddim yn cyfateb i amser dilys.";
+_u.ExtensibilityStrings.l_Invalid_Category_Error_Text = "Darparwyd categorïau annilys.";
+_u.ExtensibilityStrings.l_Item_Not_Saved_Error_Text = "Does dim modd cael gafael ar yr id hwn cyn i chi gadw’r eitem.";
 _u.ExtensibilityStrings.l_MessageInDifferentStoreError_Text = "Does dim modd cael gafael ar ID yr EWS oherwydd bod y neges wedi’i chadw mewn storfa wahanol.";
 _u.ExtensibilityStrings.l_NoValidRecipientsProvided_Text = "Doedd dim derbynwyr dilys wedi cael eu rhoi.";
 _u.ExtensibilityStrings.l_NotificationKeyNotFound_Text = "Does dim hysbysiadau gyda’r allwedd a roddwyd.";

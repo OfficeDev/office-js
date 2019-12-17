@@ -1,5 +1,3 @@
-/* Version: 16.0.11030.10000 */
-
 Type.registerNamespace("_u");
 _u.ExtensibilityStrings = function()
 {
@@ -26,6 +24,7 @@ _u.ExtensibilityStrings.l_DeleteAttachmentDoesNotExist_Text = "Atașarea nu poat
 _u.ExtensibilityStrings.l_DisplayNameTooLong_Text = "Unul sau mai multe nume de afișat furnizate sunt prea lungi.";
 _u.ExtensibilityStrings.l_DisplayReplyFormHtmlBodyRequired_Text = "„htmlBody” este obligatoriu.";
 _u.ExtensibilityStrings.l_DuplicateNotificationKey_Text = "O notificare cu cheia furnizată există deja.";
+_u.ExtensibilityStrings.l_Duplicate_Category_Error_Text = "Una dintre categoriile furnizate se află deja în lista de categorii principale.";
 _u.ExtensibilityStrings.l_ElevatedPermissionNeededForMethod_Text = "Sunt necesare permisiuni cu drepturi sporite pentru a accesa metoda: „{0}”";
 _u.ExtensibilityStrings.l_ElevatedPermissionNeeded_Text = "Sunt necesare permisiuni cu drepturi sporite pentru a accesa membrii protejați ai JavaScript API for Office.";
 _u.ExtensibilityStrings.l_EmailAddressTooLong_Text = "Una sau mai multe adrese de e-mail furnizate sunt prea lungi.";
@@ -47,6 +46,8 @@ _u.ExtensibilityStrings.l_InvalidEventDates_Text = "Data de sfârșit are loc î
 _u.ExtensibilityStrings.l_InvalidParameterValueError_Text = "Valoarea parametrului „{0}” nu este validă.";
 _u.ExtensibilityStrings.l_InvalidSelection_Text = "Selecția este nevalidă.";
 _u.ExtensibilityStrings.l_InvalidTime_Text = "Intrarea nu are ca rezultat o oră corectă.";
+_u.ExtensibilityStrings.l_Invalid_Category_Error_Text = "S-au furnizat categorii nevalide.";
+_u.ExtensibilityStrings.l_Item_Not_Saved_Error_Text = "ID-ul nu poate fi regăsit până când elementul nu este salvat.";
 _u.ExtensibilityStrings.l_MessageInDifferentStoreError_Text = "ID-ul EWS nu poate fi regăsit, deoarece mesajul este salvat într-un alt spațiu de stocare.";
 _u.ExtensibilityStrings.l_NoValidRecipientsProvided_Text = "Nu a fost furnizat niciun destinatar valid.";
 _u.ExtensibilityStrings.l_NotificationKeyNotFound_Text = "Nu există notificări cu cheia furnizată.";

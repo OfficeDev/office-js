@@ -1,5 +1,3 @@
-/* Version: 16.0.11030.10000 */
-
 Type.registerNamespace("_u");
 _u.ExtensibilityStrings = function()
 {
@@ -26,6 +24,7 @@ _u.ExtensibilityStrings.l_DeleteAttachmentDoesNotExist_Text = "אין אפשרו
 _u.ExtensibilityStrings.l_DisplayNameTooLong_Text = "אחד או יותר משמות התצוגה שסופקו ארוך מדי.";
 _u.ExtensibilityStrings.l_DisplayReplyFormHtmlBodyRequired_Text = "'htmlBody' נדרש.";
 _u.ExtensibilityStrings.l_DuplicateNotificationKey_Text = "הודעה עם המפתח שסופק קיימת כבר.";
+_u.ExtensibilityStrings.l_Duplicate_Category_Error_Text = "אחת מהקטגוריות שסופקה נמצאת כבר ברשימת הקטגוריות הראשית.";
 _u.ExtensibilityStrings.l_ElevatedPermissionNeededForMethod_Text = "נדרשת הרשאה מלאה כדי לבצע קריאה לפעולת השירות: '{0}'.";
 _u.ExtensibilityStrings.l_ElevatedPermissionNeeded_Text = "נדרשת הרשאה מלאה כדי לגשת לחברים מוגנים ב- API של JavaScript עבור Office.";
 _u.ExtensibilityStrings.l_EmailAddressTooLong_Text = "אחת או יותר מכתובות הדואר האלקטרוני שסופקו ארוכה מדי.";
@@ -47,6 +46,8 @@ _u.ExtensibilityStrings.l_InvalidEventDates_Text = "תאריך הסיום חל �
 _u.ExtensibilityStrings.l_InvalidParameterValueError_Text = "הערך של הפרמטר '{0}' אינו חוקי.";
 _u.ExtensibilityStrings.l_InvalidSelection_Text = "הבחירה אינה חוקית.";
 _u.ExtensibilityStrings.l_InvalidTime_Text = "הקלט אינו מזוהה כשעה חוקית.";
+_u.ExtensibilityStrings.l_Invalid_Category_Error_Text = "סופקו קטגוריות לא חוקיות.";
+_u.ExtensibilityStrings.l_Item_Not_Saved_Error_Text = "לא ניתן לאחזר את המזהה עד לשמירת הפריט.";
 _u.ExtensibilityStrings.l_MessageInDifferentStoreError_Text = "אין אפשרות לאחזר את מזהה EWS מכיוון שההודעה נשמרה במאגר אחר.";
 _u.ExtensibilityStrings.l_NoValidRecipientsProvided_Text = "לא סופקו נמענים חוקיים.";
 _u.ExtensibilityStrings.l_NotificationKeyNotFound_Text = "אין הודעות עם המפתח שסופק.";

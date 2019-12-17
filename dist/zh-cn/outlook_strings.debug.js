@@ -1,5 +1,3 @@
-/* Version: 16.0.11030.10000 */
-
 Type.registerNamespace("_u");
 _u.ExtensibilityStrings = function()
 {
@@ -26,6 +24,7 @@ _u.ExtensibilityStrings.l_DeleteAttachmentDoesNotExist_Text = "无法删除附�
 _u.ExtensibilityStrings.l_DisplayNameTooLong_Text = "提供的一个或多个显示名称太长。";
 _u.ExtensibilityStrings.l_DisplayReplyFormHtmlBodyRequired_Text = '需要 "htmlBody"。';
 _u.ExtensibilityStrings.l_DuplicateNotificationKey_Text = "已经存在具有提供的密钥的通知。";
+_u.ExtensibilityStrings.l_Duplicate_Category_Error_Text = "提供类别之一已在主类别列表中。";
 _u.ExtensibilityStrings.l_ElevatedPermissionNeededForMethod_Text = "调用该方法需要提升的权限:“{0}”。";
 _u.ExtensibilityStrings.l_ElevatedPermissionNeeded_Text = "访问 Office 的 JavaScript API 受保护成员需要提升的权限。";
 _u.ExtensibilityStrings.l_EmailAddressTooLong_Text = "提供的一个或多个电子邮件地址太长。";
@@ -47,6 +46,8 @@ _u.ExtensibilityStrings.l_InvalidEventDates_Text = "结束日期早于开始日�
 _u.ExtensibilityStrings.l_InvalidParameterValueError_Text = "参数“{0}”的值无效。";
 _u.ExtensibilityStrings.l_InvalidSelection_Text = "所选内容无效。";
 _u.ExtensibilityStrings.l_InvalidTime_Text = "输入未解析为有效日期。";
+_u.ExtensibilityStrings.l_Invalid_Category_Error_Text = "提供的类别无效。";
+_u.ExtensibilityStrings.l_Item_Not_Saved_Error_Text = "保存此项后，才能检索 ID。";
 _u.ExtensibilityStrings.l_MessageInDifferentStoreError_Text = "无法检索 EWS ID，因为邮件保存在其他存储区中。";
 _u.ExtensibilityStrings.l_NoValidRecipientsProvided_Text = "未提供有效的收件人。";
 _u.ExtensibilityStrings.l_NotificationKeyNotFound_Text = "不存在具有提供的密钥的任何通知。";

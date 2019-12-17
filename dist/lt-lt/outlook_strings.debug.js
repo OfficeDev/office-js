@@ -1,5 +1,3 @@
-/* Version: 16.0.11030.10000 */
-
 Type.registerNamespace("_u");
 _u.ExtensibilityStrings = function()
 {
@@ -26,6 +24,7 @@ _u.ExtensibilityStrings.l_DeleteAttachmentDoesNotExist_Text = "Priedo panaikinti
 _u.ExtensibilityStrings.l_DisplayNameTooLong_Text = "Vienas ar keli pateikti rodomi vardai yra per ilgi.";
 _u.ExtensibilityStrings.l_DisplayReplyFormHtmlBodyRequired_Text = "„htmlBody“ yra būtinas.";
 _u.ExtensibilityStrings.l_DuplicateNotificationKey_Text = "Pranešimas su pateiktu raktu jau jau.";
+_u.ExtensibilityStrings.l_Duplicate_Category_Error_Text = "Viena iš pateiktų kategorijų jau yra pagrindinių kategorijų sąraše.";
 _u.ExtensibilityStrings.l_ElevatedPermissionNeededForMethod_Text = "Norint iškviesti metodą, būtinos didesnės teisės: {0}.";
 _u.ExtensibilityStrings.l_ElevatedPermissionNeeded_Text = "Norint pasiekti apsaugotus „Office“ skirtos „JavaScript“ API narius, būtinos didesnės teisės.";
 _u.ExtensibilityStrings.l_EmailAddressTooLong_Text = "Vienas ar keli pateikti el. pašto adresai yra per ilgi.";
@@ -47,6 +46,8 @@ _u.ExtensibilityStrings.l_InvalidEventDates_Text = "Pabaigos data yra ankstesnė
 _u.ExtensibilityStrings.l_InvalidParameterValueError_Text = "Parametro {0} reikšmė yra netinkama.";
 _u.ExtensibilityStrings.l_InvalidSelection_Text = "Pasirinkimas yra neleistinas.";
 _u.ExtensibilityStrings.l_InvalidTime_Text = "Įvestis nėra paverčiama tinkamu laiku.";
+_u.ExtensibilityStrings.l_Invalid_Category_Error_Text = "Pateiktos neleistinos kategorijos.";
+_u.ExtensibilityStrings.l_Item_Not_Saved_Error_Text = "Nepavyks gauti ID, kol neįrašytas elementas.";
 _u.ExtensibilityStrings.l_MessageInDifferentStoreError_Text = "Negalima nuskaityti EWS ID, nes pranešimas įrašytas kitoje saugykloje.";
 _u.ExtensibilityStrings.l_NoValidRecipientsProvided_Text = "Nepateikta tinkamų gavėjų.";
 _u.ExtensibilityStrings.l_NotificationKeyNotFound_Text = "Šiuo metu nėra pranešimų su pateiktu raktu.";

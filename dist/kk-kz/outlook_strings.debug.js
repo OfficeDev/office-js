@@ -1,5 +1,3 @@
-/* Version: 16.0.11030.10000 */
-
 Type.registerNamespace("_u");
 _u.ExtensibilityStrings = function()
 {
@@ -26,6 +24,7 @@ _u.ExtensibilityStrings.l_DeleteAttachmentDoesNotExist_Text = "Тіркемен�
 _u.ExtensibilityStrings.l_DisplayNameTooLong_Text = "Ұсынылған бір немесе бірнеше дисплей атауы тым ұзын.";
 _u.ExtensibilityStrings.l_DisplayReplyFormHtmlBodyRequired_Text = '"htmlBody" қажет.';
 _u.ExtensibilityStrings.l_DuplicateNotificationKey_Text = "Көрсетілген кілті бар хабарландыру бұрыннан бар.";
+_u.ExtensibilityStrings.l_Duplicate_Category_Error_Text = "Көрсетілген санаттардың бірі негізгі санаттар тізіміне әлдеқашан қосылып қойған.";
 _u.ExtensibilityStrings.l_ElevatedPermissionNeededForMethod_Text = 'Әдісті шақыру үшін жоғарғы деңгейдегі рұқсат қажет: "{0}".';
 _u.ExtensibilityStrings.l_ElevatedPermissionNeeded_Text = "Office жиынтығына арналған JavaScript API қорғалған мүшелеріне кіру үшін жоғарғы деңгейдегі рұқсат қажет.";
 _u.ExtensibilityStrings.l_EmailAddressTooLong_Text = "Ұсынылған бір немесе бірнеше электрондық пошта мекенжайы тым ұзын.";
@@ -47,6 +46,8 @@ _u.ExtensibilityStrings.l_InvalidEventDates_Text = "Аяқталу күні ба
 _u.ExtensibilityStrings.l_InvalidParameterValueError_Text = '"{0}" параметрінің мәні жарамсыз.';
 _u.ExtensibilityStrings.l_InvalidSelection_Text = "Таңдау жарамсыз.";
 _u.ExtensibilityStrings.l_InvalidTime_Text = "Енгізілген деректерді жарамды уақытқа айналдыру мүмкін емес.";
+_u.ExtensibilityStrings.l_Invalid_Category_Error_Text = "Жарамсыз санаттар көрсетілді.";
+_u.ExtensibilityStrings.l_Item_Not_Saved_Error_Text = "Идентификаторды алу мүмкін емес. Алдымен элементті сақтау қажет.";
 _u.ExtensibilityStrings.l_MessageInDifferentStoreError_Text = "EWS идентификаторын алу мүмкін емес, себебі хабар басқа сақтау орнында сақталған.";
 _u.ExtensibilityStrings.l_NoValidRecipientsProvided_Text = "Жарамды алушылар ұсынылмады.";
 _u.ExtensibilityStrings.l_NotificationKeyNotFound_Text = "Көрсетілген кілті бар хабарландырулар табылмады.";

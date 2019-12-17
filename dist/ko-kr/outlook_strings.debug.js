@@ -1,5 +1,3 @@
-/* Version: 16.0.11030.10000 */
-
 Type.registerNamespace("_u");
 _u.ExtensibilityStrings = function()
 {
@@ -26,6 +24,7 @@ _u.ExtensibilityStrings.l_DeleteAttachmentDoesNotExist_Text = "첨부 파일 인
 _u.ExtensibilityStrings.l_DisplayNameTooLong_Text = "하나 이상의 제공된 표시 이름이 너무 깁니다.";
 _u.ExtensibilityStrings.l_DisplayReplyFormHtmlBodyRequired_Text = "'htmlBody'가 필요합니다.";
 _u.ExtensibilityStrings.l_DuplicateNotificationKey_Text = "입력한 키를 사용하는 알림이 이미 있습니다.";
+_u.ExtensibilityStrings.l_Duplicate_Category_Error_Text = "제공 된 범주 중 하나는 주요 범주 목록에 이미입니다.";
 _u.ExtensibilityStrings.l_ElevatedPermissionNeededForMethod_Text = "메서드 '{0}'을(를) 호출하려면 관리자 권한이 필요합니다.";
 _u.ExtensibilityStrings.l_ElevatedPermissionNeeded_Text = "JavaScript API for Office의 보호된 멤버에 액세스하려면 관리자 권한이 필요합니다.";
 _u.ExtensibilityStrings.l_EmailAddressTooLong_Text = "하나 이상의 제공된 전자 메일 주소가 너무 깁니다.";
@@ -47,6 +46,8 @@ _u.ExtensibilityStrings.l_InvalidEventDates_Text = "종료일이 시작일보다
 _u.ExtensibilityStrings.l_InvalidParameterValueError_Text = "'{0}' 매개 변수의 값이 잘못되었습니다.";
 _u.ExtensibilityStrings.l_InvalidSelection_Text = "선택이 잘못되었습니다.";
 _u.ExtensibilityStrings.l_InvalidTime_Text = "입력이 유효한 날짜로 확인되지 않습니다.";
+_u.ExtensibilityStrings.l_Invalid_Category_Error_Text = "제공된 카테고리가 잘못되었습니다.";
+_u.ExtensibilityStrings.l_Item_Not_Saved_Error_Text = "항목을 저장 해야 id를 검색할 수 있습니다.";
 _u.ExtensibilityStrings.l_MessageInDifferentStoreError_Text = "메시지가 다른 저장소에 저장되어 EWS ID를 검색할 수 없습니다.";
 _u.ExtensibilityStrings.l_NoValidRecipientsProvided_Text = "제공된 받는 사람이 유효하지 않습니다.";
 _u.ExtensibilityStrings.l_NotificationKeyNotFound_Text = "입력한 키를 사용하는 알림이 없습니다.";

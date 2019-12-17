@@ -1,5 +1,3 @@
-/* Version: 16.0.11030.10000 */
-
 Type.registerNamespace("_u");
 _u.ExtensibilityStrings = function()
 {
@@ -26,6 +24,7 @@ _u.ExtensibilityStrings.l_DeleteAttachmentDoesNotExist_Text = "Manust ei saa kus
 _u.ExtensibilityStrings.l_DisplayNameTooLong_Text = "Vähemalt üks sisestatud kuvatav nimi on liiga pikk.";
 _u.ExtensibilityStrings.l_DisplayReplyFormHtmlBodyRequired_Text = '"htmlBody" on nõutav.';
 _u.ExtensibilityStrings.l_DuplicateNotificationKey_Text = "Selle võtmega teatis on juba olemas.";
+_u.ExtensibilityStrings.l_Duplicate_Category_Error_Text = "Üks esitatud kategooriatest on juba põhikategooriate loendis.";
 _u.ExtensibilityStrings.l_ElevatedPermissionNeededForMethod_Text = "Meetodi {0} kutsumiseks on nõutavad administraatoriõigused.";
 _u.ExtensibilityStrings.l_ElevatedPermissionNeeded_Text = "Office'i JavaScripti API kaitstud liikmetele juurdepääsemiseks on nõutavad administraatoriõigused.";
 _u.ExtensibilityStrings.l_EmailAddressTooLong_Text = "Vähemalt üks sisestatud meiliaadress on liiga pikk.";
@@ -47,6 +46,8 @@ _u.ExtensibilityStrings.l_InvalidEventDates_Text = "Lõppkuupäev on varasem kui
 _u.ExtensibilityStrings.l_InvalidParameterValueError_Text = 'Parameetri "{0}" väärtus ei sobi.';
 _u.ExtensibilityStrings.l_InvalidSelection_Text = "Valik ei sobi.";
 _u.ExtensibilityStrings.l_InvalidTime_Text = "Sisend ei lahene sobivaks kellaajaks.";
+_u.ExtensibilityStrings.l_Invalid_Category_Error_Text = "Esitati sobimatud kategooriad.";
+_u.ExtensibilityStrings.l_Item_Not_Saved_Error_Text = "ID-d ei saa tuua enne üksuse salvestamist.";
 _u.ExtensibilityStrings.l_MessageInDifferentStoreError_Text = "EWS-i ID-d ei saa tuua, kuna sõnum on salvestatud mõnda teise salve.";
 _u.ExtensibilityStrings.l_NoValidRecipientsProvided_Text = "Sobivaid adressaate ei sisestatud.";
 _u.ExtensibilityStrings.l_NotificationKeyNotFound_Text = "Selle võtmega teatisi ei ole.";

@@ -1,5 +1,3 @@
-/* Version: 16.0.11030.10000 */
-
 Type.registerNamespace("_u");
 _u.ExtensibilityStrings = function()
 {
@@ -26,6 +24,7 @@ _u.ExtensibilityStrings.l_DeleteAttachmentDoesNotExist_Text = "Det går inte att
 _u.ExtensibilityStrings.l_DisplayNameTooLong_Text = "Ett eller flera av de angivna visningsnamnen är för långa.";
 _u.ExtensibilityStrings.l_DisplayReplyFormHtmlBodyRequired_Text = "htmlBody krävs.";
 _u.ExtensibilityStrings.l_DuplicateNotificationKey_Text = "Det finns redan en avisering med den angivna nyckeln.";
+_u.ExtensibilityStrings.l_Duplicate_Category_Error_Text = "En av de kategorier som är redan i huvudkategori-listan.";
 _u.ExtensibilityStrings.l_ElevatedPermissionNeededForMethod_Text = "Förhöjd behörighet krävs för att anropa metoden: {0}.";
 _u.ExtensibilityStrings.l_ElevatedPermissionNeeded_Text = "Förhöjd behörighet krävs för åtkomst till skyddade medlemmar av JavaScript API:n för Office.";
 _u.ExtensibilityStrings.l_EmailAddressTooLong_Text = "En eller flera av de angivna e-postadresserna är för långa.";
@@ -47,6 +46,8 @@ _u.ExtensibilityStrings.l_InvalidEventDates_Text = "Slutdatumet infaller före s
 _u.ExtensibilityStrings.l_InvalidParameterValueError_Text = "Ogiltigt värde för parametern {0}.";
 _u.ExtensibilityStrings.l_InvalidSelection_Text = "Markeringen är ogiltig.";
 _u.ExtensibilityStrings.l_InvalidTime_Text = "Indata omvandlas inte till en giltig tid.";
+_u.ExtensibilityStrings.l_Invalid_Category_Error_Text = "Ogiltig kategorier angavs.";
+_u.ExtensibilityStrings.l_Item_Not_Saved_Error_Text = "Det går inte att hämta ID förrän objektet har sparats.";
 _u.ExtensibilityStrings.l_MessageInDifferentStoreError_Text = "EWS-ID kan inte hämtas eftersom meddelandet har sparats i en annan lagring.";
 _u.ExtensibilityStrings.l_NoValidRecipientsProvided_Text = "Inga giltiga mottagare angavs.";
 _u.ExtensibilityStrings.l_NotificationKeyNotFound_Text = "Det finns inga aviseringar med den angivna nyckeln.";

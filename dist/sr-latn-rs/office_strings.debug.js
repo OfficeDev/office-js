@@ -1,5 +1,3 @@
-/* Version: 16.0.11030.10000 */
-
 Type.registerNamespace("Strings");
 Strings.OfficeOM = function()
 {
@@ -51,7 +49,7 @@ Strings.OfficeOM.L_DataReadError = "Greška u čitanju podataka";
 Strings.OfficeOM.L_DataStale = "Podaci nisu u toku";
 Strings.OfficeOM.L_DataWriteError = "Greška u pisanju podataka";
 Strings.OfficeOM.L_DataWriteReminder = "Podsetnik za pisanje podataka";
-Strings.OfficeOM.L_DialogAddressNotTrusted = "Domen URL adrese nije uvršten u elementu AppDomains u manifestu";
+Strings.OfficeOM.L_DialogAddressNotTrusted = "Domen URL adrese nije uključen u element AppDomains u manifestu i ne predstavlja poddomen izvorne lokacije.";
 Strings.OfficeOM.L_DialogAlreadyOpened = "Operacija nije uspela zato što ovaj programski dodatak već ima aktivan dijalog.";
 Strings.OfficeOM.L_DialogInvalidScheme = "URL šema nije podržana. Koristite HTTPS.";
 Strings.OfficeOM.L_DialogNavigateError = "Greška prilikom navigacije u dijalogu";
@@ -72,6 +70,8 @@ Strings.OfficeOM.L_GetDataIsTooLarge = "Zahtevani skup podataka je prevelik.";
 Strings.OfficeOM.L_GetDataParametersConflict = "Navedeni parametri su neusaglašeni.";
 Strings.OfficeOM.L_GetSelectionNotSupported = "Trenutna selekcija nije podržana.";
 Strings.OfficeOM.L_HostError = "Greška hosta";
+Strings.OfficeOM.L_ImplicitGetAuthContextMissing = "Funkcija za dobijanje konteksta potvrde identiteta nedostaje";
+Strings.OfficeOM.L_ImplicitNotLoaded = "Modul nije učitan pre preuzimanja tokena";
 Strings.OfficeOM.L_InValidOptionalArgument = "nevažeći opcionalni argument";
 Strings.OfficeOM.L_IndexOutOfRange = "Indeks je izvan opsega.";
 Strings.OfficeOM.L_InitializeNotReady = "Office.js još uvek nije potpuno učitan. Pokušajte ponovo kasnije ili postarajte se da dodate vaš kôd za pokretanje na vaš Office.initialize function.";
@@ -103,7 +103,7 @@ Strings.OfficeOM.L_InvalidNode = "Nevažeći čvor";
 Strings.OfficeOM.L_InvalidObjectPath = "Putanja objekta „{0}“ ne funkcioniše za ono što pokušavate da uradite. Ako objekat koristite u više „context.sync“ poziva i izvan sekvencijalnog izvršavanja grupe „.run“, koristite metode „context.trackedObjects.add()“ i „context.trackedObjects.remove()“ da biste upravljali trajanjem objekta.";
 Strings.OfficeOM.L_InvalidOperationInCellEditMode = "Excel je u režimu uređivanja ćelija. Izađite iz režima uređivanja tako što ćete pritisnuti ENTER ili TAB odnosno izabrati drugu ćeliju, a zatim pokušajte ponovo.";
 Strings.OfficeOM.L_InvalidOrTimedOutSession = "Nevažeća ili istekla sesija";
-Strings.OfficeOM.L_InvalidOrTimedOutSessionMessage = "Vaša Office Online sesija je istekla ili je nevažeća. Osvežite stranicu da biste nastavili.";
+Strings.OfficeOM.L_InvalidOrTimedOutSessionMessage = "Vaša Office sesija je istekla ili je nevažeća. Osvežite stranicu da biste nastavili.";
 Strings.OfficeOM.L_InvalidParameters = "Funkcija {0} ima nevažeće parametre.";
 Strings.OfficeOM.L_InvalidReadForBlankRow = "Navedeni red je prazan.";
 Strings.OfficeOM.L_InvalidRequestContext = "Nije moguće koristiti objekat u više različitih konteksta zahteva.";
@@ -191,3 +191,4 @@ Strings.OfficeOM.L_UserAbortedMessage = "Korisnik nije prihvatio dozvole za prog
 Strings.OfficeOM.L_UserClickIgnore = "Korisnik je odabrao da zanemari dijalog.";
 Strings.OfficeOM.L_UserNotSignedIn = "Nijedan korisnik nije prijavljen u Office.";
 Strings.OfficeOM.L_ValueNotLoaded = "Vrednost objekta rezultata još nije učitana. Pre čitanja svojstva vrednosti, pozovite „context.sync()“ na povezanom kontekstu zahteva.";
+Strings.OfficeOM.L_WorkbookHiddenMessage = "JavaScript API zahtev nije uspeo zato što je radna sveska skrivena. Otkrijte radnu svesku i pokušajte ponovo.";

@@ -1,5 +1,3 @@
-/* Version: 16.0.11030.10000 */
-
 Type.registerNamespace("Strings");
 Strings.OfficeOM = function()
 {
@@ -51,7 +49,7 @@ Strings.OfficeOM.L_DataReadError = "Ralat Bacaan Data";
 Strings.OfficeOM.L_DataStale = "Data Bukan Semasa";
 Strings.OfficeOM.L_DataWriteError = "Ralat Penulisan Data";
 Strings.OfficeOM.L_DataWriteReminder = "Peringatan Tulis Data";
-Strings.OfficeOM.L_DialogAddressNotTrusted = "Domain URL tersebut tidak termasuk dalam unsur DomainAplikasi dalam manifes.";
+Strings.OfficeOM.L_DialogAddressNotTrusted = "Domain URL tidak termasuk dalam unsur AppDomains dalam manifes, dan bukan subdomain lokasi sumber.";
 Strings.OfficeOM.L_DialogAlreadyOpened = "Operasi gagal kerana tambahan ini terdapat dialog aktif.";
 Strings.OfficeOM.L_DialogInvalidScheme = "Skema URL tersebut tidak disokong. Sebaliknya, gunakan HTTPS.";
 Strings.OfficeOM.L_DialogNavigateError = "Ralat Navigasi Dialog";
@@ -72,6 +70,8 @@ Strings.OfficeOM.L_GetDataIsTooLarge = "Set data yang diminta terlalu besar.";
 Strings.OfficeOM.L_GetDataParametersConflict = "Parameter yang ditentukan mempunyai konflik.";
 Strings.OfficeOM.L_GetSelectionNotSupported = "Pilihan semasa tidak disokong.";
 Strings.OfficeOM.L_HostError = "Ralat Hos";
+Strings.OfficeOM.L_ImplicitGetAuthContextMissing = "Fungsi untuk mendapatkan konteks pengesahan tiada";
+Strings.OfficeOM.L_ImplicitNotLoaded = "Modul tidak dimuatkan sebelum memperoleh token";
 Strings.OfficeOM.L_InValidOptionalArgument = "argumen opsyenal tidak sah";
 Strings.OfficeOM.L_IndexOutOfRange = "Indeks di luar julat.";
 Strings.OfficeOM.L_InitializeNotReady = "Office.js belum dimuatkan sepenuhnya lagi. Sila cuba lagi nanti atau pastikan untuk menambah kod pengasalan anda dalam fungsi Office.initialize.";
@@ -103,7 +103,7 @@ Strings.OfficeOM.L_InvalidNode = "Nod Tidak Sah";
 Strings.OfficeOM.L_InvalidObjectPath = 'Laluan objek \'{0}\' tidak berfungsi untuk apa yang anda sedang cuba lakukan. Jika anda menggunakan objek merentasi berbilang panggilan "context.sync" dan di luar pelaksanaan jujukan kelompok ".run", sila gunakan kaedah "context.trackedObjects.add()" dan "context.trackedObjects.remove()" untuk mengurus hayat hidup objek.';
 Strings.OfficeOM.L_InvalidOperationInCellEditMode = "Excel berada dalam mod pengeditan sel. Sila keluar daripada mod edit dengan menekan 'ENTER' atau 'TAB' atau pilih sel lain dan kemudian cuba semula.";
 Strings.OfficeOM.L_InvalidOrTimedOutSession = "Tidak Sah Atau Sesi Tamat Masa";
-Strings.OfficeOM.L_InvalidOrTimedOutSessionMessage = "Sesi Office Online anda telah tamat tempoh atau tidak sah. Untuk meneruskan, segar semula halaman.";
+Strings.OfficeOM.L_InvalidOrTimedOutSessionMessage = "Sesi Office anda telah tamat tempoh atau tidak sah. Untuk meneruskan, segarkan semula halaman.";
 Strings.OfficeOM.L_InvalidParameters = "Fungsi {0} mempunyai parameter tidak sah.";
 Strings.OfficeOM.L_InvalidReadForBlankRow = "Baris yang ditentukan adalah kosong.";
 Strings.OfficeOM.L_InvalidRequestContext = "Tidak boleh menggunakan objek merentasi konteks permohonan berbeza.";
@@ -191,3 +191,4 @@ Strings.OfficeOM.L_UserAbortedMessage = "Pengguna tidak mengizinkan kebenaran ta
 Strings.OfficeOM.L_UserClickIgnore = "Pengguna telah memilih untuk mengabaikan kotak dialog.";
 Strings.OfficeOM.L_UserNotSignedIn = "Tiada pengguna terdaftar masuk ke Office.";
 Strings.OfficeOM.L_ValueNotLoaded = 'Nilai objek hasil objek belum dimuatkan lagi. Sebelum membaca sifat nilai, hubungi "context.sync()" tentang konteks permintaan yang berkaitan.';
+Strings.OfficeOM.L_WorkbookHiddenMessage = "Permintaan JavaScript API gagal kerana buku kerja tersembunyi. Sila nyahsembunyikan buku kerja tersebut dan cuba lagi.";

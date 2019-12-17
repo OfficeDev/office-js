@@ -1,5 +1,3 @@
-/* Version: 16.0.10827.10000 */
-
 Type.registerNamespace("_u");
 _u.ExtensibilityStrings = function()
 {
@@ -26,6 +24,7 @@ _u.ExtensibilityStrings.l_DeleteAttachmentDoesNotExist_Text = "منسلکہ حذ
 _u.ExtensibilityStrings.l_DisplayNameTooLong_Text = "ایک یا زائد فراہم کردہ ڈسپلے نام بہت طویل ہیں۔";
 _u.ExtensibilityStrings.l_DisplayReplyFormHtmlBodyRequired_Text = "'htmlBody' درکار ہے۔";
 _u.ExtensibilityStrings.l_DuplicateNotificationKey_Text = "فراہم کردہ کلید کے ساتھ ایک اطلاع پہلے ہی موجود ہے۔";
+_u.ExtensibilityStrings.l_Duplicate_Category_Error_Text = "فراہم کردہ زمروں میں سے ایک پہلے ہی ماسٹر زمرہ کی فہرست میں موجود ہے۔";
 _u.ExtensibilityStrings.l_ElevatedPermissionNeededForMethod_Text = "اس طریقہ پر کال کرنے کے لیے افزودہ اجازت کی ضرورت ہے: '{0}'۔";
 _u.ExtensibilityStrings.l_ElevatedPermissionNeeded_Text = "Office کے لیے JavaScript API کے محفوظ اراکین تک رسائی کے لیے افزودہ اجازت کی ضرورت ہے۔";
 _u.ExtensibilityStrings.l_EmailAddressTooLong_Text = "ایک یا زائد فراہم کردہ ای میل بہت طویل ہیں۔";
@@ -47,6 +46,8 @@ _u.ExtensibilityStrings.l_InvalidEventDates_Text = "اختتام تاریخ آغ
 _u.ExtensibilityStrings.l_InvalidParameterValueError_Text = "'{0}' پيراميٹر کی قدر بے جواز ہے۔";
 _u.ExtensibilityStrings.l_InvalidSelection_Text = "انتخاب بے جواز ہے۔";
 _u.ExtensibilityStrings.l_InvalidTime_Text = "ان پٹ ایک جائز وقت کو حل نہیں کرتا۔";
+_u.ExtensibilityStrings.l_Invalid_Category_Error_Text = "بےجواز زمرے فراہم کیے گئے تھے۔";
+_u.ExtensibilityStrings.l_Item_Not_Saved_Error_Text = "شے کے محفوظ ہو جانے تک id بازگیر نہیں ہو سکتی۔";
 _u.ExtensibilityStrings.l_MessageInDifferentStoreError_Text = "EWS ID بازیافت نہیں ہو سکتی کیونکہ پیغام ایک مختلف اسٹور میں محفوظ ہے۔";
 _u.ExtensibilityStrings.l_NoValidRecipientsProvided_Text = "کوئی اچھا وصول کنندگان فراہم نہیں کیا گیا۔";
 _u.ExtensibilityStrings.l_NotificationKeyNotFound_Text = "فراہم کردہ کلید کے ساتھ کوئی اطلاعات موجود نہیں ہیں۔";

@@ -1,10 +1,11 @@
-/* Outlook specific API library */
-/* Version: 16.0.6807.1000 */
-/*
+/*! Outlook specific API library */
+/*! Version: 16.0.6807.1000 */
+/*! Update: 3 */
+/*!
 	Copyright (c) Microsoft Corporation.  All rights reserved.
 */
 
-/*
+/*!
 	Your use of this file is governed by the Microsoft Services Agreement http://go.microsoft.com/fwlink/?LinkId=266419.
 */
 
@@ -917,7 +918,7 @@ OSF.OfficeAppContext=function OSF_OfficeAppContext(id, appName, appVersion, appU
 	};
 	this.get_appVersion=function get_appVersion()
 	{
-		return this._appVersion
+		return "16.0.4909.1000"
 	};
 	this.get_appUILocale=function get_appUILocale()
 	{
@@ -3750,27 +3751,38 @@ OSF.DDA.DispIdHost.getClientDelegateMethods=function(actionId)
 var OSFRichclient;
 (function(OSFRichclient)
 {
-	var RichClientHostController=function()
-		{
-			function RichClientHostController(){}
-			RichClientHostController.prototype.execute=function(id, params, callback)
-			{
-				window.external.Execute(id,params,callback)
-			};
-			RichClientHostController.prototype.registerEvent=function(id, targetId, handler, callback)
-			{
-				window.external.RegisterEvent(id,targetId,handler,callback)
-			};
-			RichClientHostController.prototype.unregisterEvent=function(id, targetId, callback)
-			{
-				window.external.UnregisterEvent(id,targetId,callback)
-			};
-			RichClientHostController.prototype.messageParent=function(message)
-			{
-				window.external.MessageParent(message)
-			};
-			return RichClientHostController
-		}();
+	var RichClientHostController = (function () {
+        function RichClientHostController() {
+        }
+        RichClientHostController.prototype.execute = function (id, params, callback) {
+            if (typeof OsfOMToken != 'undefined' && OsfOMToken) {
+                window.external.Execute(id, params, callback, OsfOMToken);
+            }
+            else {
+                window.external.Execute(id, params, callback);
+            }
+        };
+        RichClientHostController.prototype.registerEvent = function (id, targetId, handler, callback) {
+            if (typeof OsfOMToken != 'undefined' && OsfOMToken) {
+                window.external.RegisterEvent(id, targetId, handler, callback, OsfOMToken);
+            }
+            else {
+                window.external.RegisterEvent(id, targetId, handler, callback);
+            }
+        };
+        RichClientHostController.prototype.unregisterEvent = function (id, targetId, callback) {
+            if (typeof OsfOMToken != 'undefined' && OsfOMToken) {
+                window.external.UnregisterEvent(id, targetId, callback, OsfOMToken);
+            }
+            else {
+                window.external.UnregisterEvent(id, targetId, callback);
+            }
+        };
+        RichClientHostController.prototype.messageParent=function (message) {
+            window.external.MessageParent(message);
+        };
+        return RichClientHostController;
+    })();
 	OSFRichclient.RichClientHostController=RichClientHostController
 })(OSFRichclient || (OSFRichclient={}));
 OSF.ClientHostController=new OSFRichclient.RichClientHostController;
@@ -3826,60 +3838,65 @@ var OfficeExt;
 		OSF.DDA.OfficeTheme.getOfficeTheme=OfficeExt.OfficeTheme.OfficeThemeManager.instance().getOfficeTheme
 	})(OfficeTheme=OfficeExt.OfficeTheme || (OfficeExt.OfficeTheme={}))
 })(OfficeExt || (OfficeExt={}));
-OSF.DDA.ClientSettingsManager={
-	getSettingsExecuteMethod: function OSF_DDA_ClientSettingsManager$getSettingsExecuteMethod(hostDelegateMethod)
-	{
-		return function(args)
-			{
-				var status,
-					response;
-				try
-				{
-					response=hostDelegateMethod(args.hostCallArgs,args.onCalling,args.onReceiving);
-					status=OSF.DDA.ErrorCodeManager.errorCodes.ooeSuccess
-				}
-				catch(ex)
-				{
-					status=OSF.DDA.ErrorCodeManager.errorCodes.ooeInternalError;
-					response={
-						name: Strings.OfficeOM.L_InternalError,
-						message: ex
-					}
-				}
-				if(args.onComplete)
-					args.onComplete(status,response)
+OSF.DDA.ClientSettingsManager = {
+	getSettingsExecuteMethod: function OSF_DDA_ClientSettingsManager$getSettingsExecuteMethod(hostDelegateMethod) {
+		return function (args) {
+			var status, response;
+			try {
+				response = hostDelegateMethod(args.hostCallArgs, args.onCalling, args.onReceiving);
+				status = OSF.DDA.ErrorCodeManager.errorCodes.ooeSuccess;
 			}
+			catch (ex) {
+				status = OSF.DDA.ErrorCodeManager.errorCodes.ooeInternalError;
+				response = { name: Strings.OfficeOM.L_InternalError, message: ex };
+			}
+			if (args.onComplete) {
+				args.onComplete(status, response);
+			}
+		};
 	},
-	read: function OSF_DDA_ClientSettingsManager$read(onCalling, onReceiving)
-	{
-		var keys=[];
-		var values=[];
-		if(onCalling)
+	read: function OSF_DDA_ClientSettingsManager$read(onCalling, onReceiving) {
+		var keys = [];
+		var values = [];
+		if (onCalling) {
 			onCalling();
-		OSF.DDA._OsfControlContext.GetSettings().Read(keys,values);
-		if(onReceiving)
-			onReceiving();
-		var serializedSettings={};
-		for(var index=0; index < keys.length; index++)
-			serializedSettings[keys[index]]=values[index];
-		return serializedSettings
-	},
-	write: function OSF_DDA_ClientSettingsManager$write(serializedSettings, overwriteIfStale, onCalling, onReceiving)
-	{
-		var keys=[];
-		var values=[];
-		for(var key in serializedSettings)
-		{
-			keys.push(key);
-			values.push(serializedSettings[key])
 		}
-		if(onCalling)
+		if (typeof OsfOMToken != 'undefined' && OsfOMToken) {
+			OSF.DDA._OsfControlContext.GetSettings(OsfOMToken).Read(keys, values);
+		}
+		else {
+			OSF.DDA._OsfControlContext.GetSettings().Read(keys, values);
+		}
+		if (onReceiving) {
+			onReceiving();
+		}
+		var serializedSettings = {};
+		for (var index = 0; index < keys.length; index++) {
+			serializedSettings[keys[index]] = values[index];
+		}
+		return serializedSettings;
+	},
+	write: function OSF_DDA_ClientSettingsManager$write(serializedSettings, overwriteIfStale, onCalling, onReceiving) {
+		var keys = [];
+		var values = [];
+		for (var key in serializedSettings) {
+			keys.push(key);
+			values.push(serializedSettings[key]);
+		}
+		if (onCalling) {
 			onCalling();
-		OSF.DDA._OsfControlContext.GetSettings().Write(keys,values);
-		if(onReceiving)
-			onReceiving()
+		}
+		if (typeof OsfOMToken != 'undefined' && OsfOMToken) {
+			OSF.DDA._OsfControlContext.GetSettings(OsfOMToken).Write(keys, values);
+		}
+		else {
+			OSF.DDA._OsfControlContext.GetSettings().Write(keys, values);
+		}
+		if (onReceiving) {
+			onReceiving();
+		}
 	}
-};
+}
 OSF.InitializationHelper.prototype.initializeSettings=function OSF_InitializationHelper$initializeSettings(refreshSupported)
 {
 	var serializedSettings=OSF.DDA.ClientSettingsManager.read();
@@ -5002,9 +5019,9 @@ var OSFLog;
 var Logger;
 (function(Logger)
 {
-	"use strict";
-	(function(TraceLevel)
-	{
+    "use strict";
+    (function(TraceLevel)
+    {
 		TraceLevel[TraceLevel["info"]=0]="info";
 		TraceLevel[TraceLevel["warning"]=1]="warning";
 		TraceLevel[TraceLevel["error"]=2]="error"
@@ -5016,125 +5033,338 @@ var Logger;
 		SendFlag[SendFlag["flush"]=1]="flush"
 	})(Logger.SendFlag || (Logger.SendFlag={}));
 	var SendFlag=Logger.SendFlag;
-	function allowUploadingData()
-	{
-		if(OSF.Logger && OSF.Logger.ulsEndpoint)
-			OSF.Logger.ulsEndpoint.loadProxyFrame()
-	}
-	Logger.allowUploadingData=allowUploadingData;
-	function sendLog(traceLevel, message, flag)
-	{
-		if(OSF.Logger && OSF.Logger.ulsEndpoint)
-		{
-			var jsonObj={
-					traceLevel: traceLevel,
-					message: message,
-					flag: flag,
-					internalLog: true
-				};
-			var logs=JSON.stringify(jsonObj);
-			OSF.Logger.ulsEndpoint.writeLog(logs)
-		}
-	}
-	Logger.sendLog=sendLog;
-	function creatULSEndpoint()
-	{
-		try
-		{
-			return new ULSEndpointProxy
-		}
-		catch(e)
-		{
-			return null
-		}
-	}
-	var ULSEndpointProxy=function()
-		{
-			function ULSEndpointProxy()
-			{
-				var _this=this;
-				this.proxyFrame=null;
-				this.telemetryEndPoint="https://telemetryservice.firstpartyapps.oaspapps.com/telemetryservice/telemetryproxy.html";
-				this.buffer=[];
-				this.proxyFrameReady=false;
-				OSF.OUtil.addEventListener(window,"message",function(e)
-				{
-					return _this.tellProxyFrameReady(e)
-				});
-				setTimeout(function()
-				{
-					_this.loadProxyFrame()
-				},3e3)
-			}
-			ULSEndpointProxy.prototype.writeLog=function(log)
-			{
-				if(this.proxyFrameReady===true)
-					this.proxyFrame.contentWindow.postMessage(log,"*");
-				else if(this.buffer.length < 128)
-					this.buffer.push(log)
-			};
-			ULSEndpointProxy.prototype.loadProxyFrame=function()
-			{
-				if(this.proxyFrame==null)
-				{
-					this.proxyFrame=document.createElement("iframe");
-					this.proxyFrame.setAttribute("style","display:none");
-					this.proxyFrame.setAttribute("src",this.telemetryEndPoint);
-					document.head.appendChild(this.proxyFrame)
-				}
-			};
-			ULSEndpointProxy.prototype.tellProxyFrameReady=function(e)
-			{
-				var _this=this;
-				if(e.data==="ProxyFrameReadyToLog")
-				{
-					this.proxyFrameReady=true;
-					for(var i=0; i < this.buffer.length; i++)
-						this.writeLog(this.buffer[i]);
-					this.buffer.length=0;
-					OSF.OUtil.removeEventListener(window,"message",function(e)
-					{
-						return _this.tellProxyFrameReady(e)
-					})
-				}
-				else if(e.data==="ProxyFrameReadyToInit")
-				{
-					var initJson={
-							appName: "Office APPs",
-							sessionId: OSF.OUtil.Guid.generateNewGuid()
-						};
-					var initStr=JSON.stringify(initJson);
-					this.proxyFrame.contentWindow.postMessage(initStr,"*")
-				}
-			};
-			return ULSEndpointProxy
-		}();
-	if(!OSF.Logger)
-		OSF.Logger=Logger;
-	Logger.ulsEndpoint=creatULSEndpoint()
-})(Logger || (Logger={}));
+	function allowUploadingData(){}
+    Logger.allowUploadingData = allowUploadingData;
+    function sendLog(traceLevel, message, flag){}
+    Logger.sendLog=sendLog;
+    function creatULSEndpoint()
+    {
+        try
+        {
+            return new ULSEndpointProxy
+        }
+        catch(e)
+        {
+            return null
+        }
+    }
+    var ULSEndpointProxy=function()
+        {
+            function ULSEndpointProxy(){}
+            ULSEndpointProxy.prototype.writeLog = function(log){};
+            ULSEndpointProxy.prototype.loadProxyFrame = function(){};
+            return ULSEndpointProxy
+        }();
+    if(!OSF.Logger)
+        OSF.Logger = Logger;
+    Logger.ulsEndpoint = creatULSEndpoint()
+})(Logger || (Logger = {}));
+var OSFAriaLogger;
+(function(OSFAriaLogger)
+{
+    var TelemetryEventAppActivated = {
+            name: "AppActivated",
+            enabled: true,
+            basic: true,
+            critical: true,
+            points: [{
+                    name: "Browser",
+                    type: "string"
+                },{
+                    name: "Message",
+                    type: "string"
+                },{
+                    name: "AppURL",
+                    type: "string"
+                },{
+                    name: "Host",
+                    type: "string"
+                },{
+                    name: "AppSizeWidth",
+                    type: "int64"
+                },{
+                    name: "AppSizeHeight",
+                    type: "int64"
+                },{
+                    name: "IsFromWacAutomation",
+                    type: "string"
+                },]
+        };
+    var TelemetryEventScriptLoad = {
+            name: "ScriptLoad",
+            enabled: true,
+            basic: false,
+            critical: false,
+            points: [{
+                    name: "ScriptId",
+                    type: "string"
+                },{
+                    name: "StartTime",
+                    type: "double"
+                },{
+                    name: "ResponseTime",
+                    type: "double"
+                },]
+        };
+    var TelemetryEventApiUsage = {
+            name: "APIUsage",
+            enabled: false,
+            basic: false,
+            critical: false,
+            points: [{
+                    name: "APIType",
+                    type: "string"
+                },{
+                    name: "APIID",
+                    type: "int64"
+                },{
+                    name: "Parameters",
+                    type: "string"
+                },{
+                    name: "ResponseTime",
+                    type: "int64"
+                },{
+                    name: "ErrorType",
+                    type: "int64"
+                },]
+        };
+    var TelemetryEventAppInitialization = {
+            name: "AppInitialization",
+            enabled: true,
+            basic: false,
+            critical: false,
+            points: [{
+                    name: "SuccessCode",
+                    type: "int64"
+                },{
+                    name: "Message",
+                    type: "string"
+                },]
+        };
+    var TelemetryEventAppClosed = {
+            name: "AppClosed",
+            enabled: true,
+            basic: false,
+            critical: false,
+            points: [{
+                    name: "FocusTime",
+                    type: "int64"
+                },{
+                    name: "AppSizeFinalWidth",
+                    type: "int64"
+                },{
+                    name: "AppSizeFinalHeight",
+                    type: "int64"
+                },{
+                    name: "OpenTime",
+                    type: "int64"
+                },]
+        };
+    var TelemetryEvents = [TelemetryEventAppActivated,TelemetryEventScriptLoad,TelemetryEventApiUsage,TelemetryEventAppInitialization,TelemetryEventAppClosed,];
+    function createDataField(value, point)
+    {
+        var key = point.rename === undefined ? point.name : point.rename;
+        var type = point.type;
+        var field = undefined;
+        switch(type)
+        {
+            case"string":
+                field = oteljs.makeStringDataField(key,value);
+                break;
+            case"double":
+                if(typeof value === "string")
+                    value = parseFloat(value);
+                field = oteljs.makeDoubleDataField(key,value);
+                break;
+            case"int64":
+                if(typeof value === "string")
+                    value = parseInt(value);
+                field = oteljs.makeInt64DataField(key,value);
+                break;
+            case"boolean":
+                if(typeof value === "string")
+                    value = value === "true";
+                field = oteljs.makeBooleanDataField(key,value);
+                break
+        }
+        return field
+    }
+    function getEventDefinition(eventName)
+    {
+        for(var _i = 0; _i < TelemetryEvents.length; _i++)
+        {
+            var event_1 = TelemetryEvents[_i];
+            if(event_1.name === eventName)
+                return event_1
+        }
+        return undefined
+    }
+    function eventEnabled(eventName)
+    {
+        var eventDefinition = getEventDefinition(eventName);
+        if(eventDefinition === undefined)
+            return false;
+        return eventDefinition.enabled
+    }
+    function generateTelemetryEvent(eventName, telemetryData)
+    {
+        var eventDefinition = getEventDefinition(eventName);
+        if(eventDefinition === undefined)
+            return undefined;
+        var dataFields = [];
+        for(var _i = 0, _a = eventDefinition.points; _i < _a.length; _i++)
+        {
+            var point = _a[_i];
+            var key = point.name;
+            var value = telemetryData[key];
+            if(value === undefined)
+                continue;
+            var field = createDataField(value,point);
+            if(field !== undefined)
+                dataFields.push(field)
+        }
+        var flags = {dataCategories: oteljs.DataCategories.ProductServiceUsage};
+        if(eventDefinition.critical)
+            flags.samplingPolicy = oteljs.SamplingPolicy.CriticalBusinessImpact;
+        if(eventDefinition.basic)
+            flags.diagnosticLevel = oteljs.DiagnosticLevel.BasicEvent;
+        var eventNameFull = "Office.Extensibility.OfficeJs." + eventName + "X";
+        var event = {
+                eventName: eventNameFull,
+                dataFields: dataFields,
+                eventFlags: flags
+            };
+        return event
+    }
+    function sendOtelTelemetryEvent(eventName, telemetryData)
+    {
+        if(eventEnabled(eventName))
+            if(typeof OTel !== "undefined")
+                OTel.OTelLogger.onTelemetryLoaded(function()
+                {
+                    var event = generateTelemetryEvent(eventName,telemetryData);
+                    if(event === undefined)
+                        return;
+                    Microsoft.Office.WebExtension.sendTelemetryEvent(event)
+                })
+    }
+    var AriaLogger = function()
+        {
+            function AriaLogger(){}
+            AriaLogger.prototype.getAriaCDNLocation = function()
+            {
+                return OSF._OfficeAppFactory.getLoadScriptHelper().getOfficeJsBasePath() + "ariatelemetry/aria-web-telemetry.js"
+            };
+            AriaLogger.getInstance = function()
+            {
+                if(AriaLogger.AriaLoggerObj === undefined)
+                    AriaLogger.AriaLoggerObj = new AriaLogger;
+                return AriaLogger.AriaLoggerObj
+            };
+            AriaLogger.prototype.isIUsageData = function(arg)
+            {
+                return arg["Fields"] !== undefined
+            };
+            AriaLogger.prototype.shouldSendDirectToAria = function()
+            {
+                var flavor;
+                var version;
+                if(OSF._OfficeAppFactory && OSF._OfficeAppFactory.getHostInfo)
+                    flavor = OSF._OfficeAppFactory.getHostInfo()["hostPlatform"];
+                if(!flavor)
+                    return false;
+                else if(flavor.toLowerCase() !== "win32")
+                    return true;
+                if(window.external && typeof window.external.GetContext !== "undefined" && typeof window.external.GetContext().GetHostFullVersion !== "undefined")
+                    version = window.external.GetContext().GetHostFullVersion();
+                var BASE10 = 10;
+                var MAX_MAJOR_VERSION = 16;
+                var MAX_MINOR_VERSION = 0;
+                var MAX_BUILD_VERSION = 11601;
+                if(version)
+                {
+                    var versionTokens = version.split(".");
+                    if(versionTokens.length < 3)
+                        return false;
+                    else if(parseInt(versionTokens[0],BASE10) >= MAX_MAJOR_VERSION && parseInt(versionTokens[1],BASE10) >= MAX_MINOR_VERSION && parseInt(versionTokens[2],BASE10) >= MAX_BUILD_VERSION)
+                        return false;
+                    else
+                        return true
+                }
+                return false
+            };
+            AriaLogger.prototype.isDirectToAriaEnabled = function()
+            {
+                if(this.EnableDirectToAria === undefined || this.EnableDirectToAria === null)
+                    this.EnableDirectToAria = true;
+                return this.EnableDirectToAria
+            };
+            AriaLogger.prototype.sendTelemetry = function(tableName, telemetryData)
+            {
+                var startAfterMs = 1e3;
+                var sendAriaEnabled = AriaLogger.EnableSendingTelemetryWithLegacyAria && this.isDirectToAriaEnabled();
+                if(sendAriaEnabled)
+                    OSF.OUtil.loadScript(this.getAriaCDNLocation(),function()
+                    {
+                        try
+                        {
+                            if(!this.ALogger)
+                            {
+                                var OfficeExtensibilityTenantID = "db334b301e7b474db5e0f02f07c51a47-a1b5bc36-1bbe-482f-a64a-c2d9cb606706-7439";
+                                this.ALogger = AWTLogManager.initialize(OfficeExtensibilityTenantID)
+                            }
+                            var eventProperties = new AWTEventProperties;
+                            eventProperties.setName("Office.Extensibility.OfficeJS." + tableName);
+                            for(var key in telemetryData)
+                                if(key.toLowerCase() !== "table")
+                                    eventProperties.setProperty(key,telemetryData[key]);
+                            var today = new Date;
+                            eventProperties.setProperty("Date",today.toISOString());
+                            this.ALogger.logEvent(eventProperties)
+                        }
+                        catch(e){}
+                    },startAfterMs);
+                if(AriaLogger.EnableSendingTelemetryWithOTel)
+                    sendOtelTelemetryEvent(tableName,telemetryData)
+            };
+            AriaLogger.prototype.logData = function(data)
+            {
+                if(this.isIUsageData(data))
+                    this.sendTelemetry(data["Table"],data["Fields"]);
+                else
+                    this.sendTelemetry(data["Table"],data)
+            };
+            AriaLogger.EnableSendingTelemetryWithOTel = true;
+            AriaLogger.EnableSendingTelemetryWithLegacyAria = true;
+            return AriaLogger
+        }();
+    OSFAriaLogger.AriaLogger = AriaLogger
+})(OSFAriaLogger || (OSFAriaLogger = {}));
 var OSFAppTelemetry;
 (function(OSFAppTelemetry)
 {
-	"use strict";
-	var appInfo;
-	var sessionId=OSF.OUtil.Guid.generateNewGuid();
+    "use strict";
+    var appInfo;
+    var sessionId=OSF.OUtil.Guid.generateNewGuid();
 	var osfControlAppCorrelationId="";
-	var AppInfo=function()
-		{
-			function AppInfo(){}
-			return AppInfo
-		}();
-	var Event=function()
-		{
-			function Event(name, handler)
-			{
-				this.name=name;
-				this.handler=handler
-			}
-			return Event
-		}();
-	var AppStorage=function()
+    var omexDomainRegex = new RegExp("^https?://store\\.office(ppe|-int)?\\.com/","i");
+    OSFAppTelemetry.enableTelemetry = true;
+    var AppInfo=function()
+        {
+            function AppInfo(){}
+            return AppInfo
+        }();
+    OSFAppTelemetry.AppInfo = AppInfo;
+    var Event=function()
+        {
+            function Event(name, handler)
+            {
+                this.name=name;
+                this.handler=handler
+            }
+            return Event
+        }();
+		var AppStorage=function()
 		{
 			function AppStorage()
 			{
@@ -5206,246 +5436,361 @@ var OSFAppTelemetry;
 			};
 			return AppStorage
 		}();
-	var AppLogger=function()
-		{
-			function AppLogger(){}
-			AppLogger.prototype.LogData=function(data)
-			{
-				if(!OSF.Logger)
-					return;
-				OSF.Logger.sendLog(OSF.Logger.TraceLevel.info,data.SerializeRow(),OSF.Logger.SendFlag.none)
-			};
-			AppLogger.prototype.LogRawData=function(log)
-			{
-				if(!OSF.Logger)
-					return;
-				OSF.Logger.sendLog(OSF.Logger.TraceLevel.info,log,OSF.Logger.SendFlag.none)
-			};
-			return AppLogger
-		}();
-	function initialize(context)
-	{
-		if(!OSF.Logger)
-			return;
-		if(appInfo)
-			return;
-		appInfo=new AppInfo;
-		appInfo.hostVersion=context.get_appVersion();
-		appInfo.appId=context.get_id();
-		appInfo.host=context.get_appName();
-		appInfo.browser=window.navigator.userAgent;
-		appInfo.correlationId=context.get_correlationId();
-		appInfo.clientId=(new AppStorage).getClientId();
-		appInfo.appInstanceId=context.get_appInstanceId();
-		if(appInfo.appInstanceId)
-			appInfo.appInstanceId=appInfo.appInstanceId.replace(/[{}]/g,"").toLowerCase();
-		var index=location.href.indexOf("?");
-		appInfo.appURL=index==-1 ? location.href : location.href.substring(0,index);
-		(function getUserIdAndAssetIdFromToken(token, appInfo)
-		{
-			var xmlContent;
-			var parser;
-			var xmlDoc;
-			appInfo.assetId="";
-			appInfo.userId="";
-			try
-			{
-				xmlContent=decodeURIComponent(token);
-				parser=new DOMParser;
-				xmlDoc=parser.parseFromString(xmlContent,"text/xml");
-				appInfo.userId=xmlDoc.getElementsByTagName("t")[0].attributes.getNamedItem("cid").nodeValue;
-				appInfo.assetId=xmlDoc.getElementsByTagName("t")[0].attributes.getNamedItem("aid").nodeValue
-			}
-			catch(e){}
-			finally
-			{
-				xmlContent=null;
-				xmlDoc=null;
-				parser=null
-			}
-		})(context.get_eToken(),appInfo);
-		(function handleLifecycle()
-		{
-			var startTime=new Date;
-			var lastFocus=null;
-			var focusTime=0;
-			var finished=false;
-			var adjustFocusTime=function()
-				{
-					if(document.hasFocus())
-					{
-						if(lastFocus==null)
-							lastFocus=new Date
-					}
-					else if(lastFocus)
-					{
-						focusTime+=Math.abs((new Date).getTime() - lastFocus.getTime());
-						lastFocus=null
-					}
-				};
-			var eventList=[];
-			eventList.push(new Event("focus",adjustFocusTime));
-			eventList.push(new Event("blur",adjustFocusTime));
-			eventList.push(new Event("focusout",adjustFocusTime));
-			eventList.push(new Event("focusin",adjustFocusTime));
-			var exitFunction=function()
-				{
-					for(var i=0; i < eventList.length; i++)
-						OSF.OUtil.removeEventListener(window,eventList[i].name,eventList[i].handler);
-					eventList.length=0;
-					if(!finished)
-					{
-						if(document.hasFocus() && lastFocus)
-						{
-							focusTime+=Math.abs((new Date).getTime() - lastFocus.getTime());
-							lastFocus=null
-						}
-						OSFAppTelemetry.onAppClosed(Math.abs((new Date).getTime() - startTime.getTime()),focusTime);
-						finished=true
-					}
-				};
-			eventList.push(new Event("beforeunload",exitFunction));
-			eventList.push(new Event("unload",exitFunction));
-			for(var i=0; i < eventList.length; i++)
-				OSF.OUtil.addEventListener(window,eventList[i].name,eventList[i].handler);
-			adjustFocusTime()
-		})();
-		OSFAppTelemetry.onAppActivated()
-	}
-	OSFAppTelemetry.initialize=initialize;
-	function onAppActivated()
-	{
-		if(!appInfo)
-			return;
-		(new AppStorage).enumerateLog(function(id, log)
-		{
-			return(new AppLogger).LogRawData(log)
-		},true);
-		var data=new OSFLog.AppActivatedUsageData;
-		data.SessionId=sessionId;
-		data.AppId=appInfo.appId;
-		data.AssetId=appInfo.assetId;
-		data.AppURL=appInfo.appURL;
-		data.UserId=appInfo.userId;
-		data.ClientId=appInfo.clientId;
-		data.Browser=appInfo.browser;
-		data.Host=appInfo.host;
-		data.HostVersion=appInfo.hostVersion;
-		data.CorrelationId=appInfo.correlationId;
-		data.AppSizeWidth=window.innerWidth;
-		data.AppSizeHeight=window.innerHeight;
-		data.AppInstanceId=appInfo.appInstanceId;
-		(new AppLogger).LogData(data);
-		setTimeout(function()
-		{
-			if(!OSF.Logger)
-				return;
-			OSF.Logger.allowUploadingData()
-		},100)
-	}
-	OSFAppTelemetry.onAppActivated=onAppActivated;
-	function onScriptDone(scriptId, msStartTime, msResponseTime, appCorrelationId)
-	{
-		var data=new OSFLog.ScriptLoadUsageData;
-		data.CorrelationId=appCorrelationId;
-		data.SessionId=sessionId;
-		data.ScriptId=scriptId;
-		data.StartTime=msStartTime;
-		data.ResponseTime=msResponseTime;
-		(new AppLogger).LogData(data)
-	}
-	OSFAppTelemetry.onScriptDone=onScriptDone;
-	function onCallDone(apiType, id, parameters, msResponseTime, errorType)
-	{
-		if(!appInfo)
-			return;
-		var data=new OSFLog.APIUsageUsageData;
-		data.CorrelationId=osfControlAppCorrelationId;
-		data.SessionId=sessionId;
-		data.APIType=apiType;
-		data.APIID=id;
-		data.Parameters=parameters;
-		data.ResponseTime=msResponseTime;
-		data.ErrorType=errorType;
-		(new AppLogger).LogData(data)
-	}
-	OSFAppTelemetry.onCallDone=onCallDone;
-	function onMethodDone(id, args, msResponseTime, errorType)
-	{
-		var parameters=null;
-		if(args)
-			if(typeof args=="number")
-				parameters=String(args);
-			else if(typeof args==="object")
-				for(var index in args)
-				{
-					if(parameters !==null)
-						parameters+=",";
-					else
-						parameters="";
-					if(typeof args[index]=="number")
-						parameters+=String(args[index])
-				}
-			else
-				parameters="";
-		OSF.AppTelemetry.onCallDone("method",id,parameters,msResponseTime,errorType)
-	}
-	OSFAppTelemetry.onMethodDone=onMethodDone;
-	function onPropertyDone(propertyName, msResponseTime)
-	{
-		OSF.AppTelemetry.onCallDone("property",-1,propertyName,msResponseTime)
-	}
-	OSFAppTelemetry.onPropertyDone=onPropertyDone;
-	function onEventDone(id, errorType)
-	{
-		OSF.AppTelemetry.onCallDone("event",id,null,0,errorType)
-	}
-	OSFAppTelemetry.onEventDone=onEventDone;
-	function onRegisterDone(register, id, msResponseTime, errorType)
-	{
-		OSF.AppTelemetry.onCallDone(register ? "registerevent" : "unregisterevent",id,null,msResponseTime,errorType)
-	}
-	OSFAppTelemetry.onRegisterDone=onRegisterDone;
-	function onAppClosed(openTime, focusTime)
-	{
-		if(!appInfo)
-			return;
-		var data=new OSFLog.AppClosedUsageData;
-		data.CorrelationId=osfControlAppCorrelationId;
-		data.SessionId=sessionId;
-		data.FocusTime=focusTime;
-		data.OpenTime=openTime;
-		data.AppSizeFinalWidth=window.innerWidth;
-		data.AppSizeFinalHeight=window.innerHeight;
-		(new AppStorage).saveLog(sessionId,data.SerializeRow())
-	}
-	OSFAppTelemetry.onAppClosed=onAppClosed;
-	function setOsfControlAppCorrelationId(correlationId)
-	{
-		osfControlAppCorrelationId=correlationId
-	}
-	OSFAppTelemetry.setOsfControlAppCorrelationId=setOsfControlAppCorrelationId;
-	function doAppInitializationLogging(isException, message)
-	{
-		var data=new OSFLog.AppInitializationUsageData;
-		data.CorrelationId=osfControlAppCorrelationId;
-		data.SessionId=sessionId;
-		data.SuccessCode=isException ? 1 : 0;
-		data.Message=message;
-		(new AppLogger).LogData(data)
-	}
-	OSFAppTelemetry.doAppInitializationLogging=doAppInitializationLogging;
-	function logAppCommonMessage(message)
-	{
-		doAppInitializationLogging(false,message)
-	}
-	OSFAppTelemetry.logAppCommonMessage=logAppCommonMessage;
-	function logAppException(errorMessage)
-	{
-		doAppInitializationLogging(true,errorMessage)
-	}
-	OSFAppTelemetry.logAppException=logAppException;
-	OSF.AppTelemetry=OSFAppTelemetry
+    var AppLogger=function()
+        {
+            function AppLogger(){}
+            AppLogger.prototype.LogData=function(data)
+            {
+                if(!OSFAppTelemetry.enableTelemetry)
+                    return;
+                try
+                {
+                    OSFAriaLogger.AriaLogger.getInstance().logData(data)
+                }
+                catch(e){}
+            };
+            AppLogger.prototype.LogRawData=function(log)
+            {
+                if(!OSFAppTelemetry.enableTelemetry)
+                    return;
+                try
+                {
+                    OSFAriaLogger.AriaLogger.getInstance().logData(JSON.parse(log))
+                }
+                catch(e){}
+            };
+            return AppLogger
+        }();
+    function trimStringToLowerCase(input)
+    {
+        if(input)
+            input = input.replace(/[{}]/g,"").toLowerCase();
+        return input || ""
+    }
+    var UrlFilter = function()
+        {
+            function UrlFilter(){}
+            UrlFilter.hashString = function(s)
+            {
+                var hash = 0;
+                if(s.length === 0)
+                    return hash;
+                for(var i = 0; i < s.length; i++)
+                {
+                    var c = s.charCodeAt(i);
+                    hash = (hash << 5) - hash + c;
+                    hash |= 0
+                }
+                return hash
+            };
+            UrlFilter.stringToHash = function(s)
+            {
+                var hash = UrlFilter.hashString(s);
+                var stringHash = hash.toString();
+                if(hash < 0)
+                    stringHash = "1" + stringHash.substring(1);
+                else
+                    stringHash = "0" + stringHash;
+                return stringHash
+            };
+            UrlFilter.startsWith = function(s, prefix)
+            {
+                return s.indexOf(prefix) == -0
+            };
+            UrlFilter.isFileUrl = function(url)
+            {
+                return UrlFilter.startsWith(url.toLowerCase(),"file:")
+            };
+            UrlFilter.removeHttpPrefix = function(url)
+            {
+                var prefix = "";
+                if(UrlFilter.startsWith(url.toLowerCase(),UrlFilter.httpsPrefix))
+                    prefix = UrlFilter.httpsPrefix;
+                else if(UrlFilter.startsWith(url.toLowerCase(),UrlFilter.httpPrefix))
+                    prefix = UrlFilter.httpPrefix;
+                var clean = url.slice(prefix.length);
+                return clean
+            };
+            UrlFilter.getUrlDomain = function(url)
+            {
+                var domain = UrlFilter.removeHttpPrefix(url);
+                domain = domain.split("/")[0];
+                domain = domain.split(":")[0];
+                return domain
+            };
+            UrlFilter.isIp4Address = function(domain)
+            {
+                var ipv4Regex = /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
+                return ipv4Regex.test(domain)
+            };
+            UrlFilter.filter = function(url)
+            {
+                if(UrlFilter.isFileUrl(url))
+                {
+                    var hash = UrlFilter.stringToHash(url);
+                    return"file://" + hash
+                }
+                var domain = UrlFilter.getUrlDomain(url);
+                if(UrlFilter.isIp4Address(domain))
+                {
+                    var hash = UrlFilter.stringToHash(url);
+                    if(UrlFilter.startsWith(domain,"10."))
+                        return"IP10Range_" + hash;
+                    else if(UrlFilter.startsWith(domain,"192."))
+                        return"IP192Range_" + hash;
+                    else if(UrlFilter.startsWith(domain,"127."))
+                        return"IP127Range_" + hash;
+                    return"IPOther_" + hash
+                }
+                return domain
+            };
+            UrlFilter.httpPrefix = "http://";
+            UrlFilter.httpsPrefix = "https://";
+            return UrlFilter
+        }();
+    function initialize(context)
+    {
+        if(!OSFAppTelemetry.enableTelemetry)
+            return;
+        if(appInfo)
+            return;
+        appInfo=new AppInfo;
+        appInfo.hostVersion=context.get_appVersion();
+        appInfo.appId=context.get_id();
+        appInfo.host=context.get_appName();
+        appInfo.browser=window.navigator.userAgent;
+        appInfo.correlationId=trimStringToLowerCase(context.get_correlationId());
+        appInfo.clientId=(new AppStorage).getClientId();
+        appInfo.appInstanceId=context.get_appInstanceId();
+        if(appInfo.appInstanceId)
+            appInfo.appInstanceId=appInfo.appInstanceId.replace(/[{}]/g,"").toLowerCase();
+        appInfo.officeJSVersion=OSF.ConstantNames.FileVersion;
+        appInfo.hostJSVersion="16.0.6807.1000";
+        if(context._wacHostEnvironment)
+            appInfo.wacHostEnvironment=context._wacHostEnvironment;
+        if(context._isFromWacAutomation !== undefined && context._isFromWacAutomation !== null)
+            appInfo.isFromWacAutomation=context._isFromWacAutomation.toString().toLowerCase();
+        var docUrl=context.get_docUrl();
+        appInfo.docUrl=omexDomainRegex.test(docUrl) ? docUrl : "";
+        var url=location.href;
+        if(url)
+            url=url.split("?")[0].split("#")[0];
+        appInfo.appURL=UrlFilter.filter(url);
+        (function getUserIdAndAssetIdFromToken(token, appInfo)
+        {
+            var xmlContent;
+            var parser;
+            var xmlDoc;
+            appInfo.assetId="";
+            appInfo.userId="";
+            try
+            {
+                xmlContent=decodeURIComponent(token);
+                parser=new DOMParser;
+                xmlDoc=parser.parseFromString(xmlContent,"text/xml");
+                var cidNode=xmlDoc.getElementsByTagName("t")[0].attributes.getNamedItem("cid");
+                var oidNode=xmlDoc.getElementsByTagName("t")[0].attributes.getNamedItem("oid");
+                if(cidNode && cidNode.nodeValue)
+                    appInfo.userId=cidNode.nodeValue;
+                else if(oidNode && oidNode.nodeValue)
+                    appInfo.userId=oidNode.nodeValue;
+                appInfo.assetId=xmlDoc.getElementsByTagName("t")[0].attributes.getNamedItem("aid").nodeValue
+            }
+            catch(e){}
+            finally
+            {
+                xmlContent=null;
+                xmlDoc=null;
+                parser=null
+            }
+        })(context.get_eToken(),appInfo);
+        appInfo.sessionId=sessionId;
+        if(typeof OTel !== "undefined")
+            OTel.OTelLogger.initialize(appInfo);
+        (function handleLifecycle()
+        {
+            var startTime=new Date;
+            var lastFocus=null;
+            var focusTime=0;
+            var finished=false;
+            var adjustFocusTime=function()
+                {
+                    if(document.hasFocus())
+                    {
+                        if(lastFocus==null)
+                            lastFocus=new Date
+                    }
+                    else if(lastFocus)
+                    {
+                        focusTime+=Math.abs((new Date).getTime() - lastFocus.getTime());
+                        lastFocus=null
+                    }
+                };
+            var eventList=[];
+            eventList.push(new Event("focus",adjustFocusTime));
+            eventList.push(new Event("blur",adjustFocusTime));
+            eventList.push(new Event("focusout",adjustFocusTime));
+            eventList.push(new Event("focusin",adjustFocusTime));
+            var exitFunction=function()
+                {
+                    for(var i=0; i < eventList.length; i++)
+                        OSF.OUtil.removeEventListener(window,eventList[i].name,eventList[i].handler);
+                    eventList.length=0;
+                    if(!finished)
+                    {
+                        if(document.hasFocus() && lastFocus)
+                        {
+                            focusTime+=Math.abs((new Date).getTime() - lastFocus.getTime());
+                            lastFocus=null
+                        }
+                        OSFAppTelemetry.onAppClosed(Math.abs((new Date).getTime() - startTime.getTime()),focusTime);
+                        finished=true
+                    }
+                };
+            eventList.push(new Event("beforeunload",exitFunction));
+            eventList.push(new Event("unload",exitFunction));
+            for(var i=0; i < eventList.length; i++)
+                OSF.OUtil.addEventListener(window,eventList[i].name,eventList[i].handler);
+            adjustFocusTime()
+        })();
+        OSFAppTelemetry.onAppActivated()
+    }
+    OSFAppTelemetry.initialize=initialize;
+    function onAppActivated()
+    {
+        if(!appInfo)
+            return;
+        (new AppStorage).enumerateLog(function(id, log)
+        {
+            return(new AppLogger).LogRawData(log)
+        },true);
+        var data=new OSFLog.AppActivatedUsageData;
+        data.SessionId=sessionId;
+        data.AppId=appInfo.appId;
+        data.AssetId=appInfo.assetId;
+        data.AppURL=appInfo.appURL;
+        data.UserId="";
+        data.ClientId=appInfo.clientId;
+        data.Browser=appInfo.browser;
+        data.Host=appInfo.host;
+        data.HostVersion=appInfo.hostVersion;
+        data.CorrelationId=trimStringToLowerCase(appInfo.correlationId);
+        data.AppSizeWidth=window.innerWidth;
+        data.AppSizeHeight=window.innerHeight;
+        data.AppInstanceId=appInfo.appInstanceId;
+        data.Message=appInfo.message;
+        data.DocUrl=appInfo.docUrl;
+        data.OfficeJSVersion=appInfo.officeJSVersion;
+        data.HostJSVersion=appInfo.hostJSVersion;
+        if(appInfo.wacHostEnvironment)
+            data.WacHostEnvironment=appInfo.wacHostEnvironment;
+        if(appInfo.isFromWacAutomation !== undefined && appInfo.isFromWacAutomation !== null)
+            data.IsFromWacAutomation=appInfo.isFromWacAutomation;
+        (new AppLogger).LogData(data)
+    }
+    OSFAppTelemetry.onAppActivated=onAppActivated;
+    function onScriptDone(scriptId, msStartTime, msResponseTime, appCorrelationId)
+    {
+        var data=new OSFLog.ScriptLoadUsageData;
+        data.CorrelationId=trimStringToLowerCase(appCorrelationId);
+        data.SessionId=sessionId;
+        data.ScriptId=scriptId;
+        data.StartTime=msStartTime;
+        data.ResponseTime=msResponseTime;
+        (new AppLogger).LogData(data)
+    }
+    OSFAppTelemetry.onScriptDone=onScriptDone;
+    function onCallDone(apiType, id, parameters, msResponseTime, errorType)
+    {
+        if(!appInfo)
+            return;
+        var data=new OSFLog.APIUsageUsageData;
+        data.CorrelationId=trimStringToLowerCase(osfControlAppCorrelationId);
+        data.SessionId=sessionId;
+        data.APIType=apiType;
+        data.APIID=id;
+        data.Parameters=parameters;
+        data.ResponseTime=msResponseTime;
+        data.ErrorType=errorType;
+        (new AppLogger).LogData(data)
+    }
+    OSFAppTelemetry.onCallDone=onCallDone;
+    function onMethodDone(id, args, msResponseTime, errorType)
+    {
+        var parameters=null;
+        if(args)
+            if(typeof args=="number")
+                parameters=String(args);
+            else if(typeof args==="object")
+                for(var index in args)
+                {
+                    if(parameters !==null)
+                        parameters+=",";
+                    else
+                        parameters="";
+                    if(typeof args[index]=="number")
+                        parameters+=String(args[index])
+                }
+            else
+                parameters="";
+        OSF.AppTelemetry.onCallDone("method",id,parameters,msResponseTime,errorType)
+    }
+    OSFAppTelemetry.onMethodDone=onMethodDone;
+    function onPropertyDone(propertyName, msResponseTime)
+    {
+        OSF.AppTelemetry.onCallDone("property",-1,propertyName,msResponseTime)
+    }
+    OSFAppTelemetry.onPropertyDone=onPropertyDone;
+    function onEventDone(id, errorType)
+    {
+        OSF.AppTelemetry.onCallDone("event",id,null,0,errorType)
+    }
+    OSFAppTelemetry.onEventDone=onEventDone;
+    function onRegisterDone(register, id, msResponseTime, errorType)
+    {
+        OSF.AppTelemetry.onCallDone(register ? "registerevent" : "unregisterevent",id,null,msResponseTime,errorType)
+    }
+    OSFAppTelemetry.onRegisterDone=onRegisterDone;
+    function onAppClosed(openTime, focusTime)
+    {
+        if(!appInfo)
+            return;
+        var data=new OSFLog.AppClosedUsageData;
+        data.CorrelationId=trimStringToLowerCase(osfControlAppCorrelationId);
+        data.SessionId=sessionId;
+        data.FocusTime=focusTime;
+        data.OpenTime=openTime;
+        data.AppSizeFinalWidth=window.innerWidth;
+        data.AppSizeFinalHeight=window.innerHeight;
+        (new AppStorage).saveLog(sessionId,data.SerializeRow())
+    }
+    OSFAppTelemetry.onAppClosed=onAppClosed;
+    function setOsfControlAppCorrelationId(correlationId)
+    {
+        osfControlAppCorrelationId=trimStringToLowerCase(correlationId)
+    }
+    OSFAppTelemetry.setOsfControlAppCorrelationId=setOsfControlAppCorrelationId;
+    function doAppInitializationLogging(isException, message)
+    {
+        var data=new OSFLog.AppInitializationUsageData;
+        data.CorrelationId=trimStringToLowerCase(osfControlAppCorrelationId);
+        data.SessionId=sessionId;
+        data.SuccessCode=isException ? 1 : 0;
+        data.Message=message;
+        (new AppLogger).LogData(data)
+    }
+    OSFAppTelemetry.doAppInitializationLogging=doAppInitializationLogging;
+    function logAppCommonMessage(message)
+    {
+        doAppInitializationLogging(false,message)
+    }
+    OSFAppTelemetry.logAppCommonMessage=logAppCommonMessage;
+    function logAppException(errorMessage)
+    {
+        doAppInitializationLogging(true,errorMessage)
+    }
+    OSFAppTelemetry.logAppException=logAppException;
+    OSF.AppTelemetry=OSFAppTelemetry
 })(OSFAppTelemetry || (OSFAppTelemetry={}));
 var OfficeExt;
 (function(OfficeExt)

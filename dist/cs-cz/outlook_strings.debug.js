@@ -1,5 +1,3 @@
-/* Version: 16.0.11030.10000 */
-
 Type.registerNamespace("_u");
 _u.ExtensibilityStrings = function()
 {
@@ -26,6 +24,7 @@ _u.ExtensibilityStrings.l_DeleteAttachmentDoesNotExist_Text = "Příloha se ned�
 _u.ExtensibilityStrings.l_DisplayNameTooLong_Text = "Minimálně jeden ze zadaných zobrazovaných názvů je moc dlouhý.";
 _u.ExtensibilityStrings.l_DisplayReplyFormHtmlBodyRequired_Text = "Parametr htmlBody je povinný.";
 _u.ExtensibilityStrings.l_DuplicateNotificationKey_Text = "Oznámení se zadaným klíčem už existuje.";
+_u.ExtensibilityStrings.l_Duplicate_Category_Error_Text = "Jedna z uvedených kategorií je již v seznamu hlavních kategorií.";
 _u.ExtensibilityStrings.l_ElevatedPermissionNeededForMethod_Text = "Je potřeba, aby zvýšené oprávnění volalo metodu: {0}.";
 _u.ExtensibilityStrings.l_ElevatedPermissionNeeded_Text = "Pro přístup k chráněným členům rozhraní JavaScript API pro Office je potřeba zvýšené oprávnění. ";
 _u.ExtensibilityStrings.l_EmailAddressTooLong_Text = "Minimálně jedna ze zadaných e-mailových adres je moc dlouhá.";
@@ -47,6 +46,8 @@ _u.ExtensibilityStrings.l_InvalidEventDates_Text = "Koncové datum předchází 
 _u.ExtensibilityStrings.l_InvalidParameterValueError_Text = "Hodnota parametru {0} je neplatná.";
 _u.ExtensibilityStrings.l_InvalidSelection_Text = "Výběr je neplatný.";
 _u.ExtensibilityStrings.l_InvalidTime_Text = "Nezadali jste platný čas.";
+_u.ExtensibilityStrings.l_Invalid_Category_Error_Text = "Byly poskytnuty neplatné kategorie.";
+_u.ExtensibilityStrings.l_Item_Not_Saved_Error_Text = "ID se nedá načíst, dokud se položka neuloží.";
 _u.ExtensibilityStrings.l_MessageInDifferentStoreError_Text = "Nejde načíst EWS ID, protože zpráva je uložená v jiném úložišti.";
 _u.ExtensibilityStrings.l_NoValidRecipientsProvided_Text = "Nebyli uvedení žádní příjemci.";
 _u.ExtensibilityStrings.l_NotificationKeyNotFound_Text = "Neexistují žádná oznámení se zadaným klíčem.";

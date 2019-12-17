@@ -1,5 +1,3 @@
-/* Version: 16.0.10827.10000 */
-
 Type.registerNamespace("_u");
 _u.ExtensibilityStrings = function()
 {
@@ -26,6 +24,7 @@ _u.ExtensibilityStrings.l_DeleteAttachmentDoesNotExist_Text = "జోడిం�
 _u.ExtensibilityStrings.l_DisplayNameTooLong_Text = "పేర్కొన్న ఒకటి లేదా అంతకంటే ఎక్కువ ప్రదర్శన పేర్లు చాలా పొడవుగా ఉన్నాయి.";
 _u.ExtensibilityStrings.l_DisplayReplyFormHtmlBodyRequired_Text = "'htmlBody' అవసరం.";
 _u.ExtensibilityStrings.l_DuplicateNotificationKey_Text = "అందించిన కీతో నోటిఫికేషన్ ఇప్పటికే ఉంది.";
+_u.ExtensibilityStrings.l_Duplicate_Category_Error_Text = "అందించిన వర్గాలలో ఒకటి ఇప్పటికే మాస్టర్ వర్గం జాబితాలో ఉంది.";
 _u.ExtensibilityStrings.l_ElevatedPermissionNeededForMethod_Text = "ఇక్కడ ఉన్న పద్ధతికి కాల్ చేసేందుకు పైస్థాయి అనుమతి అవసరం: '{0}'.";
 _u.ExtensibilityStrings.l_ElevatedPermissionNeeded_Text = "Office కోసం JavaScript API యొక్క రక్షిత సభ్యుల ప్రాప్తికి పైస్థాయి అనుమతి అవసరం.";
 _u.ExtensibilityStrings.l_EmailAddressTooLong_Text = "పేర్కొన్న ఒకటి లేదా అంతకంటే ఎక్కువ ఇమెయిల్ చిరునామాలు చాలా పొడవుగా ఉన్నాయి.";
@@ -47,6 +46,8 @@ _u.ExtensibilityStrings.l_InvalidEventDates_Text = "ప్రారంభ తే
 _u.ExtensibilityStrings.l_InvalidParameterValueError_Text = "పరామితి '{0}' విలువ చెల్లదు.";
 _u.ExtensibilityStrings.l_InvalidSelection_Text = "ఎంపిక చెల్లదు.";
 _u.ExtensibilityStrings.l_InvalidTime_Text = "ఇన్‌పుట్ చెల్లుబాటు అయ్యే తేదీని అందించడం లేదు.";
+_u.ExtensibilityStrings.l_Invalid_Category_Error_Text = "చెల్లని వర్గాలు అందించబడ్డాయి.";
+_u.ExtensibilityStrings.l_Item_Not_Saved_Error_Text = "అంశాన్ని సేవ్ చేసే వరకు idని తిరిగి పొందడం సాధ్యం కాదు.";
 _u.ExtensibilityStrings.l_MessageInDifferentStoreError_Text = "సందేశం వేరే స్టోర్‌లో సేవ్ చేయబడింది కనుక EWS IDని తిరిగి పొందడం సాధ్యం కాలేదు.";
 _u.ExtensibilityStrings.l_NoValidRecipientsProvided_Text = "చెల్లుబాటు అయ్యే గ్రహీతలు అందించబడలేదు.";
 _u.ExtensibilityStrings.l_NotificationKeyNotFound_Text = "అందించిన కీతో నోటిఫికేషన్‌లు ఉన్నాయి.";

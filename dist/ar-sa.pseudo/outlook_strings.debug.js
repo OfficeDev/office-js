@@ -1,5 +1,3 @@
-/* Version: 16.0.11030.10000 */
-
 Type.registerNamespace("_u");
 _u.ExtensibilityStrings = function()
 {
@@ -26,6 +24,7 @@ _u.ExtensibilityStrings.l_DeleteAttachmentDoesNotExist_Text = "［dLsV2］‏‏
 _u.ExtensibilityStrings.l_DisplayNameTooLong_Text = "［PlGmA］‏‏أبع[One or more of the display names provided is too long.]לף";
 _u.ExtensibilityStrings.l_DisplayReplyFormHtmlBodyRequired_Text = "［sh4OA］‏‏أبع[The 'htmlBody' is required.]לף";
 _u.ExtensibilityStrings.l_DuplicateNotificationKey_Text = "［4irY6］‏‏أبع[A notification with the provided key already exists.]לף";
+_u.ExtensibilityStrings.l_Duplicate_Category_Error_Text = "［xKaYc］‏‏أبع[One of the categories provided is already in the master category list.]לף";
 _u.ExtensibilityStrings.l_ElevatedPermissionNeededForMethod_Text = "［vpN0m］‏‏أبع[Elevated permission is required to call the method: '{0}'.]לף";
 _u.ExtensibilityStrings.l_ElevatedPermissionNeeded_Text = "［O3YaN］‏‏أبع[Elevated permission is required to access protected members of the JavaScript API for Office.]לף";
 _u.ExtensibilityStrings.l_EmailAddressTooLong_Text = "［LwH7z］‏‏أبع[One or more of the email addresses provided is too long.]לף";
@@ -47,6 +46,8 @@ _u.ExtensibilityStrings.l_InvalidEventDates_Text = "［QOLgI］‏‏أبع[The 
 _u.ExtensibilityStrings.l_InvalidParameterValueError_Text = "［R0u0v］‏‏أبع[The value of the '{0}' parameter is invalid.]לף";
 _u.ExtensibilityStrings.l_InvalidSelection_Text = "［7hTkk］‏‏أبع[The selection is invalid.]לף";
 _u.ExtensibilityStrings.l_InvalidTime_Text = "［3FI84］‏‏أبع[The input doesn't resolve to a valid time.]לף";
+_u.ExtensibilityStrings.l_Invalid_Category_Error_Text = "［Q7VEm］‏‏أبع[Invalid categories were provided.]לף";
+_u.ExtensibilityStrings.l_Item_Not_Saved_Error_Text = "［W6yB6］‏‏أبع[The id can't be retrieved until the item is saved.]לף";
 _u.ExtensibilityStrings.l_MessageInDifferentStoreError_Text = "［SE3Zc］‏‏أبع[The EWS ID can't be retrieved because the message is saved in a different store.]לף";
 _u.ExtensibilityStrings.l_NoValidRecipientsProvided_Text = "［GUfK9］‏‏أبع[No valid recipients were provided.]לף";
 _u.ExtensibilityStrings.l_NotificationKeyNotFound_Text = "［3Z6DW］‏‏أبع[There are no notifications with the provided key.]לף";

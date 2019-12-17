@@ -1,5 +1,3 @@
-/* Version: 16.0.11030.10000 */
-
 Type.registerNamespace("Strings");
 Strings.OfficeOM = function()
 {
@@ -51,7 +49,7 @@ Strings.OfficeOM.L_DataReadError = "Chyba pri čítaní údajov";
 Strings.OfficeOM.L_DataStale = "Neaktuálne údaje";
 Strings.OfficeOM.L_DataWriteError = "Chyba pri zápise údajov";
 Strings.OfficeOM.L_DataWriteReminder = "Pripomenutie zapisovania údajov";
-Strings.OfficeOM.L_DialogAddressNotTrusted = "Doména URL adresy nie je zahrnutá v elemente AppDomains v manifeste.";
+Strings.OfficeOM.L_DialogAddressNotTrusted = "Doména URL nie je zahrnutá v prvku AppDomains v manifeste a nie je subdoménou zdrojového umiestnenia.";
 Strings.OfficeOM.L_DialogAlreadyOpened = "Operácia zlyhala, pretože tento doplnok už má aktívne dialógové okno.";
 Strings.OfficeOM.L_DialogInvalidScheme = "Schéma URL adresy nie je podporovaná. Použite namiesto toho HTTPS.";
 Strings.OfficeOM.L_DialogNavigateError = "Chyba navigácie v dialógovom okne";
@@ -72,6 +70,8 @@ Strings.OfficeOM.L_GetDataIsTooLarge = "Požadovaná množina údajov je príli�
 Strings.OfficeOM.L_GetDataParametersConflict = "Uvedené parametre sú v konflikte.";
 Strings.OfficeOM.L_GetSelectionNotSupported = "Aktuálny výber nie je podporovaný.";
 Strings.OfficeOM.L_HostError = "Chyba hostiteľa";
+Strings.OfficeOM.L_ImplicitGetAuthContextMissing = "Chýba funkcia na získanie autentifikácie kontextu";
+Strings.OfficeOM.L_ImplicitNotLoaded = "Modul sa nenačíta pred získaním tokenu";
 Strings.OfficeOM.L_InValidOptionalArgument = "neplatný voliteľný argument";
 Strings.OfficeOM.L_IndexOutOfRange = "Index mimo rozsahu.";
 Strings.OfficeOM.L_InitializeNotReady = "Office.js sa ešte úplne nenačítal. Skúste to znovu neskôr alebo pridajte funkcii Office.initialize svoj inicializačný kód.";
@@ -103,7 +103,7 @@ Strings.OfficeOM.L_InvalidNode = "Neplatný uzol";
 Strings.OfficeOM.L_InvalidObjectPath = "Cesta k objektu {0} nefunguje pre to, čo sa snažíte urobiť. Ak používate objekt v rámci viacerých volaní funkcie context.sync a mimo sekvenčného spúšťania dávky .run, na spravovanie životnosti objektu použite metódy context.trackedObjects.add() a context.trackedObjects.remove().";
 Strings.OfficeOM.L_InvalidOperationInCellEditMode = "Excel je v režime úpravy bunky. Ukončite režim úprav stlačením klávesu ENTER alebo TAB alebo výberom inej bunky, a potom to skúste znova.";
 Strings.OfficeOM.L_InvalidOrTimedOutSession = "Neplatná relácia alebo relácia s uplynutým časovým limitom";
-Strings.OfficeOM.L_InvalidOrTimedOutSessionMessage = "Platnosť relácie služby Office Online uplynula alebo je relácia neplatná. Ak chcete pokračovať, obnovte stránku.";
+Strings.OfficeOM.L_InvalidOrTimedOutSessionMessage = "Platnosť relácie balíka Office uplynula alebo je neplatná. Ak chcete pokračovať, obnovte stránku.";
 Strings.OfficeOM.L_InvalidParameters = "Funkcia {0} má neplatné parametre.";
 Strings.OfficeOM.L_InvalidReadForBlankRow = "Zadaný riadok je prázdny.";
 Strings.OfficeOM.L_InvalidRequestContext = "Objekt sa nedá použiť v kontextoch rôznych žiadostí.";
@@ -191,3 +191,4 @@ Strings.OfficeOM.L_UserAbortedMessage = "Používateľ nevyjadril súhlas s povo
 Strings.OfficeOM.L_UserClickIgnore = "Používateľ sa rozhodol ignorovať toto dialógové okno.";
 Strings.OfficeOM.L_UserNotSignedIn = "V Office nie je prihlásený žiaden používateľ.";
 Strings.OfficeOM.L_ValueNotLoaded = "Hodnota výsledného objektu zatiaľ nebola načítaná. Pred čítaním vlastnosti hodnoty zavolajte príkaz context.sync() pre daný kontext požiadavky.";
+Strings.OfficeOM.L_WorkbookHiddenMessage = "Požiadavka na JavaScript API zlyhala, pretože zošit bol skrytý. Odkryte zošit a skúste to znova.";

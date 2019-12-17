@@ -1,5 +1,3 @@
-/* Version: 16.0.11030.10000 */
-
 Type.registerNamespace("Strings");
 Strings.OfficeOM = function()
 {
@@ -51,7 +49,7 @@ Strings.OfficeOM.L_DataReadError = "Greška u čitanju podataka";
 Strings.OfficeOM.L_DataStale = "Podaci nisu u toku";
 Strings.OfficeOM.L_DataWriteError = "Greška u pisanju podataka";
 Strings.OfficeOM.L_DataWriteReminder = "Data Write Reminder";
-Strings.OfficeOM.L_DialogAddressNotTrusted = "The domain of the URL is not included in the AppDomains element in the manifest.";
+Strings.OfficeOM.L_DialogAddressNotTrusted = "The domain of the URL is not included in the AppDomains element in the manifest, and is not subdomain of source location.";
 Strings.OfficeOM.L_DialogAlreadyOpened = "The operation failed because this add-in already has an active dialog.";
 Strings.OfficeOM.L_DialogInvalidScheme = "The URL scheme is not supported. Use HTTPS instead.";
 Strings.OfficeOM.L_DialogNavigateError = "Dialog Navigation Error";
@@ -72,6 +70,8 @@ Strings.OfficeOM.L_GetDataIsTooLarge = "Zahtevani skup podataka je prevelik.";
 Strings.OfficeOM.L_GetDataParametersConflict = "Navedeni parametri su neusaglašeni.";
 Strings.OfficeOM.L_GetSelectionNotSupported = "Trenutna selekcija nije podržana.";
 Strings.OfficeOM.L_HostError = "Greška hosta";
+Strings.OfficeOM.L_ImplicitGetAuthContextMissing = "The function to get authentication context is missing";
+Strings.OfficeOM.L_ImplicitNotLoaded = "The module is not loaded before acquire a token";
 Strings.OfficeOM.L_InValidOptionalArgument = "nevažeći opcionalni argument";
 Strings.OfficeOM.L_IndexOutOfRange = "Indeks je izvan opsega.";
 Strings.OfficeOM.L_InitializeNotReady = "Office.js još uvek nije potpuno učitan. Pokušajte ponovo kasnije ili postarajte se da dodate vaš kôd za pokretanje na vaš Office.initialize function.";
@@ -103,7 +103,7 @@ Strings.OfficeOM.L_InvalidNode = "Nevažeći čvor";
 Strings.OfficeOM.L_InvalidObjectPath = 'The object path \'{0}\' isn\'t working for what you\'re trying to do. If you\'re using the object across multiple "context.sync" calls and outside the sequential execution of a ".run" batch, please use the "context.trackedObjects.add()" and "context.trackedObjects.remove()" methods to manage the object\'s lifetime.';
 Strings.OfficeOM.L_InvalidOperationInCellEditMode = "Excel is in cell-editing mode. Please exit the edit mode by pressing ENTER or TAB or selecting another cell, and then try again.";
 Strings.OfficeOM.L_InvalidOrTimedOutSession = "Invalid Or Timed Out Session";
-Strings.OfficeOM.L_InvalidOrTimedOutSessionMessage = "Your Office Online session has expired or is invalid. To continue, refresh the page.";
+Strings.OfficeOM.L_InvalidOrTimedOutSessionMessage = "Your Office session has expired or is invalid. To continue, refresh the page.";
 Strings.OfficeOM.L_InvalidParameters = "Funkcija {0} ima nevažeće parametre.";
 Strings.OfficeOM.L_InvalidReadForBlankRow = "The specified row is blank.";
 Strings.OfficeOM.L_InvalidRequestContext = "Cannot use the object across different request contexts.";
@@ -191,3 +191,4 @@ Strings.OfficeOM.L_UserAbortedMessage = "The user did not consent the add-in per
 Strings.OfficeOM.L_UserClickIgnore = "The user chose to ignore the dialog box.";
 Strings.OfficeOM.L_UserNotSignedIn = "No user is signed into Office.";
 Strings.OfficeOM.L_ValueNotLoaded = 'The value of the result object has not been loaded yet. Before reading the value property, call "context.sync()" on the associated request context.';
+Strings.OfficeOM.L_WorkbookHiddenMessage = "The JavaScript API request failed because the workbook was hidden. Please unhide the workbook and try again.";

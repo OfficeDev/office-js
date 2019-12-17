@@ -1,5 +1,5 @@
 /* Excel specific API library */
-/* Version: 15.0.5159.3003 */
+/* Version: 15.0.5177.1000 */
 /*
 	Copyright (c) Microsoft Corporation.  All rights reserved.
 */
@@ -1528,7 +1528,7 @@ Microsoft.Office.Common.ServiceEndPoint.prototype={
 			{ name: "conversationId", type: String, mayBeNull: false }
 			]);
 		if (e) throw e;
-		this._conversations[conversationId]=true;
+		this._conversations[conversationId]=window.location.href;
 	},
 	unregisterConversation: function Microsoft_Office_Common_ServiceEndPoint$unregisterConversation(conversationId) {
 		var e=Function._validateParams(arguments, [
@@ -1783,6 +1783,20 @@ Microsoft.Office.Common.XdmCommunicationManager=(function () {
 			throw OsfMsAjaxFactory.msAjaxError.argument("Browser");
 		}
 	};
+	function _checkOrigin(url, origin) {
+		var res=false;
+		if ( !url || !origin || !url.length || !origin.length) {
+			return res;
+		}
+		var url_parser, org_parser;
+		url_parser=document.createElement('a');
+		org_parser=document.createElement('a');
+		url_parser.href=url;
+		org_parser.href=origin;
+		res=((url_parser.hostname==org_parser.hostname) && (url_parser.protocol==org_parser.protocol) && (url_parser.port==org_parser.port));
+		delete url_parser, org_parser;
+		return res;
+	}
 	function _receive(e) {
 		if (e.data !='') {
 			var messageObject;
@@ -1798,6 +1812,10 @@ Microsoft.Office.Common.XdmCommunicationManager=(function () {
 				var requesterUrl=(e.origin==null || e.origin=="null") ? messageObject._origin : e.origin;
 				try {
 					var serviceEndPoint=_lookupServiceEndPoint(messageObject._conversationId);
+					var conversation=serviceEndPoint._conversations[messageObject._conversationId];
+					if ( ! _checkOrigin(conversation, e.origin)) {
+						throw "Failed origin check";
+					}
 					var policyManager=serviceEndPoint.getPolicyManager();
 					if(policyManager && !policyManager.checkPermission(messageObject._conversationId, messageObject._actionName, messageObject._data)) {
 						throw "Access Denied";
@@ -1838,6 +1856,9 @@ Microsoft.Office.Common.XdmCommunicationManager=(function () {
 				}
 			} else if (messageObject._messageType===Microsoft.Office.Common.MessageType.response){
 				var clientEndPoint=_lookupClientEndPoint(messageObject._conversationId);
+				if ( ! _checkOrigin(clientEndPoint._targetUrl, e.origin) ) {
+					 throw "Failed origin check";
+				}
 				if (messageObject._responseType===Microsoft.Office.Common.ResponseType.forCalling) {
 					var callbackEntry=clientEndPoint._callbackList[messageObject._correlationId];
 					if (callbackEntry) {
@@ -1988,11 +2009,11 @@ Microsoft.Office.Common.Response.prototype.getResponseType=function Microsoft_Of
 	return this._responseType;
 };
 Microsoft.Office.Common.MessagePackager={
-	envelope: function Microsoft_Office_Common_MessagePackager$envelope(messageObject) {
-		return OsfMsAjaxFactory.msAjaxSerializer.serialize(messageObject);
+	envelope: function Microsoft_Office_Common_MessagePackager$envelope(messageObject, serializerVersion) {
+		return JSON.stringify(messageObject);
 	},
-	unenvelope: function Microsoft_Office_Common_MessagePackager$unenvelope(messageObject) {
-		return OsfMsAjaxFactory.msAjaxSerializer.deserialize(messageObject, true);
+	unenvelope: function Microsoft_Office_Common_MessagePackager$unenvelope(messageObject, serializerVersion) {
+		return JSON.parse(messageObject);
 	}
 };
 Microsoft.Office.Common.ResponseSender=function Microsoft_Office_Common_ResponseSender(requesterWindow, requesterUrl, actionName, conversationId, correlationId, responseType) {
@@ -5342,23 +5363,10 @@ var OfficeExt;
 			enumerable: true,
 			configurable: true
 		});
-		Object.defineProperty(MicrosoftAjaxFactory.prototype, "msAjaxSerializer", {
-			get: function () {
-				if (this._msAjaxSerializer==null && this.isMsAjaxLoaded()) {
-					this._msAjaxSerializer=Sys.Serialization.JavaScriptSerializer;
-				}
-				return this._msAjaxSerializer;
-			},
-			set: function (serializerClass) {
-				this._msAjaxSerializer=serializerClass;
-			},
-			enumerable: true,
-			configurable: true
-		});
 		Object.defineProperty(MicrosoftAjaxFactory.prototype, "msAjaxString", {
 			get: function () {
 				if (this._msAjaxString==null && this.isMsAjaxLoaded()) {
-					this._msAjaxSerializer=String;
+					this._msAjaxString=String;
 				}
 				return this._msAjaxString;
 			},
@@ -5386,6 +5394,7 @@ var OfficeExt;
 	OfficeExt.MicrosoftAjaxFactory=MicrosoftAjaxFactory;
 })(OfficeExt || (OfficeExt={}));
 var OsfMsAjaxFactory=new OfficeExt.MicrosoftAjaxFactory();
+var OfficeExt;
 (function (OfficeExt) {
 	var MsAjaxTypeHelper=(function () {
 		function MsAjaxTypeHelper() {
@@ -5542,10 +5551,10 @@ var OsfMsAjaxFactory=new OfficeExt.MicrosoftAjaxFactory();
 	OfficeExt.MsAjaxDebug=MsAjaxDebug;
 	if (!OsfMsAjaxFactory.isMsAjaxLoaded()) {
 		var registerTypeInternal=function registerTypeInternal(type, name, isClass) {
-			if (type.__typeName===undefined) {
+			if (type.__typeName===undefined || type.__typeName===null) {
 				type.__typeName=name;
 			}
-			if (type.__class===undefined) {
+			if (type.__class===undefined || type.__class===null) {
 				type.__class=isClass;
 			}
 		};
@@ -5760,289 +5769,6 @@ var OsfMsAjaxFactory=new OfficeExt.MicrosoftAjaxFactory();
 		OsfMsAjaxFactory.msAjaxError=MsAjaxError;
 		OsfMsAjaxFactory.msAjaxString=MsAjaxString;
 		OsfMsAjaxFactory.msAjaxDebug=MsAjaxDebug;
-	}
-})(OfficeExt || (OfficeExt={}));
-var OfficeExt;
-(function (OfficeExt) {
-	var MsAjaxJavaScriptSerializer=(function () {
-		function MsAjaxJavaScriptSerializer() {
-		}
-		MsAjaxJavaScriptSerializer._init=function () {
-			var replaceChars=['\\u0000', '\\u0001', '\\u0002', '\\u0003', '\\u0004', '\\u0005', '\\u0006', '\\u0007',
-				'\\b', '\\t', '\\n', '\\u000b', '\\f', '\\r', '\\u000e', '\\u000f', '\\u0010', '\\u0011',
-				'\\u0012', '\\u0013', '\\u0014', '\\u0015', '\\u0016', '\\u0017', '\\u0018', '\\u0019',
-				'\\u001a', '\\u001b', '\\u001c', '\\u001d', '\\u001e', '\\u001f'];
-			MsAjaxJavaScriptSerializer._charsToEscape[0]='\\';
-			MsAjaxJavaScriptSerializer._charsToEscapeRegExs['\\']=new RegExp('\\\\', 'g');
-			MsAjaxJavaScriptSerializer._escapeChars['\\']='\\\\';
-			MsAjaxJavaScriptSerializer._charsToEscape[1]='"';
-			MsAjaxJavaScriptSerializer._charsToEscapeRegExs['"']=new RegExp('"', 'g');
-			MsAjaxJavaScriptSerializer._escapeChars['"']='\\"';
-			for (var i=0; i < 32; i++) {
-				var c=String.fromCharCode(i);
-				MsAjaxJavaScriptSerializer._charsToEscape[i+2]=c;
-				MsAjaxJavaScriptSerializer._charsToEscapeRegExs[c]=new RegExp(c, 'g');
-				MsAjaxJavaScriptSerializer._escapeChars[c]=replaceChars[i];
-			}
-		};
-		MsAjaxJavaScriptSerializer.serialize=function (object) {
-			var stringBuilder=new MsAjaxStringBuilder();
-			MsAjaxJavaScriptSerializer.serializeWithBuilder(object, stringBuilder, false);
-			return stringBuilder.toString();
-		};
-		MsAjaxJavaScriptSerializer.deserialize=function (data, secure) {
-			if (data.length===0)
-				throw OfficeExt.MsAjaxError.argument('data', "Cannot deserialize empty string.");
-			try {
-				var exp=data.replace(MsAjaxJavaScriptSerializer._dateRegEx, "$1new Date($2)");
-				if (secure && MsAjaxJavaScriptSerializer._jsonRegEx.test(exp.replace(MsAjaxJavaScriptSerializer._jsonStringRegEx, '')))
-					throw null;
-				return eval('('+exp+')');
-			}
-			catch (e) {
-				throw OfficeExt.MsAjaxError.argument('data', "Cannot deserialize. The data does not correspond to valid JSON.");
-			}
-		};
-		MsAjaxJavaScriptSerializer.serializeBooleanWithBuilder=function (object, stringBuilder) {
-			stringBuilder.append(object.toString());
-		};
-		MsAjaxJavaScriptSerializer.serializeNumberWithBuilder=function (object, stringBuilder) {
-			if (isFinite(object)) {
-				stringBuilder.append(String(object));
-			}
-			else {
-				throw OfficeExt.MsAjaxError.invalidOperation("Cannot serialize non finite numbers.");
-			}
-		};
-		MsAjaxJavaScriptSerializer.serializeStringWithBuilder=function (str, stringBuilder) {
-			stringBuilder.append('"');
-			if (MsAjaxJavaScriptSerializer._escapeRegEx.test(str)) {
-				if (MsAjaxJavaScriptSerializer._charsToEscape.length===0) {
-					MsAjaxJavaScriptSerializer._init();
-				}
-				if (str.length < 128) {
-					str=str.replace(MsAjaxJavaScriptSerializer._escapeRegExGlobal, function (x) { return MsAjaxJavaScriptSerializer._escapeChars[x]; });
-				}
-				else {
-					for (var i=0; i < 34; i++) {
-						var c=MsAjaxJavaScriptSerializer._charsToEscape[i];
-						if (str.indexOf(c) !==-1) {
-							if ((navigator.userAgent.indexOf("OPR/") > -1) || (navigator.userAgent.indexOf("Firefox") > -1)) {
-								str=str.split(c).join(MsAjaxJavaScriptSerializer._escapeChars[c]);
-							}
-							else {
-								str=str.replace(MsAjaxJavaScriptSerializer._charsToEscapeRegExs[c], MsAjaxJavaScriptSerializer._escapeChars[c]);
-							}
-						}
-					}
-				}
-			}
-			stringBuilder.append(str);
-			stringBuilder.append('"');
-		};
-		MsAjaxJavaScriptSerializer.serializeWithBuilder=function (object, stringBuilder, sort, prevObjects) {
-			var i;
-			switch (typeof object) {
-				case 'object':
-					if (object) {
-						if (prevObjects) {
-							for (var j=0; j < prevObjects.length; j++) {
-								if (prevObjects[j]===object) {
-									throw OfficeExt.MsAjaxError.invalidOperation("Cannot serialize object with cyclic reference within child properties.");
-								}
-							}
-						}
-						else {
-							prevObjects=new Array();
-						}
-						try {
-							OfficeExt.MsAjaxArray.add(prevObjects, object);
-							if (OfficeExt.MsAjaxTypeHelper.isInstanceOfType(Number, object)) {
-								MsAjaxJavaScriptSerializer.serializeNumberWithBuilder(object, stringBuilder);
-							}
-							else if (OfficeExt.MsAjaxTypeHelper.isInstanceOfType(Boolean, object)) {
-								MsAjaxJavaScriptSerializer.serializeBooleanWithBuilder(object, stringBuilder);
-							}
-							else if (OfficeExt.MsAjaxTypeHelper.isInstanceOfType(String, object)) {
-								MsAjaxJavaScriptSerializer.serializeStringWithBuilder(object, stringBuilder);
-							}
-							else if (OfficeExt.MsAjaxTypeHelper.isInstanceOfType(Array, object)) {
-								stringBuilder.append('[');
-								for (i=0; i < object.length;++i) {
-									if (i > 0) {
-										stringBuilder.append(',');
-									}
-									MsAjaxJavaScriptSerializer.serializeWithBuilder(object[i], stringBuilder, false, prevObjects);
-								}
-								stringBuilder.append(']');
-							}
-							else {
-								if (OfficeExt.MsAjaxTypeHelper.isInstanceOfType(Date, object)) {
-									stringBuilder.append('"\\/Date(');
-									stringBuilder.append(object.getTime());
-									stringBuilder.append(')\\/"');
-									break;
-								}
-								var properties=[];
-								var propertyCount=0;
-								for (var name in object) {
-									if (OfficeExt.MsAjaxString.startsWith(name, '$')) {
-										continue;
-									}
-									if (name===MsAjaxJavaScriptSerializer._serverTypeFieldName && propertyCount !==0) {
-										properties[propertyCount++]=properties[0];
-										properties[0]=name;
-									}
-									else {
-										properties[propertyCount++]=name;
-									}
-								}
-								if (sort)
-									properties.sort();
-								stringBuilder.append('{');
-								var needComma=false;
-								for (i=0; i < propertyCount; i++) {
-									var value=object[properties[i]];
-									if (typeof value !=='undefined' && typeof value !=='function') {
-										if (needComma) {
-											stringBuilder.append(',');
-										}
-										else {
-											needComma=true;
-										}
-										MsAjaxJavaScriptSerializer.serializeWithBuilder(properties[i], stringBuilder, sort, prevObjects);
-										stringBuilder.append(':');
-										MsAjaxJavaScriptSerializer.serializeWithBuilder(value, stringBuilder, sort, prevObjects);
-									}
-								}
-								stringBuilder.append('}');
-							}
-						}
-						finally {
-							OfficeExt.MsAjaxArray.removeAt(prevObjects, prevObjects.length - 1);
-						}
-					}
-					else {
-						stringBuilder.append('null');
-					}
-					break;
-				case 'number':
-					MsAjaxJavaScriptSerializer.serializeNumberWithBuilder(object, stringBuilder);
-					break;
-				case 'string':
-					MsAjaxJavaScriptSerializer.serializeStringWithBuilder(object, stringBuilder);
-					break;
-				case 'boolean':
-					MsAjaxJavaScriptSerializer.serializeBooleanWithBuilder(object, stringBuilder);
-					break;
-				default:
-					stringBuilder.append('null');
-					break;
-			}
-		};
-		MsAjaxJavaScriptSerializer.__patchVersion=0;
-		MsAjaxJavaScriptSerializer._charsToEscapeRegExs=[];
-		MsAjaxJavaScriptSerializer._charsToEscape=[];
-		MsAjaxJavaScriptSerializer._dateRegEx=new RegExp('(^|[^\\\\])\\"\\\\/Date\\((-?[0-9]+)(?:[a-zA-Z]|(?:\\+|-)[0-9]{4})?\\)\\\\/\\"', 'g');
-		MsAjaxJavaScriptSerializer._escapeChars={};
-		MsAjaxJavaScriptSerializer._escapeRegEx=new RegExp('["\\\\\\x00-\\x1F]', 'i');
-		MsAjaxJavaScriptSerializer._escapeRegExGlobal=new RegExp('["\\\\\\x00-\\x1F]', 'g');
-		MsAjaxJavaScriptSerializer._jsonRegEx=new RegExp('[^,:{}\\[\\]0-9.\\-+Eaeflnr-u \\n\\r\\t]', 'g');
-		MsAjaxJavaScriptSerializer._jsonStringRegEx=new RegExp('"(\\\\.|[^"\\\\])*"', 'g');
-		MsAjaxJavaScriptSerializer._serverTypeFieldName='__type';
-		return MsAjaxJavaScriptSerializer;
-	})();
-	OfficeExt.MsAjaxJavaScriptSerializer=MsAjaxJavaScriptSerializer;
-	var MsAjaxArray=(function () {
-		function MsAjaxArray() {
-		}
-		MsAjaxArray.add=function (array, item) {
-			array[array.length]=item;
-		};
-		MsAjaxArray.removeAt=function (array, index) {
-			array.splice(index, 1);
-		};
-		MsAjaxArray.clone=function (array) {
-			if (array.length===1) {
-				return [array[0]];
-			}
-			else {
-				return Array.apply(null, array);
-			}
-		};
-		MsAjaxArray.remove=function (array, item) {
-			var index=MsAjaxArray.indexOf(array, item);
-			if (index >=0) {
-				array.splice(index, 1);
-			}
-			return (index >=0);
-		};
-		MsAjaxArray.indexOf=function (array, item, start) {
-			if (typeof (item)==="undefined")
-				return -1;
-			var length=array.length;
-			if (length !==0) {
-				start=start - 0;
-				if (isNaN(start)) {
-					start=0;
-				}
-				else {
-					if (isFinite(start)) {
-						start=start - (start % 1);
-					}
-					if (start < 0) {
-						start=Math.max(0, length+start);
-					}
-				}
-				for (var i=start; i < length; i++) {
-					if ((typeof (array[i]) !=="undefined") && (array[i]===item)) {
-						return i;
-					}
-				}
-			}
-			return -1;
-		};
-		return MsAjaxArray;
-	})();
-	OfficeExt.MsAjaxArray=MsAjaxArray;
-	var MsAjaxStringBuilder=(function () {
-		function MsAjaxStringBuilder(initialText) {
-			this._parts=(typeof (initialText) !=='undefined' && initialText !==null && initialText !=='') ?
-				[initialText.toString()] : [];
-			this._value={};
-			this._len=0;
-		}
-		MsAjaxStringBuilder.prototype.append=function (text) {
-			this._parts[this._parts.length]=text;
-		};
-		MsAjaxStringBuilder.prototype.toString=function (separator) {
-			separator=separator || '';
-			var parts=this._parts;
-			if (this._len !==parts.length) {
-				this._value={};
-				this._len=parts.length;
-			}
-			var val=this._value;
-			if (typeof (val[separator])==='undefined') {
-				if (separator !=='') {
-					for (var i=0; i < parts.length;) {
-						if ((typeof (parts[i])==='undefined') || (parts[i]==='') || (parts[i]===null)) {
-							parts.splice(i, 1);
-						}
-						else {
-							i++;
-						}
-					}
-				}
-				val[separator]=this._parts.join(separator);
-			}
-			return val[separator];
-		};
-		return MsAjaxStringBuilder;
-	})();
-	OfficeExt.MsAjaxStringBuilder=MsAjaxStringBuilder;
-	if (!OsfMsAjaxFactory.isMsAjaxLoaded()) {
-		OsfMsAjaxFactory.msAjaxSerializer=MsAjaxJavaScriptSerializer;
 	}
 })(OfficeExt || (OfficeExt={}));
 var OSF=OSF || {};
@@ -7443,6 +7169,7 @@ var OSFAppTelemetry;
 			return;
 		}
 		appInfo=new AppInfo();
+		appInfo.sessionId=sessionId;
 		appInfo.hostVersion=context.get_appVersion();
 		appInfo.appId=context.get_id();
 		appInfo.host=context.get_appName();

@@ -1,5 +1,3 @@
-/* Version: 16.0.11030.10000 */
-
 Type.registerNamespace("_u");
 _u.ExtensibilityStrings = function()
 {
@@ -26,6 +24,7 @@ _u.ExtensibilityStrings.l_DeleteAttachmentDoesNotExist_Text = "Δεν είναι
 _u.ExtensibilityStrings.l_DisplayNameTooLong_Text = "Ένα ή περισσότερα από τα εμφανιζόμενα ονόματα που παρέχονται είναι πολύ μεγάλο.";
 _u.ExtensibilityStrings.l_DisplayReplyFormHtmlBodyRequired_Text = 'Απαιτείται το στοιχείο "htmlBody".';
 _u.ExtensibilityStrings.l_DuplicateNotificationKey_Text = "Υπάρχει ήδη μια ειδοποίηση με το παρεχόμενο κλειδί.";
+_u.ExtensibilityStrings.l_Duplicate_Category_Error_Text = "Μία από τις κατηγορίες που παρέχονται είναι ήδη στη λίστα κύριων κατηγοριών.";
 _u.ExtensibilityStrings.l_ElevatedPermissionNeededForMethod_Text = "Απαιτούνται αυξημένα δικαιώματα για κλήση της μεθόδου: '{0}'.";
 _u.ExtensibilityStrings.l_ElevatedPermissionNeeded_Text = "Απαιτούνται αυξημένα δικαιώματα για πρόσβαση σε προστατευμένα μέλη του JavaScript API για το Office.";
 _u.ExtensibilityStrings.l_EmailAddressTooLong_Text = "Μία ή περισσότερες από τις διευθύνσεις email που παρέχονται είναι πολύ μεγάλη.";
@@ -47,6 +46,8 @@ _u.ExtensibilityStrings.l_InvalidEventDates_Text = "Η ημερομηνία λή
 _u.ExtensibilityStrings.l_InvalidParameterValueError_Text = 'Η τιμή της παραμέτρου "{0}" δεν είναι έγκυρη.';
 _u.ExtensibilityStrings.l_InvalidSelection_Text = "Η επιλογή δεν είναι έγκυρη.";
 _u.ExtensibilityStrings.l_InvalidTime_Text = "Τα στοιχεία εισόδου δεν αναλύονται σε έγκυρη ώρα.";
+_u.ExtensibilityStrings.l_Invalid_Category_Error_Text = "Δόθηκαν μη έγκυρες κατηγορίες.";
+_u.ExtensibilityStrings.l_Item_Not_Saved_Error_Text = "Το αναγνωριστικό δεν μπορεί να ανακτηθεί μέχρι να αποθηκευτεί το στοιχείο.";
 _u.ExtensibilityStrings.l_MessageInDifferentStoreError_Text = "Δεν είναι δυνατή η ανάκτηση του αναγνωριστικού EWS καθώς το μήνυμα έχει αποθηκευτεί σε διαφορετικό χώρο αποθήκευσης.";
 _u.ExtensibilityStrings.l_NoValidRecipientsProvided_Text = "Δεν δόθηκαν έγκυροι παραλήπτες.";
 _u.ExtensibilityStrings.l_NotificationKeyNotFound_Text = "Δεν υπάρχουν ειδοποιήσεις με το παρεχόμενο κλειδί.";

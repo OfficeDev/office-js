@@ -1,5 +1,3 @@
-/* Version: 16.0.11030.10000 */
-
 Type.registerNamespace("_u");
 _u.ExtensibilityStrings = function()
 {
@@ -26,6 +24,7 @@ _u.ExtensibilityStrings.l_DeleteAttachmentDoesNotExist_Text = "Nije moguće izbr
 _u.ExtensibilityStrings.l_DisplayNameTooLong_Text = "Neka od datih imena za prikaz su predugačka.";
 _u.ExtensibilityStrings.l_DisplayReplyFormHtmlBodyRequired_Text = "The 'htmlBody' is required.";
 _u.ExtensibilityStrings.l_DuplicateNotificationKey_Text = "A notification with the provided key already exists.";
+_u.ExtensibilityStrings.l_Duplicate_Category_Error_Text = "One of the categories provided is already in the master category list.";
 _u.ExtensibilityStrings.l_ElevatedPermissionNeededForMethod_Text = "Puna dozvola je potrebna za pozivanje ovog metoda: '{0}'.";
 _u.ExtensibilityStrings.l_ElevatedPermissionNeeded_Text = "Puna dozvola je potrebna za pristup zaštićenim članovima aplikacije JavaScript API za Office.";
 _u.ExtensibilityStrings.l_EmailAddressTooLong_Text = "Neke od datih e-adresa su predugačke.";
@@ -47,6 +46,8 @@ _u.ExtensibilityStrings.l_InvalidEventDates_Text = "Datum završetka je pre datu
 _u.ExtensibilityStrings.l_InvalidParameterValueError_Text = "The value of the '{0}' parameter is invalid.";
 _u.ExtensibilityStrings.l_InvalidSelection_Text = "The selection is invalid.";
 _u.ExtensibilityStrings.l_InvalidTime_Text = "The input doesn't resolve to a valid time.";
+_u.ExtensibilityStrings.l_Invalid_Category_Error_Text = "Invalid categories were provided.";
+_u.ExtensibilityStrings.l_Item_Not_Saved_Error_Text = "The id can't be retrieved until the item is saved.";
 _u.ExtensibilityStrings.l_MessageInDifferentStoreError_Text = "The EWS ID can't be retrieved because the message is saved in a different store.";
 _u.ExtensibilityStrings.l_NoValidRecipientsProvided_Text = "Nisu dati važeći primaoci.";
 _u.ExtensibilityStrings.l_NotificationKeyNotFound_Text = "There are no notifications with the provided key.";

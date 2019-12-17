@@ -1,5 +1,3 @@
-/* Version: 16.0.10827.10000 */
-
 Type.registerNamespace("_u");
 _u.ExtensibilityStrings = function()
 {
@@ -26,6 +24,7 @@ _u.ExtensibilityStrings.l_DeleteAttachmentDoesNotExist_Text = "ບໍ່ສາ�
 _u.ExtensibilityStrings.l_DisplayNameTooLong_Text = "ໜຶ່ງ ຫຼື ຫຼາຍກວ່າໜຶ່ງຊື່ສະແດງທີ່ລະບຸມານັ້ນຍາວເກີນໄປ.";
 _u.ExtensibilityStrings.l_DisplayReplyFormHtmlBodyRequired_Text = "ຕ້ອງລະບຸ 'htmlBody'.";
 _u.ExtensibilityStrings.l_DuplicateNotificationKey_Text = "ມີການແຈ້ງເຕືອນທີ່ມີກະແຈທີ່ລະບຸຢູ່ກ່ອນແລ້ວ.";
+_u.ExtensibilityStrings.l_Duplicate_Category_Error_Text = "ໜຶ່ງໃນໝວດໝູ່ທີ່ລະບຸນັ້ນມີຢູ່ໃນລາຍຊື່ໝວດໝູ່ຫຼັກຢູ່ກ່ອນແລ້ວ.";
 _u.ExtensibilityStrings.l_ElevatedPermissionNeededForMethod_Text = "ຕ້ອງໃຊ້ສິດອະນຸຍາດທີ່ເພີ່ມຂຶ້ນໃນການເອີ້ນວິທີ: '{0}'.";
 _u.ExtensibilityStrings.l_ElevatedPermissionNeeded_Text = "ຕ້ອງໃຊ້ສິດອະນຸຍາດທີ່ເພີ່ມຂຶ້ນໃນການເຂົ້າເຖິງສະມາຊິກທີ່ຖືກປົກປ້ອງຂອງ JavaScript API ສຳລັບ Office.";
 _u.ExtensibilityStrings.l_EmailAddressTooLong_Text = "ໜຶ່ງ ຫຼື ຫຼາຍກວ່າໜຶ່ງທີ່ຢູ່ອີເມວທີ່ລະບຸນັ້ນຍາວເກີນໄປ.";
@@ -47,6 +46,8 @@ _u.ExtensibilityStrings.l_InvalidEventDates_Text = "ວັນທີສິ້ນ�
 _u.ExtensibilityStrings.l_InvalidParameterValueError_Text = "ຄ່າພາຣາມິເຕີ '{0}' ບໍ່ຖືກຕ້ອງ.";
 _u.ExtensibilityStrings.l_InvalidSelection_Text = "ການເລືອກແມ່ນບໍ່ຖືກຕ້ອງ.";
 _u.ExtensibilityStrings.l_InvalidTime_Text = "ຂໍ້ມູນທີ່ປ້ອນເຂົ້າບໍ່ແກ້ເປັນເວລາທີ່ຖືກຕ້ອງ.";
+_u.ExtensibilityStrings.l_Invalid_Category_Error_Text = "ລະບຸໝວດໝູ່ທີ່ບໍ່ຖືກຕ້ອງ.";
+_u.ExtensibilityStrings.l_Item_Not_Saved_Error_Text = "ບໍ່ສາມາດໂຫຼດໄອດີໄດ້ຈົນກວ່າຈະບັນທຶກລາຍການ.";
 _u.ExtensibilityStrings.l_MessageInDifferentStoreError_Text = "ບໍ່ສາມາດໂຫຼດໄອດີ EWS ໄດ້ເນື່ອງຈາກຂໍ້ຄວາມຖືກບັນທຶກໄວ້ຮ້ານຄ້າອື່ນ.";
 _u.ExtensibilityStrings.l_NoValidRecipientsProvided_Text = "ບໍ່ໄດ້ລະບຸຜູ້ຮັບທີ່ຖືກຕ້ອງ.";
 _u.ExtensibilityStrings.l_NotificationKeyNotFound_Text = "ບໍ່ມີການແຈ້ງເຕືອນທີ່ໃຊ້ກະແຈທີ່ລະບຸ.";

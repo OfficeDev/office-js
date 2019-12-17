@@ -1,5 +1,3 @@
-/* Version: 16.0.11030.10000 */
-
 Type.registerNamespace("Strings");
 Strings.OfficeOM = function()
 {
@@ -51,7 +49,7 @@ Strings.OfficeOM.L_DataReadError = "Datu lasīšanas kļūda";
 Strings.OfficeOM.L_DataStale = "Dati ir novecojuši";
 Strings.OfficeOM.L_DataWriteError = "Datu rakstīšanas kļūda";
 Strings.OfficeOM.L_DataWriteReminder = "Datu rakstīšanas atgādinājums";
-Strings.OfficeOM.L_DialogAddressNotTrusted = "Vietrāža URL domēns nav iekļauts manifesta elementā AppDomains.";
+Strings.OfficeOM.L_DialogAddressNotTrusted = "URL vietrāža domēns nav iekļauts manifesta AppDomains elementā, un tas nav avota atrašanās vietas apakšdomēns.";
 Strings.OfficeOM.L_DialogAlreadyOpened = "Operācija neizdevās, jo šai pievienojumprogrammai jau ir aktīvs dialogs.";
 Strings.OfficeOM.L_DialogInvalidScheme = "URL shēma netiek atbalstīta. Tās vietā izmantojiet HTTPS.";
 Strings.OfficeOM.L_DialogNavigateError = "Dialoglodziņa navigācijas kļūda";
@@ -72,6 +70,8 @@ Strings.OfficeOM.L_GetDataIsTooLarge = "Pieprasīto datu kopa ir pārāk liela."
 Strings.OfficeOM.L_GetDataParametersConflict = "Norādītie parametri konfliktē.";
 Strings.OfficeOM.L_GetSelectionNotSupported = "Pašreizējā atlase netiek atbalstīta.";
 Strings.OfficeOM.L_HostError = "Resursdatora kļūda";
+Strings.OfficeOM.L_ImplicitGetAuthContextMissing = "Trūkst autentifikācijas konteksta noteikšanas funkcijas";
+Strings.OfficeOM.L_ImplicitNotLoaded = "Pirms marķiera iegūšanas nav ielādēts modulis ";
 Strings.OfficeOM.L_InValidOptionalArgument = "nederīgs neobligātais arguments";
 Strings.OfficeOM.L_IndexOutOfRange = "Indekss ir ārpus diapazona.";
 Strings.OfficeOM.L_InitializeNotReady = "Office.js vēl nav pilnībā ielādēts. Lūdzu, vēlāk mēģiniet vēlreiz vai nodrošiniet, lai jūsu inicializācijas kods būtu pievienots Office.initialize funkcijai.";
@@ -103,7 +103,7 @@ Strings.OfficeOM.L_InvalidNode = "Nederīgs mezgls";
 Strings.OfficeOM.L_InvalidObjectPath = "Objekta ceļš {0} nav piemērots tam, ko mēģināt darīt. Ja izmantojat objektu vairākos context.sync izsaukumos un ārpus secīgas pakešuzdevuma .run izpildes, lūdzu, izmantojiet metodi context.trackedObjects.add() un context.trackedObjects.remove(), lai pārvaldītu objekta darbības laiku.";
 Strings.OfficeOM.L_InvalidOperationInCellEditMode = "Excel darbojas šūnu rediģēšanas režīmā. Lūdzu, izejiet no rediģēšanas režīma, nospiežot taustiņu ENTER vai TAB vai izvēloties citu šūnu, un pēc tam mēģiniet vēlreiz.";
 Strings.OfficeOM.L_InvalidOrTimedOutSession = "Nederīga sesija vai iestājies taimauts";
-Strings.OfficeOM.L_InvalidOrTimedOutSessionMessage = "Jūsu Office Online sesijai beidziet derīgums, vai tā nav derīga. Lai turpinātu, atsvaidziniet lapu.";
+Strings.OfficeOM.L_InvalidOrTimedOutSessionMessage = "Jūsu Office sesijai ir beidzies derīgums, vai tas nav derīgs. Lai turpinātu, atsvaidziniet lapu.";
 Strings.OfficeOM.L_InvalidParameters = "Funkcijas {0} parametri nav derīgi.";
 Strings.OfficeOM.L_InvalidReadForBlankRow = "Norādītā rinda ir tukša.";
 Strings.OfficeOM.L_InvalidRequestContext = "Nevar izmantot objektu dažādos pieprasījuma kontekstos.";
@@ -191,3 +191,4 @@ Strings.OfficeOM.L_UserAbortedMessage = "Lietotājs nav piekritis pievienojumpro
 Strings.OfficeOM.L_UserClickIgnore = "Lietotājs izvēlējās ignorēt dialoglodziņu.";
 Strings.OfficeOM.L_UserNotSignedIn = "Office kontā nav pierakstījies neviens lietotājs.";
 Strings.OfficeOM.L_ValueNotLoaded = 'Rezultātu objekta vērtība vēl nav ielādēta. Pirms lasīt vērtības rekvizītu, saistītajā pieprasījuma kontekstā izsauciet "context.sync()".';
+Strings.OfficeOM.L_WorkbookHiddenMessage = "JavaScript API pieprasījums neizdevās, jo bija paslēpta darbgrāmata. Lūdzu parādiet darbgrāmatu un mēģiniet vēlreiz.";

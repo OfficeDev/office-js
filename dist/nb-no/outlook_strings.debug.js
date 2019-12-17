@@ -1,5 +1,3 @@
-/* Version: 16.0.11030.10000 */
-
 Type.registerNamespace("_u");
 _u.ExtensibilityStrings = function()
 {
@@ -26,6 +24,7 @@ _u.ExtensibilityStrings.l_DeleteAttachmentDoesNotExist_Text = "Vedlegget kan ikk
 _u.ExtensibilityStrings.l_DisplayNameTooLong_Text = "Ett eller flere av visningsnavnene som er angitt er for lange.";
 _u.ExtensibilityStrings.l_DisplayReplyFormHtmlBodyRequired_Text = "Krever htmlBody.";
 _u.ExtensibilityStrings.l_DuplicateNotificationKey_Text = "Det finnes allerede et varsel med den angitte nøkkelen.";
+_u.ExtensibilityStrings.l_Duplicate_Category_Error_Text = "En av de angitte kategoriene finnes allerede i listen over hovedkategorier.";
 _u.ExtensibilityStrings.l_ElevatedPermissionNeededForMethod_Text = "Forhøyet tillatelse er nødvendig for å kalle metoden: {0}.";
 _u.ExtensibilityStrings.l_ElevatedPermissionNeeded_Text = "Forhøyet tillatelse er nødvendig for å få tilgang til beskyttede medlemmer av JavaScript-API for Office.";
 _u.ExtensibilityStrings.l_EmailAddressTooLong_Text = "En eller flere av e-postadressene som er angitt er for lange.";
@@ -47,6 +46,8 @@ _u.ExtensibilityStrings.l_InvalidEventDates_Text = "Sluttdatoen kommer før star
 _u.ExtensibilityStrings.l_InvalidParameterValueError_Text = "Verdien av parameteren {0} er ugyldig.";
 _u.ExtensibilityStrings.l_InvalidSelection_Text = "Det merkede området er ugyldig.";
 _u.ExtensibilityStrings.l_InvalidTime_Text = "Inndataene løses ikke til et gyldig tidspunkt.";
+_u.ExtensibilityStrings.l_Invalid_Category_Error_Text = "Ugyldige kategorier ble angitt.";
+_u.ExtensibilityStrings.l_Item_Not_Saved_Error_Text = "IDen kan ikke hentes før elementet er lagret.";
 _u.ExtensibilityStrings.l_MessageInDifferentStoreError_Text = "Kan ikke hente EWS-ID-en fordi meldingen er lagret et annet sted.";
 _u.ExtensibilityStrings.l_NoValidRecipientsProvided_Text = "Ingen gyldige mottakere angitt.";
 _u.ExtensibilityStrings.l_NotificationKeyNotFound_Text = "Det finnes ingen varsler med den angitte nøkkelen.";

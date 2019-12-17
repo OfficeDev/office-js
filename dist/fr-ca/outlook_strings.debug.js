@@ -1,5 +1,3 @@
-/* Version: 16.0.10827.10000 */
-
 Type.registerNamespace("_u");
 _u.ExtensibilityStrings = function()
 {
@@ -14,7 +12,7 @@ _u.ExtensibilityStrings.l_AttachmentErrorName_Text = "Erreur de pièce jointe";
 _u.ExtensibilityStrings.l_AttachmentExceededSize_Text = "La pièce jointe ne peut pas être ajoutée car elle est trop volumineuse.";
 _u.ExtensibilityStrings.l_AttachmentItemIdTooLong_Text = "Un ou plusieurs des ID de pièces jointes sont trop longs.";
 _u.ExtensibilityStrings.l_AttachmentNameTooLong_Text = "Un ou plusieurs des noms de pièces jointes sont trop longs.";
-_u.ExtensibilityStrings.l_AttachmentNotSupported_Text = "Le type de pièce jointe n’est pas pris en charge.";
+_u.ExtensibilityStrings.l_AttachmentNotSupported_Text = "Ce type de pièce jointe n’est pas pris en charge.";
 _u.ExtensibilityStrings.l_AttachmentUploadGeneralFailure_Text = "La pièce jointe ne peut pas être ajoutée à l’élément.";
 _u.ExtensibilityStrings.l_AttachmentUrlTooLong_Text = "Une ou plusieurs des URL de pièces jointes sont trop longues.";
 _u.ExtensibilityStrings.l_CallSaveAsyncBeforeToken_Text = "Nous ne pouvons pas récupérer le jeton tant que l’élément n’a pas été enregistré.";
@@ -26,6 +24,7 @@ _u.ExtensibilityStrings.l_DeleteAttachmentDoesNotExist_Text = "La pièce jointe 
 _u.ExtensibilityStrings.l_DisplayNameTooLong_Text = "Un ou plusieurs des noms complets fournis sont trop longs.";
 _u.ExtensibilityStrings.l_DisplayReplyFormHtmlBodyRequired_Text = "« htmlBody » est requis.";
 _u.ExtensibilityStrings.l_DuplicateNotificationKey_Text = "Une notification est déjà associée à la clé fournie.";
+_u.ExtensibilityStrings.l_Duplicate_Category_Error_Text = "Une des catégories fournies est déjà dans la liste des catégories principales.";
 _u.ExtensibilityStrings.l_ElevatedPermissionNeededForMethod_Text = "Une autorisation élevée est requise pour appeler la méthode : « {0} ».";
 _u.ExtensibilityStrings.l_ElevatedPermissionNeeded_Text = "Une autorisation élevée est requise pour accéder aux membres protégés de l’API JavaScript pour Office.";
 _u.ExtensibilityStrings.l_EmailAddressTooLong_Text = "Une ou plusieurs des adresses de courriel sont trop longues.";
@@ -47,6 +46,8 @@ _u.ExtensibilityStrings.l_InvalidEventDates_Text = "La date de fin se produit av
 _u.ExtensibilityStrings.l_InvalidParameterValueError_Text = "La valeur du paramètre « {0} » n’est pas valide.";
 _u.ExtensibilityStrings.l_InvalidSelection_Text = "La sélection n’est pas valide.";
 _u.ExtensibilityStrings.l_InvalidTime_Text = "L’entrée ne correspond pas à une heure valide.";
+_u.ExtensibilityStrings.l_Invalid_Category_Error_Text = "Des catégories non valides ont été fournies.";
+_u.ExtensibilityStrings.l_Item_Not_Saved_Error_Text = "L'identifiant ne peut pas être obtenu tant que l'élément n'a pas été enregistré.";
 _u.ExtensibilityStrings.l_MessageInDifferentStoreError_Text = "Nous n’avons pas pu récupérer l’ID EWS, car le message est enregistré dans un autre magasin.";
 _u.ExtensibilityStrings.l_NoValidRecipientsProvided_Text = "Aucun destinataire valide n’a été indiqué.";
 _u.ExtensibilityStrings.l_NotificationKeyNotFound_Text = "Aucune notification n’est associée à la clé fournie.";

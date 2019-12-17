@@ -1,5 +1,3 @@
-/* Version: 16.0.11030.10000 */
-
 Type.registerNamespace("_u");
 _u.ExtensibilityStrings = function()
 {
@@ -26,6 +24,7 @@ _u.ExtensibilityStrings.l_DeleteAttachmentDoesNotExist_Text = "無法刪除附�
 _u.ExtensibilityStrings.l_DisplayNameTooLong_Text = "提供的一或多個顯示名稱過長。";
 _u.ExtensibilityStrings.l_DisplayReplyFormHtmlBodyRequired_Text = "必需提供 'htmlBody'。";
 _u.ExtensibilityStrings.l_DuplicateNotificationKey_Text = "已有一則含所提供之索引鍵的通知。";
+_u.ExtensibilityStrings.l_Duplicate_Category_Error_Text = "其中一個提供的類別已位於主要類別清單中。";
 _u.ExtensibilityStrings.l_ElevatedPermissionNeededForMethod_Text = "需要較高的權限，才能呼叫此方法: '{0}'。";
 _u.ExtensibilityStrings.l_ElevatedPermissionNeeded_Text = "需要較高的權限，才能存取適用於 Office 的 JavaScript API 中受保護的成員。";
 _u.ExtensibilityStrings.l_EmailAddressTooLong_Text = "提供的一或多個電子郵件地址過長。";
@@ -47,6 +46,8 @@ _u.ExtensibilityStrings.l_InvalidEventDates_Text = "結束日期早於開始日�
 _u.ExtensibilityStrings.l_InvalidParameterValueError_Text = "'{0}' 參數的值無效。";
 _u.ExtensibilityStrings.l_InvalidSelection_Text = "選取範圍無效。";
 _u.ExtensibilityStrings.l_InvalidTime_Text = "輸入未解析成有效時間。";
+_u.ExtensibilityStrings.l_Invalid_Category_Error_Text = "提供的類別無效。";
+_u.ExtensibilityStrings.l_Item_Not_Saved_Error_Text = "您必須先儲存項目才能擷取識別碼。";
 _u.ExtensibilityStrings.l_MessageInDifferentStoreError_Text = "無法擷取 EWS 識別碼，因為郵件儲存在不同的存放區。";
 _u.ExtensibilityStrings.l_NoValidRecipientsProvided_Text = "未提供有效的收件者。";
 _u.ExtensibilityStrings.l_NotificationKeyNotFound_Text = "沒有含所提供之索引鍵的通知。";

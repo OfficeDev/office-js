@@ -1,5 +1,3 @@
-/* Version: 16.0.10827.10000 */
-
 Type.registerNamespace("_u");
 _u.ExtensibilityStrings = function()
 {
@@ -26,6 +24,7 @@ _u.ExtensibilityStrings.l_DeleteAttachmentDoesNotExist_Text = "Kiambatisho hakiw
 _u.ExtensibilityStrings.l_DisplayNameTooLong_Text = "Moja au zaidi ya majina ya onyesho yaliyotolewa ni marefu sana.";
 _u.ExtensibilityStrings.l_DisplayReplyFormHtmlBodyRequired_Text = "'htmlBody' inahitajika.";
 _u.ExtensibilityStrings.l_DuplicateNotificationKey_Text = "Taarifa yenye ufunguo ulioteuliwa tayari ipo.";
+_u.ExtensibilityStrings.l_Duplicate_Category_Error_Text = "Mojawapo ya kategoria yaliyotolewa tayari ipo katika orodha ya kategoria kuu.";
 _u.ExtensibilityStrings.l_ElevatedPermissionNeededForMethod_Text = "Idhini ya juu inahitajika ili kuita mbinu: '{0}'.";
 _u.ExtensibilityStrings.l_ElevatedPermissionNeeded_Text = "Idhini ya juu inahitajika ili kufikia wanachama waliolindwa wa JavaScript API for Office.";
 _u.ExtensibilityStrings.l_EmailAddressTooLong_Text = "Moja au zaidi ya anwani za barua pepe zilizotolewa ni ndefu sana.";
@@ -47,6 +46,8 @@ _u.ExtensibilityStrings.l_InvalidEventDates_Text = "Tarehe ya mwisho inajitokeza
 _u.ExtensibilityStrings.l_InvalidParameterValueError_Text = "Thamani ya parameta '{0}' si sahihi.";
 _u.ExtensibilityStrings.l_InvalidSelection_Text = "Uteuzi si sahihi.";
 _u.ExtensibilityStrings.l_InvalidTime_Text = "Ingizo halitatuliki kuwa wakati halali.";
+_u.ExtensibilityStrings.l_Invalid_Category_Error_Text = "Kategoria za batili walitolewa.";
+_u.ExtensibilityStrings.l_Item_Not_Saved_Error_Text = "Kitambulisho hakiwezi kurejeshwa hadi kipengee kihifadhiwe.";
 _u.ExtensibilityStrings.l_MessageInDifferentStoreError_Text = "EWS ID haiwezi kurejeshwa kwa sababu ujumbe unahifadhiwa katika hifadhi tofauti.";
 _u.ExtensibilityStrings.l_NoValidRecipientsProvided_Text = "Hakuna wapokeaji halali walitolewa.";
 _u.ExtensibilityStrings.l_NotificationKeyNotFound_Text = "Hakuna taarifa zenye ufunguo ulioteuliwa.";

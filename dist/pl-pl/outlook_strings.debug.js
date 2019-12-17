@@ -1,5 +1,3 @@
-/* Version: 16.0.11030.10000 */
-
 Type.registerNamespace("_u");
 _u.ExtensibilityStrings = function()
 {
@@ -26,6 +24,7 @@ _u.ExtensibilityStrings.l_DeleteAttachmentDoesNotExist_Text = "Nie można usuną
 _u.ExtensibilityStrings.l_DisplayNameTooLong_Text = "Co najmniej jedna z podanych nazw wyświetlanych jest za długa.";
 _u.ExtensibilityStrings.l_DisplayReplyFormHtmlBodyRequired_Text = "Element „htmlBody” jest wymagany.";
 _u.ExtensibilityStrings.l_DuplicateNotificationKey_Text = "Powiadomienie z podanym kluczem już istnieje.";
+_u.ExtensibilityStrings.l_Duplicate_Category_Error_Text = "Jedna z dostarczonych kategorii jest już na głównej liście kategorii.";
 _u.ExtensibilityStrings.l_ElevatedPermissionNeededForMethod_Text = "Aby wywołać metodę: „{0}”, jest wymagany podwyższony poziom uprawnień.";
 _u.ExtensibilityStrings.l_ElevatedPermissionNeeded_Text = "Aby uzyskać dostęp do chronionych elementów członkowskich interfejsu API w języku JavaScript dla pakietu Office, jest wymagany podwyższony poziom uprawnień.";
 _u.ExtensibilityStrings.l_EmailAddressTooLong_Text = "Co najmniej jeden z podanych adresów e-mail jest za długi.";
@@ -47,6 +46,8 @@ _u.ExtensibilityStrings.l_InvalidEventDates_Text = "Data zakończenia jest wcze�
 _u.ExtensibilityStrings.l_InvalidParameterValueError_Text = "Wartość parametru „{0}” jest nieprawidłowa.";
 _u.ExtensibilityStrings.l_InvalidSelection_Text = "Zaznaczenie jest nieprawidłowe.";
 _u.ExtensibilityStrings.l_InvalidTime_Text = "Dane wejściowe nie są prawidłową godziną.";
+_u.ExtensibilityStrings.l_Invalid_Category_Error_Text = "Dostarczono nieprawidłowe kategorie.";
+_u.ExtensibilityStrings.l_Item_Not_Saved_Error_Text = "Nie można pobrać identyfikatora przed zapisaniem elementu.";
 _u.ExtensibilityStrings.l_MessageInDifferentStoreError_Text = "Nie można pobrać identyfikatora usług EWS, ponieważ wiadomość jest zapisana w innym magazynie.";
 _u.ExtensibilityStrings.l_NoValidRecipientsProvided_Text = "Nie podano żadnych prawidłowych adresatów.";
 _u.ExtensibilityStrings.l_NotificationKeyNotFound_Text = "Brak powiadomień z podanym kluczem.";

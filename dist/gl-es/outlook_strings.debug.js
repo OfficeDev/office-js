@@ -1,5 +1,3 @@
-/* Version: 16.0.11030.10000 */
-
 Type.registerNamespace("_u");
 _u.ExtensibilityStrings = function()
 {
@@ -26,6 +24,7 @@ _u.ExtensibilityStrings.l_DeleteAttachmentDoesNotExist_Text = "Non se pode elimi
 _u.ExtensibilityStrings.l_DisplayNameTooLong_Text = "Un ou máis dos nomes para mostrar fornecidos é moi longo.";
 _u.ExtensibilityStrings.l_DisplayReplyFormHtmlBodyRequired_Text = 'Requírese "htmlBody".';
 _u.ExtensibilityStrings.l_DuplicateNotificationKey_Text = "Xa existe unha notificación coa clave fornecida.";
+_u.ExtensibilityStrings.l_Duplicate_Category_Error_Text = "Unha das categorías fornecida xa está na lista de categoría principal.";
 _u.ExtensibilityStrings.l_ElevatedPermissionNeededForMethod_Text = 'Requírese un permiso elevado para chamar ao método: "{0}".';
 _u.ExtensibilityStrings.l_ElevatedPermissionNeeded_Text = "Requírese un permiso elevado para acceder a membros protexidos da API de JavaScript para Office.";
 _u.ExtensibilityStrings.l_EmailAddressTooLong_Text = "Un ou máis dos enderezos de correo electrónico fornecidos é moi longo.";
@@ -47,6 +46,8 @@ _u.ExtensibilityStrings.l_InvalidEventDates_Text = "A hora de finalización ocor
 _u.ExtensibilityStrings.l_InvalidParameterValueError_Text = 'O valor do parámetro "{0}" non é válido.';
 _u.ExtensibilityStrings.l_InvalidSelection_Text = "A selección non é válida.";
 _u.ExtensibilityStrings.l_InvalidTime_Text = "A entrada non se resolve como unha hora válida.";
+_u.ExtensibilityStrings.l_Invalid_Category_Error_Text = "Se forneceron categorías non válidas.";
+_u.ExtensibilityStrings.l_Item_Not_Saved_Error_Text = "Non se pode recuperar o ID mentres non se garde o elemento.";
 _u.ExtensibilityStrings.l_MessageInDifferentStoreError_Text = "Non se pode recuperar o ID de EWS porque a mensaxe está gardada noutro almacén.";
 _u.ExtensibilityStrings.l_NoValidRecipientsProvided_Text = "Non se forneceron destinatarios válidos.";
 _u.ExtensibilityStrings.l_NotificationKeyNotFound_Text = "Non hai notificacións coa clave fornecida.";

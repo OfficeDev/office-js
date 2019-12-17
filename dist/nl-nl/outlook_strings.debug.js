@@ -1,5 +1,3 @@
-/* Version: 16.0.11030.10000 */
-
 Type.registerNamespace("_u");
 _u.ExtensibilityStrings = function()
 {
@@ -26,6 +24,7 @@ _u.ExtensibilityStrings.l_DeleteAttachmentDoesNotExist_Text = "De bijlage kan ni
 _u.ExtensibilityStrings.l_DisplayNameTooLong_Text = "Een of meer van de opgegeven weergavenamen is te lang.";
 _u.ExtensibilityStrings.l_DisplayReplyFormHtmlBodyRequired_Text = "HtmlBody is vereist.";
 _u.ExtensibilityStrings.l_DuplicateNotificationKey_Text = "Er bestaat al een melding met de opgegeven sleutel.";
+_u.ExtensibilityStrings.l_Duplicate_Category_Error_Text = "Een van de vastgestelde categorieën is al in de lijst met hoofdcategorieën.";
 _u.ExtensibilityStrings.l_ElevatedPermissionNeededForMethod_Text = "U hebt een verhoogde machtiging nodig voor het aanroepen van de methode: '{0}'.";
 _u.ExtensibilityStrings.l_ElevatedPermissionNeeded_Text = "U hebt een verhoogde machtiging nodig voor toegang tot beschermde leden van de JavaScript-API voor Office.";
 _u.ExtensibilityStrings.l_EmailAddressTooLong_Text = "Een of meer van de opgegeven e-mailadressen is te lang.";
@@ -47,6 +46,8 @@ _u.ExtensibilityStrings.l_InvalidEventDates_Text = "De einddatum ligt voor de be
 _u.ExtensibilityStrings.l_InvalidParameterValueError_Text = "De waarde van de parameter {0} is ongeldig.";
 _u.ExtensibilityStrings.l_InvalidSelection_Text = "De selectie is ongeldig.";
 _u.ExtensibilityStrings.l_InvalidTime_Text = "De invoer kan niet worden omgezet in een geldige datum.";
+_u.ExtensibilityStrings.l_Invalid_Category_Error_Text = "Er werden ongeldige categorieën opgegeven.";
+_u.ExtensibilityStrings.l_Item_Not_Saved_Error_Text = "De id kan pas worden opgehaald als het item is opgeslagen.";
 _u.ExtensibilityStrings.l_MessageInDifferentStoreError_Text = "De EWS-id kan niet worden opgehaald, omdat het bericht is opgeslagen in een andere opslag.";
 _u.ExtensibilityStrings.l_NoValidRecipientsProvided_Text = "Er zijn geen geldige geadresseerden opgegeven.";
 _u.ExtensibilityStrings.l_NotificationKeyNotFound_Text = "Er zijn geen meldingen met de opgegeven sleutel.";

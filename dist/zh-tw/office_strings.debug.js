@@ -1,5 +1,3 @@
-/* Version: 16.0.11030.10000 */
-
 Type.registerNamespace("Strings");
 Strings.OfficeOM = function()
 {
@@ -51,7 +49,7 @@ Strings.OfficeOM.L_DataReadError = "資料讀取錯誤";
 Strings.OfficeOM.L_DataStale = "資料不是最新的";
 Strings.OfficeOM.L_DataWriteError = "資料寫入錯誤";
 Strings.OfficeOM.L_DataWriteReminder = "資料寫入提醒";
-Strings.OfficeOM.L_DialogAddressNotTrusted = "URL 的網域沒有包含在資訊清單的 AppDomains 元素中。";
+Strings.OfficeOM.L_DialogAddressNotTrusted = "URL 的網域未包含在資訊清單的 AppDomains 元素中，且不是來源位置的子網域。";
 Strings.OfficeOM.L_DialogAlreadyOpened = "作業失敗，因為這個增益集已有使用中的對話方塊。";
 Strings.OfficeOM.L_DialogInvalidScheme = "不支援 URL 配置。請改為使用 HTTPS。";
 Strings.OfficeOM.L_DialogNavigateError = "對話方塊導覽錯誤";
@@ -72,6 +70,8 @@ Strings.OfficeOM.L_GetDataIsTooLarge = "要求的資料集太大。";
 Strings.OfficeOM.L_GetDataParametersConflict = "指定的參數相衝突。";
 Strings.OfficeOM.L_GetSelectionNotSupported = "不支援目前的選取範圍。";
 Strings.OfficeOM.L_HostError = "主機錯誤";
+Strings.OfficeOM.L_ImplicitGetAuthContextMissing = "缺少取得驗證內容的功能";
+Strings.OfficeOM.L_ImplicitNotLoaded = "未在取得權杖前先載入模組";
 Strings.OfficeOM.L_InValidOptionalArgument = "無效的選擇性引數";
 Strings.OfficeOM.L_IndexOutOfRange = "索引超出範圍。";
 Strings.OfficeOM.L_InitializeNotReady = "Office.js 尚未完全載入。請稍後再試，或將您的初始化程式碼新增到 Office.initialize 函數。";
@@ -103,7 +103,7 @@ Strings.OfficeOM.L_InvalidNode = "無效的節點";
 Strings.OfficeOM.L_InvalidObjectPath = '物件路徑 \'{0}\' 不適用於您嘗試處理的狀況。如果您正在跨多個 "context.sync" 呼叫來使用物件，且處於 ".run" 批次的循序執行之外，則請使用 "context.trackedObjects.add()" 和 "context.trackedObjects.remove()" 方法來管理物件的存留期。';
 Strings.OfficeOM.L_InvalidOperationInCellEditMode = "Excel 處於儲存格編輯模式。請按 ENTER 或 TAB 或是選取另一個儲存格以結束編輯模式，然後再試一次。";
 Strings.OfficeOM.L_InvalidOrTimedOutSession = "無效或逾時的工作階段";
-Strings.OfficeOM.L_InvalidOrTimedOutSessionMessage = "您的 Office Online 工作階段已逾時或無效。若要繼續，請重新整理頁面。";
+Strings.OfficeOM.L_InvalidOrTimedOutSessionMessage = "您的 Office 會話已過期或無效。若要繼續, 請重新整理頁面。";
 Strings.OfficeOM.L_InvalidParameters = "函數 {0} 有無效的參數。";
 Strings.OfficeOM.L_InvalidReadForBlankRow = "指定的列是空白的。";
 Strings.OfficeOM.L_InvalidRequestContext = "無法使用跨不同要求內容的物件。";
@@ -191,3 +191,4 @@ Strings.OfficeOM.L_UserAbortedMessage = "使用者未同意增益集的使用權
 Strings.OfficeOM.L_UserClickIgnore = "使用者選擇略過對話方塊。";
 Strings.OfficeOM.L_UserNotSignedIn = "沒有使用者登入 Office。";
 Strings.OfficeOM.L_ValueNotLoaded = '尚未載入結果物件的值。在讀取值屬性之前，請呼叫相關聯之要求內容中的 "context.sync()"。';
+Strings.OfficeOM.L_WorkbookHiddenMessage = "JavaScript API 要求失敗，因為活頁簿已隱藏。請取消隱藏活頁簿，然後再試一次。";

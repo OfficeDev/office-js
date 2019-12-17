@@ -1,5 +1,3 @@
-/* Version: 16.0.10827.10000 */
-
 Type.registerNamespace("Strings");
 Strings.OfficeOM = function()
 {
@@ -51,7 +49,7 @@ Strings.OfficeOM.L_DataReadError = "کوائف مطالعہ نقص";
 Strings.OfficeOM.L_DataStale = "کوائف موجودہ نہیں";
 Strings.OfficeOM.L_DataWriteError = "نقص کوائف کی تحریر";
 Strings.OfficeOM.L_DataWriteReminder = "یاد دہانی کوائف کی تحریر";
-Strings.OfficeOM.L_DialogAddressNotTrusted = "آشکار میں ایپ ڈومینز عنصر میں URL کا ڈومین شامل نہیں کیا گیا ہے۔";
+Strings.OfficeOM.L_DialogAddressNotTrusted = "آشکار میں ایپ ڈومینز عنصر میں URL کا ڈومین شامل نہیں کیا گیا ہے، اور ماخذ محل وقوع کا سب ڈومین نہیں ہے۔";
 Strings.OfficeOM.L_DialogAlreadyOpened = "عمل ناکام ہوگیا ہے کیونکہ اس ایڈ-ان میں پہلے ہی سے ایک فعال ڈائلاگ ہے۔";
 Strings.OfficeOM.L_DialogInvalidScheme = "URL سکیم معاونت کردہ نہیں ہے۔ اس کے بجائے HTTPS استعمال کریں۔";
 Strings.OfficeOM.L_DialogNavigateError = "مکالمہ نیویگیشن نقص";
@@ -72,6 +70,8 @@ Strings.OfficeOM.L_GetDataIsTooLarge = "درخواست کردہ کوائف سی�
 Strings.OfficeOM.L_GetDataParametersConflict = "اختصاصی پیرامیٹر سے تعارض ہے۔";
 Strings.OfficeOM.L_GetSelectionNotSupported = "حالیہ انتخاب کی حمایت حاصل نہیں ہے۔";
 Strings.OfficeOM.L_HostError = "ہاسٹ نقص";
+Strings.OfficeOM.L_ImplicitGetAuthContextMissing = "توثیق کاری سیاق حاصل کرنے کا فعل غیر موجود ہے";
+Strings.OfficeOM.L_ImplicitNotLoaded = "ٹوکن حاصل کرنے سے قبل ماڈیول لوڈ نہیں کیا جاتا ہے";
 Strings.OfficeOM.L_InValidOptionalArgument = "غلط اختیاری دلیل";
 Strings.OfficeOM.L_IndexOutOfRange = "اشاریہ حد اطلاق سے باہر ہ۔";
 Strings.OfficeOM.L_InitializeNotReady = "Office.js ابھی تک مکمل طور پر لوڈ نہیں کی گئی ہے۔ براہ کرم بعد میں پھر کوشش کریں یا Office.initialize فعل پر اپنی ابتدائی کوڈ شامل کرنے کو یقینی بنائیں۔";
@@ -103,7 +103,7 @@ Strings.OfficeOM.L_InvalidNode = "غلط نوڈ";
 Strings.OfficeOM.L_InvalidObjectPath = 'آپ جو کام کرنے کی کوشش کر رہے ہیں آبجیکٹ راہ \'{0}\' اس کے لئے کام نہیں کر رہی ہے۔ اگر آپ آبجیکٹ کو متعدد "context.sync" کالز پر اور ایک ".run" بیچ کی تسلسل ترتیب کے باہر استعمال کر رہے ہیں تو براہ کرم آبجیکٹ کے لائف ٹائم میں اضافہ کرنے کے لئے "context.trackedObjects.add()" اور "context.trackedObjects.remove()" طریقے استعمال کریں۔';
 Strings.OfficeOM.L_InvalidOperationInCellEditMode = "Excel سیل تدوین وضع میں ہے۔ برائے مہربانی دوسرا سیل منتخب کرکے یا داخل کریں یا ٹیب دبا کر تدوین موڈ سے خروج کریں، اور پھر دوبارہ کوشش کریں۔";
 Strings.OfficeOM.L_InvalidOrTimedOutSession = "ناجائز یا سیشن کا وقت ختم ہوگیا";
-Strings.OfficeOM.L_InvalidOrTimedOutSessionMessage = "آپ کے Office Online سیشن کی مدت ختم ہوگئی ہے یا ناجائز ہے۔ جاری رکھنے کے لئے صفحے کو تازہ کریں۔";
+Strings.OfficeOM.L_InvalidOrTimedOutSessionMessage = "آپ کے Office سیشن کی مدت ختم ہوگئی ہے یا ناجائز ہے۔ جاری رکھنے کیلئے صفحہ کو تازہ کریں۔";
 Strings.OfficeOM.L_InvalidParameters = "فعل {0} غلط پیرا میٹر ہے۔";
 Strings.OfficeOM.L_InvalidReadForBlankRow = "مخصوص صف خالی ہے۔";
 Strings.OfficeOM.L_InvalidRequestContext = "آبجیکٹ کو مختلف درخواست کے سیاق و سباق میں استعمال نہیں کیا جا سکتا ہے۔";
@@ -191,3 +191,4 @@ Strings.OfficeOM.L_UserAbortedMessage = "صارف نے در اضافے کی اج
 Strings.OfficeOM.L_UserClickIgnore = "صارف نے مکالمہ خانہ کو نظر انداز کرنے کا انتخاب کیا ہے۔";
 Strings.OfficeOM.L_UserNotSignedIn = "Office میں کوئی صارف دستخط شدہ نہیں۔";
 Strings.OfficeOM.L_ValueNotLoaded = 'نتیجہ آبجیکٹ کی قدر ابھی تک لوڈ نہیں کی گئی ہے۔ خاصیت کی قدر پڑھنے سے پہلے وابستہ متن پر "context.sync()" کو کال کریں۔';
+Strings.OfficeOM.L_WorkbookHiddenMessage = "کتاب کار پوشیدہ ہونے کی وجہ سے JavaScript API کی درخواست ناکام ہو گئی ہے۔ برائے مہربانی کتاب کار کو عیاں کریں اور دوبارہ کوشش کریں۔";

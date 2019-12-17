@@ -1,5 +1,3 @@
-/* Version: 16.0.11030.10000 */
-
 Type.registerNamespace("Strings");
 Strings.OfficeOM = function()
 {
@@ -51,7 +49,7 @@ Strings.OfficeOM.L_DataReadError = "データの読み取りエラーが発生�
 Strings.OfficeOM.L_DataStale = "最新でないデータ";
 Strings.OfficeOM.L_DataWriteError = "データの書き込みエラーが発生しました";
 Strings.OfficeOM.L_DataWriteReminder = "データ書き込みのアラーム";
-Strings.OfficeOM.L_DialogAddressNotTrusted = "URL のドメインはマニフェストの AppDomains 要素に含まれていません。";
+Strings.OfficeOM.L_DialogAddressNotTrusted = "URL のドメインがマニフェストの AppDomains 要素に含まれておらず、ソースの場所のサブドメインではありません。";
 Strings.OfficeOM.L_DialogAlreadyOpened = "このアドインには既にアクティブなダイアログ ボックスがあるため、操作は失敗しました。";
 Strings.OfficeOM.L_DialogInvalidScheme = "この URL スキームはサポートされていません。代わりに HTTPS を使用します。";
 Strings.OfficeOM.L_DialogNavigateError = "ダイアログ ナビゲーション エラー";
@@ -72,6 +70,8 @@ Strings.OfficeOM.L_GetDataIsTooLarge = "要求したデータ セットはサイ
 Strings.OfficeOM.L_GetDataParametersConflict = "指定されたパラメーターが競合しています。";
 Strings.OfficeOM.L_GetSelectionNotSupported = "現在の選択内容はサポートされていません。";
 Strings.OfficeOM.L_HostError = "ホスト エラーが発生しました";
+Strings.OfficeOM.L_ImplicitGetAuthContextMissing = "認証コンテキストを取得する関数が指定されていません";
+Strings.OfficeOM.L_ImplicitNotLoaded = "トークンの取得前にモジュールが読み込まれていません";
 Strings.OfficeOM.L_InValidOptionalArgument = "オプションの引数が無効です";
 Strings.OfficeOM.L_IndexOutOfRange = "インデックスが範囲外です。";
 Strings.OfficeOM.L_InitializeNotReady = "Office.js は完全に読み込まれていません。後でやり直すか、Office.initialize 機能への初期化コードの追加を確認してください。";
@@ -103,7 +103,7 @@ Strings.OfficeOM.L_InvalidNode = "無効なノード";
 Strings.OfficeOM.L_InvalidObjectPath = 'この操作ではオブジェクト パス \'{0}\' は機能しません。オブジェクトを複数の "context.sync" 呼び出し間で使用している場合、また ".run" バッチの逐次実行以外で使用している場合は、オブジェクトの有効期間の管理には "context.trackedObjects.add()" と "context.trackedObjects.remove()"メソッドを使用してください。';
 Strings.OfficeOM.L_InvalidOperationInCellEditMode = "Excel はセル編集モードです。Enter キーまたは Tab を押すか、別のセルを選択して編集モードを終了し、もう一度お試しください。";
 Strings.OfficeOM.L_InvalidOrTimedOutSession = "セッションが無効であるか、タイムアウトになりました";
-Strings.OfficeOM.L_InvalidOrTimedOutSessionMessage = "Office オンライン セッションの期限が切れたか、無効です。続けるには、ページを更新してください。";
+Strings.OfficeOM.L_InvalidOrTimedOutSessionMessage = "Office セッションの有効期限が切れているか、無効です。続行するには、ページを更新してください。";
 Strings.OfficeOM.L_InvalidParameters = "関数 {0} に無効なパラメーターが含まれています。";
 Strings.OfficeOM.L_InvalidReadForBlankRow = "指定された行は空白です。";
 Strings.OfficeOM.L_InvalidRequestContext = "異なる要求のコンテキスト間でオブジェクトを使用することはできません。";
@@ -191,3 +191,4 @@ Strings.OfficeOM.L_UserAbortedMessage = "ユーザーがアドインのアクセ
 Strings.OfficeOM.L_UserClickIgnore = "ダイアログ ボックスを無視するようにユーザーが選択しました。";
 Strings.OfficeOM.L_UserNotSignedIn = "Office にサインイン済みのユーザーはいません。";
 Strings.OfficeOM.L_ValueNotLoaded = '結果のオブジェクトの値はまだ読み込まれていません。Value プロパティを読み取る前に、関連付けられている要求のコンテキストで "context.sync()" を呼び出します。';
+Strings.OfficeOM.L_WorkbookHiddenMessage = "ブックが非表示のため、JavaScript API 要求が失敗しました。ブックを再表示して、もう一度お試しください。";

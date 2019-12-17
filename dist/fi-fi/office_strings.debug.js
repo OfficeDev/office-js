@@ -1,5 +1,3 @@
-/* Version: 16.0.11030.10000 */
-
 Type.registerNamespace("Strings");
 Strings.OfficeOM = function()
 {
@@ -36,7 +34,7 @@ Strings.OfficeOM.L_ConnectionFailureWithStatus = "Pyyntö epäonnistui tilakoodi
 Strings.OfficeOM.L_CustomFunctionDefinitionMissing = "Excel.Script.CustomFunctions-kohteessa on oltava tämän niminen ominaisuus, joka kuvaa funktion määritystä.";
 Strings.OfficeOM.L_CustomFunctionImplementationMissing = "Excel.Script.CustomFunctions-kohteen tämän nimisessä ominaisuudessa, joka kuvaa funktion määritystä, on oltava call-ominaisuus, joka ottaa funktion käyttöön.";
 Strings.OfficeOM.L_CustomFunctionNameCannotSplit = "Funktion nimessä on oltava muu kuin tyhjä nimitila ja muu kuin tyhjä lyhyt nimi.";
-Strings.OfficeOM.L_CustomFunctionNameContainsBadChars = "Funktion nimessä voi olla ainoastaan kirjaimia, lukuja, alaviivoja ja pisteitä.";
+Strings.OfficeOM.L_CustomFunctionNameContainsBadChars = "Funktion nimessä voi olla ainoastaan kirjaimia, numeroita, alaviivoja ja pisteitä.";
 Strings.OfficeOM.L_CustomXmlError = "Mukautettu XML -virhe.";
 Strings.OfficeOM.L_CustomXmlExceedQuotaMessage = "XPath rajoittaa valinnan 1024 kohteeseen.";
 Strings.OfficeOM.L_CustomXmlExceedQuotaName = "Valinnan raja saavutettu";
@@ -51,7 +49,7 @@ Strings.OfficeOM.L_DataReadError = "Tietojen lukuvirhe";
 Strings.OfficeOM.L_DataStale = "Tiedot eivät ole ajan tasalla";
 Strings.OfficeOM.L_DataWriteError = "Virhe kirjoitettaessa tietoja";
 Strings.OfficeOM.L_DataWriteReminder = "Tietojen kirjoittamismuistutus";
-Strings.OfficeOM.L_DialogAddressNotTrusted = "URL-osoitteen toimialuetta ei ole sisällytetty manifestin AppDomains-elementtiin.";
+Strings.OfficeOM.L_DialogAddressNotTrusted = "URL-osoitteen toimi alue ei sisälly luettelo tiedoston AppDomains-elementtiin, eikä se ole lähde sijainnin aliverkkotunnus.";
 Strings.OfficeOM.L_DialogAlreadyOpened = "Toiminto epäonnistui, koska tällä apuohjelmalla on jo aktiivinen valintaikkuna.";
 Strings.OfficeOM.L_DialogInvalidScheme = "URL-malli ei ole tuettu. Käytä sen sijaan HTTPS-protokollaa.";
 Strings.OfficeOM.L_DialogNavigateError = "Valintaikkunan siirtymisvirhe";
@@ -72,6 +70,8 @@ Strings.OfficeOM.L_GetDataIsTooLarge = "Pyydetty tietojoukko on liian suuri.";
 Strings.OfficeOM.L_GetDataParametersConflict = "Määritetyt parametrit ovat ristiriidassa.";
 Strings.OfficeOM.L_GetSelectionNotSupported = "Nykyistä valintaa ei tueta.";
 Strings.OfficeOM.L_HostError = "Isäntävirhe";
+Strings.OfficeOM.L_ImplicitGetAuthContextMissing = "Käyttöoikeuskontekstin hankkimistoiminto puuttuu";
+Strings.OfficeOM.L_ImplicitNotLoaded = "Moduulia ei ole ladattu ennen tunnuksen hankkimista";
 Strings.OfficeOM.L_InValidOptionalArgument = "valinnainen argumentti ei kelpaa";
 Strings.OfficeOM.L_IndexOutOfRange = "Indeksi on alueen ulkopuolella.";
 Strings.OfficeOM.L_InitializeNotReady = "Office.js-tiedostoa ei ole vielä ladattu kokonaan. Yritä myöhemmin uudelleen tai varmista, että lisäät alustuskoodin Office.initialize-toimintoon.";
@@ -103,7 +103,7 @@ Strings.OfficeOM.L_InvalidNode = "Virheellinen solmu";
 Strings.OfficeOM.L_InvalidObjectPath = "Objektin polku {0} ei toimi tässä yhteydessä. Jos käytät objektia useissa context.sync-kutsuissa sekä .run-erän peräkkäisen suorituksen ulkopuolella, käytä context.trackedObjects.add()- ja context.trackedObjects.remove()-menetelmiä objektin elinkaaren hallintaan.";
 Strings.OfficeOM.L_InvalidOperationInCellEditMode = "Excel on solujen muokkaustilassa. Poistu muokkaustilasta painamalla Enter- tai sarkainnäppäintä tai valitsemalla toinen solu. Yritä sitten uudelleen.";
 Strings.OfficeOM.L_InvalidOrTimedOutSession = "Virheellinen tai aikakatkaistu istunto";
-Strings.OfficeOM.L_InvalidOrTimedOutSessionMessage = "Office Online -istuntosi on vanhentunut tai virheellinen. Jatka päivittämällä sivu.";
+Strings.OfficeOM.L_InvalidOrTimedOutSessionMessage = "Office-istunto on vanhentunut tai se on virheellinen. Jatka päivittämällä sivu.";
 Strings.OfficeOM.L_InvalidParameters = "Toiminnon {0} parametrit ovat virheellisiä.";
 Strings.OfficeOM.L_InvalidReadForBlankRow = "Määritetty rivi on tyhjä.";
 Strings.OfficeOM.L_InvalidRequestContext = "Objektia ei voi käyttää eri pyyntökonteksteissa.";
@@ -191,3 +191,4 @@ Strings.OfficeOM.L_UserAbortedMessage = "Käyttäjä ei antanut lupaa apuohjelma
 Strings.OfficeOM.L_UserClickIgnore = "Käyttäjä ohitti valintaikkunan.";
 Strings.OfficeOM.L_UserNotSignedIn = "Kukaan ei ole kirjautunut Officeen.";
 Strings.OfficeOM.L_ValueNotLoaded = "Tulosobjektin arvoa ei ole vielä ladattu. Kutsu arvoon liittyvässä pyyntökontekstissa context.sync() ennen arvo-ominaisuuden lukemista.";
+Strings.OfficeOM.L_WorkbookHiddenMessage = "JavaScript-ohjelmointi raja pinta pyyntö epäonnistui, koska työkirja on piilotettu. Näytä työkirja ja yritä uudelleen.";

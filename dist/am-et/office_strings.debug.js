@@ -1,5 +1,3 @@
-/* Version: 16.0.10827.10000 */
-
 Type.registerNamespace("Strings");
 Strings.OfficeOM = function()
 {
@@ -72,6 +70,8 @@ Strings.OfficeOM.L_GetDataIsTooLarge = "የተጠየቀው የውሂብ ስብ�
 Strings.OfficeOM.L_GetDataParametersConflict = "ተለይተው የተገለፁት መለክያዎች ይጋጫሉ።";
 Strings.OfficeOM.L_GetSelectionNotSupported = "አሁን የተመረጠው የሚደገፍ አይደለም።";
 Strings.OfficeOM.L_HostError = "የአስተናጋጅ ስህተት";
+Strings.OfficeOM.L_ImplicitGetAuthContextMissing = "የማረጋገጫ ዓውድ ማግኛው ተግባር አልተገኘም";
+Strings.OfficeOM.L_ImplicitNotLoaded = "ማድዩሉ ቶክን ከመገኘቱ በፊት አልተጫነም";
 Strings.OfficeOM.L_InValidOptionalArgument = "የማይሰራ አማራጭያዊ ክርክር";
 Strings.OfficeOM.L_IndexOutOfRange = "ኢንዴክስ ከአውድ ውጪ";
 Strings.OfficeOM.L_InitializeNotReady = "Office.js እስካሁን ሙሉበሙሉ አልተጫነም። እባክዎ ቆየት ብለው እንደገና ይሞክሩ ወይም የመነሻ ኮድዎን Office.መነሻ ተግባር ላይ ማከልዎ እርግጠኛ ይሁኑ።";
@@ -191,3 +191,4 @@ Strings.OfficeOM.L_UserAbortedMessage = "ተጠቃሚው የውስጥ አክል 
 Strings.OfficeOM.L_UserClickIgnore = "ተጠቃሚው የንግግር ሳጥኑን ችላ ማለትን መርጧል።";
 Strings.OfficeOM.L_UserNotSignedIn = "ማንም ወደ Office በማንነት የገባ ተጠቃሚ የለም።";
 Strings.OfficeOM.L_ValueNotLoaded = 'የእሴቱ የውጤት ነገር ገና አልተጫነም። የእሴት ባህሪ ከማንበብዎ በፊት፣ በተያያዘው የጥያቄ ይዘት ላይ "context.sync()" ይደውሉ።';
+Strings.OfficeOM.L_WorkbookHiddenMessage = "የ JavaScript API ጥያቄ አልተሳካም ምክንያቱም የሥራ ደብተሩ ተደብቆ ነበር። እባክዎ የሥራ ደብተሩን ከመደበቅ ያውጡ እና እንደገና ይሞክሩ።";

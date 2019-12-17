@@ -1,5 +1,3 @@
-/* Version: 16.0.11030.10000 */
-
 Type.registerNamespace("_u");
 _u.ExtensibilityStrings = function()
 {
@@ -26,6 +24,7 @@ _u.ExtensibilityStrings.l_DeleteAttachmentDoesNotExist_Text = "Ek dizini bulunam
 _u.ExtensibilityStrings.l_DisplayNameTooLong_Text = "Sağlanan bir veya daha fazla sayıda görünen ad çok uzun.";
 _u.ExtensibilityStrings.l_DisplayReplyFormHtmlBodyRequired_Text = "'htmlBody' gereklidir.";
 _u.ExtensibilityStrings.l_DuplicateNotificationKey_Text = "Sağlanan anahtara sahip bir bildirim zaten var.";
+_u.ExtensibilityStrings.l_Duplicate_Category_Error_Text = "Girilen kategorilerden biri zaten ana kategori listesinde.";
 _u.ExtensibilityStrings.l_ElevatedPermissionNeededForMethod_Text = "Şu yöntemi çağırmak için yükseltilmiş izin gerekir: '{0}'.";
 _u.ExtensibilityStrings.l_ElevatedPermissionNeeded_Text = "Office için JavaScript API'sinin korumalı üyelerine erişmek amacıyla yükseltilmiş izinler gerekir:.";
 _u.ExtensibilityStrings.l_EmailAddressTooLong_Text = "Sağlanan bir veya daha fazla e-posta adresi çok uzun.";
@@ -47,6 +46,8 @@ _u.ExtensibilityStrings.l_InvalidEventDates_Text = "Bitiş tarihi başlangıç t
 _u.ExtensibilityStrings.l_InvalidParameterValueError_Text = "'{0}' parametresinin değeri geçersiz.";
 _u.ExtensibilityStrings.l_InvalidSelection_Text = "Seçim geçersiz.";
 _u.ExtensibilityStrings.l_InvalidTime_Text = "Giriş, geçerli bir tarihe çözümlenemiyor.";
+_u.ExtensibilityStrings.l_Invalid_Category_Error_Text = "Geçersiz kategoriler girildi.";
+_u.ExtensibilityStrings.l_Item_Not_Saved_Error_Text = "Öğe kaydedilene kadar kimlik alınamaz.";
 _u.ExtensibilityStrings.l_MessageInDifferentStoreError_Text = "İleti farklı bir depoya kaydedildiğinden EWS kimliği alınamıyor.";
 _u.ExtensibilityStrings.l_NoValidRecipientsProvided_Text = "Geçerli alıcı bilgisi sağlanmadı.";
 _u.ExtensibilityStrings.l_NotificationKeyNotFound_Text = "Sağlanan anahtara sahip bildirim yok.";

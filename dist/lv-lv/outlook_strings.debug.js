@@ -1,5 +1,3 @@
-/* Version: 16.0.11030.10000 */
-
 Type.registerNamespace("_u");
 _u.ExtensibilityStrings = function()
 {
@@ -26,6 +24,7 @@ _u.ExtensibilityStrings.l_DeleteAttachmentDoesNotExist_Text = "Pielikumu nevar i
 _u.ExtensibilityStrings.l_DisplayNameTooLong_Text = "Vismaz viens parādāmais vārds ir pārāk garš.";
 _u.ExtensibilityStrings.l_DisplayReplyFormHtmlBodyRequired_Text = "Nepieciešams parametrs htmlBody.";
 _u.ExtensibilityStrings.l_DuplicateNotificationKey_Text = "Paziņojums ar norādīto atslēgu jau pastāv.";
+_u.ExtensibilityStrings.l_Duplicate_Category_Error_Text = "Viena no piedāvātajām kategorijām jau ir iekļauta pamatkategoriju sarakstā.";
 _u.ExtensibilityStrings.l_ElevatedPermissionNeededForMethod_Text = "Lai izsauktu metodi, nepieciešamas privileģētas atļaujas: {0}.";
 _u.ExtensibilityStrings.l_ElevatedPermissionNeeded_Text = "Lai piekļūtu aizsargātajiem JavaScript API elementiem darbam ar Office, nepieciešamas privileģētas atļaujas.";
 _u.ExtensibilityStrings.l_EmailAddressTooLong_Text = "Vismaz viena norādītā e-pasta adrese ir pārāk gara.";
@@ -47,6 +46,8 @@ _u.ExtensibilityStrings.l_InvalidEventDates_Text = "Beigu datums ir pirms sākum
 _u.ExtensibilityStrings.l_InvalidParameterValueError_Text = "Parametra {0} vērtība nav derīga.";
 _u.ExtensibilityStrings.l_InvalidSelection_Text = "Atlase nav derīga.";
 _u.ExtensibilityStrings.l_InvalidTime_Text = "Ievade netiek atrisināta kā derīgs laiks.";
+_u.ExtensibilityStrings.l_Invalid_Category_Error_Text = "Tika ievadītas nederīgas kategorijas.";
+_u.ExtensibilityStrings.l_Item_Not_Saved_Error_Text = "ID nevar izgūt, kamēr vienums nav saglabāts.";
 _u.ExtensibilityStrings.l_MessageInDifferentStoreError_Text = "EWS ID nevar izgūt, jo ziņojums ir saglabāts citā veikalā.";
 _u.ExtensibilityStrings.l_NoValidRecipientsProvided_Text = "Netika norādīts neviens derīgs adresāts.";
 _u.ExtensibilityStrings.l_NotificationKeyNotFound_Text = "Nav neviena paziņojuma ar norādīto atslēgu.";

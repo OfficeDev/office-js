@@ -1,5 +1,3 @@
-/* Version: 16.0.11030.10000 */
-
 Type.registerNamespace("_u");
 _u.ExtensibilityStrings = function()
 {
@@ -26,6 +24,7 @@ _u.ExtensibilityStrings.l_DeleteAttachmentDoesNotExist_Text = "Прикачен�
 _u.ExtensibilityStrings.l_DisplayNameTooLong_Text = "Едно или повече от предоставените показвани имена са твърде дълги.";
 _u.ExtensibilityStrings.l_DisplayReplyFormHtmlBodyRequired_Text = '"HtmlBody" е задължително.';
 _u.ExtensibilityStrings.l_DuplicateNotificationKey_Text = "Вече съществува известие с предоставения ключ.";
+_u.ExtensibilityStrings.l_Duplicate_Category_Error_Text = "Една от предоставените категории вече е в главния списък на категориите.";
 _u.ExtensibilityStrings.l_ElevatedPermissionNeededForMethod_Text = 'Изисква се разрешение на администратор за извикване на метода: "{0}".';
 _u.ExtensibilityStrings.l_ElevatedPermissionNeeded_Text = "Изисква се разрешение на администратор за достъп до защитени членове на JavaScript API за Office.";
 _u.ExtensibilityStrings.l_EmailAddressTooLong_Text = "Един или повече от предоставените имейли са твърде дълги.";
@@ -47,6 +46,8 @@ _u.ExtensibilityStrings.l_InvalidEventDates_Text = "Крайната дата е
 _u.ExtensibilityStrings.l_InvalidParameterValueError_Text = 'Стойността на параметъра "{0}" е невалидна.';
 _u.ExtensibilityStrings.l_InvalidSelection_Text = "Селекцията е невалидна.";
 _u.ExtensibilityStrings.l_InvalidTime_Text = "Въведеното не е валиден час.";
+_u.ExtensibilityStrings.l_Invalid_Category_Error_Text = "Предоставени са невалидни категории.";
+_u.ExtensibilityStrings.l_Item_Not_Saved_Error_Text = "ИД не може да бъде извлечен, докато елементът не бъде записан.";
 _u.ExtensibilityStrings.l_MessageInDifferentStoreError_Text = "ИД на EWS не може да бъде извлечен, защото съобщението е записано в друго хранилище.";
 _u.ExtensibilityStrings.l_NoValidRecipientsProvided_Text = "Едно или повече от предоставените показвани имена са твърде дълги.";
 _u.ExtensibilityStrings.l_NotificationKeyNotFound_Text = "Няма известия с предоставения ключ.";

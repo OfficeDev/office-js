@@ -1,5 +1,3 @@
-/* Version: 16.0.10827.10000 */
-
 Type.registerNamespace("_u");
 _u.ExtensibilityStrings = function()
 {
@@ -26,6 +24,7 @@ _u.ExtensibilityStrings.l_DeleteAttachmentDoesNotExist_Text = "No se pueden elim
 _u.ExtensibilityStrings.l_DisplayNameTooLong_Text = "Uno o varios nombres de pantalla proporcionados son demasiado largos.";
 _u.ExtensibilityStrings.l_DisplayReplyFormHtmlBodyRequired_Text = 'Se requiere "htmlBody".';
 _u.ExtensibilityStrings.l_DuplicateNotificationKey_Text = "Ya existe una notificación con la clave proporcionada.";
+_u.ExtensibilityStrings.l_Duplicate_Category_Error_Text = "Una de las categorías proporcionadas ya está en la lista principal de categorías.";
 _u.ExtensibilityStrings.l_ElevatedPermissionNeededForMethod_Text = 'Para llamar al método: "{0}" se necesita un permiso elevado.';
 _u.ExtensibilityStrings.l_ElevatedPermissionNeeded_Text = "Para tener acceso a los miembros protegidos de la API de JavaScript para Office se necesita un permiso elevado.";
 _u.ExtensibilityStrings.l_EmailAddressTooLong_Text = "Una o varias direcciones de correo proporcionadas son demasiado largas.";
@@ -47,6 +46,8 @@ _u.ExtensibilityStrings.l_InvalidEventDates_Text = "La fecha de finalización se
 _u.ExtensibilityStrings.l_InvalidParameterValueError_Text = 'El valor del parámetro "{0}" no es válido.';
 _u.ExtensibilityStrings.l_InvalidSelection_Text = "La selección no es válida.";
 _u.ExtensibilityStrings.l_InvalidTime_Text = "La entrada no se resuelve en una hora válida.";
+_u.ExtensibilityStrings.l_Invalid_Category_Error_Text = "Se proporcionaron categorías no válidas.";
+_u.ExtensibilityStrings.l_Item_Not_Saved_Error_Text = "No se puede recuperar el identificador hasta que se guarde el elemento.";
 _u.ExtensibilityStrings.l_MessageInDifferentStoreError_Text = "No se puede recuperar el id. de EWS porque el mensaje está guardado en otro almacén.";
 _u.ExtensibilityStrings.l_NoValidRecipientsProvided_Text = "No se proporcionaron destinatarios válidos.";
 _u.ExtensibilityStrings.l_NotificationKeyNotFound_Text = "No existe ninguna notificación con la clave proporcionada.";

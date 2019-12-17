@@ -1,5 +1,3 @@
-/* Version: 16.0.11030.10000 */
-
 Type.registerNamespace("Strings");
 Strings.OfficeOM = function()
 {
@@ -30,7 +28,7 @@ Strings.OfficeOM.L_CellFormatAmountBeyondLimits = "הערה: מומלץ שמספ
 Strings.OfficeOM.L_CloseFileBeforeRetrieve = "בצע קריאה ל- closeAsync בקובץ הנוכחי לפני אחזור קובץ אחר.";
 Strings.OfficeOM.L_CoercionTypeNotMatchBinding = "סוג הכפייה שצוין אינו תואם לסוג איגוד זה.";
 Strings.OfficeOM.L_CoercionTypeNotSupported = "סוג הכפייה שצוין אינו נתמך.";
-Strings.OfficeOM.L_ColIndexOutOfRange = "ערך אינדקס העמודות נמצא מחוץ לטווח המותר. השתמש בערך (0 ומעלה) הקטן ממספר העמודות.";
+Strings.OfficeOM.L_ColIndexOutOfRange = "ערך אינדקס העמודה נמצא מחוץ לטווח המותר. השתמש בערך (0 ומעלה) הקטן ממספר העמודות.";
 Strings.OfficeOM.L_ConnectionFailureWithDetails = "הבקשה נכשלה עם קוד המצב {0}, קוד השגיאה {1} והודעת השגיאה הבאה: {2}";
 Strings.OfficeOM.L_ConnectionFailureWithStatus = "הבקשה נכשלה עם קוד המצב {0}.";
 Strings.OfficeOM.L_CustomFunctionDefinitionMissing = "מאפיין בשם זה המייצג את הגדרת הפונקציה חייב להיות קיים ב- Excel.Script.CustomFunctions.";
@@ -51,7 +49,7 @@ Strings.OfficeOM.L_DataReadError = "שגיאה בקריאת נתונים";
 Strings.OfficeOM.L_DataStale = "הנתונים אינם עדכניים";
 Strings.OfficeOM.L_DataWriteError = "שגיאה בכתיבת נתונים";
 Strings.OfficeOM.L_DataWriteReminder = "תזכורת כתיבת נתונים";
-Strings.OfficeOM.L_DialogAddressNotTrusted = "התחום של כתובת ה- URL אינו כלול ברכיב AppDomains שבמניפסט.";
+Strings.OfficeOM.L_DialogAddressNotTrusted = "התחום של כתובת ה-URL אינו כלול ברכיב AppDomains במניפסט, והוא אינו תחום משנה של מיקום מקור.";
 Strings.OfficeOM.L_DialogAlreadyOpened = "הפעולה נכשלה מכיוון שתוספת זו כוללת כבר תיבת דו-שיח פעילה.";
 Strings.OfficeOM.L_DialogInvalidScheme = "סכימת כתובת ה- URL אינה נתמכת. השתמש ב- HTTPS במקום זאת.";
 Strings.OfficeOM.L_DialogNavigateError = "שגיאת ניווט בתיבת דו-שיח";
@@ -72,6 +70,8 @@ Strings.OfficeOM.L_GetDataIsTooLarge = "ערכת הנתונים המבוקשת �
 Strings.OfficeOM.L_GetDataParametersConflict = "הפרמטרים שצוינו מתנגשים.";
 Strings.OfficeOM.L_GetSelectionNotSupported = "הבחירה הנוכחית אינה נתמכת.";
 Strings.OfficeOM.L_HostError = "שגיאת מארח";
+Strings.OfficeOM.L_ImplicitGetAuthContextMissing = "הפונקציה לקבלת הקשר אימות חסרה";
+Strings.OfficeOM.L_ImplicitNotLoaded = "המודול לא נטען לפני השגת אסימון";
 Strings.OfficeOM.L_InValidOptionalArgument = "ארגומנט אופציונלי לא חוקי";
 Strings.OfficeOM.L_IndexOutOfRange = "האינדקס מחוץ לטווח.";
 Strings.OfficeOM.L_InitializeNotReady = "Office.js עדיין לא נטען במלואו. נסה שוב מאוחר יותר או הקפד להוסיף את קוד האתחול שלך בפונקציה Office.initialize.";
@@ -103,7 +103,7 @@ Strings.OfficeOM.L_InvalidNode = "צומת לא חוקי";
 Strings.OfficeOM.L_InvalidObjectPath = 'נתיב האובייקט \'{0}\' אינו עובד עבור הפעולה שאתה מנסה לבצע. אם אתה משתמש באובייקט בקריאות "context.sync" מרובות ומחוץ לביצוע הרציף של אצוות "‎.run", השתמש בפעולות השירות "context.trackedObjects.add()‎" ו- "context.trackedObjects.remove()‎" כדי לנהל את אורך החיים של האובייקט.';
 Strings.OfficeOM.L_InvalidOperationInCellEditMode = "Excel נמצא במצב עריכת תא. צא ממצב העריכה על-ידי הקשה על ENTER או TAB או בחירת תא אחר, ולאחר מכן נסה שוב.";
 Strings.OfficeOM.L_InvalidOrTimedOutSession = "הפעלה לא חוקית או הפעלה שהזמן הקצוב שלה הסתיים";
-Strings.OfficeOM.L_InvalidOrTimedOutSessionMessage = "תוקפה של הפעלת Office Online פג, או שההפעלה אינה חוקית. כדי להמשיך, רענן את הדף.";
+Strings.OfficeOM.L_InvalidOrTimedOutSessionMessage = "תוקף הפעלת Office פג או שאינו חוקי. כדי להמשיך, רענן את הדף.";
 Strings.OfficeOM.L_InvalidParameters = "הפונקציה {0} כוללת פרמטרים לא חוקיים.";
 Strings.OfficeOM.L_InvalidReadForBlankRow = "השורה שצוינה ריקה.";
 Strings.OfficeOM.L_InvalidRequestContext = "אין אפשרות להשתמש באובייקט בהקשרי בקשה שונים.";
@@ -149,7 +149,7 @@ Strings.OfficeOM.L_ReadSettingsError = "שגיאה בקריאת הגדרות";
 Strings.OfficeOM.L_RedundantCallbackSpecification = "אין אפשרות לציין התקשרות חזרה גם ברשימת הארגומנטים וגם באובייקט האופציונלי.";
 Strings.OfficeOM.L_RequestTimeout = "ביצוע הקריאה נמשך זמן רב מדי.";
 Strings.OfficeOM.L_RequestTokenUnavailable = "API זה ווסת כדי להאט את תדירות הקריאות.";
-Strings.OfficeOM.L_RowIndexOutOfRange = "ערך אינדקס השורות נמצא מחוץ לטווח המותר. השתמש בערך (0 ומעלה) הקטן ממספר השורות.";
+Strings.OfficeOM.L_RowIndexOutOfRange = "ערך אינדקס השורה נמצא מחוץ לטווח המותר. השתמש בערך (0 ומעלה) הקטן ממספר השורות.";
 Strings.OfficeOM.L_RunMustReturnPromise = 'פונקציית האצווה שהועברה לפעולת השירות "‎.run" לא החזירה הבטחה. הפונקציה חייבת להחזיר הבטחה, כדי שתהיה אפשרות לשחרר אובייקטים הנמצאים במעקב אוטומטי בעת השלמת פעולת האצווה. בדרך כלל, ניתן להחזיר הבטחה על-ידי החזרת התגובה מ- "context.sync()‎".';
 Strings.OfficeOM.L_SSOClientError = "אירעה שגיאה בבקשת האימות מ- Office.";
 Strings.OfficeOM.L_SSOClientErrorMessage = "אירעה שגיאה לא צפויה בלקוח.";
@@ -191,3 +191,4 @@ Strings.OfficeOM.L_UserAbortedMessage = "המשתמש לא הסכים להרשא
 Strings.OfficeOM.L_UserClickIgnore = "המשתמש בחר להתעלם מתיבת הדו-שיח.";
 Strings.OfficeOM.L_UserNotSignedIn = "אף משתמש לא נכנס ל- Office.";
 Strings.OfficeOM.L_ValueNotLoaded = 'הערך של אובייקט התוצאה עדיין לא נטען. לפני קריאת מאפיין הערך, בצע קריאה ל- "context.sync()‎" בהקשר הבקשה המשויך.';
+Strings.OfficeOM.L_WorkbookHiddenMessage = "בקשת ה- API של JavaScript נכשלה מאחר שחוברת העבודה הוסתרה. בטל את הסתרת חוברת העבודה ונסה שוב.";

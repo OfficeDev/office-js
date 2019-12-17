@@ -1,5 +1,3 @@
-/* Version: 16.0.11030.10000 */
-
 Type.registerNamespace("_u");
 _u.ExtensibilityStrings = function()
 {
@@ -26,6 +24,7 @@ _u.ExtensibilityStrings.l_DeleteAttachmentDoesNotExist_Text = "O anexo não pode
 _u.ExtensibilityStrings.l_DisplayNameTooLong_Text = "Um ou mais dos nomes a apresentar fornecidos são demasiado longos.";
 _u.ExtensibilityStrings.l_DisplayReplyFormHtmlBodyRequired_Text = '"htmlBody" é necessário.';
 _u.ExtensibilityStrings.l_DuplicateNotificationKey_Text = "Já existe uma notificação com a chave fornecida.";
+_u.ExtensibilityStrings.l_Duplicate_Category_Error_Text = "Uma das categorias fornecidas já está na lista de categorias principais.";
 _u.ExtensibilityStrings.l_ElevatedPermissionNeededForMethod_Text = 'São necessárias permissões elevadas para chamar o método: "{0}".';
 _u.ExtensibilityStrings.l_ElevatedPermissionNeeded_Text = "São necessárias permissões elevadas para aceder a membros protegidos da API de Java para Office.";
 _u.ExtensibilityStrings.l_EmailAddressTooLong_Text = "Um ou mais dos endereços de e-mail fornecidos são demasiado longos.";
@@ -47,6 +46,8 @@ _u.ExtensibilityStrings.l_InvalidEventDates_Text = "A data de fim ocorre antes d
 _u.ExtensibilityStrings.l_InvalidParameterValueError_Text = 'O valor do parâmetro "{0}" é inválido.';
 _u.ExtensibilityStrings.l_InvalidSelection_Text = "A seleção não é válida.";
 _u.ExtensibilityStrings.l_InvalidTime_Text = "Os dados introduzidos não resultam numa hora válida.";
+_u.ExtensibilityStrings.l_Invalid_Category_Error_Text = "Foram fornecidas categorias inválidas.";
+_u.ExtensibilityStrings.l_Item_Not_Saved_Error_Text = "Não é possível obter o ID enquanto o item não for guardado.";
 _u.ExtensibilityStrings.l_MessageInDifferentStoreError_Text = "Não é possível obter o ID do EWS porque a mensagem está guardada num arquivo diferente.";
 _u.ExtensibilityStrings.l_NoValidRecipientsProvided_Text = "Não foram fornecidos destinatários válidos.";
 _u.ExtensibilityStrings.l_NotificationKeyNotFound_Text = "Não existem notificações com a chave fornecida.";

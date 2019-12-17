@@ -1,5 +1,3 @@
-/* Version: 16.0.11030.10000 */
-
 Type.registerNamespace("_u");
 _u.ExtensibilityStrings = function()
 {
@@ -26,6 +24,7 @@ _u.ExtensibilityStrings.l_DeleteAttachmentDoesNotExist_Text = "[OG:Thê áttàç
 _u.ExtensibilityStrings.l_DisplayNameTooLong_Text = "[OG:Ôñê õr móré òf thê ðîsplæÿ ñàmés prøvïðéð ìs tøø löñg.瑞갂偁略 яšæẤßソ瑞갂థ్క لإَّ'Ii.]";
 _u.ExtensibilityStrings.l_DisplayReplyFormHtmlBodyRequired_Text = "[OG:Thê 'htmlÞòðý' îs rëqûïréð.瑞갂偁略 яšథ్క لإَّ'Ii.]";
 _u.ExtensibilityStrings.l_DuplicateNotificationKey_Text = "[OG:Ã ñôtífíçàtíøñ wíth thë pròvïðëð kêý ålrëáðÿ éxísts.瑞갂偁略 яšæẤßソ瑞థ్క لإَّ'Ii.]";
+_u.ExtensibilityStrings.l_Duplicate_Category_Error_Text = "[OG:Öñè öf thè ¢ãtëgórìés prøvîðëð ïs àlrêªðý ìñ thê mªstér ¢ãtégörÿ lîst.瑞갂偁略 яšæẤßソ瑞갂偁略 яథ్క لإَّ'Ii.]";
 _u.ExtensibilityStrings.l_ElevatedPermissionNeededForMethod_Text = "[:Èlêvàtéð pèrmîssíóñ ìs rêqûìrêð tõ ¢æll thé méthöð: '{0}'.瑞갂偁略 яšæẤßソ瑞갂థ్క لإَّ'Ii.]";
 _u.ExtensibilityStrings.l_ElevatedPermissionNeeded_Text = "[:Ëlévætëð pêrmïssíóñ ïs réqùïréð tó á¢çéss prõtèçtéð mêmþérs öf thë Jávà§¢rípt ÁPÎ fõr Øffì¢ë.瑞갂偁略 яšæẤßソ瑞갂偁略 яšæẤßథ్క لإَّ'Ii.]";
 _u.ExtensibilityStrings.l_EmailAddressTooLong_Text = "[OG:Õñè òr mørè øf thè êmæïl âððrêssês próvïðèð ís tøó lóñg.瑞갂偁略 яšæẤßソ瑞갂థ్క لإَّ'Ii.]";
@@ -47,6 +46,8 @@ _u.ExtensibilityStrings.l_InvalidEventDates_Text = "[:Thê èñð ðàté öçç
 _u.ExtensibilityStrings.l_InvalidParameterValueError_Text = "[OG:Thè válüé ôf thë '{0}' pãråmètér ìs îñválíð.瑞갂偁略 яšæẤßథ్క لإَّ'Ii.]";
 _u.ExtensibilityStrings.l_InvalidSelection_Text = "[OG:Thè sêlë¢tìòñ ïs îñvälíð.瑞갂偁略 яథ్క لإَّ'Ii.]";
 _u.ExtensibilityStrings.l_InvalidTime_Text = "[OG:Thë íñpüt ðòésñ't rèsòlvê tó æ vælíð tìmè.瑞갂偁略 яšæẤథ్క لإَّ'Ii.]";
+_u.ExtensibilityStrings.l_Invalid_Category_Error_Text = "[OG:Ìñvålíð çåtègórîês wèré prôvïðéð.瑞갂偁略 яšæథ్క لإَّ'Ii.]";
+_u.ExtensibilityStrings.l_Item_Not_Saved_Error_Text = "[OG:Thé íð çæñ't þê rëtríêvêð úñtïl thé îtêm ïs såvèð.瑞갂偁略 яšæẤßソథ్క لإَّ'Ii.]";
 _u.ExtensibilityStrings.l_MessageInDifferentStoreError_Text = "[OG:Thè ÈW§ ÌÐ çãñ't þë rëtríêvêð þë¢áûsé thë mëssâgè ís sªvëð îñ á ðïffèrêñt stõrë.瑞갂偁略 яšæẤßソ瑞갂偁略 яšæథ్క لإَّ'Ii.]";
 _u.ExtensibilityStrings.l_NoValidRecipientsProvided_Text = "[OG:Ñó vâlîð rèçïpíéñts wérè prõvîðêð.瑞갂偁略 яšæథ్క لإَّ'Ii.]";
 _u.ExtensibilityStrings.l_NotificationKeyNotFound_Text = "[OG:Thérè àré ñõ ñötîfï¢ätîöñs wïth thè pròvíðêð kéÿ.瑞갂偁略 яšæẤßソథ్క لإَّ'Ii.]";

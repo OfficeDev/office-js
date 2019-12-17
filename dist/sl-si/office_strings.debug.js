@@ -1,5 +1,3 @@
-/* Version: 16.0.11030.10000 */
-
 Type.registerNamespace("Strings");
 Strings.OfficeOM = function()
 {
@@ -51,7 +49,7 @@ Strings.OfficeOM.L_DataReadError = "Napaka pri branju podatkov";
 Strings.OfficeOM.L_DataStale = "Podatki niso ažurni";
 Strings.OfficeOM.L_DataWriteError = "Napaka pri pisanju podatkov";
 Strings.OfficeOM.L_DataWriteReminder = "Opomnik za zapis podatkov";
-Strings.OfficeOM.L_DialogAddressNotTrusted = "Domena URL-ja ni vključena v element AppDomains v manifestu.";
+Strings.OfficeOM.L_DialogAddressNotTrusted = "Domena URL-ja ni vključena v element AppDomains v manifestu in ni poddomena izvorne lokacije.";
 Strings.OfficeOM.L_DialogAlreadyOpened = "Postopek ni uspel, ker ima ta dodatek že aktivno pogovorno okno.";
 Strings.OfficeOM.L_DialogInvalidScheme = "Shema URL ni podprta. Namesto tega uporabite HTTPS.";
 Strings.OfficeOM.L_DialogNavigateError = "Napaka pri premikanju po pogovornem oknu";
@@ -72,6 +70,8 @@ Strings.OfficeOM.L_GetDataIsTooLarge = "Zahtevani nabor podatkov je prevelik.";
 Strings.OfficeOM.L_GetDataParametersConflict = "Navedeni parametri so v sporu.";
 Strings.OfficeOM.L_GetSelectionNotSupported = "Trenutna izbira ni podprta.";
 Strings.OfficeOM.L_HostError = "Napaka gostitelja";
+Strings.OfficeOM.L_ImplicitGetAuthContextMissing = "Manjka funkcija za pridobitev konteksta o preverjanju pristnosti";
+Strings.OfficeOM.L_ImplicitNotLoaded = "Modul ni naložen pred pridobitvijo žetona";
 Strings.OfficeOM.L_InValidOptionalArgument = "neveljaven izbirni argument";
 Strings.OfficeOM.L_IndexOutOfRange = "Indeks je zunaj obsega.";
 Strings.OfficeOM.L_InitializeNotReady = "Office.js se še ni v celoti naložil. Poskusite znova kasneje ali dodajte svojo inicializacijsko kodo funkciji »Office.initialize«.";
@@ -101,9 +101,9 @@ Strings.OfficeOM.L_InvalidGrantMessage = "Manjka odobritev za ta dodatek.";
 Strings.OfficeOM.L_InvalidNamedItemForBindingType = "Navedena vrsta vezave ni združljiva s podanim imenovanim elementom.";
 Strings.OfficeOM.L_InvalidNode = "Neveljavno vozlišče";
 Strings.OfficeOM.L_InvalidObjectPath = "Pot predmeta »{0}« ne deluje za namen, ki ga želite. Če predmet uporabljate v več klicih »context.sync« in zunaj zaporedne izvedbe paketa ».run«, uporabite medoti »context.trackedObjects.add()« in »context.trackedObjects.remove()« za upravljanje življenjskega cikla predmeta.";
-Strings.OfficeOM.L_InvalidOperationInCellEditMode = "Excel je način za urejanje celice. Zaprite način za urejanje tako, da pritisnete ENTER ali TAB ali pa izberite drugo celico in nato poskusite znova.";
+Strings.OfficeOM.L_InvalidOperationInCellEditMode = "Excel je način urejanja celice. Zaprite način urejanja tako, da pritisnete ENTER ali TAB ali pa izberite drugo celico in nato poskusite znova.";
 Strings.OfficeOM.L_InvalidOrTimedOutSession = "Neveljavna ali potekla seja";
-Strings.OfficeOM.L_InvalidOrTimedOutSessionMessage = "Vaša seja storitve Office Online je potekla ali ni veljavna. Če želite nadaljevati, osvežite stran.";
+Strings.OfficeOM.L_InvalidOrTimedOutSessionMessage = "Vaša Officeova seja je potekla ali pa ni veljavna. Če želite nadaljevati, osvežite stran.";
 Strings.OfficeOM.L_InvalidParameters = "Parametri funkcije {0} so neveljavni.";
 Strings.OfficeOM.L_InvalidReadForBlankRow = "Navedena vrstica je prazna.";
 Strings.OfficeOM.L_InvalidRequestContext = "Predmeta ni mogoče uporabiti v različnih kontekstih zahteve.";
@@ -191,3 +191,4 @@ Strings.OfficeOM.L_UserAbortedMessage = "Uporabnik se ni strinjal z dovoljenji d
 Strings.OfficeOM.L_UserClickIgnore = "Uporabnik se je odločil prezrti pogovorno okno.";
 Strings.OfficeOM.L_UserNotSignedIn = "Noben uporabnik ni vpisan v Office.";
 Strings.OfficeOM.L_ValueNotLoaded = "Vrednost predmeta rezultata še ni bila naložena. Preden preberete lastnost »Value«, v povezanem kontekstu zahteve pokličite »context.sync()«.";
+Strings.OfficeOM.L_WorkbookHiddenMessage = "JavaScript API zahteva ni uspela, ker je bil delovni zvezek skrit. Razkrijte delovni zvezek in poskusite znova.";
