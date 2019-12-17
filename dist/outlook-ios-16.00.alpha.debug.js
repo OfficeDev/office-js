@@ -1,6 +1,6 @@
 /* Outlook iOS specific API library */
-/* osfweb version: 16.0.12219.10000 */
-/* office-js-api version: 20191022.2 */
+/* osfweb version: 16.0.12312.10000 */
+/* office-js-api version: 20191121.2 */
 /*
 	Copyright (c) Microsoft Corporation.  All rights reserved.
 */
@@ -15,22 +15,7 @@
         * @version   2.3.0
 */
 /* Outlook iOS client specific API library */
-/* Version: 16.0.12219.10000 */
-/*
-	Copyright (c) Microsoft Corporation.  All rights reserved.
-*/
-
-
-/*
-    Your use of this file is governed by the Microsoft Services Agreement http://go.microsoft.com/fwlink/?LinkId=266419.
-
-    This file also contains the following Promise implementation (with a few small modifications):
-        * @overview es6-promise - a tiny implementation of Promises/A+.
-        * @copyright Copyright (c) 2014 Yehuda Katz, Tom Dale, Stefan Penner and contributors (Conversion to ES6 API by Jake Archibald)
-        * @license   Licensed under MIT license
-        *            See https://raw.githubusercontent.com/jakearchibald/es6-promise/master/LICENSE
-        * @version   2.3.0
-*/
+/* Version: 16.0.12312.10000 */
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
@@ -1124,7 +1109,8 @@ OSF.AgaveHostAction = {
     "EnableTaskPaneHeaderButton": 29,
     "DisableTaskPaneHeaderButton": 30,
     "TaskPaneHeaderButtonClicked": 31,
-    "RemoveAppCommandsAddin": 32
+    "RemoveAppCommandsAddin": 32,
+    "RefreshRibbonGallery": 33
 };
 OSF.SharedConstants = {
     "NotificationConversationIdSuffix": '_ntf'
@@ -2312,6 +2298,11 @@ OSF.DDA.Context = function OSF_DDA_Context(officeAppContext, document, license, 
     if (officeAppContext.ui && officeAppContext.ui.taskPaneAction) {
         OSF.OUtil.defineEnumerableProperty(this, "taskPaneAction", {
             value: officeAppContext.ui.taskPaneAction
+        });
+    }
+    if (officeAppContext.ui && officeAppContext.ui.ribbonGallery) {
+        OSF.OUtil.defineEnumerableProperty(this, "ribbonGallery", {
+            value: officeAppContext.ui.ribbonGallery
         });
     }
     if (officeAppContext.get_isDialog()) {
@@ -3778,8 +3769,16 @@ OSF.DDA.SafeArray.Delegate.executeAsync = function OSF_DDA_SafeArray_Delegate$Ex
             args.onCalling();
         }
         OSF.ClientHostController.execute(args.dispId, toArray(args.hostCallArgs), function OSF_DDA_SafeArrayFacade$Execute_OnResponse(hostResponseArgs, resultCode) {
-            var result = hostResponseArgs.toArray();
-            var status = result[OSF.DDA.SafeArray.Response.Status];
+            var result;
+            var status;
+            if (typeof hostResponseArgs === "number") {
+                result = [];
+                status = hostResponseArgs;
+            }
+            else {
+                result = hostResponseArgs.toArray();
+                status = result[OSF.DDA.SafeArray.Response.Status];
+            }
             if (status == OSF.DDA.ErrorCodeManager.errorCodes.ooeChunkResult) {
                 var payload = result[OSF.DDA.SafeArray.Response.Payload];
                 payload = fromSafeArray(payload);
@@ -6467,7 +6466,7 @@ var OSFAppTelemetry;
         }
         appInfo.message = context.get_hostCustomMessage();
         appInfo.officeJSVersion = OSF.ConstantNames.FileVersion;
-        appInfo.hostJSVersion = "16.0.12219.10000";
+        appInfo.hostJSVersion = "16.0.12312.10000";
         if (context._wacHostEnvironment) {
             appInfo.wacHostEnvironment = context._wacHostEnvironment;
         }
@@ -7863,7 +7862,7 @@ function createArgumentTypeError(paramName, actualType, expectedType, message) {
 
 function checkPermissionsAndThrow(permissions, namespace) {
   if (getPermissionLevel_getPermissionLevel() < permissions) {
-    createError(getString("l_ElevatedPermissionNeededForMethod_Text").replace("{0}", namespace));
+    throw createError(getString("l_ElevatedPermissionNeededForMethod_Text").replace("{0}", namespace));
   }
 }
 // CONCATENATED MODULE: ./src/utils/parseCommonArgs.ts
@@ -8360,8 +8359,6 @@ function throwOnInvalidEmailAddressDetails(originalAttendee) {
       throw createArgumentOutOfRange("recipientType");
     }
   }
-
-  throw createArgumentError("originalAttendee");
 }
 function validateDisplayFormParameters(itemId) {
   if (typeof itemId === "string") {
@@ -10015,7 +10012,7 @@ var createEmailAddressDetails = function createEmailAddressDetails(input) {
   }
 
   if (typeof input.recipientType === "number") {
-    emailAddressDetails.recipientType = type < recipientTypeMap.length ? recipientTypeMap[response] : RecipientType.Other;
+    emailAddressDetails.recipientType = type < recipientTypeMap.length ? recipientTypeMap[type] : RecipientType.Other;
   }
 
   return emailAddressDetails;
@@ -10594,6 +10591,7 @@ function dateToDictionary(date) {
 
 
 
+
 var EntityKeys;
 
 (function (EntityKeys) {
@@ -10609,17 +10607,31 @@ var EntityKeys;
 })(EntityKeys || (EntityKeys = {}));
 
 function createEntities(data) {
-  return {
-    addresses: createEntities_createAddresses(data[EntityKeys.address]),
-    emailAddresses: createEntities_createEmailAddresses(data[EntityKeys.emailAddress]),
-    urls: createUrls(data[EntityKeys.url]),
-    taskSuggestions: createEntities_createTaskSuggestions(data[EntityKeys.taskSuggestion]),
-    meetingSuggestions: createEntities_createMeetingSuggestions(data[EntityKeys.meetingSuggestion]),
-    phoneNumbers: createPhoneNumbers(data[EntityKeys.phoneNumber]),
-    contacts: createEntities_createContacts(data[EntityKeys.contact]),
-    flightReservations: createEntities_createReadItemArray(data[EntityKeys.flightReservations]),
-    parcelDelivery: createEntities_createReadItemArray(data[EntityKeys.parcelDeliveries])
-  };
+  if (isNullOrUndefined(data)) {
+    return {
+      addresses: [],
+      emailAddresses: [],
+      urls: [],
+      taskSuggestions: [],
+      meetingSuggestions: [],
+      phoneNumbers: [],
+      contacts: [],
+      flightReservations: [],
+      parcelDelivery: []
+    };
+  } else {
+    return {
+      addresses: createEntities_createAddresses(data[EntityKeys.address]),
+      emailAddresses: createEntities_createEmailAddresses(data[EntityKeys.emailAddress]),
+      urls: createUrls(data[EntityKeys.url]),
+      taskSuggestions: createEntities_createTaskSuggestions(data[EntityKeys.taskSuggestion]),
+      meetingSuggestions: createEntities_createMeetingSuggestions(data[EntityKeys.meetingSuggestion]),
+      phoneNumbers: createPhoneNumbers(data[EntityKeys.phoneNumber]),
+      contacts: createEntities_createContacts(data[EntityKeys.contact]),
+      flightReservations: createEntities_createReadItemArray(data[EntityKeys.flightReservations]),
+      parcelDelivery: createEntities_createReadItemArray(data[EntityKeys.parcelDeliveries])
+    };
+  }
 }
 function createFilteredEntities(data, name) {
   checkPermissionsAndThrow(1, "item.getFilteredEntitiesByName");
@@ -10863,7 +10875,324 @@ function convertAttachmentType(attachmentDetails) {
 
   return attachmentDetails;
 }
+// CONCATENATED MODULE: ./src/methods/deepClone.ts
+function deepClone(original) {
+  return JSON.parse(JSON.stringify(original));
+}
+// CONCATENATED MODULE: ./src/validation/seriesTimeConstants.ts
+var StartYearKey = "startYear";
+var StartMonthKey = "startMonth";
+var StartDayKey = "startDay";
+var EndYearKey = "endYear";
+var EndMonthKey = "endMonth";
+var EndDayKey = "endDay";
+var NoEndDateKey = "noEndDate";
+var StartTimeMinKey = "startTimeMin";
+var DurationMinKey = "durationMin";
+// CONCATENATED MODULE: ./src/validation/recurrenceConstants.ts
+var StartDateKey = "startDate";
+var EndDateKey = "endDate";
+var StartTimeKey = "startTime";
+var EndTimeKey = "endTime";
+var RecurrenceTypeKey = "recurrenceType";
+var SeriesTimeKey = "seriesTime";
+var SeriesTimeJsonKey = "seriesTimeJson";
+var RecurrenceTimeZoneKey = "recurrenceTimeZone";
+var RecurrenceTimeZoneName = "name";
+var RecurrencePropertiesKey = "recurrenceProperties";
+var IntervalKey = "interval";
+var DaysKey = "days";
+var DayOfMonthKey = "dayOfMonth";
+var DayOfWeekKey = "dayOfWeek";
+var WeekNumberKey = "weekNumber";
+var MonthKey = "month";
+var FirstDayOfWeekKey = "firstDayOfWeek";
+// CONCATENATED MODULE: ./src/utils/seriesTimeUtils.ts
+
+
+
+function prependZeroToString(number) {
+  if (number < 0) {
+    number = 1;
+  }
+
+  if (number < 10) {
+    return "0" + number.toString();
+  }
+
+  return number.toString();
+}
+function throwOnInvalidDate(year, month, day) {
+  if (!isValidDate(year, month, day)) {
+    throw createArgumentError(SeriesTimeKey, getString("l_InvalidDate_Text"));
+  }
+}
+function isValidDate(year, month, day) {
+  if (year < 1601 || month < 1 || month > 12 || day < 1 || day > 31) {
+    return false;
+  }
+
+  return true;
+}
+function throwOnInvalidDateString(dateString) {
+  var regEx = new RegExp("^\\d{4}-(?:[0]\\d|1[0-2])-(?:[0-2]\\d|3[01])$");
+
+  if (!regEx.test(dateString)) {
+    throw createArgumentError(SeriesTimeKey, getString("l_InvalidDate_Text"));
+  }
+}
+// CONCATENATED MODULE: ./src/api/SeriesTime.ts
+
+
+
+
+
+
+var SeriesTime_SeriesTime = function () {
+  function SeriesTime() {
+    this.startYear = 0;
+    this.startMonth = 0;
+    this.startDay = 0;
+    this.endYear = 0;
+    this.endMonth = 0;
+    this.endDay = 0;
+    this.startTimeMinutes = 0;
+    this.durationMinutes = 0;
+  }
+
+  SeriesTime.prototype.getDuration = function () {
+    return this.durationMinutes;
+  };
+
+  SeriesTime.prototype.getEndTime = function () {
+    var endTimeMinutes = this.startTimeMinutes + this.durationMinutes;
+    var minutes = endTimeMinutes % 60;
+    var hours = Math.floor(endTimeMinutes / 60) % 24;
+    return "T" + prependZeroToString(hours) + ":" + prependZeroToString(minutes) + ":00.000";
+  };
+
+  SeriesTime.prototype.getEndDate = function () {
+    if (this.endYear === 0 && this.endMonth === 0 && this.endDay === 0) {
+      return null;
+    }
+
+    return this.endYear.toString() + "-" + prependZeroToString(this.endMonth) + "-" + prependZeroToString(this.endDay);
+  };
+
+  SeriesTime.prototype.getStartDate = function () {
+    return this.startYear.toString() + "-" + prependZeroToString(this.startMonth) + "-" + prependZeroToString(this.startDay);
+  };
+
+  SeriesTime.prototype.getStartTime = function () {
+    var minutes = this.startTimeMinutes % 60;
+    var hours = Math.floor(this.startTimeMinutes / 60);
+    return "T" + prependZeroToString(hours) + ":" + prependZeroToString(minutes) + ":00.000";
+  };
+
+  SeriesTime.prototype.setDuration = function (minutes) {
+    if (minutes >= 0) {
+      this.durationMinutes = minutes;
+    } else {
+      throw createArgumentError(undefined, getString("l_InvalidTime_Text"));
+    }
+  };
+
+  SeriesTime.prototype.setEndDate = function (yearOrDateString, month, day) {
+    if (yearOrDateString !== null && !isNullOrUndefined(month) && day !== null) {
+      this.setDateHelper(false, yearOrDateString, month, day);
+    } else if (yearOrDateString !== null) {
+      this.setDateHelper(false, yearOrDateString);
+    } else if (yearOrDateString == null) {
+      this.endYear = 0;
+      this.endMonth = 0;
+      this.endDay = 0;
+    }
+  };
+
+  SeriesTime.prototype.setStartDate = function (yearOrDateString, month, day) {
+    if (yearOrDateString !== null && !isNullOrUndefined(month) && day !== null) {
+      this.setDateHelper(true, yearOrDateString, month, day);
+    } else if (yearOrDateString !== null) {
+      this.setDateHelper(true, yearOrDateString);
+    }
+  };
+
+  SeriesTime.prototype.setStartTime = function (hoursOrTimeString, minutes) {
+    if (!isNullOrUndefined(hoursOrTimeString) && !isNullOrUndefined(minutes)) {
+      var totalMinutes = hoursOrTimeString * 60 + minutes;
+
+      if (totalMinutes >= 0) {
+        this.startTimeMinutes = totalMinutes;
+      } else {
+        throw createArgumentError(undefined, getString("l_InvalidTime_Text"));
+      }
+    } else if (!isNullOrUndefined(hoursOrTimeString)) {
+      var timeString = hoursOrTimeString;
+      var newDateString = "2017-01-15" + timeString + "Z";
+      var regEx = new RegExp("^T[0-2]\\d:[0-5]\\d:[0-5]\\d\\.\\d{3}$");
+
+      if (!regEx.test(timeString)) {
+        throw createArgumentError(undefined, getString("l_InvalidTime_Text"));
+      }
+
+      var dateObject = new Date(newDateString);
+
+      if (!isNullOrUndefined(dateObject) && !isNaN(dateObject.getUTCHours()) && !isNaN(dateObject.getUTCMinutes())) {
+        this.startTimeMinutes = dateObject.getUTCHours() * 60 + dateObject.getUTCMinutes();
+      } else {
+        throw createArgumentError(undefined, getString("l_InvalidTime_Text"));
+      }
+    }
+  };
+
+  SeriesTime.prototype.isValid = function () {
+    if (!isValidDate(this.startYear, this.startMonth, this.startDay)) {
+      return false;
+    }
+
+    if (this.endDay !== 0 && this.endMonth !== 0 && this.endYear !== 0) {
+      if (!isValidDate(this.endYear, this.endMonth, this.endDay)) {
+        return false;
+      }
+    }
+
+    if (this.startTimeMinutes < 0 || this.durationMinutes <= 0) {
+      return false;
+    }
+
+    return true;
+  };
+
+  SeriesTime.prototype.exportToSeriesTimeJson = function () {
+    var result = {};
+    result[StartYearKey] = this.startYear;
+    result[StartMonthKey] = this.startMonth;
+    result[StartDayKey] = this.startDay;
+
+    if (this.endYear === 0 && this.endMonth === 0 && this.endDay === 0) {
+      result[NoEndDateKey] = true;
+    } else {
+      result[EndYearKey] = this.endYear;
+      result[EndMonthKey] = this.endMonth;
+      result[EndDayKey] = this.endDay;
+    }
+
+    result[StartTimeMinKey] = this.startTimeMinutes;
+
+    if (this.durationMinutes > 0) {
+      result[DurationMinKey] = this.durationMinutes;
+    }
+
+    return result;
+  };
+
+  SeriesTime.prototype.importFromSeriesTimeJsonObject = function (jsonObject) {
+    this.startYear = jsonObject[StartYearKey];
+    this.startMonth = jsonObject[StartMonthKey];
+    this.startDay = jsonObject[StartDayKey];
+
+    if (jsonObject[NoEndDateKey] != null && typeof jsonObject[NoEndDateKey] === "boolean") {
+      this.endYear = 0;
+      this.endMonth = 0;
+      this.endDay = 0;
+    } else {
+      this.endYear = jsonObject[EndYearKey];
+      this.endMonth = jsonObject[EndMonthKey];
+      this.endDay = jsonObject[EndDayKey];
+    }
+
+    this.startTimeMinutes = jsonObject[StartTimeMinKey];
+    this.durationMinutes = jsonObject[DurationMinKey];
+  };
+
+  SeriesTime.prototype.setDateHelper = function (isStart, yearOrDateString, month, day) {
+    var yearCalculated = 0;
+    var monthCalculated = 0;
+    var dayCalculated = 0;
+
+    if (yearOrDateString !== null && !isNullOrUndefined(month) && day !== null) {
+      throwOnInvalidDate(yearOrDateString, month + 1, day);
+      yearCalculated = yearOrDateString;
+      monthCalculated = month + 1;
+      dayCalculated = day;
+    } else if (yearOrDateString !== null) {
+      var dateString = yearOrDateString;
+      throwOnInvalidDateString(dateString);
+      var dateObject = new Date(dateString);
+
+      if (dateObject !== null && !isNaN(dateObject.getUTCFullYear()) && !isNaN(dateObject.getUTCMonth()) && !isNaN(dateObject.getUTCDate())) {
+        throwOnInvalidDate(dateObject.getUTCFullYear(), dateObject.getUTCMonth() + 1, dateObject.getUTCDate());
+        yearCalculated = dateObject.getUTCFullYear();
+        monthCalculated = dateObject.getUTCMonth() + 1;
+        dayCalculated = dateObject.getUTCDate();
+      }
+    }
+
+    if (yearCalculated !== 0 && monthCalculated !== 0 && dayCalculated !== 0) {
+      if (isStart) {
+        this.startYear = yearCalculated;
+        this.startMonth = monthCalculated;
+        this.startDay = dayCalculated;
+      } else {
+        this.endYear = yearCalculated;
+        this.endMonth = monthCalculated;
+        this.endDay = dayCalculated;
+      }
+    }
+  };
+
+  SeriesTime.prototype.isEndAfterStart = function () {
+    if (this.endYear === 0 && this.endMonth === 0 && this.endDay === 0) {
+      return true;
+    }
+
+    var startDateTime = new Date();
+    startDateTime.setFullYear(this.startYear);
+    startDateTime.setMonth(this.startMonth - 1);
+    startDateTime.setDate(this.startDay);
+    var endDateTime = new Date();
+    endDateTime.setFullYear(this.endYear);
+    endDateTime.setMonth(this.endMonth - 1);
+    endDateTime.setDate(this.endDay);
+    return endDateTime >= startDateTime;
+  };
+
+  return SeriesTime;
+}();
+
+
+// CONCATENATED MODULE: ./src/utils/recurrenceUtils.ts
+
+
+
+function copyRecurrenceObjectConvertSeriesTimeJson(recurrenceOriginal) {
+  if (isNullOrUndefined(recurrenceOriginal) || isNullOrUndefined(recurrenceOriginal.seriesTimeJson)) {
+    return recurrenceOriginal;
+  }
+
+  var recurrenceCopy = {
+    recurrenceType: "",
+    recurrenceProperties: null,
+    recurrenceTimeZone: null
+  };
+  var newSeriesTime = new SeriesTime_SeriesTime();
+
+  if (!isNullOrUndefined(recurrenceOriginal.recurrenceProperties)) {
+    recurrenceCopy.recurrenceProperties = deepClone(recurrenceOriginal.recurrenceProperties);
+  }
+
+  recurrenceCopy.recurrenceType = recurrenceOriginal.recurrenceType;
+
+  if (!isNullOrUndefined(recurrenceOriginal.recurrenceTimeZone)) {
+    recurrenceCopy.recurrenceTimeZone = deepClone(recurrenceOriginal.recurrenceTimeZone);
+  }
+
+  newSeriesTime.importFromSeriesTimeJsonObject(recurrenceOriginal.seriesTimeJson);
+  recurrenceCopy.seriesTime = newSeriesTime;
+  return recurrenceCopy;
+}
 // CONCATENATED MODULE: ./src/api/getMessageRead.ts
+
 
 
 
@@ -10907,6 +11236,7 @@ function getMessageRead() {
     move: moveToFolder,
     normalizedSubject: getInitialDataProp("normalizedSubject"),
     notificationMessages: getNotificationMessageSurface(),
+    recurrence: copyRecurrenceObjectConvertSeriesTimeJson(getInitialDataProp("recurrence")),
     seriesId: getInitialDataProp("seriesId"),
     sender: sender ? createEmailAddressDetails(sender) : undefined,
     start: start ? new Date(start) : undefined,
@@ -11287,6 +11617,8 @@ function getRecipientsSurface(namespace) {
 
 
 
+
+
 function getFrom(namespace) {
   return function () {
     var args = [];
@@ -11297,8 +11629,12 @@ function getFrom(namespace) {
 
     checkPermissionsAndThrow(1, namespace + ".getAsync");
     var commonParameters = parseCommonArgs(args, true, false);
-    standardInvokeHostMethod(107, commonParameters.asyncContext, commonParameters.callback, undefined, undefined);
+    standardInvokeHostMethod(107, commonParameters.asyncContext, commonParameters.callback, undefined, getFrom_format);
   };
+}
+
+function getFrom_format(rawInput) {
+  return isNullOrUndefined(rawInput) ? null : createEmailAddressDetails(rawInput);
 }
 // CONCATENATED MODULE: ./src/api/getFromSurface.ts
 
@@ -11699,288 +12035,208 @@ function getEnhancedLocationsSurface(isCompose) {
 
   return enhancedLocations;
 }
-// CONCATENATED MODULE: ./src/validation/seriesTimeConstants.ts
-var StartYearKey = "startYear";
-var StartMonthKey = "startMonth";
-var StartDayKey = "startDay";
-var EndYearKey = "endYear";
-var EndMonthKey = "endMonth";
-var EndDayKey = "endDay";
-var NoEndDateKey = "noEndDate";
-var StartTimeMinKey = "startTimeMin";
-var DurationMinKey = "durationMin";
-// CONCATENATED MODULE: ./src/validation/recurrenceConstants.ts
-var StartDateKey = "startDate";
-var EndDateKey = "endDate";
-var StartTimeKey = "startTime";
-var EndTimeKey = "endTime";
-var RecurrenceTypeKey = "recurrenceType";
-var SeriesTimeKey = "seriesTime";
-var SeriesTimeJsonKey = "seriesTimeJson";
-var RecurrenceTimeZoneKey = "recurrenceTimeZone";
-var RecurrenceTimeZoneName = "name";
-var RecurrencePropertiesKey = "recurrenceProperties";
-var IntervalKey = "interval";
-var DaysKey = "days";
-var DayOfMonthKey = "dayOfMonth";
-var DayOfWeekKey = "dayOfWeek";
-var WeekNumberKey = "weekNumber";
-var MonthKey = "month";
-var FirstDayOfWeekKey = "firstDayOfWeek";
-// CONCATENATED MODULE: ./src/utils/seriesTimeUtils.ts
+// CONCATENATED MODULE: ./src/api/getAppointmentRead.ts
 
 
 
-function prependZeroToString(number) {
-  if (number < 0) {
-    number = 1;
-  }
 
-  if (number < 10) {
-    return "0" + number.toString();
-  }
 
-  return number.toString();
+
+
+
+
+
+
+
+
+
+
+function getAppointmentRead() {
+  var organizer = getInitialDataProp("organizer");
+  var dateTimeCreated = getInitialDataProp("dateTimeCreated");
+  var dateTimeModified = getInitialDataProp("dateTimeModified");
+  var end = getInitialDataProp("end");
+  var start = getInitialDataProp("start");
+  var appointmentRead = objectDefine({}, {
+    attachments: CustomJsonAttachmentsResponse(getInitialDataProp("attachments")),
+    body: getBodySurface(false),
+    categories: getCategoriesSurface(),
+    dateTimeCreated: dateTimeCreated ? new Date(dateTimeCreated) : undefined,
+    dateTimeModified: dateTimeModified ? new Date(dateTimeModified) : undefined,
+    end: end ? new Date(end) : undefined,
+    enhancedLocation: getEnhancedLocationsSurface(false),
+    itemClass: getInitialDataProp("itemClass"),
+    itemId: getInitialDataProp("id"),
+    itemType: "appointment",
+    location: getInitialDataProp("location"),
+    normalizedSubject: getInitialDataProp("normalizedSubject"),
+    notificationMessages: getNotificationMessageSurface(),
+    optionalAttendees: (getInitialDataProp("cc") || []).map(createEmailAddressDetails),
+    organizer: organizer ? createEmailAddressDetails(organizer) : undefined,
+    recurrence: copyRecurrenceObjectConvertSeriesTimeJson(getInitialDataProp("recurrence")),
+    requiredAttendees: (getInitialDataProp("to") || []).map(createEmailAddressDetails),
+    start: start ? new Date(start) : undefined,
+    seriesId: getInitialDataProp("seriesId"),
+    subject: getInitialDataProp("subject"),
+    displayReplyForm: displayReplyForm,
+    displayReplyAllForm: displayReplyAllForm,
+    getAttachmentContentAsync: getAttachmentContent,
+    getEntities: Entities_getEntities,
+    getEntitiesByType: Entities_getEntitiesByType,
+    getFilteredEntitiesByName: Entities_getFilteredEntitiesByName,
+    getInitializationContextAsync: getInitializationContext,
+    getRegExMatches: Entities_getRegExMatches,
+    getRegExMatchesByName: Entities_getRegExMatchesByName,
+    getSelectedEntities: Entities_getSelectedEntities,
+    getSelectedRegExMatches: Entities_getSelectedRegExMatches,
+    loadCustomPropertiesAsync: loadCustomProperties
+  });
+  return appointmentRead;
 }
-function throwOnInvalidDate(year, month, day) {
-  if (!isValidDate(year, month, day)) {
-    throw createArgumentError(SeriesTimeKey, getString("l_InvalidDate_Text"));
+// CONCATENATED MODULE: ./src/validation/timeConstants.ts
+var TimeType;
+
+(function (TimeType) {
+  TimeType[TimeType["start"] = 1] = "start";
+  TimeType[TimeType["end"] = 2] = "end";
+})(TimeType || (TimeType = {}));
+// CONCATENATED MODULE: ./src/methods/getTime.ts
+
+
+
+
+function getTime(namespace) {
+  return function () {
+    var args = [];
+
+    for (var _i = 0; _i < arguments.length; _i++) {
+      args[_i] = arguments[_i];
+    }
+
+    checkPermissionsAndThrow(1, namespace + ".getAsync");
+    var commonParameters = parseCommonArgs(args, true, false);
+    standardInvokeHostMethod(24, commonParameters.asyncContext, commonParameters.callback, {
+      TimeProperty: TimeType[namespace]
+    }, getTime_format);
+  };
+}
+
+function getTime_format(rawInput) {
+  var ticks = rawInput;
+  return new Date(ticks);
+}
+// CONCATENATED MODULE: ./src/methods/setTime.ts
+
+
+
+
+
+var maxTime = 8640000000000000;
+var minTime = -8640000000000000;
+function setTime(namespace) {
+  return function (date) {
+    var args = [];
+
+    for (var _i = 1; _i < arguments.length; _i++) {
+      args[_i - 1] = arguments[_i];
+    }
+
+    checkPermissionsAndThrow(2, namespace + ".setAsync");
+    var commonParameters = parseCommonArgs(args, false, false);
+    var parameters = {
+      date: date
+    };
+    setTime_validateParameters(parameters);
+    standardInvokeHostMethod(25, commonParameters.asyncContext, commonParameters.callback, {
+      TimeProperty: TimeType[namespace],
+      time: parameters.date.getTime()
+    }, undefined);
+  };
+}
+
+function setTime_validateParameters(parameters) {
+  if (!(parameters.date instanceof Date)) {
+    throw createArgumentTypeError("dateTime", typeof parameters.date, typeof Date);
+  }
+
+  if (isNaN(parameters.date.getTime())) {
+    throw createArgumentError("dateTime");
+  }
+
+  if (parameters.date.getTime() < minTime || parameters.date.getTime() > maxTime) {
+    throw createArgumentOutOfRange("dateTime");
   }
 }
-function isValidDate(year, month, day) {
-  if (year < 1601 || month < 1 || month > 12 || day < 1 || day > 31) {
-    return false;
-  }
+// CONCATENATED MODULE: ./src/api/getTimeSurface.ts
 
-  return true;
+
+
+function getTimeSurface(namespace) {
+  return objectDefine({}, {
+    getAsync: getTime(namespace),
+    setAsync: setTime(namespace)
+  });
 }
-function throwOnInvalidDateString(dateString) {
-  var regEx = new RegExp("^\\d{4}-(?:[0]\\d|1[0-2])-(?:[0-2]\\d|3[01])$");
+// CONCATENATED MODULE: ./src/methods/getLocation.ts
 
-  if (!regEx.test(dateString)) {
-    throw createArgumentError(SeriesTimeKey, getString("l_InvalidDate_Text"));
+
+
+function getLocation() {
+  var args = [];
+
+  for (var _i = 0; _i < arguments.length; _i++) {
+    args[_i] = arguments[_i];
+  }
+
+  checkPermissionsAndThrow(1, "location.getAsync");
+  var commonParameters = parseCommonArgs(args, true, false);
+  standardInvokeHostMethod(26, commonParameters.asyncContext, commonParameters.callback, undefined, undefined);
+}
+// CONCATENATED MODULE: ./src/methods/setLocation.ts
+
+
+
+
+
+
+var MaximumLocationLength = 255;
+function setLocation(location) {
+  var args = [];
+
+  for (var _i = 1; _i < arguments.length; _i++) {
+    args[_i - 1] = arguments[_i];
+  }
+
+  checkPermissionsAndThrow(2, "location.setAsync");
+  var commonParameters = parseCommonArgs(args, false, false);
+  var parameters = {
+    location: location
+  };
+  setLocation_validateParameters(parameters);
+  standardInvokeHostMethod(27, commonParameters.asyncContext, commonParameters.callback, parameters, undefined);
+}
+
+function setLocation_validateParameters(parameters) {
+  if (!isNullOrUndefined(parameters.location)) {
+    if (!(typeof parameters.location === "string")) {
+      throw createArgumentTypeError("location", typeof parameters.location, "string");
+    }
+
+    throwOnOutOfRange(parameters.location.length, 0, MaximumLocationLength, "location");
+  } else {
+    throw createNullArgumentError("location");
   }
 }
-// CONCATENATED MODULE: ./src/api/SeriesTime.ts
+// CONCATENATED MODULE: ./src/api/getLocationSurface.ts
 
 
 
-
-
-
-var SeriesTime_SeriesTime = function () {
-  function SeriesTime() {
-    this.startYear = 0;
-    this.startMonth = 0;
-    this.startDay = 0;
-    this.endYear = 0;
-    this.endMonth = 0;
-    this.endDay = 0;
-    this.startTimeMinutes = 0;
-    this.durationMinutes = 0;
-  }
-
-  SeriesTime.prototype.getDuration = function () {
-    return this.durationMinutes;
-  };
-
-  SeriesTime.prototype.getEndTime = function () {
-    var endTimeMinutes = this.startTimeMinutes + this.durationMinutes;
-    var minutes = endTimeMinutes % 60;
-    var hours = Math.floor(endTimeMinutes / 60) % 24;
-    return "T" + prependZeroToString(hours) + ":" + prependZeroToString(minutes) + ":00.000";
-  };
-
-  SeriesTime.prototype.getEndDate = function () {
-    if (this.endYear === 0 && this.endMonth === 0 && this.endDay === 0) {
-      return null;
-    }
-
-    return this.endYear.toString() + "-" + prependZeroToString(this.endMonth) + "-" + prependZeroToString(this.endDay);
-  };
-
-  SeriesTime.prototype.getStartDate = function () {
-    return this.startYear.toString() + "-" + prependZeroToString(this.startMonth) + "-" + prependZeroToString(this.startDay);
-  };
-
-  SeriesTime.prototype.getStartTime = function () {
-    var minutes = this.startTimeMinutes % 60;
-    var hours = Math.floor(this.startTimeMinutes / 60);
-    return "T" + prependZeroToString(hours) + ":" + prependZeroToString(minutes) + ":00.000";
-  };
-
-  SeriesTime.prototype.setDuration = function (minutes) {
-    if (minutes >= 0) {
-      this.durationMinutes = minutes;
-    } else {
-      throw createArgumentError(undefined, getString("l_InvalidTime_Text"));
-    }
-  };
-
-  SeriesTime.prototype.setEndDate = function (yearOrDateString, month, day) {
-    if (yearOrDateString !== null && !isNullOrUndefined(month) && day !== null) {
-      this.setDateHelper(false, yearOrDateString, month, day);
-    } else if (yearOrDateString !== null) {
-      this.setDateHelper(false, yearOrDateString);
-    } else if (yearOrDateString == null) {
-      this.endYear = 0;
-      this.endMonth = 0;
-      this.endDay = 0;
-    }
-  };
-
-  SeriesTime.prototype.setStartDate = function (yearOrDateString, month, day) {
-    if (yearOrDateString !== null && !isNullOrUndefined(month) && day !== null) {
-      this.setDateHelper(true, yearOrDateString, month, day);
-    } else if (yearOrDateString !== null) {
-      this.setDateHelper(true, yearOrDateString);
-    }
-  };
-
-  SeriesTime.prototype.setStartTime = function (hoursOrTimeString, minutes) {
-    if (!isNullOrUndefined(hoursOrTimeString) && !isNullOrUndefined(minutes)) {
-      var totalMinutes = hoursOrTimeString * 60 + minutes;
-
-      if (totalMinutes >= 0) {
-        this.startTimeMinutes = totalMinutes;
-      } else {
-        throw createArgumentError(undefined, getString("l_InvalidTime_Text"));
-      }
-    } else if (!isNullOrUndefined(hoursOrTimeString)) {
-      var timeString = hoursOrTimeString;
-      var newDateString = "2017-01-15" + timeString + "Z";
-      var regEx = new RegExp("^T[0-2]\\d:[0-5]\\d:[0-5]\\d\\.\\d{3}$");
-
-      if (!regEx.test(timeString)) {
-        throw createArgumentError(undefined, getString("l_InvalidTime_Text"));
-      }
-
-      var dateObject = new Date(newDateString);
-
-      if (!isNullOrUndefined(dateObject) && !isNaN(dateObject.getUTCHours()) && !isNaN(dateObject.getUTCMinutes())) {
-        this.startTimeMinutes = dateObject.getUTCHours() * 60 + dateObject.getUTCMinutes();
-      } else {
-        throw createArgumentError(undefined, getString("l_InvalidTime_Text"));
-      }
-    }
-  };
-
-  SeriesTime.prototype.isValid = function () {
-    if (!isValidDate(this.startYear, this.startMonth, this.startDay)) {
-      return false;
-    }
-
-    if (this.endDay !== 0 && this.endMonth !== 0 && this.endYear !== 0) {
-      if (!isValidDate(this.endYear, this.endMonth, this.endDay)) {
-        return false;
-      }
-    }
-
-    if (this.startTimeMinutes < 0 || this.durationMinutes <= 0) {
-      return false;
-    }
-
-    return true;
-  };
-
-  SeriesTime.prototype.exportToSeriesTimeJson = function () {
-    var result = {};
-    result[StartYearKey] = this.startYear;
-    result[StartMonthKey] = this.startMonth;
-    result[StartDayKey] = this.startDay;
-
-    if (this.endYear === 0 && this.endMonth === 0 && this.endDay === 0) {
-      result[NoEndDateKey] = true;
-    } else {
-      result[EndYearKey] = this.endYear;
-      result[EndMonthKey] = this.endMonth;
-      result[EndDayKey] = this.endDay;
-    }
-
-    result[StartTimeMinKey] = this.startTimeMinutes;
-
-    if (this.durationMinutes > 0) {
-      result[DurationMinKey] = this.durationMinutes;
-    }
-
-    return result;
-  };
-
-  SeriesTime.prototype.importFromSeriesTimeJsonObject = function (jsonObject) {
-    this.startYear = jsonObject[StartYearKey];
-    this.startMonth = jsonObject[StartMonthKey];
-    this.startDay = jsonObject[StartDayKey];
-
-    if (jsonObject[NoEndDateKey] != null && typeof jsonObject[NoEndDateKey] === "boolean") {
-      this.endYear = 0;
-      this.endMonth = 0;
-      this.endDay = 0;
-    } else {
-      this.endYear = jsonObject[EndYearKey];
-      this.endMonth = jsonObject[EndMonthKey];
-      this.endDay = jsonObject[EndDayKey];
-    }
-
-    this.startTimeMinutes = jsonObject[StartTimeMinKey];
-    this.durationMinutes = jsonObject[DurationMinKey];
-  };
-
-  SeriesTime.prototype.setDateHelper = function (isStart, yearOrDateString, month, day) {
-    var yearCalculated = 0;
-    var monthCalculated = 0;
-    var dayCalculated = 0;
-
-    if (yearOrDateString !== null && !isNullOrUndefined(month) && day !== null) {
-      throwOnInvalidDate(yearOrDateString, month + 1, day);
-      yearCalculated = yearOrDateString;
-      monthCalculated = month + 1;
-      dayCalculated = day;
-    } else if (yearOrDateString !== null) {
-      var dateString = yearOrDateString;
-      throwOnInvalidDateString(dateString);
-      var dateObject = new Date(dateString);
-
-      if (dateObject !== null && !isNaN(dateObject.getUTCFullYear()) && !isNaN(dateObject.getUTCMonth()) && !isNaN(dateObject.getUTCDate())) {
-        throwOnInvalidDate(dateObject.getUTCFullYear(), dateObject.getUTCMonth() + 1, dateObject.getUTCDate());
-        yearCalculated = dateObject.getUTCFullYear();
-        monthCalculated = dateObject.getUTCMonth() + 1;
-        dayCalculated = dateObject.getUTCDate();
-      }
-    }
-
-    if (yearCalculated !== 0 && monthCalculated !== 0 && dayCalculated !== 0) {
-      if (isStart) {
-        this.startYear = yearCalculated;
-        this.startMonth = monthCalculated;
-        this.startDay = dayCalculated;
-      } else {
-        this.endYear = yearCalculated;
-        this.endMonth = monthCalculated;
-        this.endDay = dayCalculated;
-      }
-    }
-  };
-
-  SeriesTime.prototype.isEndAfterStart = function () {
-    if (this.endYear === 0 && this.endMonth === 0 && this.endDay === 0) {
-      return true;
-    }
-
-    var startDateTime = new Date();
-    startDateTime.setFullYear(this.startYear);
-    startDateTime.setMonth(this.startMonth - 1);
-    startDateTime.setDate(this.startDay);
-    var endDateTime = new Date();
-    endDateTime.setFullYear(this.endYear);
-    endDateTime.setMonth(this.endMonth - 1);
-    endDateTime.setDate(this.endDay);
-    return endDateTime >= startDateTime;
-  };
-
-  return SeriesTime;
-}();
-
-
+function getLocationSurface() {
+  return objectDefine({}, {
+    getAsync: getLocation,
+    setAsync: setLocation
+  });
+}
 // CONCATENATED MODULE: ./src/methods/getRecurrence.ts
 
 
@@ -12230,208 +12486,6 @@ function throwOnInvalidMonth(month) {
     throw createArgumentError(MonthKey);
   }
 }
-// CONCATENATED MODULE: ./src/validation/timeConstants.ts
-var TimeType;
-
-(function (TimeType) {
-  TimeType[TimeType["start"] = 1] = "start";
-  TimeType[TimeType["end"] = 2] = "end";
-})(TimeType || (TimeType = {}));
-// CONCATENATED MODULE: ./src/methods/getTime.ts
-
-
-
-
-function getTime(namespace) {
-  return function () {
-    var args = [];
-
-    for (var _i = 0; _i < arguments.length; _i++) {
-      args[_i] = arguments[_i];
-    }
-
-    checkPermissionsAndThrow(1, namespace + ".getAsync");
-    var commonParameters = parseCommonArgs(args, true, false);
-    standardInvokeHostMethod(24, commonParameters.asyncContext, commonParameters.callback, {
-      TimeProperty: TimeType[namespace]
-    }, getTime_format);
-  };
-}
-
-function getTime_format(rawInput) {
-  var ticks = rawInput;
-  return new Date(ticks);
-}
-// CONCATENATED MODULE: ./src/methods/setTime.ts
-
-
-
-
-
-var maxTime = 8640000000000000;
-var minTime = -8640000000000000;
-function setTime(namespace) {
-  return function (date) {
-    var args = [];
-
-    for (var _i = 1; _i < arguments.length; _i++) {
-      args[_i - 1] = arguments[_i];
-    }
-
-    checkPermissionsAndThrow(2, namespace + ".setAsync");
-    var commonParameters = parseCommonArgs(args, false, false);
-    var parameters = {
-      date: date
-    };
-    setTime_validateParameters(parameters);
-    standardInvokeHostMethod(25, commonParameters.asyncContext, commonParameters.callback, {
-      TimeProperty: TimeType[namespace],
-      time: parameters.date.getTime()
-    }, undefined);
-  };
-}
-
-function setTime_validateParameters(parameters) {
-  if (!(parameters.date instanceof Date)) {
-    throw createArgumentTypeError("dateTime", typeof parameters.date, typeof Date);
-  }
-
-  if (isNaN(parameters.date.getTime())) {
-    throw createArgumentError("dateTime");
-  }
-
-  if (parameters.date.getTime() < minTime || parameters.date.getTime() > maxTime) {
-    throw createArgumentOutOfRange("dateTime");
-  }
-}
-// CONCATENATED MODULE: ./src/api/getTimeSurface.ts
-
-
-
-function getTimeSurface(namespace) {
-  return objectDefine({}, {
-    getAsync: getTime(namespace),
-    setAsync: setTime(namespace)
-  });
-}
-// CONCATENATED MODULE: ./src/methods/getLocation.ts
-
-
-
-function getLocation() {
-  var args = [];
-
-  for (var _i = 0; _i < arguments.length; _i++) {
-    args[_i] = arguments[_i];
-  }
-
-  checkPermissionsAndThrow(1, "location.getAsync");
-  var commonParameters = parseCommonArgs(args, true, false);
-  standardInvokeHostMethod(26, commonParameters.asyncContext, commonParameters.callback, undefined, undefined);
-}
-// CONCATENATED MODULE: ./src/methods/setLocation.ts
-
-
-
-
-
-
-var MaximumLocationLength = 255;
-function setLocation(location) {
-  var args = [];
-
-  for (var _i = 1; _i < arguments.length; _i++) {
-    args[_i - 1] = arguments[_i];
-  }
-
-  checkPermissionsAndThrow(2, "location.setAsync");
-  var commonParameters = parseCommonArgs(args, false, false);
-  var parameters = {
-    location: location
-  };
-  setLocation_validateParameters(parameters);
-  standardInvokeHostMethod(27, commonParameters.asyncContext, commonParameters.callback, parameters, undefined);
-}
-
-function setLocation_validateParameters(parameters) {
-  if (!isNullOrUndefined(parameters.location)) {
-    if (!(typeof parameters.location === "string")) {
-      throw createArgumentTypeError("location", typeof parameters.location, "string");
-    }
-
-    throwOnOutOfRange(parameters.location.length, 0, MaximumLocationLength, "location");
-  } else {
-    throw createNullArgumentError("location");
-  }
-}
-// CONCATENATED MODULE: ./src/api/getLocationSurface.ts
-
-
-
-function getLocationSurface() {
-  return objectDefine({}, {
-    getAsync: getLocation,
-    setAsync: setLocation
-  });
-}
-// CONCATENATED MODULE: ./src/api/getAppointmentCompose.ts
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-function getAppointmentCompose() {
-  var appointmentCompose = objectDefine({}, {
-    body: getBodySurface(true),
-    categories: getCategoriesSurface(),
-    end: getTimeSurface("end"),
-    enhancedLocation: getEnhancedLocationsSurface(true),
-    itemType: "appointment",
-    location: getLocationSurface(),
-    notificationMessages: getNotificationMessageSurface(),
-    optionalAttendees: getRecipientsSurface("optionalAttendees"),
-    organizer: getFromSurface("organizer"),
-    recurrence: getRecurrenceSurface(true),
-    requiredAttendees: getRecipientsSurface("requiredAttendees"),
-    seriesId: getInitialDataProp("seriesId"),
-    start: getTimeSurface("start"),
-    subject: getSubjectSurface(),
-    addFileAttachmentAsync: addFileAttachment,
-    addFileAttachmentFromBase64Async: addBase64FileAttachment,
-    addItemAttachmentAsync: addItemAttachment,
-    close: close_close,
-    getAttachmentsAsync: getAttachments_getAttachments,
-    getAttachmentContentAsync: getAttachmentContent,
-    getInitializationContextAsync: getInitializationContext,
-    getItemIdAsync: getItemId,
-    getSelectedDataAsync: getSelectedData,
-    loadCustomPropertiesAsync: loadCustomProperties,
-    removeAttachmentAsync: removeAttachment,
-    saveAsync: save,
-    setSelectedDataAsync: setSelectedData(29)
-  });
-  return appointmentCompose;
-}
 // CONCATENATED MODULE: ./src/methods/setRecurrence.ts
 
 
@@ -12497,7 +12551,7 @@ function getRecurrenceSurface(isCompose) {
 
   return recurrence;
 }
-// CONCATENATED MODULE: ./src/api/getAppointmentRead.ts
+// CONCATENATED MODULE: ./src/api/getAppointmentCompose.ts
 
 
 
@@ -12513,47 +12567,47 @@ function getRecurrenceSurface(isCompose) {
 
 
 
-function getAppointmentRead() {
-  var organizer = getInitialDataProp("organizer");
-  var dateTimeCreated = getInitialDataProp("dateTimeCreated");
-  var dateTimeModified = getInitialDataProp("dateTimeModified");
-  var end = getInitialDataProp("end");
-  var start = getInitialDataProp("start");
-  var appointmentRead = objectDefine({}, {
-    attachments: CustomJsonAttachmentsResponse(getInitialDataProp("attachments")),
-    body: getBodySurface(false),
+
+
+
+
+
+
+
+
+
+
+function getAppointmentCompose() {
+  var appointmentCompose = objectDefine({}, {
+    body: getBodySurface(true),
     categories: getCategoriesSurface(),
-    dateTimeCreated: dateTimeCreated ? new Date(dateTimeCreated) : undefined,
-    dateTimeModified: dateTimeModified ? new Date(dateTimeModified) : undefined,
-    end: end ? new Date(end) : undefined,
-    enhancedLocation: getEnhancedLocationsSurface(false),
-    itemClass: getInitialDataProp("itemClass"),
-    itemId: getInitialDataProp("id"),
+    end: getTimeSurface("end"),
+    enhancedLocation: getEnhancedLocationsSurface(true),
     itemType: "appointment",
-    location: getInitialDataProp("location"),
-    normalizedSubject: getInitialDataProp("normalizedSubject"),
+    location: getLocationSurface(),
     notificationMessages: getNotificationMessageSurface(),
-    optionalAttendees: (getInitialDataProp("optionalAttendees") || []).map(createEmailAddressDetails),
-    organizer: organizer ? createEmailAddressDetails(organizer) : undefined,
-    recurrence: getRecurrenceSurface(false),
-    requiredAttendees: (getInitialDataProp("requiredAttendees") || []).map(createEmailAddressDetails),
-    start: start ? new Date(start) : undefined,
+    optionalAttendees: getRecipientsSurface("optionalAttendees"),
+    organizer: getFromSurface("organizer"),
+    recurrence: getRecurrenceSurface(true),
+    requiredAttendees: getRecipientsSurface("requiredAttendees"),
     seriesId: getInitialDataProp("seriesId"),
-    subject: getInitialDataProp("subject"),
-    displayReplyForm: displayReplyForm,
-    displayReplyAllForm: displayReplyAllForm,
+    start: getTimeSurface("start"),
+    subject: getSubjectSurface(),
+    addFileAttachmentAsync: addFileAttachment,
+    addFileAttachmentFromBase64Async: addBase64FileAttachment,
+    addItemAttachmentAsync: addItemAttachment,
+    close: close_close,
+    getAttachmentsAsync: getAttachments_getAttachments,
     getAttachmentContentAsync: getAttachmentContent,
-    getEntities: Entities_getEntities,
-    getEntitiesByType: Entities_getEntitiesByType,
-    getFilteredEntitiesByName: Entities_getFilteredEntitiesByName,
     getInitializationContextAsync: getInitializationContext,
-    getRegExMatches: Entities_getRegExMatches,
-    getRegExMatchesByName: Entities_getRegExMatchesByName,
-    getSelectedEntities: Entities_getSelectedEntities,
-    getSelectedRegExMatches: Entities_getSelectedRegExMatches,
-    loadCustomPropertiesAsync: loadCustomProperties
+    getItemIdAsync: getItemId,
+    getSelectedDataAsync: getSelectedData,
+    loadCustomPropertiesAsync: loadCustomProperties,
+    removeAttachmentAsync: removeAttachment,
+    saveAsync: save,
+    setSelectedDataAsync: setSelectedData(29)
   });
-  return appointmentRead;
+  return appointmentCompose;
 }
 // CONCATENATED MODULE: ./src/utils/addEventSupport.ts
 var addEventSupport_OSF = __webpack_require__(0);
@@ -13242,14 +13296,10 @@ var Intellisense = {
     throw createArgumentTypeError();
   },
   toMessage: function toMessage(item) {
-    if (getHostItemType_getHostItemType() === HostItemType.Message) {
-      return item;
-    }
-
-    throw createArgumentTypeError();
+    return Intellisense.toMessageRead(item);
   },
   toMessageRead: function toMessageRead(item) {
-    if (getHostItemType_getHostItemType() === HostItemType.Message) {
+    if (getHostItemType_getHostItemType() === HostItemType.Message || getHostItemType_getHostItemType() === HostItemType.MeetingRequest) {
       return item;
     }
 

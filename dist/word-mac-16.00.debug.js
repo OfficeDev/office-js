@@ -16,10 +16,10 @@
 
 
 // Sources:
-// osfweb: 16.0\12223.10000
-// runtime: 16.0.12215.30007
-// core: 16.0\12223.10000
-// host: 16.0\12223.10000
+// osfweb: 16.0\12322.10000
+// runtime: 16.0.12306.30007
+// core: 16.0\12322.10000
+// host: 16.0\12322.10000
 
 var __extends=(this && this.__extends) || function (d, b) {
 	for (var p in b)
@@ -1116,7 +1116,8 @@ OSF.AgaveHostAction={
 	"EnableTaskPaneHeaderButton": 29,
 	"DisableTaskPaneHeaderButton": 30,
 	"TaskPaneHeaderButtonClicked": 31,
-	"RemoveAppCommandsAddin": 32
+	"RemoveAppCommandsAddin": 32,
+	"RefreshRibbonGallery": 33
 };
 OSF.SharedConstants={
 	"NotificationConversationIdSuffix": '_ntf'
@@ -1280,6 +1281,7 @@ Microsoft.Office.WebExtension.Parameters={
 	UseDeviceIndependentPixels: "useDeviceIndependentPixels",
 	PromptBeforeOpen: "promptBeforeOpen",
 	EnforceAppDomain: "enforceAppDomain",
+	UrlNoHostInfo: "urlNoHostInfo",
 	AppCommandInvocationCompletedData: "appCommandInvocationCompletedData",
 	Base64: "base64",
 	FormId: "formId"
@@ -2304,6 +2306,11 @@ OSF.DDA.Context=function OSF_DDA_Context(officeAppContext, document, license, ap
 	if (officeAppContext.ui && officeAppContext.ui.taskPaneAction) {
 		OSF.OUtil.defineEnumerableProperty(this, "taskPaneAction", {
 			value: officeAppContext.ui.taskPaneAction
+		});
+	}
+	if (officeAppContext.ui && officeAppContext.ui.ribbonGallery) {
+		OSF.OUtil.defineEnumerableProperty(this, "ribbonGallery", {
+			value: officeAppContext.ui.ribbonGallery
 		});
 	}
 	if (officeAppContext.get_isDialog()) {
@@ -4147,8 +4154,16 @@ OSF.DDA.SafeArray.Delegate.executeAsync=function OSF_DDA_SafeArray_Delegate$Exec
 			args.onCalling();
 		}
 		OSF.ClientHostController.execute(args.dispId, toArray(args.hostCallArgs), function OSF_DDA_SafeArrayFacade$Execute_OnResponse(hostResponseArgs, resultCode) {
-			var result=hostResponseArgs.toArray();
-			var status=result[OSF.DDA.SafeArray.Response.Status];
+			var result;
+			var status;
+			if (typeof hostResponseArgs==="number") {
+				result=[];
+				status=hostResponseArgs;
+			}
+			else {
+				result=hostResponseArgs.toArray();
+				status=result[OSF.DDA.SafeArray.Response.Status];
+			}
 			if (status==OSF.DDA.ErrorCodeManager.errorCodes.ooeChunkResult) {
 				var payload=result[OSF.DDA.SafeArray.Response.Payload];
 				payload=fromSafeArray(payload);
@@ -6159,7 +6174,7 @@ var OSFAppTelemetry;
 		}
 		appInfo.message=context.get_hostCustomMessage();
 		appInfo.officeJSVersion=OSF.ConstantNames.FileVersion;
-		appInfo.hostJSVersion="16.0.12223.10000";
+		appInfo.hostJSVersion="16.0.12322.10000";
 		if (context._wacHostEnvironment) {
 			appInfo.wacHostEnvironment=context._wacHostEnvironment;
 		}
@@ -6934,6 +6949,13 @@ OSF.DDA.AsyncMethodCalls.define({
 		},
 		{
 			name: Microsoft.Office.WebExtension.Parameters.EnforceAppDomain,
+			value: {
+				"types": ["boolean"],
+				"defaultValue": false
+			}
+		},
+		{
+			name: Microsoft.Office.WebExtension.Parameters.UrlNoHostInfo,
 			value: {
 				"types": ["boolean"],
 				"defaultValue": false
@@ -15924,14 +15946,92 @@ var __extends=(this && this.__extends) || (function () {
 		d.prototype=b===null ? Object.create(b) : (__.prototype=b.prototype, new __());
 	};
 })();
-var __assign=(this && this.__assign) || Object.assign || function (t) {
-	for (var s, i=1, n=arguments.length; i < n; i++) {
-		s=arguments[i];
-		for (var p in s)
-			if (Object.prototype.hasOwnProperty.call(s, p))
-				t[p]=s[p];
+var __awaiter=(this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+	return new (P || (P=Promise))(function (resolve, reject) {
+		function fulfilled(value) { try {
+			step(generator.next(value));
+		}
+		catch (e) {
+			reject(e);
+		} }
+		function rejected(value) { try {
+			step(generator["throw"](value));
+		}
+		catch (e) {
+			reject(e);
+		} }
+		function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
+		step((generator=generator.apply(thisArg, _arguments || [])).next());
+	});
+};
+var __generator=(this && this.__generator) || function (thisArg, body) {
+	var _={ label: 0, sent: function () { if (t[0] & 1)
+			throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
+	return g={ next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol==="function" && (g[Symbol.iterator]=function () { return this; }), g;
+	function verb(n) { return function (v) { return step([n, v]); }; }
+	function step(op) {
+		if (f)
+			throw new TypeError("Generator is already executing.");
+		while (_)
+			try {
+				if (f=1, y && (t=y[op[0] & 2 ? "return" : op[0] ? "throw" : "next"]) && !(t=t.call(y, op[1])).done)
+					return t;
+				if (y=0, t)
+					op=[0, t.value];
+				switch (op[0]) {
+					case 0:
+					case 1:
+						t=op;
+						break;
+					case 4:
+						_.label++;
+						return { value: op[1], done: false };
+					case 5:
+						_.label++;
+						y=op[1];
+						op=[0];
+						continue;
+					case 7:
+						op=_.ops.pop();
+						_.trys.pop();
+						continue;
+					default:
+						if (!(t=_.trys, t=t.length > 0 && t[t.length - 1]) && (op[0]===6 || op[0]===2)) {
+							_=0;
+							continue;
+						}
+						if (op[0]===3 && (!t || (op[1] > t[0] && op[1] < t[3]))) {
+							_.label=op[1];
+							break;
+						}
+						if (op[0]===6 && _.label < t[1]) {
+							_.label=t[1];
+							t=op;
+							break;
+						}
+						if (t && _.label < t[2]) {
+							_.label=t[2];
+							_.ops.push(op);
+							break;
+						}
+						if (t[2])
+							_.ops.pop();
+						_.trys.pop();
+						continue;
+				}
+				op=body.call(thisArg, _);
+			}
+			catch (e) {
+				op=[6, e];
+				y=0;
+			}
+			finally {
+				f=t=0;
+			}
+		if (op[0] & 5)
+			throw op[1];
+		return { value: op[0] ? op[1] : void 0, done: true };
 	}
-	return t;
 };
 var OfficeCore;
 (function (OfficeCore) {
@@ -17385,6 +17485,11 @@ var OfficeCore;
 		CommentTextFormat["markdown"]="Markdown";
 		CommentTextFormat["delta"]="Delta";
 	})(CommentTextFormat=OfficeCore.CommentTextFormat || (OfficeCore.CommentTextFormat={}));
+	var PersonaCardPerfPoint;
+	(function (PersonaCardPerfPoint) {
+		PersonaCardPerfPoint["placeHolderRendered"]="PlaceHolderRendered";
+		PersonaCardPerfPoint["initialCardRendered"]="InitialCardRendered";
+	})(PersonaCardPerfPoint=OfficeCore.PersonaCardPerfPoint || (OfficeCore.PersonaCardPerfPoint={}));
 	var UnifiedCommunicationAvailability;
 	(function (UnifiedCommunicationAvailability) {
 		UnifiedCommunicationAvailability["notSet"]="NotSet";
@@ -19488,6 +19593,9 @@ var OfficeCore;
 		Persona.prototype.getViewableSources=function () {
 			return _invokeMethod(this, "GetViewableSources", 0, [], 0, 0);
 		};
+		Persona.prototype.reportTimeForRender=function (perfpoint, millisecUTC) {
+			_invokeMethod(this, "ReportTimeForRender", 0, [perfpoint, millisecUTC], 0, 0);
+		};
 		Persona.prototype.warmup=function (dataToWarmUp) {
 			_invokeMethod(this, "Warmup", 0, [dataToWarmUp], 0, 0);
 		};
@@ -19921,6 +20029,9 @@ var OfficeCore;
 		ServiceContext.prototype.getPersonaLifetime=function (instanceId) {
 			return _createMethodObject(OfficeCore.PersonaLifetime, this, "GetPersonaLifetime", 0, [instanceId], false, false, null, 0);
 		};
+		ServiceContext.prototype.getPersonaPolicies=function () {
+			return _invokeMethod(this, "GetPersonaPolicies", 0, [], 0, 0);
+		};
 		ServiceContext.prototype._handleResult=function (value) {
 			_super.prototype._handleResult.call(this, value);
 			if (_isNullOrUndefined(value))
@@ -20075,6 +20186,27 @@ var OfficeCore;
 		AppRuntimeService.newObject=function (context) {
 			return _createTopLevelServiceObject(OfficeCore.AppRuntimeService, context, "Microsoft.AppRuntime.AppRuntimeService", false, 4);
 		};
+		Object.defineProperty(AppRuntimeService.prototype, "onVisibilityChanged", {
+			get: function () {
+				if (!this.m_visibilityChanged) {
+					this.m_visibilityChanged=new OfficeExtension.GenericEventHandlers(this.context, this, "VisibilityChanged", {
+						eventType: 65539,
+						registerFunc: function () { },
+						unregisterFunc: function () { },
+						getTargetIdFunc: function () { return ""; },
+						eventArgsTransformFunc: function (value) {
+							if (value && value.message) {
+								value.visibility=value.message;
+							}
+							return OfficeExtension.Utility._createPromiseFromResult(value);
+						}
+					});
+				}
+				return this.m_visibilityChanged;
+			},
+			enumerable: true,
+			configurable: true
+		});
 		AppRuntimeService.prototype.toJSON=function () {
 			return _toJson(this, {}, {});
 		};
@@ -20087,12 +20219,19 @@ var OfficeCore;
 		AppRuntimeState["background"]="Background";
 		AppRuntimeState["visible"]="Visible";
 	})(AppRuntimeState=OfficeCore.AppRuntimeState || (OfficeCore.AppRuntimeState={}));
+	var Visibility;
+	(function (Visibility) {
+		Visibility["hidden"]="Hidden";
+		Visibility["visible"]="Visible";
+	})(Visibility=OfficeCore.Visibility || (OfficeCore.Visibility={}));
 	var ErrorCodes;
 	(function (ErrorCodes) {
 		ErrorCodes["apiNotAvailable"]="ApiNotAvailable";
 		ErrorCodes["clientError"]="ClientError";
+		ErrorCodes["controlIdNotFound"]="ControlIdNotFound";
 		ErrorCodes["entryIdRequired"]="EntryIdRequired";
 		ErrorCodes["generalException"]="GeneralException";
+		ErrorCodes["instanceNotFound"]="InstanceNotFound";
 		ErrorCodes["interactiveFlowAborted"]="InteractiveFlowAborted";
 		ErrorCodes["invalidArgument"]="InvalidArgument";
 		ErrorCodes["invalidGrant"]="InvalidGrant";
@@ -20114,88 +20253,154 @@ var OfficeCore;
 	(function (Interfaces) {
 	})(Interfaces=OfficeCore.Interfaces || (OfficeCore.Interfaces={}));
 })(OfficeCore || (OfficeCore={}));
-var OfficeRuntime;
-(function (OfficeRuntime) {
-	var AppRuntimeState;
-	(function (AppRuntimeState) {
-		AppRuntimeState["inactive"]="Inactive";
-		AppRuntimeState["background"]="Background";
-		AppRuntimeState["visible"]="Visible";
-	})(AppRuntimeState=OfficeRuntime.AppRuntimeState || (OfficeRuntime.AppRuntimeState={}));
-	OfficeRuntime.RuntimeState=__assign({}, AppRuntimeState);
-	var CurrentRuntime=(function () {
-		function CurrentRuntime() {
+var Office;
+(function (Office) {
+	Office.Visibility=OfficeCore.Visibility;
+	var StartupBehavior;
+	(function (StartupBehavior) {
+		StartupBehavior["none"]="None";
+		StartupBehavior["load"]="Load";
+	})(StartupBehavior=Office.StartupBehavior || (Office.StartupBehavior={}));
+	var addin;
+	(function (addin) {
+		var _this=this;
+		function _createRequestContext(wacPartition) {
+			var context=new OfficeCore.RequestContext();
+			context._requestFlagModifier |=64;
+			if (wacPartition) {
+				context._customData='WacPartition';
+			}
+			return context;
 		}
-		CurrentRuntime.prototype.setStartupState=function (state) {
-			return this.callAppRuntimeManagerToReturnVoid(function (appRuntimeMgr) {
-				appRuntimeMgr.context._customData="";
-				return appRuntimeMgr.getAppRuntimePersistenceService().setAppRuntimeStartState(state);
+		function setStartupBehavior(behavior) {
+			return __awaiter(this, void 0, void 0, function () {
+				var state, context, appRuntimePersistenceService;
+				return __generator(this, function (_a) {
+					switch (_a.label) {
+						case 0:
+							if (behavior !==StartupBehavior.load && behavior !==StartupBehavior.none) {
+								throw OfficeExtension.Utility.createRuntimeError(OfficeExtension.ErrorCodes.invalidArgument, null, null);
+							}
+							state=(behavior==StartupBehavior.load ? OfficeCore.AppRuntimeState.background : OfficeCore.AppRuntimeState.inactive);
+							context=_createRequestContext(false);
+							appRuntimePersistenceService=OfficeCore.AppRuntimePersistenceService.newObject(context);
+							appRuntimePersistenceService.setAppRuntimeStartState(state);
+							return [4, context.sync()];
+						case 1:
+							_a.sent();
+							return [2];
+					}
+				});
 			});
-		};
-		;
-		CurrentRuntime.prototype.getStartupState=function () {
-			return this.callAppRuntimeManagerToReturnRuntimeState(function (appRuntimeMgr) {
-				appRuntimeMgr.context._customData="";
-				return appRuntimeMgr.getAppRuntimePersistenceService().getAppRuntimeStartState();
-			});
-		};
-		;
-		CurrentRuntime.prototype.setState=function (state) {
-			return this.callAppRuntimeManagerToReturnVoid(function (appRuntimeMgr) {
-				appRuntimeMgr.context._customData='WacPartition';
-				return appRuntimeMgr.getAppRuntimeService().setAppRuntimeState(state);
-			});
-		};
-		;
-		CurrentRuntime.prototype.getState=function () {
-			return this.callAppRuntimeManagerToReturnRuntimeState(function (appRuntimeMgr) {
-				appRuntimeMgr.context._customData='WacPartition';
-				return appRuntimeMgr.getAppRuntimeService().getAppRuntimeState();
-			});
-		};
-		;
-		CurrentRuntime.prototype.callAppRuntimeManagerToReturnRuntimeState=function (nativeCall) {
-			var appRtManager=AppRuntimeManager.getInstance();
-			var result=nativeCall(appRtManager);
-			return appRtManager.context.sync().then(function () {
-				return result.value;
-			});
-		};
-		CurrentRuntime.prototype.callAppRuntimeManagerToReturnVoid=function (nativeCall) {
-			var appRtManager=AppRuntimeManager.getInstance();
-			nativeCall(appRtManager);
-			return appRtManager.context.sync();
-		};
-		return CurrentRuntime;
-	}());
-	OfficeRuntime.CurrentRuntime=CurrentRuntime;
-	OfficeRuntime.currentRuntime=new CurrentRuntime();
-	var AppRuntimeManager=(function () {
-		function AppRuntimeManager() {
-			this.context=new OfficeExtension.ClientRequestContext();
 		}
-		AppRuntimeManager.getInstance=function () {
-			if (AppRuntimeManager.instance===undefined) {
-				AppRuntimeManager.instance=new AppRuntimeManager();
+		addin.setStartupBehavior=setStartupBehavior;
+		function getStartupBehavior() {
+			return __awaiter(this, void 0, void 0, function () {
+				var context, appRuntimePersistenceService, stateResult, state, ret;
+				return __generator(this, function (_a) {
+					switch (_a.label) {
+						case 0:
+							context=_createRequestContext(false);
+							appRuntimePersistenceService=OfficeCore.AppRuntimePersistenceService.newObject(context);
+							stateResult=appRuntimePersistenceService.getAppRuntimeStartState();
+							return [4, context.sync()];
+						case 1:
+							_a.sent();
+							state=stateResult.value;
+							ret=(state==OfficeCore.AppRuntimeState.inactive ? StartupBehavior.none : StartupBehavior.load);
+							return [2, ret];
+					}
+				});
+			});
+		}
+		addin.getStartupBehavior=getStartupBehavior;
+		function _setState(state) {
+			return __awaiter(this, void 0, void 0, function () {
+				var context, appRuntimeService;
+				return __generator(this, function (_a) {
+					switch (_a.label) {
+						case 0:
+							context=_createRequestContext(true);
+							appRuntimeService=OfficeCore.AppRuntimeService.newObject(context);
+							appRuntimeService.setAppRuntimeState(state);
+							return [4, context.sync()];
+						case 1:
+							_a.sent();
+							return [2];
+					}
+				});
+			});
+		}
+		function _getState() {
+			return __awaiter(this, void 0, void 0, function () {
+				var context, appRuntimeService, stateResult;
+				return __generator(this, function (_a) {
+					switch (_a.label) {
+						case 0:
+							context=_createRequestContext(true);
+							appRuntimeService=OfficeCore.AppRuntimeService.newObject(context);
+							stateResult=appRuntimeService.getAppRuntimeState();
+							return [4, context.sync()];
+						case 1:
+							_a.sent();
+							return [2, stateResult.value];
+					}
+				});
+			});
+		}
+		addin._getState=_getState;
+		function showAsTaskpane() {
+			return _setState(OfficeCore.AppRuntimeState.visible);
+		}
+		addin.showAsTaskpane=showAsTaskpane;
+		function hide() {
+			return _setState(OfficeCore.AppRuntimeState.background);
+		}
+		addin.hide=hide;
+		var _appRuntimeEvent;
+		function _getAppRuntimeEventService() {
+			if (!_appRuntimeEvent) {
+				var context=_createRequestContext(true);
+				_appRuntimeEvent=OfficeCore.AppRuntimeService.newObject(context);
 			}
-			return AppRuntimeManager.instance;
-		};
-		AppRuntimeManager.prototype.getAppRuntimeService=function () {
-			if (!this._appRuntimeService) {
-				this._appRuntimeService=OfficeCore.AppRuntimeService.newObject(AppRuntimeManager.instance.context);
+			return _appRuntimeEvent;
+		}
+		addin.onVisibilityChanged={
+			add: function (handler) {
+				return __awaiter(_this, void 0, void 0, function () {
+					var _this=this;
+					var eventService, registrationToken;
+					return __generator(this, function (_a) {
+						switch (_a.label) {
+							case 0:
+								eventService=_getAppRuntimeEventService();
+								registrationToken=eventService.onVisibilityChanged.add(handler);
+								return [4, eventService.context.sync()];
+							case 1:
+								_a.sent();
+								return [2, {
+										remove: function () {
+											return __awaiter(_this, void 0, void 0, function () {
+												return __generator(this, function (_a) {
+													switch (_a.label) {
+														case 0:
+															registrationToken.remove();
+															return [4, eventService.context.sync()];
+														case 1:
+															_a.sent();
+															return [2];
+													}
+												});
+											});
+										}
+									}];
+						}
+					});
+				});
 			}
-			return this._appRuntimeService;
 		};
-		AppRuntimeManager.prototype.getAppRuntimePersistenceService=function () {
-			if (!this._appRuntimePersistenceService) {
-				this._appRuntimePersistenceService=OfficeCore.AppRuntimePersistenceService.newObject(AppRuntimeManager.instance.context);
-			}
-			return this._appRuntimePersistenceService;
-		};
-		return AppRuntimeManager;
-	}());
-	;
-})(OfficeRuntime || (OfficeRuntime={}));
+	})(addin=Office.addin || (Office.addin={}));
+})(Office || (Office={}));
 var __extends=(this && this.__extends) || (function () {
 	var extendStatics=Object.setPrototypeOf ||
 		({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__=b; }) ||

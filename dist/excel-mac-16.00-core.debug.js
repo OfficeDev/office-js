@@ -1108,7 +1108,8 @@ OSF.AgaveHostAction = {
     "EnableTaskPaneHeaderButton": 29,
     "DisableTaskPaneHeaderButton": 30,
     "TaskPaneHeaderButtonClicked": 31,
-    "RemoveAppCommandsAddin": 32
+    "RemoveAppCommandsAddin": 32,
+    "RefreshRibbonGallery": 33
 };
 OSF.SharedConstants = {
     "NotificationConversationIdSuffix": '_ntf'
@@ -1272,6 +1273,7 @@ Microsoft.Office.WebExtension.Parameters = {
     UseDeviceIndependentPixels: "useDeviceIndependentPixels",
     PromptBeforeOpen: "promptBeforeOpen",
     EnforceAppDomain: "enforceAppDomain",
+    UrlNoHostInfo: "urlNoHostInfo",
     AppCommandInvocationCompletedData: "appCommandInvocationCompletedData",
     Base64: "base64",
     FormId: "formId"
@@ -2296,6 +2298,11 @@ OSF.DDA.Context = function OSF_DDA_Context(officeAppContext, document, license, 
     if (officeAppContext.ui && officeAppContext.ui.taskPaneAction) {
         OSF.OUtil.defineEnumerableProperty(this, "taskPaneAction", {
             value: officeAppContext.ui.taskPaneAction
+        });
+    }
+    if (officeAppContext.ui && officeAppContext.ui.ribbonGallery) {
+        OSF.OUtil.defineEnumerableProperty(this, "ribbonGallery", {
+            value: officeAppContext.ui.ribbonGallery
         });
     }
     if (officeAppContext.get_isDialog()) {
@@ -4139,8 +4146,16 @@ OSF.DDA.SafeArray.Delegate.executeAsync = function OSF_DDA_SafeArray_Delegate$Ex
             args.onCalling();
         }
         OSF.ClientHostController.execute(args.dispId, toArray(args.hostCallArgs), function OSF_DDA_SafeArrayFacade$Execute_OnResponse(hostResponseArgs, resultCode) {
-            var result = hostResponseArgs.toArray();
-            var status = result[OSF.DDA.SafeArray.Response.Status];
+            var result;
+            var status;
+            if (typeof hostResponseArgs === "number") {
+                result = [];
+                status = hostResponseArgs;
+            }
+            else {
+                result = hostResponseArgs.toArray();
+                status = result[OSF.DDA.SafeArray.Response.Status];
+            }
             if (status == OSF.DDA.ErrorCodeManager.errorCodes.ooeChunkResult) {
                 var payload = result[OSF.DDA.SafeArray.Response.Payload];
                 payload = fromSafeArray(payload);
@@ -7003,6 +7018,13 @@ OSF.DDA.AsyncMethodCalls.define({
         },
         {
             name: Microsoft.Office.WebExtension.Parameters.EnforceAppDomain,
+            value: {
+                "types": ["boolean"],
+                "defaultValue": false
+            }
+        },
+        {
+            name: Microsoft.Office.WebExtension.Parameters.UrlNoHostInfo,
             value: {
                 "types": ["boolean"],
                 "defaultValue": false

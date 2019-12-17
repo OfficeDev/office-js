@@ -1,4 +1,4 @@
-/* Version: 16.0.12223.10000 */
+/* Version: 16.0.12322.10000 */
 /*
 	Copyright (c) Microsoft Corporation.  All rights reserved.
 */
@@ -7005,7 +7005,9 @@ var Excel;
 			/// <field name="content" type="String">Gets or sets the comment&apos;s content. The string is plain text. [Api set: ExcelApi 1.10]</field>
 			/// <field name="creationDate" type="Date">Gets the creation time of the comment. Returns null if the comment was converted from a note, since the comment does not have a creation date. [Api set: ExcelApi 1.10]</field>
 			/// <field name="id" type="String">Represents the comment identifier. Read-only. [Api set: ExcelApi 1.10]</field>
+			/// <field name="mentions" type="Array" elementType="Excel.Interfaces.CommentMention">Gets the entities (e.g. people) that are mentioned in comments. [Api set: ExcelApiOnline 1.1]</field>
 			/// <field name="replies" type="Excel.CommentReplyCollection">Represents a collection of reply objects associated with the comment. Read-only. [Api set: ExcelApi 1.10]</field>
+			/// <field name="richContent" type="String">Gets the rich comment content (e.g. mentions in comments). This string is not meant to be displayed to end-users. Your add-in should only use this to parse rich comment content. [Api set: ExcelApiOnline 1.1]</field>
 		}
 
 		Comment.prototype.load = function(option) {
@@ -7042,6 +7044,13 @@ var Excel;
 			/// </summary>
 			/// <returns type="Excel.Range"></returns>
 		}
+		Comment.prototype.updateMentions = function(contentWithMentions) {
+			/// <summary>
+			/// Updates the comment content with a specially formatted string and a list of mentions. [Api set: ExcelApiOnline 1.1]
+			/// </summary>
+			/// <param name="contentWithMentions" type="Excel.Interfaces.CommentRichContent">The content for the comment. This contains a specially formatted string and a list of mentions that will be parsed into the string when displayed by Excel.</param>
+			/// <returns ></returns>
+		}
 
 		return Comment;
 	})(OfficeExtension.ClientObject);
@@ -7071,8 +7080,8 @@ var Excel;
 			/// Creates a new comment with the given content on the given cell. An `InvalidArgument` error is thrown if the provided range is larger than one cell. [Api set: ExcelApi 1.10]
 			/// </summary>
 			/// <param name="cellAddress" >The cell to which the comment is added. This can be a Range object or a string. If it&apos;s a string, it must contain the full address, including the sheet name. An `InvalidArgument` error is thrown if the provided range is larger than one cell.</param>
-			/// <param name="content" >The comment&apos;s content. This can be either a string or CommentRichContent object. Strings are used for plain text. CommentRichContent objects allow for other comment features, such as mentions. [Api set: ExcelApi 1.10 for string, ExcelApi Preview for CommentRichContent object]</param>
-			/// <param name="contentType" type="String" optional="true">Optional. The type of content contained within the comment. The default value is enum `ContentType.plain`.</param>
+			/// <param name="content" >The comment&apos;s content. This can be either a string or CommentRichContent object. Strings are used for plain text. CommentRichContent objects allow for other comment features, such as mentions. [Api set: ExcelApi 1.10 for string, ExcelApiOnline 1.1 for CommentRichContent object]</param>
+			/// <param name="contentType" type="String" optional="true">Optional. The type of content contained within the comment. The default value is enum `ContentType.Plain`. [Api set: ExcelApi 1.10 for Enum ContentType.Plain, ExcelApiOnline 1.1 for Enum ContentType.Mention]</param>
 			/// <returns type="Excel.Comment"></returns>
 		}
 		CommentCollection.prototype.getCount = function() {
@@ -7121,6 +7130,24 @@ var Excel;
 
 var Excel;
 (function (Excel) {
+	var Interfaces;
+	(function (Interfaces) {
+		var CommentMention = (function() {
+			function CommentMention() {
+				/// <summary> Represents the entity that is mentioned in comments. [Api set: ExcelApiOnline 1.1] </summary>
+				/// <field name="email" type="String">Gets or sets the email address of the entity that is mentioned in comment. [Api set: ExcelApiOnline 1.1]</field>
+				/// <field name="id" type="Number">Gets or sets the id of the entity. This is aligned with the id information in `CommentRichContent.richContent`. [Api set: ExcelApiOnline 1.1]</field>
+				/// <field name="name" type="String">Gets or sets the name of the entity that is mentioned in comment. [Api set: ExcelApiOnline 1.1]</field>
+			}
+			return CommentMention;
+		})();
+		Interfaces.CommentMention.__proto__ = null;
+		Interfaces.CommentMention = CommentMention;
+	})(Interfaces = Excel.Interfaces || (Excel.Interfaces = { __proto__: null}));
+})(Excel || (Excel = {__proto__: null}));
+
+var Excel;
+(function (Excel) {
 	var CommentReply = (function(_super) {
 		__extends(CommentReply, _super);
 		function CommentReply() {
@@ -7132,6 +7159,8 @@ var Excel;
 			/// <field name="content" type="String">Gets or sets the comment reply&apos;s content. The string is plain text. [Api set: ExcelApi 1.10]</field>
 			/// <field name="creationDate" type="Date">Gets the creation time of the comment reply. [Api set: ExcelApi 1.10]</field>
 			/// <field name="id" type="String">Represents the comment reply identifier. Read-only. [Api set: ExcelApi 1.10]</field>
+			/// <field name="mentions" type="Array" elementType="Excel.Interfaces.CommentMention">Gets the entities (e.g. people) that are mentioned in comments. [Api set: ExcelApiOnline 1.1]</field>
+			/// <field name="richContent" type="String">Gets the rich comment content (e.g. mentions in comments). This string is not meant to be displayed to end-users. Your add-in should only use this to parse rich comment content. [Api set: ExcelApiOnline 1.1]</field>
 		}
 
 		CommentReply.prototype.load = function(option) {
@@ -7174,6 +7203,13 @@ var Excel;
 			/// </summary>
 			/// <returns type="Excel.Comment"></returns>
 		}
+		CommentReply.prototype.updateMentions = function(contentWithMentions) {
+			/// <summary>
+			/// Updates the comment content with a specially formatted string and a list of mentions. [Api set: ExcelApiOnline 1.1]
+			/// </summary>
+			/// <param name="contentWithMentions" type="Excel.Interfaces.CommentRichContent">The content for the comment. This contains a specially formatted string and a list of mentions that will be parsed into the string when displayed by Excel.</param>
+			/// <returns ></returns>
+		}
 
 		return CommentReply;
 	})(OfficeExtension.ClientObject);
@@ -7202,8 +7238,8 @@ var Excel;
 			/// <summary>
 			/// Creates a comment reply for comment. [Api set: ExcelApi 1.10]
 			/// </summary>
-			/// <param name="content" >The comment&apos;s content. This can be either a string or Interface CommentRichContent (e.g. for comments with mentions). [Api set: ExcelApi 1.10 for string, ExcelApi Preview for CommentRichContent object]</param>
-			/// <param name="contentType" type="String" optional="true">Optional. The type of content contained within the comment. The default value is enum `ContentType.plain`.</param>
+			/// <param name="content" >The comment&apos;s content. This can be either a string or Interface CommentRichContent (e.g. for comments with mentions). [Api set: ExcelApi 1.10 for string, ExcelApiOnline 1.1 for CommentRichContent object]</param>
+			/// <param name="contentType" type="String" optional="true">Optional. The type of content contained within the comment. The default value is enum `ContentType.Plain`. [Api set: ExcelApi 1.10 for Enum ContentType.Plain, ExcelApiOnline 1.1 for Enum ContentType.Mention]</param>
 			/// <returns type="Excel.CommentReply"></returns>
 		}
 		CommentReplyCollection.prototype.getCount = function() {
@@ -7242,7 +7278,9 @@ var Excel;
 	(function (Interfaces) {
 		var CommentRichContent = (function() {
 			function CommentRichContent() {
-				/// <summary> Represents the content contained within a comment or comment reply. Rich content incudes the text string and any other objects contained within the comment body, such as mentions. [Api set: ExcelApi 1.10] </summary>
+				/// <summary> Represents the content contained within a comment or comment reply. Rich content incudes the text string and any other objects contained within the comment body, such as mentions. [Api set: ExcelApiOnline 1.1] </summary>
+				/// <field name="mentions" type="Array" elementType="Excel.Interfaces.CommentMention">An array containing all the entities (e.g. people) mentioned within the comment. [Api set: ExcelApiOnline 1.1]</field>
+				/// <field name="richContent" type="String"> [Api set: ExcelApiOnline 1.1]</field>
 			}
 			return CommentRichContent;
 		})();
@@ -12933,8 +12971,6 @@ var Excel;
 		"threeStars": "threeStars",
 		"threeTriangles": "threeTriangles",
 		"fiveBoxes": "fiveBoxes",
-		"linkedEntityFinanceIcon": "linkedEntityFinanceIcon",
-		"linkedEntityMapIcon": "linkedEntityMapIcon",
 	}
 	Excel.IconSet = IconSet;
 })(Excel || (Excel = {__proto__: null}));
@@ -14866,6 +14902,13 @@ var Excel;
 			/// <param name="across" type="Boolean" optional="true">Optional. Set true to merge cells in each row of the specified range as separate merged cells. The default value is false.</param>
 			/// <returns ></returns>
 		}
+		Range.prototype.moveTo = function(destinationRange) {
+			/// <summary>
+			/// Moves cell values, formatting, and formulas from current range to the destination range, replacing the old information in those cells.               The destination range will be expanded automatically if it is smaller than the current range. Any cells in the destination range that are outside of the original range&apos;s area are not changed. [Api set: ExcelApiOnline 1.1]
+			/// </summary>
+			/// <param name="destinationRange" >destinationRange Specifies the range to where the information in this range will be moved.</param>
+			/// <returns ></returns>
+		}
 		Range.prototype.removeDuplicates = function(columns, includesHeader) {
 			/// <summary>
 			/// Removes duplicate values from the range specified by the columns. [Api set: ExcelApi 1.9]
@@ -15441,6 +15484,13 @@ var Excel;
 			/// <param name="properties" type="RangeFormat">An existing RangeFormat object, with properties that have already been loaded and synced.</param>
 			/// </signature>
 		}
+		RangeFormat.prototype.adjustIndent = function(amount) {
+			/// <summary>
+			/// Adjusts the indentation of the range formatting. The indent value ranges from 0 to 250. [Api set: ExcelApiOnline 1.1]
+			/// </summary>
+			/// <param name="amount" type="Number">The number of character spaces by which the current indent is adjusted. This value should be between -250 and 250.              **Note**: If the amount would raise the indent level above 250, the indent level stays with 250.              Similarly, if the amount would lower the indent level below 0, the indent level stays 0.</param>
+			/// <returns ></returns>
+		}
 		RangeFormat.prototype.autofitColumns = function() {
 			/// <summary>
 			/// Changes the width of the columns of the current range to achieve the best fit, based on the current data in the columns. [Api set: ExcelApi 1.2]
@@ -15700,7 +15750,7 @@ var Excel;
 		var ReplaceCriteria = (function() {
 			function ReplaceCriteria() {
 				/// <summary> Represents the replace criteria to be used. [Api set: ExcelApi 1.9] </summary>
-				/// <field name="completeMatch" type="Boolean">Specifies whether the match needs to be complete or partial. Default is false (partial). [Api set: ExcelApi 1.9]</field>
+				/// <field name="completeMatch" type="Boolean">Specifies whether the match needs to be complete or partial.               A complete match matches the entire contents of the cell. A partial match matches a substring within the content of the cell (e.g., `cat` partially matches `caterpillar` and `scatter`).              Default is false (partial). [Api set: ExcelApi 1.9]</field>
 				/// <field name="matchCase" type="Boolean">Specifies whether the match is case sensitive. Default is false (insensitive). [Api set: ExcelApi 1.9]</field>
 			}
 			return ReplaceCriteria;
@@ -15896,7 +15946,7 @@ var Excel;
 		var SearchCriteria = (function() {
 			function SearchCriteria() {
 				/// <summary> Represents the search criteria to be used. [Api set: ExcelApi 1.9] </summary>
-				/// <field name="completeMatch" type="Boolean">Specifies whether the match needs to be complete or partial. A complete match matches the entire contents of the cell. Default is false (partial). [Api set: ExcelApi 1.9]</field>
+				/// <field name="completeMatch" type="Boolean">Specifies whether the match needs to be complete or partial.               A complete match matches the entire contents of the cell. A partial match matches a substring within the content of the cell (e.g., `cat` partially matches `caterpillar` and `scatter`).              Default is false (partial). [Api set: ExcelApi 1.9]</field>
 				/// <field name="matchCase" type="Boolean">Specifies whether the match is case sensitive. Default is false (insensitive). [Api set: ExcelApi 1.9]</field>
 				/// <field name="searchDirection" type="String">Specifies the search direction. Default is forward. See Excel.SearchDirection. [Api set: ExcelApi 1.9]</field>
 			}
@@ -18883,9 +18933,9 @@ var Excel;
 			/// <summary>
 			/// Copy a worksheet and place it at the specified position. Return the copied worksheet. [Api set: ExcelApi 1.7]
 			/// </summary>
-			/// <param name="positionType" type="String" optional="true">Optional.</param>
-			/// <param name="relativeTo" type="Excel.Worksheet" optional="true">Optional.</param>
-			/// <returns type="Excel.Worksheet"></returns>
+			/// <param name="positionType" type="String" optional="true">The location in the workbook to place the newly created worksheet. The default value is &quot;None&quot;, which inserts the worksheet at the beginning of the worksheet.</param>
+			/// <param name="relativeTo" type="Excel.Worksheet" optional="true">The existing worksheet which determines the newly created worksheet&apos;s position. This is only needed if `positionType` is &quot;Before&quot; or &quot;After&quot;.</param>
+			/// <returns type="Excel.Worksheet">The newly created worksheet.</returns>
 		}
 		Worksheet.prototype.delete = function() {
 			/// <summary>
@@ -19694,7 +19744,7 @@ var Excel;
 		var WorksheetSearchCriteria = (function() {
 			function WorksheetSearchCriteria() {
 				/// <summary> Represents the worksheet search criteria to be used. [Api set: ExcelApi 1.9] </summary>
-				/// <field name="completeMatch" type="Boolean">Specifies whether the match needs to be complete or partial. A complete match matches the entire contents of the cell. Default is false (partial). [Api set: ExcelApi 1.9]</field>
+				/// <field name="completeMatch" type="Boolean">Specifies whether the match needs to be complete or partial.               A complete match matches the entire contents of the cell. A partial match matches a substring within the content of the cell (e.g., `cat` partially matches `caterpillar` and `scatter`).              Default is false (partial). [Api set: ExcelApi 1.9]</field>
 				/// <field name="matchCase" type="Boolean">Specifies whether the match is case sensitive. Default is false (insensitive). [Api set: ExcelApi 1.9]</field>
 			}
 			return WorksheetSearchCriteria;

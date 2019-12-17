@@ -74,69 +74,6 @@ var oteljs = function(modules) {
         DataFieldType[DataFieldType["Int64"] = 2] = "Int64";
         DataFieldType[DataFieldType["Double"] = 3] = "Double";
     })(DataFieldType || (DataFieldType = {}));
-    var TelemetryEventValidator_TelemetryEventValidator;
-    (function(TelemetryEventValidator) {
-        var INT64_MIN = -9007199254740991;
-        var INT64_MAX = 9007199254740991;
-        var StartsWithCapitalRegex = /^[A-Z][a-zA-Z0-9]*$/;
-        var AlphanumericRegex = /^[a-zA-Z0-9_\.]*$/;
-        function validateTelemetryEvent(event) {
-            if (!isEventNameValid(event.eventName)) {
-                throw new Error("Invalid eventName");
-            }
-            if (event.eventContract && !isEventContractValid(event.eventContract)) {
-                throw new Error("Invalid eventContract");
-            }
-            if (event.dataFields != null) {
-                for (var i = 0; i < event.dataFields.length; i++) {
-                    validateDataField(event.dataFields[i]);
-                }
-            }
-        }
-        TelemetryEventValidator.validateTelemetryEvent = validateTelemetryEvent;
-        function isNamespaceValid(eventNamePieces) {
-            return !!eventNamePieces && eventNamePieces.length >= 3 && eventNamePieces[0] === "Office";
-        }
-        function isEventNodeValid(eventNode) {
-            return eventNode !== undefined && StartsWithCapitalRegex.test(eventNode);
-        }
-        function isEventNameValid(eventName) {
-            var maxEventNameLength = 98;
-            if (!eventName || eventName.length > maxEventNameLength) {
-                return false;
-            }
-            var eventNamePieces = eventName.split(".");
-            var eventNodeName = eventNamePieces[eventNamePieces.length - 1];
-            return isNamespaceValid(eventNamePieces) && isEventNodeValid(eventNodeName);
-        }
-        function isEventContractValid(eventContract) {
-            return isNameValid(eventContract.name);
-        }
-        function isDataFieldNameValid(dataFieldName) {
-            var maxDataFieldNameLength = 100;
-            var dataFieldPrefixLength = 5;
-            return !!dataFieldName && isNameValid(dataFieldName) && dataFieldName.length + dataFieldPrefixLength < maxDataFieldNameLength;
-        }
-        function isNameValid(name) {
-            return name !== undefined && AlphanumericRegex.test(name);
-        }
-        function validateDataField(dataField) {
-            if (!isDataFieldNameValid(dataField.name)) {
-                throw new Error("Invalid dataField name");
-            }
-            if (dataField.dataType === DataFieldType.Int64) {
-                validateInt(dataField.value);
-            }
-        }
-        function validateInt(value) {
-            if (typeof value !== "number" || !isFinite(value) || Math.floor(value) !== value || value < INT64_MIN || value > INT64_MAX) {
-                throw {
-                    message: "Invalid integer " + JSON.stringify(value)
-                };
-            }
-        }
-        TelemetryEventValidator.validateInt = validateInt;
-    })(TelemetryEventValidator_TelemetryEventValidator || (TelemetryEventValidator_TelemetryEventValidator = {}));
     function makeBooleanDataField(name, value) {
         return {
             name: name,
@@ -145,7 +82,6 @@ var oteljs = function(modules) {
         };
     }
     function makeInt64DataField(name, value) {
-        TelemetryEventValidator_TelemetryEventValidator.validateInt(value);
         return {
             name: name,
             dataType: DataFieldType.Int64,
@@ -492,6 +428,12 @@ var oteljs = function(modules) {
             level: level,
             category: category,
             message: message
+        });
+    }
+    function logError(category, message, error) {
+        logNotification(LogLevel.Error, category, function() {
+            var errorMessage = error instanceof Error ? error.message : "";
+            return message + ": " + errorMessage;
         });
     }
     var __awaiter = undefined && undefined.__awaiter || function(thisArg, _arguments, P, generator) {
@@ -851,7 +793,7 @@ var oteljs = function(modules) {
             var ariaTenantToken = getAriaTenantToken(eventName);
             var nexusTenantToken = getNexusTenantToken(eventName);
             if (!nexusTenantToken || !ariaTenantToken) {
-                throw new Error("Could not find tenant token");
+                throw new Error("Could not find tenant token for " + eventName);
             }
             return {
                 ariaTenantToken: ariaTenantToken,
@@ -923,16 +865,89 @@ var oteljs = function(modules) {
         }
         TenantTokenManager.clear = clear;
     })(TenantTokenManager_TenantTokenManager || (TenantTokenManager_TenantTokenManager = {}));
-    var oteljsVersion = "3.1.24";
+    var TelemetryEventValidator_TelemetryEventValidator;
+    (function(TelemetryEventValidator) {
+        var INT64_MIN = -9007199254740991;
+        var INT64_MAX = 9007199254740991;
+        var StartsWithCapitalRegex = /^[A-Z][a-zA-Z0-9]*$/;
+        var AlphanumericRegex = /^[a-zA-Z0-9_\.]*$/;
+        function validateTelemetryEvent(event) {
+            if (!isEventNameValid(event.eventName)) {
+                throw new Error("Invalid eventName");
+            }
+            if (event.eventContract && !isEventContractValid(event.eventContract)) {
+                throw new Error("Invalid eventContract");
+            }
+            if (event.dataFields != null) {
+                for (var i = 0; i < event.dataFields.length; i++) {
+                    validateDataField(event.dataFields[i]);
+                }
+            }
+        }
+        TelemetryEventValidator.validateTelemetryEvent = validateTelemetryEvent;
+        function isNamespaceValid(eventNamePieces) {
+            return !!eventNamePieces && eventNamePieces.length >= 3 && eventNamePieces[0] === "Office";
+        }
+        function isEventNodeValid(eventNode) {
+            return eventNode !== undefined && StartsWithCapitalRegex.test(eventNode);
+        }
+        function isEventNameValid(eventName) {
+            var maxEventNameLength = 98;
+            if (!eventName || eventName.length > maxEventNameLength) {
+                return false;
+            }
+            var eventNamePieces = eventName.split(".");
+            var eventNodeName = eventNamePieces[eventNamePieces.length - 1];
+            return isNamespaceValid(eventNamePieces) && isEventNodeValid(eventNodeName);
+        }
+        function isEventContractValid(eventContract) {
+            return isNameValid(eventContract.name);
+        }
+        function isDataFieldNameValid(dataFieldName) {
+            var maxDataFieldNameLength = 100;
+            var dataFieldPrefixLength = 5;
+            return !!dataFieldName && isNameValid(dataFieldName) && dataFieldName.length + dataFieldPrefixLength < maxDataFieldNameLength;
+        }
+        function isNameValid(name) {
+            return name !== undefined && AlphanumericRegex.test(name);
+        }
+        function validateDataField(dataField) {
+            if (!isDataFieldNameValid(dataField.name)) {
+                throw new Error("Invalid dataField name");
+            }
+            if (dataField.dataType === DataFieldType.Int64) {
+                validateInt(dataField.value);
+            }
+        }
+        function validateInt(value) {
+            if (typeof value !== "number" || !isFinite(value) || Math.floor(value) !== value || value < INT64_MIN || value > INT64_MAX) {
+                throw new Error("Invalid integer " + JSON.stringify(value));
+            }
+        }
+        TelemetryEventValidator.validateInt = validateInt;
+    })(TelemetryEventValidator_TelemetryEventValidator || (TelemetryEventValidator_TelemetryEventValidator = {}));
+    var oteljsVersion = "3.1.28";
+    var __assign = undefined && undefined.__assign || function() {
+        __assign = Object.assign || function(t) {
+            for (var s, i = 1, n = arguments.length; i < n; i++) {
+                s = arguments[i];
+                for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p)) t[p] = s[p];
+            }
+            return t;
+        };
+        return __assign.apply(this, arguments);
+    };
     var SuppressNexus = -1;
     var SimpleTelemetryLogger_SimpleTelemetryLogger = function() {
-        function SimpleTelemetryLogger(parent, persistentDataFields) {
+        function SimpleTelemetryLogger(parent, persistentDataFields, config) {
             var _a, _b;
             this.onSendEvent = new Event();
             this.persistentDataFields = [];
+            this.config = config || {};
             if (parent) {
                 this.onSendEvent = parent.onSendEvent;
                 (_a = this.persistentDataFields).push.apply(_a, parent.persistentDataFields);
+                this.config = __assign(__assign({}, parent.getConfig()), this.config);
             } else {
                 this.persistentDataFields.push(makeStringDataField("OTelJS.Version", oteljsVersion));
             }
@@ -941,6 +956,7 @@ var oteljs = function(modules) {
             }
         }
         SimpleTelemetryLogger.prototype.sendTelemetryEvent = function(event) {
+            var localEvent;
             try {
                 if (this.onSendEvent.getListenerCount() === 0) {
                     logNotification(LogLevel.Warning, Category.Core, function() {
@@ -948,20 +964,15 @@ var oteljs = function(modules) {
                     });
                     return;
                 }
-                var localEvent = this.cloneEvent(event);
+                localEvent = this.cloneEvent(event);
                 this.processTelemetryEvent(localEvent);
-                this.onSendEvent.fireEvent(localEvent);
             } catch (error) {
-                var errorMessage_1;
-                if (error instanceof Error) {
-                    errorMessage_1 = error.message;
-                } else {
-                    errorMessage_1 = JSON.stringify(error);
-                }
-                logNotification(LogLevel.Error, Category.Core, function() {
-                    return errorMessage_1;
-                });
+                logError(Category.Core, "SendTelemetryEvent", error);
+                return;
             }
+            try {
+                this.onSendEvent.fireEvent(localEvent);
+            } catch (_e) {}
         };
         SimpleTelemetryLogger.prototype.processTelemetryEvent = function(event) {
             var _a;
@@ -969,7 +980,9 @@ var oteljs = function(modules) {
                 event.telemetryProperties = TenantTokenManager_TenantTokenManager.getTenantTokens(event.eventName);
             }
             (_a = event.dataFields).push.apply(_a, this.persistentDataFields);
-            TelemetryEventValidator_TelemetryEventValidator.validateTelemetryEvent(event);
+            if (!this.config.disableValidation) {
+                TelemetryEventValidator_TelemetryEventValidator.validateTelemetryEvent(event);
+            }
         };
         SimpleTelemetryLogger.prototype.addSink = function(sink) {
             this.onSendEvent.addListener(function(event) {
@@ -1001,6 +1014,9 @@ var oteljs = function(modules) {
             }
             localEvent.dataFields = !!event.dataFields ? event.dataFields.slice() : [];
             return localEvent;
+        };
+        SimpleTelemetryLogger.prototype.getConfig = function() {
+            return this.config;
         };
         return SimpleTelemetryLogger;
     }();
@@ -1240,6 +1256,9 @@ var oteljs = function(modules) {
     });
     __webpack_require__.d(__webpack_exports__, "logNotification", function() {
         return logNotification;
+    });
+    __webpack_require__.d(__webpack_exports__, "logError", function() {
+        return logError;
     });
     __webpack_require__.d(__webpack_exports__, "SuppressNexus", function() {
         return SuppressNexus;

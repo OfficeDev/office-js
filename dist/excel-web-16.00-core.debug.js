@@ -1108,7 +1108,8 @@ OSF.AgaveHostAction = {
     "EnableTaskPaneHeaderButton": 29,
     "DisableTaskPaneHeaderButton": 30,
     "TaskPaneHeaderButtonClicked": 31,
-    "RemoveAppCommandsAddin": 32
+    "RemoveAppCommandsAddin": 32,
+    "RefreshRibbonGallery": 33
 };
 OSF.SharedConstants = {
     "NotificationConversationIdSuffix": '_ntf'
@@ -1272,6 +1273,7 @@ Microsoft.Office.WebExtension.Parameters = {
     UseDeviceIndependentPixels: "useDeviceIndependentPixels",
     PromptBeforeOpen: "promptBeforeOpen",
     EnforceAppDomain: "enforceAppDomain",
+    UrlNoHostInfo: "urlNoHostInfo",
     AppCommandInvocationCompletedData: "appCommandInvocationCompletedData",
     Base64: "base64",
     FormId: "formId"
@@ -2296,6 +2298,11 @@ OSF.DDA.Context = function OSF_DDA_Context(officeAppContext, document, license, 
     if (officeAppContext.ui && officeAppContext.ui.taskPaneAction) {
         OSF.OUtil.defineEnumerableProperty(this, "taskPaneAction", {
             value: officeAppContext.ui.taskPaneAction
+        });
+    }
+    if (officeAppContext.ui && officeAppContext.ui.ribbonGallery) {
+        OSF.OUtil.defineEnumerableProperty(this, "ribbonGallery", {
+            value: officeAppContext.ui.ribbonGallery
         });
     }
     if (officeAppContext.get_isDialog()) {
@@ -3559,7 +3566,8 @@ OSF.ShowWindowDialogParameterKeys = {
     HideTitle: "hideTitle",
     UseDeviceIndependentPixels: "useDeviceIndependentPixels",
     PromptBeforeOpen: "promptBeforeOpen",
-    EnforceAppDomain: "enforceAppDomain"
+    EnforceAppDomain: "enforceAppDomain",
+    UrlNoHostInfo: "urlNoHostInfo"
 };
 OSF.HostThemeButtonStyleKeys = {
     ButtonBorderColor: "buttonBorderColor",
@@ -5219,6 +5227,7 @@ OSF.OUtil.setNamespace("WebApp", OSF);
 OSF.OUtil.setNamespace("Messaging", OSF);
 OSF.OUtil.setNamespace("ExtensionLifeCycle", OSF);
 OSF.OUtil.setNamespace("TaskPaneAction", OSF);
+OSF.OUtil.setNamespace("RibbonGallery", OSF);
 OSF.WebApp.AddHostInfoAndXdmInfo = function OSF_WebApp$AddHostInfoAndXdmInfo(url) {
     if (OSF._OfficeAppFactory.getWindowLocationSearch && OSF._OfficeAppFactory.getWindowLocationHash) {
         return url + OSF._OfficeAppFactory.getWindowLocationSearch() + OSF._OfficeAppFactory.getWindowLocationHash();
@@ -5387,7 +5396,7 @@ OSF.InitializationHelper.prototype.getAppContext = function OSF_InitializationHe
             }
             throw errorMsg;
         }
-        if (typeof CustomEvent !== "undefined" && typeof dispatchEvent !== "undefined") {
+        if (typeof CustomEvent === "function" && typeof dispatchEvent === "function") {
             dispatchEvent(new CustomEvent("JSPerfFinished"));
         }
     };
@@ -5519,6 +5528,7 @@ OSF.InitializationHelper.prototype.addOrRemoveEventListenersForWindow = function
             e.returnValue = false;
         };
         if (e.keyCode == 117 && (e.ctrlKey || e.metaKey)) {
+            e.preventDefault();
             var actionId = OSF.AgaveHostAction.CtrlF6Exit;
             if (e.shiftKey) {
                 actionId = OSF.AgaveHostAction.CtrlF6ExitShift;
@@ -5642,6 +5652,9 @@ OSF.TaskPaneAction.enableHeaderButton = function OSF_TaskPaneAction$enableHeader
 };
 OSF.TaskPaneAction.disableHeaderButton = function OSF_TaskPaneAction$disableHeaderButton() {
     OSF.getClientEndPoint().invoke("ContextActivationManager_notifyHost", null, [OSF._OfficeAppFactory.getWebAppState().id, OSF.AgaveHostAction.DisableTaskPaneHeaderButton]);
+};
+OSF.RibbonGallery.refreshRibbon = function OSF_RibbonGallery$refreshRibbon(params) {
+    OSF.getClientEndPoint().invoke("ContextActivationManager_notifyHost", null, [OSF._OfficeAppFactory.getWebAppState().id, OSF.AgaveHostAction.RefreshRibbonGallery, params]);
 };
 var OSFLog;
 (function (OSFLog) {
@@ -7441,6 +7454,13 @@ OSF.DDA.AsyncMethodCalls.define({
                 "types": ["boolean"],
                 "defaultValue": false
             }
+        },
+        {
+            name: Microsoft.Office.WebExtension.Parameters.UrlNoHostInfo,
+            value: {
+                "types": ["boolean"],
+                "defaultValue": false
+            }
         }
     ],
     privateStateCallbacks: [],
@@ -8013,7 +8033,9 @@ var OfficeExt;
                 var hostInfo = hostInfoVals.join("|");
                 var appContext = OSF._OfficeAppFactory.getInitializationHelper()._appContext;
                 var windowUrl = dialogInfo[OSF.ShowWindowDialogParameterKeys.Url];
-                windowUrl = OfficeExt.WACUtils.addHostInfoAsQueryParam(windowUrl, hostInfo);
+                if (!dialogInfo[OSF.ShowWindowDialogParameterKeys.UrlNoHostInfo]) {
+                    windowUrl = OfficeExt.WACUtils.addHostInfoAsQueryParam(windowUrl, hostInfo);
+                }
                 var windowName = JSON.parse(window.name);
                 windowName[OSF.WindowNameItemKeys.HostInfo] = hostInfo;
                 windowName[OSF.WindowNameItemKeys.AppContext] = appContext;

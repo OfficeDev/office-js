@@ -1,5 +1,5 @@
 /* Outlook web application specific API library */
-/* Version: 16.0.12219.10000 */
+/* Version: 16.0.12312.10000 */
 /*
 /*!
 Copyright (c) Microsoft Corporation.  All rights reserved.
@@ -1202,7 +1202,8 @@ OSF.AgaveHostAction = {
     EnableTaskPaneHeaderButton: 29,
     DisableTaskPaneHeaderButton: 30,
     TaskPaneHeaderButtonClicked: 31,
-    RemoveAppCommandsAddin: 32
+    RemoveAppCommandsAddin: 32,
+    RefreshRibbonGallery: 33
 };
 OSF.SharedConstants = {NotificationConversationIdSuffix: "_ntf"};
 OSF.DialogMessageType = {
@@ -2765,6 +2766,8 @@ OSF.DDA.Context = function OSF_DDA_Context(officeAppContext, document, license, 
         OSF.OUtil.defineEnumerableProperty(this,"messaging",{value: officeAppContext.messaging});
     if(officeAppContext.ui && officeAppContext.ui.taskPaneAction)
         OSF.OUtil.defineEnumerableProperty(this,"taskPaneAction",{value: officeAppContext.ui.taskPaneAction});
+    if(officeAppContext.ui && officeAppContext.ui.ribbonGallery)
+        OSF.OUtil.defineEnumerableProperty(this,"ribbonGallery",{value: officeAppContext.ui.ribbonGallery});
     if(officeAppContext.get_isDialog())
     {
         var requirements = OfficeExt.Requirement.RequirementsMatrixFactory.getDefaultDialogRequirementMatrix(officeAppContext);
@@ -5554,6 +5557,7 @@ OSF.OUtil.setNamespace("WebApp",OSF);
 OSF.OUtil.setNamespace("Messaging",OSF);
 OSF.OUtil.setNamespace("ExtensionLifeCycle",OSF);
 OSF.OUtil.setNamespace("TaskPaneAction",OSF);
+OSF.OUtil.setNamespace("RibbonGallery",OSF);
 OSF.WebApp.AddHostInfoAndXdmInfo = function OSF_WebApp$AddHostInfoAndXdmInfo(url)
 {
     if(OSF._OfficeAppFactory.getWindowLocationSearch && OSF._OfficeAppFactory.getWindowLocationHash)
@@ -5728,7 +5732,7 @@ OSF.InitializationHelper.prototype.getAppContext = function OSF_InitializationHe
                     OSF.AppTelemetry.logAppException(errorMsg);
                 throw errorMsg;
             }
-            if(typeof CustomEvent !== "undefined" && typeof dispatchEvent !== "undefined")
+            if(typeof CustomEvent === "function" && typeof dispatchEvent === "function")
                 dispatchEvent(new CustomEvent("JSPerfFinished"))
         };
     try
@@ -5866,6 +5870,7 @@ OSF.InitializationHelper.prototype.addOrRemoveEventListenersForWindow = function
             };
             if(e.keyCode == 117 && (e.ctrlKey || e.metaKey))
             {
+                e.preventDefault();
                 var actionId = OSF.AgaveHostAction.CtrlF6Exit;
                 if(e.shiftKey)
                     actionId = OSF.AgaveHostAction.CtrlF6ExitShift;
@@ -5998,6 +6003,10 @@ OSF.TaskPaneAction.enableHeaderButton = function OSF_TaskPaneAction$enableHeader
 OSF.TaskPaneAction.disableHeaderButton = function OSF_TaskPaneAction$disableHeaderButton()
 {
     OSF.getClientEndPoint().invoke("ContextActivationManager_notifyHost",null,[OSF._OfficeAppFactory.getWebAppState().id,OSF.AgaveHostAction.DisableTaskPaneHeaderButton])
+};
+OSF.RibbonGallery.refreshRibbon = function OSF_RibbonGallery$refreshRibbon(params)
+{
+    OSF.getClientEndPoint().invoke("ContextActivationManager_notifyHost",null,[OSF._OfficeAppFactory.getWebAppState().id,OSF.AgaveHostAction.RefreshRibbonGallery,params])
 };
 (function()
 {
@@ -7391,7 +7400,7 @@ var OSFAppTelemetry;
             appInfo.appInstanceId = appInfo.appInstanceId.replace(/[{}]/g,"").toLowerCase();
         appInfo.message = context.get_hostCustomMessage();
         appInfo.officeJSVersion = OSF.ConstantNames.FileVersion;
-        appInfo.hostJSVersion = "16.0.12212.10000";
+        appInfo.hostJSVersion = "16.0.12312.10000";
         if(context._wacHostEnvironment)
             appInfo.wacHostEnvironment = context._wacHostEnvironment;
         if(context._isFromWacAutomation !== undefined && context._isFromWacAutomation !== null)
@@ -9613,7 +9622,7 @@ OSF.DDA.WAC.Delegate.ParameterMap.define({
             value: OSF.DDA.Marshaling.SingleSignOn.GetAccessTokenKeys.AllowConsentPrompt
         },{
             name: Microsoft.Office.WebExtension.Parameters.ForMSGraphAccess,
-            value: OSF.DDA.Marshaling.SingleSignOn.GetAccessTokenKeys.forMSGraphAccess
+            value: OSF.DDA.Marshaling.SingleSignOn.GetAccessTokenKeys.ForMSGraphAccess
         },{
             name: Microsoft.Office.WebExtension.Parameters.AllowSignInPrompt,
             value: OSF.DDA.Marshaling.SingleSignOn.GetAccessTokenKeys.AllowSignInPrompt
