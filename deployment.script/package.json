@@ -1,0 +1,25 @@
+{
+  "name": "@microsoft/office-js-deployment-script",
+  "description": "Deployment Script for Office.js",
+  "version": "0.0.0",
+  "engines": {
+    "node": ">=6.9.4"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "deploy": "node ./out/index.js",
+    "test": "./node_modules/.bin/ts-node ./src/index.ts",
+    "lint": "tslint --project tsconfig.json",
+    "debug": "npm run build && node ./out/debug.js",
+    "prettier": "prettier --list-different \"./**/*.@(ts|tsx|js|jsx|html)\"",
+    "prettier:write": "prettier --write \"./**/*.@(ts|tsx|js|jsx|html)\""
+  },
+  "devDependencies": {
+    "@types/node": "^7.10.6",
+    "@types/semver": "^5.5.0"
+  },
+  "dependencies": {
+    "semver": "^5.6.0",
+    "typescript": "^2.9.2"
+  }
+}
