@@ -1,6 +1,6 @@
 /* Outlook iOS specific API library */
 /* osfweb version: 16.0.12312.10000 */
-/* office-js-api version: 20191121.2 */
+/* office-js-api version: 20191204.1 */
 /*
 	Copyright (c) Microsoft Corporation.  All rights reserved.
 */
@@ -8852,17 +8852,16 @@ var getDiagnostics_getHostName = function getHostName() {
     case getDiagnostics_OSF.AppName.OutlookWebApp:
       return "OutlookWebApp";
 
-    case getDiagnostics_OSF.AppName.OutlookIOSApp:
+    case getDiagnostics_OSF.AppName.OutlookIOS:
       return "OutlookIOS";
 
-    case getDiagnostics_OSF.AppName.OutlookAndroidApp:
+    case getDiagnostics_OSF.AppName.OutlookAndroid:
       return "OutlookAndroid";
 
     default:
       return undefined;
   }
 };
-
 function getDiagnosticsSurface() {
   return objectDefine({}, {
     hostName: getDiagnostics_getHostName(),
