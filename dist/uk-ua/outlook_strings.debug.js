@@ -4,6 +4,7 @@ _u.ExtensibilityStrings = function()
 };
 _u.ExtensibilityStrings.registerClass("_u.ExtensibilityStrings");
 _u.ExtensibilityStrings.l_APICallFailedDueToItemChange_Text = "Вибраний елемент змінено.";
+_u.ExtensibilityStrings.l_API_Not_Supported_By_ExtensionPoint_Error_Text = "API не підтримується для точки розширення.";
 _u.ExtensibilityStrings.l_ActionsDefinitionMultipleActionsError_Text = "Зараз підтримується лише одна дія.";
 _u.ExtensibilityStrings.l_ActionsDefinitionWrongNotificationMessageError_Text = "Не можна визначати дії для цього типу сповіщення.";
 _u.ExtensibilityStrings.l_AttachmentDeleteGeneralFailure_Text = "Вкладення не можна видалити з елемента.";
@@ -49,6 +50,7 @@ _u.ExtensibilityStrings.l_InvalidTime_Text = "Введене значення н
 _u.ExtensibilityStrings.l_Invalid_Category_Error_Text = "Надані недійсні категорії.";
 _u.ExtensibilityStrings.l_Item_Not_Saved_Error_Text = "Щоб отримати ідентифікатор, спочатку збережіть елемент.";
 _u.ExtensibilityStrings.l_MessageInDifferentStoreError_Text = "Не вдалось отримати ідентифікатор EWS, тому що повідомлення збережено в іншому сховищі.";
+_u.ExtensibilityStrings.l_Missing_Extended_Permissions_For_API = "Extended Permission missing for the API call.";
 _u.ExtensibilityStrings.l_NoValidRecipientsProvided_Text = "Не вказано жодного припустимого одержувача.";
 _u.ExtensibilityStrings.l_NotificationKeyNotFound_Text = "Немає сповіщень із наданим ключем.";
 _u.ExtensibilityStrings.l_NullOrEmptyParameterError_Text = 'Параметр "{0}" обов’язковий. Він не може бути пустим або мати Null-значення.';
@@ -67,3 +69,4 @@ _u.ExtensibilityStrings.l_RecurrenceUnsupportedAlternateCalendar_Text = "Кор�
 _u.ExtensibilityStrings.l_Recurrence_Error_Instance_SetAsync_Text = "Не можна вказати шаблон повторення для однієї події в низці.";
 _u.ExtensibilityStrings.l_Recurrence_Error_Properties_Invalid_Text = "Неприпустимий шаблон повторення. Переконайтеся, що вказані властивості повторення узгоджені з типом повторення.";
 _u.ExtensibilityStrings.l_SaveError_Text = "Під час спроби зберегти цей елемент на сервері сталася помилка.";
+_u.ExtensibilityStrings.l_TokenAccessDeniedWithoutItemContext_Text = "A REST token is only available with ReadWriteMailbox permission when there is no item context.";

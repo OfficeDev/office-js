@@ -134,6 +134,7 @@ Strings.OfficeOM.L_NotImplemented = "Funcția {0} nu este implementată.";
 Strings.OfficeOM.L_NotSupported = "Funcția {0} nu este acceptată.";
 Strings.OfficeOM.L_NotSupportedBindingType = "Tipul de legare {0} specificat nu este acceptat.";
 Strings.OfficeOM.L_NotSupportedEventType = "Tipul de eveniment {0} specificat nu este acceptat.";
+Strings.OfficeOM.L_NotTrustedWAC = "Acest program de completare a fost blocat pentru a vă proteja datele. Puteți continua să utilizați programul de completare descărcând o copie a acestui document pe computerul dvs.";
 Strings.OfficeOM.L_OperationCancelledError = "Operațiune anulată";
 Strings.OfficeOM.L_OperationCancelledErrorMessage = "Această operațiune a fost anulată de utilizator.";
 Strings.OfficeOM.L_OperationNotSupported = "Operație neacceptată.";

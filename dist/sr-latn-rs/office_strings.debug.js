@@ -134,6 +134,7 @@ Strings.OfficeOM.L_NotImplemented = "Funkcija {0} nije primenjena.";
 Strings.OfficeOM.L_NotSupported = "Funkcija {0} nije podržana.";
 Strings.OfficeOM.L_NotSupportedBindingType = "Navedeni tip povezivanja {0} nije podržan.";
 Strings.OfficeOM.L_NotSupportedEventType = "Navedeni tip događaja {0} nije podržan.";
+Strings.OfficeOM.L_NotTrustedWAC = "Ovaj programski dodatak je blokiran kako bi se zaštitili vaši podaci. Možete nastaviti da koristite programski dodatak preuzimanjem kopije ovog dokumenta na računar";
 Strings.OfficeOM.L_OperationCancelledError = "Operacija je otkazana";
 Strings.OfficeOM.L_OperationCancelledErrorMessage = "Korisnik je otkazao operaciju.";
 Strings.OfficeOM.L_OperationNotSupported = "Operacija nije podržana.";

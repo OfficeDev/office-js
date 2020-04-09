@@ -4,6 +4,7 @@ _u.ExtensibilityStrings = function()
 };
 _u.ExtensibilityStrings.registerClass("_u.ExtensibilityStrings");
 _u.ExtensibilityStrings.l_APICallFailedDueToItemChange_Text = "Het geselecteerde item is gewijzigd.";
+_u.ExtensibilityStrings.l_API_Not_Supported_By_ExtensionPoint_Error_Text = "API wordt niet ondersteund voor uitbreidingspunt.";
 _u.ExtensibilityStrings.l_ActionsDefinitionMultipleActionsError_Text = "Er wordt momenteel slechts één actie ondersteund.";
 _u.ExtensibilityStrings.l_ActionsDefinitionWrongNotificationMessageError_Text = "Voor dit meldingstype kunnen geen acties worden gedefinieerd.";
 _u.ExtensibilityStrings.l_AttachmentDeleteGeneralFailure_Text = "De bijlage kan niet worden verwijderd uit het item.";
@@ -49,6 +50,7 @@ _u.ExtensibilityStrings.l_InvalidTime_Text = "De invoer kan niet worden omgezet 
 _u.ExtensibilityStrings.l_Invalid_Category_Error_Text = "Er werden ongeldige categorieën opgegeven.";
 _u.ExtensibilityStrings.l_Item_Not_Saved_Error_Text = "De id kan pas worden opgehaald als het item is opgeslagen.";
 _u.ExtensibilityStrings.l_MessageInDifferentStoreError_Text = "De EWS-id kan niet worden opgehaald, omdat het bericht is opgeslagen in een andere opslag.";
+_u.ExtensibilityStrings.l_Missing_Extended_Permissions_For_API = "Uitgebreide machtiging ontbreekt voor de API-aanroep.";
 _u.ExtensibilityStrings.l_NoValidRecipientsProvided_Text = "Er zijn geen geldige geadresseerden opgegeven.";
 _u.ExtensibilityStrings.l_NotificationKeyNotFound_Text = "Er zijn geen meldingen met de opgegeven sleutel.";
 _u.ExtensibilityStrings.l_NullOrEmptyParameterError_Text = "De parameter {0} is verplicht en kan niet null of leeg zijn.";
@@ -67,3 +69,4 @@ _u.ExtensibilityStrings.l_RecurrenceUnsupportedAlternateCalendar_Text = "Het ter
 _u.ExtensibilityStrings.l_Recurrence_Error_Instance_SetAsync_Text = "Er kan geen terugkeerpatroon worden ingesteld voor één gebeurtenis in een reeks.";
 _u.ExtensibilityStrings.l_Recurrence_Error_Properties_Invalid_Text = "Het terugkeerpatroon is niet geldig. Controleer of de opgegeven eigenschappen van het terugkeerpatroon zijn afgestemd op het type terugkeerpatroon.";
 _u.ExtensibilityStrings.l_SaveError_Text = "Er is een verbindingsfout opgetreden bij het opslaan van het item op de server.";
+_u.ExtensibilityStrings.l_TokenAccessDeniedWithoutItemContext_Text = "A REST token is only available with ReadWriteMailbox permission when there is no item context.";

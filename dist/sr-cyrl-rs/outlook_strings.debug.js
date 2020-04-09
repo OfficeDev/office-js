@@ -4,6 +4,7 @@ _u.ExtensibilityStrings = function()
 };
 _u.ExtensibilityStrings.registerClass("_u.ExtensibilityStrings");
 _u.ExtensibilityStrings.l_APICallFailedDueToItemChange_Text = "Изабрана ставка је промењена.";
+_u.ExtensibilityStrings.l_API_Not_Supported_By_ExtensionPoint_Error_Text = "API није подржан за тачку проширења.";
 _u.ExtensibilityStrings.l_ActionsDefinitionMultipleActionsError_Text = "Тренутно је подржана само једна радња.";
 _u.ExtensibilityStrings.l_ActionsDefinitionWrongNotificationMessageError_Text = "Није могуће дефинисати радње за овај тип поруке са обавештењем.";
 _u.ExtensibilityStrings.l_AttachmentDeleteGeneralFailure_Text = "Није могуће избрисати прилог из ставке.";
@@ -49,6 +50,7 @@ _u.ExtensibilityStrings.l_InvalidTime_Text = "Унос се не разреша�
 _u.ExtensibilityStrings.l_Invalid_Category_Error_Text = "Обезбеђене су неважеће категорије.";
 _u.ExtensibilityStrings.l_Item_Not_Saved_Error_Text = "Није могуће преузети ID док се ставка не сачува.";
 _u.ExtensibilityStrings.l_MessageInDifferentStoreError_Text = "Није могуће преузети EWS ID зато што је порука сачувана у другом складишту.";
+_u.ExtensibilityStrings.l_Missing_Extended_Permissions_For_API = "Extended Permission missing for the API call.";
 _u.ExtensibilityStrings.l_NoValidRecipientsProvided_Text = "Нису пружени важећи примаоци.";
 _u.ExtensibilityStrings.l_NotificationKeyNotFound_Text = "Не постоји ниједно обавештење са обезбеђеним кључем.";
 _u.ExtensibilityStrings.l_NullOrEmptyParameterError_Text = "Параметар „{0}“ је обавезан и не може да буде без вредности или празан.";
@@ -67,3 +69,4 @@ _u.ExtensibilityStrings.l_RecurrenceUnsupportedAlternateCalendar_Text = "Кор�
 _u.ExtensibilityStrings.l_Recurrence_Error_Instance_SetAsync_Text = "Није могуће поставити образац понављања за једно појављивање у групи.";
 _u.ExtensibilityStrings.l_Recurrence_Error_Properties_Invalid_Text = "Образац понављања није важећи. Проверите да ли су наведена својства понављања поравната са типом понављања.";
 _u.ExtensibilityStrings.l_SaveError_Text = "Дошло је до грешке у повезивању приликом покушаја чувања ставке на серверу.";
+_u.ExtensibilityStrings.l_TokenAccessDeniedWithoutItemContext_Text = "A REST token is only available with ReadWriteMailbox permission when there is no item context.";

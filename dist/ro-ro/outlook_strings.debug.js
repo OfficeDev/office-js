@@ -4,6 +4,7 @@ _u.ExtensibilityStrings = function()
 };
 _u.ExtensibilityStrings.registerClass("_u.ExtensibilityStrings");
 _u.ExtensibilityStrings.l_APICallFailedDueToItemChange_Text = "Elementul selectat a fost modificat.";
+_u.ExtensibilityStrings.l_API_Not_Supported_By_ExtensionPoint_Error_Text = "API neacceptat pentru punctul de extensie.";
 _u.ExtensibilityStrings.l_ActionsDefinitionMultipleActionsError_Text = "Momentan se acceptă o singură acțiune.";
 _u.ExtensibilityStrings.l_ActionsDefinitionWrongNotificationMessageError_Text = "Acțiunile nu pot fi definite pentru acest tip de mesaj de notificare.";
 _u.ExtensibilityStrings.l_AttachmentDeleteGeneralFailure_Text = "Atașarea nu poate fi ștearsă din element.";
@@ -49,6 +50,7 @@ _u.ExtensibilityStrings.l_InvalidTime_Text = "Intrarea nu are ca rezultat o oră
 _u.ExtensibilityStrings.l_Invalid_Category_Error_Text = "S-au furnizat categorii nevalide.";
 _u.ExtensibilityStrings.l_Item_Not_Saved_Error_Text = "ID-ul nu poate fi regăsit până când elementul nu este salvat.";
 _u.ExtensibilityStrings.l_MessageInDifferentStoreError_Text = "ID-ul EWS nu poate fi regăsit, deoarece mesajul este salvat într-un alt spațiu de stocare.";
+_u.ExtensibilityStrings.l_Missing_Extended_Permissions_For_API = "Lipsește permisiunea extinsă pentru apelul API.";
 _u.ExtensibilityStrings.l_NoValidRecipientsProvided_Text = "Nu a fost furnizat niciun destinatar valid.";
 _u.ExtensibilityStrings.l_NotificationKeyNotFound_Text = "Nu există notificări cu cheia furnizată.";
 _u.ExtensibilityStrings.l_NullOrEmptyParameterError_Text = "Parametrul „{0}” este obligatoriu și nu poate fi nul sau gol.";
@@ -67,3 +69,4 @@ _u.ExtensibilityStrings.l_RecurrenceUnsupportedAlternateCalendar_Text = "Modelul
 _u.ExtensibilityStrings.l_Recurrence_Error_Instance_SetAsync_Text = "Nu se poate seta un model de recurență pentru o singură ocurență dintr-o serie.";
 _u.ExtensibilityStrings.l_Recurrence_Error_Properties_Invalid_Text = "Modelul de recurență nu este valid. Asigurați-vă că proprietățile de recurență specificate sunt conforme cu tipul de recurență.";
 _u.ExtensibilityStrings.l_SaveError_Text = "A apărut o eroare de conexiune atunci când încercați să salvați elementul pe server.";
+_u.ExtensibilityStrings.l_TokenAccessDeniedWithoutItemContext_Text = "Un simbol REST este disponibil doar cu permisiune ReadWriteMailbox atunci când nu există niciun context de element.";

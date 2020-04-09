@@ -4,6 +4,7 @@ _u.ExtensibilityStrings = function()
 };
 _u.ExtensibilityStrings.registerClass("_u.ExtensibilityStrings");
 _u.ExtensibilityStrings.l_APICallFailedDueToItemChange_Text = "Valitud üksust on muudetud.";
+_u.ExtensibilityStrings.l_API_Not_Supported_By_ExtensionPoint_Error_Text = "Laienduspunkt ei toeta seda API-t.";
 _u.ExtensibilityStrings.l_ActionsDefinitionMultipleActionsError_Text = "Praegu toetatakse ainult ühte toimingut.";
 _u.ExtensibilityStrings.l_ActionsDefinitionWrongNotificationMessageError_Text = "Seda tüüpi teavitussõnumite jaoks ei saa toiminguid määratleda.";
 _u.ExtensibilityStrings.l_AttachmentDeleteGeneralFailure_Text = "Manust ei saa üksusest kustutada.";
@@ -49,6 +50,7 @@ _u.ExtensibilityStrings.l_InvalidTime_Text = "Sisend ei lahene sobivaks kellaaja
 _u.ExtensibilityStrings.l_Invalid_Category_Error_Text = "Esitati sobimatud kategooriad.";
 _u.ExtensibilityStrings.l_Item_Not_Saved_Error_Text = "ID-d ei saa tuua enne üksuse salvestamist.";
 _u.ExtensibilityStrings.l_MessageInDifferentStoreError_Text = "EWS-i ID-d ei saa tuua, kuna sõnum on salvestatud mõnda teise salve.";
+_u.ExtensibilityStrings.l_Missing_Extended_Permissions_For_API = "Laiendatud õigus on API-kutse jaoks puudu.";
 _u.ExtensibilityStrings.l_NoValidRecipientsProvided_Text = "Sobivaid adressaate ei sisestatud.";
 _u.ExtensibilityStrings.l_NotificationKeyNotFound_Text = "Selle võtmega teatisi ei ole.";
 _u.ExtensibilityStrings.l_NullOrEmptyParameterError_Text = 'Parameeter "{0}" on kohustuslik ning see ei tohi olla nullväärtusega ega tühi.';
@@ -67,3 +69,4 @@ _u.ExtensibilityStrings.l_RecurrenceUnsupportedAlternateCalendar_Text = "Kasutaj
 _u.ExtensibilityStrings.l_Recurrence_Error_Instance_SetAsync_Text = "Sarja ühe esinemiskorra jaoks ei kordussagedust määrata.";
 _u.ExtensibilityStrings.l_Recurrence_Error_Properties_Invalid_Text = "Kordussagedus ei sobi. Veenduge, et määratud korduvusatribuudid vastaksid korduvuse tüübile.";
 _u.ExtensibilityStrings.l_SaveError_Text = "Üksuse serverisse salvestamise katsel tekkis ühendustõrge.";
+_u.ExtensibilityStrings.l_TokenAccessDeniedWithoutItemContext_Text = "Readwritemailboxi on saadaval ainult juhul, kui üksuse konteksti pole.";

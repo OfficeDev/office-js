@@ -134,6 +134,7 @@ Strings.OfficeOM.L_NotImplemented = "함수 {0}이(가) 구현되지 않았습�
 Strings.OfficeOM.L_NotSupported = "함수 {0}은(는) 지원되지 않습니다.";
 Strings.OfficeOM.L_NotSupportedBindingType = "지정한 바인딩 유형 {0}이(가) 지원되지 않습니다.";
 Strings.OfficeOM.L_NotSupportedEventType = "지정한 이벤트 종류 {0}이(가) 지원되지 않습니다.";
+Strings.OfficeOM.L_NotTrustedWAC = "데이터를 보호하기 위해 이 추가 기능이 차단되었습니다. 이 문서의 복사본을 컴퓨터에 다운로드하여 계속해서 추가 기능을 사용할 수 있습니다.";
 Strings.OfficeOM.L_OperationCancelledError = "작업이 취소되었습니다.";
 Strings.OfficeOM.L_OperationCancelledErrorMessage = "사용자가 작업을 취소했습니다.";
 Strings.OfficeOM.L_OperationNotSupported = "지원하지 않는 작업입니다.";

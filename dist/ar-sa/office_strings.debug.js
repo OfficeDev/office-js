@@ -134,6 +134,7 @@ Strings.OfficeOM.L_NotImplemented = "لم يتم تنفيذ الدالة {0}.";
 Strings.OfficeOM.L_NotSupported = "الدالة {0} غير معتمدة.";
 Strings.OfficeOM.L_NotSupportedBindingType = "نوع الربط المحدد {0} غير معتمد.";
 Strings.OfficeOM.L_NotSupportedEventType = "نوع الحدث المحدد {0} غير معتمد.";
+Strings.OfficeOM.L_NotTrustedWAC = "تم حظر هذه الوظيفة الاضافيه لحماية بياناتك. لا يزال بإمكانك متابعه استخدام الوظيفة الاضافيه من خلال تنزيل نسخه من هذا المستند علي جهازك";
 Strings.OfficeOM.L_OperationCancelledError = "تم إلغاء العملية";
 Strings.OfficeOM.L_OperationCancelledErrorMessage = "تم إلغاء العملية بواسطة المستخدم.";
 Strings.OfficeOM.L_OperationNotSupported = "العملية غير معتمدة.";

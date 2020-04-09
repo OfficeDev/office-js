@@ -134,6 +134,7 @@ Strings.OfficeOM.L_NotImplemented = "Функцията {0} не е реализ
 Strings.OfficeOM.L_NotSupported = "Функцията {0} не се поддържа.";
 Strings.OfficeOM.L_NotSupportedBindingType = "Указаният тип на обвързване {0} не се поддържа.";
 Strings.OfficeOM.L_NotSupportedEventType = "Указаният тип на събитие {0} не се поддържа.";
+Strings.OfficeOM.L_NotTrustedWAC = "Тази добавка е блокирана, за да защити вашите данни. Все още можете да продължите да използвате добавката, като изтеглите копие на този документ на вашия компютър";
 Strings.OfficeOM.L_OperationCancelledError = "Операцията е отменена";
 Strings.OfficeOM.L_OperationCancelledErrorMessage = "Операцията е отменена от потребителя.";
 Strings.OfficeOM.L_OperationNotSupported = "Тази операция не се поддържа.";

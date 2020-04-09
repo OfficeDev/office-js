@@ -134,6 +134,7 @@ Strings.OfficeOM.L_NotImplemented = "Funkcija {0} nav ieviesta.";
 Strings.OfficeOM.L_NotSupported = "Funkcija {0} netiek atbalstīta.";
 Strings.OfficeOM.L_NotSupportedBindingType = "Norādītais saistījuma tips {0} netiek atbalstīts.";
 Strings.OfficeOM.L_NotSupportedEventType = "Norādītais notikuma tips {0} netiek atbalstīts.";
+Strings.OfficeOM.L_NotTrustedWAC = "Šī pievienojumprogramma ir bloķēta, lai aizsargātu jūsu datus. Joprojām varat turpināt izmantot pievienojumprogrammu, lejupielādējot šī dokumenta kopiju savā datorā";
 Strings.OfficeOM.L_OperationCancelledError = "Darbība atcelta";
 Strings.OfficeOM.L_OperationCancelledErrorMessage = "Darbību atcēla lietotājs.";
 Strings.OfficeOM.L_OperationNotSupported = "Operācija netiek atbalstīta.";

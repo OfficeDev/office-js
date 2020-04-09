@@ -134,6 +134,7 @@ Strings.OfficeOM.L_NotImplemented = "A função {0} não está implementada.";
 Strings.OfficeOM.L_NotSupported = "A função {0} não é suportada.";
 Strings.OfficeOM.L_NotSupportedBindingType = "O tipo de vínculo especificado {0} não é suportado.";
 Strings.OfficeOM.L_NotSupportedEventType = "O tipo de evento especificado {0} não é suportado.";
+Strings.OfficeOM.L_NotTrustedWAC = "Este suplemento foi bloqueado para proteger os seus dados. Ainda pode continuar a utilizar o suplemento ao transferir uma cópia deste documento para o seu computador";
 Strings.OfficeOM.L_OperationCancelledError = "Operação Cancelada";
 Strings.OfficeOM.L_OperationCancelledErrorMessage = "A operação foi cancelada pelo utilizador.";
 Strings.OfficeOM.L_OperationNotSupported = "A operação não é suportada.";

@@ -134,6 +134,7 @@ Strings.OfficeOM.L_NotImplemented = "הפונקציה {0} אינה מיושמת.
 Strings.OfficeOM.L_NotSupported = "הפונקציה {0} אינה נתמכת.";
 Strings.OfficeOM.L_NotSupportedBindingType = "סוג האיגוד שצוין {0} אינו נתמך.";
 Strings.OfficeOM.L_NotSupportedEventType = "סוג האירוע שצוין {0} אינו נתמך.";
+Strings.OfficeOM.L_NotTrustedWAC = "תוספת זו נחסמה כדי להגן על הנתונים שלך. באפשרותך עדיין להמשיך להשתמש בתוספת על-ידי הורדת עותק של מסמך זה אל המחשב שלך";
 Strings.OfficeOM.L_OperationCancelledError = "הפעולה בוטלה";
 Strings.OfficeOM.L_OperationCancelledErrorMessage = "הפעולה בוטלה על-ידי המשתמש.";
 Strings.OfficeOM.L_OperationNotSupported = "הפעולה אינה נתמכת.";

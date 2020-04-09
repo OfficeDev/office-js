@@ -134,6 +134,7 @@ Strings.OfficeOM.L_NotImplemented = "{0} функциясы орындалған
 Strings.OfficeOM.L_NotSupported = "{0} функциясы қолданылмайды.";
 Strings.OfficeOM.L_NotSupportedBindingType = "Көрсетілген {0} байланыстыру түріне қолдау көрсетілмейді.";
 Strings.OfficeOM.L_NotSupportedEventType = "Көрсетілген оқиға түріне {0} қолдау көрсетілмеді.";
+Strings.OfficeOM.L_NotTrustedWAC = "Деректеріңізді қорғау мақсатында осы қондырма блокталды. Осы құжаттың көшірмесін компьютеріңізге жүктеп алу арқылы қондырманы пайдалануды жалғастыра аласыз";
 Strings.OfficeOM.L_OperationCancelledError = "Операциядан бас тартылды";
 Strings.OfficeOM.L_OperationCancelledErrorMessage = "Пайдаланушы операциядан бас тартты.";
 Strings.OfficeOM.L_OperationNotSupported = "Осы әрекет қолданылмайды.";

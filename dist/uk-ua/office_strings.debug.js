@@ -134,6 +134,7 @@ Strings.OfficeOM.L_NotImplemented = "Функцію {0} не виконано.";
 Strings.OfficeOM.L_NotSupported = "Функція {0} не підтримується.";
 Strings.OfficeOM.L_NotSupportedBindingType = "Указаний тип зв’язування {0} не підтримується.";
 Strings.OfficeOM.L_NotSupportedEventType = "Указаний тип події {0} не підтримується.";
+Strings.OfficeOM.L_NotTrustedWAC = "Цю надбудову заблоковано, щоб захистити ваші дані. Ви все ще можете продовжити використання надбудови, завантаживши копію цього документа на свій комп'ютер";
 Strings.OfficeOM.L_OperationCancelledError = "Операцію скасовано";
 Strings.OfficeOM.L_OperationCancelledErrorMessage = "Користувач скасував цю операцію.";
 Strings.OfficeOM.L_OperationNotSupported = "Операція не підтримується.";

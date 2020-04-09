@@ -134,6 +134,7 @@ Strings.OfficeOM.L_NotImplemented = "Functie {0} is niet geïmplementeerd.";
 Strings.OfficeOM.L_NotSupported = "Functie {0} wordt niet ondersteund.";
 Strings.OfficeOM.L_NotSupportedBindingType = "Het type van de opgegeven binding {0} wordt niet ondersteund.";
 Strings.OfficeOM.L_NotSupportedEventType = "Het type van de opgegeven gebeurtenis {0} wordt niet ondersteund.";
+Strings.OfficeOM.L_NotTrustedWAC = "Deze invoegtoepassing is geblokkeerd om uw gegevens te beveiligen. U kunt de invoegtoepassing nog steeds blijven gebruiken door een kopie van dit document op uw computer te downloaden";
 Strings.OfficeOM.L_OperationCancelledError = "Bewerking is geannuleerd";
 Strings.OfficeOM.L_OperationCancelledErrorMessage = "De bewerking is geannuleerd door de gebruiker.";
 Strings.OfficeOM.L_OperationNotSupported = "De bewerking wordt niet ondersteund.";

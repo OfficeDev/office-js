@@ -4,6 +4,7 @@ _u.ExtensibilityStrings = function()
 };
 _u.ExtensibilityStrings.registerClass("_u.ExtensibilityStrings");
 _u.ExtensibilityStrings.l_APICallFailedDueToItemChange_Text = "Wybrany element został zmieniony.";
+_u.ExtensibilityStrings.l_API_Not_Supported_By_ExtensionPoint_Error_Text = "Interfejs API nie jest obsługiwany dla punktu rozszerzenia.";
 _u.ExtensibilityStrings.l_ActionsDefinitionMultipleActionsError_Text = "Obecnie jest obsługiwana tylko pojedyncza akcja.";
 _u.ExtensibilityStrings.l_ActionsDefinitionWrongNotificationMessageError_Text = "Nie można zdefiniować akcji dla tego typu komunikatu powiadomienia.";
 _u.ExtensibilityStrings.l_AttachmentDeleteGeneralFailure_Text = "Nie można usunąć załącznika z elementu.";
@@ -49,6 +50,7 @@ _u.ExtensibilityStrings.l_InvalidTime_Text = "Dane wejściowe nie są prawidłow
 _u.ExtensibilityStrings.l_Invalid_Category_Error_Text = "Dostarczono nieprawidłowe kategorie.";
 _u.ExtensibilityStrings.l_Item_Not_Saved_Error_Text = "Nie można pobrać identyfikatora przed zapisaniem elementu.";
 _u.ExtensibilityStrings.l_MessageInDifferentStoreError_Text = "Nie można pobrać identyfikatora usług EWS, ponieważ wiadomość jest zapisana w innym magazynie.";
+_u.ExtensibilityStrings.l_Missing_Extended_Permissions_For_API = "Brak uprawnienia rozszerzonego dla wywołania interfejsu API.";
 _u.ExtensibilityStrings.l_NoValidRecipientsProvided_Text = "Nie podano żadnych prawidłowych adresatów.";
 _u.ExtensibilityStrings.l_NotificationKeyNotFound_Text = "Brak powiadomień z podanym kluczem.";
 _u.ExtensibilityStrings.l_NullOrEmptyParameterError_Text = "Parametr „{0}” jest obowiązkowy i nie może mieć wartości null ani być pusty.";
@@ -67,3 +69,4 @@ _u.ExtensibilityStrings.l_RecurrenceUnsupportedAlternateCalendar_Text = "Wzorzec
 _u.ExtensibilityStrings.l_Recurrence_Error_Instance_SetAsync_Text = "Nie można ustawić wzorca cyklu dla pojedynczego wystąpienia w serii.";
 _u.ExtensibilityStrings.l_Recurrence_Error_Properties_Invalid_Text = "Wzorzec cyklu jest nieprawidłowy. Sprawdź, czy określone właściwości cyklu są zgodne z typem cyklu.";
 _u.ExtensibilityStrings.l_SaveError_Text = "Wystąpił błąd połączenia podczas próby zapisania elementu na serwerze.";
+_u.ExtensibilityStrings.l_TokenAccessDeniedWithoutItemContext_Text = "Token REST jest dostępny tylko z uprawnieniem ReadWriteMailbox w przypadku braku kontekstu elementu.";

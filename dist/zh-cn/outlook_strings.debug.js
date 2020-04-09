@@ -4,6 +4,7 @@ _u.ExtensibilityStrings = function()
 };
 _u.ExtensibilityStrings.registerClass("_u.ExtensibilityStrings");
 _u.ExtensibilityStrings.l_APICallFailedDueToItemChange_Text = "选定的项已被更改。";
+_u.ExtensibilityStrings.l_API_Not_Supported_By_ExtensionPoint_Error_Text = "扩展点不支持 API。";
 _u.ExtensibilityStrings.l_ActionsDefinitionMultipleActionsError_Text = "目前仅支持单个操作。";
 _u.ExtensibilityStrings.l_ActionsDefinitionWrongNotificationMessageError_Text = "无法为此通知消息类型定义操作。";
 _u.ExtensibilityStrings.l_AttachmentDeleteGeneralFailure_Text = "无法从项目中删除附件。";
@@ -49,6 +50,7 @@ _u.ExtensibilityStrings.l_InvalidTime_Text = "输入未解析为有效日期。"
 _u.ExtensibilityStrings.l_Invalid_Category_Error_Text = "提供的类别无效。";
 _u.ExtensibilityStrings.l_Item_Not_Saved_Error_Text = "保存此项后，才能检索 ID。";
 _u.ExtensibilityStrings.l_MessageInDifferentStoreError_Text = "无法检索 EWS ID，因为邮件保存在其他存储区中。";
+_u.ExtensibilityStrings.l_Missing_Extended_Permissions_For_API = "缺少 API 调用扩展权限。";
 _u.ExtensibilityStrings.l_NoValidRecipientsProvided_Text = "未提供有效的收件人。";
 _u.ExtensibilityStrings.l_NotificationKeyNotFound_Text = "不存在具有提供的密钥的任何通知。";
 _u.ExtensibilityStrings.l_NullOrEmptyParameterError_Text = "参数“{0}”是必需的，且不能为 null 或为空。";
@@ -67,3 +69,4 @@ _u.ExtensibilityStrings.l_RecurrenceUnsupportedAlternateCalendar_Text = "定期�
 _u.ExtensibilityStrings.l_Recurrence_Error_Instance_SetAsync_Text = "不能为系列中的单次事件设置定期模式。";
 _u.ExtensibilityStrings.l_Recurrence_Error_Properties_Invalid_Text = "定期模式无效。请检查指定的周期属性是否与定期类型相对应。";
 _u.ExtensibilityStrings.l_SaveError_Text = "试图在服务器上保存项目时发生连接错误。";
+_u.ExtensibilityStrings.l_TokenAccessDeniedWithoutItemContext_Text = "在没有项目上下文时，只有获得 ReadWriteMailbox 权限才能使用 REST 令牌。";

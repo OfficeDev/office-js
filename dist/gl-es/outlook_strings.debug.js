@@ -4,6 +4,7 @@ _u.ExtensibilityStrings = function()
 };
 _u.ExtensibilityStrings.registerClass("_u.ExtensibilityStrings");
 _u.ExtensibilityStrings.l_APICallFailedDueToItemChange_Text = "O elemento seleccionado cambiouse.";
+_u.ExtensibilityStrings.l_API_Not_Supported_By_ExtensionPoint_Error_Text = "A API non é compatible para o punto de extensión.";
 _u.ExtensibilityStrings.l_ActionsDefinitionMultipleActionsError_Text = "Actualmente só se admite unha acción.";
 _u.ExtensibilityStrings.l_ActionsDefinitionWrongNotificationMessageError_Text = "Non se poden definir accións para este tipo de mensaxe de notificación.";
 _u.ExtensibilityStrings.l_AttachmentDeleteGeneralFailure_Text = "O anexo non se pode eliminar do elemento.";
@@ -49,6 +50,7 @@ _u.ExtensibilityStrings.l_InvalidTime_Text = "A entrada non se resolve como unha
 _u.ExtensibilityStrings.l_Invalid_Category_Error_Text = "Se forneceron categorías non válidas.";
 _u.ExtensibilityStrings.l_Item_Not_Saved_Error_Text = "Non se pode recuperar o ID mentres non se garde o elemento.";
 _u.ExtensibilityStrings.l_MessageInDifferentStoreError_Text = "Non se pode recuperar o ID de EWS porque a mensaxe está gardada noutro almacén.";
+_u.ExtensibilityStrings.l_Missing_Extended_Permissions_For_API = "Falta o permiso ampliado para a chamada á API.";
 _u.ExtensibilityStrings.l_NoValidRecipientsProvided_Text = "Non se forneceron destinatarios válidos.";
 _u.ExtensibilityStrings.l_NotificationKeyNotFound_Text = "Non hai notificacións coa clave fornecida.";
 _u.ExtensibilityStrings.l_NullOrEmptyParameterError_Text = 'O parámetro "{0}" é obrigatorio e non pode ser nulo nin estar baleiro.';
@@ -67,3 +69,4 @@ _u.ExtensibilityStrings.l_RecurrenceUnsupportedAlternateCalendar_Text = "O usuar
 _u.ExtensibilityStrings.l_Recurrence_Error_Instance_SetAsync_Text = "Non se pode establecer unha periodicidade para un só evento da serie.";
 _u.ExtensibilityStrings.l_Recurrence_Error_Properties_Invalid_Text = "A periodicidade non é válida. Comproba que as propiedades de periodicidade especificadas se corresponden co tipo de periodicidade.";
 _u.ExtensibilityStrings.l_SaveError_Text = "Houbo un problema de conexión ao tentar gardar o elemento no servidor.";
+_u.ExtensibilityStrings.l_TokenAccessDeniedWithoutItemContext_Text = "O token de REST só está dispoñible co permiso ReadWriteMailbox cando non hai contexto do elemento.";

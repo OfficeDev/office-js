@@ -4,6 +4,7 @@ _u.ExtensibilityStrings = function()
 };
 _u.ExtensibilityStrings.registerClass("_u.ExtensibilityStrings");
 _u.ExtensibilityStrings.l_APICallFailedDueToItemChange_Text = "Vybratá položka sa zmenila.";
+_u.ExtensibilityStrings.l_API_Not_Supported_By_ExtensionPoint_Error_Text = "Rozhranie API nie je podporované pre bod rozšírenia.";
 _u.ExtensibilityStrings.l_ActionsDefinitionMultipleActionsError_Text = "Momentálne sa podporuje len jedna akcia.";
 _u.ExtensibilityStrings.l_ActionsDefinitionWrongNotificationMessageError_Text = "Pre tento typ správ s oznámením sa akcie nedajú definovať.";
 _u.ExtensibilityStrings.l_AttachmentDeleteGeneralFailure_Text = "Príloha sa nedá z položky odstrániť.";
@@ -49,6 +50,7 @@ _u.ExtensibilityStrings.l_InvalidTime_Text = "Nezadali ste platný čas.";
 _u.ExtensibilityStrings.l_Invalid_Category_Error_Text = "Boli zadané neplatné kategórie.";
 _u.ExtensibilityStrings.l_Item_Not_Saved_Error_Text = "ID sa nedá načítať, kým sa položka neuloží.";
 _u.ExtensibilityStrings.l_MessageInDifferentStoreError_Text = "EWS ID sa nedá načítať, pretože správa je uložená v inom ukladacom priestore.";
+_u.ExtensibilityStrings.l_Missing_Extended_Permissions_For_API = "Chýba rozšírené povolenie pre volanie rozhrania API.";
 _u.ExtensibilityStrings.l_NoValidRecipientsProvided_Text = "Neboli zadaní žiadni platní príjemcovia.";
 _u.ExtensibilityStrings.l_NotificationKeyNotFound_Text = "Neexistujú žiadne oznámenia so zadaným kľúčom.";
 _u.ExtensibilityStrings.l_NullOrEmptyParameterError_Text = "Parameter {0} je povinný a nemôže byť prázdny ani mať hodnotu Null.";
@@ -67,3 +69,4 @@ _u.ExtensibilityStrings.l_RecurrenceUnsupportedAlternateCalendar_Text = "Spôsob
 _u.ExtensibilityStrings.l_Recurrence_Error_Instance_SetAsync_Text = "Spôsob opakovania sa nedá nastaviť pre jediný výskyt v rade.";
 _u.ExtensibilityStrings.l_Recurrence_Error_Properties_Invalid_Text = "Spôsob opakovania nie je platný. Skontrolujte, či zadané vlastnosti opakovania zodpovedajú typu opakovania.";
 _u.ExtensibilityStrings.l_SaveError_Text = "Pri pokuse o uloženie položky na server sa vyskytla chyba pripojenia.";
+_u.ExtensibilityStrings.l_TokenAccessDeniedWithoutItemContext_Text = "A REST token is only available with ReadWriteMailbox permission when there is no item context.";

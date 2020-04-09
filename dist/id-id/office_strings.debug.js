@@ -134,6 +134,7 @@ Strings.OfficeOM.L_NotImplemented = "Fungsi {0} tidak diimplementasikan.";
 Strings.OfficeOM.L_NotSupported = "Fungsi {0} tidak didukung.";
 Strings.OfficeOM.L_NotSupportedBindingType = "Tipe ikatan {0} yang ditentukan tidak didukung.";
 Strings.OfficeOM.L_NotSupportedEventType = "Tipe acara {0} yang ditentukan tidak didukung.";
+Strings.OfficeOM.L_NotTrustedWAC = "Add-in ini telah diblokir untuk melindungi data Anda. Anda masih dapat terus menggunakan Add-in dengan mengunduh salinan dokumen ini ke komputer Anda";
 Strings.OfficeOM.L_OperationCancelledError = "Operasi Dibatalkan";
 Strings.OfficeOM.L_OperationCancelledErrorMessage = "Operasi dibatalkan oleh pengguna.";
 Strings.OfficeOM.L_OperationNotSupported = "Operasi ini tidak didukung.";

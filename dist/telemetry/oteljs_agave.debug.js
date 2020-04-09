@@ -122,6 +122,44 @@ var oteljs_agave = function(modules) {
     Object.defineProperty(exports, "__esModule", {
         value: true
     });
+    var Enums_1 = __webpack_require__(0);
+    exports.AWTPropertyType = Enums_1.AWTPropertyType;
+    exports.AWTPiiKind = Enums_1.AWTPiiKind;
+    exports.AWTEventPriority = Enums_1.AWTEventPriority;
+    exports.AWTEventsDroppedReason = Enums_1.AWTEventsDroppedReason;
+    exports.AWTEventsRejectedReason = Enums_1.AWTEventsRejectedReason;
+    exports.AWTCustomerContentKind = Enums_1.AWTCustomerContentKind;
+    var Enums_2 = __webpack_require__(6);
+    exports.AWTUserIdType = Enums_2.AWTUserIdType;
+    exports.AWTSessionState = Enums_2.AWTSessionState;
+    var DataModels_1 = __webpack_require__(12);
+    exports.AWT_BEST_EFFORT = DataModels_1.AWT_BEST_EFFORT;
+    exports.AWT_NEAR_REAL_TIME = DataModels_1.AWT_NEAR_REAL_TIME;
+    exports.AWT_REAL_TIME = DataModels_1.AWT_REAL_TIME;
+    var AWTEventProperties_1 = __webpack_require__(7);
+    exports.AWTEventProperties = AWTEventProperties_1.default;
+    var AWTLogger_1 = __webpack_require__(13);
+    exports.AWTLogger = AWTLogger_1.default;
+    var AWTLogManager_1 = __webpack_require__(17);
+    exports.AWTLogManager = AWTLogManager_1.default;
+    var AWTTransmissionManager_1 = __webpack_require__(36);
+    exports.AWTTransmissionManager = AWTTransmissionManager_1.default;
+    var AWTSerializer_1 = __webpack_require__(15);
+    exports.AWTSerializer = AWTSerializer_1.default;
+    var AWTSemanticContext_1 = __webpack_require__(9);
+    exports.AWTSemanticContext = AWTSemanticContext_1.default;
+    exports.AWT_COLLECTOR_URL_UNITED_STATES = "https://us.pipe.aria.microsoft.com/Collector/3.0/";
+    exports.AWT_COLLECTOR_URL_GERMANY = "https://de.pipe.aria.microsoft.com/Collector/3.0/";
+    exports.AWT_COLLECTOR_URL_JAPAN = "https://jp.pipe.aria.microsoft.com/Collector/3.0/";
+    exports.AWT_COLLECTOR_URL_AUSTRALIA = "https://au.pipe.aria.microsoft.com/Collector/3.0/";
+    exports.AWT_COLLECTOR_URL_EUROPE = "https://eu.pipe.aria.microsoft.com/Collector/3.0/";
+    exports.AWT_COLLECTOR_URL_USGOV_DOD = "https://pf.pipe.aria.microsoft.com/Collector/3.0";
+    exports.AWT_COLLECTOR_URL_USGOV_DOJ = "https://tb.pipe.aria.microsoft.com/Collector/3.0";
+}, function(module, exports, __webpack_require__) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", {
+        value: true
+    });
     var microsoft_bond_primitives_1 = __webpack_require__(8);
     var Enums_1 = __webpack_require__(0);
     var GuidRegex = /[xy]/g;
@@ -352,7 +390,7 @@ var oteljs_agave = function(modules) {
     var AWTStatsManager_1 = __webpack_require__(14);
     var AWTEventProperties_1 = __webpack_require__(7);
     var AWTLogManager_1 = __webpack_require__(17);
-    var Utils = __webpack_require__(2);
+    var Utils = __webpack_require__(3);
     var MaxBackoffCount = 4;
     var MinDurationBetweenUploadNow = 3e4;
     var StatName = "awt_stats";
@@ -610,44 +648,6 @@ var oteljs_agave = function(modules) {
     Object.defineProperty(exports, "__esModule", {
         value: true
     });
-    var Enums_1 = __webpack_require__(0);
-    exports.AWTPropertyType = Enums_1.AWTPropertyType;
-    exports.AWTPiiKind = Enums_1.AWTPiiKind;
-    exports.AWTEventPriority = Enums_1.AWTEventPriority;
-    exports.AWTEventsDroppedReason = Enums_1.AWTEventsDroppedReason;
-    exports.AWTEventsRejectedReason = Enums_1.AWTEventsRejectedReason;
-    exports.AWTCustomerContentKind = Enums_1.AWTCustomerContentKind;
-    var Enums_2 = __webpack_require__(6);
-    exports.AWTUserIdType = Enums_2.AWTUserIdType;
-    exports.AWTSessionState = Enums_2.AWTSessionState;
-    var DataModels_1 = __webpack_require__(12);
-    exports.AWT_BEST_EFFORT = DataModels_1.AWT_BEST_EFFORT;
-    exports.AWT_NEAR_REAL_TIME = DataModels_1.AWT_NEAR_REAL_TIME;
-    exports.AWT_REAL_TIME = DataModels_1.AWT_REAL_TIME;
-    var AWTEventProperties_1 = __webpack_require__(7);
-    exports.AWTEventProperties = AWTEventProperties_1.default;
-    var AWTLogger_1 = __webpack_require__(13);
-    exports.AWTLogger = AWTLogger_1.default;
-    var AWTLogManager_1 = __webpack_require__(17);
-    exports.AWTLogManager = AWTLogManager_1.default;
-    var AWTTransmissionManager_1 = __webpack_require__(36);
-    exports.AWTTransmissionManager = AWTTransmissionManager_1.default;
-    var AWTSerializer_1 = __webpack_require__(15);
-    exports.AWTSerializer = AWTSerializer_1.default;
-    var AWTSemanticContext_1 = __webpack_require__(9);
-    exports.AWTSemanticContext = AWTSemanticContext_1.default;
-    exports.AWT_COLLECTOR_URL_UNITED_STATES = "https://us.pipe.aria.microsoft.com/Collector/3.0/";
-    exports.AWT_COLLECTOR_URL_GERMANY = "https://de.pipe.aria.microsoft.com/Collector/3.0/";
-    exports.AWT_COLLECTOR_URL_JAPAN = "https://jp.pipe.aria.microsoft.com/Collector/3.0/";
-    exports.AWT_COLLECTOR_URL_AUSTRALIA = "https://au.pipe.aria.microsoft.com/Collector/3.0/";
-    exports.AWT_COLLECTOR_URL_EUROPE = "https://eu.pipe.aria.microsoft.com/Collector/3.0/";
-    exports.AWT_COLLECTOR_URL_USGOV_DOD = "https://pf.pipe.aria.microsoft.com/Collector/3.0";
-    exports.AWT_COLLECTOR_URL_USGOV_DOJ = "https://tb.pipe.aria.microsoft.com/Collector/3.0";
-}, function(module, exports, __webpack_require__) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", {
-        value: true
-    });
     var AWTUserIdType;
     (function(AWTUserIdType) {
         AWTUserIdType[AWTUserIdType["Unknown"] = 0] = "Unknown";
@@ -674,7 +674,7 @@ var oteljs_agave = function(modules) {
     Object.defineProperty(exports, "__esModule", {
         value: true
     });
-    var Utils = __webpack_require__(2);
+    var Utils = __webpack_require__(3);
     var Enums_1 = __webpack_require__(0);
     var AWTEventProperties = function() {
         function AWTEventProperties(name) {
@@ -957,7 +957,7 @@ var oteljs_agave = function(modules) {
     Object.defineProperty(exports, "__esModule", {
         value: true
     });
-    var Utils = __webpack_require__(2);
+    var Utils = __webpack_require__(3);
     var DEVICE_ID_COOKIE = "MicrosoftApplicationsTelemetryDeviceId";
     var FIRSTLAUNCHTIME_COOKIE = "MicrosoftApplicationsTelemetryFirstLaunchTime";
     var BROWSERS = {
@@ -1121,6 +1121,12 @@ var oteljs_agave = function(modules) {
         AWTAutoCollection._getBrowserVersion = function(userAgent, browserName) {
             if (browserName === BROWSERS.MSIE) {
                 return this._getIeVersion(userAgent);
+            } else if (browserName === BROWSERS.EDGE) {
+                var version = this._getOtherVersion(browserName, userAgent);
+                if (version === UNKNOWN) {
+                    return this._getOtherVersion("Edg", userAgent);
+                }
+                return version;
             } else {
                 return this._getOtherVersion(browserName, userAgent);
             }
@@ -1267,10 +1273,10 @@ var oteljs_agave = function(modules) {
     });
     var Enums_1 = __webpack_require__(0);
     var AWTHttpManager_1 = __webpack_require__(25);
-    var AWTTransmissionManagerCore_1 = __webpack_require__(3);
+    var AWTTransmissionManagerCore_1 = __webpack_require__(4);
     var AWTRecordBatcher_1 = __webpack_require__(35);
-    var AWTNotificationManager_1 = __webpack_require__(4);
-    var Utils = __webpack_require__(2);
+    var AWTNotificationManager_1 = __webpack_require__(5);
+    var Utils = __webpack_require__(3);
     var UploadNowCheckTimer = 250;
     var MaxNumberEventPerBatch = 500;
     var MaxSendAttempts = 6;
@@ -1456,10 +1462,10 @@ var oteljs_agave = function(modules) {
     var Enums_1 = __webpack_require__(0);
     var Enums_2 = __webpack_require__(6);
     var AWTEventProperties_1 = __webpack_require__(7);
-    var Utils = __webpack_require__(2);
+    var Utils = __webpack_require__(3);
     var AWTStatsManager_1 = __webpack_require__(14);
-    var AWTNotificationManager_1 = __webpack_require__(4);
-    var AWTTransmissionManagerCore_1 = __webpack_require__(3);
+    var AWTNotificationManager_1 = __webpack_require__(5);
+    var AWTTransmissionManagerCore_1 = __webpack_require__(4);
     var AWTLogManagerSettings_1 = __webpack_require__(18);
     var Version = __webpack_require__(16);
     var AWTSemanticContext_1 = __webpack_require__(9);
@@ -1729,8 +1735,8 @@ var oteljs_agave = function(modules) {
     Object.defineProperty(exports, "__esModule", {
         value: true
     });
-    var Utils = __webpack_require__(2);
-    var AWTNotificationManager_1 = __webpack_require__(4);
+    var Utils = __webpack_require__(3);
+    var AWTNotificationManager_1 = __webpack_require__(5);
     var Enums_1 = __webpack_require__(0);
     var StatsTimer = 6e4;
     var AWTStatsManager = function() {
@@ -1830,8 +1836,8 @@ var oteljs_agave = function(modules) {
     });
     var Bond = __webpack_require__(26);
     var Enums_1 = __webpack_require__(0);
-    var AWTNotificationManager_1 = __webpack_require__(4);
-    var Utils = __webpack_require__(2);
+    var AWTNotificationManager_1 = __webpack_require__(5);
+    var Utils = __webpack_require__(3);
     var RequestSizeLimitBytes = 2936012;
     var AWTSerializer = function() {
         function AWTSerializer() {}
@@ -2069,7 +2075,7 @@ var oteljs_agave = function(modules) {
     Object.defineProperty(exports, "__esModule", {
         value: true
     });
-    exports.Version = "1.8.5";
+    exports.Version = "1.8.6";
     exports.FullVersionString = "AWT-Web-JS-" + exports.Version;
 }, function(module, exports, __webpack_require__) {
     "use strict";
@@ -2080,8 +2086,8 @@ var oteljs_agave = function(modules) {
     var Enums_2 = __webpack_require__(6);
     var AWTLogManagerSettings_1 = __webpack_require__(18);
     var AWTLogger_1 = __webpack_require__(13);
-    var AWTTransmissionManagerCore_1 = __webpack_require__(3);
-    var AWTNotificationManager_1 = __webpack_require__(4);
+    var AWTTransmissionManagerCore_1 = __webpack_require__(4);
+    var AWTNotificationManager_1 = __webpack_require__(5);
     var AWTAutoCollection_1 = __webpack_require__(10);
     var AWTLogManager = function() {
         function AWTLogManager() {}
@@ -2304,9 +2310,9 @@ var oteljs_agave = function(modules) {
     var AWTKillSwitch_1 = __webpack_require__(33);
     var AWTClockSkewManager_1 = __webpack_require__(34);
     var Version = __webpack_require__(16);
-    var Utils = __webpack_require__(2);
-    var AWTNotificationManager_1 = __webpack_require__(4);
-    var AWTTransmissionManagerCore_1 = __webpack_require__(3);
+    var Utils = __webpack_require__(3);
+    var AWTNotificationManager_1 = __webpack_require__(5);
+    var AWTTransmissionManagerCore_1 = __webpack_require__(4);
     var MaxConnections = 2;
     var MaxRetries = 1;
     var Method = "POST";
@@ -3075,7 +3081,7 @@ var oteljs_agave = function(modules) {
     Object.defineProperty(exports, "__esModule", {
         value: true
     });
-    var AWTTransmissionManagerCore_1 = __webpack_require__(3);
+    var AWTTransmissionManagerCore_1 = __webpack_require__(4);
     var AWTTransmissionManager = function() {
         function AWTTransmissionManager() {}
         AWTTransmissionManager.setEventsHandler = function(eventsHandler) {
@@ -3093,6 +3099,9 @@ var oteljs_agave = function(modules) {
 }, function(module, __webpack_exports__, __webpack_require__) {
     "use strict";
     __webpack_require__.r(__webpack_exports__);
+    __webpack_require__.d(__webpack_exports__, "AgaveSink", function() {
+        return AgaveSink_AgaveSink;
+    });
     var Event = function() {
         function Event() {
             this._listeners = [];
@@ -3422,11 +3431,7 @@ var oteljs_agave = function(modules) {
         };
         return SdxWacSink;
     }();
-    var AriaSDK = __webpack_require__(5);
-    var AWTTransmissionManagerCore = __webpack_require__(3);
-    var AWTTransmissionManagerCore_default = __webpack_require__.n(AWTTransmissionManagerCore);
-    var AWTQueueManager = __webpack_require__(11);
-    var AWTQueueManager_default = __webpack_require__.n(AWTQueueManager);
+    var AriaSDK = __webpack_require__(2);
     var Enums = __webpack_require__(0);
     var DataFieldType;
     (function(DataFieldType) {
@@ -3434,6 +3439,7 @@ var oteljs_agave = function(modules) {
         DataFieldType[DataFieldType["Boolean"] = 1] = "Boolean";
         DataFieldType[DataFieldType["Int64"] = 2] = "Int64";
         DataFieldType[DataFieldType["Double"] = 3] = "Double";
+        DataFieldType[DataFieldType["Guid"] = 4] = "Guid";
     })(DataFieldType || (DataFieldType = {}));
     var EVENT_NAME_DOT_REPLACE_REGEX = /\./g;
     var SEPARATOR_TOKEN = ".";
@@ -3495,6 +3501,7 @@ var oteljs_agave = function(modules) {
     function mapDataFieldTypeToAWTPropertyType(otelType) {
         switch (otelType) {
           case DataFieldType.String:
+          case DataFieldType.Guid:
             return Enums["AWTPropertyType"].String;
 
           case DataFieldType.Boolean:
@@ -3517,6 +3524,55 @@ var oteljs_agave = function(modules) {
     function isMetadataPrefix(prefix) {
         return prefix === CONTRACT_TOKEN;
     }
+    var AWTTransmissionManagerCore = __webpack_require__(4);
+    var AWTTransmissionManagerCore_default = __webpack_require__.n(AWTTransmissionManagerCore);
+    var AWTQueueManager = __webpack_require__(11);
+    var AWTQueueManager_default = __webpack_require__.n(AWTQueueManager);
+    var sendRequestActualMethod;
+    var sendPostActualMethod;
+    var statsCallback;
+    var payloadSizeCallback;
+    function instrumentDeliveryTask(callbackForStats, callbackForPayloadSize) {
+        var eventHandler = AWTTransmissionManagerCore_default.a.getEventsHandler();
+        if (!(eventHandler instanceof AWTQueueManager_default.a)) {
+            return false;
+        }
+        var queueManager = eventHandler;
+        var httpManager = queueManager._httpManager;
+        if (!(httpManager && httpManager["_sendRequest"] && httpManager["_httpInterface"])) {
+            return false;
+        }
+        sendRequestActualMethod = httpManager._sendRequest.bind(httpManager);
+        httpManager._sendRequest = Wrappers.sendRequestWrapper;
+        var httpInterface = httpManager._httpInterface;
+        sendPostActualMethod = httpInterface.sendPOST.bind(httpManager);
+        httpInterface.sendPOST = Wrappers.sendPostWrapper;
+        statsCallback = callbackForStats;
+        payloadSizeCallback = callbackForPayloadSize;
+        return true;
+    }
+    var Wrappers = {
+        sendRequestWrapper: sendRequestWrapper,
+        sendPostWrapper: sendPostWrapper
+    };
+    function sendRequestWrapper(request, retryCount, isTeardown, isSynchronous) {
+        if (isSynchronous === void 0) {
+            isSynchronous = false;
+        }
+        var numOfEvents = 0;
+        for (var token in request) {
+            if (request.hasOwnProperty(token)) {
+                numOfEvents += request[token].length;
+            }
+        }
+        var startTime = performance.now();
+        sendRequestActualMethod(request, retryCount, isTeardown, isSynchronous);
+        statsCallback(performance.now() - startTime, numOfEvents);
+    }
+    function sendPostWrapper(urlString, data, ontimeout, onerror, onload, sync) {
+        sendPostActualMethod(urlString, data, ontimeout, onerror, onload, sync);
+        payloadSizeCallback(data.length);
+    }
     var ARIA_INIT_TOKEN = "cd836626611c4caaa8fc5b2e728ee81d-3b6d6c45-6377-4bf5-9792-dbf8e1881088-7521";
     var otelEventsProcessed = 0;
     var ariaEventsSent = 0;
@@ -3535,11 +3591,45 @@ var oteljs_agave = function(modules) {
         var logger = AriaSDK["AWTLogManager"].getLogger(telemetryEvent.telemetryProperties.ariaTenantToken);
         logger.logEvent(ariaEvent);
     }
-    function initialize(configuration) {
+    function initialize(configuration, ariaSinkProperties) {
         if (!awtInitialized) {
-            hookUpAriaNotifications();
             AriaSDK["AWTLogManager"].initialize(ARIA_INIT_TOKEN, configuration);
+            if (ariaSinkProperties) {
+                setUploadFrequency(ariaSinkProperties.uploadFrequency);
+                connectNotificationListener(ariaSinkProperties.notificationListener);
+                addInstrumentation(ariaSinkProperties.stats);
+                if (!ariaSinkProperties.disableStatsTracking) {
+                    hookUpAriaNotifications();
+                }
+            }
             awtInitialized = true;
+        }
+    }
+    function addInstrumentation(callbacks) {
+        if (!callbacks) {
+            return;
+        }
+        if (!instrumentDeliveryTask(callbacks.requestProcessingStats, callbacks.networkStats)) {
+            logNotification(LogLevel.Error, Category.Sink, function() {
+                return "Failed to instrument Aria delivery task";
+            });
+        }
+    }
+    function setUploadFrequency(uploadFrequency) {
+        if (!uploadFrequency) {
+            return;
+        }
+        var normalLatencyFrequency = uploadFrequency / 1e3;
+        var highLatencyFrequency = normalLatencyFrequency / 2;
+        var lowLatencyFrequency = normalLatencyFrequency * 2;
+        var customProfiles = {};
+        customProfiles["OTelCustomTransmissionProfile"] = [ lowLatencyFrequency, normalLatencyFrequency, highLatencyFrequency ];
+        AriaSDK["AWTLogManager"].loadTransmitProfiles(customProfiles);
+        AriaSDK["AWTLogManager"].setTransmitProfile("OTelCustomTransmissionProfile");
+    }
+    function connectNotificationListener(notificationListener) {
+        if (notificationListener) {
+            AriaSDK["AWTLogManager"].addNotificationListener(notificationListener);
         }
     }
     function hookUpAriaNotifications() {
@@ -3582,17 +3672,6 @@ var oteljs_agave = function(modules) {
             }
         });
     }
-    function disableBeaconsApiAvailabilityForAriaSdk() {
-        var ariaEventHander = AWTTransmissionManagerCore_default.a.getEventsHandler();
-        if (ariaEventHander instanceof AWTQueueManager_default.a) {
-            var ariaHttpManager = ariaEventHander._httpManager;
-            if (ariaHttpManager && ariaHttpManager.hasOwnProperty("_useBeacons")) {
-                ariaHttpManager._useBeacons = false;
-                return true;
-            }
-        }
-        return false;
-    }
     function shutdown() {
         AriaSDK["AWTLogManager"].flushAndTeardown();
     }
@@ -3614,7 +3693,7 @@ var oteljs_agave = function(modules) {
         AriaSinkType[AriaSinkType["AriaSE"] = 1] = "AriaSE";
     })(AriaSinkType || (AriaSinkType = {}));
     var AriaSink_AriaSink = function() {
-        function AriaSink(additionalDataFields, cacheMemorySizeLimitInNumberOfEvents, ariaSinkProperties) {
+        function AriaSink(additionalDataFields, ariaSinkProperties) {
             if (additionalDataFields === void 0) {
                 additionalDataFields = [];
             }
@@ -3627,17 +3706,20 @@ var oteljs_agave = function(modules) {
             } else if (AriaSink.ariaSinkType !== this.getSinkType()) {
                 throw new Error("Multiple Aria Configurations are not allowed");
             }
-            initialize(this.getAWTLogConfiguration(cacheMemorySizeLimitInNumberOfEvents, ariaSinkProperties));
+            initialize(this.getAWTLogConfiguration(ariaSinkProperties), ariaSinkProperties);
         }
         AriaSink.prototype.getSinkType = function() {
             return AriaSinkType.Aria;
         };
-        AriaSink.prototype.getAWTLogConfiguration = function(cacheMemorySizeLimitInNumberOfEvents, ariaSinkProperties) {
+        AriaSink.prototype.getAWTLogConfiguration = function(ariaSinkProperties) {
             var awtLogConfiguration = {
-                cacheMemorySizeLimitInNumberOfEvents: cacheMemorySizeLimitInNumberOfEvents,
-                disableCookiesUsage: true
+                disableCookiesUsage: true,
+                canSendStatEvent: function() {
+                    return false;
+                }
             };
-            if (ariaSinkProperties !== undefined) {
+            if (ariaSinkProperties) {
+                awtLogConfiguration.cacheMemorySizeLimitInNumberOfEvents = ariaSinkProperties.eventsLimitInMem;
                 awtLogConfiguration.collectorUri = ariaSinkProperties.endpointUrl;
             }
             return awtLogConfiguration;
@@ -3663,8 +3745,8 @@ var oteljs_agave = function(modules) {
         AriaSink.prototype.setFullEventsEnabled = function(enabled) {
             this._fullEventProcessor.setFullEventsEnabled(enabled);
         };
-        AriaSink.prototype.disableBeaconsApiAvailabilityForAriaSdk = function() {
-            return disableBeaconsApiAvailabilityForAriaSdk();
+        AriaSink.prototype.flushAsync = function(callback) {
+            AriaSDK["AWTLogManager"].flush(callback);
         };
         AriaSink.prototype.shutdown = function() {
             shutdown();
@@ -3725,6 +3807,7 @@ var oteljs_agave = function(modules) {
     })(Utils_Utils || (Utils_Utils = {}));
     var BASE10 = 10;
     var MAX_SUPPORTED_WIN32_VERSION = [ 16, 0, 11599 ];
+    var MIN_SUPPORTED_WIN32_VERSION = [ 16, 0, 4266 ];
     var MAX_SUPPORTED_MAC_VERSION = [ 16, 26 ];
     var MAX_SUPPORTED_IOS_WXP_VERSION = [ 2, 29 ];
     var MAX_SUPPORTED_WEB_OUTLOOK_VERSION = [ 16, 0, 99999 ];
@@ -3753,10 +3836,11 @@ var oteljs_agave = function(modules) {
         if (!version) {
             return true;
         }
-        var versionArray = String(version).split(".");
         var maxVersion;
+        var minVersion = [];
         if (platform === "Win32") {
             maxVersion = MAX_SUPPORTED_WIN32_VERSION;
+            minVersion = MIN_SUPPORTED_WIN32_VERSION;
         } else if (platform === "Mac") {
             maxVersion = MAX_SUPPORTED_MAC_VERSION;
         } else if (platform === "iOS") {
@@ -3769,15 +3853,20 @@ var oteljs_agave = function(modules) {
         } else {
             return false;
         }
-        for (var i = 0; i < maxVersion.length && i < versionArray.length; i++) {
-            var versionToken = parseInt(versionArray[i], BASE10);
-            if (isNaN(versionToken)) {
+        var versionArray = String(version).split(".").map(function(x) {
+            return parseInt(x, BASE10);
+        });
+        return isVersionLessThanOrEqual(minVersion, versionArray) && isVersionLessThanOrEqual(versionArray, maxVersion);
+    }
+    function isVersionLessThanOrEqual(smallerVersion, largerVersion) {
+        for (var i = 0; i < smallerVersion.length && i < largerVersion.length; i++) {
+            if (isNaN(smallerVersion[i]) || isNaN(largerVersion[i])) {
                 return false;
             }
-            if (versionToken < maxVersion[i]) {
+            if (smallerVersion[i] < largerVersion[i]) {
                 return true;
             }
-            if (versionToken > maxVersion[i]) {
+            if (smallerVersion[i] > largerVersion[i]) {
                 return false;
             }
         }
@@ -3902,7 +3991,4 @@ var oteljs_agave = function(modules) {
         };
         return AgaveSink;
     }();
-    __webpack_require__.d(__webpack_exports__, "AgaveSink", function() {
-        return AgaveSink_AgaveSink;
-    });
 } ]);

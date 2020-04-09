@@ -140,6 +140,7 @@ Strings.OfficeOM.L_NotImplemented='Function {0} is not implemented.';
 Strings.OfficeOM.L_NotSupported='Function {0} is not supported.';
 Strings.OfficeOM.L_NotSupportedBindingType='The specified binding type {0} is not supported.';
 Strings.OfficeOM.L_NotSupportedEventType='The specified event type {0} is not supported.';
+Strings.OfficeOM.L_NotTrustedWAC='This add-in has been blocked to protect your data. You can still continue using the add-in by downloading a copy of this document onto your machine';
 Strings.OfficeOM.L_OperationCancelledError='Operation Cancelled';
 Strings.OfficeOM.L_OperationCancelledErrorMessage='The operation was cancelled by the user.';
 Strings.OfficeOM.L_OperationNotSupported='The operation is not supported.';

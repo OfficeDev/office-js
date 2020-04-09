@@ -67,12 +67,88 @@ var oteljs = function(modules) {
 }, function(module, __webpack_exports__, __webpack_require__) {
     "use strict";
     __webpack_require__.r(__webpack_exports__);
+    __webpack_require__.d(__webpack_exports__, "Contracts", function() {
+        return Contracts;
+    });
+    __webpack_require__.d(__webpack_exports__, "ActivityScope", function() {
+        return Activity_ActivityScope;
+    });
+    __webpack_require__.d(__webpack_exports__, "getFieldsForContract", function() {
+        return getFieldsForContract;
+    });
+    __webpack_require__.d(__webpack_exports__, "addContractField", function() {
+        return addContractField;
+    });
+    __webpack_require__.d(__webpack_exports__, "DataClassification", function() {
+        return DataClassification;
+    });
+    __webpack_require__.d(__webpack_exports__, "makeBooleanDataField", function() {
+        return makeBooleanDataField;
+    });
+    __webpack_require__.d(__webpack_exports__, "makeInt64DataField", function() {
+        return makeInt64DataField;
+    });
+    __webpack_require__.d(__webpack_exports__, "makeDoubleDataField", function() {
+        return makeDoubleDataField;
+    });
+    __webpack_require__.d(__webpack_exports__, "makeStringDataField", function() {
+        return makeStringDataField;
+    });
+    __webpack_require__.d(__webpack_exports__, "makeGuidDataField", function() {
+        return makeGuidDataField;
+    });
+    __webpack_require__.d(__webpack_exports__, "DataFieldType", function() {
+        return DataFieldType;
+    });
+    __webpack_require__.d(__webpack_exports__, "getEffectiveEventFlags", function() {
+        return getEffectiveEventFlags;
+    });
+    __webpack_require__.d(__webpack_exports__, "SamplingPolicy", function() {
+        return SamplingPolicy;
+    });
+    __webpack_require__.d(__webpack_exports__, "PersistencePriority", function() {
+        return PersistencePriority;
+    });
+    __webpack_require__.d(__webpack_exports__, "CostPriority", function() {
+        return CostPriority;
+    });
+    __webpack_require__.d(__webpack_exports__, "DataCategories", function() {
+        return DataCategories;
+    });
+    __webpack_require__.d(__webpack_exports__, "DiagnosticLevel", function() {
+        return DiagnosticLevel;
+    });
+    __webpack_require__.d(__webpack_exports__, "LogLevel", function() {
+        return LogLevel;
+    });
+    __webpack_require__.d(__webpack_exports__, "Category", function() {
+        return Category;
+    });
+    __webpack_require__.d(__webpack_exports__, "onNotification", function() {
+        return onNotification;
+    });
+    __webpack_require__.d(__webpack_exports__, "logNotification", function() {
+        return logNotification;
+    });
+    __webpack_require__.d(__webpack_exports__, "logError", function() {
+        return logError;
+    });
+    __webpack_require__.d(__webpack_exports__, "SuppressNexus", function() {
+        return SuppressNexus;
+    });
+    __webpack_require__.d(__webpack_exports__, "SimpleTelemetryLogger", function() {
+        return SimpleTelemetryLogger_SimpleTelemetryLogger;
+    });
+    __webpack_require__.d(__webpack_exports__, "TelemetryLogger", function() {
+        return TelemetryLogger_TelemetryLogger;
+    });
     var DataFieldType;
     (function(DataFieldType) {
         DataFieldType[DataFieldType["String"] = 0] = "String";
         DataFieldType[DataFieldType["Boolean"] = 1] = "Boolean";
         DataFieldType[DataFieldType["Int64"] = 2] = "Int64";
         DataFieldType[DataFieldType["Double"] = 3] = "Double";
+        DataFieldType[DataFieldType["Guid"] = 4] = "Guid";
     })(DataFieldType || (DataFieldType = {}));
     function makeBooleanDataField(name, value) {
         return {
@@ -99,6 +175,13 @@ var oteljs = function(modules) {
         return {
             name: name,
             dataType: DataFieldType.String,
+            value: value
+        };
+    }
+    function makeGuidDataField(name, value) {
+        return {
+            name: name,
+            dataType: DataFieldType.Guid,
             value: value
         };
     }
@@ -926,7 +1009,7 @@ var oteljs = function(modules) {
         }
         TelemetryEventValidator.validateInt = validateInt;
     })(TelemetryEventValidator_TelemetryEventValidator || (TelemetryEventValidator_TelemetryEventValidator = {}));
-    var oteljsVersion = "3.1.28";
+    var oteljsVersion = "3.1.39";
     var __assign = undefined && undefined.__assign || function() {
         __assign = Object.assign || function(t) {
             for (var s, i = 1, n = arguments.length; i < n; i++) {
@@ -979,7 +1062,9 @@ var oteljs = function(modules) {
             if (!event.telemetryProperties) {
                 event.telemetryProperties = TenantTokenManager_TenantTokenManager.getTenantTokens(event.eventName);
             }
-            (_a = event.dataFields).push.apply(_a, this.persistentDataFields);
+            if (event.dataFields && this.persistentDataFields) {
+                (_a = event.dataFields).push.apply(_a, this.persistentDataFields);
+            }
             if (!this.config.disableValidation) {
                 TelemetryEventValidator_TelemetryEventValidator.validateTelemetryEvent(event);
             }
@@ -1197,76 +1282,4 @@ var oteljs = function(modules) {
         };
         return TelemetryLogger;
     }(SimpleTelemetryLogger_SimpleTelemetryLogger);
-    __webpack_require__.d(__webpack_exports__, "Contracts", function() {
-        return Contracts;
-    });
-    __webpack_require__.d(__webpack_exports__, "ActivityScope", function() {
-        return Activity_ActivityScope;
-    });
-    __webpack_require__.d(__webpack_exports__, "getFieldsForContract", function() {
-        return getFieldsForContract;
-    });
-    __webpack_require__.d(__webpack_exports__, "addContractField", function() {
-        return addContractField;
-    });
-    __webpack_require__.d(__webpack_exports__, "DataClassification", function() {
-        return DataClassification;
-    });
-    __webpack_require__.d(__webpack_exports__, "makeBooleanDataField", function() {
-        return makeBooleanDataField;
-    });
-    __webpack_require__.d(__webpack_exports__, "makeInt64DataField", function() {
-        return makeInt64DataField;
-    });
-    __webpack_require__.d(__webpack_exports__, "makeDoubleDataField", function() {
-        return makeDoubleDataField;
-    });
-    __webpack_require__.d(__webpack_exports__, "makeStringDataField", function() {
-        return makeStringDataField;
-    });
-    __webpack_require__.d(__webpack_exports__, "DataFieldType", function() {
-        return DataFieldType;
-    });
-    __webpack_require__.d(__webpack_exports__, "getEffectiveEventFlags", function() {
-        return getEffectiveEventFlags;
-    });
-    __webpack_require__.d(__webpack_exports__, "SamplingPolicy", function() {
-        return SamplingPolicy;
-    });
-    __webpack_require__.d(__webpack_exports__, "PersistencePriority", function() {
-        return PersistencePriority;
-    });
-    __webpack_require__.d(__webpack_exports__, "CostPriority", function() {
-        return CostPriority;
-    });
-    __webpack_require__.d(__webpack_exports__, "DataCategories", function() {
-        return DataCategories;
-    });
-    __webpack_require__.d(__webpack_exports__, "DiagnosticLevel", function() {
-        return DiagnosticLevel;
-    });
-    __webpack_require__.d(__webpack_exports__, "LogLevel", function() {
-        return LogLevel;
-    });
-    __webpack_require__.d(__webpack_exports__, "Category", function() {
-        return Category;
-    });
-    __webpack_require__.d(__webpack_exports__, "onNotification", function() {
-        return onNotification;
-    });
-    __webpack_require__.d(__webpack_exports__, "logNotification", function() {
-        return logNotification;
-    });
-    __webpack_require__.d(__webpack_exports__, "logError", function() {
-        return logError;
-    });
-    __webpack_require__.d(__webpack_exports__, "SuppressNexus", function() {
-        return SuppressNexus;
-    });
-    __webpack_require__.d(__webpack_exports__, "SimpleTelemetryLogger", function() {
-        return SimpleTelemetryLogger_SimpleTelemetryLogger;
-    });
-    __webpack_require__.d(__webpack_exports__, "TelemetryLogger", function() {
-        return TelemetryLogger_TelemetryLogger;
-    });
 } ]);

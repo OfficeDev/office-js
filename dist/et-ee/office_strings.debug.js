@@ -134,6 +134,7 @@ Strings.OfficeOM.L_NotImplemented = "Funktsioon {0} pole juurutatud.";
 Strings.OfficeOM.L_NotSupported = "Funktsiooni {0} ei toetata.";
 Strings.OfficeOM.L_NotSupportedBindingType = "Määratud sidumistüüp {0} pole toetatud.";
 Strings.OfficeOM.L_NotSupportedEventType = "Määratud sündmuse tüüp {0} pole toetatud.";
+Strings.OfficeOM.L_NotTrustedWAC = "See lisandmoodul on teie andmete kaitsmiseks blokeeritud. Kui soovite lisandmoodulit siiski edasi kasutada, saate selle dokumendi koopia oma seadmesse alla laadida.";
 Strings.OfficeOM.L_OperationCancelledError = "Toiming on tühistatud";
 Strings.OfficeOM.L_OperationCancelledErrorMessage = "Kasutaja on toimingu tühistanud.";
 Strings.OfficeOM.L_OperationNotSupported = "Toimingut ei toetata.";

@@ -134,6 +134,7 @@ Strings.OfficeOM.L_NotImplemented = "Funkcija {0} ni izvedena.";
 Strings.OfficeOM.L_NotSupported = "Funkcija {0} ni podprta.";
 Strings.OfficeOM.L_NotSupportedBindingType = "Navedena vrsta vezave {0} ni podprta. ";
 Strings.OfficeOM.L_NotSupportedEventType = "Navedena vrsta dogodka {0} ni podprta. ";
+Strings.OfficeOM.L_NotTrustedWAC = "Ta dodatek je bil blokiran za zaščito vaših podatkov. Dodatek lahko še naprej uporabljate tako, da v svoj računalnik prenesete kopijo tega dokumenta.";
 Strings.OfficeOM.L_OperationCancelledError = "Postopek je preklican";
 Strings.OfficeOM.L_OperationCancelledErrorMessage = "Ta postopek je preklical uporabnik.";
 Strings.OfficeOM.L_OperationNotSupported = "Postopek ni podprt.";

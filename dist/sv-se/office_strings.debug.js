@@ -134,6 +134,7 @@ Strings.OfficeOM.L_NotImplemented = "Funktionen {0} är inte implementerad.";
 Strings.OfficeOM.L_NotSupported = "Funktionen {0} stöds inte.";
 Strings.OfficeOM.L_NotSupportedBindingType = "Den angivna bindningstypen {0} kan inte användas.";
 Strings.OfficeOM.L_NotSupportedEventType = "Den angivna händelsetypen {0} kan inte användas.";
+Strings.OfficeOM.L_NotTrustedWAC = "Det här tillägget har blockerats för att skydda dina data. Du kan fortfarande fortsätta använda tillägget genom att ladda ned en kopia av det här dokumentet till datorn";
 Strings.OfficeOM.L_OperationCancelledError = "Åtgärden avbröts";
 Strings.OfficeOM.L_OperationCancelledErrorMessage = "Åtgärden avbröts av användaren.";
 Strings.OfficeOM.L_OperationNotSupported = "Åtgärden stöds inte.";

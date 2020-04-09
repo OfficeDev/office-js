@@ -134,6 +134,7 @@ Strings.OfficeOM.L_NotImplemented = "未实现函数 {0}。";
 Strings.OfficeOM.L_NotSupported = "不支持函数 {0}。";
 Strings.OfficeOM.L_NotSupportedBindingType = "不支持指定的绑定类型 {0}。";
 Strings.OfficeOM.L_NotSupportedEventType = "不支持指定的事件类型 {0}。";
+Strings.OfficeOM.L_NotTrustedWAC = "已阻止此加载项来保护你的数据。您仍然可以通过将此文档的副本下载到您的计算机来继续使用该加载项";
 Strings.OfficeOM.L_OperationCancelledError = "已取消操作";
 Strings.OfficeOM.L_OperationCancelledErrorMessage = "用户已取消操作。";
 Strings.OfficeOM.L_OperationNotSupported = "不支持此项操作。";

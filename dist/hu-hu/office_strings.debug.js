@@ -134,6 +134,7 @@ Strings.OfficeOM.L_NotImplemented = "A(z) {0} függvény nincs implementálva.";
 Strings.OfficeOM.L_NotSupported = "A(z) {0} függvény nem támogatott.";
 Strings.OfficeOM.L_NotSupportedBindingType = "A megadott kötéstípus ({0}) nem támogatott.";
 Strings.OfficeOM.L_NotSupportedEventType = "A megadott eseménytípus ({0}) nem támogatott.";
+Strings.OfficeOM.L_NotTrustedWAC = "Adatvédelmi okokból letiltottuk a bővítményt. Ha tovább szeretné használni, töltse le a dokumentum egy példányát a gépére.";
 Strings.OfficeOM.L_OperationCancelledError = "Művelet megszakítva";
 Strings.OfficeOM.L_OperationCancelledErrorMessage = "A felhasználó megszakította a műveletet.";
 Strings.OfficeOM.L_OperationNotSupported = "A művelet nem támogatott.";

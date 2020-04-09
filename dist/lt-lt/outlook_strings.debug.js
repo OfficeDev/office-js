@@ -4,6 +4,7 @@ _u.ExtensibilityStrings = function()
 };
 _u.ExtensibilityStrings.registerClass("_u.ExtensibilityStrings");
 _u.ExtensibilityStrings.l_APICallFailedDueToItemChange_Text = "Pasirinktas elementas pakeistas.";
+_u.ExtensibilityStrings.l_API_Not_Supported_By_ExtensionPoint_Error_Text = "API išplėtimo taške nepalaikomas.";
 _u.ExtensibilityStrings.l_ActionsDefinitionMultipleActionsError_Text = "Šiuo metu palaikomas tik vienas veiksmas.";
 _u.ExtensibilityStrings.l_ActionsDefinitionWrongNotificationMessageError_Text = "Nepavyko apibrėžti šio pranešimo tipo veiksmų.";
 _u.ExtensibilityStrings.l_AttachmentDeleteGeneralFailure_Text = "Priedo negalima panaikinti iš elemento.";
@@ -49,6 +50,7 @@ _u.ExtensibilityStrings.l_InvalidTime_Text = "Įvestis nėra paverčiama tinkamu
 _u.ExtensibilityStrings.l_Invalid_Category_Error_Text = "Pateiktos neleistinos kategorijos.";
 _u.ExtensibilityStrings.l_Item_Not_Saved_Error_Text = "Nepavyks gauti ID, kol neįrašytas elementas.";
 _u.ExtensibilityStrings.l_MessageInDifferentStoreError_Text = "Negalima nuskaityti EWS ID, nes pranešimas įrašytas kitoje saugykloje.";
+_u.ExtensibilityStrings.l_Missing_Extended_Permissions_For_API = "API iškvietimui trūksta išplėstinio leidimo.";
 _u.ExtensibilityStrings.l_NoValidRecipientsProvided_Text = "Nepateikta tinkamų gavėjų.";
 _u.ExtensibilityStrings.l_NotificationKeyNotFound_Text = "Šiuo metu nėra pranešimų su pateiktu raktu.";
 _u.ExtensibilityStrings.l_NullOrEmptyParameterError_Text = "Parametras {0} yra privalomas ir jis negali būti „null“ arba tuščias.";
@@ -67,3 +69,4 @@ _u.ExtensibilityStrings.l_RecurrenceUnsupportedAlternateCalendar_Text = "Pasikar
 _u.ExtensibilityStrings.l_Recurrence_Error_Instance_SetAsync_Text = "Vienam pasikartojimui iš sekos negalima nustatyti pasikartojimo šablono.";
 _u.ExtensibilityStrings.l_Recurrence_Error_Properties_Invalid_Text = "Pasikartojimo šablonas negalioja. Patikrinkite, ar nurodytos pasikartojimo ypatybės atitinka pasikartojimo tipą.";
 _u.ExtensibilityStrings.l_SaveError_Text = "Bandant įrašyti elementą į serverį, įvyko prisijungimo klaida.";
+_u.ExtensibilityStrings.l_TokenAccessDeniedWithoutItemContext_Text = "REST atpažinimo ženklas pasiekiamas tik naudojant ReadWriteMailbox teises, kai nėra elemento konteksto.";

@@ -4,6 +4,7 @@ _u.ExtensibilityStrings = function()
 };
 _u.ExtensibilityStrings.registerClass("_u.ExtensibilityStrings");
 _u.ExtensibilityStrings.l_APICallFailedDueToItemChange_Text = "चयनित आइटम बदला गया है.";
+_u.ExtensibilityStrings.l_API_Not_Supported_By_ExtensionPoint_Error_Text = "API, एक्सटेंशन पॉइंट के लिए समर्थित नहीं है.";
 _u.ExtensibilityStrings.l_ActionsDefinitionMultipleActionsError_Text = "वर्तमान में केवल कोई एकल क्रिया समर्थित है.";
 _u.ExtensibilityStrings.l_ActionsDefinitionWrongNotificationMessageError_Text = "इस अधिसूचना संदेश प्रकार के लिए क्रियाएँ निर्धारित नहीं की जा सकतीं.";
 _u.ExtensibilityStrings.l_AttachmentDeleteGeneralFailure_Text = "अनुलग्नक को आइटम से हटाया नहीं जा सकता.";
@@ -49,6 +50,7 @@ _u.ExtensibilityStrings.l_InvalidTime_Text = "इनपुट मान्य �
 _u.ExtensibilityStrings.l_Invalid_Category_Error_Text = "अमान्य श्रेणियाँ प्रदान की गई थीं.";
 _u.ExtensibilityStrings.l_Item_Not_Saved_Error_Text = "आइटम सहेजे जाने तक id को पुनर्प्राप्त नहीं किया जा सकता.";
 _u.ExtensibilityStrings.l_MessageInDifferentStoreError_Text = "EWS ID पुनर्प्राप्त नहीं की जा सकती क्योंकि संदेश किसी अन्य स्टोर में सहेजा जाता है.";
+_u.ExtensibilityStrings.l_Missing_Extended_Permissions_For_API = "API कॉल के लिए विस्तृत अनुमति अनुपलब्ध है.";
 _u.ExtensibilityStrings.l_NoValidRecipientsProvided_Text = "कोई मान्य प्राप्तकर्ता प्रदान नहीं किए गए थे.";
 _u.ExtensibilityStrings.l_NotificationKeyNotFound_Text = "दी गई कुंजी के साथ कोई अधिसूचना नहीं है.";
 _u.ExtensibilityStrings.l_NullOrEmptyParameterError_Text = "पैरामीटर '{0}' अनिवार्य है और यह नल या रिक्त नहीं हो सकता.";
@@ -67,3 +69,4 @@ _u.ExtensibilityStrings.l_RecurrenceUnsupportedAlternateCalendar_Text = "पु�
 _u.ExtensibilityStrings.l_Recurrence_Error_Instance_SetAsync_Text = "श्रृंखला में किसी एकल पुनरावृत्ति के लिए पुनरावर्ती प्रतिमान सेट नहीं किया जा सकता.";
 _u.ExtensibilityStrings.l_Recurrence_Error_Properties_Invalid_Text = "पुनरावर्ती प्रतिमान मान्य नहीं है. कृपया जाँचें कि निर्दिष्ट पुनरावर्तन गुण पुनरावर्तन प्रकार के साथ संरेखित है.";
 _u.ExtensibilityStrings.l_SaveError_Text = "आइटम को सर्वर पर सहेजने का प्रयास करते समय कनेक्शन त्रुटि उत्पन्न हुई.";
+_u.ExtensibilityStrings.l_TokenAccessDeniedWithoutItemContext_Text = "जब किसी आइटम का प्रसंग न हो, केवल तभी ReadWriteMailbox अनुमति के साथ एक REST टोकन उपलब्ध होता है.";

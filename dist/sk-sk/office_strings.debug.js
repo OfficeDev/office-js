@@ -134,6 +134,7 @@ Strings.OfficeOM.L_NotImplemented = "Funkcia {0} nie je implementovaná.";
 Strings.OfficeOM.L_NotSupported = "Funkcia {0} nie je podporovaná.";
 Strings.OfficeOM.L_NotSupportedBindingType = "Zadaný typ väzby {0} nie je podporovaný.";
 Strings.OfficeOM.L_NotSupportedEventType = "Zadaný typ udalosti {0} nie je podporovaný.";
+Strings.OfficeOM.L_NotTrustedWAC = "Tento doplnok bol zablokovaný na ochranu vašich údajov. Doplnok môžete naďalej používať po stiahnutí kópie tohto dokumentu do počítača";
 Strings.OfficeOM.L_OperationCancelledError = "Operácia bola zrušená";
 Strings.OfficeOM.L_OperationCancelledErrorMessage = "Používateľ zrušil operáciu.";
 Strings.OfficeOM.L_OperationNotSupported = "Operácia nie je podporovaná.";

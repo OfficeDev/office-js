@@ -4,6 +4,7 @@ _u.ExtensibilityStrings = function()
 };
 _u.ExtensibilityStrings.registerClass("_u.ExtensibilityStrings");
 _u.ExtensibilityStrings.l_APICallFailedDueToItemChange_Text = "Seçili öğe değiştirilmiş.";
+_u.ExtensibilityStrings.l_API_Not_Supported_By_ExtensionPoint_Error_Text = "API, genişletme noktası için desteklenmiyor.";
 _u.ExtensibilityStrings.l_ActionsDefinitionMultipleActionsError_Text = "Şu anda yalnızca tek eylem destekleniyor.";
 _u.ExtensibilityStrings.l_ActionsDefinitionWrongNotificationMessageError_Text = "Bu bildirim iletisi türü için eylemler tanımlanamıyor.";
 _u.ExtensibilityStrings.l_AttachmentDeleteGeneralFailure_Text = "Ek öğeden silinemiyor.";
@@ -49,6 +50,7 @@ _u.ExtensibilityStrings.l_InvalidTime_Text = "Giriş, geçerli bir tarihe çöz�
 _u.ExtensibilityStrings.l_Invalid_Category_Error_Text = "Geçersiz kategoriler girildi.";
 _u.ExtensibilityStrings.l_Item_Not_Saved_Error_Text = "Öğe kaydedilene kadar kimlik alınamaz.";
 _u.ExtensibilityStrings.l_MessageInDifferentStoreError_Text = "İleti farklı bir depoya kaydedildiğinden EWS kimliği alınamıyor.";
+_u.ExtensibilityStrings.l_Missing_Extended_Permissions_For_API = "API çağrısı için Genişletilmiş İzin bulunmuyor.";
 _u.ExtensibilityStrings.l_NoValidRecipientsProvided_Text = "Geçerli alıcı bilgisi sağlanmadı.";
 _u.ExtensibilityStrings.l_NotificationKeyNotFound_Text = "Sağlanan anahtara sahip bildirim yok.";
 _u.ExtensibilityStrings.l_NullOrEmptyParameterError_Text = "'{0}' parametresi zorunludur, null veya boş olamaz.";
@@ -67,3 +69,4 @@ _u.ExtensibilityStrings.l_RecurrenceUnsupportedAlternateCalendar_Text = "Kullan�
 _u.ExtensibilityStrings.l_Recurrence_Error_Instance_SetAsync_Text = "Bir serideki tek bir olay için yinelenme düzeni ayarlanamaz.";
 _u.ExtensibilityStrings.l_Recurrence_Error_Properties_Invalid_Text = "Yinelenme düzeni geçerli değil. Belirtilen yinelenme özelliklerinin yinelenme türüne uygun olup olmadığını denetleyin.";
 _u.ExtensibilityStrings.l_SaveError_Text = "Öğe sunucuya kaydedilirken bağlantı hatası oluştu.";
+_u.ExtensibilityStrings.l_TokenAccessDeniedWithoutItemContext_Text = "REST belirteci, yalnızca öğe bağlamı olmadığında ReadWriteMailbox izniyle kullanılabilir.";

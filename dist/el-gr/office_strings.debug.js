@@ -134,6 +134,7 @@ Strings.OfficeOM.L_NotImplemented = "Η λειτουργία {0} δεν έχει
 Strings.OfficeOM.L_NotSupported = "Η συνάρτηση {0} δεν υποστηρίζεται.";
 Strings.OfficeOM.L_NotSupportedBindingType = "Ο καθορισμένος τύπος σύνδεσης {0} δεν υποστηρίζεται.";
 Strings.OfficeOM.L_NotSupportedEventType = "Ο καθορισμένος τύπος συμβάντος {0} δεν υποστηρίζεται.";
+Strings.OfficeOM.L_NotTrustedWAC = "Αυτό το πρόσθετο έχει αποκλειστεί για την προστασία των δεδομένων σας. Μπορείτε ακόμη να συνεχίσετε να χρησιμοποιείτε το πρόσθετο, πραγματοποιώντας λήψη ενός αντιγράφου αυτού του εγγράφου στον υπολογιστή σας";
 Strings.OfficeOM.L_OperationCancelledError = "Η λειτουργία ακυρώθηκε";
 Strings.OfficeOM.L_OperationCancelledErrorMessage = "Η λειτουργία ακυρώθηκε από τον χρήστη.";
 Strings.OfficeOM.L_OperationNotSupported = "Η λειτουργία δεν υποστηρίζεται.";

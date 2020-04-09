@@ -134,6 +134,7 @@ Strings.OfficeOM.L_NotImplemented = "Désolé... la fonction {0} n'est pas impl�
 Strings.OfficeOM.L_NotSupported = "La fonction {0} n’est pas prise en charge.";
 Strings.OfficeOM.L_NotSupportedBindingType = "Le type de liaison {0} spécifié n'est pas pris en charge.";
 Strings.OfficeOM.L_NotSupportedEventType = "Le type d'événement {0} spécifié n'est pas pris en charge.";
+Strings.OfficeOM.L_NotTrustedWAC = "Ce complément a été bloqué pour protéger vos données. Vous pouvez continuer à utiliser le complément en téléchargeant une copie de ce document sur votre ordinateur";
 Strings.OfficeOM.L_OperationCancelledError = "Opération annulée";
 Strings.OfficeOM.L_OperationCancelledErrorMessage = "L’opération a été annulée par l’utilisateur.";
 Strings.OfficeOM.L_OperationNotSupported = "L’opération n’est pas prise en charge.";

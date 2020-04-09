@@ -134,6 +134,7 @@ Strings.OfficeOM.L_NotImplemented = "{0} funtzioa ez dago inplementatuta.";
 Strings.OfficeOM.L_NotSupported = "Ez da {0} funtzioa onartzen.";
 Strings.OfficeOM.L_NotSupportedBindingType = "Ez da zehaztutako {0} lotura mota onartzen.";
 Strings.OfficeOM.L_NotSupportedEventType = "Ez da zehaztutako {0} gertaera mota onartzen.";
+Strings.OfficeOM.L_NotTrustedWAC = "Osagarri hau datuak babesteko blokeatu da. Hura erabiltzen jarraitzeko, deskargatu dokumentu honen kopia bat gailuan.";
 Strings.OfficeOM.L_OperationCancelledError = "Bertan behera utzi da eragiketa";
 Strings.OfficeOM.L_OperationCancelledErrorMessage = "Erabiltzaileak bertan behera utzi du eragiketa.";
 Strings.OfficeOM.L_OperationNotSupported = "Ez da eragiketa onartzen.";

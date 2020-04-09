@@ -4,6 +4,7 @@ _u.ExtensibilityStrings = function()
 };
 _u.ExtensibilityStrings.registerClass("_u.ExtensibilityStrings");
 _u.ExtensibilityStrings.l_APICallFailedDueToItemChange_Text = "تم تغيير العنصر المحدد.";
+_u.ExtensibilityStrings.l_API_Not_Supported_By_ExtensionPoint_Error_Text = "API غير مدعم لنقطة الامتداد.";
 _u.ExtensibilityStrings.l_ActionsDefinitionMultipleActionsError_Text = "يتم حالياً دعم إجراء واحد فقط.";
 _u.ExtensibilityStrings.l_ActionsDefinitionWrongNotificationMessageError_Text = "لا يمكن تعريف الإجراءات لهذا النوع من رسائل الإعلام.";
 _u.ExtensibilityStrings.l_AttachmentDeleteGeneralFailure_Text = "لا يمكن حذف المرفق من العنصر.";
@@ -49,6 +50,7 @@ _u.ExtensibilityStrings.l_InvalidTime_Text = "لا يتم حل الإدخال إ
 _u.ExtensibilityStrings.l_Invalid_Category_Error_Text = "تم تقديم فئات غير صالحة.";
 _u.ExtensibilityStrings.l_Item_Not_Saved_Error_Text = "لا يمكن استرداد المعرف حتى يتم حفظ العنصر.";
 _u.ExtensibilityStrings.l_MessageInDifferentStoreError_Text = "لا يمكن استرداد معرّف EWS لأن الرسالة محفوظة في مخزن آخر.";
+_u.ExtensibilityStrings.l_Missing_Extended_Permissions_For_API = "الإذن الموسع مفقود لاستدعاء API.";
 _u.ExtensibilityStrings.l_NoValidRecipientsProvided_Text = "لم يتم توفير مستلمين صالحين.";
 _u.ExtensibilityStrings.l_NotificationKeyNotFound_Text = "لا توجد أية إعلامات بالمفتاح المتوفر.";
 _u.ExtensibilityStrings.l_NullOrEmptyParameterError_Text = "المعلمة '{0}' إلزامية ولا يمكن أن تكون خالية أو فارغة.";
@@ -67,3 +69,4 @@ _u.ExtensibilityStrings.l_RecurrenceUnsupportedAlternateCalendar_Text = "تم إ
 _u.ExtensibilityStrings.l_Recurrence_Error_Instance_SetAsync_Text = "لا يمكن تعيين نمط التكرار لحالة واحدة في سلسلة.";
 _u.ExtensibilityStrings.l_Recurrence_Error_Properties_Invalid_Text = "نمط التكرار غير صالح. الرجاء التحقق من أن خصائص التكرار المحدد تحاذي نوع التكرار.";
 _u.ExtensibilityStrings.l_SaveError_Text = "حدث خطأ في الاتصال أثناء محاولة حفظ العنصر على الخادم.";
+_u.ExtensibilityStrings.l_TokenAccessDeniedWithoutItemContext_Text = "يتوفر رمز REST فقط مع اذن ريدوريتيمايلبوكس عندما لا يكون هناك سياق عنصر.";

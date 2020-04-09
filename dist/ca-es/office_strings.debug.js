@@ -134,6 +134,7 @@ Strings.OfficeOM.L_NotImplemented = "La funció {0} no està implementada.";
 Strings.OfficeOM.L_NotSupported = "No s'admet la funció {0}.";
 Strings.OfficeOM.L_NotSupportedBindingType = "El tipus de vinculació {0} especificat no s'admet.";
 Strings.OfficeOM.L_NotSupportedEventType = "El tipus d'incidència {0} especificat no s'admet.";
+Strings.OfficeOM.L_NotTrustedWAC = "Aquest complement s'ha bloquejat per protegir les dades. Podeu continuar utilitzant el complement descarregant una còpia d'aquest document a l'ordinador.";
 Strings.OfficeOM.L_OperationCancelledError = "Operació cancel·lada";
 Strings.OfficeOM.L_OperationCancelledErrorMessage = "L'usuari ha cancel·lat l'operació.";
 Strings.OfficeOM.L_OperationNotSupported = "Aquesta operació no és permesa.";

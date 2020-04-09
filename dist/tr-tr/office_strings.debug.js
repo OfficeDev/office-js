@@ -134,6 +134,7 @@ Strings.OfficeOM.L_NotImplemented = "{0} işlevi uygulanmadı.";
 Strings.OfficeOM.L_NotSupported = "{0} işlevi desteklenmiyor.";
 Strings.OfficeOM.L_NotSupportedBindingType = "Belirtilen bağlama türü {0} desteklenmiyor.";
 Strings.OfficeOM.L_NotSupportedEventType = "Belirtilen olay türü {0} desteklenmiyor.";
+Strings.OfficeOM.L_NotTrustedWAC = "Bu eklenti, verilerinizi korumak için engellenmiş. Bu belgenin bir kopyasını makinenize yükleyerek yine de eklentiyi kullanmaya devam edebilirsiniz";
 Strings.OfficeOM.L_OperationCancelledError = "İşlem İptal Edildi";
 Strings.OfficeOM.L_OperationCancelledErrorMessage = "İşlem kullanıcı tarafından iptal edildi.";
 Strings.OfficeOM.L_OperationNotSupported = "İşlem desteklenmiyor.";

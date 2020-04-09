@@ -4,6 +4,7 @@ _u.ExtensibilityStrings = function()
 };
 _u.ExtensibilityStrings.registerClass("_u.ExtensibilityStrings");
 _u.ExtensibilityStrings.l_APICallFailedDueToItemChange_Text = "Item yang dipilih telah diubah.";
+_u.ExtensibilityStrings.l_API_Not_Supported_By_ExtensionPoint_Error_Text = "API tidak disokong untuk titik sambungan.";
 _u.ExtensibilityStrings.l_ActionsDefinitionMultipleActionsError_Text = "Hanya satu tindakan yang disokong pada masa ini.";
 _u.ExtensibilityStrings.l_ActionsDefinitionWrongNotificationMessageError_Text = "Tindakan tidak dapat ditakrif untuk jenis mesej pemberitahuan ini.";
 _u.ExtensibilityStrings.l_AttachmentDeleteGeneralFailure_Text = "Lampiran tidak boleh dipadam daripada item.";
@@ -49,6 +50,7 @@ _u.ExtensibilityStrings.l_InvalidTime_Text = "Input tidak diselesaikan kepada ma
 _u.ExtensibilityStrings.l_Invalid_Category_Error_Text = "Kategori tidak sah telah disediakan.";
 _u.ExtensibilityStrings.l_Item_Not_Saved_Error_Text = "Id tidak boleh diambil sehingga item tersebut disimpan.";
 _u.ExtensibilityStrings.l_MessageInDifferentStoreError_Text = "ID EWS tidak dapat diambil kerana mesej disimpan dalam gedung yang berbeza.";
+_u.ExtensibilityStrings.l_Missing_Extended_Permissions_For_API = "Kebenaran Lanjutan tiada untuk panggilan API.";
 _u.ExtensibilityStrings.l_NoValidRecipientsProvided_Text = "Tiada penerima sah diberikan.";
 _u.ExtensibilityStrings.l_NotificationKeyNotFound_Text = "Tiada pemberitahuan dengan kunci yang diberikan.";
 _u.ExtensibilityStrings.l_NullOrEmptyParameterError_Text = "Parameter '{0}' adalah wajib dan ia tidak boleh nol atau kosong.";
@@ -67,3 +69,4 @@ _u.ExtensibilityStrings.l_RecurrenceUnsupportedAlternateCalendar_Text = "Corak p
 _u.ExtensibilityStrings.l_Recurrence_Error_Instance_SetAsync_Text = "Corak perulangan tidak boleh disetkan untuk satu kejadian dalam satu siri.";
 _u.ExtensibilityStrings.l_Recurrence_Error_Properties_Invalid_Text = "Corak perulangan tidak sah. Sila semak bahawa sifat perulangan yang ditentukan sejajar dengan jenis perulangan.";
 _u.ExtensibilityStrings.l_SaveError_Text = "Ralat sambungan berlaku semasa cuba menyimpan item pada pelayan.";
+_u.ExtensibilityStrings.l_TokenAccessDeniedWithoutItemContext_Text = "Token REHAT hanya tersedia dengan keizinan ReadWriteMailbox apabila tiada konteks item.";

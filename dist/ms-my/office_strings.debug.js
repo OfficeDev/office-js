@@ -134,6 +134,7 @@ Strings.OfficeOM.L_NotImplemented = "Fungsi {0} tidak dilaksanakan.";
 Strings.OfficeOM.L_NotSupported = "Fungsi {0} tidak disokong.";
 Strings.OfficeOM.L_NotSupportedBindingType = "Jenis pengikatan {0} yang ditentukan tidak disokong.";
 Strings.OfficeOM.L_NotSupportedEventType = "Jenis acara {0} yang ditentukan tidak disokong.";
+Strings.OfficeOM.L_NotTrustedWAC = "Tambahan ini telah disekat untuk melindungi data anda. Anda masih boleh terus menggunakan tambahan tersebut dengan memuat turun salinan dokumen ini ke mesin anda";
 Strings.OfficeOM.L_OperationCancelledError = "Operasi Dibatalkan";
 Strings.OfficeOM.L_OperationCancelledErrorMessage = "Operasi telah dibatalkan oleh pengguna.";
 Strings.OfficeOM.L_OperationNotSupported = "Operasi tidak disokong.";

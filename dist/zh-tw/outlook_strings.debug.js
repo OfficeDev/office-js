@@ -4,6 +4,7 @@ _u.ExtensibilityStrings = function()
 };
 _u.ExtensibilityStrings.registerClass("_u.ExtensibilityStrings");
 _u.ExtensibilityStrings.l_APICallFailedDueToItemChange_Text = "選取的項目已變更。";
+_u.ExtensibilityStrings.l_API_Not_Supported_By_ExtensionPoint_Error_Text = "擴充點不支援 API。";
 _u.ExtensibilityStrings.l_ActionsDefinitionMultipleActionsError_Text = "目前僅支援單一動作。";
 _u.ExtensibilityStrings.l_ActionsDefinitionWrongNotificationMessageError_Text = "無法定義此通知訊息類型的動作。";
 _u.ExtensibilityStrings.l_AttachmentDeleteGeneralFailure_Text = "無法從項目刪除附件。";
@@ -49,6 +50,7 @@ _u.ExtensibilityStrings.l_InvalidTime_Text = "輸入未解析成有效時間。"
 _u.ExtensibilityStrings.l_Invalid_Category_Error_Text = "提供的類別無效。";
 _u.ExtensibilityStrings.l_Item_Not_Saved_Error_Text = "您必須先儲存項目才能擷取識別碼。";
 _u.ExtensibilityStrings.l_MessageInDifferentStoreError_Text = "無法擷取 EWS 識別碼，因為郵件儲存在不同的存放區。";
+_u.ExtensibilityStrings.l_Missing_Extended_Permissions_For_API = "遺失 API 呼叫的延伸權限。";
 _u.ExtensibilityStrings.l_NoValidRecipientsProvided_Text = "未提供有效的收件者。";
 _u.ExtensibilityStrings.l_NotificationKeyNotFound_Text = "沒有含所提供之索引鍵的通知。";
 _u.ExtensibilityStrings.l_NullOrEmptyParameterError_Text = "'{0}' 參數是必要參數且不可為 Null 或空白。";
@@ -67,3 +69,4 @@ _u.ExtensibilityStrings.l_RecurrenceUnsupportedAlternateCalendar_Text = "週期�
 _u.ExtensibilityStrings.l_Recurrence_Error_Instance_SetAsync_Text = "無法為系列中的單次活動設定週期模式。";
 _u.ExtensibilityStrings.l_Recurrence_Error_Properties_Invalid_Text = "週期模式無效。請檢查指定的週期屬性是否與週期類型相符。";
 _u.ExtensibilityStrings.l_SaveError_Text = "嘗試在伺服器上儲存項目時，發生連線錯誤。";
+_u.ExtensibilityStrings.l_TokenAccessDeniedWithoutItemContext_Text = "只有在沒有項目內容時，REST 權杖才能搭配 ReadWriteMailbox 權限使用。";

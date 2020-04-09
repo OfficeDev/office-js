@@ -4,6 +4,7 @@ _u.ExtensibilityStrings = function()
 };
 _u.ExtensibilityStrings.registerClass("_u.ExtensibilityStrings");
 _u.ExtensibilityStrings.l_APICallFailedDueToItemChange_Text = "Odabrana je stavka izmijenjena.";
+_u.ExtensibilityStrings.l_API_Not_Supported_By_ExtensionPoint_Error_Text = "API nije podržan za točku proširenja.";
 _u.ExtensibilityStrings.l_ActionsDefinitionMultipleActionsError_Text = "Trenutno je podržana samo jedna akcija.";
 _u.ExtensibilityStrings.l_ActionsDefinitionWrongNotificationMessageError_Text = "Za tu vrstu poruke s obavijesti nije moguće definirati akcije.";
 _u.ExtensibilityStrings.l_AttachmentDeleteGeneralFailure_Text = "Privitak se ne može izbrisati iz te stavke.";
@@ -49,6 +50,7 @@ _u.ExtensibilityStrings.l_InvalidTime_Text = "Unos se ne razrješava na valjano 
 _u.ExtensibilityStrings.l_Invalid_Category_Error_Text = "Unesene su kategorije netočne.";
 _u.ExtensibilityStrings.l_Item_Not_Saved_Error_Text = "ID se ne može dohvatiti dok stavka ne bude spremljena.";
 _u.ExtensibilityStrings.l_MessageInDifferentStoreError_Text = "ID za EWS nije moguće dohvatiti jer je poruka spremljena u nekom drugom spremištu.";
+_u.ExtensibilityStrings.l_Missing_Extended_Permissions_For_API = "Nedostaje proširena dozvola za pozivanje API-ja.";
 _u.ExtensibilityStrings.l_NoValidRecipientsProvided_Text = "Nije naveden nijedan valjani primatelj.";
 _u.ExtensibilityStrings.l_NotificationKeyNotFound_Text = "Nema obavijesti s navedenim ključem.";
 _u.ExtensibilityStrings.l_NullOrEmptyParameterError_Text = 'Parametar "{0}" obavezan je i ne smije imati vrijednost null ni biti prazan.';
@@ -67,3 +69,4 @@ _u.ExtensibilityStrings.l_RecurrenceUnsupportedAlternateCalendar_Text = "Korisni
 _u.ExtensibilityStrings.l_Recurrence_Error_Instance_SetAsync_Text = "Uzorak ponavljanja nije moguće postaviti za jednu pojavu u nizu.";
 _u.ExtensibilityStrings.l_Recurrence_Error_Properties_Invalid_Text = "Uzorak ponavljanja nije valjan. Provjerite jesu li navedena svojstva ponavljanja u skladu s vrstom ponavljanja.";
 _u.ExtensibilityStrings.l_SaveError_Text = "Prilikom pokušaja spremanja stavke na poslužitelj pojavila se pogreška veze.";
+_u.ExtensibilityStrings.l_TokenAccessDeniedWithoutItemContext_Text = "A REST token is only available with ReadWriteMailbox permission when there is no item context.";

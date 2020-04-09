@@ -134,6 +134,7 @@ Strings.OfficeOM.L_NotImplemented = "Funktion {0} ist nicht implementiert.";
 Strings.OfficeOM.L_NotSupported = 'Die Funktion "{0}" wird nicht unterstützt.';
 Strings.OfficeOM.L_NotSupportedBindingType = 'Der angegebene Bindungstyp "{0}" wird nicht unterstützt.';
 Strings.OfficeOM.L_NotSupportedEventType = 'Der angegebenen Ereignistyp "{0}" wird nicht unterstützt.';
+Strings.OfficeOM.L_NotTrustedWAC = "Dieses Add-in wurde blockiert, um Ihre Daten zu schützen. Das Add-in kann weiterhin verwendet werden, indem eine Kopie dieses Dokuments auf den Computer heruntergeladen wird.";
 Strings.OfficeOM.L_OperationCancelledError = "Vorgang abgebrochen.";
 Strings.OfficeOM.L_OperationCancelledErrorMessage = "Der Vorgang wurde vom Benutzer abgebrochen.";
 Strings.OfficeOM.L_OperationNotSupported = "Dieser Vorgang wird nicht unterstützt.";

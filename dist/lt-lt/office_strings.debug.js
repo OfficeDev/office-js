@@ -134,6 +134,7 @@ Strings.OfficeOM.L_NotImplemented = "Funkcija {0} neįgyvendinta.";
 Strings.OfficeOM.L_NotSupported = "Funkcija {0} nepalaikoma.";
 Strings.OfficeOM.L_NotSupportedBindingType = "Nurodytas susiejimo tipas {0} nepalaikomas.";
 Strings.OfficeOM.L_NotSupportedEventType = "Nurodytas įvykio tipas {0} nepalaikomas.";
+Strings.OfficeOM.L_NotTrustedWAC = "Šis papildinys buvo užblokuotas siekiant apsaugoti jūsų duomenis. Vis dar galite toliau naudoti papildinį atsisiųsdami šio dokumento kopiją į savo kompiuterį";
 Strings.OfficeOM.L_OperationCancelledError = "Operacija atšaukta";
 Strings.OfficeOM.L_OperationCancelledErrorMessage = "Vartotojas atšaukė operaciją.";
 Strings.OfficeOM.L_OperationNotSupported = "Operacija nepalaikoma.";

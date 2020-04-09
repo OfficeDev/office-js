@@ -4,6 +4,7 @@ _u.ExtensibilityStrings = function()
 };
 _u.ExtensibilityStrings.registerClass("_u.ExtensibilityStrings");
 _u.ExtensibilityStrings.l_APICallFailedDueToItemChange_Text = "L'elemento selezionato è stato cambiato.";
+_u.ExtensibilityStrings.l_API_Not_Supported_By_ExtensionPoint_Error_Text = "L'API non è supportata per il punto di estensione.";
 _u.ExtensibilityStrings.l_ActionsDefinitionMultipleActionsError_Text = "Attualmente è supportata una sola azione.";
 _u.ExtensibilityStrings.l_ActionsDefinitionWrongNotificationMessageError_Text = "Non è possibile definire azioni per questo tipo di messaggio di notifica.";
 _u.ExtensibilityStrings.l_AttachmentDeleteGeneralFailure_Text = "Non è possibile eliminare l'allegato dall'elemento.";
@@ -49,6 +50,7 @@ _u.ExtensibilityStrings.l_InvalidTime_Text = "L'input non viene risolto in un'or
 _u.ExtensibilityStrings.l_Invalid_Category_Error_Text = "Sono state fornite delle categorie non valide.";
 _u.ExtensibilityStrings.l_Item_Not_Saved_Error_Text = "L\\'ID non può essere recuperato fino a quando l\\'elemento non viene salvato.";
 _u.ExtensibilityStrings.l_MessageInDifferentStoreError_Text = "L'ID di Servizi Web Exchange non è stato recuperato perché il messaggio è stato salvato in un archivio diverso.";
+_u.ExtensibilityStrings.l_Missing_Extended_Permissions_For_API = "Autorizzazione estesa mancante per la chiamata API.";
 _u.ExtensibilityStrings.l_NoValidRecipientsProvided_Text = "Non è stato specificato alcun destinatario valido.";
 _u.ExtensibilityStrings.l_NotificationKeyNotFound_Text = "Non ci sono notifiche con la chiave specificata.";
 _u.ExtensibilityStrings.l_NullOrEmptyParameterError_Text = "Il parametro '{0}' è obbligatorio e non può essere Null o vuoto.";
@@ -67,3 +69,4 @@ _u.ExtensibilityStrings.l_RecurrenceUnsupportedAlternateCalendar_Text = "Il crit
 _u.ExtensibilityStrings.l_Recurrence_Error_Instance_SetAsync_Text = "Non è possibile impostare un criterio di ricorrenza per una singola occorrenza di una serie.";
 _u.ExtensibilityStrings.l_Recurrence_Error_Properties_Invalid_Text = "Il criterio di ricorrenza non è valido. Verificare che le proprietà di ricorrenza specificate siano allineate con il tipo di ricorrenza.";
 _u.ExtensibilityStrings.l_SaveError_Text = "Si è verificato un errore di connessione durante il tentativo di salvare l\\'elemento nel server.";
+_u.ExtensibilityStrings.l_TokenAccessDeniedWithoutItemContext_Text = "Se non è presente alcun contesto per l'elemento, un token REST è disponibile solo con l'autorizzazione ReadWriteMailbox.";

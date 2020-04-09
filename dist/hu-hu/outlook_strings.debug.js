@@ -4,6 +4,7 @@ _u.ExtensibilityStrings = function()
 };
 _u.ExtensibilityStrings.registerClass("_u.ExtensibilityStrings");
 _u.ExtensibilityStrings.l_APICallFailedDueToItemChange_Text = "Másik elem lett kijelölve.";
+_u.ExtensibilityStrings.l_API_Not_Supported_By_ExtensionPoint_Error_Text = "Ez a kiterjesztési pont nem használható API-hívással.";
 _u.ExtensibilityStrings.l_ActionsDefinitionMultipleActionsError_Text = "Egyelőre csak egyetlen művelet végezhető el.";
 _u.ExtensibilityStrings.l_ActionsDefinitionWrongNotificationMessageError_Text = "Ilyen típusú értesítő üzenethez nem definiálhatók műveletek.";
 _u.ExtensibilityStrings.l_AttachmentDeleteGeneralFailure_Text = "A melléklet nem törölhető az elemből.";
@@ -49,6 +50,7 @@ _u.ExtensibilityStrings.l_InvalidTime_Text = "A beírt érték nem értelmezhet�
 _u.ExtensibilityStrings.l_Invalid_Category_Error_Text = "Érvénytelen kategóriák lettek megadva.";
 _u.ExtensibilityStrings.l_Item_Not_Saved_Error_Text = "Az azonosító nem olvasható be az elem mentésekor.";
 _u.ExtensibilityStrings.l_MessageInDifferentStoreError_Text = "Nem sikerült beolvasni az EWS-azonosítót, mert egy másik tárolóba lett mentve az üzenet.";
+_u.ExtensibilityStrings.l_Missing_Extended_Permissions_For_API = "A bővített engedély hiányzik az API-híváshoz.";
 _u.ExtensibilityStrings.l_NoValidRecipientsProvided_Text = "Nincs érvényes címzett megadva.";
 _u.ExtensibilityStrings.l_NotificationKeyNotFound_Text = "Nem találtunk a megadott kulccsal jelölt értesítést.";
 _u.ExtensibilityStrings.l_NullOrEmptyParameterError_Text = "A(z) {0} paramétert kötelező megadni, és az értéke nem lehet null vagy üres.";
@@ -67,3 +69,4 @@ _u.ExtensibilityStrings.l_RecurrenceUnsupportedAlternateCalendar_Text = "Az ism�
 _u.ExtensibilityStrings.l_Recurrence_Error_Instance_SetAsync_Text = "Sorozat részét képező egyszeri alkalomhoz nem állítható be ismétlődési szabály.";
 _u.ExtensibilityStrings.l_Recurrence_Error_Properties_Invalid_Text = "Érvénytelen az ismétlődési szabály. Kérjük, ellenőrizze, hogy a megadott ismétlődési tulajdonságok megfelelnek-e az ismétlődési típusnak.";
 _u.ExtensibilityStrings.l_SaveError_Text = "Csatlakozási hiba történt az elem kiszolgálóra mentése közben.";
+_u.ExtensibilityStrings.l_TokenAccessDeniedWithoutItemContext_Text = "A REST token csak akkor érhető el a ReadWriteMailbox engedéllyel, ha az elemnek nincs környezete.";

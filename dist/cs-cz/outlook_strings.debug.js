@@ -4,6 +4,7 @@ _u.ExtensibilityStrings = function()
 };
 _u.ExtensibilityStrings.registerClass("_u.ExtensibilityStrings");
 _u.ExtensibilityStrings.l_APICallFailedDueToItemChange_Text = "Vybraná položka se změnila.";
+_u.ExtensibilityStrings.l_API_Not_Supported_By_ExtensionPoint_Error_Text = "API není pro rozšiřovací bod podporované.";
 _u.ExtensibilityStrings.l_ActionsDefinitionMultipleActionsError_Text = "Momentálně je podporovaná jenom jediná akce.";
 _u.ExtensibilityStrings.l_ActionsDefinitionWrongNotificationMessageError_Text = "Pro tento typ oznámení se nedají definovat akce.";
 _u.ExtensibilityStrings.l_AttachmentDeleteGeneralFailure_Text = "Příloha se nedá odstranit z položky.";
@@ -49,6 +50,7 @@ _u.ExtensibilityStrings.l_InvalidTime_Text = "Nezadali jste platný čas.";
 _u.ExtensibilityStrings.l_Invalid_Category_Error_Text = "Byly poskytnuty neplatné kategorie.";
 _u.ExtensibilityStrings.l_Item_Not_Saved_Error_Text = "ID se nedá načíst, dokud se položka neuloží.";
 _u.ExtensibilityStrings.l_MessageInDifferentStoreError_Text = "Nejde načíst EWS ID, protože zpráva je uložená v jiném úložišti.";
+_u.ExtensibilityStrings.l_Missing_Extended_Permissions_For_API = "Pro volání rozhraní API chybí rozšířené oprávnění.";
 _u.ExtensibilityStrings.l_NoValidRecipientsProvided_Text = "Nebyli uvedení žádní příjemci.";
 _u.ExtensibilityStrings.l_NotificationKeyNotFound_Text = "Neexistují žádná oznámení se zadaným klíčem.";
 _u.ExtensibilityStrings.l_NullOrEmptyParameterError_Text = "Parametr {0} je povinný a nemůže být null ani prázdný.";
@@ -67,3 +69,4 @@ _u.ExtensibilityStrings.l_RecurrenceUnsupportedAlternateCalendar_Text = "Uživat
 _u.ExtensibilityStrings.l_Recurrence_Error_Instance_SetAsync_Text = "Způsob opakování se nedá nastavit pro jediný výskyt v řadě.";
 _u.ExtensibilityStrings.l_Recurrence_Error_Properties_Invalid_Text = "Způsob opakování není platný. Zkontrolujte prosím, že zadané vlastnosti opakování odpovídají typu opakování.";
 _u.ExtensibilityStrings.l_SaveError_Text = "Při pokusu o uložení položky na server došlo k chybě připojení.";
+_u.ExtensibilityStrings.l_TokenAccessDeniedWithoutItemContext_Text = "A REST token is only available with ReadWriteMailbox permission when there is no item context.";

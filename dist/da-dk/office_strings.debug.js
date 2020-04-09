@@ -134,6 +134,7 @@ Strings.OfficeOM.L_NotImplemented = "Funktion {0} er ikke implementeret.";
 Strings.OfficeOM.L_NotSupported = "Funktionen {0} understøttes ikke.";
 Strings.OfficeOM.L_NotSupportedBindingType = "Den angivne bindingstype {0} understøttes ikke.";
 Strings.OfficeOM.L_NotSupportedEventType = "Den angivne hændelsestype {0} understøttes ikke.";
+Strings.OfficeOM.L_NotTrustedWAC = "Dette tilføjelses er blevet blokeret for at beskytte dine data. Du kan fortsat fortsætte med at bruge tilføjelsesfilen ved at downloade en kopi af dokumentet til computeren";
 Strings.OfficeOM.L_OperationCancelledError = "Handlingen blev annulleret";
 Strings.OfficeOM.L_OperationCancelledErrorMessage = "Handlingen blev annulleret af brugeren.";
 Strings.OfficeOM.L_OperationNotSupported = "Handlingen understøttes ikke.";

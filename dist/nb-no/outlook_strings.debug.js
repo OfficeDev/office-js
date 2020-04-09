@@ -4,6 +4,7 @@ _u.ExtensibilityStrings = function()
 };
 _u.ExtensibilityStrings.registerClass("_u.ExtensibilityStrings");
 _u.ExtensibilityStrings.l_APICallFailedDueToItemChange_Text = "Det valgte elementet er endret.";
+_u.ExtensibilityStrings.l_API_Not_Supported_By_ExtensionPoint_Error_Text = "API støttes ikke for utvidelsespunkt.";
 _u.ExtensibilityStrings.l_ActionsDefinitionMultipleActionsError_Text = "Støtter bare én enkelt handling for øyeblikket.";
 _u.ExtensibilityStrings.l_ActionsDefinitionWrongNotificationMessageError_Text = "Kan ikke definere handlinger for denne typen meldingsvarsel.";
 _u.ExtensibilityStrings.l_AttachmentDeleteGeneralFailure_Text = "Vedlegget kan ikke slettes fra elementet.";
@@ -49,6 +50,7 @@ _u.ExtensibilityStrings.l_InvalidTime_Text = "Inndataene løses ikke til et gyld
 _u.ExtensibilityStrings.l_Invalid_Category_Error_Text = "Ugyldige kategorier ble angitt.";
 _u.ExtensibilityStrings.l_Item_Not_Saved_Error_Text = "IDen kan ikke hentes før elementet er lagret.";
 _u.ExtensibilityStrings.l_MessageInDifferentStoreError_Text = "Kan ikke hente EWS-ID-en fordi meldingen er lagret et annet sted.";
+_u.ExtensibilityStrings.l_Missing_Extended_Permissions_For_API = "Utvidet tillatelse mangler for API-samtalen.";
 _u.ExtensibilityStrings.l_NoValidRecipientsProvided_Text = "Ingen gyldige mottakere angitt.";
 _u.ExtensibilityStrings.l_NotificationKeyNotFound_Text = "Det finnes ingen varsler med den angitte nøkkelen.";
 _u.ExtensibilityStrings.l_NullOrEmptyParameterError_Text = "Parameteren {0} er obligatorisk og kan ikke være null eller tom.";
@@ -67,3 +69,4 @@ _u.ExtensibilityStrings.l_RecurrenceUnsupportedAlternateCalendar_Text = "Mønste
 _u.ExtensibilityStrings.l_Recurrence_Error_Instance_SetAsync_Text = "Kan ikke angi et mønster for regelmessighet for én enkelt forekomst i en serie.";
 _u.ExtensibilityStrings.l_Recurrence_Error_Properties_Invalid_Text = "Mønsteret for regelmessighet er ikke gyldig. Kontroller at de angitte regelmessighetsegenskapene samsvarer med regelmessighetstypen.";
 _u.ExtensibilityStrings.l_SaveError_Text = "Det oppstod en tilkoblingsfeil under forsøk på å lagre elementet på serveren.";
+_u.ExtensibilityStrings.l_TokenAccessDeniedWithoutItemContext_Text = "Et REST-token er bare tilgjengelig med ReadWriteMailbox-tillatelse når det ikke er noen element kontekst.";

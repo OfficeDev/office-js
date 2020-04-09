@@ -134,6 +134,7 @@ Strings.OfficeOM.L_NotImplemented = "関数 {0} は実装されていません�
 Strings.OfficeOM.L_NotSupported = "関数 {0} はサポートされていません。";
 Strings.OfficeOM.L_NotSupportedBindingType = "指定したバインド タイプ {0} はサポートされていません。";
 Strings.OfficeOM.L_NotSupportedEventType = "指定したイベント タイプ {0} はサポートされていません。";
+Strings.OfficeOM.L_NotTrustedWAC = "このアドインはデータを保護するためにブロックされています。このドキュメントのコピーをコンピューターにダウンロードして、アドインを引き続き使用することができます";
 Strings.OfficeOM.L_OperationCancelledError = "操作は取り消されました";
 Strings.OfficeOM.L_OperationCancelledErrorMessage = "操作はユーザーによって取り消されました。";
 Strings.OfficeOM.L_OperationNotSupported = "操作はサポートされていません。";

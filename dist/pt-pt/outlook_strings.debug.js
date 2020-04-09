@@ -4,6 +4,7 @@ _u.ExtensibilityStrings = function()
 };
 _u.ExtensibilityStrings.registerClass("_u.ExtensibilityStrings");
 _u.ExtensibilityStrings.l_APICallFailedDueToItemChange_Text = "O item selecionado foi alterado.";
+_u.ExtensibilityStrings.l_API_Not_Supported_By_ExtensionPoint_Error_Text = "A API não é suportada para o ponto de extensão.";
 _u.ExtensibilityStrings.l_ActionsDefinitionMultipleActionsError_Text = "Atualmente só é suportada uma única ação.";
 _u.ExtensibilityStrings.l_ActionsDefinitionWrongNotificationMessageError_Text = "Não podem ser definidas ações para este tipo de mensagem de notificação.";
 _u.ExtensibilityStrings.l_AttachmentDeleteGeneralFailure_Text = "O anexo não pode ser eliminado do item.";
@@ -49,6 +50,7 @@ _u.ExtensibilityStrings.l_InvalidTime_Text = "Os dados introduzidos não resulta
 _u.ExtensibilityStrings.l_Invalid_Category_Error_Text = "Foram fornecidas categorias inválidas.";
 _u.ExtensibilityStrings.l_Item_Not_Saved_Error_Text = "Não é possível obter o ID enquanto o item não for guardado.";
 _u.ExtensibilityStrings.l_MessageInDifferentStoreError_Text = "Não é possível obter o ID do EWS porque a mensagem está guardada num arquivo diferente.";
+_u.ExtensibilityStrings.l_Missing_Extended_Permissions_For_API = "Permissão Expandida em falta para a chamada à API.";
 _u.ExtensibilityStrings.l_NoValidRecipientsProvided_Text = "Não foram fornecidos destinatários válidos.";
 _u.ExtensibilityStrings.l_NotificationKeyNotFound_Text = "Não existem notificações com a chave fornecida.";
 _u.ExtensibilityStrings.l_NullOrEmptyParameterError_Text = 'O parâmetro "{0}" é obrigatório e não pode ser nulo nem estar vazio.';
@@ -67,3 +69,4 @@ _u.ExtensibilityStrings.l_RecurrenceUnsupportedAlternateCalendar_Text = "O padr�
 _u.ExtensibilityStrings.l_Recurrence_Error_Instance_SetAsync_Text = "Não é possível definir um padrão de periodicidade para uma única ocorrência numa série.";
 _u.ExtensibilityStrings.l_Recurrence_Error_Properties_Invalid_Text = "O padrão de periodicidade é inválido. Verifique que as propriedades de periodicidade especificadas correspondem ao tipo de periodicidade.";
 _u.ExtensibilityStrings.l_SaveError_Text = "Ocorreu um erro de ligação ao tentar guardar o item no servidor.";
+_u.ExtensibilityStrings.l_TokenAccessDeniedWithoutItemContext_Text = "A REST token is only available with ReadWriteMailbox permission when there is no item context.";

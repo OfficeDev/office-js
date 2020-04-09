@@ -1416,6 +1416,12 @@ OSF._OfficeAppFactory = (function OSF__OfficeAppFactory() {
         }
     }
     window.Office = Microsoft.Office.WebExtension;
+    var initialDisplayModeMappings = {
+        0: "Unknown",
+        1: "Hidden",
+        2: "Taskpane",
+        3: "Dialog"
+    };
     Microsoft.Office.WebExtension.PlatformType = {
         PC: "PC",
         OfficeOnline: "OfficeOnline",
@@ -1445,7 +1451,7 @@ OSF._OfficeAppFactory = (function OSF__OfficeAppFactory() {
     var _isOfficeJsLoaded = false;
     var _officeOnReadyPendingResolves = [];
     var _isOfficeOnReadyCalled = false;
-    var _officeOnReadyHostAndPlatformInfo = { host: null, platform: null };
+    var _officeOnReadyHostAndPlatformInfo = { host: null, platform: null, addin: null };
     var _loadScriptHelper = new ScriptLoading.LoadScriptHelper({
         OfficeJS: OSF.ConstantNames.OfficeJS,
         OfficeDebugJS: OSF.ConstantNames.OfficeDebugJS
@@ -1457,9 +1463,9 @@ OSF._OfficeAppFactory = (function OSF__OfficeAppFactory() {
     var _windowLocationSearch = window.location.search;
     var _windowName = window.name;
     var setOfficeJsAsLoadedAndDispatchPendingOnReadyCallbacks = function (_a) {
-        var host = _a.host, platform = _a.platform;
+        var host = _a.host, platform = _a.platform, addin = _a.addin;
         _isOfficeJsLoaded = true;
-        _officeOnReadyHostAndPlatformInfo = { host: host, platform: platform };
+        _officeOnReadyHostAndPlatformInfo = { host: host, platform: platform, addin: addin };
         while (_officeOnReadyPendingResolves.length > 0) {
             _officeOnReadyPendingResolves.shift()(_officeOnReadyHostAndPlatformInfo);
         }
@@ -1470,14 +1476,14 @@ OSF._OfficeAppFactory = (function OSF__OfficeAppFactory() {
     };
     Microsoft.Office.WebExtension.onReadyInternal = function Microsoft_Office_WebExtension_onReadyInternal(callback) {
         if (_isOfficeJsLoaded) {
-            var host = _officeOnReadyHostAndPlatformInfo.host, platform = _officeOnReadyHostAndPlatformInfo.platform;
+            var host = _officeOnReadyHostAndPlatformInfo.host, platform = _officeOnReadyHostAndPlatformInfo.platform, addin = _officeOnReadyHostAndPlatformInfo.addin;
             if (callback) {
-                var result = callback({ host: host, platform: platform });
+                var result = callback({ host: host, platform: platform, addin: addin });
                 if (result && result.then && typeof result.then === "function") {
-                    return result.then(function () { return Office.Promise.resolve({ host: host, platform: platform }); });
+                    return result.then(function () { return Office.Promise.resolve({ host: host, platform: platform, addin: addin }); });
                 }
             }
-            return Office.Promise.resolve({ host: host, platform: platform });
+            return Office.Promise.resolve({ host: host, platform: platform, addin: addin });
         }
         if (callback) {
             return new Office.Promise(function (resolve) {
@@ -1766,9 +1772,16 @@ OSF._OfficeAppFactory = (function OSF__OfficeAppFactory() {
                                 }
                                 _initializationHelper.prepareRightAfterWebExtensionInitialize && _initializationHelper.prepareRightAfterWebExtensionInitialize();
                                 var appNumber = appContext.get_appName();
+                                var addinInfo = null;
+                                if ((_hostInfo.flags & OSF.HostInfoFlags.SharedApp) !== 0) {
+                                    addinInfo = {
+                                        visibilityMode: initialDisplayModeMappings[(appContext.get_initialDisplayMode && typeof appContext.get_initialDisplayMode === 'function') ? appContext.get_initialDisplayMode() : 0]
+                                    };
+                                }
                                 setOfficeJsAsLoadedAndDispatchPendingOnReadyCallbacks({
                                     host: OfficeExt.HostName.Host.getInstance().getHost(appNumber),
-                                    platform: OfficeExt.HostName.Host.getInstance().getPlatform(appNumber)
+                                    platform: OfficeExt.HostName.Host.getInstance().getPlatform(appNumber),
+                                    addin: addinInfo
                                 });
                             }
                             else {
@@ -1801,7 +1814,8 @@ OSF._OfficeAppFactory = (function OSF__OfficeAppFactory() {
                         if (isPlainBrowser) {
                             setOfficeJsAsLoadedAndDispatchPendingOnReadyCallbacks({
                                 host: null,
-                                platform: null
+                                platform: null,
+                                addin: null
                             });
                         }
                     }
@@ -2185,7 +2199,8 @@ OSF._OfficeAppFactory = (function OSF__OfficeAppFactory() {
             var requestMessageText = JSON.stringify(requestMessage.Body);
             CoreUtility.log("Request:"), CoreUtility.log(requestMessageText);
             var headers = {};
-            return headers[CoreConstants.sourceLibHeader] = sourceLibHeaderValue, RichApiMessageUtility.buildRequestMessageSafeArray(customData, requestFlags, "POST", CoreConstants.processQuery, headers, requestMessageText);
+            return CoreUtility._copyHeaders(requestMessage.Headers, headers), headers[CoreConstants.sourceLibHeader] = sourceLibHeaderValue, 
+            RichApiMessageUtility.buildRequestMessageSafeArray(customData, requestFlags, "POST", CoreConstants.processQuery, headers, requestMessageText);
         }, RichApiMessageUtility.buildResponseOnSuccess = function(responseBody, responseHeaders) {
             var response = {
                 ErrorCode: "",
@@ -2349,7 +2364,7 @@ OSF._OfficeAppFactory = (function OSF__OfficeAppFactory() {
                 var keyvalue = parts[i].split("=");
                 if (keyvalue[0].toLowerCase() === CoreConstants.flags) {
                     var flags = parseInt(keyvalue[1]);
-                    flags &= 511, ret.flags = flags;
+                    flags &= 4095, ret.flags = flags;
                 } else keyvalue[0].toLowerCase() === CoreConstants.customData && (ret.customData = decodeURIComponent(keyvalue[1]));
             }
             return ret;
@@ -2760,12 +2775,13 @@ OSF._OfficeAppFactory = (function OSF__OfficeAppFactory() {
                 id = CommonUtility.tryGetObjectIdFromLoadOrRetrieveResult(value);
                 if (!Core.CoreUtility.isNullOrUndefined(id)) return this.saveOriginalObjectPathInfo(), 
                 this.resetForUpdateUsingObjectData(), Core.CoreUtility.isNullOrEmptyString(getByIdMethodName) ? (this.m_objectPathInfo.ObjectPathType = 5, 
-                this.m_objectPathInfo.Name = "") : (this.m_objectPathInfo.ObjectPathType = 3, this.m_objectPathInfo.Name = getByIdMethodName, 
-                this.m_getByIdMethodName = null), void (this.m_objectPathInfo.ArgumentInfo.Arguments = [ id ]);
+                this.m_objectPathInfo.Name = "") : (this.m_objectPathInfo.ObjectPathType = 3, this.m_objectPathInfo.Name = getByIdMethodName), 
+                void (this.m_objectPathInfo.ArgumentInfo.Arguments = [ id ]);
             }
         }, ObjectPath.prototype.resetForUpdateUsingObjectData = function() {
             this.m_isInvalidAfterRequest = !1, this.m_isValid = !0, this.m_operationType = 1, 
-            this.m_flags = 4, this.m_objectPathInfo.ArgumentInfo = {}, this.m_argumentObjectPaths = null;
+            this.m_flags = 4, this.m_objectPathInfo.ArgumentInfo = {}, this.m_argumentObjectPaths = null, 
+            this.m_getByIdMethodName = null;
         }, ObjectPath.isRestorableObjectPath = function(objectPathType) {
             return 1 === objectPathType || 5 === objectPathType || 3 === objectPathType || 4 === objectPathType;
         }, ObjectPath.copyObjectPathInfo = function(src, dest) {
@@ -3778,7 +3794,7 @@ OSF._OfficeAppFactory = (function OSF__OfficeAppFactory() {
             this._requestFlagModifier && (requestFlags |= this._requestFlagModifier), this._requestExecutor || (Core.CoreUtility._isLocalDocumentUrl(this.m_requestUrlAndHeaderInfo.url) ? this._requestExecutor = new OfficeJsRequestExecutor(this) : this._requestExecutor = new Common.HttpRequestExecutor());
             var requestExecutor = this._requestExecutor, headers = {};
             Core.CoreUtility._copyHeaders(this.m_requestUrlAndHeaderInfo.headers, headers), 
-            Core.CoreUtility._copyHeaders(this.m_customRequestHeaders, headers);
+            Core.CoreUtility._copyHeaders(this.m_customRequestHeaders, headers), delete this.m_customRequestHeaders[Constants.officeScriptEventId];
             var requestExecutorRequestMessage = {
                 Url: this.m_requestUrlAndHeaderInfo.url,
                 Headers: headers,
@@ -4061,7 +4077,8 @@ OSF._OfficeAppFactory = (function OSF__OfficeAppFactory() {
         Constants.eventMessageCategory = 65536, Constants.eventWorkbookId = "Workbook", 
         Constants.eventSourceRemote = "Remote", Constants.proxy = "$proxy", Constants.className = "_className", 
         Constants.isCollection = "_isCollection", Constants.collectionPropertyPath = "_collectionPropertyPath", 
-        Constants.objectPathInfoDoNotKeepReferenceFieldName = "D", Constants;
+        Constants.objectPathInfoDoNotKeepReferenceFieldName = "D", Constants.officeScriptEventId = "X-OfficeScriptEventId", 
+        Constants;
     }(Common.CommonConstants);
     exports.Constants = Constants;
     var ClientRequest = function(_super) {
@@ -5067,6 +5084,15 @@ OSF._OfficeAppFactory = (function OSF__OfficeAppFactory() {
     function getOfficeRuntimeImplementation(info) {
         return window[info.platform === Office.PlatformType.OfficeOnline ? "_OfficeRuntimeWeb" : "_OfficeRuntimeNative"];
     }
+    function getWrapMethod(property) {
+        return function(name) {
+            return function(property, method) {
+                return wrapMethod(function(impl) {
+                    return impl[property][method];
+                });
+            }(property, name);
+        };
+    }
     function wrapMethod(methodFetcher) {
         return function() {
             var _this = this, args = arguments;
@@ -5129,6 +5155,20 @@ OSF._OfficeAppFactory = (function OSF__OfficeAppFactory() {
             isSetSupported: function(capability, semVer) {
                 return Office.context.requirements.isSetSupported(capability, Number(semVer));
             }
+        },
+        message: function() {
+            var wrap = getWrapMethod("message");
+            return {
+                on: wrap("on"),
+                off: wrap("off"),
+                emit: wrap("emit")
+            };
+        }(),
+        auth: {
+            getAccessToken: getWrapMethod("auth")("getAccessToken")
+        },
+        ui: {
+            getRibbon: getWrapMethod("ui")("getRibbon")
         }
     };
 }, function(module, exports) {
@@ -5415,7 +5455,7 @@ OSF._OfficeAppFactory = (function OSF__OfficeAppFactory() {
             var _this = _super.call(this, requestInfo) || this;
             return _this.m_customFunctions = CustomFunctions.newObject(_this), _this.m_container = _createRootServiceObject(CustomFunctionsContainer, _this), 
             _this._rootObject = _this.m_container, _this._rootObjectPropertyName = "customFunctionsContainer", 
-            _this._requestFlagModifier = 128, _this;
+            _this._requestFlagModifier = 2176, _this;
         }
         return __extends(CustomFunctionRequestContext, _super), Object.defineProperty(CustomFunctionRequestContext.prototype, "customFunctions", {
             get: function() {
@@ -5506,24 +5546,18 @@ OSF._OfficeAppFactory = (function OSF__OfficeAppFactory() {
         ErrorCode.invalidNumber = "#NUM!", ErrorCode.nullReference = "#NULL!";
     }(ErrorCode = exports.ErrorCode || (exports.ErrorCode = {}));
     var CustomFunctionError = function(_super) {
-        function CustomFunctionError(errorCode, message) {
-            var _this = _super.call(this, message) || this;
-            return Object.setPrototypeOf(_this, CustomFunctionError.prototype), _this._code = errorCode || ErrorCode.invalidValue, 
-            _this._message = message || "", _this;
+        function CustomFunctionError(errorCode, errorMessage) {
+            var _this = _super.call(this, errorMessage || "") || this;
+            return Object.setPrototypeOf(_this, CustomFunctionError.prototype), _this.valueType = "CustomFunctionError", 
+            _this.code = errorCode || ErrorCode.invalidValue, _this;
         }
-        return __extends(CustomFunctionError, _super), Object.defineProperty(CustomFunctionError.prototype, "code", {
-            get: function() {
-                return this._code;
-            },
-            enumerable: !0,
-            configurable: !0
-        }), Object.defineProperty(CustomFunctionError.prototype, "message", {
-            get: function() {
-                return this._message;
-            },
-            enumerable: !0,
-            configurable: !0
-        }), CustomFunctionError;
+        return __extends(CustomFunctionError, _super), CustomFunctionError.prototype.toJSON = function() {
+            return {
+                valueType: this.valueType,
+                code: this.code,
+                message: this.message
+            };
+        }, CustomFunctionError;
     }(Error);
     exports.CustomFunctionError = CustomFunctionError;
     var CustomFunctionProxy = function() {
@@ -5767,8 +5801,13 @@ OSF._OfficeAppFactory = (function OSF__OfficeAppFactory() {
                 value: result
             };
             "number" == typeof result ? isNaN(result) ? (invocationResult.failed = !0, invocationResult.value = "NaN") : isFinite(result) || (invocationResult.failed = !0, 
-            invocationResult.value = "Infinity", invocationResult.errorCode = 6) : result instanceof Error && (invocationResult.failed = !0, 
-            invocationResult.value = CustomFunctionProxy.toLogMessage(result), invocationResult.errorCode = 0);
+            invocationResult.value = "Infinity", invocationResult.errorCode = 6) : result instanceof CustomFunctionError ? (invocationResult.failed = !1, 
+            invocationResult.value = {
+                valueType: result.valueType,
+                code: result.code,
+                message: result.message
+            }) : result instanceof Error && (invocationResult.failed = !0, invocationResult.value = CustomFunctionProxy.toLogMessage(result), 
+            invocationResult.errorCode = 0);
             var timeNow = Date.now();
             this._resultEntryBuffer[invocationId] = {
                 timeCreated: timeNow,
@@ -5894,6 +5933,7 @@ OSF._OfficeAppFactory = (function OSF__OfficeAppFactory() {
             var context = new CustomFunctionRequestContext();
             return exports.customFunctionProxy.ensureInit(context).then(function() {
                 return context.customFunctions._SetOsfControlContainerReadyForCustomFunctions(), 
+                OfficeExtension.Utility.log("OsfControl activation lifecycle: Set OsfControlContainer ready for CustomFunctions"), 
                 context._customData = "SetOsfControlContainerReadyForCustomFunctions", context.sync().catch(function(error) {
                     return function(error, rethrowOtherError) {
                         var isCellEditModeError = error instanceof OfficeExtension.Error && error.code === CustomFunctionRuntimeErrorCode.invalidOperationInCellEditMode;
@@ -5962,8 +6002,8 @@ OSF._OfficeAppFactory = (function OSF__OfficeAppFactory() {
                 var obj = value;
                 _fixObjectPathIfNecessary(this, obj), _handleNavigationPropertyResults(this, obj, [ "customFunctions", "CustomFunctions" ]);
             }
-        }, CustomFunctionsContainer.prototype.load = function(option) {
-            return _load(this, option);
+        }, CustomFunctionsContainer.prototype.load = function(options) {
+            return _load(this, options);
         }, CustomFunctionsContainer.prototype._handleRetrieveResult = function(value, result) {
             _super.prototype._handleRetrieveResult.call(this, value, result), _processRetrieveResult(this, value, result);
         }, CustomFunctionsContainer.prototype.toJSON = function() {
@@ -6053,6 +6093,7 @@ var oteljs = function(modules) {
         DataFieldType[DataFieldType["Boolean"] = 1] = "Boolean";
         DataFieldType[DataFieldType["Int64"] = 2] = "Int64";
         DataFieldType[DataFieldType["Double"] = 3] = "Double";
+        DataFieldType[DataFieldType["Guid"] = 4] = "Guid";
     })(DataFieldType || (DataFieldType = {}));
     function makeBooleanDataField(name, value) {
         return {
@@ -6079,6 +6120,13 @@ var oteljs = function(modules) {
         return {
             name: name,
             dataType: DataFieldType.String,
+            value: value
+        };
+    }
+    function makeGuidDataField(name, value) {
+        return {
+            name: name,
+            dataType: DataFieldType.Guid,
             value: value
         };
     }
@@ -6906,7 +6954,7 @@ var oteljs = function(modules) {
         }
         TelemetryEventValidator.validateInt = validateInt;
     })(TelemetryEventValidator_TelemetryEventValidator || (TelemetryEventValidator_TelemetryEventValidator = {}));
-    var oteljsVersion = "3.1.27";
+    var oteljsVersion = "3.1.36";
     var __assign = undefined && undefined.__assign || function() {
         __assign = Object.assign || function(t) {
             for (var s, i = 1, n = arguments.length; i < n; i++) {
@@ -6959,7 +7007,9 @@ var oteljs = function(modules) {
             if (!event.telemetryProperties) {
                 event.telemetryProperties = TenantTokenManager_TenantTokenManager.getTenantTokens(event.eventName);
             }
-            (_a = event.dataFields).push.apply(_a, this.persistentDataFields);
+            if (event.dataFields && this.persistentDataFields) {
+                (_a = event.dataFields).push.apply(_a, this.persistentDataFields);
+            }
             if (!this.config.disableValidation) {
                 TelemetryEventValidator_TelemetryEventValidator.validateTelemetryEvent(event);
             }
@@ -7203,6 +7253,9 @@ var oteljs = function(modules) {
     });
     __webpack_require__.d(__webpack_exports__, "makeStringDataField", function() {
         return makeStringDataField;
+    });
+    __webpack_require__.d(__webpack_exports__, "makeGuidDataField", function() {
+        return makeGuidDataField;
     });
     __webpack_require__.d(__webpack_exports__, "DataFieldType", function() {
         return DataFieldType;

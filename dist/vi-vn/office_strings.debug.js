@@ -134,6 +134,7 @@ Strings.OfficeOM.L_NotImplemented = "Hàm {0} chưa được triển khai.";
 Strings.OfficeOM.L_NotSupported = "Hàm {0} không được hỗ trợ.";
 Strings.OfficeOM.L_NotSupportedBindingType = "Không hỗ trợ kiểu ghép nối {0} đã xác định.";
 Strings.OfficeOM.L_NotSupportedEventType = "Không hỗ trợ kiểu sự kiện {0} đã xác định.";
+Strings.OfficeOM.L_NotTrustedWAC = "Bổ trợ này đã bị chặn để bảo vệ dữ liệu của bạn. Bạn vẫn có thể tiếp tục sử dụng phần bổ trợ bằng cách tải bản sao của tài liệu này vào máy của bạn";
 Strings.OfficeOM.L_OperationCancelledError = "Đã hủy bỏ Thao tác";
 Strings.OfficeOM.L_OperationCancelledErrorMessage = "Thao tác này đã bị người dùng hủy bỏ.";
 Strings.OfficeOM.L_OperationNotSupported = "Thao tác không được hỗ trợ.";

@@ -4,6 +4,7 @@ _u.ExtensibilityStrings = function()
 };
 _u.ExtensibilityStrings.registerClass("_u.ExtensibilityStrings");
 _u.ExtensibilityStrings.l_APICallFailedDueToItemChange_Text = "Izbrani element je bil spremenjen.";
+_u.ExtensibilityStrings.l_API_Not_Supported_By_ExtensionPoint_Error_Text = "API ni podprt za razširitveno točko.";
 _u.ExtensibilityStrings.l_ActionsDefinitionMultipleActionsError_Text = "Trenutno je podprto le eno dejanje.";
 _u.ExtensibilityStrings.l_ActionsDefinitionWrongNotificationMessageError_Text = "Dejanj ni mogoče določiti za to vrsto sporočila obvestila.";
 _u.ExtensibilityStrings.l_AttachmentDeleteGeneralFailure_Text = "Priloge ni mogoče izbrisati iz elementa.";
@@ -49,6 +50,7 @@ _u.ExtensibilityStrings.l_InvalidTime_Text = "Vnosa ni mogoče razrešiti v velj
 _u.ExtensibilityStrings.l_Invalid_Category_Error_Text = "Navedene so bile neveljavne kategorije.";
 _u.ExtensibilityStrings.l_Item_Not_Saved_Error_Text = "ID-ja ni mogoče pridobiti, dokler element ne bo shranjen.";
 _u.ExtensibilityStrings.l_MessageInDifferentStoreError_Text = "ID-ja EWS ni mogoče pridobiti, ker je bilo sporočilo shranjeno v drugi shrambi.";
+_u.ExtensibilityStrings.l_Missing_Extended_Permissions_For_API = "Razširjeno dovoljenje manjka za klic API.";
 _u.ExtensibilityStrings.l_NoValidRecipientsProvided_Text = "Ni navedenih veljavnih prejemnikov.";
 _u.ExtensibilityStrings.l_NotificationKeyNotFound_Text = "Ni obvestil z navedenim ključem.";
 _u.ExtensibilityStrings.l_NullOrEmptyParameterError_Text = "Parameter »{0}J je obvezen in ne more biti null ali prazen.";
@@ -67,3 +69,4 @@ _u.ExtensibilityStrings.l_RecurrenceUnsupportedAlternateCalendar_Text = "Vzorec 
 _u.ExtensibilityStrings.l_Recurrence_Error_Instance_SetAsync_Text = "Vzorca ponavljanja ni mogoče nastaviti za eno ponovitev v nizu.";
 _u.ExtensibilityStrings.l_Recurrence_Error_Properties_Invalid_Text = "Vzorec ponovitev ni veljaven. Preverite, ali so navedene lastnosti ponovitve usklajene z vrsto ponovitve.";
 _u.ExtensibilityStrings.l_SaveError_Text = "Med poskusom shranjevanja elementa v strežniku je prišlo do napake.";
+_u.ExtensibilityStrings.l_TokenAccessDeniedWithoutItemContext_Text = "Žeton za počitek je na voljo le z dovoljenjem ReadWriteMailbox, če ni konteksta elementa.";

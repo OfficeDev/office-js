@@ -4,6 +4,7 @@ _u.ExtensibilityStrings = function()
 };
 _u.ExtensibilityStrings.registerClass("_u.ExtensibilityStrings");
 _u.ExtensibilityStrings.l_APICallFailedDueToItemChange_Text = "選択したアイテムは変更されました。";
+_u.ExtensibilityStrings.l_API_Not_Supported_By_ExtensionPoint_Error_Text = "API が拡張点でサポートされていません。";
 _u.ExtensibilityStrings.l_ActionsDefinitionMultipleActionsError_Text = "現在、単一の処理のみがサポートされています。";
 _u.ExtensibilityStrings.l_ActionsDefinitionWrongNotificationMessageError_Text = "この通知メッセージの種類に対して処理を定義することはできません。";
 _u.ExtensibilityStrings.l_AttachmentDeleteGeneralFailure_Text = "アイテムから添付ファイルを削除できません。";
@@ -49,6 +50,7 @@ _u.ExtensibilityStrings.l_InvalidTime_Text = "有効な時刻に解決される�
 _u.ExtensibilityStrings.l_Invalid_Category_Error_Text = "無効なカテゴリが指定されています。";
 _u.ExtensibilityStrings.l_Item_Not_Saved_Error_Text = "アイテムが保存されるまで id を取得できません。";
 _u.ExtensibilityStrings.l_MessageInDifferentStoreError_Text = "メッセージが別のストアに保存されているため、EWS ID を取得できません。";
+_u.ExtensibilityStrings.l_Missing_Extended_Permissions_For_API = "API 呼び出しの拡張アクセス許可がありません。";
 _u.ExtensibilityStrings.l_NoValidRecipientsProvided_Text = "有効な受信者が指定されていません。";
 _u.ExtensibilityStrings.l_NotificationKeyNotFound_Text = "指定したキーを持つ通知はありません。";
 _u.ExtensibilityStrings.l_NullOrEmptyParameterError_Text = "パラメーター '{0}' は必須で、null または空にすることはできません。";
@@ -67,3 +69,4 @@ _u.ExtensibilityStrings.l_RecurrenceUnsupportedAlternateCalendar_Text = "サポ�
 _u.ExtensibilityStrings.l_Recurrence_Error_Instance_SetAsync_Text = "定期的なアイテムの中の 1 回に対して定期的なパターンを設定することはできません。";
 _u.ExtensibilityStrings.l_Recurrence_Error_Properties_Invalid_Text = "定期的なパターンが無効です。パターンの種類に合致したパターンのプロパティが指定されていることを確認してください。";
 _u.ExtensibilityStrings.l_SaveError_Text = "サーバー上にアイテムを保存しようとしているときに接続エラーが発生しました。";
+_u.ExtensibilityStrings.l_TokenAccessDeniedWithoutItemContext_Text = "REST トークンは、アイテム コンテキストが存在しない場合にのみ、ReadWriteMailbox のアクセス許可で使用できます。";
