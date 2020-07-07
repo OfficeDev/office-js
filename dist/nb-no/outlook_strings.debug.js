@@ -48,6 +48,7 @@ _u.ExtensibilityStrings.l_InvalidParameterValueError_Text = "Verdien av paramete
 _u.ExtensibilityStrings.l_InvalidSelection_Text = "Det merkede området er ugyldig.";
 _u.ExtensibilityStrings.l_InvalidTime_Text = "Inndataene løses ikke til et gyldig tidspunkt.";
 _u.ExtensibilityStrings.l_Invalid_Category_Error_Text = "Ugyldige kategorier ble angitt.";
+_u.ExtensibilityStrings.l_ItemNotFound_Text = "Elementet finnes ikke eller er ikke opprettet.";
 _u.ExtensibilityStrings.l_Item_Not_Saved_Error_Text = "IDen kan ikke hentes før elementet er lagret.";
 _u.ExtensibilityStrings.l_MessageInDifferentStoreError_Text = "Kan ikke hente EWS-ID-en fordi meldingen er lagret et annet sted.";
 _u.ExtensibilityStrings.l_Missing_Extended_Permissions_For_API = "Utvidet tillatelse mangler for API-samtalen.";

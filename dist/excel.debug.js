@@ -1,4 +1,3 @@
-
 /*
  * Office JavaScript API library
  *
@@ -13,32 +12,6 @@
  *      *            See https://raw.githubusercontent.com/jakearchibald/es6-promise/master/LICENSE
  *      * @version   2.3.0
  */
-
-
-var __assign = (this && this.__assign) || function () {
-    __assign = Object.assign || function(t) {
-        for (var s, i = 1, n = arguments.length; i < n; i++) {
-            s = arguments[i];
-            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
-                t[p] = s[p];
-        }
-        return t;
-    };
-    return __assign.apply(this, arguments);
-};
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = function (d, b) {
-        extendStatics = Object.setPrototypeOf ||
-            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-        return extendStatics(d, b);
-    };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
 var OSFPerformance;
 (function (OSFPerformance) {
     function now() {
@@ -51,9 +24,9 @@ var OSFPerformance;
     }
     OSFPerformance.now = now;
     OSFPerformance.officeExecuteStartDate = Date.now();
-    OSFPerformance.officeExecuteStart = now();
+    OSFPerformance.officeExecuteStart = 0;
     OSFPerformance.officeExecuteEnd = 0;
-    OSFPerformance.hostInitializationStart = 0;
+    OSFPerformance.hostInitializationStart = now();
     OSFPerformance.hostInitializationEnd = 0;
     OSFPerformance.createOMEnd = 0;
     OSFPerformance.hostSpecificFileName = "";
@@ -76,6 +49,25 @@ var OSF;
     }
     OSF.definePropertyOnNamespace = definePropertyOnNamespace;
 })(OSF || (OSF = {}));
+var Office;
+(function (Office) {
+    var actions;
+    (function (actions) {
+        var m_association;
+        function get_association() {
+            if (!m_association) {
+                m_association = new OSF.Association();
+            }
+            return m_association;
+        }
+        function associate() {
+            get_association().associate.apply(get_association(), arguments);
+        }
+        actions.associate = associate;
+        ;
+        OSF.definePropertyOnNamespace(actions, '_association', get_association);
+    })(actions = Office.actions || (Office.actions = {}));
+})(Office || (Office = {}));
 var OSF;
 (function (OSF) {
     var AgaveHostAction;
@@ -990,6 +982,12 @@ var Office;
             return _officeTheme;
         }
         OSF.definePropertyOnNamespace(context, 'officeTheme', get_officeTheme);
+        OSF.definePropertyOnNamespace(context, 'webAuth', function () {
+            if (OSF.DDA.WebAuth) {
+                return OSF.DDA.WebAuth;
+            }
+            return undefined;
+        });
     })(context = Office.context || (Office.context = {}));
 })(Office || (Office = {}));
 var Office;
@@ -1004,6 +1002,17 @@ var Office;
         })(ui = context.ui || (context.ui = {}));
     })(context = Office.context || (Office.context = {}));
 })(Office || (Office = {}));
+var __assign = (this && this.__assign) || function () {
+    __assign = Object.assign || function(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
 var Office;
 (function (Office) {
     var _isOfficeOnReadyCalled = false;
@@ -1418,6 +1427,19 @@ var Office;
         PlatformType["Universal"] = "Universal";
     })(PlatformType = Office.PlatformType || (Office.PlatformType = {}));
 })(Office || (Office = {}));
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
 var OfficeExt;
 (function (OfficeExt) {
     function appSpecificCheckOriginFunction(allowed_domains, eventObj, origin, checkOriginFunction) {
@@ -3066,75 +3088,156 @@ var OSF;
                 onError(new Error("The Office.js is loaded outside of Office client"));
                 return;
             }
-            var appType = context.GetAppType();
-            var id = context.GetSolutionRef();
-            var version = context.GetAppVersionMajor();
-            var minorVersion = context.GetAppVersionMinor();
-            var UILocale = context.GetAppUILocale();
-            var dataLocale = context.GetAppDataLocale();
-            var docUrl = context.GetDocUrl();
-            var clientMode = context.GetAppCapabilities();
-            var activationMode = context.GetActivationMode();
-            var reason = (activationMode === 2) ? Office.InitializationReason.DocumentOpened : Office.InitializationReason.Inserted;
-            var osfControlType = context.GetControlIntegrationLevel();
+            var appType;
+            var id;
+            var version;
+            var minorVersion;
+            var UILocale;
+            var dataLocale;
+            var docUrl;
+            var clientMode;
+            var activationMode;
+            var reason;
+            var osfControlType;
             var eToken;
-            try {
-                eToken = context.GetSolutionToken();
-            }
-            catch (ex) {
-            }
             var correlationId;
-            var externalNativeFunctionExists = OSF.Utility.externalNativeFunctionExists;
-            if (externalNativeFunctionExists(typeof context.GetCorrelationId)) {
-                correlationId = context.GetCorrelationId();
-            }
             var appInstanceId;
-            if (externalNativeFunctionExists(typeof context.GetInstanceId)) {
-                appInstanceId = context.GetInstanceId();
-            }
             var touchEnabled;
-            if (externalNativeFunctionExists(typeof context.GetTouchEnabled)) {
-                touchEnabled = context.GetTouchEnabled();
-            }
             var commerceAllowed;
-            if (externalNativeFunctionExists(typeof context.GetCommerceAllowed)) {
-                commerceAllowed = context.GetCommerceAllowed();
-            }
             var requirementMatrix;
-            if (externalNativeFunctionExists(typeof context.GetSupportedMatrix)) {
-                requirementMatrix = context.GetSupportedMatrix();
-            }
             var hostCustomMessage;
-            if (externalNativeFunctionExists(typeof context.GetHostCustomMessage)) {
-                hostCustomMessage = context.GetHostCustomMessage();
-            }
             var hostFullVersion;
-            if (externalNativeFunctionExists(typeof context.GetHostFullVersion)) {
-                hostFullVersion = context.GetHostFullVersion();
-            }
             var dialogRequirementMatrix;
-            if (externalNativeFunctionExists(typeof context.GetDialogRequirementMatrix)) {
-                dialogRequirementMatrix = context.GetDialogRequirementMatrix();
-            }
             var sdxFeatureGates;
-            if (externalNativeFunctionExists(typeof context.GetFeaturesForSolution)) {
-                try {
-                    var sdxFeatureGatesJson = context.GetFeaturesForSolution();
-                    if (sdxFeatureGatesJson) {
-                        sdxFeatureGates = JSON.parse(sdxFeatureGatesJson);
+            var initialDisplayMode = 0;
+            var settingsFunc;
+            var officeThemeFunc;
+            var fallback = false;
+            var externalNativeFunctionExists = OSF.Utility.externalNativeFunctionExists;
+            if (!externalNativeFunctionExists(typeof context.GetContextDataInJson)) {
+                fallback = true;
+            }
+            else {
+                var contextJsonString;
+                if (typeof OsfOMToken !== 'undefined' && OsfOMToken) {
+                    contextJsonString = context.GetContextDataInJson(OsfOMToken);
+                    var contextJson;
+                    if (contextJsonString) {
+                        contextJson = JSON.parse(contextJsonString);
+                    }
+                    if (!contextJson) {
+                        fallback = true;
+                    }
+                    else {
+                        appType = contextJson.appType;
+                        id = contextJson.solutionRef;
+                        version = contextJson.versionMajor;
+                        minorVersion = contextJson.versionMinor;
+                        UILocale = contextJson.uiLocale;
+                        dataLocale = contextJson.dataLocale;
+                        docUrl = contextJson.docUrl;
+                        clientMode = contextJson.clientMode;
+                        activationMode = contextJson.activationMode;
+                        osfControlType = contextJson.controlType;
+                        eToken = contextJson.eToken;
+                        correlationId = contextJson.correlationId;
+                        appInstanceId = contextJson.appInstanceId;
+                        touchEnabled = contextJson.touchEnabled;
+                        commerceAllowed = context.commerceAllowed;
+                        requirementMatrix = contextJson.requirementMatrix;
+                        hostFullVersion = contextJson.hostFullVersion;
+                        dialogRequirementMatrix = contextJson.requirementMatrix;
+                        var sdxFeatureGatesJson = contextJson.featureGates;
+                        if (sdxFeatureGatesJson) {
+                            sdxFeatureGates = JSON.parse(sdxFeatureGatesJson);
+                        }
+                        initialDisplayMode = contextJson.initialDisplayMode;
+                        settingsFunc = function () {
+                            var settingsString = contextJson.settings;
+                            var settings;
+                            if (settingsString) {
+                                settings = JSON.parse(settingsString);
+                            }
+                            var serializedSettings = {};
+                            if (settings) {
+                                var names = settings.names;
+                                var values = settings.values;
+                                for (var index = 0; index < names.length; index++) {
+                                    serializedSettings[names[index]] = values[index];
+                                }
+                            }
+                            return serializedSettings;
+                        };
+                        officeThemeFunc = function () {
+                            var osfOfficeThemeInfoString = contextJson.themeInfo;
+                            return _this.getOfficeThemeFromInfoString(osfOfficeThemeInfoString);
+                        };
                     }
                 }
-                catch (ex) {
-                    OSF.Utility.trace("Exception while creating the SDX FeatureGates object. Details: " + ex);
+                else {
+                    fallback = true;
                 }
             }
-            var initialDisplayMode = 0;
-            if (externalNativeFunctionExists(typeof context.GetInitialDisplayMode)) {
-                initialDisplayMode = context.GetInitialDisplayMode();
+            if (fallback) {
+                appType = context.GetAppType();
+                id = context.GetSolutionRef();
+                version = context.GetAppVersionMajor();
+                minorVersion = context.GetAppVersionMinor();
+                UILocale = context.GetAppUILocale();
+                dataLocale = context.GetAppDataLocale();
+                docUrl = context.GetDocUrl();
+                clientMode = context.GetAppCapabilities();
+                activationMode = context.GetActivationMode();
+                osfControlType = context.GetControlIntegrationLevel();
+                try {
+                    eToken = context.GetSolutionToken();
+                }
+                catch (ex) {
+                }
+                var externalNativeFunctionExists = OSF.Utility.externalNativeFunctionExists;
+                if (externalNativeFunctionExists(typeof context.GetCorrelationId)) {
+                    correlationId = context.GetCorrelationId();
+                }
+                if (externalNativeFunctionExists(typeof context.GetInstanceId)) {
+                    appInstanceId = context.GetInstanceId();
+                }
+                if (externalNativeFunctionExists(typeof context.GetTouchEnabled)) {
+                    touchEnabled = context.GetTouchEnabled();
+                }
+                if (externalNativeFunctionExists(typeof context.GetCommerceAllowed)) {
+                    commerceAllowed = context.GetCommerceAllowed();
+                }
+                if (externalNativeFunctionExists(typeof context.GetSupportedMatrix)) {
+                    requirementMatrix = context.GetSupportedMatrix();
+                }
+                if (externalNativeFunctionExists(typeof context.GetHostCustomMessage)) {
+                    hostCustomMessage = context.GetHostCustomMessage();
+                }
+                if (externalNativeFunctionExists(typeof context.GetHostFullVersion)) {
+                    hostFullVersion = context.GetHostFullVersion();
+                }
+                if (externalNativeFunctionExists(typeof context.GetDialogRequirementMatrix)) {
+                    dialogRequirementMatrix = context.GetDialogRequirementMatrix();
+                }
+                if (externalNativeFunctionExists(typeof context.GetFeaturesForSolution)) {
+                    try {
+                        var sdxFeatureGatesJson = context.GetFeaturesForSolution();
+                        if (sdxFeatureGatesJson) {
+                            sdxFeatureGates = JSON.parse(sdxFeatureGatesJson);
+                        }
+                    }
+                    catch (ex) {
+                        OSF.Utility.trace("Exception while creating the SDX FeatureGates object. Details: " + ex);
+                    }
+                }
+                if (externalNativeFunctionExists(typeof context.GetInitialDisplayMode)) {
+                    initialDisplayMode = context.GetInitialDisplayMode();
+                }
+                settingsFunc = function () { return _this.getSerializedSettings(); };
+                officeThemeFunc = function () { return _this.getOfficeTheme(); };
             }
+            reason = (activationMode === 2) ? Office.InitializationReason.DocumentOpened : Office.InitializationReason.Inserted;
             eToken = eToken ? eToken.toString() : "";
-            var settingsFunc = function () { return _this.getSerializedSettings(); };
-            var officeThemeFunc = function () { return _this.getOfficeTheme(); };
             var returnedContext = new OSF.OfficeAppContext(id, appType, version, UILocale, dataLocale, docUrl, clientMode, settingsFunc, reason, osfControlType, eToken, correlationId, appInstanceId, touchEnabled, commerceAllowed, minorVersion, requirementMatrix, hostCustomMessage, hostFullVersion, undefined, undefined, undefined, undefined, dialogRequirementMatrix, sdxFeatureGates, officeThemeFunc, initialDisplayMode);
             onSuccess(returnedContext);
             return;
@@ -3192,9 +3295,15 @@ var OSF;
         RichClientInitializationHelper.prototype.getOfficeTheme = function () {
             var osfControlContext = this.getOsfControlContext();
             var osfOfficeThemeInfoString = osfControlContext.GetOfficeThemeInfo();
-            var osfOfficeTheme = JSON.parse(osfOfficeThemeInfoString);
-            for (var color in osfOfficeTheme) {
-                osfOfficeTheme[color] = OSF.OUtil.convertIntToCssHexColor(osfOfficeTheme[color]);
+            return this.getOfficeThemeFromInfoString(osfOfficeThemeInfoString);
+        };
+        RichClientInitializationHelper.prototype.getOfficeThemeFromInfoString = function (osfOfficeThemeInfoString) {
+            var osfOfficeTheme;
+            if (osfOfficeThemeInfoString) {
+                osfOfficeTheme = JSON.parse(osfOfficeThemeInfoString);
+                for (var color in osfOfficeTheme) {
+                    osfOfficeTheme[color] = OSF.OUtil.convertIntToCssHexColor(osfOfficeTheme[color]);
+                }
             }
             return osfOfficeTheme;
         };
@@ -3740,6 +3849,77 @@ var OSF;
         return WebAsyncMethodExecutor;
     }(OSF.AsyncMethodExecutor));
     OSF.WebAsyncMethodExecutor = WebAsyncMethodExecutor;
+})(OSF || (OSF = {}));
+var OSF;
+(function (OSF) {
+    var DDA;
+    (function (DDA) {
+        var WebAuth;
+        (function (WebAuth) {
+            function getAuthContextAsync(callback) {
+                var asyncMethodExecutor = OSF._OfficeAppFactory.getAsyncMethodExecutor();
+                var dataTransform = {
+                    toSafeArrayHost: function () {
+                        return [];
+                    },
+                    fromSafeArrayHost: function (payload) {
+                        return null;
+                    },
+                    toWebHost: function () {
+                        return {};
+                    },
+                    fromWebHost: function (payload) {
+                        return payload.authContext;
+                    }
+                };
+                asyncMethodExecutor.executeAsync(99, dataTransform, callback);
+            }
+            WebAuth.getAuthContextAsync = getAuthContextAsync;
+        })(WebAuth = DDA.WebAuth || (DDA.WebAuth = {}));
+    })(DDA = OSF.DDA || (OSF.DDA = {}));
+    var WebAuth;
+    (function (WebAuth) {
+        var CDN_PATH_WEBAUTHJS = 'webauth/webauth.implicit.js';
+        WebAuth.config = null;
+        function load(callback) {
+            var loadResult;
+            OSF.OUtil.loadScript(OSF.LoadScriptHelper.getHostBundleJsBasePath() + CDN_PATH_WEBAUTHJS, function () {
+                if (WebAuth.config) {
+                    loadResult = Implicit.Load(WebAuth.config, OSF._OfficeAppFactory.getHostInfo().osfControlAppCorrelationId);
+                    WebAuth.loaded = true;
+                    if (callback) {
+                        callback(WebAuth.loaded);
+                    }
+                }
+                else {
+                    Implicit.GetAuthConfig().then(function (configParent) {
+                        WebAuth.config = configParent;
+                        loadResult = Implicit.Load(WebAuth.config, OSF._OfficeAppFactory.getHostInfo().osfControlAppCorrelationId);
+                        WebAuth.loaded = true;
+                    }, function () {
+                        WebAuth.loaded = false;
+                    }).then(function () {
+                        if (callback) {
+                            callback(WebAuth.loaded);
+                        }
+                    });
+                }
+            });
+            return loadResult;
+        }
+        WebAuth.load = load;
+        function getToken(target, applicationId, correlationId, popup) {
+            if (!WebAuth.loaded)
+                return null;
+            if (typeof popup === "boolean") {
+                return Implicit.GetToken(target, applicationId, correlationId, popup);
+            }
+            else {
+                return Implicit.GetToken(target, applicationId, correlationId);
+            }
+        }
+        WebAuth.getToken = getToken;
+    })(WebAuth = OSF.WebAuth || (OSF.WebAuth = {}));
 })(OSF || (OSF = {}));
 var OSF;
 (function (OSF) {
@@ -5828,8 +6008,16 @@ var OSF;
 })(OSF || (OSF = {}));
 var OSF;
 (function (OSF) {
-    var isBrowser = new Function("try { return typeof(window) !== 'undefined' && this===window; } catch(e) { return false; }");
-    if (isBrowser()) {
+    function isNodeJs() {
+        try {
+            return (typeof process === 'object'
+                && String(process) === '[object process]');
+        }
+        catch (e) {
+            return false;
+        }
+    }
+    if (!isNodeJs()) {
         OSF._OfficeAppFactory.bootstrap(function () { }, function (e) {
             if (e instanceof Error) {
                 console.warn(e.message);
@@ -5846,8 +6034,6 @@ var OSF;
         });
     }
 })(OSF || (OSF = {}));
-
-
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
         extendStatics = Object.setPrototypeOf ||
@@ -6697,7 +6883,8 @@ var OfficeExtension;
         alwaysPolyfillClientObjectUpdateMethod: false,
         alwaysPolyfillClientObjectRetrieveMethod: false,
         enableConcurrentFlag: true,
-        enableUndoableFlag: true
+        enableUndoableFlag: true,
+        appendTypeNameToObjectPathInfo: false
     };
     OfficeExtension_1.config = {
         extendedErrorLogging: false
@@ -8229,6 +8416,9 @@ var OfficeExtension;
                         context.trackedObjects._autoAdd(_this);
                     }
                 }
+                if (OfficeExtension_1._internalConfig.appendTypeNameToObjectPathInfo && _this._objectPath.objectPathInfo && _this._className) {
+                    _this._objectPath.objectPathInfo.T = _this._className;
+                }
             }
             return _this;
         }
@@ -9201,6 +9391,7 @@ var OfficeExtension;
         Constants.collectionPropertyPath = '_collectionPropertyPath';
         Constants.objectPathInfoDoNotKeepReferenceFieldName = 'D';
         Constants.officeScriptEventId = 'X-OfficeScriptEventId';
+        Constants.officeScriptFireRecordingEvent = 'X-OfficeScriptFireRecordingEvent';
         return Constants;
     }(CommonConstants));
     OfficeExtension_1.Constants = Constants;
@@ -10765,6 +10956,11 @@ var OfficeExtension;
                     thisBuilder.buildPrototype(thisBuilder.m_targetNamespaceObject[typeInfo.name], typeInfo);
                     thisBuilder.m_targetNamespaceObject[typeInfo.name]._typeInited = true;
                 }
+                if (OfficeExtension_1._internalConfig.appendTypeNameToObjectPathInfo) {
+                    if (this._objectPath && this._objectPath.objectPathInfo && this._className) {
+                        this._objectPath.objectPathInfo.T = this._className;
+                    }
+                }
             };
             this.m_targetNamespaceObject[typeInfo.name] = type;
             this.extendsType(type, ClientObject);
@@ -10818,18 +11014,36 @@ var OfficeExtension;
             }
             return this.findObjectUnderPath(this.m_targetNamespaceObject, parts, 0);
         };
-        LibraryBuilder.prototype.evaluateExpression = function (expression, thisObj) {
+        LibraryBuilder.prototype.evaluateSimpleExpression = function (expression, thisObj) {
             if (Utility.isNullOrUndefined(expression)) {
                 return null;
             }
-            var result = new Function('return ' + expression).call(thisObj);
-            return result;
+            var paths = expression.split('.');
+            if (paths.length === 3 && paths[0] === 'OfficeExtension' && paths[1] === 'Constants') {
+                return Constants[paths[2]];
+            }
+            if (paths[0] === 'this') {
+                var obj = thisObj;
+                for (var i = 1; i < paths.length; i++) {
+                    if (paths[i] == 'toString()') {
+                        obj = obj.toString();
+                    }
+                    else if (paths[i].substr(paths[i].length - 2) === "()") {
+                        obj = obj[paths[i].substr(0, paths[i].length - 2)]();
+                    }
+                    else {
+                        obj = obj[paths[i]];
+                    }
+                }
+                return obj;
+            }
+            throw new OfficeExtension_1.Error("Cannot evaluate: " + expression);
         };
         LibraryBuilder.prototype.evaluateEventTargetId = function (targetIdExpression, thisObj) {
             if (Utility.isNullOrEmptyString(targetIdExpression)) {
                 return '';
             }
-            return this.evaluateExpression(targetIdExpression, thisObj);
+            return this.evaluateSimpleExpression(targetIdExpression, thisObj);
         };
         LibraryBuilder.prototype.isAllDigits = function (expression) {
             var charZero = '0'.charCodeAt(0);
@@ -11620,8 +11834,6 @@ var OfficeExtension;
         configurable: true
     });
 })(OfficeExtension || (OfficeExtension = {}));
-
-
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
         extendStatics = Object.setPrototypeOf ||
@@ -12038,6 +12250,114 @@ var OfficeCore;
     }
     OfficeCore.run = run;
 })(OfficeCore || (OfficeCore = {}));
+var Office;
+(function (Office) {
+    var license;
+    (function (license_1) {
+        function _createRequestContext() {
+            var context = new OfficeCore.RequestContext();
+            if (OSF._OfficeAppFactory.getHostInfo().hostPlatform == 'web') {
+                context._customData = 'WacPartition';
+            }
+            return context;
+        }
+        function isFeatureEnabled(feature, fallbackValue) {
+            return __awaiter(this, void 0, void 0, function () {
+                var context, license, isEnabled;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0:
+                            context = _createRequestContext();
+                            license = OfficeCore.License.newObject(context);
+                            isEnabled = license.isFeatureEnabled(feature, fallbackValue);
+                            return [4, context.sync()];
+                        case 1:
+                            _a.sent();
+                            return [2, isEnabled.value];
+                    }
+                });
+            });
+        }
+        license_1.isFeatureEnabled = isFeatureEnabled;
+        function getFeatureTier(feature, fallbackValue) {
+            return __awaiter(this, void 0, void 0, function () {
+                var context, license, tier;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0:
+                            context = _createRequestContext();
+                            license = OfficeCore.License.newObject(context);
+                            tier = license.getFeatureTier(feature, fallbackValue);
+                            return [4, context.sync()];
+                        case 1:
+                            _a.sent();
+                            return [2, tier.value];
+                    }
+                });
+            });
+        }
+        license_1.getFeatureTier = getFeatureTier;
+        function isFreemiumUpsellEnabled() {
+            return __awaiter(this, void 0, void 0, function () {
+                var context, license, isFreemiumUpsellEnabled;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0:
+                            context = _createRequestContext();
+                            license = OfficeCore.License.newObject(context);
+                            isFreemiumUpsellEnabled = license.isFreemiumUpsellEnabled();
+                            return [4, context.sync()];
+                        case 1:
+                            _a.sent();
+                            return [2, isFreemiumUpsellEnabled.value];
+                    }
+                });
+            });
+        }
+        license_1.isFreemiumUpsellEnabled = isFreemiumUpsellEnabled;
+        function launchUpsellExperience(experienceId) {
+            return __awaiter(this, void 0, void 0, function () {
+                var context, license;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0:
+                            context = _createRequestContext();
+                            license = OfficeCore.License.newObject(context);
+                            license.launchUpsellExperience(experienceId);
+                            return [4, context.sync()];
+                        case 1:
+                            _a.sent();
+                            return [2];
+                    }
+                });
+            });
+        }
+        license_1.launchUpsellExperience = launchUpsellExperience;
+        function onFeatureStateChanged(feature, listener) {
+            return __awaiter(this, void 0, void 0, function () {
+                var context, license, licenseFeature, removeListener;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0:
+                            context = _createRequestContext();
+                            license = OfficeCore.License.newObject(context);
+                            licenseFeature = license.getLicenseFeature(feature);
+                            licenseFeature.onStateChanged.add(listener);
+                            removeListener = function () {
+                                licenseFeature.onStateChanged.remove(listener);
+                                return null;
+                            };
+                            return [4, context.sync()];
+                        case 1:
+                            _a.sent();
+                            return [2, removeListener];
+                    }
+                });
+            });
+        }
+        license_1.onFeatureStateChanged = onFeatureStateChanged;
+    })(license = Office.license || (Office.license = {}));
+})(Office || (Office = {}));
 var OfficeCore;
 (function (OfficeCore) {
     var _hostName = "Office";
@@ -12194,7 +12514,7 @@ var OfficeFirstPartyAuth;
                             OSF.WebAuth.config = {
                                 idp: authContext.authorityType.toLowerCase(),
                                 appIds: [isMsa ? (authContext.msaAppId) ? authContext.msaAppId : authContext.appId : authContext.appId],
-                                authority: (OfficeFirstPartyAuth.authorityOverride && OfficeFirstPartyAuth.debugging) ? OfficeFirstPartyAuth.authorityOverride : authContext.authority,
+                                authority: (OfficeFirstPartyAuth.authorityOverride) ? OfficeFirstPartyAuth.authorityOverride : authContext.authority,
                                 redirectUri: (replyUrl) ? replyUrl : null,
                                 upn: authContext.upn,
                                 enableConsoleLogging: OfficeFirstPartyAuth.debugging,
@@ -12247,24 +12567,29 @@ var OfficeFirstPartyAuth;
     }
     OfficeFirstPartyAuth.load = load;
     function getAccessToken(options, behaviorOption) {
-        if (OSF.WebAuth && OSF.WebAuth.loaded && OSF._OfficeAppFactory.getHostInfo().hostPlatform == "web") {
-            return new OfficeExtension.CoreUtility.Promise(function (resolve, reject) {
-                if (behaviorOption && behaviorOption.forceRefresh) {
-                    OSF.WebAuth.clearCache();
-                }
-                var identityType = (OSF.WebAuth.config.idp.toLowerCase() == "msa")
-                    ? OfficeCore.IdentityType.microsoftAccount
-                    : OfficeCore.IdentityType.organizationAccount;
-                if (OSF.WebAuth.config.appIds[0]) {
-                    OSF.WebAuth.getToken(options.resource, OSF.WebAuth.config.appIds[0], OSF._OfficeAppFactory.getHostInfo().osfControlAppCorrelationId, (behaviorOption && behaviorOption.popup) ? behaviorOption.popup : null).then(function (result) {
-                        logAcquireEvent(result, true, options.resource, (behaviorOption && behaviorOption.popup) ? behaviorOption.popup : null);
-                        resolve({ accessToken: result.Token, tokenIdenityType: identityType });
-                    }).catch(function (result) {
-                        logAcquireEvent(result, false, options.resource, (behaviorOption && behaviorOption.popup) ? behaviorOption.popup : null, result.ErrorCode);
-                        reject({ code: result.ErrorCode, message: result.ErrorMessage });
-                    });
-                }
-            });
+        if (OSF.WebAuth && OSF._OfficeAppFactory.getHostInfo().hostPlatform == "web") {
+            if (OSF.WebAuth.loaded) {
+                return new OfficeExtension.CoreUtility.Promise(function (resolve, reject) {
+                    if (behaviorOption && behaviorOption.forceRefresh) {
+                        OSF.WebAuth.clearCache();
+                    }
+                    var identityType = (OSF.WebAuth.config.idp.toLowerCase() == "msa")
+                        ? OfficeCore.IdentityType.microsoftAccount
+                        : OfficeCore.IdentityType.organizationAccount;
+                    if (OSF.WebAuth.config.appIds[0]) {
+                        OSF.WebAuth.getToken(options.resource, OSF.WebAuth.config.appIds[0], OSF._OfficeAppFactory.getHostInfo().osfControlAppCorrelationId, (behaviorOption && behaviorOption.popup) ? behaviorOption.popup : null).then(function (result) {
+                            logAcquireEvent(result, true, options.resource, (behaviorOption && behaviorOption.popup) ? behaviorOption.popup : null);
+                            resolve({ accessToken: result.Token, tokenIdenityType: identityType });
+                        }).catch(function (result) {
+                            logAcquireEvent(result, false, options.resource, (behaviorOption && behaviorOption.popup) ? behaviorOption.popup : null, result.ErrorCode);
+                            reject({ code: result.ErrorCode, message: result.ErrorMessage });
+                        });
+                    }
+                });
+            }
+            else {
+                logUnexpectedAcquireEvent(OSF.WebAuth.loaded, OSF.WebAuth.loadAttempts);
+            }
         }
         var context = new OfficeCore.RequestContext();
         var auth = OfficeCore.AuthenticationService.newObject(context);
@@ -12428,13 +12753,38 @@ var OfficeFirstPartyAuth;
             });
         }
     }
-    function loadWebAuthForReplyPage() {
-        if (typeof (window) === "undefined" || !window.sessionStorage) {
-            return;
+    function logUnexpectedAcquireEvent(loaded, loadAttempts) {
+        if (OfficeFirstPartyAuth.debugging) {
+            console.log("Logging Implicit unexpected acquire event");
         }
-        var webAuthRedirectUrls = sessionStorage.getItem(WebAuthReplyUrlsStorageKey);
-        if (webAuthRedirectUrls !== null && webAuthRedirectUrls.indexOf(window.location.origin + window.location.pathname) !== -1) {
-            load();
+        if (typeof OTel !== "undefined") {
+            OTel.OTelLogger.onTelemetryLoaded(function () {
+                var telemetryData = [
+                    oteljs.makeBooleanDataField('Loaded', loaded),
+                    oteljs.makeInt64DataField('LoadAttempts', loadAttempts)
+                ];
+                OTel.OTelLogger.sendTelemetryEvent({
+                    eventName: "Office.Extensibility.OfficeJs.OfficeFirstPartyAuth.UnexpectedAcquire",
+                    dataFields: telemetryData,
+                    eventFlags: {
+                        dataCategories: oteljs.DataCategories.ProductServiceUsage
+                    }
+                });
+            });
+        }
+    }
+    function loadWebAuthForReplyPage() {
+        try {
+            if (typeof (window) === "undefined" || !window.sessionStorage) {
+                return;
+            }
+            var webAuthRedirectUrls = sessionStorage.getItem(WebAuthReplyUrlsStorageKey);
+            if (webAuthRedirectUrls !== null && webAuthRedirectUrls.indexOf(window.location.origin + window.location.pathname) !== -1) {
+                load();
+            }
+        }
+        catch (ex) {
+            console.error(ex);
         }
     }
     if (typeof (window) !== "undefined" && window.OSF) {
@@ -12808,16 +13158,6 @@ var OfficeCore;
         return PeopleApiContext;
     }());
     OfficeCore.PeopleApiContext = PeopleApiContext;
-    (function (_CC) {
-        function AppRuntimeService_VisibilityChanged_EventArgsTransform(thisObj, args) {
-            var value = args;
-            if (value && value.message) {
-                value.visibility = value.message;
-            }
-            return value;
-        }
-        _CC.AppRuntimeService_VisibilityChanged_EventArgsTransform = AppRuntimeService_VisibilityChanged_EventArgsTransform;
-    })(_CC = OfficeCore._CC || (OfficeCore._CC = {}));
     var ErrorCodes;
     (function (ErrorCodes) {
         ErrorCodes["apiNotAvailable"] = "ApiNotAvailable";
@@ -12831,7 +13171,6 @@ var OfficeCore;
         ErrorCodes["invalidArgument"] = "InvalidArgument";
         ErrorCodes["invalidGrant"] = "InvalidGrant";
         ErrorCodes["invalidResourceUrl"] = "InvalidResourceUrl";
-        ErrorCodes["noPhoto"] = "NoPhoto";
         ErrorCodes["objectNotFound"] = "ObjectNotFound";
         ErrorCodes["resourceNotSupported"] = "ResourceNotSupported";
         ErrorCodes["serverError"] = "ServerError";
@@ -12852,14 +13191,14 @@ var OfficeCore;
         "name": "OfficeCore",
         "defaultApiSetName": "OfficeSharedApi",
         "hostName": "Office",
-        "apiSets": [["1.2", "FirstPartyAuthentication"], ["1.3", "FirstPartyAuthentication"]],
-        "strings": ["AuthenticationService", "RoamingSetting", "RoamingSettingCollection", "ServiceUrlProvider", "LinkedIn", "NetworkUsage", "DynamicRibbon", "RibbonTab", "RibbonButton", "RibbonButtonCollection", "LocaleApi", "OfficeServicesManagerApi", "Comment", "CommentCollection", "MemberInfoList", "PersonaActions", "PersonaInfoSource", "PersonaInfo", "PersonaUnifiedCommunicationInfo", "PersonaPhotoInfo", "PersonaCollection", "PersonaOrganizationInfo", "UnifiedGroupInfo", "Persona", "PersonaLifetime", "LokiTokenProvider", "LokiTokenProviderFactory", "ServiceContext", "Tap", "AppRuntimePersistenceService", "AppRuntimeService", "License", "LicenseFeature", "null", "id", "getItem", "getCount", "isWarmedUp", "isWarmingUp", "displayName", "email", "emailAddresses", "sipAddresses", "birthday", "birthdays", "title", "jobInfoDepartment", "companyName", "office", "linkedTitles", "linkedDepartments", "linkedCompanyNames", "linkedOffices", "webSites", "notes", "getImageUri", "setPlaceholderColor", "getPlaceholderUri", "instanceId", "dispose", "_RegisterPersonaUpdatedEvent", "_UnregisterPersonaUpdatedEvent", "this.instanceId", "_RegisterLokiTokenAvailableEvent", "_UnregisterLokiTokenAvailableEvent", "_RegisterIdentityUniqueIdAvailableEvent", "_UnregisterIdentityUniqueIdAvailableEvent", "getLokiTokenProvider"],
+        "apiSets": [["1.2", "FirstPartyAuthentication"], ["1.3", "FirstPartyAuthentication"], ["1.2", "DynamicRibbon"]],
+        "strings": ["AuthenticationService", "RoamingSetting", "RoamingSettingCollection", "ServiceUrlProvider", "LinkedIn", "NetworkUsage", "DynamicRibbon", "RibbonTab", "RibbonButton", "RibbonButtonCollection", "LocaleApi", "OfficeServicesManagerApi", "Comment", "CommentCollection", "MemberInfoList", "PersonaActions", "PersonaInfoSource", "PersonaInfo", "PersonaUnifiedCommunicationInfo", "PersonaPhotoInfo", "PersonaCollection", "PersonaOrganizationInfo", "UnifiedGroupInfo", "Persona", "PersonaLifetime", "LokiTokenProvider", "LokiTokenProviderFactory", "ServiceContext", "RichapiPcxFeatureChecks", "Tap", "AppRuntimePersistenceService", "AppRuntimeService", "License", "LicenseFeature", "null", "id", "getItem", "getCount", "isWarmedUp", "isWarmingUp", "displayName", "email", "emailAddresses", "sipAddresses", "birthday", "birthdays", "title", "jobInfoDepartment", "companyName", "office", "linkedTitles", "linkedDepartments", "linkedCompanyNames", "linkedOffices", "webSites", "notes", "getImageUri", "setPlaceholderColor", "getPlaceholderUri", "getImageUriWithMetadata", "instanceId", "dispose", "_RegisterPersonaUpdatedEvent", "_UnregisterPersonaUpdatedEvent", "this.instanceId", "_RegisterLokiTokenAvailableEvent", "_UnregisterLokiTokenAvailableEvent", "_RegisterIdentityUniqueIdAvailableEvent", "_UnregisterIdentityUniqueIdAvailableEvent", "_RegisterClientAccessTokenAvailableEvent", "_UnregisterClientAccessTokenAvailableEvent", "getLokiTokenProvider"],
         "enumTypes": [["IdentityType", ["organizationAccount", "microsoftAccount", "unsupported"]],
             ["ServiceProvider", ["ariaBrowserPipeUrl", "ariaUploadUrl", "ariaVNextUploadUrl"]],
             ["TimeStringFormat", ["shortTime", "longTime", "shortDate", "longDate"]],
             ["CommentTextFormat", ["plain", "markdown", "delta"]],
             ["PersonaCardPerfPoint", ["placeHolderRendered", "initialCardRendered"]],
-            ["MessageType", [], { "personaLifetimePersonaUpdatedEvent": 3502, "lokiTokenProviderLokiTokenAvailableEvent": 3503, "lokiTokenProviderIdentityUniqueIdAvailableEvent": 3504 }],
+            ["MessageType", [], { "personaLifetimePersonaUpdatedEvent": 3502, "lokiTokenProviderLokiTokenAvailableEvent": 3503, "lokiTokenProviderIdentityUniqueIdAvailableEvent": 3504, "lokiTokenProviderClientAccessTokenAvailableEvent": 3505 }],
             ["UnifiedCommunicationAvailability", ["notSet", "free", "idle", "busy", "idleBusy", "doNotDisturb", "unalertable", "unavailable"]],
             ["UnifiedCommunicationStatus", ["online", "notOnline", "away", "busy", "beRightBack", "onThePhone", "outToLunch", "inAMeeting", "outOfOffice", "doNotDisturb", "inAConference", "getting", "notABuddy", "disconnected", "notInstalled", "urgentInterruptionsOnly", "mayBeAvailable", "idle", "inPresentation"]],
             ["UnifiedCommunicationPresence", ["free", "busy", "idle", "doNotDistrub", "blocked", "notSet", "outOfOffice"]],
@@ -12875,39 +13214,40 @@ var OfficeCore;
             ["Visibility", ["hidden", "visible"]],
             ["LicenseFeatureTier", ["unknown", "basic", "premium"]],
             ["LicenseEventType", [], { "featureStateChanged": 1 }]],
-        "clientObjectTypes": [[1, 4, 0, [["roamingSettings", 3, 2, 0, 0, 4]], [["getAccessToken", 2, 2, 0, 5], ["getPrimaryIdentityInfo", 0, 2, 1, 5], ["getIdentities", 0, 2, 2, 5]], 0, 0, 0, [["TokenReceived", 2, 1, "3001", "this._targetId", 34, 34]], "Microsoft.Authentication.AuthenticationService", 4],
-            [2, 0, [[35, 3], ["value", 1]]],
-            [3, 0, 0, 0, 0, [[36, 2, 1, 2, 0, 4], ["getItemOrNullObject", 2, 1, 2, 0, 4]]],
-            [4, 0, 0, 0, [["getServiceUrl", 2]], 0, 0, 0, 0, "Microsoft.DesktopCompliance.ServiceUrlProvider", 4],
-            [5, 0, 0, 0, [["isEnabledForOffice"], ["recordLinkedInSettingsCompliance", 2]], 0, 0, 0, 0, "Microsoft.DesktopCompliance.LinkedIn", 4],
-            [6, 0, 0, 0, [["isInOnlineMode"]], 0, 0, 0, 0, "Microsoft.DesktopCompliance.NetworkUsage", 4],
-            [7, 0, 0, [["buttons", 10, 19, 0, 0, 4]], 0, [["getButton", 9, 1], ["getTab", 8, 1], ["executeRequestUpdate", 9, 1]], 0, 0, 0, "Microsoft.DynamicRibbon.DynamicRibbon", 4],
-            [8, 0, [[35, 3]], 0, [["setVisibility", 1]]],
-            [9, 0, [[35, 3], ["enabled", 1], ["label", 3]], 0, [["setEnabled", 1]]],
-            [10, 1, 0, 0, [[37, 0, 2, 0, 4]], [[36, 9, 1, 18, 0, 4]], 0, 9],
-            [11, 0, 0, 0, [["getLocaleDateTimeFormattingInfo", 1], ["formatDateTimeString", 3]], 0, 0, 0, 0, "Microsoft.LocaleApi.LocaleApi", 4],
-            [12, 0, 0, 0, [["bindServiceToProfile", 2]], 0, 0, 0, 0, "Microsoft.OfficeServicesManager.OfficeServicesManagerApi", 4],
-            [13, 0, [[35, 3], ["text", 1], ["created", 11], ["level", 3], ["resolved", 1], ["author", 3], ["mentions", 3]], [["parent", 13, 2, 0, 0, 4], ["parentOrNullObject", 13, 2, 0, 0, 4], ["replies", 14, 19, 0, 0, 4]], [["getRichText", 1, 2, 0, 4], ["setRichText", 2], ["delete"]], [["getParentOrSelf", 13, 0, 2, 0, 4], ["reply", 13, 2]]],
-            [14, 1, 0, 0, [[37, 0, 2, 0, 4]], [[36, 13, 1, 18, 0, 4]], 0, 13],
-            [15, 0, [[38, 3], [39, 3]], 0, [["items"]], [["getPersonaForMember", 24, 1]]],
-            [16, 0, 0, 0, [["addContact"], ["editContact"], ["composeEmail", 1], ["composeInstantMessage", 1], ["callPhoneNumber", 1], ["pinPersonaToQuickContacts"], ["toggleTagForAlerts"], ["scheduleMeeting"], ["openLinkContactUx"], ["editContactByIdentifier", 1], ["showHoverCardForPersona", 6], ["hideHoverCardForPersona"], ["showContextMenu", 6], ["showContactCard", 6], ["showExpandedCard", 6], ["openGroupCalendar"], ["subscribeToGroup"], ["unsubscribeFromGroup"]]],
-            [17, 0, [[40, 3], [41, 3], [42, 3], [43, 3], [44, 3], [45, 3], [46, 3], [47, 3], [48, 3], [49, 3], [50, 3], [51, 3], [52, 3], [53, 3], ["phones", 3], ["addresses", 3], [54, 3], [55, 3]]],
-            [18, 0, [[40, 3], [41, 3], [42, 3], [43, 3], [44, 11], [45, 11], [46, 3], [47, 3], [48, 3], [49, 3], [50, 3], [51, 3], [52, 3], [53, 3], [54, 3], [55, 3], ["isPersonResolved", 3]], [["sources", 17, 3, 0, 0, 4]], [["getPhones", 0, 2, 0, 4], ["getAddresses", 0, 2, 0, 4]]],
+        "clientObjectTypes": [[1, 4, 0, [["roamingSettings", 3, 2, 0, 0, 4]], [["getAccessToken", 2, 2, 0, 5], ["getPrimaryIdentityInfo", 0, 2, 1, 5], ["getIdentities", 0, 2, 2, 5]], 0, 0, 0, [["TokenReceived", 2, 1, "3001", "this._targetId", 35, 35]], "Microsoft.Authentication.AuthenticationService", 4],
+            [2, 0, [[36, 3], ["value", 1]]],
+            [3, 0, 0, 0, 0, [[37, 2, 1, 2, 0, 4], ["getItemOrNullObject", 2, 1, 2, 0, 4]]],
+            [4, 0, 0, 0, [["getServiceUrl", 2, 2, 0, 4]], 0, 0, 0, 0, "Microsoft.DesktopCompliance.ServiceUrlProvider", 4],
+            [5, 0, 0, 0, [["isEnabledForOffice", 0, 2, 0, 4], ["recordLinkedInSettingsCompliance", 2]], 0, 0, 0, 0, "Microsoft.DesktopCompliance.LinkedIn", 4],
+            [6, 0, 0, 0, [["isInOnlineMode", 0, 2, 0, 4]], 0, 0, 0, 0, "Microsoft.DesktopCompliance.NetworkUsage", 4],
+            [7, 0, 0, [["buttons", 10, 19, 0, 0, 4]], [["executeRequestUpdate", 1, 2, 0, 4], ["executeRequestCreate", 1, 2, 3, 4]], [["getButton", 9, 1, 2, 0, 4], ["getTab", 8, 1, 2, 0, 4]], 0, 0, 0, "Microsoft.DynamicRibbon.DynamicRibbon", 4],
+            [8, 0, [[36, 3]], 0, [["setVisibility", 1]]],
+            [9, 0, [[36, 3], ["enabled", 1], ["label", 3]], 0, [["setEnabled", 1]]],
+            [10, 1, 0, 0, [[38, 0, 2, 0, 4]], [[37, 9, 1, 18, 0, 4]], 0, 9],
+            [11, 0, 0, 0, [["getLocaleDateTimeFormattingInfo", 1, 2, 0, 4], ["formatDateTimeString", 3, 2, 0, 4]], 0, 0, 0, 0, "Microsoft.LocaleApi.LocaleApi", 4],
+            [12, 0, 0, 0, [["bindServiceToProfile", 3]], 0, 0, 0, 0, "Microsoft.OfficeServicesManager.OfficeServicesManagerApi", 4],
+            [13, 0, [[36, 3], ["text", 1], ["created", 11], ["level", 3], ["resolved", 1], ["author", 3], ["mentions", 3]], [["parent", 13, 2, 0, 0, 4], ["parentOrNullObject", 13, 2, 0, 0, 4], ["replies", 14, 19, 0, 0, 4]], [["getRichText", 1, 2, 0, 4], ["setRichText", 2], ["delete"]], [["getParentOrSelf", 13, 0, 2, 0, 4], ["reply", 13, 2]]],
+            [14, 1, 0, 0, [[38, 0, 2, 0, 4]], [[37, 13, 1, 18, 0, 4]], 0, 13],
+            [15, 0, [[39, 3], [40, 3]], 0, [["items", 0, 2, 0, 4]], [["getPersonaForMember", 24, 1, 2, 0, 4]]],
+            [16, 0, 0, 0, [["addContact"], ["editContact"], ["composeEmail", 1], ["composeInstantMessage", 1], ["callPhoneNumber", 1], ["pinPersonaToQuickContacts"], ["toggleTagForAlerts"], ["scheduleMeeting"], ["openLinkContactUx"], ["editContactByIdentifier", 1], ["showHoverCardForPersona", 6], ["hideHoverCardForPersona"], ["showContextMenu", 6], ["showContactCard", 6], ["showExpandedCard", 6], ["openGroupCalendar"], ["subscribeToGroup"], ["unsubscribeFromGroup"], ["getChangePhotoUrlAndOpenInBrowser"], ["startAudioCall"], ["startVideoCall"]]],
+            [17, 0, [[41, 3], [42, 3], [43, 3], [44, 3], [45, 3], [46, 3], [47, 3], [48, 3], [49, 3], [50, 3], [51, 3], [52, 3], [53, 3], [54, 3], ["phones", 3], ["addresses", 3], [55, 3], [56, 3]]],
+            [18, 0, [[41, 3], [42, 3], [43, 3], [44, 3], [45, 11], [46, 11], [47, 3], [48, 3], [49, 3], [50, 3], [51, 3], [52, 3], [53, 3], [54, 3], [55, 3], [56, 3], ["isPersonResolved", 3]], [["sources", 17, 3, 0, 0, 4]], [["getPhones", 0, 2, 0, 4], ["getAddresses", 0, 2, 0, 4]]],
             [19, 0, [["availability", 3], ["status", 3], ["isSelf", 3], ["isTagged", 3], ["customStatusString", 3], ["isBlocked", 3], ["presenceTooltip", 3], ["isOutOfOffice", 3], ["outOfOfficeNote", 3], ["timezone", 3], ["meetingLocation", 3], ["meetingSubject", 3], ["timezoneBias", 3], ["idleStartTime", 11], ["overallCapability", 3], ["isOnBuddyList", 3], ["presenceNote", 3], ["voiceMailUri", 3], ["availabilityText", 3], ["availabilityTooltip", 3], ["isDurationInAvailabilityText", 3], ["freeBusyStatus", 3], ["calendarState", 3], ["presence", 3]]],
-            [20, 0, 0, 0, [[56, 1, 0, 0, 0, 56], [57, 1, 0, 0, 0, 57], [58, 1, 0, 0, 0, 58]]],
-            [21, 1, 0, 0, [[37, 0, 2, 0, 4]], [[36, 24, 1, 18, 0, 4]], 0, 24],
-            [22, 0, [[38, 3], [39, 3]], [["hierarchy", 21, 18, 0, 0, 4], ["manager", 24, 2, 0, 0, 4], ["directReports", 21, 18, 0, 0, 4]]],
+            [20, 0, 0, 0, [[57, 1, 2, 0, 4, 57], [58, 1, 0, 0, 0, 58], [59, 1, 2, 0, 4, 59], [60, 1, 2, 0, 4, 60]]],
+            [21, 1, 0, 0, [[38, 0, 2, 0, 4]], [[37, 24, 1, 18, 0, 4]], 0, 24],
+            [22, 0, [[39, 3], [40, 3]], [["hierarchy", 21, 18, 0, 0, 4], ["manager", 24, 2, 0, 0, 4], ["directReports", 21, 18, 0, 0, 4]]],
             [23, 0, [["description", 1], ["oneDrive", 1], ["oneNote", 1], ["isPublic", 1], ["amIOwner", 1], ["amIMember", 1], ["amISubscribed", 1], ["memberCount", 1], ["ownerCount", 1], ["hasGuests", 1], ["site", 1], ["planner", 1], ["classification", 1], ["subscriptionEnabled", 1]]],
-            [24, 4, [["hostId", 3], ["type", 3], ["capabilities", 3], ["diagnosticId", 3], [59, 3]], [["photo", 20, 3, 0, 0, 4], ["personaInfo", 18, 3, 0, 0, 4], ["unifiedCommunicationInfo", 19, 3, 0, 0, 4], ["organization", 22, 3, 0, 0, 4], ["unifiedGroupInfo", 23, 35, 0, 0, 4], ["actions", 16, 2, 0, 0, 4]], [["getCustomizations"], ["warmup", 1], [60], ["getViewableSources"], ["reportTimeForRender", 2]], [["getMembers", 15], ["getMembership", 15]]],
-            [25, 0, [[59, 3]], 0, [["getPolicies"], [61], [62]], [["getPersona", 24, 1], ["getPersonaForOrgEntry", 24, 4], ["getPersonaForOrgByEntryId", 24, 4]], 0, 0, [["PersonaUpdated", 0, 0, "MessageType.personaLifetimePersonaUpdatedEvent", 63, 61, 62]]],
-            [26, 0, [["emailOrUpn", 3], [59, 3]], 0, [["requestToken"], [64], [65], ["requestIdentityUniqueId"], [66], [67]], 0, 0, 0, [["IdentityUniqueIdAvailable", 0, 0, "MessageType.lokiTokenProviderIdentityUniqueIdAvailableEvent", 63, 66, 67], ["LokiTokenAvailable", 0, 0, "MessageType.lokiTokenProviderLokiTokenAvailableEvent", 63, 64, 65]]],
-            [27, 0, 0, 0, 0, [[68, 26, 1]], 0, 0, 0, "Microsoft.People.LokiTokenProviderFactory", 4],
-            [28, 0, 0, 0, [[60, 1], ["accountEmailOrUpn", 1], ["getPersonaPolicies"]], [[68, 26, 1], ["getPersonaLifetime", 25, 1], ["getInitialPersona", 24, 1]], 0, 0, 0, "Microsoft.People.ServiceContext", 4],
-            [29, 0, 0, 0, [["getEnterpriseUserInfo", 0, 2, 0, 5], ["getMruFriendlyPath", 1, 2, 0, 5], ["launchFileUrlInOfficeApp", 2, 2, 0, 5], ["performLocalSearch", 4, 2, 0, 5], ["readSearchCache", 3, 2, 0, 5], ["writeSearchCache", 3, 2, 0, 5]], 0, 0, 0, 0, "Microsoft.TapRichApi.Tap", 4],
-            [30, 0, 0, 0, [["setAppRuntimeStartState", 1], ["getAppRuntimeStartState", 0, 2, 0, 4]], 0, 0, 0, 0, "Microsoft.AppRuntime.AppRuntimePersistenceService", 4],
-            [31, 0, 0, 0, [["setAppRuntimeState", 1], ["getAppRuntimeState", 0, 2, 0, 4]], 0, 0, 0, [["VisibilityChanged", 2, 0, "65539", "", 34, 34]], "Microsoft.AppRuntime.AppRuntimeService", 4],
-            [32, 0, 0, 0, [["isFeatureEnabled", 2, 2, 0, 4], ["getFeatureTier", 2, 2, 0, 4], ["isFreemiumUpsellEnabled", 0, 2, 0, 4], ["launchUpsellExperience", 1, 2, 0, 4], ["_TestFireStateChangedEvent", 1, 0, 0, 1]], [["getLicenseFeature", 33, 1, 2, 0, 4]], 0, 0, 0, "Microsoft.Office.Licensing.License", 4],
-            [33, 0, [[35, 3]], 0, [["_RegisterStateChange", 0, 2, 0, 4], ["_UnregisterStateChange", 0, 2, 0, 4]]]] };
+            [24, 4, [["hostId", 3], ["type", 3], ["capabilities", 3], ["diagnosticId", 3], [61, 3]], [["photo", 20, 3, 0, 0, 4], ["personaInfo", 18, 3, 0, 0, 4], ["unifiedCommunicationInfo", 19, 3, 0, 0, 4], ["organization", 22, 3, 0, 0, 4], ["unifiedGroupInfo", 23, 35, 0, 0, 4], ["actions", 16, 2, 0, 0, 4]], [["getCustomizations", 0, 2, 0, 4], ["warmup", 1], [62], ["getViewableSources", 0, 2, 0, 4], ["reportTimeForRender", 2]], [["getMembers", 15, 0, 2, 0, 4], ["getMembership", 15, 0, 2, 0, 4]]],
+            [25, 0, [[61, 3]], 0, [["getPolicies", 0, 2, 0, 4], [63], [64]], [["getPersona", 24, 1, 2, 0, 4], ["getPersonaForOrgEntry", 24, 4, 2, 0, 4], ["getPersonaForOrgByEntryId", 24, 4, 2, 0, 4]], 0, 0, [["PersonaUpdated", 0, 0, "MessageType.personaLifetimePersonaUpdatedEvent", 65, 63, 64]]],
+            [26, 0, [["emailOrUpn", 3], [61, 3]], 0, [["requestToken"], [66], [67], ["requestIdentityUniqueId"], [68], [69], ["requestClientAccessToken"], [70], [71]], 0, 0, 0, [["ClientAccessTokenAvailable", 0, 0, "MessageType.lokiTokenProviderClientAccessTokenAvailableEvent", 65, 70, 71], ["IdentityUniqueIdAvailable", 0, 0, "MessageType.lokiTokenProviderIdentityUniqueIdAvailableEvent", 65, 68, 69], ["LokiTokenAvailable", 0, 0, "MessageType.lokiTokenProviderLokiTokenAvailableEvent", 65, 66, 67]]],
+            [27, 0, 0, 0, 0, [[72, 26, 1, 2, 0, 4]], 0, 0, 0, "Microsoft.People.LokiTokenProviderFactory", 4],
+            [28, 0, 0, 0, [[62, 1], ["accountEmailOrUpn", 1, 2, 0, 4], ["getPersonaPolicies", 0, 2, 0, 4]], [[72, 26, 1, 2, 0, 4], ["getPersonaLifetime", 25, 1, 2, 0, 4], ["getInitialPersona", 24, 1, 2, 0, 4]], 0, 0, 0, "Microsoft.People.ServiceContext", 4],
+            [29, 0, 0, 0, [["isAddChangePhotoLinkOnLpcPersonaImageFlightEnabled", 0, 2, 0, 4]], 0, 0, 0, 0, "Microsoft.People.RichapiPcxFeatureChecks", 4],
+            [30, 0, 0, 0, [["getEnterpriseUserInfo", 0, 2, 0, 5], ["getMruFriendlyPath", 1, 2, 0, 5], ["launchFileUrlInOfficeApp", 2, 2, 0, 5], ["performLocalSearch", 4, 2, 0, 5], ["readSearchCache", 3, 2, 0, 5], ["writeSearchCache", 3, 2, 0, 5]], 0, 0, 0, 0, "Microsoft.TapRichApi.Tap", 4],
+            [31, 0, 0, 0, [["setAppRuntimeStartState", 1], ["getAppRuntimeStartState", 0, 2, 0, 4]], 0, 0, 0, 0, "Microsoft.AppRuntime.AppRuntimePersistenceService", 4],
+            [32, 0, 0, 0, [["setAppRuntimeState", 1], ["getAppRuntimeState", 0, 2, 0, 4]], 0, 0, 0, [["VisibilityChanged", 0, 0, "65539", "", 35, 35]], "Microsoft.AppRuntime.AppRuntimeService", 4],
+            [33, 0, 0, 0, [["isFeatureEnabled", 2, 2, 0, 4], ["getFeatureTier", 2, 2, 0, 4], ["isFreemiumUpsellEnabled", 0, 2, 0, 4], ["launchUpsellExperience", 1, 2, 0, 4], ["_TestFireStateChangedEvent", 1, 0, 0, 1]], [["getLicenseFeature", 34, 1, 2, 0, 4]], 0, 0, 0, "Microsoft.Office.Licensing.License", 4],
+            [34, 0, [[36, 3]], 0, [["_RegisterStateChange", 0, 2, 0, 4], ["_UnregisterStateChange", 0, 2, 0, 4]]]] };
     var _builder = new OfficeExtension.LibraryBuilder({ metadata: _libraryMetadataOfficeSharedApi, targetNamespaceObject: OfficeCore });
 })(OfficeCore || (OfficeCore = {}));
 var Office;
@@ -13071,8 +13411,252 @@ var Office;
         addin.onVisibilityModeChanged = onVisibilityModeChanged;
     })(addin = Office.addin || (Office.addin = {}));
 })(Office || (Office = {}));
-
-
+var Office;
+(function (Office) {
+    var ribbon;
+    (function (ribbon_1) {
+        function _createRequestContext() {
+            var context = new OfficeCore.RequestContext();
+            if (OSF._OfficeAppFactory.getHostInfo().hostPlatform == 'web') {
+                context._customData = 'WacPartition';
+            }
+            return context;
+        }
+        function requestUpdate(input) {
+            var requestContext = _createRequestContext();
+            var ribbon = requestContext.ribbon;
+            function processControls(parent) {
+                parent.controls
+                    .filter(function (control) { return !(!control.id); })
+                    .forEach(function (control) {
+                    var ribbonControl = ribbon.getButton(control.id);
+                    if (control.enabled !== undefined && control.enabled !== null) {
+                        ribbonControl.enabled = control.enabled;
+                    }
+                });
+            }
+            input.tabs
+                .filter(function (tab) { return !(!tab.id); })
+                .forEach(function (tab) {
+                var ribbonTab = ribbon.getTab(tab.id);
+                if (tab.visible !== undefined && tab.visible !== null) {
+                    ribbonTab.setVisibility(tab.visible);
+                }
+                if (!!tab.groups && !!tab.groups.length) {
+                    tab.groups
+                        .filter(function (group) { return !(!group.id); })
+                        .forEach(function (group) {
+                        processControls(group);
+                    });
+                }
+                else {
+                    processControls(tab);
+                }
+            });
+            return requestContext.sync();
+        }
+        ribbon_1.requestUpdate = requestUpdate;
+        function requestCreateControls(input) {
+            var requestContext = _createRequestContext();
+            var ribbon = requestContext.ribbon;
+            ribbon.executeRequestCreate(JSON.stringify(input));
+            return requestContext.sync();
+        }
+        ribbon_1.requestCreateControls = requestCreateControls;
+    })(ribbon = Office.ribbon || (Office.ribbon = {}));
+})(Office || (Office = {}));
+var OfficeCore;
+(function (OfficeCore) {
+    var _hostName = "Office";
+    var _defaultApiSetName = "OfficeSharedApi";
+    var _createPropertyObject = OfficeExtension.BatchApiHelper.createPropertyObject;
+    var _createMethodObject = OfficeExtension.BatchApiHelper.createMethodObject;
+    var _createIndexerObject = OfficeExtension.BatchApiHelper.createIndexerObject;
+    var _createRootServiceObject = OfficeExtension.BatchApiHelper.createRootServiceObject;
+    var _createTopLevelServiceObject = OfficeExtension.BatchApiHelper.createTopLevelServiceObject;
+    var _createChildItemObject = OfficeExtension.BatchApiHelper.createChildItemObject;
+    var _invokeMethod = OfficeExtension.BatchApiHelper.invokeMethod;
+    var _invokeEnsureUnchanged = OfficeExtension.BatchApiHelper.invokeEnsureUnchanged;
+    var _invokeSetProperty = OfficeExtension.BatchApiHelper.invokeSetProperty;
+    var _isNullOrUndefined = OfficeExtension.Utility.isNullOrUndefined;
+    var _isUndefined = OfficeExtension.Utility.isUndefined;
+    var _throwIfNotLoaded = OfficeExtension.Utility.throwIfNotLoaded;
+    var _throwIfApiNotSupported = OfficeExtension.Utility.throwIfApiNotSupported;
+    var _load = OfficeExtension.Utility.load;
+    var _retrieve = OfficeExtension.Utility.retrieve;
+    var _toJson = OfficeExtension.Utility.toJson;
+    var _fixObjectPathIfNecessary = OfficeExtension.Utility.fixObjectPathIfNecessary;
+    var _handleNavigationPropertyResults = OfficeExtension.Utility._handleNavigationPropertyResults;
+    var _adjustToDateTime = OfficeExtension.Utility.adjustToDateTime;
+    var _processRetrieveResult = OfficeExtension.Utility.processRetrieveResult;
+    var _setMockData = OfficeExtension.Utility.setMockData;
+    var _typeAddinInternalService = "AddinInternalService";
+    var AddinInternalService = (function (_super) {
+        __extends(AddinInternalService, _super);
+        function AddinInternalService() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        Object.defineProperty(AddinInternalService.prototype, "_className", {
+            get: function () {
+                return "AddinInternalService";
+            },
+            enumerable: true,
+            configurable: true
+        });
+        AddinInternalService.prototype.notifyActionHandlerReady = function () {
+            _invokeMethod(this, "NotifyActionHandlerReady", 1, [], 4, 0);
+        };
+        AddinInternalService.prototype._handleResult = function (value) {
+            _super.prototype._handleResult.call(this, value);
+            if (_isNullOrUndefined(value))
+                return;
+            var obj = value;
+            _fixObjectPathIfNecessary(this, obj);
+        };
+        AddinInternalService.prototype._handleRetrieveResult = function (value, result) {
+            _super.prototype._handleRetrieveResult.call(this, value, result);
+            _processRetrieveResult(this, value, result);
+        };
+        AddinInternalService.newObject = function (context) {
+            return _createTopLevelServiceObject(OfficeCore.AddinInternalService, context, "Microsoft.InternalService.AddinInternalService", false, 4);
+        };
+        AddinInternalService.prototype.toJSON = function () {
+            return _toJson(this, {}, {});
+        };
+        return AddinInternalService;
+    }(OfficeExtension.ClientObject));
+    OfficeCore.AddinInternalService = AddinInternalService;
+    var AddinInternalServiceErrorCodes;
+    (function (AddinInternalServiceErrorCodes) {
+        AddinInternalServiceErrorCodes["generalException"] = "GeneralException";
+    })(AddinInternalServiceErrorCodes || (AddinInternalServiceErrorCodes = {}));
+})(OfficeCore || (OfficeCore = {}));
+var Office;
+(function (Office) {
+    var actionProxy;
+    (function (actionProxy) {
+        var _isNullOrUndefined = OfficeExtension.Utility.isNullOrUndefined;
+        var _association;
+        var ActionMessageCategory = 2;
+        var ActionDispatchMessageType = 1000;
+        function init() {
+            setActionAssociation(Office.actions._association);
+            var context = new OfficeExtension.ClientRequestContext();
+            return context.eventRegistration.register(5, "", _handleMessage);
+        }
+        function setActionAssociation(association) {
+            _association = association;
+        }
+        function _getFunction(functionName) {
+            if (functionName) {
+                var nameUpperCase = functionName.toUpperCase();
+                var call = _association.mappings[nameUpperCase];
+                if (!_isNullOrUndefined(call) && typeof (call) === "function") {
+                    return call;
+                }
+            }
+            throw OfficeExtension.Utility.createRuntimeError("invalidOperation", "sourceData", "ActionProxy._getFunction");
+        }
+        function _handleMessage(args) {
+            try {
+                OfficeExtension.Utility.log('ActionProxy._handleMessage');
+                OfficeExtension.Utility.checkArgumentNull(args, "args");
+                var entryArray = args.entries;
+                var invocationArray = [];
+                for (var i = 0; i < entryArray.length; i++) {
+                    if (entryArray[i].messageCategory !== ActionMessageCategory) {
+                        continue;
+                    }
+                    if (typeof (entryArray[i].message) === 'string') {
+                        entryArray[i].message = JSON.parse(entryArray[i].message);
+                    }
+                    if (entryArray[i].messageType === ActionDispatchMessageType) {
+                        var actionsArgs = null;
+                        var actionName = entryArray[i].message[0];
+                        var call = _getFunction(actionName);
+                        if (entryArray[i].message.length >= 2) {
+                            var actionArgsJson = entryArray[i].message[1];
+                            if (actionArgsJson) {
+                                if (_isJsonObjectString(actionArgsJson)) {
+                                    actionsArgs = JSON.parse(actionArgsJson);
+                                }
+                                else {
+                                    actionsArgs = actionArgsJson;
+                                }
+                            }
+                        }
+                        call.apply(null, [actionsArgs]);
+                    }
+                    else {
+                        OfficeExtension.Utility.log('ActionProxy._handleMessage unknown message type ' + entryArray[i].messageType);
+                    }
+                }
+            }
+            catch (ex) {
+                _tryLog(ex);
+                throw ex;
+            }
+            return OfficeExtension.Utility._createPromiseFromResult(null);
+        }
+        function _isJsonObjectString(value) {
+            if (typeof value === 'string' && value[0] === '{') {
+                return true;
+            }
+            return false;
+        }
+        function toLogMessage(ex) {
+            var ret = 'Unknown Error';
+            if (ex) {
+                try {
+                    if (ex.toString) {
+                        ret = ex.toString();
+                    }
+                    ret = ret + ' ' + JSON.stringify(ex);
+                }
+                catch (otherEx) {
+                    ret = 'Unexpected Error';
+                }
+            }
+            return ret;
+        }
+        function _tryLog(ex) {
+            var message = toLogMessage(ex);
+            OfficeExtension.Utility.log(message);
+        }
+        function notifyActionHandlerReady() {
+            var context = new OfficeExtension.ClientRequestContext();
+            var addinInternalService = OfficeCore.AddinInternalService.newObject(context);
+            context._customData = 'WacPartition';
+            addinInternalService.notifyActionHandlerReady();
+            return context.sync();
+        }
+        function handlerOnReadyInternal() {
+            Office.onReadyInternal()
+                .then(function () {
+                return init();
+            })
+                .then(function () {
+                return notifyActionHandlerReady();
+            });
+        }
+        function initOnce() {
+            OfficeExtension.Utility.log('ActionProxy.initOnce');
+            if (typeof (document) !== 'undefined') {
+                if (document.readyState && document.readyState !== 'loading') {
+                    OfficeExtension.Utility.log('ActionProxy.initOnce: document.readyState is not loading state');
+                    handlerOnReadyInternal();
+                }
+                else if (document.addEventListener) {
+                    document.addEventListener("DOMContentLoaded", function () {
+                        OfficeExtension.Utility.log('ActionProxy.initOnce: DOMContentLoaded event triggered');
+                        handlerOnReadyInternal();
+                    });
+                }
+            }
+        }
+        initOnce();
+    })(actionProxy || (actionProxy = {}));
+})(Office || (Office = {}));
 var OfficeRuntime;
 (function (OfficeRuntime) {
     var experimentation;
@@ -13124,8 +13708,6 @@ var OfficeRuntime;
         experimentation.getStringFeatureGateAsync = getStringFeatureGateAsync;
     })(experimentation = OfficeRuntime.experimentation || (OfficeRuntime.experimentation = {}));
 })(OfficeRuntime || (OfficeRuntime = {}));
-
-
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
         extendStatics = Object.setPrototypeOf ||
@@ -13420,6 +14002,29 @@ var Excel;
         return RequestContext;
     }(OfficeCore.RequestContext));
     Excel.RequestContext = RequestContext;
+    var Recorder = (function () {
+        function Recorder() {
+        }
+        Recorder.enableMacroRecordingEvent = function (context) {
+            OfficeExtension._internalConfig.appendTypeNameToObjectPathInfo = true;
+            var registerEventHandler = function (context) {
+                context.requestHeaders[OfficeExtension.Constants.officeScriptFireRecordingEvent] = "true";
+                context.workbook.onRecordingStateChangedEvent.add(function (args) {
+                    OfficeExtension._internalConfig.appendTypeNameToObjectPathInfo = args.recording;
+                    return OfficeExtension.Utility._createPromiseFromResult(null);
+                });
+                return OfficeExtension.Utility._createPromiseFromResult(null);
+            };
+            if (context !== undefined && context !== null) {
+                return registerEventHandler(context);
+            }
+            return run(function (context) {
+                return registerEventHandler(context);
+            });
+        };
+        return Recorder;
+    }());
+    Excel.Recorder = Recorder;
     function onBeforeExcelRun(options, context) {
         var excelOptions = options;
         if (excelOptions.delayForCellEdit && OfficeExtension.CommonUtility.isSetSupported("DelayForCellEdit")) {
@@ -13687,6 +14292,10 @@ var Excel;
             ret._ParentObject = thisObj;
         }
         _CC.Worksheet_Charts_Get = Worksheet_Charts_Get;
+        function Worksheet_Comments_Get(thisObj, ret) {
+            ret._ParentObject = thisObj;
+        }
+        _CC.Worksheet_Comments_Get = Worksheet_Comments_Get;
         function Worksheet_ShowGridlines_Set(thisObj, value) {
             if (ALWAYS_TRUE_PLACEHOLDER_OVERRIDE) {
                 thisObj.m_showGridlines = value;
@@ -13764,6 +14373,64 @@ var Excel;
         _CC.Worksheet_FormatChanged_EventArgsTransform = Worksheet_FormatChanged_EventArgsTransform;
     })(_CC = Excel._CC || (Excel._CC = {}));
     (function (_CC) {
+        function _overrideWorksheetCollectionEventMethod(thisObj, methodName, apiVersion) {
+            if ((!isOfficePlatform("OfficeOnline") && !isExcelApiSetSupported(1.12)) ||
+                (isOfficePlatform("OfficeOnline") && !isExcelApiSetSupported(1.11))) {
+                _throwIfApiNotSupported("WorksheetCollection." + methodName, _defaultApiSetName, apiVersion, _hostName);
+                _invokeMethod(thisObj, methodName, 0, [], 0, 0);
+                return { handled: true };
+            }
+            return { handled: false };
+        }
+        function WorksheetCollection__RegisterActivatedEvent(thisObj) {
+            if (!isExcelApiSetSupported(1.9)) {
+                _throwIfApiNotSupported("WorksheetCollection._RegisterActivatedEvent", _defaultApiSetName, "1.7", _hostName);
+                _invokeMethod(thisObj, "_RegisterActivatedEvent", 0, [], 0, 0);
+                return { handled: true };
+            }
+            return { handled: false };
+        }
+        _CC.WorksheetCollection__RegisterActivatedEvent = WorksheetCollection__RegisterActivatedEvent;
+        function WorksheetCollection__RegisterAddedEvent(thisObj) {
+            return _overrideWorksheetCollectionEventMethod(thisObj, "_RegisterAddedEvent", "1.7");
+        }
+        _CC.WorksheetCollection__RegisterAddedEvent = WorksheetCollection__RegisterAddedEvent;
+        function WorksheetCollection__RegisterColumnSortedEvent(thisObj) {
+            return _overrideWorksheetCollectionEventMethod(thisObj, "_RegisterColumnSortedEvent", "1.10");
+        }
+        _CC.WorksheetCollection__RegisterColumnSortedEvent = WorksheetCollection__RegisterColumnSortedEvent;
+        function WorksheetCollection__RegisterDataChangedEvent(thisObj) {
+            return _overrideWorksheetCollectionEventMethod(thisObj, "_RegisterDataChangedEvent", "1.9");
+        }
+        _CC.WorksheetCollection__RegisterDataChangedEvent = WorksheetCollection__RegisterDataChangedEvent;
+        function WorksheetCollection__RegisterDeletedEvent(thisObj) {
+            return _overrideWorksheetCollectionEventMethod(thisObj, "_RegisterDeletedEvent", "1.7");
+        }
+        _CC.WorksheetCollection__RegisterDeletedEvent = WorksheetCollection__RegisterDeletedEvent;
+        function WorksheetCollection__RegisterRowSortedEvent(thisObj) {
+            return _overrideWorksheetCollectionEventMethod(thisObj, "_RegisterRowSortedEvent", "1.10");
+        }
+        _CC.WorksheetCollection__RegisterRowSortedEvent = WorksheetCollection__RegisterRowSortedEvent;
+        function WorksheetCollection__UnregisterAddedEvent(thisObj) {
+            return _overrideWorksheetCollectionEventMethod(thisObj, "_UnregisterAddedEvent", "1.7");
+        }
+        _CC.WorksheetCollection__UnregisterAddedEvent = WorksheetCollection__UnregisterAddedEvent;
+        function WorksheetCollection__UnregisterColumnSortedEvent(thisObj) {
+            return _overrideWorksheetCollectionEventMethod(thisObj, "_UnregisterColumnSortedEvent", "1.10");
+        }
+        _CC.WorksheetCollection__UnregisterColumnSortedEvent = WorksheetCollection__UnregisterColumnSortedEvent;
+        function WorksheetCollection__UnregisterDataChangedEvent(thisObj) {
+            return _overrideWorksheetCollectionEventMethod(thisObj, "_UnregisterDataChangedEvent", "1.9");
+        }
+        _CC.WorksheetCollection__UnregisterDataChangedEvent = WorksheetCollection__UnregisterDataChangedEvent;
+        function WorksheetCollection__UnregisterDeletedEvent(thisObj) {
+            return _overrideWorksheetCollectionEventMethod(thisObj, "_UnregisterDeletedEvent", "1.7");
+        }
+        _CC.WorksheetCollection__UnregisterDeletedEvent = WorksheetCollection__UnregisterDeletedEvent;
+        function WorksheetCollection__UnregisterRowSortedEvent(thisObj) {
+            return _overrideWorksheetCollectionEventMethod(thisObj, "_UnregisterRowSortedEvent", "1.10");
+        }
+        _CC.WorksheetCollection__UnregisterRowSortedEvent = WorksheetCollection__UnregisterRowSortedEvent;
         function WorksheetCollection_Changed_EventArgsTransform(thisObj, args) {
             var value = args;
             var details;
@@ -14076,6 +14743,13 @@ var Excel;
             enumerable: true,
             configurable: true
         });
+        Object.defineProperty(TableCollectionCustom.prototype, "_eventTargetId", {
+            get: function () {
+                return this._ParentObject ? this._ParentObject.id : OfficeExtension.Constants.eventWorkbookId;
+            },
+            enumerable: true,
+            configurable: true
+        });
         return TableCollectionCustom;
     }());
     Excel.TableCollectionCustom = TableCollectionCustom;
@@ -14264,6 +14938,28 @@ var Excel;
         }
         _CC.PivotField_SortByLabels = PivotField_SortByLabels;
     })(_CC = Excel._CC || (Excel._CC = {}));
+    (function (_CC) {
+        function NumberFormattingService_GetFormatter(thisObj, format) {
+            if (typeof (window) === "undefined" || !window.Office || !window.Office.context || !window.Office.context.requirements || !window.Office.context.requirements.isSetSupported("NumberFormatting", "1.2")) {
+                _throwIfApiNotSupported("NumberFormatting.GetFormatter", "NumberFormatting", "1.1", _hostName);
+                var result = _createMethodObject(Excel.NumberFormatter, thisObj, "GetFormatter", 0, [format], false, false, null, 0);
+                return { handled: true, result: result };
+            }
+            return { handled: false, result: undefined };
+        }
+        _CC.NumberFormattingService_GetFormatter = NumberFormattingService_GetFormatter;
+    })(_CC = Excel._CC || (Excel._CC = {}));
+    (function (_CC) {
+        function NumberFormatter_Format(thisObj, value) {
+            if (typeof (window) === "undefined" || !window.Office || !window.Office.context || !window.Office.context.requirements || !window.Office.context.requirements.isSetSupported("NumberFormatting", "1.2")) {
+                _throwIfApiNotSupported("NumberFormatter.Format", "NumberFormatting", "1.1", _hostName);
+                var result = _invokeMethod(thisObj, "Format", 0, [value], 0, 0);
+                return { handled: true, result: result };
+            }
+            return { handled: false, result: undefined };
+        }
+        _CC.NumberFormatter_Format = NumberFormatter_Format;
+    })(_CC = Excel._CC || (Excel._CC = {}));
     var CustomFunctionManagerCustom = (function () {
         function CustomFunctionManagerCustom() {
         }
@@ -14319,6 +15015,29 @@ var Excel;
         }
         _CC.InternalTest_TestEvent_EventArgsTransform = InternalTest_TestEvent_EventArgsTransform;
     })(_CC = Excel._CC || (Excel._CC = {}));
+    var CommentCollectionCustom = (function () {
+        function CommentCollectionCustom() {
+        }
+        Object.defineProperty(CommentCollectionCustom.prototype, "_ParentObject", {
+            get: function () {
+                return this.m__ParentObject;
+            },
+            set: function (value) {
+                this.m__ParentObject = value;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(CommentCollectionCustom.prototype, "_eventTargetId", {
+            get: function () {
+                return this._ParentObject ? this._ParentObject.id : OfficeExtension.Constants.eventWorkbookId;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        return CommentCollectionCustom;
+    }());
+    Excel.CommentCollectionCustom = CommentCollectionCustom;
     var ErrorCodes;
     (function (ErrorCodes) {
         ErrorCodes["accessDenied"] = "AccessDenied";
@@ -14338,6 +15057,7 @@ var Excel;
         ErrorCodes["rangeExceedsLimit"] = "RangeExceedsLimit";
         ErrorCodes["requestAborted"] = "RequestAborted";
         ErrorCodes["unsupportedOperation"] = "UnsupportedOperation";
+        ErrorCodes["unsupportedSheet"] = "UnsupportedSheet";
         ErrorCodes["invalidOperationInCellEditMode"] = "InvalidOperationInCellEditMode";
     })(ErrorCodes = Excel.ErrorCodes || (Excel.ErrorCodes = {}));
     var Interfaces;
@@ -14347,9 +15067,10 @@ var Excel;
         "name": "Excel",
         "defaultApiSetName": "ExcelApi",
         "hostName": "Excel",
-        "apiSets": [["1.8"], ["1.9"], ["1.11"], ["1.6"], ["1.7"], ["1.12"], ["1.2"], ["1.3"], ["1.4"], ["1.5"], ["1.10"], ["1.1", "CustomFunctions"], ["1.1", "WACOperationEvents"], ["99.9"], ["1.1", "ExcelApiOnline"]],
-        "strings": ["DataConnection", "Runtime", "Application", "IterativeCalculation", "Workbook", "WorkbookProtection", "WorkbookCreated", "Worksheet", "WorksheetCollection", "WorksheetProtection", "WorksheetFreezePanes", "Range", "RangeAreas", "RangeView", "RangeViewCollection", "SettingCollection", "Setting", "NamedItemCollection", "NamedItem", "NamedItemArrayValues", "Binding", "BindingCollection", "TableCollection", "TableScopedCollection", "Table", "TableColumnCollection", "TableColumn", "TableRowCollection", "TableRow", "DataValidation", "RemoveDuplicatesResult", "RangeFormat", "FormatProtection", "RangeFill", "RangeBorder", "RangeBorderCollection", "RangeFont", "ChartCollection", "Chart", "ChartPivotOptions", "ChartAreaFormat", "ChartSeriesCollection", "ChartSeries", "ChartSeriesFormat", "ChartPointsCollection", "ChartPoint", "ChartPointFormat", "ChartAxes", "ChartAxis", "ChartAxisFormat", "ChartAxisTitle", "ChartAxisTitleFormat", "ChartDataLabels", "ChartDataLabel", "ChartDataLabelFormat", "ChartErrorBars", "ChartErrorBarsFormat", "ChartGridlines", "ChartGridlinesFormat", "ChartLegend", "ChartLegendEntry", "ChartLegendEntryCollection", "ChartLegendFormat", "ChartMapOptions", "ChartTitle", "ChartFormatString", "ChartTitleFormat", "ChartFill", "ChartBorder", "ChartBinOptions", "ChartBoxwhiskerOptions", "ChartLineFormat", "ChartFont", "ChartTrendline", "ChartTrendlineCollection", "ChartTrendlineFormat", "ChartTrendlineLabel", "ChartTrendlineLabelFormat", "ChartPlotArea", "ChartPlotAreaFormat", "VisualCollection", "Visual", "VisualProperty", "VisualPropertyCollection", "DataControllerClient", "RangeSort", "TableSort", "Filter", "AutoFilter", "CultureInfo", "NumberFormatInfo", "DatetimeFormatInfo", "CustomXmlPartScopedCollection", "CustomXmlPartCollection", "CustomXmlPart", "_V1Api", "PivotTableScopedCollection", "PivotTableCollection", "PivotTable", "PivotLayout", "PivotHierarchyCollection", "PivotHierarchy", "RowColumnPivotHierarchyCollection", "RowColumnPivotHierarchy", "FilterPivotHierarchyCollection", "FilterPivotHierarchy", "DataPivotHierarchyCollection", "DataPivotHierarchy", "PivotFieldCollection", "PivotField", "PivotItemCollection", "PivotItem", "WorksheetCustomProperty", "WorksheetCustomPropertyCollection", "DocumentProperties", "CustomProperty", "CustomPropertyCollection", "ConditionalFormatCollection", "ConditionalFormat", "DataBarConditionalFormat", "ConditionalDataBarPositiveFormat", "ConditionalDataBarNegativeFormat", "CustomConditionalFormat", "ConditionalFormatRule", "IconSetConditionalFormat", "ColorScaleConditionalFormat", "TopBottomConditionalFormat", "PresetCriteriaConditionalFormat", "TextConditionalFormat", "CellValueConditionalFormat", "ConditionalRangeFormat", "ConditionalRangeFont", "ConditionalRangeFill", "ConditionalRangeBorder", "ConditionalRangeBorderCollection", "NumberFormattingService", "NumberFormatter", "CustomFunctionManager", "Style", "StyleCollection", "TableStyleCollection", "TableStyle", "PivotTableStyleCollection", "PivotTableStyle", "SlicerStyleCollection", "SlicerStyle", "TimelineStyleCollection", "TimelineStyle", "InternalTest", "PageLayout", "HeaderFooter", "HeaderFooterGroup", "PageBreak", "PageBreakCollection", "DataConnectionCollection", "RangeCollection", "CommentCollection", "Comment", "CommentReplyCollection", "CommentReply", "ShapeCollection", "Shape", "GeometricShape", "Image", "ShapeGroup", "GroupShapeCollection", "Line", "ShapeFill", "ShapeLineFormat", "TextFrame", "TextRange", "ShapeFont", "Slicer", "SlicerCollection", "SlicerItem", "SlicerItemCollection", "Ribbon", "SheetView", "SheetViewCollection", "FunctionResult", "Functions", "name", "calculationEngineVersion", "calculate", "_GetWorkbookCreatedById", "enabled", "readOnly", "names", "tables", "pivotTables", "properties", "protection", "comments", "slicers", "_RegisterAutoSaveSettingChangedEvent", "_UnregisterAutoSaveSettingChangedEvent", "_RegisterWACOperationEvent", "_UnregisterWACOperationEvent", "OfficeExtension.Constants.eventWorkbookId", "SelectionChanged", "", "protected", "protect", "unprotect", "id", "position", "shapes", "autoFilter", "delete", "activate", "_RegisterDataChangedEvent", "_UnregisterDataChangedEvent", "_RegisterActivatedEvent", "_UnregisterActivatedEvent", "_RegisterDeactivatedEvent", "_UnregisterDeactivatedEvent", "_RegisterSelectionChangedEvent", "_UnregisterSelectionChangedEvent", "_RegisterCalculatedEvent", "_UnregisterCalculatedEvent", "replaceAll", "_RegisterFilteredEvent", "_UnregisterFilteredEvent", "_RegisterFormatChangedEvent", "_UnregisterFormatChangedEvent", "_RegisterRowSortedEvent", "_UnregisterRowSortedEvent", "_RegisterColumnSortedEvent", "_UnregisterColumnSortedEvent", "_RegisterSingleClickedEvent", "_UnregisterSingleClickedEvent", "_RegisterRowHiddenChangedEvent", "_UnregisterRowHiddenChangedEvent", "getRange", "getUsedRange", "getCell", "getUsedRangeOrNullObject", "_GetSheetById", "_GetAnotherWorksheetById", "getRanges", "Activated", "MessageType.worksheetActivatedEvent", "this.id", "Calculated", "MessageType.worksheetCalculatedEvent", "Changed", "MessageType.worksheetDataChangedEvent", "ColumnSorted", "MessageType.worksheetColumnSortedEvent", "Deactivated", "MessageType.worksheetDeactivatedEvent", "Filtered", "MessageType.worksheetFilteredEvent", "FormatChanged", "MessageType.worksheetFormatChangedEvent", "RowHiddenChanged", "MessageType.worksheetRowHiddenChangedEvent", "RowSorted", "MessageType.worksheetRowSortedEvent", "MessageType.worksheetSelectionChangedEvent", "SingleClicked", "MessageType.worksheetSingleClickedEvent", "getCount", "_RegisterAddedEvent", "_UnregisterAddedEvent", "_RegisterDeletedEvent", "_UnregisterDeletedEvent", "getItem", "add", "getItemOrNullObject", "getFirst", "Added", "Deleted", "options", "getLocation", "numberFormat", "numberFormatLocal", "values", "text", "formulas", "formulasLocal", "rowIndex", "columnIndex", "rowCount", "columnCount", "address", "addressLocal", "cellCount", "_ReferenceId", "valueTypes", "formulasR1C1", "isEntireColumn", "isEntireRow", "hyperlink", "style", "top", "left", "height", "width", "format", "worksheet", "sort", "conditionalFormats", "dataValidation", "clear", "select", "_KeepReference", "getImage", "copyFrom", "convertToLinkedDataType", "convertDataTypeToText", "setDirty", "showTeachingCallout", "group", "ungroup", "getEntireColumn", "getEntireRow", "getIntersection", "getIntersectionOrNullObject", "getTables", "find", "getSpecialCells", "getSpecialCellsOrNullObject", "areas", "index", "rows", "getItemAt", "key", "value", "_Id", "type", "visible", "formula", "getRangeOrNullObject", "count", "this._ParentObject ? this._ParentObject.id : OfficeExtension.Constants.eventWorkbookId", "MessageType.tableDataChangedEvent", "MessageType.tableFilteredEvent", "columns", "clearFilters", "setStyle", "getHeaderRowRange", "getDataBodyRange", "getTotalRowRange", "rule", "wrapText", "horizontalAlignment", "verticalAlignment", "rowHeight", "textOrientation", "readingOrder", "shrinkToFit", "indentLevel", "autoIndent", "fill", "font", "borders", "locked", "formulaHidden", "color", "tintAndShade", "sideIndex", "weight", "size", "italic", "bold", "underline", "strikethrough", "_GetItem", "MessageType.chartActivatedEvent", "this._ParentObject.id", "MessageType.chartDeactivatedEvent", "chartType", "title", "dataLabels", "border", "markerSize", "markerStyle", "showShadow", "markerBackgroundColor", "markerForegroundColor", "axisGroup", "line", "linkNumberFormat", "setFormula", "showValue", "showSeriesName", "showCategoryName", "showLegendKey", "showPercentage", "showBubbleSize", "separator", "autoText", "overlay", "level", "getSubstring", "setSolidColor", "lineStyle", "null", "_RegisterChangeEvent", "_UnregisterChangeEvent", "min", "max", "apply", "fields", "reapply", "criteria", "remove", "refreshAll", "setToDefault", "creationDate", "custom", "fillColor", "borderColor", "right", "isText", "setDefault", "getDefault", "duplicate", "_RegisterTestEvent", "_UnregisterTestEvent", "_RegisterTest1Event", "_UnregisterTest1Event", "_RegisterCustomFunctionExecutionBeginEvent", "_UnregisterCustomFunctionExecutionBeginEvent", "_RegisterCustomFunctionExecutionEndEvent", "_UnregisterCustomFunctionExecutionEndEvent", "orientation", "leftMargin", "rightMargin", "topMargin", "bottomMargin", "content", "authorName", "authorEmail", "resolved", "richContent", "mentions", "contentType", "updateMentions", "_GetShapeById", "shape", "connectorType", "transparency", "_RegisterCommandExecutedEvent", "_UnregisterCommandExecutedEvent"],
-        "enumTypes": [["DataSourceType", ["unknown", "cube"]],
+        "apiSets": [["1.8"], ["1.9"], ["1.11"], ["1.6"], ["1.7"], ["1.12"], ["1.2"], ["1.3"], ["1.4"], ["1.5"], ["1.10"], ["99.9"], ["1.1", "CustomFunctions"], ["1.1", "WACOperationEvents"], ["1.1", "ExcelApiOnline"]],
+        "strings": ["Task", "TaskCollection", "Query", "QueryCollection", "DataConnection", "Runtime", "Application", "IterativeCalculation", "Workbook", "WorkbookProtection", "WorkbookCreated", "Worksheet", "WorksheetCollection", "WorksheetProtection", "WorksheetFreezePanes", "Range", "RangeAreas", "WorkbookRangeAreas", "RangeView", "RangeViewCollection", "SettingCollection", "Setting", "NamedItemCollection", "NamedItem", "NamedItemArrayValues", "Binding", "BindingCollection", "TableCollection", "TableScopedCollection", "Table", "TableColumnCollection", "TableColumn", "TableRowCollection", "TableRow", "DataValidation", "RemoveDuplicatesResult", "RangeFormat", "FormatProtection", "RangeFill", "RangeBorder", "RangeBorderCollection", "RangeFont", "ChartCollection", "Chart", "ChartPivotOptions", "ChartAreaFormat", "ChartSeriesCollection", "ChartSeries", "ChartSeriesFormat", "ChartPointsCollection", "ChartPoint", "ChartPointFormat", "ChartAxes", "ChartAxis", "ChartAxisFormat", "ChartAxisTitle", "ChartAxisTitleFormat", "ChartDataLabels", "ChartDataLabel", "ChartDataLabelFormat", "ChartErrorBars", "ChartErrorBarsFormat", "ChartGridlines", "ChartGridlinesFormat", "ChartLegend", "ChartLegendEntry", "ChartLegendEntryCollection", "ChartLegendFormat", "ChartMapOptions", "ChartTitle", "ChartFormatString", "ChartTitleFormat", "ChartFill", "ChartBorder", "ChartBinOptions", "ChartBoxwhiskerOptions", "ChartLineFormat", "ChartFont", "ChartTrendline", "ChartTrendlineCollection", "ChartTrendlineFormat", "ChartTrendlineLabel", "ChartTrendlineLabelFormat", "ChartPlotArea", "ChartPlotAreaFormat", "VisualCollection", "Visual", "VisualProperty", "VisualPropertyCollection", "DataControllerClient", "RangeSort", "TableSort", "Filter", "AutoFilter", "CultureInfo", "NumberFormatInfo", "DatetimeFormatInfo", "CustomXmlPartScopedCollection", "CustomXmlPartCollection", "CustomXmlPart", "_V1Api", "PivotTableScopedCollection", "PivotTableCollection", "PivotTable", "PivotLayout", "PivotHierarchyCollection", "PivotHierarchy", "RowColumnPivotHierarchyCollection", "RowColumnPivotHierarchy", "FilterPivotHierarchyCollection", "FilterPivotHierarchy", "DataPivotHierarchyCollection", "DataPivotHierarchy", "PivotFieldCollection", "PivotField", "PivotItemCollection", "PivotItem", "WorksheetCustomProperty", "WorksheetCustomPropertyCollection", "DocumentProperties", "CustomProperty", "CustomPropertyCollection", "ConditionalFormatCollection", "ConditionalFormat", "DataBarConditionalFormat", "ConditionalDataBarPositiveFormat", "ConditionalDataBarNegativeFormat", "CustomConditionalFormat", "ConditionalFormatRule", "IconSetConditionalFormat", "ColorScaleConditionalFormat", "TopBottomConditionalFormat", "PresetCriteriaConditionalFormat", "TextConditionalFormat", "CellValueConditionalFormat", "ConditionalRangeFormat", "ConditionalRangeFont", "ConditionalRangeFill", "ConditionalRangeBorder", "ConditionalRangeBorderCollection", "NumberFormattingService", "NumberFormatter", "CustomFunctionManager", "Style", "StyleCollection", "TableStyleCollection", "TableStyle", "PivotTableStyleCollection", "PivotTableStyle", "SlicerStyleCollection", "SlicerStyle", "TimelineStyleCollection", "TimelineStyle", "InternalTest", "PageLayout", "HeaderFooter", "HeaderFooterGroup", "PageBreak", "PageBreakCollection", "DataConnectionCollection", "RangeCollection", "RangeAreasCollection", "CommentCollection", "Comment", "CommentReplyCollection", "CommentReply", "ShapeCollection", "Shape", "GeometricShape", "Image", "ShapeGroup", "GroupShapeCollection", "Line", "ShapeFill", "ShapeLineFormat", "TextFrame", "TextRange", "ShapeFont", "Slicer", "SlicerCollection", "SlicerItem", "SlicerItemCollection", "Ribbon", "LinkedDataType", "LinkedDataTypeCollection", "SheetView", "SheetViewCollection", "NamedSheetView", "NamedSheetViewCollection", "FunctionResult", "Functions", "id", "priority", "title", "comment", "getCount", "getItem", "getItemAt", "name", "calculationEngineVersion", "calculate", "_GetWorkbookCreatedById", "enabled", "readOnly", "names", "tables", "pivotTables", "properties", "protection", "comments", "slicers", "tasks", "_RegisterAutoSaveSettingChangedEvent", "_UnregisterAutoSaveSettingChangedEvent", "_RegisterWACOperationEvent", "_UnregisterWACOperationEvent", "_RegisterRecordingStateChangedEvent", "_UnregisterRecordingStateChangedEvent", "OfficeExtension.Constants.eventWorkbookId", "SelectionChanged", "", "protected", "protect", "unprotect", "position", "shapes", "autoFilter", "delete", "activate", "_RegisterDataChangedEvent", "_UnregisterDataChangedEvent", "_RegisterActivatedEvent", "_UnregisterActivatedEvent", "_RegisterDeactivatedEvent", "_UnregisterDeactivatedEvent", "_RegisterSelectionChangedEvent", "_UnregisterSelectionChangedEvent", "_RegisterCalculatedEvent", "_UnregisterCalculatedEvent", "replaceAll", "_RegisterFilteredEvent", "_UnregisterFilteredEvent", "_RegisterFormatChangedEvent", "_UnregisterFormatChangedEvent", "_RegisterRowSortedEvent", "_UnregisterRowSortedEvent", "_RegisterColumnSortedEvent", "_UnregisterColumnSortedEvent", "_RegisterSingleClickedEvent", "_UnregisterSingleClickedEvent", "_RegisterRowHiddenChangedEvent", "_UnregisterRowHiddenChangedEvent", "getRange", "getUsedRange", "getCell", "getUsedRangeOrNullObject", "_GetSheetById", "_GetAnotherWorksheetById", "getRanges", "Activated", "MessageType.worksheetActivatedEvent", "this.id", "Calculated", "MessageType.worksheetCalculatedEvent", "Changed", "MessageType.worksheetDataChangedEvent", "ColumnSorted", "MessageType.worksheetColumnSortedEvent", "Deactivated", "MessageType.worksheetDeactivatedEvent", "Filtered", "MessageType.worksheetFilteredEvent", "FormatChanged", "MessageType.worksheetFormatChangedEvent", "RowHiddenChanged", "MessageType.worksheetRowHiddenChangedEvent", "RowSorted", "MessageType.worksheetRowSortedEvent", "MessageType.worksheetSelectionChangedEvent", "SingleClicked", "MessageType.worksheetSingleClickedEvent", "_RegisterAddedEvent", "_UnregisterAddedEvent", "_RegisterDeletedEvent", "_UnregisterDeletedEvent", "add", "getItemOrNullObject", "getFirst", "Added", "Deleted", "options", "getLocation", "numberFormat", "numberFormatLocal", "values", "text", "formulas", "formulasLocal", "rowIndex", "columnIndex", "rowCount", "columnCount", "address", "addressLocal", "cellCount", "_ReferenceId", "valueTypes", "formulasR1C1", "isEntireColumn", "isEntireRow", "hyperlink", "style", "top", "left", "height", "width", "format", "worksheet", "sort", "conditionalFormats", "dataValidation", "clear", "select", "_KeepReference", "getImage", "copyFrom", "convertToLinkedDataType", "convertDataTypeToText", "setDirty", "showTeachingCallout", "group", "ungroup", "getEntireColumn", "getEntireRow", "getIntersection", "getIntersectionOrNullObject", "getTables", "find", "getSpecialCells", "getSpecialCellsOrNullObject", "areas", "index", "rows", "key", "value", "_Id", "type", "visible", "formula", "getRangeOrNullObject", "count", "this._eventTargetId", "MessageType.tableDataChangedEvent", "MessageType.tableFilteredEvent", "columns", "clearFilters", "setStyle", "getHeaderRowRange", "getDataBodyRange", "getTotalRowRange", "rule", "wrapText", "horizontalAlignment", "verticalAlignment", "rowHeight", "textOrientation", "readingOrder", "shrinkToFit", "indentLevel", "autoIndent", "fill", "font", "borders", "locked", "formulaHidden", "color", "tintAndShade", "sideIndex", "weight", "size", "italic", "bold", "underline", "strikethrough", "_GetItem", "MessageType.chartActivatedEvent", "this._ParentObject.id", "MessageType.chartDeactivatedEvent", "chartType", "dataLabels", "border", "markerSize", "markerStyle", "showShadow", "markerBackgroundColor", "markerForegroundColor", "axisGroup", "line", "linkNumberFormat", "setFormula", "showValue", "showSeriesName", "showCategoryName", "showLegendKey", "showPercentage", "showBubbleSize", "separator", "autoText", "overlay", "level", "getSubstring", "setSolidColor", "lineStyle", "null", "_RegisterChangeEvent", "_UnregisterChangeEvent", "min", "max", "apply", "fields", "reapply", "criteria", "remove", "refreshAll", "setToDefault", "creationDate", "custom", "fillColor", "borderColor", "right", "isText", "setDefault", "getDefault", "duplicate", "_RegisterTestEvent", "_UnregisterTestEvent", "_RegisterTest1Event", "_UnregisterTest1Event", "_RegisterCustomFunctionExecutionBeginEvent", "_UnregisterCustomFunctionExecutionBeginEvent", "_RegisterCustomFunctionExecutionEndEvent", "_UnregisterCustomFunctionExecutionEndEvent", "orientation", "leftMargin", "rightMargin", "topMargin", "bottomMargin", "_RegisterChangedEvent", "_UnregisterChangedEvent", "content", "authorName", "authorEmail", "resolved", "richContent", "mentions", "contentType", "updateMentions", "_GetShapeById", "shape", "connectorType", "transparency", "_RegisterCommandExecutedEvent", "_UnregisterCommandExecutedEvent", "_RegisterRefreshRequestCompletedEvent", "_UnregisterRefreshRequestCompletedEvent", "_RegisterRefreshModeChangedEvent", "_UnregisterRefreshModeChangedEvent", "_RegisterLinkedDataTypeAddedEvent", "_UnregisterLinkedDataTypeAddedEvent", "exit", "enterTemporary", "getActive"],
+        "enumTypes": [["LoadToType", ["connectionOnly", "table", "pivotTable", "pivotChart"]],
+            ["DataSourceType", ["unknown", "cube"]],
             ["DateFilterCondition", ["unknown", "equals", "before", "beforeOrEqualTo", "after", "afterOrEqualTo", "between", "tomorrow", "today", "yesterday", "nextWeek", "thisWeek", "lastWeek", "nextMonth", "thisMonth", "lastMonth", "nextQuarter", "thisQuarter", "lastQuarter", "nextYear", "thisYear", "lastYear", "yearToDate", "allDatesInPeriodQuarter1", "allDatesInPeriodQuarter2", "allDatesInPeriodQuarter3", "allDatesInPeriodQuarter4", "allDatesInPeriodJanuary", "allDatesInPeriodFebruary", "allDatesInPeriodMarch", "allDatesInPeriodApril", "allDatesInPeriodMay", "allDatesInPeriodJune", "allDatesInPeriodJuly", "allDatesInPeriodAugust", "allDatesInPeriodSeptember", "allDatesInPeriodOctober", "allDatesInPeriodNovember", "allDatesInPeriodDecember"]],
             ["LabelFilterCondition", ["unknown", "equals", "beginsWith", "endsWith", "contains", "greaterThan", "greaterThanOrEqualTo", "lessThan", "lessThanOrEqualTo", "between"]],
             ["PivotFilterType", ["unknown", "value", "manual", "label", "date"]],
@@ -14364,6 +15085,7 @@ var Excel;
             ["AggregationFunction", ["unknown", "automatic", "sum", "count", "average", "max", "min", "product", "countNumbers", "standardDeviation", "standardDeviationP", "variance", "varianceP"]],
             ["ShowAsCalculation", ["unknown", "none", "percentOfGrandTotal", "percentOfRowTotal", "percentOfColumnTotal", "percentOfParentRowTotal", "percentOfParentColumnTotal", "percentOfParentTotal", "percentOf", "runningTotal", "percentRunningTotal", "differenceFrom", "percentDifferenceFrom", "rankAscending", "rankDecending", "index"]],
             ["PivotAxis", ["unknown", "row", "column", "data", "filter"]],
+            ["LinkedDataTypeRefreshMode", ["unknown", "manual", "onLoad", "periodic"]],
             ["AxisType", ["invalid", "category", "value", "series"]],
             ["AxisGroup", ["primary", "secondary"]],
             ["AxisScaleType", ["linear", "logarithmic"]],
@@ -14473,12 +15195,13 @@ var Excel;
             ["SortMethod", ["pinYin", "strokeCount"]],
             ["VerticalAlignment", ["top", "center", "bottom", "justify", "distributed"]],
             ["MessageCategory", [], { "none": 0, "customFunction": 1, "action": 2, "event": 65536 }],
-            ["MessageType", [], { "none": 0, "testEvent": 1, "test1Event": 2, "worksheetDataChangedEvent": 10, "worksheetActivatedEvent": 11, "worksheetDeactivatedEvent": 12, "worksheetAddedEvent": 13, "worksheetSelectionChangedEvent": 14, "worksheetDeletedEvent": 15, "worksheetCalculatedEvent": 16, "worksheetFilteredEvent": 17, "worksheetFormatChangedEvent": 18, "worksheetRowSortedEvent": 19, "worksheetColumnSortedEvent": 20, "worksheetSingleClickedEvent": 21, "worksheetRowHiddenChangedEvent": 22, "chartAddedEvent": 50, "chartActivatedEvent": 51, "chartDeactivatedEvent": 52, "chartDeletedEvent": 53, "tableSelectionChangedEvent": 100, "tableDataChangedEvent": 101, "tableAddedEvent": 102, "tableDeletedEvent": 103, "tableFilteredEvent": 104, "agaveVisualUpdateEvent": 150, "customFunctionExecutionBeginEvent": 200, "customFunctionExecutionEndEvent": 201, "invocationMessage": 1000, "cancellationMessage": 1001, "metadataMessage": 1002, "visualSelectionChangedEvent": 2000, "visualChangeEvent": 2001, "shapeSelectionChangedEvent": 2100, "shapeActivatedEvent": 2101, "shapeDeactivatedEvent": 2102, "workbookAutoSaveSettingChangedEvent": 2200, "wacoperationEvent": 2201, "ribbonCommandExecutedEvent": 2300, "appRuntimeVisibilityChangedEvent": 65539 }],
+            ["MessageType", [], { "none": 0, "testEvent": 1, "test1Event": 2, "worksheetDataChangedEvent": 10, "worksheetActivatedEvent": 11, "worksheetDeactivatedEvent": 12, "worksheetAddedEvent": 13, "worksheetSelectionChangedEvent": 14, "worksheetDeletedEvent": 15, "worksheetCalculatedEvent": 16, "worksheetFilteredEvent": 17, "worksheetFormatChangedEvent": 18, "worksheetRowSortedEvent": 19, "worksheetColumnSortedEvent": 20, "worksheetSingleClickedEvent": 21, "worksheetRowHiddenChangedEvent": 22, "chartAddedEvent": 50, "chartActivatedEvent": 51, "chartDeactivatedEvent": 52, "chartDeletedEvent": 53, "tableSelectionChangedEvent": 100, "tableDataChangedEvent": 101, "tableAddedEvent": 102, "tableDeletedEvent": 103, "tableFilteredEvent": 104, "agaveVisualUpdateEvent": 150, "customFunctionExecutionBeginEvent": 200, "customFunctionExecutionEndEvent": 201, "commentAddedEvent": 250, "commentDeletedEvent": 251, "commentChangedEvent": 252, "invocationMessage": 1000, "cancellationMessage": 1001, "metadataMessage": 1002, "visualSelectionChangedEvent": 2000, "visualChangeEvent": 2001, "shapeSelectionChangedEvent": 2100, "shapeActivatedEvent": 2101, "shapeDeactivatedEvent": 2102, "workbookAutoSaveSettingChangedEvent": 2200, "wacoperationEvent": 2201, "recordingStateChangedEvent": 2202, "ribbonCommandExecutedEvent": 2300, "linkedDataTypeRefreshRequestCompletedEvent": 2500, "linkedDataTypeRefreshModeChangedEvent": 2501, "linkedDataTypeLinkedDataTypeAddedEvent": 2502, "appRuntimeVisibilityChangedEvent": 65539 }],
             ["DocumentPropertyType", ["number", "boolean", "date", "string", "float"]],
             ["EventSource", ["local", "remote"]],
             ["DataChangeType", ["unknown", "rangeEdited", "rowInserted", "rowDeleted", "columnInserted", "columnDeleted", "cellInserted", "cellDeleted"]],
             ["RowHiddenChangeType", ["unhidden", "hidden"]],
-            ["EventType", ["worksheetChanged", "worksheetSelectionChanged", "worksheetAdded", "worksheetActivated", "worksheetDeactivated", "tableChanged", "tableSelectionChanged", "worksheetDeleted", "chartAdded", "chartActivated", "chartDeactivated", "chartDeleted", "worksheetCalculated", "visualSelectionChanged", "agaveVisualUpdate", "tableAdded", "tableDeleted", "tableFiltered", "worksheetFiltered", "shapeActivated", "shapeDeactivated", "visualChange", "workbookAutoSaveSettingChanged", "worksheetFormatChanged", "ribbonCommandExecuted", "worksheetRowSorted", "worksheetColumnSorted", "worksheetSingleClicked", "worksheetRowHiddenChanged"], { "wacoperationEvent": "WACOperationEvent" }],
+            ["CommentChangeType", ["commentEdited", "commentResolved", "commentReopened", "replyAdded", "replyDeleted", "replyEdited"]],
+            ["EventType", ["worksheetChanged", "worksheetSelectionChanged", "worksheetAdded", "worksheetActivated", "worksheetDeactivated", "tableChanged", "tableSelectionChanged", "worksheetDeleted", "chartAdded", "chartActivated", "chartDeactivated", "chartDeleted", "worksheetCalculated", "visualSelectionChanged", "agaveVisualUpdate", "tableAdded", "tableDeleted", "tableFiltered", "worksheetFiltered", "shapeActivated", "shapeDeactivated", "visualChange", "workbookAutoSaveSettingChanged", "worksheetFormatChanged", "ribbonCommandExecuted", "worksheetRowSorted", "worksheetColumnSorted", "worksheetSingleClicked", "worksheetRowHiddenChanged", "recordingStateChangedEvent", "commentAdded", "commentDeleted", "commentChanged", "linkedDataTypeRefreshRequestCompleted", "linkedDataTypeRefreshModeChanged", "linkedDataTypeLinkedDataTypeAdded"], { "wacoperationEvent": "WACOperationEvent" }],
             ["DocumentPropertyItem", ["title", "subject", "author", "keywords", "comments", "template", "lastAuth", "revision", "appName", "lastPrint", "creation", "lastSave", "category", "format", "manager", "company"]],
             ["SubtotalLocationType", ["atTop", "atBottom", "off"]],
             ["PivotLayoutType", ["compact", "tabular", "outline"]],
@@ -14516,191 +15239,199 @@ var Excel;
             ["SlicerSortType", ["dataSourceOrder", "ascending", "descending"]],
             ["RibbonTab", ["others", "home", "insert", "draw", "pageLayout", "formulas", "data", "review", "view", "developer", "addIns", "help"]],
             ["NumberFormatCategory", ["general", "number", "currency", "accounting", "date", "time", "percentage", "fraction", "scientific", "text", "special", "custom"]]],
-        "clientObjectTypes": [[1, 0, [["connectionString", 2], [182, 2], ["commandText", 2], ["dataSourceType", 2]]],
-            [2, 0, [["enableEvents", 1, 1]]],
-            [3, 0, [["calculationMode", 1], [183, 3, 2], ["calculationState", 3, 2], ["decimalSeparator", 3, 3], ["thousandsSeparator", 3, 3], ["useSystemSeparators", 3, 3]], [["iterativeCalculation", 4, 35, 2, 0, 4], ["ribbon", 177, 35, 2, 0, 4], ["cultureInfo", 90, 3, 3, 0, 4]], [[184, 1], ["suspendApiCalculationUntilNextSync", 0, 1, 4], ["suspendScreenUpdatingUntilNextSync", 0, 0, 2]], [["createWorkbook", 7, 1, 10, 1, 0, 0, 185], [185, 7, 1, 2, 1, 4]]],
-            [4, 0, [[186, 1], ["maxIteration", 1], ["maxChange", 1]]],
-            [5, 0, [[182, 3, 5], [187, 3, 1], ["isDirty", 1, 2], ["use1904DateSystem", 1, 6], ["chartDataPointTrack", 1, 2], ["usePrecisionAsDisplayed", 1, 2], [183, 3, 2], ["autoSave", 3, 2], ["previouslySaved", 3, 2]], [["worksheets", 9, 19, 0, 0, 4], [188, 18, 19, 0, 0, 4], [189, 23, 19, 0, 0, 4], ["application", 3, 2, 0, 0, 4], ["bindings", 22, 19, 0, 0, 4], ["functions", 181, 2, 7, 0, 4], [96, 96, 2, 8, 0, 4], [190, 98, 19, 8, 0, 4], ["settings", 16, 19, 9, 0, 4], ["customXmlParts", 94, 19, 10, 0, 4], ["internalTest", 149, 2, 4, 0, 4], [191, 115, 35, 5, 0, 4], ["styles", 140, 19, 5, 0, 4], [192, 6, 3, 5, 0, 4], ["dataConnections", 155, 3, 5, 0, 4], ["_Runtime", 2, 2, 10, 0, 4], [193, 157, 19, 11, 0, 4], [194, 174, 19, 11, 0, 4], ["tableStyles", 141, 19, 11, 0, 4], ["pivotTableStyles", 143, 19, 11, 0, 4], ["slicerStyles", 145, 19, 11, 0, 4], ["timelineStyles", 147, 19, 11, 0, 4]], [["_RemoveReference", 1, 2], ["_GetObjectByReferenceId", 1, 2, 0, 4], ["_GetObjectTypeNameByReferenceId", 1, 2, 0, 4], ["_RemoveAllReferences", 0, 2], ["_GetReferenceCount", 0, 2, 0, 4], ["getIsActiveCollabSession", 0, 0, 2], ["registerCustomFunctions", 7, 0, 12, 8], ["_SetOsfControlContainerReadyForCustomFunctions", 0, 0, 12], ["close", 1, 0, 3], ["save", 1, 0, 3], [195, 0, 0, 2], [196, 0, 0, 2], [197, 0, 0, 13], [198, 0, 0, 13]], [["getSelectedRange", 12, 0, 10, 0, 4], ["getActiveCell", 12, 0, 10, 5, 4], ["_GetRangeForEventByReferenceId", 12, 1, 2, 0, 4], ["_GetRangeOrNullObjectForEventByReferenceId", 12, 1, 2, 0, 4], ["getActiveChart", 39, 0, 2, 2, 4], ["getActiveChartOrNullObject", 39, 0, 2, 2, 4], ["getSelectedRanges", 13, 0, 10, 2, 4], ["_GetRangesForEventByReferenceId", 13, 1, 2, 2, 4], ["_GetRangesOrNullObjectForEventByReferenceId", 13, 1, 2, 2, 4], ["getActiveSlicer", 173, 0, 2, 11, 4], ["getActiveSlicerOrNullObject", 173, 0, 2, 11, 4]], 0, 0, [["AutoSaveSettingChanged", 0, 2, "MessageType.workbookAutoSaveSettingChangedEvent", 199, 195, 196], [200, 3, 8, "_CC.office10EventIdDocumentSelectionChangedEvent", 201, 201, 201], ["WACOperationEvent", 2, 13, "MessageType.wacoperationEvent", 199, 197, 198], ["_Message", 3, 5, "_CC.office10EventIdRichApiMessageEvent", 201, 201, 201]]],
-            [6, 0, [[202, 3]], 0, [[203, 1], [204, 1]]],
-            [7, 0, [[205, 3]], 0, [["open", 0, 2, 0, 4]]],
-            [8, 0, [[182, 1], [205, 3], [206, 1], ["visibility", 1], ["tabColor", 1, 5], ["standardWidth", 1, 5], ["standardHeight", 3, 5], ["showGridlines", 5, 1], ["showHeadings", 5, 1], ["enableCalculation", 1, 2]], [["charts", 38, 83, 0, 0, 4], [189, 23, 83, 0, 0, 4], [192, 10, 3, 7, 0, 4], [190, 98, 19, 8, 0, 4], [188, 18, 19, 9, 0, 4], ["freezePanes", 11, 3, 5, 0, 4], ["pageLayout", 150, 35, 2, 0, 4], ["visuals", 81, 83, 11, 0, 4], [207, 161, 19, 2, 0, 4], ["horizontalPageBreaks", 154, 19, 2, 0, 4], ["verticalPageBreaks", 154, 19, 2, 0, 4], [208, 89, 3, 2, 0, 4], [194, 174, 19, 11, 0, 4], [193, 157, 19, 11, 0, 4], ["customProperties", 114, 19, 6, 0, 4], ["sheetViews", 179, 18, 14, 0, 4]], [[209], [210, 0, 2], [184, 1, 0, 4], [211, 0, 0, 5], [212, 0, 0, 5], [213, 0, 0, 5], [214, 0, 0, 5], [215, 0, 0, 5], [216, 0, 0, 5], [217, 0, 0, 5], [218, 0, 0, 5], [219, 0, 0, 1], [220, 0, 0, 1], [221, 3, 0, 2], [222, 0, 0, 6], [223, 0, 0, 6], [224, 0, 0, 2], [225, 0, 0, 2], [226, 0, 0, 11], [227, 0, 0, 11], [228, 0, 0, 11], [229, 0, 0, 11], [230, 0, 0, 11], [231, 0, 0, 11], [232, 0, 0, 3], [233, 0, 0, 3], ["showOutlineLevels", 2, 0, 11]], [[234, 12, 1, 10, 0, 4], [235, 12, 1, 10, 0, 4], [236, 12, 2, 10, 0, 4], [237, 12, 1, 10, 9, 4], ["getRangeByIndexes", 12, 4, 10, 5, 4], ["getPrevious", 8, 1, 10, 10, 4, 0, 238], ["getPreviousOrNullObject", 8, 1, 10, 10, 4, 0, 238], ["getNext", 8, 1, 10, 10, 4, 0, 238], ["getNextOrNullObject", 8, 1, 10, 10, 4, 0, 238], [238, 8, 1, 2, 5, 4], ["copy", 8, 2, 0, 5, 0, 0, 239], [239, 8, 1, 0, 5], ["findAll", 13, 2, 10, 2, 4], ["findAllOrNullObject", 13, 2, 10, 2, 4], [240, 13, 1, 10, 2, 4]], "workbook.worksheets", 0, [[241, 0, 5, 242, 243, 213, 214], [244, 0, 1, 245, 243, 219, 220], [246, 2, 5, 247, 243, 211, 212], [248, 0, 11, 249, 243, 228, 229], [250, 0, 5, 251, 243, 215, 216], [252, 0, 6, 253, 243, 222, 223], [254, 2, 2, 255, 243, 224, 225], [256, 0, 3, 257, 243, 232, 233], [258, 0, 11, 259, 243, 226, 227], [200, 0, 5, 260, 243, 217, 218], [261, 0, 11, 262, 243, 230, 231]]],
-            [9, 1, 0, 0, [[263, 1, 2, 9, 4], [264, 0, 0, 5], [265, 0, 0, 5], [213, 0, 2, 5], [214, 0, 0, 5], [215, 0, 0, 5], [216, 0, 0, 5], [266, 0, 0, 5], [267, 0, 0, 5], [219, 0, 0, 1], [220, 0, 0, 1], [211, 0, 0, 2], [212, 0, 0, 2], [217, 0, 0, 2], [218, 0, 0, 2], ["addFromBase64", 4, 0, 6], [222, 0, 0, 6], [223, 0, 0, 6], [224, 0, 0, 2], [225, 0, 0, 2], [226, 0, 0, 11], [227, 0, 0, 11], [228, 0, 0, 11], [229, 0, 0, 11], [230, 0, 0, 11], [231, 0, 0, 11], [232, 0, 0, 3], [233, 0, 0, 3]], [[268, 8, 1, 18, 0, 4], [269, 8, 1, 8], ["getActiveWorksheet", 8, 0, 2, 0, 4], [270, 8, 1, 2, 9, 4], [271, 8, 1, 10, 10, 4], ["getLast", 8, 1, 10, 10, 4]], 0, 8, [[241, 0, 5, 242, 199, 213, 214], [272, 0, 5, "MessageType.worksheetAddedEvent", 199, 264, 265], [244, 0, 1, 245, 199, 219, 220], [246, 2, 2, 247, 199, 211, 212], [248, 0, 11, 249, 199, 228, 229], [250, 0, 5, 251, 199, 215, 216], [273, 0, 5, "MessageType.worksheetDeletedEvent", 199, 266, 267], [252, 0, 6, 253, 199, 222, 223], [254, 2, 2, 255, 199, 224, 225], [256, 0, 3, 257, 199, 232, 233], [258, 0, 11, 259, 199, 226, 227], [200, 0, 2, 260, 199, 217, 218], [261, 0, 11, 262, 199, 230, 231]]],
-            [10, 0, [[202, 3], [274, 3]], 0, [[203, 2, 1], [204, 1]]],
-            [11, 0, 0, 0, [["unfreeze"], ["freezeAt", 1], ["freezeRows", 1], ["freezeColumns", 1]], [[275, 12, 0, 10, 0, 4], ["getLocationOrNullObject", 12, 0, 10, 0, 4]]],
-            [12, 14, [[276, 5], [277, 1, 5], [278, 5], [279, 3], [280, 5], [281, 5], [282, 3], [283, 3], [284, 3], [285, 3], [286, 3], [287, 3], [288, 3], [289, 2], [290, 3], [291, 5, 7], ["hidden", 3, 7], ["rowHidden", 1, 7], ["columnHidden", 1, 7], [292, 3, 5], [293, 3, 5], [294, 1, 5], [295, 1, 5], ["linkedDataTypeState", 3, 2], ["hasSpill", 3, 6], [296, 3, 11], [297, 3, 11], [298, 3, 11], [299, 3, 11], ["savedAsArray", 3, 6], ["numberFormatCategories", 3, 6]], [[300, 32, 35, 0, 0, 4], [301, 8, 2, 0, 0, 4], [302, 86, 3, 7, 0, 4], [303, 118, 19, 4, 0, 4], [304, 30, 35, 1, 0, 4]], [[305, 1], [209, 1], [306, 0, 2], [307, 0, 2], ["merge", 1, 0, 7], ["unmerge", 0, 0, 7], ["_ValidateArraySize", 2, 2, 8, 4], [184, 0, 0, 4], ["showCard", 0, 0, 5], [308, 0, 2, 5, 4], [221, 3, 0, 2], [309, 4, 0, 2], [310, 2, 0, 2], [311, 0, 0, 2], [312, 0, 0, 2], ["getCellProperties", 1, 0, 2], ["getRowProperties", 1, 0, 2], ["getColumnProperties", 1, 0, 2], ["setCellProperties", 1, 0, 2], ["setRowProperties", 1, 0, 2], ["setColumnProperties", 1, 0, 2], ["autoFill", 2, 0, 2], [313, 2, 0, 2], ["flashFill", 0, 0, 2], [314, 1, 0, 11], [315, 1, 0, 11], ["showGroupDetails", 1, 0, 11], ["hideGroupDetails", 1, 0, 11], ["moveTo", 1, 0, 15]], [[236, 12, 2, 10, 0, 4], [235, 12, 1, 10, 0, 4], ["insert", 12, 1, 8], [316, 12, 0, 10, 0, 4], [317, 12, 0, 10, 0, 4], ["getOffsetRange", 12, 2, 10, 0, 4], ["getRow", 12, 1, 10, 0, 4], ["getColumn", 12, 1, 10, 0, 4], [318, 12, 1, 10, 0, 4], ["getBoundingRect", 12, 1, 10, 0, 4], ["getLastCell", 12, 0, 10, 0, 4], ["getLastColumn", 12, 0, 10, 0, 4], ["getLastRow", 12, 0, 10, 0, 4], [319, 12, 1, 10, 9, 4], ["getRowsAbove", 12, 1, 11, 8, 4], ["getRowsBelow", 12, 1, 11, 8, 4], ["getColumnsBefore", 12, 1, 11, 8, 4], ["getColumnsAfter", 12, 1, 11, 8, 4], ["getResizedRange", 12, 2, 11, 8, 4], ["getVisibleView", 14, 0, 2, 8, 4], [237, 12, 1, 10, 9, 4], ["getSurroundingRegion", 12, 0, 10, 5, 4], ["getAbsoluteResizedRange", 12, 2, 10, 5, 4], [320, 24, 1, 6, 2, 4], [321, 12, 2, 10, 2, 4], ["findOrNullObject", 12, 2, 10, 2, 4], ["removeDuplicates", 31, 2, 8, 2], [322, 13, 2, 10, 2, 4], [323, 13, 2, 10, 2, 4], ["getSpillingToRange", 12, 0, 10, 6, 4], ["getSpillParent", 12, 0, 10, 6, 4], ["getSpillingToRangeOrNullObject", 12, 0, 10, 6, 4], ["getSpillParentOrNullObject", 12, 0, 10, 6, 4], ["getMergedAreas", 13, 0, 10, 6, 4], ["getPivotTables", 97, 1, 6, 6, 4]]],
-            [13, 2, [[289, 2], [286, 3], [287, 3], ["areaCount", 3], [288, 3], [292, 3], [293, 3], [295, 1]], [[324, 156, 19, 0, 0, 4], [303, 118, 19, 0, 0, 4], [300, 32, 35, 0, 0, 4], [304, 30, 35, 0, 0, 4], [301, 8, 2, 0, 0, 4]], [[307, 0, 2], [184], [305, 1], [312], [309, 4], [310, 2], [311], [306, 0, 2, 6]], [[316, 13, 0, 10, 0, 4], [317, 13, 0, 10, 0, 4], [318, 13, 1, 10, 0, 4], [319, 13, 1, 10, 0, 4], ["getOffsetRangeAreas", 13, 2, 10, 0, 4], ["getUsedRangeAreas", 13, 1, 10, 0, 4], ["getUsedRangeAreasOrNullObject", 13, 1, 10, 0, 4], [320, 24, 1, 6, 0, 4], [322, 13, 2, 10, 0, 4], [323, 13, 2, 10, 0, 4]]],
-            [14, 0, [[276, 1], [278, 1], [279, 3], [280, 1], [281, 1], [291, 1], [290, 3], [284, 3], [285, 3], ["cellAddresses", 3], [325, 3]], [[326, 15, 19, 0, 0, 4]], 0, [[234, 12, 0, 10, 0, 4]]],
-            [15, 1, 0, 0, [[263, 0, 2, 9, 4]], [[327, 14, 1, 2, 0, 4]], 0, 14],
-            [16, 1, 0, 0, [[263, 0, 2, 0, 4]], [[268, 17, 1, 18, 0, 4], [269, 17, 2, 9], [270, 17, 1, 2, 0, 4]], 0, 17, [["SettingsChanged", 3, 0, "_CC.office10EventIdSettingsChangedEvent", 201, 201, 201]]],
-            [17, 8, [[328, 3], [329, 5], [330, 2]], 0, [[209]]],
-            [18, 1, 0, 0, [[263, 0, 2, 9, 4]], [[268, 19, 1, 18, 0, 4], [270, 19, 1, 2, 9, 4], [269, 19, 3, 8, 9], ["addFormulaLocal", 19, 3, 0, 9]], 0, 19],
-            [19, 0, [[182, 3], [331, 3], [329, 3], [332, 1], [330, 2], ["comment", 1, 9], ["scope", 3, 9], [333, 1, 5]], [[301, 8, 2, 9, 0, 4], ["worksheetOrNullObject", 8, 2, 9, 0, 4], ["arrayValues", 20, 3, 5, 0, 4]], [[209, 0, 0, 9]], [[234, 12, 0, 10, 0, 4], [334, 12, 0, 10, 9, 4]]],
-            [20, 0, [[278, 3], ["types", 3]]],
-            [21, 0, [[205, 3], [331, 3]], 0, [["getText", 0, 2, 0, 4], [209, 0, 0, 8]], [["getTable", 25, 0, 2, 0, 4], [234, 12, 0, 2, 0, 4]], 0, 0, [["DataChanged", 3, 8, "_CC.office10EventIdBindingDataChangedEvent", 243, 201, 201], [200, 3, 8, "_CC.office10EventIdBindingSelectionChangedEvent", 243, 201, 201]]],
-            [22, 1, [[335, 3]], 0, [[263, 0, 2, 9, 4]], [[268, 21, 1, 18, 0, 4], [327, 21, 1, 2, 0, 4], [269, 21, 3, 8, 8], ["addFromNamedItem", 21, 3, 0, 8], ["addFromSelection", 21, 2, 0, 8], [270, 21, 1, 2, 9, 4]], 0, 21],
-            [23, 5, [[335, 3]], 0, [[263, 0, 2, 9, 4], [211, 0, 0, 5], [212, 0, 0, 5], [264, 0, 0, 2], [265, 0, 0, 2], [266, 0, 0, 2], [267, 0, 0, 2], [222, 0, 0, 6], [223, 0, 0, 6]], [[268, 25, 1, 18, 0, 4], [327, 25, 1, 2, 0, 4], [269, 25, 2, 8], [270, 25, 1, 2, 9, 4]], 0, 25, [[272, 0, 2, "MessageType.tableAddedEvent", 336, 264, 265], [246, 2, 5, 337, 336, 211, 212], [273, 0, 2, "MessageType.tableDeletedEvent", 336, 266, 267], [252, 0, 6, 338, 336, 222, 223]]],
-            [24, 1, 0, 0, [[263, 0, 2, 0, 4]], [[271, 25, 0, 10, 0, 4], [268, 25, 1, 18, 0, 4]], 0, 25],
-            [25, 24, [[205, 3], [182, 1], ["showHeaders", 1], ["showTotals", 1], [295, 1], ["highlightFirstColumn", 1, 8], ["highlightLastColumn", 1, 8], ["showBandedRows", 1, 8], ["showBandedColumns", 1, 8], ["showFilterButton", 1, 8], ["legacyId", 3, 1]], [[339, 26, 19, 0, 0, 4], [326, 28, 19, 0, 0, 4], [302, 87, 3, 7, 0, 4], [301, 8, 2, 7, 0, 4], [208, 89, 3, 2, 0, 4], ["tableStyle", 142, 35, 6, 0, 4]], [[209], [340, 0, 0, 7], ["reapplyFilters", 0, 0, 7], [217, 0, 0, 5], [218, 0, 0, 5], [211, 0, 0, 5], [212, 0, 0, 5], ["clearStyle", 0, 0, 6], [222, 0, 0, 6], [223, 0, 0, 6], [341, 1, 0, 6]], [[234, 12, 0, 10, 0, 4], [342, 12, 0, 10, 0, 4], [343, 12, 0, 10, 0, 4], [344, 12, 0, 10, 0, 4], ["convertToRange", 12, 0, 8, 7]], "workbook.tables", 0, [[246, 2, 5, 337, 243, 211, 212], [252, 0, 6, 338, 243, 222, 223], [200, 2, 5, "MessageType.tableSelectionChangedEvent", 243, 217, 218]]],
-            [26, 1, [[335, 3]], 0, [[263, 0, 2, 9, 4]], [[268, 27, 1, 18, 0, 4], [327, 27, 1, 2, 0, 4], [269, 27, 3, 8], [270, 27, 1, 2, 9, 4]], 0, 27],
-            [27, 0, [[205, 3], [325, 3], [278, 1], [182, 1]], [["filter", 88, 3, 7, 0, 4]], [[209]], [[234, 12, 0, 10, 0, 4], [342, 12, 0, 10, 0, 4], [343, 12, 0, 10, 0, 4], [344, 12, 0, 10, 0, 4]]],
-            [28, 1, [[335, 3]], 0, [[263, 0, 2, 9, 4]], [[327, 29, 1, 2, 0, 4], [269, 29, 2, 8]], 0, 29],
-            [29, 0, [[325, 3], [278, 1]], 0, [[209]], [[234, 12, 0, 10, 0, 4]]],
-            [30, 0, [[331, 3], [345, 1], ["prompt", 1], ["errorAlert", 1], ["ignoreBlanks", 1], ["valid", 3]], 0, [[305]], [["getInvalidCells", 13, 0, 10, 2, 4], ["getInvalidCellsOrNullObject", 13, 0, 10, 2, 4]]],
-            [31, 0, [["removed", 3], ["uniqueRemaining", 3]]],
-            [32, 0, [[346, 1], [347, 1], [348, 1], ["columnWidth", 1, 7], [349, 1, 7], [350, 1, 5], ["useStandardHeight", 1, 5], ["useStandardWidth", 1, 5], [351, 1, 2], [352, 1, 2], [353, 1, 2], [354, 1, 2]], [[355, 34, 35, 0, 0, 4], [356, 37, 35, 0, 0, 4], [357, 36, 51, 0, 0, 4], [192, 33, 35, 7, 0, 4]], [["autofitColumns", 0, 0, 7], ["autofitRows", 0, 0, 7], ["adjustIndent", 1, 0, 15]]],
-            [33, 0, [[358, 1], [359, 1]]],
-            [34, 0, [[360, 1], [361, 1, 2], ["patternTintAndShade", 1, 2], ["pattern", 1, 2], ["patternColor", 1, 2]], 0, [[305]]],
-            [35, 0, [[362, 3], [295, 1], [363, 1], [360, 1], [361, 1, 2]]],
-            [36, 1, [[335, 3], [361, 1, 2]], 0, 0, [[268, 35, 1, 18, 0, 4], [327, 35, 1, 2, 0, 4]], 0, 35],
-            [37, 0, [[182, 1], [364, 1], [360, 1], [365, 1], [366, 1], [367, 1], [368, 1, 2], ["subscript", 1, 2], ["superscript", 1, 2], [361, 1, 2]]],
-            [38, 5, [[335, 3]], 0, [[263, 0, 2, 9, 4], [264, 0, 0, 1], [265, 0, 0, 1], [213, 0, 0, 1], [214, 0, 0, 1], [215, 0, 0, 1], [216, 0, 0, 1], [266, 0, 0, 1], [267, 0, 0, 1]], [[269, 39, 3, 9], [327, 39, 1, 2, 0, 4], [369, 39, 1, 18, 0, 4], [268, 39, 1, 2, 0, 4], [270, 39, 1, 2, 9, 4]], 0, 39, [[241, 0, 1, 370, 371, 213, 214], [272, 0, 1, "MessageType.chartAddedEvent", 371, 264, 265], [250, 0, 1, 372, 371, 215, 216], [273, 0, 1, "MessageType.chartDeletedEvent", 371, 266, 267]]],
-            [39, 0, [[182, 1], [296, 1], [297, 1], [299, 1], [298, 1], [205, 3, 5], ["showAllFieldButtons", 1, 5], [373, 1, 5], ["showDataLabelsOverMaximum", 1, 1], ["categoryLabelLevel", 1, 1], [295, 1, 1], ["displayBlanksAs", 1, 1], ["plotBy", 1, 1], ["plotVisibleOnly", 1, 1], ["seriesNameLevel", 1, 1]], [[374, 65, 35, 0, 0, 4], [375, 53, 35, 0, 0, 4], ["legend", 60, 35, 0, 0, 4], ["series", 42, 19, 0, 0, 4], ["axes", 48, 35, 0, 0, 4], [300, 41, 35, 0, 0, 4], [301, 8, 2, 7, 0, 4], ["plotArea", 79, 35, 1, 0, 4], ["pivotOptions", 40, 35, 2, 0, 4]], [["setData", 2, 1], [209], ["setPosition", 2], [308, 3, 2, 7, 4], [213, 0, 0, 1], [214, 0, 0, 1], [215, 0, 0, 1], [216, 0, 0, 1], [210, 0, 2, 2]], 0, 0, 0, [[241, 0, 1, 370, 243, 213, 214], [250, 0, 1, 372, 243, 215, 216]]],
-            [40, 0, [["showAxisFieldButtons", 1], ["showLegendFieldButtons", 1], ["showReportFilterFieldButtons", 1], ["showValueFieldButtons", 1]]],
-            [41, 0, [["roundedCorners", 1, 2], ["colorScheme", 1, 2]], [[355, 68, 3, 0, 0, 4], [356, 73, 35, 0, 0, 4], [376, 69, 35, 5, 0, 4]]],
-            [42, 1, [[335, 3]], 0, [[263, 0, 2, 9, 4]], [[327, 43, 1, 2, 0, 4], [269, 43, 2, 8, 5]], 0, 43],
-            [43, 0, [[182, 1], [373, 1, 5], ["hasDataLabels", 1, 5], ["filtered", 1, 5], [377, 1, 5], [378, 1, 5], [379, 1, 5], [380, 1, 5], [381, 1, 5], ["smooth", 1, 5], ["plotOrder", 1, 5], ["gapWidth", 1, 5], ["doughnutHoleSize", 1, 5], [382, 1, 1], ["explosion", 1, 1], ["firstSliceAngle", 1, 1], ["invertIfNegative", 1, 1], ["bubbleScale", 1, 2], ["secondPlotSize", 1, 1], ["splitType", 1, 1], ["splitValue", 1, 2], ["varyByCategories", 1, 1], ["showLeaderLines", 1, 2], ["overlap", 1, 1], ["gradientStyle", 1, 2], ["gradientMinimumType", 1, 2], ["gradientMidpointType", 1, 2], ["gradientMaximumType", 1, 2], ["gradientMinimumValue", 1, 2], ["gradientMidpointValue", 1, 2], ["gradientMaximumValue", 1, 2], ["gradientMinimumColor", 1, 2], ["gradientMidpointColor", 1, 2], ["gradientMaximumColor", 1, 2], ["parentLabelStrategy", 1, 2], ["showConnectorLines", 1, 2], ["invertColor", 1, 2]], [["points", 45, 19, 0, 0, 4], [300, 44, 35, 0, 0, 4], ["trendlines", 75, 19, 5, 0, 4], ["xErrorBars", 56, 35, 2, 0, 4], ["yErrorBars", 56, 35, 2, 0, 4], [375, 53, 35, 1, 0, 4], ["binOptions", 70, 35, 2, 0, 4], ["mapOptions", 64, 35, 2, 0, 4], ["boxwhiskerOptions", 71, 35, 2, 0, 4]], [[209, 0, 0, 5], ["setXAxisValues", 1, 0, 5], ["setValues", 1, 0, 5], ["setBubbleSizes", 1, 0, 5], ["getDimensionValues", 1, 0, 6]]],
-            [44, 0, 0, [[355, 68, 3, 0, 0, 4], [383, 72, 35, 0, 0, 4]]],
-            [45, 1, [[335, 3]], 0, [[263, 0, 2, 9, 4]], [[327, 46, 1, 2, 0, 4]], 0, 46],
-            [46, 0, [[329, 3], ["hasDataLabel", 1, 5], [378, 1, 5], [377, 1, 5], [380, 1, 5], [381, 1, 5]], [[300, 47, 35, 0, 0, 4], ["dataLabel", 54, 35, 5, 0, 4]]],
-            [47, 0, 0, [[355, 68, 3, 0, 0, 4], [376, 69, 35, 5, 0, 4]]],
-            [48, 0, 0, [["categoryAxis", 49, 35, 0, 0, 4], ["seriesAxis", 49, 35, 0, 0, 4], ["valueAxis", 49, 35, 0, 0, 4]], 0, [[268, 49, 2, 2, 5, 4]]],
-            [49, 0, [["majorUnit", 1], ["maximum", 1], ["minimum", 1], ["minorUnit", 1], ["displayUnit", 1, 5], ["showDisplayUnitLabel", 1, 5], ["customDisplayUnit", 3, 5], [331, 3, 5], ["minorTimeUnitScale", 1, 5], ["majorTimeUnitScale", 1, 5], ["baseTimeUnit", 1, 5], ["categoryType", 1, 5], [382, 3, 5], ["scaleType", 1, 5], ["logBase", 1, 5], [297, 3, 5], [296, 3, 5], [298, 3, 5], [299, 3, 5], ["reversePlotOrder", 1, 5], ["crosses", 1, 5], ["crossesAt", 3, 5], [332, 1, 5], ["isBetweenCategories", 1, 1], ["majorTickMark", 1, 5], ["minorTickMark", 1, 5], ["tickMarkSpacing", 1, 5], ["tickLabelPosition", 1, 5], ["tickLabelSpacing", 1, 5], ["alignment", 1, 1], ["multiLevel", 1, 1], [276, 1, 1], [384, 1, 2], ["offset", 1, 1], [350, 1, 1], [206, 1, 1], ["positionAt", 3, 1]], [["majorGridlines", 58, 35, 0, 0, 4], ["minorGridlines", 58, 35, 0, 0, 4], [374, 51, 35, 0, 0, 4], [300, 50, 35, 0, 0, 4]], [["setCategoryNames", 1, 0, 5], ["setCustomDisplayUnit", 1, 0, 5], ["setCrossesAt", 1, 0, 5], ["setPositionAt", 1, 0, 1]]],
-            [50, 0, 0, [[356, 73, 35, 0, 0, 4], [383, 72, 35, 0, 0, 4], [355, 68, 3, 1, 0, 4]]],
-            [51, 0, [[279, 1], [332, 1], [350, 1, 6]], [[300, 52, 35, 0, 0, 4]], [[385, 1, 0, 1]]],
-            [52, 0, 0, [[356, 73, 35, 0, 0, 4], [355, 68, 3, 1, 0, 4], [376, 69, 35, 1, 0, 4]]],
-            [53, 0, [[206, 1], [386, 1], [387, 1], [388, 1], [389, 1], [390, 1], [391, 1], [392, 1], [276, 1, 1], [384, 1, 2], [350, 1, 1], [393, 1, 1], [347, 1, 1], [348, 1, 1]], [[300, 55, 35, 0, 0, 4]]],
-            [54, 0, [[206, 1], [386, 1], [387, 1], [388, 1], [389, 1], [390, 1], [391, 1], [392, 1], [296, 1, 1], [297, 1, 1], [299, 3, 1], [298, 3, 1], [333, 1, 1], [350, 1, 1], [347, 1, 1], [348, 1, 1], [279, 1, 1], [393, 1, 1], [276, 1, 1], [384, 1, 2]], [[300, 55, 35, 1, 0, 4]]],
-            [55, 0, 0, [[356, 73, 35, 0, 0, 4], [355, 68, 3, 0, 0, 4], [376, 69, 35, 1, 0, 4]]],
-            [56, 0, [["endStyleCap", 1], ["include", 1], [331, 1], [332, 1]], [[300, 57, 35, 0, 0, 4]]],
-            [57, 0, 0, [[383, 72, 35, 0, 0, 4]]],
-            [58, 0, [[332, 1]], [[300, 59, 35, 0, 0, 4]]],
-            [59, 0, 0, [[383, 72, 35, 0, 0, 4]]],
-            [60, 0, [[332, 1], [206, 1], [394, 1], [297, 1, 5], [296, 1, 5], [299, 1, 5], [298, 1, 5], [379, 1, 5]], [[300, 63, 35, 0, 0, 4], ["legendEntries", 62, 19, 5, 0, 4]]],
-            [61, 0, [[332, 1], [297, 3, 1], [296, 3, 1], [299, 3, 1], [298, 3, 1], [325, 3, 1]]],
-            [62, 1, 0, 0, [[263, 0, 2, 0, 4]], [[327, 61, 1, 2, 0, 4]], 0, 61],
-            [63, 0, 0, [[356, 73, 35, 0, 0, 4], [355, 68, 3, 0, 0, 4], [376, 69, 35, 1, 0, 4]]],
-            [64, 0, [[395, 1], ["labelStrategy", 1], ["projectionType", 1]]],
-            [65, 0, [[332, 1], [279, 1], [394, 1], [347, 1, 5], [296, 1, 5], [297, 1, 5], [299, 3, 5], [298, 3, 5], [348, 1, 5], [350, 1, 5], [206, 1, 5], [379, 1, 5]], [[300, 67, 35, 0, 0, 4]], [[385, 1, 0, 5]], [[396, 66, 2, 2, 5, 4]]],
-            [66, 0, 0, [[356, 73, 35, 0, 0, 4]]],
-            [67, 0, 0, [[356, 73, 35, 0, 0, 4], [355, 68, 3, 0, 0, 4], [376, 69, 35, 5, 0, 4]]],
-            [68, 4, 0, 0, [[397, 1], [305]]],
-            [69, 0, [[360, 1], [398, 1], [363, 1]], 0, [[305, 0, 0, 1]]],
-            [70, 0, [[331, 1], [299, 1], [335, 1], ["allowOverflow", 1], ["allowUnderflow", 1], ["overflowValue", 1], ["underflowValue", 1]]],
-            [71, 0, [["showInnerPoints", 1], ["showOutlierPoints", 1], ["showMeanMarker", 1], ["showMeanLine", 1], ["quartileCalculation", 1]]],
-            [72, 0, [[360, 1], [398, 1, 5], [363, 1, 5]], 0, [[305]]],
-            [73, 0, [[366, 1], [360, 1], [365, 1], [182, 1], [364, 1], [367, 1]]],
-            [74, 0, [[331, 1], ["polynomialOrder", 1], ["movingAveragePeriod", 1], [330, 2], ["showEquation", 1, 1], ["showRSquared", 1, 1], ["forwardPeriod", 1, 1], ["backwardPeriod", 1, 1], [182, 1], ["intercept", 1]], [[300, 76, 35, 0, 0, 4], ["label", 77, 35, 1, 0, 4]], [[209]]],
-            [75, 1, 0, 0, [[263, 0, 2, 0, 4]], [[269, 74, 1, 8], [268, 74, 1, 18, 0, 4]], 0, 74],
-            [76, 0, 0, [[383, 72, 35, 0, 0, 4]]],
-            [77, 0, [[296, 1], [297, 1], [299, 3], [298, 3], [333, 1], [350, 1], [347, 1], [348, 1], [279, 1], [393, 1], [276, 1], [384, 1, 2]], [[300, 78, 35, 0, 0, 4]]],
-            [78, 0, 0, [[355, 68, 3, 0, 0, 4], [376, 69, 35, 0, 0, 4], [356, 73, 35, 0, 0, 4]]],
-            [79, 0, [[297, 1], [296, 1], [299, 1], [298, 1], ["insideLeft", 1], ["insideTop", 1], ["insideWidth", 1], ["insideHeight", 1], [206, 1]], [[300, 80, 35, 0, 0, 4]]],
-            [80, 0, 0, [[376, 69, 35, 0, 0, 4], [355, 68, 3, 0, 0, 4]]],
-            [81, 5, 0, 0, [["getDefinitions", 0, 2, 0, 4], ["getPreview", 4, 2, 0, 4], ["bootstrapAgaveVisual", 0, 0, 0, 2], [263, 0, 2, 0, 4], [217, 0, 2], [218, 0, 2]], [[269, 82, 3, 8, 0, 2], [369, 82, 1, 18, 0, 4], ["getSelectedOrNullObject", 82, 0, 2, 0, 4]], 0, 82, [["AgaveVisualUpdate", 2, 0, "MessageType.agaveVisualUpdateEvent", 201, 399, 399], [200, 0, 0, "MessageType.visualSelectionChangedEvent", 371, 217, 218]]],
-            [82, 0, [[205, 3], ["isSupportedInVisualTaskpane", 3]], [[191, 84, 18, 0, 0, 4]], [[209, 0, 0, 0, 2], ["getProperty", 1, 2, 0, 4], ["setProperty", 2, 0, 0, 2], ["changeDataSource", 2, 0, 0, 2], ["getDataSource", 0, 2, 0, 4], ["setPropertyToDefault", 1, 0, 0, 2], [400, 0, 2], [401, 0, 2], ["serializeProperties", 0, 2, 0, 4], ["deserializeProperties", 1, 0, 0, 2]], [["getChildProperties", 84, 2, 6, 0, 4], ["getDataControllerClient", 85, 0, 2, 0, 4], ["getElementChildProperties", 84, 3, 6, 0, 4]], 0, 0, [["ChangeNotification", 2, 0, "MessageType.visualChangeEvent", 243, 400, 401]]],
-            [83, 0, [[331, 3], [329, 3], [205, 3], ["localizedName", 3], [274, 3], ["localizedOptions", 3], ["hasDefault", 3], ["isDefault", 3], [402, 3], [403, 3], ["stepSize", 3], ["hideMeButShowChildrenUI", 3], ["expandableUI", 3], ["nextPropOnSameLine", 3], ["showResetUI", 3]], 0, [["getBoolMetaProperty", 1, 2, 0, 4]]],
-            [84, 1, 0, 0, [[263, 0, 2, 0, 4]], [[268, 83, 1, 18, 0, 4], [327, 83, 1, 2, 0, 4]], 0, 83],
-            [85, 0, 0, 0, [["getWells", 0, 2, 0, 4], ["getAssociatedFields", 1, 2, 0, 4], ["getAvailableFields", 1, 2, 0, 4], ["addField", 3, 0, 0, 2], ["removeField", 2, 0, 0, 2], ["moveField", 3, 0, 0, 2]]],
-            [86, 0, 0, 0, [[404, 5]]],
-            [87, 0, [["matchCase", 3], ["method", 3], [405, 3]], 0, [[404, 3], [305], [406]]],
-            [88, 0, [[407, 3]], 0, [[404, 1], [305], ["applyBottomItemsFilter", 1], ["applyBottomPercentFilter", 1], ["applyCellColorFilter", 1], ["applyDynamicFilter", 1], ["applyFontColorFilter", 1], ["applyValuesFilter", 1], ["applyTopItemsFilter", 1], ["applyTopPercentFilter", 1], ["applyIconFilter", 1], ["applyCustomFilter", 3]]],
-            [89, 0, [[186, 3], ["isDataFiltered", 3], [407, 3]], 0, [[404, 3], [406], [408], ["clearCriteria"]], [[234, 12, 0, 10, 0, 4], [334, 12, 0, 10, 0, 4]]],
-            [90, 0, [[182, 3]], [[276, 91, 3, 0, 0, 4], ["datetimeFormat", 92, 3, 6, 0, 4]]],
-            [91, 0, [["numberDecimalSeparator", 3], ["numberGroupSeparator", 3]]],
-            [92, 0, [["dateSeparator", 3], ["longDatePattern", 3], ["shortDatePattern", 3], ["timeSeparator", 3], ["longTimePattern", 3]]],
-            [93, 1, 0, 0, [[263, 0, 2, 0, 4]], [[268, 95, 1, 18, 0, 4], [270, 95, 1, 2, 0, 4], ["getOnlyItem", 95, 0, 2, 0, 4], ["getOnlyItemOrNullObject", 95, 0, 2, 0, 4]], 0, 95],
-            [94, 1, 0, 0, [[263, 0, 2, 0, 4]], [[268, 95, 1, 18, 0, 4], [269, 95, 1, 8], ["getByNamespace", 93, 1, 6, 0, 4], [270, 95, 1, 2, 0, 4]], 0, 95],
-            [95, 0, [[205, 3], ["namespaceUri", 3]], 0, [[209], ["getXml", 0, 2, 0, 4], ["setXml", 1]]],
-            [96, 0, 0, 0, [["bindingGetData", 1, 2, 0, 4], ["getSelectedData", 1, 2, 0, 4], ["gotoById", 1, 2, 0, 4], ["bindingAddFromSelection", 1, 2], ["bindingGetById", 1, 2, 0, 4], ["bindingReleaseById", 1, 2], ["bindingGetAll", 0, 2, 0, 4], ["bindingAddFromNamedItem", 1, 2], ["bindingAddFromPrompt", 1, 2], ["bindingDeleteAllDataValues", 1], ["setSelectedData", 1], ["bindingClearFormats", 1], ["bindingSetData", 1], ["bindingSetFormats", 1], ["bindingSetTableOptions", 1], ["bindingAddRows", 1], ["bindingAddColumns", 1], ["getFilePropertiesAsync", 0, 2, 4, 4]]],
-            [97, 1, 0, 0, [[263, 0, 2, 0, 4]], [[268, 99, 1, 18, 0, 4], [271, 99, 0, 10, 0, 4], [270, 99, 1, 2, 0, 4]], 0, 99],
-            [98, 1, 0, 0, [[409], [263, 0, 2, 9, 4]], [[268, 99, 1, 18, 0, 4], [270, 99, 1, 2, 9, 4], [269, 99, 3, 8, 1]], 0, 99],
-            [99, 0, [[182, 1], [205, 3, 10], ["useCustomSortLists", 1, 2], ["enableDataValueEditing", 1, 2], ["allowMultipleFiltersPerField", 0, 3]], [[301, 8, 2, 0, 0, 4], ["hierarchies", 101, 19, 1, 0, 4], ["rowHierarchies", 103, 19, 1, 0, 4], ["columnHierarchies", 103, 19, 1, 0, 4], ["dataHierarchies", 107, 19, 1, 0, 4], ["filterHierarchies", 105, 19, 1, 0, 4], ["layout", 100, 2, 1, 0, 4]], [["refresh"], [209, 0, 0, 1]]],
-            [100, 0, [["showColumnGrandTotals", 1], ["showRowGrandTotals", 1], ["enableFieldList", 1, 11], ["subtotalLocation", 1], ["layoutType", 1], ["autoFormat", 1, 2], ["preserveFormatting", 1, 2]], [["pivotStyle", 144, 35, 6, 0, 4]], [["getPivotItems", 2, 0, 2], ["setAutoSortOnCell", 2, 0, 2], [341, 1, 0, 6]], [[234, 12], ["getRowLabelRange", 12], ["getColumnLabelRange", 12], ["getFilterAxisRange", 12], [343, 12], [236, 12, 3, 0, 6], ["getDataHierarchy", 108, 1, 0, 2]]],
-            [101, 1, 0, 0, [[263, 0, 2, 0, 4]], [[268, 102, 1, 18, 0, 4], [270, 102, 1, 2, 0, 4]], 0, 102],
-            [102, 0, [[205, 3], [182, 1]], [[405, 109, 19, 0, 0, 4]]],
-            [103, 1, 0, 0, [[263, 0, 2, 0, 4], [408, 1]], [[268, 104, 1, 18, 0, 4], [270, 104, 1, 2, 0, 4], [269, 104, 1, 8]], 0, 104],
-            [104, 0, [[205, 3], [182, 1], [206, 1]], [[405, 109, 19, 0, 0, 4]], [[410]]],
-            [105, 1, 0, 0, [[263, 0, 2, 0, 4], [408, 1]], [[268, 106, 1, 18, 0, 4], [270, 106, 1, 2, 0, 4], [269, 106, 1, 8]], 0, 106],
-            [106, 0, [[205, 3], [182, 1], [206, 1], ["enableMultipleFilterItems", 1]], [[405, 109, 19, 0, 0, 4]], [[410]]],
-            [107, 1, 0, 0, [[263, 0, 2, 0, 4], [408, 1]], [[268, 108, 1, 18, 0, 4], [270, 108, 1, 2, 0, 4], [269, 108, 1, 8]], 0, 108],
-            [108, 0, [[205, 3], [182, 1], [206, 1], [276, 1], ["summarizeBy", 1], ["showAs", 1]], [["field", 110, 35, 0, 0, 4]], [[410]]],
-            [109, 1, 0, 0, [[263, 0, 2, 0, 4]], [[268, 110, 1, 18, 0, 4], [270, 110, 1, 2, 0, 4]], 0, 110],
-            [110, 0, [[205, 3], [182, 1], ["subtotals", 1], ["showAllItems", 1]], [["items", 111, 19, 0, 0, 4]], [["sortByLabels", 1, 1], ["sortByValues", 3, 0, 2], ["applyFilter", 1, 0, 3], ["clearAllFilters", 0, 0, 3], ["clearFilter", 1, 0, 3], ["getFilters", 0, 0, 3], ["isFiltered", 1, 0, 3]]],
-            [111, 1, 0, 0, [[263, 0, 2, 0, 4]], [[268, 112, 1, 18, 0, 4], [270, 112, 1, 2, 0, 4]], 0, 112],
-            [112, 0, [[205, 3], [182, 1], ["isExpanded", 1], [332, 1]]],
-            [113, 0, [[328, 3], [329, 3]]],
-            [114, 1, 0, 0, [[263, 0, 2, 0, 4]], [[268, 113, 1, 18, 0, 4], [270, 113, 1]], 0, 113],
-            [115, 0, [[374, 1], ["subject", 1], ["author", 1], ["keywords", 1], [193, 1], ["lastAuthor", 3], ["revisionNumber", 1], [411, 11], ["category", 1], ["manager", 1], ["company", 1]], [[412, 117, 19, 0, 0, 4]]],
-            [116, 0, [[328, 3], [329, 1], [331, 3]], 0, [[209]]],
-            [117, 1, 0, 0, [[263, 0, 2, 0, 4], ["deleteAll"]], [[270, 116, 1, 2, 0, 4], [269, 116, 2, 8], [268, 116, 1, 18, 0, 4]], 0, 116],
-            [118, 1, 0, 0, [[263, 0, 2, 0, 4], ["clearAll"]], [[327, 119, 1, 2, 0, 4], [269, 119, 1, 8], [268, 119, 1, 18, 0, 4]], 0, 119],
-            [119, 0, [["stopIfTrue", 1], ["priority", 1], [331, 3], [205, 3]], [["dataBarOrNullObject", 120, 35, 0, 0, 4], ["dataBar", 120, 35, 0, 0, 4], ["customOrNullObject", 123, 35, 0, 0, 4], [412, 123, 35, 0, 0, 4], ["iconSet", 125, 35, 0, 0, 4], ["iconSetOrNullObject", 125, 35, 0, 0, 4], ["colorScale", 126, 35, 0, 0, 4], ["colorScaleOrNullObject", 126, 35, 0, 0, 4], ["topBottom", 127, 35, 0, 0, 4], ["topBottomOrNullObject", 127, 35, 0, 0, 4], ["preset", 128, 35, 0, 0, 4], ["presetOrNullObject", 128, 35, 0, 0, 4], ["textComparison", 129, 35, 0, 0, 4], ["textComparisonOrNullObject", 129, 35, 0, 0, 4], ["cellValue", 130, 35, 0, 0, 4], ["cellValueOrNullObject", 130, 35, 0, 0, 4]], [[209]], [[234, 12, 0, 10, 0, 4], [334, 12, 0, 10, 0, 4], [240, 13, 0, 10, 2, 4]]],
-            [120, 0, [["showDataBarOnly", 1], ["barDirection", 1], ["axisFormat", 1], ["axisColor", 1], ["lowerBoundRule", 1], ["upperBoundRule", 1]], [["positiveFormat", 121, 35, 0, 0, 4], ["negativeFormat", 122, 35, 0, 0, 4]]],
-            [121, 0, [[413, 1], ["gradientFill", 1], [414, 1]]],
-            [122, 0, [[413, 1], ["matchPositiveFillColor", 1], [414, 1], ["matchPositiveBorderColor", 1]]],
-            [123, 0, 0, [[345, 124, 35, 0, 0, 4], [300, 131, 35, 0, 0, 4]]],
-            [124, 0, [[333, 1], ["formulaLocal", 1], ["formulaR1C1", 1]]],
-            [125, 0, [["reverseIconOrder", 1], ["showIconOnly", 1], [295, 1], [407, 1]]],
-            [126, 0, [["threeColorScale", 3], [407, 1]]],
-            [127, 0, [[345, 1]], [[300, 131, 35, 0, 0, 4]]],
-            [128, 0, [[345, 1]], [[300, 131, 35, 0, 0, 4]]],
-            [129, 0, [[345, 1]], [[300, 131, 35, 0, 0, 4]]],
-            [130, 0, [[345, 1]], [[300, 131, 35, 0, 0, 4]]],
-            [131, 0, [[276, 1]], [[355, 133, 35, 0, 0, 4], [356, 132, 35, 0, 0, 4], [357, 135, 51, 0, 0, 4]]],
-            [132, 0, [[360, 1], [365, 1], [366, 1], [367, 1], [368, 1]], 0, [[305]]],
-            [133, 0, [[360, 1]], 0, [[305]]],
-            [134, 0, [[362, 3], [295, 1], [360, 1]]],
-            [135, 1, [[335, 3]], [[296, 134, 35, 0, 0, 4], ["bottom", 134, 35, 0, 0, 4], [297, 134, 35, 0, 0, 4], [415, 134, 35, 0, 0, 4]], 0, [[268, 134, 1, 18, 0, 4], [327, 134, 1, 2, 0, 4]], 0, 134],
-            [136, 0, 0, 0, 0, [["getFormatter", 137, 1]], 0, 0, 0, "Microsoft.ExcelServices.NumberFormattingService", 4],
-            [137, 0, [["isDateTime", 3], ["isPercent", 3], ["isCurrency", 3], ["isNumeric", 3], [416, 3], ["hasYear", 3], ["hasMonth", 3], ["hasDayOfWeek", 3]], 0, [[300, 1]]],
-            [138, 36, [["status", 2]], 0, [["register", 2]], 0, 0, 0, 0, "Microsoft.ExcelServices.CustomFunctionManager", 4],
-            [139, 0, [["builtIn", 3], [359, 1], [347, 1], ["includeAlignment", 1], ["includeBorder", 1], ["includeFont", 1], ["includeNumber", 1], ["includePatterns", 1], ["includeProtection", 1], [353, 1], [358, 1], [182, 3], [276, 1], [277, 1], [351, 1], [352, 1], [348, 1], [346, 1], [350, 5, 1], [354, 1, 1]], [[357, 36, 51, 0, 0, 4], [356, 37, 35, 0, 0, 4], [355, 34, 35, 0, 0, 4]], [[209]]],
-            [140, 1, 0, 0, [[269, 1], [263, 0, 2, 2, 4]], [[268, 139, 1, 18, 0, 4], [327, 139, 1, 2, 2, 4]], 0, 139],
-            [141, 1, 0, 0, [[263, 0, 2, 0, 4], [417, 1]], [[268, 142, 1, 18, 0, 4], [270, 142, 1, 2, 0, 4], [269, 142, 2, 8], [418, 142]], 0, 142],
-            [142, 0, [[182, 1], [187, 3], [330, 2]], 0, [[209]], [[419, 142]]],
-            [143, 1, 0, 0, [[263, 0, 2, 0, 4], [417, 1]], [[268, 144, 1, 18, 0, 4], [270, 144, 1, 2, 0, 4], [269, 144, 2, 8], [418, 144]], 0, 144],
-            [144, 0, [[182, 1], [187, 3], [330, 2]], 0, [[209]], [[419, 144]]],
-            [145, 1, 0, 0, [[263, 0, 2, 0, 4], [417, 1]], [[268, 146, 1, 18, 0, 4], [270, 146, 1, 2, 0, 4], [269, 146, 2, 8], [418, 146]], 0, 146],
-            [146, 0, [[182, 1], [187, 3], [330, 2]], 0, [[209]], [[419, 146]]],
-            [147, 1, 0, 0, [[263, 0, 2, 0, 4], [417, 1]], [[268, 148, 1, 18, 0, 4], [270, 148, 1, 2, 0, 4], [269, 148, 2, 8], [418, 148]], 0, 148],
-            [148, 0, [[182, 1], [187, 3], [330, 2]], 0, [[209]], [[419, 148]]],
-            [149, 0, 0, 0, [["delay", 1], ["triggerMessage", 4, 0, 5], [420, 0, 0, 5], [421, 0, 0, 5], ["triggerTestEvent", 2, 0, 5], ["triggerPostProcess", 0, 0, 5], [422, 0, 0, 5], [423, 0, 0, 5], ["triggerTestEventWithFilter", 3, 0, 5], ["firstPartyMethod", 0, 2, 5, 5], [424, 0, 0, 12], [425, 0, 0, 12], [426, 0, 0, 12], [427, 0, 0, 12], ["unregisterAllCustomFunctionExecutionEvents", 0, 0, 12], ["saveWorkbookToTempFile", 1, 2, 14], ["compareTempFilesAreIdentical", 2, 2, 14], ["updateRangeValueOnCurrentSheet", 2, 0, 14, 2], ["triggerUserUndo", 0, 2, 14], ["triggerUserRedo", 0, 2, 14], ["enterCellEdit", 1, 0, 2], ["installCustomFunctionsFromCache", 0, 0, 2], ["recalc", 2, 0, 2], ["recalcBySolutionId", 1, 0, 2], ["safeForCellEditModeMethod", 1, 0, 2], ["exitCellEdit", 0, 0, 2], ["noPermissionMethod", 1, 0, 2], ["verifyCustomFunctionListExist", 0, 0, 2]], 0, 0, 0, [["CustomFunctionExecutionBeginEvent", 0, 12, "MessageType.customFunctionExecutionBeginEvent", 201, 424, 425], ["CustomFunctionExecutionEndEvent", 0, 12, "MessageType.customFunctionExecutionEndEvent", 201, 426, 427], ["Test1Event", 2, 5, "MessageType.test1Event", 201, 422, 423], ["TestEvent", 2, 5, "MessageType.testEvent", 201, 420, 421]], "Microsoft.ExcelServices.InternalTest", 4],
-            [150, 0, [[428, 1], ["paperSize", 1], ["blackAndWhite", 1], ["printErrors", 1], ["zoom", 1], ["centerHorizontally", 1], ["centerVertically", 1], ["printHeadings", 1], ["printGridlines", 1], [429, 1], [430, 1], [431, 1], [432, 1], ["headerMargin", 1], ["footerMargin", 1], ["printComments", 1], ["draftMode", 1], ["firstPageNumber", 1], ["printOrder", 1]], [["headersFooters", 152, 35, 0, 0, 4]], [["setPrintMargins", 2], ["setPrintArea", 1], ["setPrintTitleRows", 1], ["setPrintTitleColumns", 1]], [["getPrintArea", 13, 0, 10, 0, 4], ["getPrintAreaOrNullObject", 13, 0, 10, 0, 4], ["getPrintTitleRows", 12, 0, 10, 0, 4], ["getPrintTitleRowsOrNullObject", 12, 0, 10, 0, 4], ["getPrintTitleColumns", 12, 0, 10, 0, 4], ["getPrintTitleColumnsOrNullObject", 12, 0, 10, 0, 4]]],
-            [151, 0, [["leftHeader", 1], ["centerHeader", 1], ["rightHeader", 1], ["leftFooter", 1], ["centerFooter", 1], ["rightFooter", 1]]],
-            [152, 0, [["state", 1], ["useSheetMargins", 1], ["useSheetScale", 1]], [["defaultForAllPages", 151, 35, 0, 0, 4], ["firstPage", 151, 35, 0, 0, 4], ["evenPages", 151, 35, 0, 0, 4], ["oddPages", 151, 35, 0, 0, 4]]],
-            [153, 0, [[330, 2], [283, 3], [282, 3]], 0, [[209]], [["getCellAfterBreak", 12, 0, 10, 0, 4]]],
-            [154, 1, 0, 0, [["removePageBreaks"], [263, 0, 2, 0, 4]], [[268, 153, 1, 18, 0, 4], [269, 153, 1, 8]], 0, 153],
-            [155, 0, 0, 0, [[409]], [[269, 1, 4, 8, 6]]],
-            [156, 1, 0, 0, [[263, 0, 2, 0, 4]], [[327, 12, 1, 2, 0, 4]], 0, 12],
-            [157, 1, 0, 0, [[263, 0, 2, 0, 4]], [[268, 158, 1, 18, 0, 4], [327, 158, 1, 2, 0, 4], [269, 158, 3, 8], ["getItemByReplyId", 158, 1, 2, 0, 4], ["getItemByCell", 158, 1, 2, 0, 4]], 0, 158],
-            [158, 0, [[205, 3], [433, 1], [434, 3], [435, 3], [411, 11], [436, 1, 3], [437, 3, 15], [438, 3, 15], [439, 3, 6]], [["replies", 159, 19, 0, 0, 4]], [[209], [440, 1, 0, 15]], [[275, 12, 0, 10, 0, 4]]],
-            [159, 1, 0, 0, [[263, 0, 2, 0, 4]], [[269, 160, 2, 8], [268, 160, 1, 18, 0, 4], [327, 160, 1, 2, 0, 4]], 0, 160],
-            [160, 0, [[205, 3], [433, 1], [434, 3], [435, 3], [411, 11], [436, 3, 3], [437, 3, 15], [438, 3, 15], [439, 3, 6]], 0, [[209], [440, 1, 0, 15]], [[275, 12, 0, 10, 0, 4], ["getParentComment", 158]]],
-            [161, 1, 0, 0, [[263, 0, 2, 0, 4]], [["addImage", 162, 1], [369, 162, 1, 18, 0, 4], ["addGeometricShape", 162, 1], ["addTextBox", 162, 1], ["addSvg", 162, 1, 0, 6], ["addGroup", 162, 1], [327, 162, 1, 2, 0, 4], [268, 162, 1, 2, 0, 4], ["addLine", 162, 5]], 0, 162],
-            [162, 0, [[205, 3], [182, 1], [297, 1], [296, 1], [299, 1], [298, 1], ["rotation", 1], ["zOrderPosition", 3], ["altTextTitle", 1], ["altTextDescription", 1], [331, 3], ["lockAspectRatio", 1], ["placement", 1, 11], ["geometricShapeType", 1], [332, 1], [395, 3], ["connectionSiteCount", 3]], [["geometricShape", 163, 2, 0, 0, 4], ["image", 164, 2, 0, 0, 4], ["textFrame", 170, 2, 0, 0, 4], [355, 168, 35, 0, 0, 4], [314, 165, 2, 0, 0, 4], ["parentGroup", 162, 2, 0, 0, 4], [383, 167, 2, 0, 0, 4], ["lineFormat", 169, 35, 0, 0, 4]], [["setZOrder", 1], ["incrementLeft", 1], ["incrementTop", 1], ["incrementRotation", 1], ["scaleHeight", 3], ["scaleWidth", 3], [209], ["getAsImage", 1], [213], [214], [215], [216]], [["copyTo", 162, 1, 8, 11, 0, 0, 441], [441, 162, 1, 2, 0, 4]], 0, 0, [[241, 0, 0, "MessageType.shapeActivatedEvent", 243, 213, 214], [250, 0, 0, "MessageType.shapeDeactivatedEvent", 243, 215, 216]]],
-            [163, 0, [[205, 3]], [[442, 162, 2, 0, 0, 4]]],
-            [164, 0, [[205, 3], [300, 3, 0, 300]], [[442, 162, 2, 0, 0, 4]]],
-            [165, 0, [[205, 3]], [[207, 166, 19, 0, 0, 4], [442, 162, 2, 0, 0, 4]], [[315]]],
-            [166, 1, 0, 0, [[263, 0, 2, 0, 4]], [[369, 162, 1, 18, 0, 4], [327, 162, 1, 2, 0, 4], [268, 162, 1, 2, 0, 4]], 0, 162],
-            [167, 0, [[205, 3], [443, 1, 0, 443], ["beginArrowheadLength", 1], ["beginArrowheadStyle", 1], ["beginArrowheadWidth", 1], ["endArrowheadLength", 1], ["endArrowheadStyle", 1], ["endArrowheadWidth", 1], ["isBeginConnected", 3], ["beginConnectedSite", 3], ["isEndConnected", 3], ["endConnectedSite", 3]], [[442, 162, 2, 0, 0, 4], ["beginConnectedShape", 162, 2, 0, 0, 4], ["endConnectedShape", 162, 2, 0, 0, 4]], [["connectBeginShape", 2], ["disconnectBeginShape"], ["connectEndShape", 2], ["disconnectEndShape"]]],
-            [168, 0, [["foregroundColor", 1], [331, 3], [444, 1]], 0, [[305], [397, 1]]],
-            [169, 0, [[332, 1], [360, 1], [295, 1], [363, 1], ["dashStyle", 1], [444, 1]]],
-            [170, 0, [[429, 1], [430, 1], [431, 1], [432, 1], [347, 1], ["horizontalOverflow", 1], [348, 1], ["verticalOverflow", 1], [428, 1], [351, 1], ["hasText", 3], ["autoSizeSetting", 1]], [["textRange", 171, 2, 0, 0, 4]], [["deleteText"]]],
-            [171, 0, [[279, 1]], [[356, 172, 35, 0, 0, 4]], 0, [[396, 171, 2]]],
-            [172, 0, [[364, 1], [182, 1], [360, 1], [366, 1], [365, 1], [367, 1]]],
-            [173, 0, [[205, 3], [182, 1], ["caption", 1], [297, 1], [296, 1], [299, 1], [298, 1], ["nameInFormula", 1, 3], ["isFilterCleared", 3], [295, 1], ["sortBy", 1], ["sortUsingCustomLists", 1, 14], [285, 1, 14], ["disableMoveResizeUI", 1, 14], ["displayHeader", 1, 14], [349, 1, 14]], [["slicerItems", 176, 19, 0, 0, 4], [301, 8, 35, 0, 0, 4], ["slicerStyle", 146, 35, 6, 0, 4]], [[209], [340], ["getSelectedItems"], ["selectItems", 1], [210, 0, 2, 14], [341, 1, 0, 6]]],
-            [174, 1, 0, 0, [[263, 0, 2, 0, 4]], [[269, 173, 3, 8], [327, 173, 1, 2, 0, 4], [268, 173, 1, 18, 0, 4], [270, 173, 1, 2, 0, 4]], 0, 173],
-            [175, 0, [[328, 3], [182, 3], ["isSelected", 1], ["hasData", 3]]],
-            [176, 1, 0, 0, [[263, 0, 2, 0, 4]], [[327, 175, 1, 2, 0, 4], [268, 175, 1, 18, 0, 4], [270, 175, 1, 2, 0, 4]], 0, 175],
-            [177, 0, [["activeTab", 1]], 0, [["executeCommand", 2], [313, 3], [445], [446]], 0, 0, 0, [["CommandExecuted", 0, 0, "MessageType.ribbonCommandExecutedEvent", 199, 445, 446]]],
-            [178, 0, [[182]], 0, [[210], [209]], [[419, 178, 1]]],
-            [179, 1, 0, 0, [[263, 0, 2, 0, 4], ["exit"]], [[269, 178, 1, 8], ["enterTemporary", 178], ["getActive", 178], [268, 178, 1, 18, 0, 4], [327, 178, 1, 2, 0, 4]], 0, 178],
-            [180, 0, [["error", 3], [329, 3]]],
-            [181, 0, 0, 0, 0, [[335, 180, 1, 72], ["if", 180, 3, 8], ["isNA", 180, 1, 8], ["isError", 180, 1, 8], ["sum", 180, 1, 72], ["average", 180, 1, 72], [402, 180, 1, 72], [403, 180, 1, 72], ["na", 180, 0, 8], ["npv", 180, 2, 72], ["dollar", 180, 2, 8], ["fixed", 180, 3, 8], ["sin", 180, 1, 8], ["cos", 180, 1, 8], ["tan", 180, 1, 8], ["atan", 180, 1, 8], ["pi", 180, 0, 8], ["sqrt", 180, 1, 8], ["exp", 180, 1, 8], ["ln", 180, 1, 8], ["log10", 180, 1, 8], ["abs", 180, 1, 8], ["int", 180, 1, 8], ["sign", 180, 1, 8], ["round", 180, 2, 8], ["lookup", 180, 3, 8], ["rept", 180, 2, 8], ["mid", 180, 3, 8], ["len", 180, 1, 8], [329, 180, 1, 8], ["true", 180, 0, 8], ["false", 180, 0, 8], ["and", 180, 1, 72], ["or", 180, 1, 72], ["not", 180, 1, 8], ["mod", 180, 2, 8], ["dcount", 180, 3, 8, 0, 0, "DCount"], ["dsum", 180, 3, 8, 0, 0, "DSum"], ["daverage", 180, 3, 8, 0, 0, "DAverage"], ["dmin", 180, 3, 8, 0, 0, "DMin"], ["dmax", 180, 3, 8, 0, 0, "DMax"], ["dstDev", 180, 3, 8, 0, 0, "DStDev"], ["dvar", 180, 3, 8, 0, 0, "DVar"], [279, 180, 2, 8], ["pv", 180, 5, 8], ["fv", 180, 5, 8], ["nper", 180, 5, 8, 0, 0, "NPer"], ["pmt", 180, 5, 8], ["rate", 180, 6, 8], ["mirr", 180, 3, 8, 0, 0, "MIrr"], ["irr", 180, 2, 8], ["rand", 180, 0, 8], ["match", 180, 3, 8], ["date", 180, 3, 8], ["time", 180, 3, 8], ["day", 180, 1, 8], ["month", 180, 1, 8], ["year", 180, 1, 8], ["weekday", 180, 2, 8], ["hour", 180, 1, 8], ["minute", 180, 1, 8], ["second", 180, 1, 8], ["now", 180, 0, 8], [324, 180, 1, 8], [326, 180, 1, 8], [339, 180, 1, 8], [331, 180, 1, 8], ["atan2", 180, 2, 8], ["asin", 180, 1, 8], ["acos", 180, 1, 8], ["choose", 180, 2, 72], ["hlookup", 180, 4, 8, 0, 0, "HLookup"], ["vlookup", 180, 4, 8, 0, 0, "VLookup"], ["isref", 180, 1, 8], ["log", 180, 2, 8], ["char", 180, 1, 8], ["lower", 180, 1, 8], ["upper", 180, 1, 8], ["proper", 180, 1, 8], [297, 180, 2, 8], [415, 180, 2, 8], ["exact", 180, 2, 8], ["trim", 180, 1, 8], ["replace", 180, 4, 8], ["substitute", 180, 4, 8], ["code", 180, 1, 8], [321, 180, 3, 8], ["isErr", 180, 1, 8], [416, 180, 1, 8], ["isNumber", 180, 1, 8], ["t", 180, 1, 8, 0, 0, "T"], ["n", 180, 1, 8, 0, 0, "N"], ["datevalue", 180, 1, 8], ["timevalue", 180, 1, 8], ["sln", 180, 3, 8], ["syd", 180, 4, 8], ["ddb", 180, 5, 8], ["clean", 180, 1, 8], ["ipmt", 180, 6, 8], ["ppmt", 180, 6, 8], ["countA", 180, 1, 72], ["product", 180, 1, 72], ["fact", 180, 1, 8], ["dproduct", 180, 3, 8, 0, 0, "DProduct"], ["isNonText", 180, 1, 8], ["dstDevP", 180, 3, 8, 0, 0, "DStDevP"], ["dvarP", 180, 3, 8, 0, 0, "DVarP"], ["trunc", 180, 2, 8], ["isLogical", 180, 1, 8], ["dcountA", 180, 3, 8, 0, 0, "DCountA"], ["usdollar", 180, 2, 8, 0, 0, "USDollar"], ["findB", 180, 3, 8], ["replaceB", 180, 4, 8], ["leftb", 180, 2, 8], ["rightb", 180, 2, 8], ["midb", 180, 3, 8], ["lenb", 180, 1, 8], ["roundUp", 180, 2, 8], ["roundDown", 180, 2, 8], ["asc", 180, 1, 8], ["dbcs", 180, 1, 8], ["days360", 180, 3, 8], ["today", 180, 0, 8], ["vdb", 180, 7, 8], ["median", 180, 1, 72], ["sinh", 180, 1, 8], ["cosh", 180, 1, 8], ["tanh", 180, 1, 8], ["asinh", 180, 1, 8], ["acosh", 180, 1, 8], ["atanh", 180, 1, 8], ["dget", 180, 3, 8, 0, 0, "DGet"], ["db", 180, 5, 8], ["error_Type", 180, 1, 8], ["aveDev", 180, 1, 72], ["gammaLn", 180, 1, 8], ["combin", 180, 2, 8], ["even", 180, 1, 8], ["fisher", 180, 1, 8], ["fisherInv", 180, 1, 8], ["standardize", 180, 3, 8], ["odd", 180, 1, 8], ["permut", 180, 2, 8], ["devSq", 180, 1, 72], ["geoMean", 180, 1, 72], ["harMean", 180, 1, 72], ["sumSq", 180, 1, 72], ["kurt", 180, 1, 72], ["skew", 180, 1, 72], ["large", 180, 2, 8], ["small", 180, 2, 8], ["trimMean", 180, 2, 8], ["concatenate", 180, 1, 72], ["power", 180, 2, 8], ["radians", 180, 1, 8], ["degrees", 180, 1, 8], ["subtotal", 180, 2, 72], ["sumIf", 180, 3, 8], ["countIf", 180, 2, 8], ["countBlank", 180, 1, 8], ["ispmt", 180, 4, 8], ["roman", 180, 2, 8], [294, 180, 2, 8], ["averageA", 180, 1, 72], ["maxA", 180, 1, 72], ["minA", 180, 1, 72], ["stDevPA", 180, 1, 72], ["varPA", 180, 1, 72], ["stDevA", 180, 1, 72], ["varA", 180, 1, 72], ["bahtText", 180, 1, 8], ["hex2Bin", 180, 2, 8], ["hex2Dec", 180, 1, 8], ["hex2Oct", 180, 2, 8], ["dec2Bin", 180, 2, 8], ["dec2Hex", 180, 2, 8], ["dec2Oct", 180, 2, 8], ["oct2Bin", 180, 2, 8], ["oct2Hex", 180, 2, 8], ["oct2Dec", 180, 1, 8], ["bin2Dec", 180, 1, 8], ["bin2Oct", 180, 2, 8], ["bin2Hex", 180, 2, 8], ["imSub", 180, 2, 8], ["imDiv", 180, 2, 8], ["imPower", 180, 2, 8], ["imAbs", 180, 1, 8], ["imSqrt", 180, 1, 8], ["imLn", 180, 1, 8], ["imLog2", 180, 1, 8], ["imLog10", 180, 1, 8], ["imSin", 180, 1, 8], ["imCos", 180, 1, 8], ["imExp", 180, 1, 8], ["imArgument", 180, 1, 8], ["imConjugate", 180, 1, 8], ["imaginary", 180, 1, 8], ["imReal", 180, 1, 8], ["complex", 180, 3, 8], ["imSum", 180, 1, 72], ["imProduct", 180, 1, 72], ["seriesSum", 180, 4, 8], ["factDouble", 180, 1, 8], ["sqrtPi", 180, 1, 8], ["quotient", 180, 2, 8], ["delta", 180, 2, 8], ["geStep", 180, 2, 8], ["isEven", 180, 1, 8], ["isOdd", 180, 1, 8], ["mround", 180, 2, 8, 0, 0, "MRound"], ["erf", 180, 2, 8], ["erfC", 180, 1, 8], ["besselJ", 180, 2, 8], ["besselK", 180, 2, 8], ["besselY", 180, 2, 8], ["besselI", 180, 2, 8], ["xirr", 180, 3, 8], ["xnpv", 180, 3, 8], ["priceMat", 180, 6, 8], ["yieldMat", 180, 6, 8], ["intRate", 180, 5, 8], ["received", 180, 5, 8], ["disc", 180, 5, 8], ["priceDisc", 180, 5, 8], ["yieldDisc", 180, 5, 8], ["tbillEq", 180, 3, 8, 0, 0, "TBillEq"], ["tbillPrice", 180, 3, 8, 0, 0, "TBillPrice"], ["tbillYield", 180, 3, 8, 0, 0, "TBillYield"], ["price", 180, 7, 8], ["yield", 180, 7, 8], ["dollarDe", 180, 2, 8], ["dollarFr", 180, 2, 8], ["nominal", 180, 2, 8], ["effect", 180, 2, 8], ["cumPrinc", 180, 6, 8], ["cumIPmt", 180, 6, 8], ["edate", 180, 2, 8, 0, 0, "EDate"], ["eoMonth", 180, 2, 8], ["yearFrac", 180, 3, 8], ["coupDayBs", 180, 4, 8], ["coupDays", 180, 4, 8], ["coupDaysNc", 180, 4, 8], ["coupNcd", 180, 4, 8], ["coupNum", 180, 4, 8], ["coupPcd", 180, 4, 8], ["duration", 180, 6, 8], ["mduration", 180, 6, 8, 0, 0, "MDuration"], ["oddLPrice", 180, 8, 8], ["oddLYield", 180, 8, 8], ["oddFPrice", 180, 9, 8], ["oddFYield", 180, 9, 8], ["randBetween", 180, 2, 8], ["weekNum", 180, 2, 8], ["amorDegrc", 180, 7, 8], ["amorLinc", 180, 7, 8], ["convert", 180, 3, 8], ["accrInt", 180, 8, 8], ["accrIntM", 180, 5, 8], ["workDay", 180, 3, 8], ["networkDays", 180, 3, 8], ["gcd", 180, 1, 72], ["multiNomial", 180, 1, 72], ["lcm", 180, 1, 72], ["fvschedule", 180, 2, 8, 0, 0, "FVSchedule"], ["countIfs", 180, 1, 72], ["sumIfs", 180, 2, 72], ["averageIf", 180, 3, 8], ["averageIfs", 180, 2, 72], ["binom_Dist", 180, 4, 8], ["binom_Inv", 180, 3, 8], ["confidence_Norm", 180, 3, 8], ["confidence_T", 180, 3, 8], ["expon_Dist", 180, 3, 8], ["gamma_Dist", 180, 4, 8], ["gamma_Inv", 180, 3, 8], ["norm_Dist", 180, 4, 8], ["norm_Inv", 180, 3, 8], ["percentile_Exc", 180, 2, 8], ["percentile_Inc", 180, 2, 8], ["percentRank_Exc", 180, 3, 8], ["percentRank_Inc", 180, 3, 8], ["poisson_Dist", 180, 3, 8], ["quartile_Exc", 180, 2, 8], ["quartile_Inc", 180, 2, 8], ["rank_Avg", 180, 3, 8], ["rank_Eq", 180, 3, 8], ["stDev_S", 180, 1, 72], ["stDev_P", 180, 1, 72], ["t_Dist", 180, 3, 8], ["t_Dist_2T", 180, 2, 8], ["t_Dist_RT", 180, 2, 8], ["t_Inv", 180, 2, 8], ["t_Inv_2T", 180, 2, 8], ["var_S", 180, 1, 72], ["var_P", 180, 1, 72], ["weibull_Dist", 180, 4, 8], ["networkDays_Intl", 180, 4, 8], ["workDay_Intl", 180, 4, 8], ["ecma_Ceiling", 180, 2, 8, 0, 0, "ECMA_Ceiling"], ["iso_Ceiling", 180, 2, 8, 0, 0, "ISO_Ceiling"], ["beta_Dist", 180, 6, 8], ["beta_Inv", 180, 5, 8], ["chiSq_Dist", 180, 3, 8], ["chiSq_Dist_RT", 180, 2, 8], ["chiSq_Inv", 180, 2, 8], ["chiSq_Inv_RT", 180, 2, 8], ["f_Dist", 180, 4, 8], ["f_Dist_RT", 180, 3, 8], ["f_Inv", 180, 3, 8], ["f_Inv_RT", 180, 3, 8], ["hypGeom_Dist", 180, 5, 8], ["logNorm_Dist", 180, 4, 8], ["logNorm_Inv", 180, 3, 8], ["negBinom_Dist", 180, 4, 8], ["norm_S_Dist", 180, 2, 8], ["norm_S_Inv", 180, 1, 8], ["z_Test", 180, 3, 8], ["erf_Precise", 180, 1, 8], ["erfC_Precise", 180, 1, 8], ["gammaLn_Precise", 180, 1, 8], ["ceiling_Precise", 180, 2, 8], ["floor_Precise", 180, 2, 8], ["acot", 180, 1, 8], ["acoth", 180, 1, 8], ["cot", 180, 1, 8], ["coth", 180, 1, 8], ["csc", 180, 1, 8], ["csch", 180, 1, 8], ["sec", 180, 1, 8], ["sech", 180, 1, 8], ["imTan", 180, 1, 8], ["imCot", 180, 1, 8], ["imCsc", 180, 1, 8], ["imCsch", 180, 1, 8], ["imSec", 180, 1, 8], ["imSech", 180, 1, 8], ["bitand", 180, 2, 8], ["bitor", 180, 2, 8], ["bitxor", 180, 2, 8], ["bitlshift", 180, 2, 8], ["bitrshift", 180, 2, 8], ["permutationa", 180, 2, 8], ["combina", 180, 2, 8], ["xor", 180, 1, 72], ["pduration", 180, 3, 8, 0, 0, "PDuration"], ["base", 180, 3, 8], ["decimal", 180, 2, 8], ["days", 180, 2, 8], ["binom_Dist_Range", 180, 4, 8], ["gamma", 180, 1, 8], ["skew_p", 180, 1, 72], ["gauss", 180, 1, 8], ["phi", 180, 1, 8], ["rri", 180, 3, 8], ["unichar", 180, 1, 8], ["unicode", 180, 1, 8], ["arabic", 180, 1, 8], ["isoWeekNum", 180, 1, 8], ["numberValue", 180, 3, 8], ["sheet", 180, 1, 8], ["sheets", 180, 1, 8], ["isFormula", 180, 1, 8], ["ceiling_Math", 180, 3, 8], ["floor_Math", 180, 3, 8], ["imSinh", 180, 1, 8], ["imCosh", 180, 1, 8]]]] };
+        "clientObjectTypes": [[1, 0, [["assignees", 2], ["dueDate", 10], [192, 2], ["percentComplete", 2], [193, 2], ["startDate", 10], [194, 2]], [[195, 164, 2, 0, 0, 4]], [["addAssignee", 1], ["applyChanges", 1], ["removeAllAssignees"], ["removeAssignee", 1], ["schedule", 2], ["setPercentComplete", 1], ["setPriority", 1], ["setTitle", 1]]],
+            [2, 1, 0, 0, [[196, 0, 2, 0, 4]], [[197, 1, 1, 18, 0, 4], [198, 1, 1, 2, 0, 4], ["getItemOrNull", 1, 1]], 0, 1],
+            [3, 0, [["errorMessage", 2], ["loadedTo", 2], ["loadedToDataModel", 2], [199, 2], ["refreshDate", 10], ["rowsLoadedCount", 2]]],
+            [4, 1, 0, 0, [[196, 0, 2, 0, 4]], [[197, 3, 1, 18, 0, 4]], 0, 3],
+            [5, 0, [["connectionString", 2], [199, 2], ["commandText", 2], ["dataSourceType", 2]]],
+            [6, 0, [["enableEvents", 1, 1]]],
+            [7, 0, [["calculationMode", 1], [200, 3, 2], ["calculationState", 3, 2], ["decimalSeparator", 3, 3], ["thousandsSeparator", 3, 3], ["useSystemSeparators", 3, 3]], [["iterativeCalculation", 8, 35, 2, 0, 4], ["ribbon", 183, 35, 2, 0, 4], ["cultureInfo", 95, 3, 3, 0, 4]], [[201, 1], ["suspendApiCalculationUntilNextSync", 0, 1, 4], ["suspendScreenUpdatingUntilNextSync", 0, 0, 2]], [["createWorkbook", 11, 1, 10, 1, 0, 0, 202], [202, 11, 1, 2, 1, 4]]],
+            [8, 0, [[203, 1], ["maxIteration", 1], ["maxChange", 1]]],
+            [9, 0, [[199, 3, 5], [204, 3, 1], ["isDirty", 1, 2], ["use1904DateSystem", 1, 6], ["chartDataPointTrack", 1, 2], ["usePrecisionAsDisplayed", 1, 2], [200, 3, 2], ["autoSave", 3, 2], ["previouslySaved", 3, 2], ["showPivotFieldList", 0, 6]], [["worksheets", 13, 19, 0, 0, 4], [205, 23, 19, 0, 0, 4], [206, 28, 19, 0, 0, 4], ["application", 7, 2, 0, 0, 4], ["bindings", 27, 19, 0, 0, 4], ["functions", 191, 2, 7, 0, 4], [101, 101, 2, 8, 0, 4], [207, 103, 19, 8, 0, 4], ["settings", 21, 19, 9, 0, 4], ["customXmlParts", 99, 19, 10, 0, 4], ["internalTest", 154, 2, 4, 0, 4], [208, 120, 35, 5, 0, 4], ["styles", 145, 19, 5, 0, 4], [209, 10, 3, 5, 0, 4], ["dataConnections", 160, 3, 5, 0, 4], ["_Runtime", 6, 2, 10, 0, 4], [210, 163, 19, 11, 0, 4], [211, 180, 19, 11, 0, 4], ["tableStyles", 146, 19, 11, 0, 4], ["pivotTableStyles", 148, 19, 11, 0, 4], ["slicerStyles", 150, 19, 11, 0, 4], ["timelineStyles", 152, 19, 11, 0, 4], [212, 2, 18, 12, 0, 4], ["linkedDataTypes", 185, 18, 12, 0, 4], ["queries", 4, 18, 12, 0, 4]], [["_RemoveReference", 1, 2], ["_GetObjectByReferenceId", 1, 2, 0, 4], ["_GetObjectTypeNameByReferenceId", 1, 2, 0, 4], ["_RemoveAllReferences", 0, 2], ["_GetReferenceCount", 0, 2, 0, 4], ["getIsActiveCollabSession", 0, 0, 2], ["registerCustomFunctions", 7, 0, 13, 8], ["_SetOsfControlContainerReadyForCustomFunctions", 0, 0, 13], ["close", 1, 0, 3], ["save", 1, 0, 3], [213, 0, 0, 2], [214, 0, 0, 2], [215, 0, 0, 14], [216, 0, 0, 14], [217, 0, 0, 14], [218, 0, 0, 14]], [["getSelectedRange", 16, 0, 10, 0, 4], ["getActiveCell", 16, 0, 10, 5, 4], ["_GetRangeForEventByReferenceId", 16, 1, 2, 0, 4], ["_GetRangeOrNullObjectForEventByReferenceId", 16, 1, 2, 0, 4], ["getActiveChart", 44, 0, 2, 2, 4], ["getActiveChartOrNullObject", 44, 0, 2, 2, 4], ["getSelectedRanges", 17, 0, 10, 2, 4], ["_GetRangesForEventByReferenceId", 17, 1, 2, 2, 4], ["_GetRangesOrNullObjectForEventByReferenceId", 17, 1, 2, 2, 4], ["getActiveSlicer", 179, 0, 2, 11, 4], ["getActiveSlicerOrNullObject", 179, 0, 2, 11, 4]], 0, 0, [["AutoSaveSettingChanged", 0, 2, "MessageType.workbookAutoSaveSettingChangedEvent", 219, 213, 214], ["RecordingStateChangedEvent", 0, 14, "MessageType.recordingStateChangedEvent", 219, 217, 218], [220, 3, 8, "_CC.office10EventIdDocumentSelectionChangedEvent", 221, 221, 221], ["WACOperationEvent", 2, 14, "MessageType.wacoperationEvent", 219, 215, 216], ["_Message", 3, 5, "_CC.office10EventIdRichApiMessageEvent", 221, 221, 221]]],
+            [10, 0, [[222, 3]], 0, [[223, 1], [224, 1]]],
+            [11, 0, [[192, 3]], 0, [["open", 0, 2, 0, 4]]],
+            [12, 0, [[199, 1], [192, 3], [225, 1], ["visibility", 1], ["tabColor", 1, 5], ["standardWidth", 1, 5], ["standardHeight", 3, 5], ["showGridlines", 5, 1], ["showHeadings", 5, 1], ["enableCalculation", 1, 2]], [["charts", 43, 83, 0, 0, 4], [206, 28, 83, 0, 0, 4], [209, 14, 3, 7, 0, 4], [207, 103, 19, 8, 0, 4], [205, 23, 19, 9, 0, 4], ["freezePanes", 15, 3, 5, 0, 4], ["pageLayout", 155, 35, 2, 0, 4], ["visuals", 86, 83, 11, 0, 4], [226, 167, 19, 2, 0, 4], ["horizontalPageBreaks", 159, 19, 2, 0, 4], ["verticalPageBreaks", 159, 19, 2, 0, 4], [227, 94, 3, 2, 0, 4], [211, 180, 19, 11, 0, 4], [210, 163, 83, 11, 0, 4], ["customProperties", 119, 19, 6, 0, 4], ["namedSheetViews", 189, 18, 6, 0, 4], [212, 2, 18, 12, 0, 4]], [[228], [229, 0, 2], [201, 1, 0, 4], [230, 0, 0, 5], [231, 0, 0, 5], [232, 0, 0, 5], [233, 0, 0, 5], [234, 0, 0, 5], [235, 0, 0, 5], [236, 0, 0, 5], [237, 0, 0, 5], [238, 0, 0, 1], [239, 0, 0, 1], [240, 3, 0, 2], [241, 0, 0, 6], [242, 0, 0, 6], [243, 0, 0, 2], [244, 0, 0, 2], [245, 0, 0, 11], [246, 0, 0, 11], [247, 0, 0, 11], [248, 0, 0, 11], [249, 0, 0, 11], [250, 0, 0, 11], [251, 0, 0, 3], [252, 0, 0, 3], ["showOutlineLevels", 2, 0, 11]], [[253, 16, 1, 10, 0, 4], [254, 16, 1, 10, 0, 4], [255, 16, 2, 10, 0, 4], [256, 16, 1, 10, 9, 4], ["getRangeByIndexes", 16, 4, 10, 5, 4], ["getPrevious", 12, 1, 10, 10, 4, 0, 257], ["getPreviousOrNullObject", 12, 1, 10, 10, 4, 0, 257], ["getNext", 12, 1, 10, 10, 4, 0, 257], ["getNextOrNullObject", 12, 1, 10, 10, 4, 0, 257], [257, 12, 1, 2, 5, 4], ["copy", 12, 2, 0, 5, 0, 0, 258], [258, 12, 1, 0, 5], ["findAll", 17, 2, 10, 2, 4], ["findAllOrNullObject", 17, 2, 10, 2, 4], [259, 17, 1, 10, 2, 4]], "workbook.worksheets", 0, [[260, 0, 5, 261, 262, 232, 233], [263, 0, 1, 264, 262, 238, 239], [265, 2, 5, 266, 262, 230, 231], [267, 0, 11, 268, 262, 247, 248], [269, 0, 5, 270, 262, 234, 235], [271, 0, 6, 272, 262, 241, 242], [273, 2, 2, 274, 262, 243, 244], [275, 0, 3, 276, 262, 251, 252], [277, 0, 11, 278, 262, 245, 246], [220, 0, 5, 279, 262, 236, 237], [280, 0, 11, 281, 262, 249, 250]]],
+            [13, 1, 0, 0, [[196, 1, 2, 9, 4], [282, 0, 3, 5], [283, 0, 3, 5], [232, 0, 3, 5], [233, 0, 0, 5], [234, 0, 0, 5], [235, 0, 0, 5], [284, 0, 3, 5], [285, 0, 3, 5], [238, 0, 0, 1], [239, 0, 0, 1], [230, 0, 3, 2], [231, 0, 3, 2], [236, 0, 0, 2], [237, 0, 0, 2], ["addFromBase64", 4, 0, 6], [241, 0, 0, 6], [242, 0, 0, 6], [243, 0, 0, 2], [244, 0, 0, 2], [245, 0, 3, 11], [246, 0, 3, 11], [247, 0, 3, 11], [248, 0, 3, 11], [249, 0, 0, 11], [250, 0, 0, 11], [251, 0, 0, 3], [252, 0, 0, 3]], [[197, 12, 1, 18, 0, 4], [286, 12, 1, 8], ["getActiveWorksheet", 12, 0, 2, 0, 4], [287, 12, 1, 2, 9, 4], [288, 12, 1, 10, 10, 4], ["getLast", 12, 1, 10, 10, 4]], 0, 12, [[260, 0, 5, 261, 219, 232, 233], [289, 0, 5, "MessageType.worksheetAddedEvent", 219, 282, 283], [263, 0, 1, 264, 219, 238, 239], [265, 2, 2, 266, 219, 230, 231], [267, 0, 11, 268, 219, 247, 248], [269, 0, 5, 270, 219, 234, 235], [290, 0, 5, "MessageType.worksheetDeletedEvent", 219, 284, 285], [271, 0, 6, 272, 219, 241, 242], [273, 2, 2, 274, 219, 243, 244], [275, 0, 3, 276, 219, 251, 252], [277, 0, 11, 278, 219, 245, 246], [220, 0, 2, 279, 219, 236, 237], [280, 0, 11, 281, 219, 249, 250]]],
+            [14, 0, [[222, 3], [291, 3]], 0, [[223, 2, 1], [224, 1]]],
+            [15, 0, 0, 0, [["unfreeze"], ["freezeAt", 1], ["freezeRows", 1], ["freezeColumns", 1]], [[292, 16, 0, 10, 0, 4], ["getLocationOrNullObject", 16, 0, 10, 0, 4]]],
+            [16, 14, [[293, 5], [294, 1, 5], [295, 5], [296, 3], [297, 5], [298, 5], [299, 3], [300, 3], [301, 3], [302, 3], [303, 3], [304, 3], [305, 3], [306, 2], [307, 3], [308, 5, 7], ["hidden", 3, 7], ["rowHidden", 1, 7], ["columnHidden", 1, 7], [309, 3, 5], [310, 3, 5], [311, 1, 5], [312, 1, 5], ["linkedDataTypeState", 3, 2], ["hasSpill", 3, 6], [313, 3, 11], [314, 3, 11], [315, 3, 11], [316, 3, 11], ["savedAsArray", 3, 6], ["numberFormatCategories", 3, 6]], [[317, 37, 35, 0, 0, 4], [318, 12, 2, 0, 0, 4], [319, 91, 3, 7, 0, 4], [320, 123, 19, 4, 0, 4], [321, 35, 35, 1, 0, 4]], [[322, 1], [228, 1], [323, 0, 2], [324, 0, 2], ["merge", 1, 0, 7], ["unmerge", 0, 0, 7], ["_ValidateArraySize", 2, 2, 8, 4], [201, 0, 0, 4], ["showCard", 0, 0, 5], [325, 0, 2, 5, 4], [240, 3, 0, 2], [326, 4, 0, 2], [327, 2, 0, 2], [328, 0, 0, 2], [329, 0, 0, 2], ["getCellProperties", 1, 0, 2], ["getRowProperties", 1, 0, 2], ["getColumnProperties", 1, 0, 2], ["setCellProperties", 1, 0, 2], ["setRowProperties", 1, 0, 2], ["setColumnProperties", 1, 0, 2], ["autoFill", 2, 0, 2], [330, 2, 0, 2], ["flashFill", 0, 0, 2], [331, 1, 0, 11], [332, 1, 0, 11], ["showGroupDetails", 1, 0, 11], ["hideGroupDetails", 1, 0, 11], ["moveTo", 1, 0, 3]], [[255, 16, 2, 10, 0, 4], [254, 16, 1, 10, 0, 4], ["insert", 16, 1, 8], [333, 16, 0, 10, 0, 4], [334, 16, 0, 10, 0, 4], ["getOffsetRange", 16, 2, 10, 0, 4], ["getRow", 16, 1, 10, 0, 4], ["getColumn", 16, 1, 10, 0, 4], [335, 16, 1, 10, 0, 4], ["getBoundingRect", 16, 1, 10, 0, 4], ["getLastCell", 16, 0, 10, 0, 4], ["getLastColumn", 16, 0, 10, 0, 4], ["getLastRow", 16, 0, 10, 0, 4], [336, 16, 1, 10, 9, 4], ["getRowsAbove", 16, 1, 11, 8, 4], ["getRowsBelow", 16, 1, 11, 8, 4], ["getColumnsBefore", 16, 1, 11, 8, 4], ["getColumnsAfter", 16, 1, 11, 8, 4], ["getResizedRange", 16, 2, 11, 8, 4], ["getVisibleView", 19, 0, 2, 8, 4], [256, 16, 1, 10, 9, 4], ["getSurroundingRegion", 16, 0, 10, 5, 4], ["getAbsoluteResizedRange", 16, 2, 10, 5, 4], [337, 29, 1, 6, 2, 4], [338, 16, 2, 10, 2, 4], ["findOrNullObject", 16, 2, 10, 2, 4], ["removeDuplicates", 36, 2, 8, 2], [339, 17, 2, 10, 2, 4], [340, 17, 2, 10, 2, 4], ["getSpillingToRange", 16, 0, 10, 6, 4], ["getSpillParent", 16, 0, 10, 6, 4], ["getSpillingToRangeOrNullObject", 16, 0, 10, 6, 4], ["getSpillParentOrNullObject", 16, 0, 10, 6, 4], ["getMergedAreas", 17, 0, 10, 6, 4], ["getPivotTables", 102, 1, 6, 15, 4], ["getPrecedents", 18, 0, 10, 6, 4], ["getDirectPrecedents", 18, 0, 10, 6, 4]]],
+            [17, 2, [[306, 2], [303, 3], [304, 3], ["areaCount", 3], [305, 3], [309, 3], [310, 3], [312, 1]], [[341, 161, 19, 0, 0, 4], [320, 123, 19, 0, 0, 4], [317, 37, 35, 0, 0, 4], [321, 35, 35, 0, 0, 4], [318, 12, 2, 0, 0, 4]], [[324, 0, 2], [201], [322, 1], [329], [326, 4], [327, 2], [328], [323, 0, 2, 6]], [[333, 17, 0, 10, 0, 4], [334, 17, 0, 10, 0, 4], [335, 17, 1, 10, 0, 4], [336, 17, 1, 10, 0, 4], ["getOffsetRangeAreas", 17, 2, 10, 0, 4], ["getUsedRangeAreas", 17, 1, 10, 0, 4], ["getUsedRangeAreasOrNullObject", 17, 1, 10, 0, 4], [337, 29, 1, 6, 0, 4], [339, 17, 2, 10, 0, 4], [340, 17, 2, 10, 0, 4]]],
+            [18, 2, [[306, 2], ["addresses", 3]], [["ranges", 161, 19, 0, 0, 4], [341, 162, 19, 0, 0, 4]], [[324, 0, 2]], [["getRangeAreasBySheet", 17, 1, 10, 0, 4], ["getRangeAreasOrNullObjectBySheet", 17, 1, 10, 0, 4]]],
+            [19, 0, [[293, 1], [295, 1], [296, 3], [297, 1], [298, 1], [308, 1], [307, 3], [301, 3], [302, 3], ["cellAddresses", 3], [342, 3]], [[343, 20, 19, 0, 0, 4]], 0, [[253, 16, 0, 10, 0, 4]]],
+            [20, 1, 0, 0, [[196, 0, 2, 9, 4]], [[198, 19, 1, 2, 0, 4]], 0, 19],
+            [21, 1, 0, 0, [[196, 0, 2, 0, 4]], [[197, 22, 1, 18, 0, 4], [286, 22, 2, 9], [287, 22, 1, 2, 0, 4]], 0, 22, [["SettingsChanged", 3, 0, "_CC.office10EventIdSettingsChangedEvent", 221, 221, 221]]],
+            [22, 8, [[344, 3], [345, 5], [346, 2]], 0, [[228]]],
+            [23, 1, 0, 0, [[196, 0, 2, 9, 4]], [[197, 24, 1, 18, 0, 4], [287, 24, 1, 2, 9, 4], [286, 24, 3, 8, 9], ["addFormulaLocal", 24, 3, 0, 9]], 0, 24],
+            [24, 0, [[199, 3], [347, 3], [345, 3], [348, 1], [346, 2], [195, 1, 9], ["scope", 3, 9], [349, 1, 5]], [[318, 12, 2, 9, 0, 4], ["worksheetOrNullObject", 12, 2, 9, 0, 4], ["arrayValues", 25, 3, 5, 0, 4]], [[228, 0, 0, 9]], [[253, 16, 0, 10, 0, 4], [350, 16, 0, 10, 9, 4]]],
+            [25, 0, [[295, 3], ["types", 3]]],
+            [26, 0, [[192, 3], [347, 3]], 0, [["getText", 0, 2, 0, 4], [228, 0, 0, 8]], [["getTable", 30, 0, 2, 0, 4], [253, 16, 0, 2, 0, 4]], 0, 0, [["DataChanged", 3, 8, "_CC.office10EventIdBindingDataChangedEvent", 262, 221, 221], [220, 3, 8, "_CC.office10EventIdBindingSelectionChangedEvent", 262, 221, 221]]],
+            [27, 1, [[351, 3]], 0, [[196, 0, 2, 9, 4]], [[197, 26, 1, 18, 0, 4], [198, 26, 1, 2, 0, 4], [286, 26, 3, 8, 8], ["addFromNamedItem", 26, 3, 0, 8], ["addFromSelection", 26, 2, 0, 8], [287, 26, 1, 2, 9, 4]], 0, 26],
+            [28, 5, [[351, 3]], 0, [[196, 0, 2, 9, 4], [230, 0, 0, 5], [231, 0, 0, 5], [282, 0, 0, 2], [283, 0, 0, 2], [284, 0, 0, 2], [285, 0, 0, 2], [241, 0, 0, 6], [242, 0, 0, 6]], [[197, 30, 1, 18, 0, 4], [198, 30, 1, 2, 0, 4], [286, 30, 2, 8], [287, 30, 1, 2, 9, 4]], 0, 30, [[289, 0, 2, "MessageType.tableAddedEvent", 352, 282, 283], [265, 2, 5, 353, 352, 230, 231], [290, 0, 2, "MessageType.tableDeletedEvent", 352, 284, 285], [271, 0, 6, 354, 352, 241, 242]]],
+            [29, 1, 0, 0, [[196, 0, 2, 0, 4]], [[288, 30, 0, 10, 0, 4], [197, 30, 1, 18, 0, 4]], 0, 30],
+            [30, 24, [[192, 3], [199, 1], ["showHeaders", 1], ["showTotals", 1], [312, 1], ["highlightFirstColumn", 1, 8], ["highlightLastColumn", 1, 8], ["showBandedRows", 1, 8], ["showBandedColumns", 1, 8], ["showFilterButton", 1, 8], ["legacyId", 3, 1]], [[355, 31, 19, 0, 0, 4], [343, 33, 19, 0, 0, 4], [319, 92, 3, 7, 0, 4], [318, 12, 2, 7, 0, 4], [227, 94, 3, 2, 0, 4], ["tableStyle", 147, 35, 6, 0, 4]], [[228], [356, 0, 0, 7], ["reapplyFilters", 0, 0, 7], [236, 0, 0, 5], [237, 0, 0, 5], [230, 0, 0, 5], [231, 0, 0, 5], ["clearStyle", 0, 0, 6], [241, 0, 0, 6], [242, 0, 0, 6], [357, 1, 0, 6]], [[253, 16, 0, 10, 0, 4], [358, 16, 0, 10, 0, 4], [359, 16, 0, 10, 0, 4], [360, 16, 0, 10, 0, 4], ["convertToRange", 16, 0, 8, 7]], "workbook.tables", 0, [[265, 2, 5, 353, 262, 230, 231], [271, 0, 6, 354, 262, 241, 242], [220, 2, 5, "MessageType.tableSelectionChangedEvent", 262, 236, 237]]],
+            [31, 1, [[351, 3]], 0, [[196, 0, 2, 9, 4]], [[197, 32, 1, 18, 0, 4], [198, 32, 1, 2, 0, 4], [286, 32, 3, 8], [287, 32, 1, 2, 9, 4]], 0, 32],
+            [32, 0, [[192, 3], [342, 3], [295, 1], [199, 1]], [["filter", 93, 3, 7, 0, 4]], [[228]], [[253, 16, 0, 10, 0, 4], [358, 16, 0, 10, 0, 4], [359, 16, 0, 10, 0, 4], [360, 16, 0, 10, 0, 4]]],
+            [33, 1, [[351, 3]], 0, [[196, 0, 2, 9, 4]], [[198, 34, 1, 2, 0, 4], [286, 34, 2, 8]], 0, 34],
+            [34, 0, [[342, 3], [295, 1]], 0, [[228]], [[253, 16, 0, 10, 0, 4]]],
+            [35, 0, [[347, 3], [361, 1], ["prompt", 1], ["errorAlert", 1], ["ignoreBlanks", 1], ["valid", 3]], 0, [[322]], [["getInvalidCells", 17, 0, 10, 2, 4], ["getInvalidCellsOrNullObject", 17, 0, 10, 2, 4]]],
+            [36, 0, [["removed", 3], ["uniqueRemaining", 3]]],
+            [37, 0, [[362, 1], [363, 1], [364, 1], ["columnWidth", 1, 7], [365, 1, 7], [366, 1, 5], ["useStandardHeight", 1, 5], ["useStandardWidth", 1, 5], [367, 1, 2], [368, 1, 2], [369, 1, 2], [370, 1, 2]], [[371, 39, 35, 0, 0, 4], [372, 42, 35, 0, 0, 4], [373, 41, 51, 0, 0, 4], [209, 38, 35, 7, 0, 4]], [["autofitColumns", 0, 0, 7], ["autofitRows", 0, 0, 7], ["adjustIndent", 1, 0, 3]]],
+            [38, 0, [[374, 1], [375, 1]]],
+            [39, 0, [[376, 1], [377, 1, 2], ["patternTintAndShade", 1, 2], ["pattern", 1, 2], ["patternColor", 1, 2]], 0, [[322]]],
+            [40, 0, [[378, 3], [312, 1], [379, 1], [376, 1], [377, 1, 2]]],
+            [41, 1, [[351, 3], [377, 1, 2]], 0, 0, [[197, 40, 1, 18, 0, 4], [198, 40, 1, 2, 0, 4]], 0, 40],
+            [42, 0, [[199, 1], [380, 1], [376, 1], [381, 1], [382, 1], [383, 1], [384, 1, 2], ["subscript", 1, 2], ["superscript", 1, 2], [377, 1, 2]]],
+            [43, 5, [[351, 3]], 0, [[196, 0, 2, 9, 4], [282, 0, 0, 1], [283, 0, 0, 1], [232, 0, 0, 1], [233, 0, 0, 1], [234, 0, 0, 1], [235, 0, 0, 1], [284, 0, 0, 1], [285, 0, 0, 1]], [[286, 44, 3, 9], [198, 44, 1, 2, 0, 4], [385, 44, 1, 18, 0, 4], [197, 44, 1, 2, 0, 4], [287, 44, 1, 2, 9, 4]], 0, 44, [[260, 0, 1, 386, 387, 232, 233], [289, 0, 1, "MessageType.chartAddedEvent", 387, 282, 283], [269, 0, 1, 388, 387, 234, 235], [290, 0, 1, "MessageType.chartDeletedEvent", 387, 284, 285]]],
+            [44, 0, [[199, 1], [313, 1], [314, 1], [316, 1], [315, 1], [192, 3, 5], ["showAllFieldButtons", 1, 5], [389, 1, 5], ["showDataLabelsOverMaximum", 1, 1], ["categoryLabelLevel", 1, 1], [312, 1, 1], ["displayBlanksAs", 1, 1], ["plotBy", 1, 1], ["plotVisibleOnly", 1, 1], ["seriesNameLevel", 1, 1]], [[194, 70, 35, 0, 0, 4], [390, 58, 35, 0, 0, 4], ["legend", 65, 35, 0, 0, 4], ["series", 47, 19, 0, 0, 4], ["axes", 53, 35, 0, 0, 4], [317, 46, 35, 0, 0, 4], [318, 12, 2, 7, 0, 4], ["plotArea", 84, 35, 1, 0, 4], ["pivotOptions", 45, 35, 2, 0, 4]], [["setData", 2, 1], [228], ["setPosition", 2], [325, 3, 2, 7, 4], [232, 0, 0, 1], [233, 0, 0, 1], [234, 0, 0, 1], [235, 0, 0, 1], [229, 0, 2, 2]], 0, 0, 0, [[260, 0, 1, 386, 262, 232, 233], [269, 0, 1, 388, 262, 234, 235]]],
+            [45, 0, [["showAxisFieldButtons", 1], ["showLegendFieldButtons", 1], ["showReportFilterFieldButtons", 1], ["showValueFieldButtons", 1]]],
+            [46, 0, [["roundedCorners", 1, 2], ["colorScheme", 1, 2]], [[371, 73, 3, 0, 0, 4], [372, 78, 35, 0, 0, 4], [391, 74, 35, 5, 0, 4]]],
+            [47, 1, [[351, 3]], 0, [[196, 0, 2, 9, 4]], [[198, 48, 1, 2, 0, 4], [286, 48, 2, 8, 5]], 0, 48],
+            [48, 0, [[199, 1], [389, 1, 5], ["hasDataLabels", 1, 5], ["filtered", 1, 5], [392, 1, 5], [393, 1, 5], [394, 1, 5], [395, 1, 5], [396, 1, 5], ["smooth", 1, 5], ["plotOrder", 1, 5], ["gapWidth", 1, 5], ["doughnutHoleSize", 1, 5], [397, 1, 1], ["explosion", 1, 1], ["firstSliceAngle", 1, 1], ["invertIfNegative", 1, 1], ["bubbleScale", 1, 2], ["secondPlotSize", 1, 1], ["splitType", 1, 1], ["splitValue", 1, 2], ["varyByCategories", 1, 1], ["showLeaderLines", 1, 2], ["overlap", 1, 1], ["gradientStyle", 1, 2], ["gradientMinimumType", 1, 2], ["gradientMidpointType", 1, 2], ["gradientMaximumType", 1, 2], ["gradientMinimumValue", 1, 2], ["gradientMidpointValue", 1, 2], ["gradientMaximumValue", 1, 2], ["gradientMinimumColor", 1, 2], ["gradientMidpointColor", 1, 2], ["gradientMaximumColor", 1, 2], ["parentLabelStrategy", 1, 2], ["showConnectorLines", 1, 2], ["invertColor", 1, 2]], [["points", 50, 19, 0, 0, 4], [317, 49, 35, 0, 0, 4], ["trendlines", 80, 19, 5, 0, 4], ["xErrorBars", 61, 35, 2, 0, 4], ["yErrorBars", 61, 35, 2, 0, 4], [390, 58, 35, 1, 0, 4], ["binOptions", 75, 35, 2, 0, 4], ["mapOptions", 69, 35, 2, 0, 4], ["boxwhiskerOptions", 76, 35, 2, 0, 4]], [[228, 0, 0, 5], ["setXAxisValues", 1, 0, 5], ["setValues", 1, 0, 5], ["setBubbleSizes", 1, 0, 5], ["getDimensionValues", 1, 0, 6]]],
+            [49, 0, 0, [[371, 73, 3, 0, 0, 4], [398, 77, 35, 0, 0, 4]]],
+            [50, 1, [[351, 3]], 0, [[196, 0, 2, 9, 4]], [[198, 51, 1, 2, 0, 4]], 0, 51],
+            [51, 0, [[345, 3], ["hasDataLabel", 1, 5], [393, 1, 5], [392, 1, 5], [395, 1, 5], [396, 1, 5]], [[317, 52, 35, 0, 0, 4], ["dataLabel", 59, 35, 5, 0, 4]]],
+            [52, 0, 0, [[371, 73, 3, 0, 0, 4], [391, 74, 35, 5, 0, 4]]],
+            [53, 0, 0, [["categoryAxis", 54, 35, 0, 0, 4], ["seriesAxis", 54, 35, 0, 0, 4], ["valueAxis", 54, 35, 0, 0, 4]], 0, [[197, 54, 2, 2, 5, 4]]],
+            [54, 0, [["majorUnit", 1], ["maximum", 1], ["minimum", 1], ["minorUnit", 1], ["displayUnit", 1, 5], ["showDisplayUnitLabel", 1, 5], ["customDisplayUnit", 3, 5], [347, 3, 5], ["minorTimeUnitScale", 1, 5], ["majorTimeUnitScale", 1, 5], ["baseTimeUnit", 1, 5], ["categoryType", 1, 5], [397, 3, 5], ["scaleType", 1, 5], ["logBase", 1, 5], [314, 3, 5], [313, 3, 5], [315, 3, 5], [316, 3, 5], ["reversePlotOrder", 1, 5], ["crosses", 1, 5], ["crossesAt", 3, 5], [348, 1, 5], ["isBetweenCategories", 1, 1], ["majorTickMark", 1, 5], ["minorTickMark", 1, 5], ["tickMarkSpacing", 1, 5], ["tickLabelPosition", 1, 5], ["tickLabelSpacing", 1, 5], ["alignment", 1, 1], ["multiLevel", 1, 1], [293, 1, 1], [399, 1, 2], ["offset", 1, 1], [366, 1, 1], [225, 1, 1], ["positionAt", 3, 1]], [["majorGridlines", 63, 35, 0, 0, 4], ["minorGridlines", 63, 35, 0, 0, 4], [194, 56, 35, 0, 0, 4], [317, 55, 35, 0, 0, 4]], [["setCategoryNames", 1, 0, 5], ["setCustomDisplayUnit", 1, 0, 5], ["setCrossesAt", 1, 0, 5], ["setPositionAt", 1, 0, 1]]],
+            [55, 0, 0, [[372, 78, 35, 0, 0, 4], [398, 77, 35, 0, 0, 4], [371, 73, 3, 1, 0, 4]]],
+            [56, 0, [[296, 1], [348, 1], [366, 1, 15]], [[317, 57, 35, 0, 0, 4]], [[400, 1, 0, 1]]],
+            [57, 0, 0, [[372, 78, 35, 0, 0, 4], [371, 73, 3, 1, 0, 4], [391, 74, 35, 1, 0, 4]]],
+            [58, 0, [[225, 1], [401, 1], [402, 1], [403, 1], [404, 1], [405, 1], [406, 1], [407, 1], [293, 1, 1], [399, 1, 2], [366, 1, 1], [408, 1, 1], [363, 1, 1], [364, 1, 1]], [[317, 60, 35, 0, 0, 4]]],
+            [59, 0, [[225, 1], [401, 1], [402, 1], [403, 1], [404, 1], [405, 1], [406, 1], [407, 1], [313, 1, 1], [314, 1, 1], [316, 3, 1], [315, 3, 1], [349, 1, 1], [366, 1, 1], [363, 1, 1], [364, 1, 1], [296, 1, 1], [408, 1, 1], [293, 1, 1], [399, 1, 2]], [[317, 60, 35, 1, 0, 4]]],
+            [60, 0, 0, [[372, 78, 35, 0, 0, 4], [371, 73, 3, 0, 0, 4], [391, 74, 35, 1, 0, 4]]],
+            [61, 0, [["endStyleCap", 1], ["include", 1], [347, 1], [348, 1]], [[317, 62, 35, 0, 0, 4]]],
+            [62, 0, 0, [[398, 77, 35, 0, 0, 4]]],
+            [63, 0, [[348, 1]], [[317, 64, 35, 0, 0, 4]]],
+            [64, 0, 0, [[398, 77, 35, 0, 0, 4]]],
+            [65, 0, [[348, 1], [225, 1], [409, 1], [314, 1, 5], [313, 1, 5], [316, 1, 5], [315, 1, 5], [394, 1, 5]], [[317, 68, 35, 0, 0, 4], ["legendEntries", 67, 19, 5, 0, 4]]],
+            [66, 0, [[348, 1], [314, 3, 1], [313, 3, 1], [316, 3, 1], [315, 3, 1], [342, 3, 1]]],
+            [67, 1, 0, 0, [[196, 0, 2, 0, 4]], [[198, 66, 1, 2, 0, 4]], 0, 66],
+            [68, 0, 0, [[372, 78, 35, 0, 0, 4], [371, 73, 3, 0, 0, 4], [391, 74, 35, 1, 0, 4]]],
+            [69, 0, [[410, 1], ["labelStrategy", 1], ["projectionType", 1]]],
+            [70, 0, [[348, 1], [296, 1], [409, 1], [363, 1, 5], [313, 1, 5], [314, 1, 5], [316, 3, 5], [315, 3, 5], [364, 1, 5], [366, 1, 5], [225, 1, 5], [394, 1, 5]], [[317, 72, 35, 0, 0, 4]], [[400, 1, 0, 5]], [[411, 71, 2, 2, 5, 4]]],
+            [71, 0, 0, [[372, 78, 35, 0, 0, 4]]],
+            [72, 0, 0, [[372, 78, 35, 0, 0, 4], [371, 73, 3, 0, 0, 4], [391, 74, 35, 5, 0, 4]]],
+            [73, 4, 0, 0, [[412, 1], [322]]],
+            [74, 0, [[376, 1], [413, 1], [379, 1]], 0, [[322, 0, 0, 1]]],
+            [75, 0, [[347, 1], [316, 1], [351, 1], ["allowOverflow", 1], ["allowUnderflow", 1], ["overflowValue", 1], ["underflowValue", 1]]],
+            [76, 0, [["showInnerPoints", 1], ["showOutlierPoints", 1], ["showMeanMarker", 1], ["showMeanLine", 1], ["quartileCalculation", 1]]],
+            [77, 0, [[376, 1], [413, 1, 5], [379, 1, 5]], 0, [[322]]],
+            [78, 0, [[382, 1], [376, 1], [381, 1], [199, 1], [380, 1], [383, 1]]],
+            [79, 0, [[347, 1], ["polynomialOrder", 1], ["movingAveragePeriod", 1], [346, 2], ["showEquation", 1, 1], ["showRSquared", 1, 1], ["forwardPeriod", 1, 1], ["backwardPeriod", 1, 1], [199, 1], ["intercept", 1]], [[317, 81, 35, 0, 0, 4], ["label", 82, 35, 1, 0, 4]], [[228]]],
+            [80, 1, 0, 0, [[196, 0, 2, 0, 4]], [[286, 79, 1, 8], [197, 79, 1, 18, 0, 4]], 0, 79],
+            [81, 0, 0, [[398, 77, 35, 0, 0, 4]]],
+            [82, 0, [[313, 1], [314, 1], [316, 3], [315, 3], [349, 1], [366, 1], [363, 1], [364, 1], [296, 1], [408, 1], [293, 1], [399, 1, 2]], [[317, 83, 35, 0, 0, 4]]],
+            [83, 0, 0, [[371, 73, 3, 0, 0, 4], [391, 74, 35, 0, 0, 4], [372, 78, 35, 0, 0, 4]]],
+            [84, 0, [[314, 1], [313, 1], [316, 1], [315, 1], ["insideLeft", 1], ["insideTop", 1], ["insideWidth", 1], ["insideHeight", 1], [225, 1]], [[317, 85, 35, 0, 0, 4]]],
+            [85, 0, 0, [[391, 74, 35, 0, 0, 4], [371, 73, 3, 0, 0, 4]]],
+            [86, 5, 0, 0, [["getDefinitions", 0, 2, 0, 4], ["getPreview", 4, 2, 0, 4], ["bootstrapAgaveVisual", 0, 0, 0, 2], [196, 0, 2, 0, 4], [236, 0, 2], [237, 0, 2]], [[286, 87, 3, 8, 0, 2], [385, 87, 1, 18, 0, 4], ["getSelectedOrNullObject", 87, 0, 2, 0, 4]], 0, 87, [["AgaveVisualUpdate", 2, 0, "MessageType.agaveVisualUpdateEvent", 221, 414, 414], [220, 0, 0, "MessageType.visualSelectionChangedEvent", 387, 236, 237]]],
+            [87, 0, [[192, 3], ["isSupportedInVisualTaskpane", 3]], [[208, 89, 18, 0, 0, 4]], [[228, 0, 0, 0, 2], ["getProperty", 1, 2, 0, 4], ["setProperty", 2, 0, 0, 2], ["changeDataSource", 2, 0, 0, 2], ["getDataSource", 0, 2, 0, 4], ["setPropertyToDefault", 1, 0, 0, 2], [415, 0, 2], [416, 0, 2], ["serializeProperties", 0, 2, 0, 4], ["deserializeProperties", 1, 0, 0, 2]], [["getChildProperties", 89, 2, 6, 0, 4], ["getDataControllerClient", 90, 0, 2, 0, 4], ["getElementChildProperties", 89, 3, 6, 0, 4]], 0, 0, [["ChangeNotification", 2, 0, "MessageType.visualChangeEvent", 262, 415, 416]]],
+            [88, 0, [[347, 3], [345, 3], [192, 3], ["localizedName", 3], [291, 3], ["localizedOptions", 3], ["hasDefault", 3], ["isDefault", 3], [417, 3], [418, 3], ["stepSize", 3], ["hideMeButShowChildrenUI", 3], ["expandableUI", 3], ["nextPropOnSameLine", 3], ["showResetUI", 3]], 0, [["getBoolMetaProperty", 1, 2, 0, 4]]],
+            [89, 1, 0, 0, [[196, 0, 2, 0, 4]], [[197, 88, 1, 18, 0, 4], [198, 88, 1, 2, 0, 4]], 0, 88],
+            [90, 0, 0, 0, [["getWells", 0, 2, 0, 4], ["getAssociatedFields", 1, 2, 0, 4], ["getAvailableFields", 1, 2, 0, 4], ["addField", 3, 0, 0, 2], ["removeField", 2, 0, 0, 2], ["moveField", 3, 0, 0, 2]]],
+            [91, 0, 0, 0, [[419, 5]]],
+            [92, 0, [["matchCase", 3], ["method", 3], [420, 3]], 0, [[419, 3], [322], [421]]],
+            [93, 0, [[422, 3]], 0, [[419, 1], [322], ["applyBottomItemsFilter", 1], ["applyBottomPercentFilter", 1], ["applyCellColorFilter", 1], ["applyDynamicFilter", 1], ["applyFontColorFilter", 1], ["applyValuesFilter", 1], ["applyTopItemsFilter", 1], ["applyTopPercentFilter", 1], ["applyIconFilter", 1], ["applyCustomFilter", 3]]],
+            [94, 0, [[203, 3], ["isDataFiltered", 3], [422, 3]], 0, [[419, 3], [421], [423], ["clearCriteria"]], [[253, 16, 0, 10, 0, 4], [350, 16, 0, 10, 0, 4]]],
+            [95, 0, [[199, 3]], [[293, 96, 3, 0, 0, 4], ["datetimeFormat", 97, 3, 6, 0, 4]]],
+            [96, 0, [["numberDecimalSeparator", 3], ["numberGroupSeparator", 3]]],
+            [97, 0, [["dateSeparator", 3], ["longDatePattern", 3], ["shortDatePattern", 3], ["timeSeparator", 3], ["longTimePattern", 3]]],
+            [98, 1, 0, 0, [[196, 0, 2, 0, 4]], [[197, 100, 1, 18, 0, 4], [287, 100, 1, 2, 0, 4], ["getOnlyItem", 100, 0, 2, 0, 4], ["getOnlyItemOrNullObject", 100, 0, 2, 0, 4]], 0, 100],
+            [99, 1, 0, 0, [[196, 0, 2, 0, 4]], [[197, 100, 1, 18, 0, 4], [286, 100, 1, 8], ["getByNamespace", 98, 1, 6, 0, 4], [287, 100, 1, 2, 0, 4]], 0, 100],
+            [100, 0, [[192, 3], ["namespaceUri", 3]], 0, [[228], ["getXml", 0, 2, 0, 4], ["setXml", 1]]],
+            [101, 0, 0, 0, [["bindingGetData", 1, 2, 0, 4], ["getSelectedData", 1, 2, 0, 4], ["gotoById", 1, 2, 0, 4], ["bindingAddFromSelection", 1, 2], ["bindingGetById", 1, 2, 0, 4], ["bindingReleaseById", 1, 2], ["bindingGetAll", 0, 2, 0, 4], ["bindingAddFromNamedItem", 1, 2], ["bindingAddFromPrompt", 1, 2], ["bindingDeleteAllDataValues", 1], ["setSelectedData", 1], ["bindingClearFormats", 1], ["bindingSetData", 1], ["bindingSetFormats", 1], ["bindingSetTableOptions", 1], ["bindingAddRows", 1], ["bindingAddColumns", 1], ["getFilePropertiesAsync", 0, 2, 4, 4]]],
+            [102, 1, 0, 0, [[196, 0, 2, 0, 4]], [[197, 104, 1, 18, 0, 4], [288, 104, 0, 10, 0, 4], [287, 104, 1, 2, 0, 4]], 0, 104],
+            [103, 1, 0, 0, [[424], [196, 0, 2, 9, 4]], [[197, 104, 1, 18, 0, 4], [287, 104, 1, 2, 9, 4], [286, 104, 3, 8, 1]], 0, 104],
+            [104, 0, [[199, 1], [192, 3, 10], ["useCustomSortLists", 1, 2], ["enableDataValueEditing", 1, 2], ["allowMultipleFiltersPerField", 0, 6]], [[318, 12, 2, 0, 0, 4], ["hierarchies", 106, 19, 1, 0, 4], ["rowHierarchies", 108, 19, 1, 0, 4], ["columnHierarchies", 108, 19, 1, 0, 4], ["dataHierarchies", 112, 19, 1, 0, 4], ["filterHierarchies", 110, 19, 1, 0, 4], ["layout", 105, 2, 1, 0, 4]], [["refresh"], [228, 0, 0, 1]]],
+            [105, 0, [["showColumnGrandTotals", 1], ["showRowGrandTotals", 1], ["enableFieldList", 1, 11], ["subtotalLocation", 1], ["layoutType", 1], ["autoFormat", 1, 2], ["preserveFormatting", 1, 2]], [["pivotStyle", 149, 35, 6, 0, 4]], [["getPivotItems", 2, 0, 2], ["setAutoSortOnCell", 2, 0, 2], [357, 1, 0, 6]], [[253, 16], ["getRowLabelRange", 16], ["getColumnLabelRange", 16], ["getFilterAxisRange", 16], [359, 16], [255, 16, 3, 0, 6], ["getDataHierarchy", 113, 1, 0, 2]]],
+            [106, 1, 0, 0, [[196, 0, 2, 0, 4]], [[197, 107, 1, 18, 0, 4], [287, 107, 1, 2, 0, 4]], 0, 107],
+            [107, 0, [[192, 3], [199, 1]], [[420, 114, 19, 0, 0, 4]]],
+            [108, 1, 0, 0, [[196, 0, 2, 0, 4], [423, 1]], [[197, 109, 1, 18, 0, 4], [287, 109, 1, 2, 0, 4], [286, 109, 1, 8]], 0, 109],
+            [109, 0, [[192, 3], [199, 1], [225, 1]], [[420, 114, 19, 0, 0, 4]], [[425]]],
+            [110, 1, 0, 0, [[196, 0, 2, 0, 4], [423, 1]], [[197, 111, 1, 18, 0, 4], [287, 111, 1, 2, 0, 4], [286, 111, 1, 8]], 0, 111],
+            [111, 0, [[192, 3], [199, 1], [225, 1], ["enableMultipleFilterItems", 1]], [[420, 114, 19, 0, 0, 4]], [[425]]],
+            [112, 1, 0, 0, [[196, 0, 2, 0, 4], [423, 1]], [[197, 113, 1, 18, 0, 4], [287, 113, 1, 2, 0, 4], [286, 113, 1, 8]], 0, 113],
+            [113, 0, [[192, 3], [199, 1], [225, 1], [293, 1], ["summarizeBy", 1], ["showAs", 1]], [["field", 115, 35, 0, 0, 4]], [[425]]],
+            [114, 1, 0, 0, [[196, 0, 2, 0, 4]], [[197, 115, 1, 18, 0, 4], [287, 115, 1, 2, 0, 4]], 0, 115],
+            [115, 0, [[192, 3], [199, 1], ["subtotals", 1], ["showAllItems", 1]], [["items", 116, 19, 0, 0, 4]], [["sortByLabels", 1, 1], ["sortByValues", 3, 0, 2], ["applyFilter", 1, 0, 6], ["clearAllFilters", 0, 0, 6], ["clearFilter", 1, 0, 6], ["getFilters", 0, 0, 6], ["isFiltered", 1, 0, 6]]],
+            [116, 1, 0, 0, [[196, 0, 2, 0, 4]], [[197, 117, 1, 18, 0, 4], [287, 117, 1, 2, 0, 4]], 0, 117],
+            [117, 0, [[192, 3], [199, 1], ["isExpanded", 1], [348, 1]]],
+            [118, 0, [[344, 3], [345, 1], [346, 2]], 0, [[228]]],
+            [119, 1, 0, 0, [[196, 0, 2, 0, 4]], [[197, 118, 1, 18, 0, 4], [287, 118, 1], [286, 118, 2, 8]], 0, 118],
+            [120, 0, [[194, 1], ["subject", 1], ["author", 1], ["keywords", 1], [210, 1], ["lastAuthor", 3], ["revisionNumber", 1], [426, 11], ["category", 1], ["manager", 1], ["company", 1]], [[427, 122, 19, 0, 0, 4]]],
+            [121, 0, [[344, 3], [345, 1], [347, 3]], 0, [[228]]],
+            [122, 1, 0, 0, [[196, 0, 2, 0, 4], ["deleteAll"]], [[287, 121, 1, 2, 0, 4], [286, 121, 2, 8], [197, 121, 1, 18, 0, 4]], 0, 121],
+            [123, 1, 0, 0, [[196, 0, 2, 0, 4], ["clearAll"]], [[198, 124, 1, 2, 0, 4], [286, 124, 1, 8], [197, 124, 1, 18, 0, 4]], 0, 124],
+            [124, 0, [["stopIfTrue", 1], [193, 1], [347, 3], [192, 3]], [["dataBarOrNullObject", 125, 35, 0, 0, 4], ["dataBar", 125, 35, 0, 0, 4], ["customOrNullObject", 128, 35, 0, 0, 4], [427, 128, 35, 0, 0, 4], ["iconSet", 130, 35, 0, 0, 4], ["iconSetOrNullObject", 130, 35, 0, 0, 4], ["colorScale", 131, 35, 0, 0, 4], ["colorScaleOrNullObject", 131, 35, 0, 0, 4], ["topBottom", 132, 35, 0, 0, 4], ["topBottomOrNullObject", 132, 35, 0, 0, 4], ["preset", 133, 35, 0, 0, 4], ["presetOrNullObject", 133, 35, 0, 0, 4], ["textComparison", 134, 35, 0, 0, 4], ["textComparisonOrNullObject", 134, 35, 0, 0, 4], ["cellValue", 135, 35, 0, 0, 4], ["cellValueOrNullObject", 135, 35, 0, 0, 4]], [[228]], [[253, 16, 0, 10, 0, 4], [350, 16, 0, 10, 0, 4], [259, 17, 0, 10, 2, 4]]],
+            [125, 0, [["showDataBarOnly", 1], ["barDirection", 1], ["axisFormat", 1], ["axisColor", 1], ["lowerBoundRule", 1], ["upperBoundRule", 1]], [["positiveFormat", 126, 35, 0, 0, 4], ["negativeFormat", 127, 35, 0, 0, 4]]],
+            [126, 0, [[428, 1], ["gradientFill", 1], [429, 1]]],
+            [127, 0, [[428, 1], ["matchPositiveFillColor", 1], [429, 1], ["matchPositiveBorderColor", 1]]],
+            [128, 0, 0, [[361, 129, 35, 0, 0, 4], [317, 136, 35, 0, 0, 4]]],
+            [129, 0, [[349, 1], ["formulaLocal", 1], ["formulaR1C1", 1]]],
+            [130, 0, [["reverseIconOrder", 1], ["showIconOnly", 1], [312, 1], [422, 1]]],
+            [131, 0, [["threeColorScale", 3], [422, 1]]],
+            [132, 0, [[361, 1]], [[317, 136, 35, 0, 0, 4]]],
+            [133, 0, [[361, 1]], [[317, 136, 35, 0, 0, 4]]],
+            [134, 0, [[361, 1]], [[317, 136, 35, 0, 0, 4]]],
+            [135, 0, [[361, 1]], [[317, 136, 35, 0, 0, 4]]],
+            [136, 0, [[293, 1]], [[371, 138, 35, 0, 0, 4], [372, 137, 35, 0, 0, 4], [373, 140, 51, 0, 0, 4]]],
+            [137, 0, [[376, 1], [381, 1], [382, 1], [383, 1], [384, 1]], 0, [[322]]],
+            [138, 0, [[376, 1]], 0, [[322]]],
+            [139, 0, [[378, 3], [312, 1], [376, 1]]],
+            [140, 1, [[351, 3]], [[313, 139, 35, 0, 0, 4], ["bottom", 139, 35, 0, 0, 4], [314, 139, 35, 0, 0, 4], [430, 139, 35, 0, 0, 4]], 0, [[197, 139, 1, 18, 0, 4], [198, 139, 1, 2, 0, 4]], 0, 139],
+            [141, 0, 0, 0, 0, [["getFormatter", 142, 1, 3]], 0, 0, 0, "Microsoft.ExcelServices.NumberFormattingService", 4],
+            [142, 0, [["isDateTime", 3], ["isPercent", 3], ["isCurrency", 3], ["isNumeric", 3], [431, 3], ["hasYear", 3], ["hasMonth", 3], ["hasDayOfWeek", 3]], 0, [[317, 1, 3]]],
+            [143, 36, [["status", 2]], 0, [["register", 2]], 0, 0, 0, 0, "Microsoft.ExcelServices.CustomFunctionManager", 4],
+            [144, 0, [["builtIn", 3], [375, 1], [363, 1], ["includeAlignment", 1], ["includeBorder", 1], ["includeFont", 1], ["includeNumber", 1], ["includePatterns", 1], ["includeProtection", 1], [369, 1], [374, 1], [199, 3], [293, 1], [294, 1], [367, 1], [368, 1], [364, 1], [362, 1], [366, 5, 1], [370, 1, 1]], [[373, 41, 51, 0, 0, 4], [372, 42, 35, 0, 0, 4], [371, 39, 35, 0, 0, 4]], [[228]]],
+            [145, 1, 0, 0, [[286, 1], [196, 0, 2, 2, 4]], [[197, 144, 1, 18, 0, 4], [198, 144, 1, 2, 2, 4]], 0, 144],
+            [146, 1, 0, 0, [[196, 0, 2, 0, 4], [432, 1]], [[197, 147, 1, 18, 0, 4], [287, 147, 1, 2, 0, 4], [286, 147, 2, 8], [433, 147]], 0, 147],
+            [147, 0, [[199, 1], [204, 3], [346, 2]], 0, [[228]], [[434, 147]]],
+            [148, 1, 0, 0, [[196, 0, 2, 0, 4], [432, 1]], [[197, 149, 1, 18, 0, 4], [287, 149, 1, 2, 0, 4], [286, 149, 2, 8], [433, 149]], 0, 149],
+            [149, 0, [[199, 1], [204, 3], [346, 2]], 0, [[228]], [[434, 149]]],
+            [150, 1, 0, 0, [[196, 0, 2, 0, 4], [432, 1]], [[197, 151, 1, 18, 0, 4], [287, 151, 1, 2, 0, 4], [286, 151, 2, 8], [433, 151]], 0, 151],
+            [151, 0, [[199, 1], [204, 3], [346, 2]], 0, [[228]], [[434, 151]]],
+            [152, 1, 0, 0, [[196, 0, 2, 0, 4], [432, 1]], [[197, 153, 1, 18, 0, 4], [287, 153, 1, 2, 0, 4], [286, 153, 2, 8], [433, 153]], 0, 153],
+            [153, 0, [[199, 1], [204, 3], [346, 2]], 0, [[228]], [[434, 153]]],
+            [154, 0, 0, 0, [["delay", 1], ["triggerMessage", 4, 0, 5], [435, 0, 0, 5], [436, 0, 0, 5], ["triggerTestEvent", 2, 0, 5], ["triggerPostProcess", 0, 0, 5], [437, 0, 0, 5], [438, 0, 0, 5], ["triggerTestEventWithFilter", 3, 0, 5], ["firstPartyMethod", 0, 2, 5, 5], [439, 0, 0, 13], [440, 0, 0, 13], [441, 0, 0, 13], [442, 0, 0, 13], ["unregisterAllCustomFunctionExecutionEvents", 0, 0, 13], ["saveWorkbookToTempFile", 1, 2, 12], ["compareTempFilesAreIdentical", 2, 2, 12], ["updateRangeValueOnCurrentSheet", 2, 0, 12, 2], ["triggerUserUndo", 0, 2, 12], ["triggerUserRedo", 0, 2, 12], ["enterCellEdit", 1, 0, 2], ["installCustomFunctionsFromCache", 0, 0, 2], ["recalc", 2, 0, 2], ["recalcBySolutionId", 1, 0, 2], ["safeForCellEditModeMethod", 1, 0, 2], ["exitCellEdit", 0, 0, 2], ["noPermissionMethod", 1, 0, 2], ["verifyCustomFunctionListExist", 0, 0, 2]], 0, 0, 0, [["CustomFunctionExecutionBeginEvent", 0, 13, "MessageType.customFunctionExecutionBeginEvent", 221, 439, 440], ["CustomFunctionExecutionEndEvent", 0, 13, "MessageType.customFunctionExecutionEndEvent", 221, 441, 442], ["Test1Event", 2, 5, "MessageType.test1Event", 221, 437, 438], ["TestEvent", 2, 5, "MessageType.testEvent", 221, 435, 436]], "Microsoft.ExcelServices.InternalTest", 4],
+            [155, 0, [[443, 1], ["paperSize", 1], ["blackAndWhite", 1], ["printErrors", 1], ["zoom", 1], ["centerHorizontally", 1], ["centerVertically", 1], ["printHeadings", 1], ["printGridlines", 1], [444, 1], [445, 1], [446, 1], [447, 1], ["headerMargin", 1], ["footerMargin", 1], ["printComments", 1], ["draftMode", 1], ["firstPageNumber", 1], ["printOrder", 1]], [["headersFooters", 157, 35, 0, 0, 4]], [["setPrintMargins", 2], ["setPrintArea", 1], ["setPrintTitleRows", 1], ["setPrintTitleColumns", 1]], [["getPrintArea", 17, 0, 10, 0, 4], ["getPrintAreaOrNullObject", 17, 0, 10, 0, 4], ["getPrintTitleRows", 16, 0, 10, 0, 4], ["getPrintTitleRowsOrNullObject", 16, 0, 10, 0, 4], ["getPrintTitleColumns", 16, 0, 10, 0, 4], ["getPrintTitleColumnsOrNullObject", 16, 0, 10, 0, 4]]],
+            [156, 0, [["leftHeader", 1], ["centerHeader", 1], ["rightHeader", 1], ["leftFooter", 1], ["centerFooter", 1], ["rightFooter", 1]]],
+            [157, 0, [["state", 1], ["useSheetMargins", 1], ["useSheetScale", 1]], [["defaultForAllPages", 156, 35, 0, 0, 4], ["firstPage", 156, 35, 0, 0, 4], ["evenPages", 156, 35, 0, 0, 4], ["oddPages", 156, 35, 0, 0, 4]]],
+            [158, 0, [[346, 2], [300, 3], [299, 3]], 0, [[228]], [["getCellAfterBreak", 16, 0, 10, 0, 4]]],
+            [159, 1, 0, 0, [["removePageBreaks"], [196, 0, 2, 0, 4]], [[197, 158, 1, 18, 0, 4], [286, 158, 1, 8]], 0, 158],
+            [160, 0, 0, 0, [[424]], [[286, 5, 4, 8, 6]]],
+            [161, 1, 0, 0, [[196, 0, 2, 0, 4]], [[198, 16, 1, 2, 0, 4]], 0, 16],
+            [162, 1, 0, 0, [[196, 0, 2, 0, 4]], [[198, 17, 1, 2, 0, 4]], 0, 17],
+            [163, 5, 0, 0, [[196, 0, 2, 0, 4], [282, 0, 2, 6], [283, 0, 2, 6], [284, 0, 2, 6], [285, 0, 2, 6], [448, 0, 2, 6], [449, 0, 2, 6]], [[197, 164, 1, 18, 0, 4], [198, 164, 1, 2, 0, 4], [286, 164, 3, 8], ["getItemByReplyId", 164, 1, 2, 0, 4], ["getItemByCell", 164, 1, 2, 0, 4]], 0, 164, [[289, 0, 6, "MessageType.commentAddedEvent", 352, 282, 283], [265, 0, 6, "MessageType.commentChangedEvent", 352, 448, 449], [290, 0, 6, "MessageType.commentDeletedEvent", 352, 284, 285]]],
+            [164, 0, [[192, 3], [450, 1], [451, 3], [452, 3], [426, 11], [453, 1, 3], [454, 3, 3], [455, 3, 3], [456, 3, 6]], [["replies", 165, 19, 0, 0, 4]], [[228], [457, 1, 0, 3]], [[292, 16, 0, 10, 0, 4], ["assignTask", 1, 1, 0, 12], ["getTask", 1, 0, 0, 12], ["getTaskOrNullObject", 1, 0, 0, 12]]],
+            [165, 1, 0, 0, [[196, 0, 2, 0, 4]], [[286, 166, 2, 8], [197, 166, 1, 18, 0, 4], [198, 166, 1, 2, 0, 4], ["addWithTaskChanges", 166, 3, 0, 12]], 0, 166],
+            [166, 0, [[192, 3], [450, 1], [451, 3], [452, 3], [426, 11], [453, 3, 3], [454, 3, 3], [455, 3, 3], [456, 3, 6]], 0, [[228], [457, 1, 0, 3]], [[292, 16, 0, 10, 0, 4], ["getParentComment", 164]]],
+            [167, 1, 0, 0, [[196, 0, 2, 0, 4]], [["addImage", 168, 1], [385, 168, 1, 18, 0, 4], ["addGeometricShape", 168, 1], ["addTextBox", 168, 1], ["addSvg", 168, 1, 0, 6], ["addGroup", 168, 1], [198, 168, 1, 2, 0, 4], [197, 168, 1, 2, 0, 4], ["addLine", 168, 5]], 0, 168],
+            [168, 0, [[192, 3], [199, 1], [314, 1], [313, 1], [316, 1], [315, 1], ["rotation", 1], ["zOrderPosition", 3], ["altTextTitle", 1], ["altTextDescription", 1], [347, 3], ["lockAspectRatio", 1], ["placement", 1, 11], ["geometricShapeType", 1], [348, 1], [410, 3], ["connectionSiteCount", 3]], [["geometricShape", 169, 2, 0, 0, 4], ["image", 170, 2, 0, 0, 4], ["textFrame", 176, 2, 0, 0, 4], [371, 174, 35, 0, 0, 4], [331, 171, 2, 0, 0, 4], ["parentGroup", 168, 2, 0, 0, 4], [398, 173, 2, 0, 0, 4], ["lineFormat", 175, 35, 0, 0, 4]], [["setZOrder", 1], ["incrementLeft", 1], ["incrementTop", 1], ["incrementRotation", 1], ["scaleHeight", 3], ["scaleWidth", 3], [228], ["getAsImage", 1], [232], [233], [234], [235]], [["copyTo", 168, 1, 8, 11, 0, 0, 458], [458, 168, 1, 2, 0, 4]], 0, 0, [[260, 0, 0, "MessageType.shapeActivatedEvent", 262, 232, 233], [269, 0, 0, "MessageType.shapeDeactivatedEvent", 262, 234, 235]]],
+            [169, 0, [[192, 3]], [[459, 168, 2, 0, 0, 4]]],
+            [170, 0, [[192, 3], [317, 3, 0, 317]], [[459, 168, 2, 0, 0, 4]]],
+            [171, 0, [[192, 3]], [[226, 172, 19, 0, 0, 4], [459, 168, 2, 0, 0, 4]], [[332]]],
+            [172, 1, 0, 0, [[196, 0, 2, 0, 4]], [[385, 168, 1, 18, 0, 4], [198, 168, 1, 2, 0, 4], [197, 168, 1, 2, 0, 4]], 0, 168],
+            [173, 0, [[192, 3], [460, 1, 0, 460], ["beginArrowheadLength", 1], ["beginArrowheadStyle", 1], ["beginArrowheadWidth", 1], ["endArrowheadLength", 1], ["endArrowheadStyle", 1], ["endArrowheadWidth", 1], ["isBeginConnected", 3], ["beginConnectedSite", 3], ["isEndConnected", 3], ["endConnectedSite", 3]], [[459, 168, 2, 0, 0, 4], ["beginConnectedShape", 168, 2, 0, 0, 4], ["endConnectedShape", 168, 2, 0, 0, 4]], [["connectBeginShape", 2], ["disconnectBeginShape"], ["connectEndShape", 2], ["disconnectEndShape"]]],
+            [174, 0, [["foregroundColor", 1], [347, 3], [461, 1]], 0, [[322], [412, 1]]],
+            [175, 0, [[348, 1], [376, 1], [312, 1], [379, 1], ["dashStyle", 1], [461, 1]]],
+            [176, 0, [[444, 1], [445, 1], [446, 1], [447, 1], [363, 1], ["horizontalOverflow", 1], [364, 1], ["verticalOverflow", 1], [443, 1], [367, 1], ["hasText", 3], ["autoSizeSetting", 1]], [["textRange", 177, 2, 0, 0, 4]], [["deleteText"]]],
+            [177, 0, [[296, 1]], [[372, 178, 35, 0, 0, 4]], 0, [[411, 177, 2]]],
+            [178, 0, [[380, 1], [199, 1], [376, 1], [382, 1], [381, 1], [383, 1]]],
+            [179, 0, [[192, 3], [199, 1], ["caption", 1], [314, 1], [313, 1], [316, 1], [315, 1], ["nameInFormula", 1, 6], ["isFilterCleared", 3], [312, 1], ["sortBy", 1], ["sortUsingCustomLists", 1, 12], [302, 1, 12], ["disableMoveResizeUI", 1, 12], ["displayHeader", 1, 12], [365, 1, 12]], [["slicerItems", 182, 19, 0, 0, 4], [318, 12, 35, 0, 0, 4], ["slicerStyle", 151, 35, 6, 0, 4]], [[228], [356], ["getSelectedItems"], ["selectItems", 1], [229, 0, 2, 12], [357, 1, 0, 6]]],
+            [180, 1, 0, 0, [[196, 0, 2, 0, 4]], [[286, 179, 3, 8], [198, 179, 1, 2, 0, 4], [197, 179, 1, 18, 0, 4], [287, 179, 1, 2, 0, 4]], 0, 179],
+            [181, 0, [[344, 3], [199, 3], ["isSelected", 1], ["hasData", 3]]],
+            [182, 1, 0, 0, [[196, 0, 2, 0, 4]], [[198, 181, 1, 2, 0, 4], [197, 181, 1, 18, 0, 4], [287, 181, 1, 2, 0, 4]], 0, 181],
+            [183, 0, [["activeTab", 1]], 0, [["executeCommand", 2], [330, 3], [462], [463]], 0, 0, 0, [["CommandExecuted", 0, 0, "MessageType.ribbonCommandExecutedEvent", 219, 462, 463]]],
+            [184, 0, [["dataProvider", 2], ["serviceId", 2], ["lastRefreshed", 10], [199, 2], ["periodicRefreshInterval", 2], ["refreshDataLoadWarnings", 2], ["refreshMode", 2], ["supportedRefreshModes", 2], ["fontIconCodePoint", 2]], 0, [["requestRefresh"], ["requestSetRefreshMode", 1]]],
+            [185, 1, [["iconFontFaceUrl", 2]], 0, [[196, 0, 2, 0, 4], ["requestRefreshAll"], [464], [465], [466], [467], [468], [469]], [[197, 184, 1, 18, 0, 4], [287, 184, 1], [198, 184, 1, 2, 0, 4]], 0, 184, [["LinkedDataTypeAdded", 0, 0, "MessageType.linkedDataTypeLinkedDataTypeAddedEvent", 219, 468, 469], ["RefreshModeChanged", 0, 0, "MessageType.linkedDataTypeRefreshModeChangedEvent", 219, 466, 467], ["RefreshRequestCompleted", 0, 0, "MessageType.linkedDataTypeRefreshRequestCompletedEvent", 219, 464, 465]]],
+            [186, 0, [[199]], 0, [[229], [228]], [[434, 186, 1]]],
+            [187, 1, 0, 0, [[196, 0, 2, 0, 4], [470]], [[286, 186, 1, 8], [471, 186], [472, 186], [197, 186, 1, 18, 0, 4], [198, 186, 1, 2, 0, 4]], 0, 186],
+            [188, 0, [[199]], 0, [[229], [228]], [[434, 188, 1]]],
+            [189, 1, 0, 0, [[196, 0, 2, 0, 4], [470]], [[286, 188, 1, 8], [471, 188], [472, 188], [197, 188, 1, 18, 0, 4], [198, 188, 1, 2, 0, 4]], 0, 188],
+            [190, 0, [["error", 3], [345, 3]]],
+            [191, 0, 0, 0, 0, [[351, 190, 1, 72], ["if", 190, 3, 8], ["isNA", 190, 1, 8], ["isError", 190, 1, 8], ["sum", 190, 1, 72], ["average", 190, 1, 72], [417, 190, 1, 72], [418, 190, 1, 72], ["na", 190, 0, 8], ["npv", 190, 2, 72], ["dollar", 190, 2, 8], ["fixed", 190, 3, 8], ["sin", 190, 1, 8], ["cos", 190, 1, 8], ["tan", 190, 1, 8], ["atan", 190, 1, 8], ["pi", 190, 0, 8], ["sqrt", 190, 1, 8], ["exp", 190, 1, 8], ["ln", 190, 1, 8], ["log10", 190, 1, 8], ["abs", 190, 1, 8], ["int", 190, 1, 8], ["sign", 190, 1, 8], ["round", 190, 2, 8], ["lookup", 190, 3, 8], ["rept", 190, 2, 8], ["mid", 190, 3, 8], ["len", 190, 1, 8], [345, 190, 1, 8], ["true", 190, 0, 8], ["false", 190, 0, 8], ["and", 190, 1, 72], ["or", 190, 1, 72], ["not", 190, 1, 8], ["mod", 190, 2, 8], ["dcount", 190, 3, 8, 0, 0, "DCount"], ["dsum", 190, 3, 8, 0, 0, "DSum"], ["daverage", 190, 3, 8, 0, 0, "DAverage"], ["dmin", 190, 3, 8, 0, 0, "DMin"], ["dmax", 190, 3, 8, 0, 0, "DMax"], ["dstDev", 190, 3, 8, 0, 0, "DStDev"], ["dvar", 190, 3, 8, 0, 0, "DVar"], [296, 190, 2, 8], ["pv", 190, 5, 8], ["fv", 190, 5, 8], ["nper", 190, 5, 8, 0, 0, "NPer"], ["pmt", 190, 5, 8], ["rate", 190, 6, 8], ["mirr", 190, 3, 8, 0, 0, "MIrr"], ["irr", 190, 2, 8], ["rand", 190, 0, 8], ["match", 190, 3, 8], ["date", 190, 3, 8], ["time", 190, 3, 8], ["day", 190, 1, 8], ["month", 190, 1, 8], ["year", 190, 1, 8], ["weekday", 190, 2, 8], ["hour", 190, 1, 8], ["minute", 190, 1, 8], ["second", 190, 1, 8], ["now", 190, 0, 8], [341, 190, 1, 8], [343, 190, 1, 8], [355, 190, 1, 8], [347, 190, 1, 8], ["atan2", 190, 2, 8], ["asin", 190, 1, 8], ["acos", 190, 1, 8], ["choose", 190, 2, 72], ["hlookup", 190, 4, 8, 0, 0, "HLookup"], ["vlookup", 190, 4, 8, 0, 0, "VLookup"], ["isref", 190, 1, 8], ["log", 190, 2, 8], ["char", 190, 1, 8], ["lower", 190, 1, 8], ["upper", 190, 1, 8], ["proper", 190, 1, 8], [314, 190, 2, 8], [430, 190, 2, 8], ["exact", 190, 2, 8], ["trim", 190, 1, 8], ["replace", 190, 4, 8], ["substitute", 190, 4, 8], ["code", 190, 1, 8], [338, 190, 3, 8], ["isErr", 190, 1, 8], [431, 190, 1, 8], ["isNumber", 190, 1, 8], ["t", 190, 1, 8, 0, 0, "T"], ["n", 190, 1, 8, 0, 0, "N"], ["datevalue", 190, 1, 8], ["timevalue", 190, 1, 8], ["sln", 190, 3, 8], ["syd", 190, 4, 8], ["ddb", 190, 5, 8], ["clean", 190, 1, 8], ["ipmt", 190, 6, 8], ["ppmt", 190, 6, 8], ["countA", 190, 1, 72], ["product", 190, 1, 72], ["fact", 190, 1, 8], ["dproduct", 190, 3, 8, 0, 0, "DProduct"], ["isNonText", 190, 1, 8], ["dstDevP", 190, 3, 8, 0, 0, "DStDevP"], ["dvarP", 190, 3, 8, 0, 0, "DVarP"], ["trunc", 190, 2, 8], ["isLogical", 190, 1, 8], ["dcountA", 190, 3, 8, 0, 0, "DCountA"], ["usdollar", 190, 2, 8, 0, 0, "USDollar"], ["findB", 190, 3, 8], ["replaceB", 190, 4, 8], ["leftb", 190, 2, 8], ["rightb", 190, 2, 8], ["midb", 190, 3, 8], ["lenb", 190, 1, 8], ["roundUp", 190, 2, 8], ["roundDown", 190, 2, 8], ["asc", 190, 1, 8], ["dbcs", 190, 1, 8], ["days360", 190, 3, 8], ["today", 190, 0, 8], ["vdb", 190, 7, 8], ["median", 190, 1, 72], ["sinh", 190, 1, 8], ["cosh", 190, 1, 8], ["tanh", 190, 1, 8], ["asinh", 190, 1, 8], ["acosh", 190, 1, 8], ["atanh", 190, 1, 8], ["dget", 190, 3, 8, 0, 0, "DGet"], ["db", 190, 5, 8], ["error_Type", 190, 1, 8], ["aveDev", 190, 1, 72], ["gammaLn", 190, 1, 8], ["combin", 190, 2, 8], ["even", 190, 1, 8], ["fisher", 190, 1, 8], ["fisherInv", 190, 1, 8], ["standardize", 190, 3, 8], ["odd", 190, 1, 8], ["permut", 190, 2, 8], ["devSq", 190, 1, 72], ["geoMean", 190, 1, 72], ["harMean", 190, 1, 72], ["sumSq", 190, 1, 72], ["kurt", 190, 1, 72], ["skew", 190, 1, 72], ["large", 190, 2, 8], ["small", 190, 2, 8], ["trimMean", 190, 2, 8], ["concatenate", 190, 1, 72], ["power", 190, 2, 8], ["radians", 190, 1, 8], ["degrees", 190, 1, 8], ["subtotal", 190, 2, 72], ["sumIf", 190, 3, 8], ["countIf", 190, 2, 8], ["countBlank", 190, 1, 8], ["ispmt", 190, 4, 8], ["roman", 190, 2, 8], [311, 190, 2, 8], ["averageA", 190, 1, 72], ["maxA", 190, 1, 72], ["minA", 190, 1, 72], ["stDevPA", 190, 1, 72], ["varPA", 190, 1, 72], ["stDevA", 190, 1, 72], ["varA", 190, 1, 72], ["bahtText", 190, 1, 8], ["hex2Bin", 190, 2, 8], ["hex2Dec", 190, 1, 8], ["hex2Oct", 190, 2, 8], ["dec2Bin", 190, 2, 8], ["dec2Hex", 190, 2, 8], ["dec2Oct", 190, 2, 8], ["oct2Bin", 190, 2, 8], ["oct2Hex", 190, 2, 8], ["oct2Dec", 190, 1, 8], ["bin2Dec", 190, 1, 8], ["bin2Oct", 190, 2, 8], ["bin2Hex", 190, 2, 8], ["imSub", 190, 2, 8], ["imDiv", 190, 2, 8], ["imPower", 190, 2, 8], ["imAbs", 190, 1, 8], ["imSqrt", 190, 1, 8], ["imLn", 190, 1, 8], ["imLog2", 190, 1, 8], ["imLog10", 190, 1, 8], ["imSin", 190, 1, 8], ["imCos", 190, 1, 8], ["imExp", 190, 1, 8], ["imArgument", 190, 1, 8], ["imConjugate", 190, 1, 8], ["imaginary", 190, 1, 8], ["imReal", 190, 1, 8], ["complex", 190, 3, 8], ["imSum", 190, 1, 72], ["imProduct", 190, 1, 72], ["seriesSum", 190, 4, 8], ["factDouble", 190, 1, 8], ["sqrtPi", 190, 1, 8], ["quotient", 190, 2, 8], ["delta", 190, 2, 8], ["geStep", 190, 2, 8], ["isEven", 190, 1, 8], ["isOdd", 190, 1, 8], ["mround", 190, 2, 8, 0, 0, "MRound"], ["erf", 190, 2, 8], ["erfC", 190, 1, 8], ["besselJ", 190, 2, 8], ["besselK", 190, 2, 8], ["besselY", 190, 2, 8], ["besselI", 190, 2, 8], ["xirr", 190, 3, 8], ["xnpv", 190, 3, 8], ["priceMat", 190, 6, 8], ["yieldMat", 190, 6, 8], ["intRate", 190, 5, 8], ["received", 190, 5, 8], ["disc", 190, 5, 8], ["priceDisc", 190, 5, 8], ["yieldDisc", 190, 5, 8], ["tbillEq", 190, 3, 8, 0, 0, "TBillEq"], ["tbillPrice", 190, 3, 8, 0, 0, "TBillPrice"], ["tbillYield", 190, 3, 8, 0, 0, "TBillYield"], ["price", 190, 7, 8], ["yield", 190, 7, 8], ["dollarDe", 190, 2, 8], ["dollarFr", 190, 2, 8], ["nominal", 190, 2, 8], ["effect", 190, 2, 8], ["cumPrinc", 190, 6, 8], ["cumIPmt", 190, 6, 8], ["edate", 190, 2, 8, 0, 0, "EDate"], ["eoMonth", 190, 2, 8], ["yearFrac", 190, 3, 8], ["coupDayBs", 190, 4, 8], ["coupDays", 190, 4, 8], ["coupDaysNc", 190, 4, 8], ["coupNcd", 190, 4, 8], ["coupNum", 190, 4, 8], ["coupPcd", 190, 4, 8], ["duration", 190, 6, 8], ["mduration", 190, 6, 8, 0, 0, "MDuration"], ["oddLPrice", 190, 8, 8], ["oddLYield", 190, 8, 8], ["oddFPrice", 190, 9, 8], ["oddFYield", 190, 9, 8], ["randBetween", 190, 2, 8], ["weekNum", 190, 2, 8], ["amorDegrc", 190, 7, 8], ["amorLinc", 190, 7, 8], ["convert", 190, 3, 8], ["accrInt", 190, 8, 8], ["accrIntM", 190, 5, 8], ["workDay", 190, 3, 8], ["networkDays", 190, 3, 8], ["gcd", 190, 1, 72], ["multiNomial", 190, 1, 72], ["lcm", 190, 1, 72], ["fvschedule", 190, 2, 8, 0, 0, "FVSchedule"], ["countIfs", 190, 1, 72], ["sumIfs", 190, 2, 72], ["averageIf", 190, 3, 8], ["averageIfs", 190, 2, 72], ["binom_Dist", 190, 4, 8], ["binom_Inv", 190, 3, 8], ["confidence_Norm", 190, 3, 8], ["confidence_T", 190, 3, 8], ["expon_Dist", 190, 3, 8], ["gamma_Dist", 190, 4, 8], ["gamma_Inv", 190, 3, 8], ["norm_Dist", 190, 4, 8], ["norm_Inv", 190, 3, 8], ["percentile_Exc", 190, 2, 8], ["percentile_Inc", 190, 2, 8], ["percentRank_Exc", 190, 3, 8], ["percentRank_Inc", 190, 3, 8], ["poisson_Dist", 190, 3, 8], ["quartile_Exc", 190, 2, 8], ["quartile_Inc", 190, 2, 8], ["rank_Avg", 190, 3, 8], ["rank_Eq", 190, 3, 8], ["stDev_S", 190, 1, 72], ["stDev_P", 190, 1, 72], ["t_Dist", 190, 3, 8], ["t_Dist_2T", 190, 2, 8], ["t_Dist_RT", 190, 2, 8], ["t_Inv", 190, 2, 8], ["t_Inv_2T", 190, 2, 8], ["var_S", 190, 1, 72], ["var_P", 190, 1, 72], ["weibull_Dist", 190, 4, 8], ["networkDays_Intl", 190, 4, 8], ["workDay_Intl", 190, 4, 8], ["ecma_Ceiling", 190, 2, 8, 0, 0, "ECMA_Ceiling"], ["iso_Ceiling", 190, 2, 8, 0, 0, "ISO_Ceiling"], ["beta_Dist", 190, 6, 8], ["beta_Inv", 190, 5, 8], ["chiSq_Dist", 190, 3, 8], ["chiSq_Dist_RT", 190, 2, 8], ["chiSq_Inv", 190, 2, 8], ["chiSq_Inv_RT", 190, 2, 8], ["f_Dist", 190, 4, 8], ["f_Dist_RT", 190, 3, 8], ["f_Inv", 190, 3, 8], ["f_Inv_RT", 190, 3, 8], ["hypGeom_Dist", 190, 5, 8], ["logNorm_Dist", 190, 4, 8], ["logNorm_Inv", 190, 3, 8], ["negBinom_Dist", 190, 4, 8], ["norm_S_Dist", 190, 2, 8], ["norm_S_Inv", 190, 1, 8], ["z_Test", 190, 3, 8], ["erf_Precise", 190, 1, 8], ["erfC_Precise", 190, 1, 8], ["gammaLn_Precise", 190, 1, 8], ["ceiling_Precise", 190, 2, 8], ["floor_Precise", 190, 2, 8], ["acot", 190, 1, 8], ["acoth", 190, 1, 8], ["cot", 190, 1, 8], ["coth", 190, 1, 8], ["csc", 190, 1, 8], ["csch", 190, 1, 8], ["sec", 190, 1, 8], ["sech", 190, 1, 8], ["imTan", 190, 1, 8], ["imCot", 190, 1, 8], ["imCsc", 190, 1, 8], ["imCsch", 190, 1, 8], ["imSec", 190, 1, 8], ["imSech", 190, 1, 8], ["bitand", 190, 2, 8], ["bitor", 190, 2, 8], ["bitxor", 190, 2, 8], ["bitlshift", 190, 2, 8], ["bitrshift", 190, 2, 8], ["permutationa", 190, 2, 8], ["combina", 190, 2, 8], ["xor", 190, 1, 72], ["pduration", 190, 3, 8, 0, 0, "PDuration"], ["base", 190, 3, 8], ["decimal", 190, 2, 8], ["days", 190, 2, 8], ["binom_Dist_Range", 190, 4, 8], ["gamma", 190, 1, 8], ["skew_p", 190, 1, 72], ["gauss", 190, 1, 8], ["phi", 190, 1, 8], ["rri", 190, 3, 8], ["unichar", 190, 1, 8], ["unicode", 190, 1, 8], ["arabic", 190, 1, 8], ["isoWeekNum", 190, 1, 8], ["numberValue", 190, 3, 8], ["sheet", 190, 1, 8], ["sheets", 190, 1, 8], ["isFormula", 190, 1, 8], ["ceiling_Math", 190, 3, 8], ["floor_Math", 190, 3, 8], ["imSinh", 190, 1, 8], ["imCosh", 190, 1, 8]]]] };
     var _builder = new OfficeExtension.LibraryBuilder({ metadata: _libraryMetadataXlapi, targetNamespaceObject: Excel });
 })(Excel || (Excel = {}));
 var _EndExcel = "_EndExcel";
-
-
-OSFPerformance.officeExecuteEnd = OSFPerformance.now();
+OSFPerformance.hostInitializationEnd = OSFPerformance.now();
 

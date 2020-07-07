@@ -48,6 +48,7 @@ _u.ExtensibilityStrings.l_InvalidParameterValueError_Text = "Nilai parameter '{0
 _u.ExtensibilityStrings.l_InvalidSelection_Text = "Pemilihan tidak sah.";
 _u.ExtensibilityStrings.l_InvalidTime_Text = "Input tidak diselesaikan kepada masa yang sah.";
 _u.ExtensibilityStrings.l_Invalid_Category_Error_Text = "Kategori tidak sah telah disediakan.";
+_u.ExtensibilityStrings.l_ItemNotFound_Text = "Item tidak wujud atau belum dicipta..";
 _u.ExtensibilityStrings.l_Item_Not_Saved_Error_Text = "Id tidak boleh diambil sehingga item tersebut disimpan.";
 _u.ExtensibilityStrings.l_MessageInDifferentStoreError_Text = "ID EWS tidak dapat diambil kerana mesej disimpan dalam gedung yang berbeza.";
 _u.ExtensibilityStrings.l_Missing_Extended_Permissions_For_API = "Kebenaran Lanjutan tiada untuk panggilan API.";

@@ -54,6 +54,7 @@ _u.ExtensibilityStrings.l_InvalidParameterValueError_Text='The value of the \'{0
 _u.ExtensibilityStrings.l_InvalidSelection_Text='The selection is invalid.';
 _u.ExtensibilityStrings.l_InvalidTime_Text='The input doesn\'t resolve to a valid time.';
 _u.ExtensibilityStrings.l_Invalid_Category_Error_Text='Invalid categories were provided.';
+_u.ExtensibilityStrings.l_ItemNotFound_Text='The item does not exist or has not been created.';
 _u.ExtensibilityStrings.l_Item_Not_Saved_Error_Text='The id can\'t be retrieved until the item is saved.';
 _u.ExtensibilityStrings.l_MessageInDifferentStoreError_Text='The EWS ID can\'t be retrieved because the message is saved in a different store.';
 _u.ExtensibilityStrings.l_Missing_Extended_Permissions_For_API='Extended Permission missing for the API call.';

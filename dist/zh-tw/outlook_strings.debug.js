@@ -48,6 +48,7 @@ _u.ExtensibilityStrings.l_InvalidParameterValueError_Text = "'{0}' 參數的值�
 _u.ExtensibilityStrings.l_InvalidSelection_Text = "選取範圍無效。";
 _u.ExtensibilityStrings.l_InvalidTime_Text = "輸入未解析成有效時間。";
 _u.ExtensibilityStrings.l_Invalid_Category_Error_Text = "提供的類別無效。";
+_u.ExtensibilityStrings.l_ItemNotFound_Text = "專案不存在或尚未建立。";
 _u.ExtensibilityStrings.l_Item_Not_Saved_Error_Text = "您必須先儲存項目才能擷取識別碼。";
 _u.ExtensibilityStrings.l_MessageInDifferentStoreError_Text = "無法擷取 EWS 識別碼，因為郵件儲存在不同的存放區。";
 _u.ExtensibilityStrings.l_Missing_Extended_Permissions_For_API = "遺失 API 呼叫的延伸權限。";

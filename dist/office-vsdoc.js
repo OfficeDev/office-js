@@ -1,4 +1,4 @@
-/* Version: 16.0.12705.10000 */
+/* Version: 16.0.13018.10000 */
 /*
 	Copyright (c) Microsoft Corporation.  All rights reserved.
 */
@@ -3284,14 +3284,14 @@ var Excel;
 			/// <summary> Represents the Excel application that manages the workbook. [Api set: ExcelApi 1.1] </summary>
 			/// <field name="context" type="Excel.RequestContext">The request context associated with this object.</field>
 			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
-			/// <field name="calculationEngineVersion" type="Number">Returns the Excel calculation engine version used for the last full recalculation. Read-only. [Api set: ExcelApi 1.9]</field>
+			/// <field name="calculationEngineVersion" type="Number">Returns the Excel calculation engine version used for the last full recalculation. [Api set: ExcelApi 1.9]</field>
 			/// <field name="calculationMode" type="String">Returns the calculation mode used in the workbook, as defined by the constants in Excel.CalculationMode. Possible values are: `Automatic`, where Excel controls recalculation; `AutomaticExceptTables`, where Excel controls recalculation but ignores changes in tables; `Manual`, where calculation is done when the user requests it. [Api set: ExcelApi 1.1 for get, 1.8 for set]</field>
-			/// <field name="calculationState" type="String">Returns the calculation state of the application. See Excel.CalculationState for details. Read-only. [Api set: ExcelApi 1.9]</field>
-			/// <field name="cultureInfo" type="Excel.CultureInfo">Provides information based on current system culture settings. This includes the culture names, number formatting, and other culturally dependent settings. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
-			/// <field name="decimalSeparator" type="String">Gets the string used as the decimal separator for numeric values. This is based on Excel&apos;s local settings. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
+			/// <field name="calculationState" type="String">Returns the calculation state of the application. See Excel.CalculationState for details. [Api set: ExcelApi 1.9]</field>
+			/// <field name="cultureInfo" type="Excel.CultureInfo">Provides information based on current system culture settings. This includes the culture names, number formatting, and other culturally dependent settings. [Api set: ExcelApi 1.11]</field>
+			/// <field name="decimalSeparator" type="String">Gets the string used as the decimal separator for numeric values. This is based on Excel&apos;s local settings. [Api set: ExcelApi 1.11]</field>
 			/// <field name="iterativeCalculation" type="Excel.IterativeCalculation">Returns the Iterative Calculation settings.              In Excel on Windows and Mac, the settings will apply to the Excel Application.              In Excel on the web and other platforms, the settings will apply to the active workbook. [Api set: ExcelApi 1.9]</field>
-			/// <field name="thousandsSeparator" type="String">Gets the string used to separate groups of digits to the left of the decimal for numeric values. This is based on Excel&apos;s local settings. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
-			/// <field name="useSystemSeparators" type="Boolean">Specifies whether the system separators of Microsoft Excel are enabled.              System separators include the decimal separator and thousands separator. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
+			/// <field name="thousandsSeparator" type="String">Gets the string used to separate groups of digits to the left of the decimal for numeric values. This is based on Excel&apos;s local settings. [Api set: ExcelApi 1.11]</field>
+			/// <field name="useSystemSeparators" type="Boolean">Specifies if the system separators of Excel are enabled.              System separators include the decimal separator and thousands separator. [Api set: ExcelApi 1.11]</field>
 		}
 
 		Application.prototype.load = function(option) {
@@ -3331,7 +3331,7 @@ var Excel;
 		}
 		Application.prototype.suspendScreenUpdatingUntilNextSync = function() {
 			/// <summary>
-			/// Suspends sceen updating until the next &quot;context.sync()&quot; is called. [Api set: ExcelApi 1.9]
+			/// Suspends screen updating until the next `context.sync()` is called.                             **Note**: Don&apos;t call `suspendScreenUpdatingUntilNextSync` repeatedly (such as in a loop). Repeated calls will cause the Excel window to flicker. [Api set: ExcelApi 1.9]
 			/// </summary>
 			/// <returns ></returns>
 		}
@@ -3382,7 +3382,7 @@ var Excel;
 
 var Excel;
 (function (Excel) {
-	/// <summary> [Api set: ExcelApi 1.9] </summary>
+	/// <summary> The behavior types when AutoFill is used on a range in the workbook. [Api set: ExcelApi 1.9] </summary>
 	var AutoFillType = {
 		__proto__: null,
 		"fillDefault": "fillDefault",
@@ -3409,9 +3409,9 @@ var Excel;
 			/// <summary> Represents the AutoFilter object.               AutoFilter turns the values in Excel column into specific filters based on the cell contents. [Api set: ExcelApi 1.9] </summary>
 			/// <field name="context" type="Excel.RequestContext">The request context associated with this object.</field>
 			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
-			/// <field name="criteria" type="Array" elementType="Excel.Interfaces.FilterCriteria">An array that holds all the filter criteria in the autofiltered range. Read-Only. [Api set: ExcelApi 1.9]</field>
-			/// <field name="enabled" type="Boolean">Indicates if the AutoFilter is enabled or not. Read-Only. [Api set: ExcelApi 1.9]</field>
-			/// <field name="isDataFiltered" type="Boolean">Indicates if the AutoFilter has filter criteria. Read-Only. [Api set: ExcelApi 1.9]</field>
+			/// <field name="criteria" type="Array" elementType="Excel.Interfaces.FilterCriteria">An array that holds all the filter criteria in the autofiltered range. [Api set: ExcelApi 1.9]</field>
+			/// <field name="enabled" type="Boolean">Specifies if the AutoFilter is enabled. [Api set: ExcelApi 1.9]</field>
+			/// <field name="isDataFiltered" type="Boolean">Specifies if the AutoFilter has filter criteria. [Api set: ExcelApi 1.9]</field>
 		}
 
 		AutoFilter.prototype.load = function(option) {
@@ -3492,10 +3492,10 @@ var Excel;
 			/// <summary> Represents an Office.js binding that is defined in the workbook. [Api set: ExcelApi 1.1] </summary>
 			/// <field name="context" type="Excel.RequestContext">The request context associated with this object.</field>
 			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
-			/// <field name="id" type="String">Represents binding identifier. Read-only. [Api set: ExcelApi 1.1]</field>
-			/// <field name="type" type="String">Returns the type of the binding. See Excel.BindingType for details. Read-only. [Api set: ExcelApi 1.1]</field>
+			/// <field name="id" type="String">Represents binding identifier. [Api set: ExcelApi 1.1]</field>
+			/// <field name="type" type="String">Returns the type of the binding. See Excel.BindingType for details. [Api set: ExcelApi 1.1]</field>
 			/// <field name="onDataChanged" type="OfficeExtension.EventHandlers">Occurs when data or formatting within the binding is changed. [Api set: ExcelApi 1.2]</field>
-			/// <field name="onSelectionChanged" type="OfficeExtension.EventHandlers">Occurs when the selected content in the binding is changed. [Api set: ExcelApi 1.2]</field>
+			/// <field name="onSelectionChanged" type="OfficeExtension.EventHandlers">Occurs when the selected content in the binding is changed.                             **Note**: If multiple, discontiguous cells are selected, `Binding.onSelectionChanged` only reports row and column information for one selection. Use `Worksheet.onSelectionChanged` for multiple selected ranges. [Api set: ExcelApi 1.2]</field>
 		}
 
 		Binding.prototype.load = function(option) {
@@ -3550,7 +3550,7 @@ var Excel;
 		Binding.prototype.onSelectionChanged = {
 			__proto__: null,
 			add: function (handler) {
-				/// <param name="handler" type="function(eventArgs: Excel.Interfaces.BindingSelectionChangedEventArgs)">Handler for the event. EventArgs: Provides information about the binding that raised the SelectionChanged event. </param>
+				/// <param name="handler" type="function(eventArgs: Excel.Interfaces.BindingSelectionChangedEventArgs)">Handler for the event. EventArgs: Provides information about the selection that raised the &quot;SelectionChanged&quot; event.                             **Note**: If multiple, discontiguous cells are selected, `Binding.onSelectionChanged` only reports row and column information for one selection. Use `Worksheet.onSelectionChanged` for multiple selected ranges. </param>
 				/// <returns type="OfficeExtension.EventHandlerResult"></returns>
 				var eventInfo = new Excel.Interfaces.BindingSelectionChangedEventArgs();
 				eventInfo.__proto__ = null;
@@ -3575,7 +3575,7 @@ var Excel;
 			/// <summary> Represents the collection of all the binding objects that are part of the workbook. [Api set: ExcelApi 1.1] </summary>
 			/// <field name="context" type="Excel.RequestContext">The request context associated with this object.</field>
 			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
-			/// <field name="count" type="Number">Returns the number of bindings in the collection. Read-only. [Api set: ExcelApi 1.1]</field>
+			/// <field name="count" type="Number">Returns the number of bindings in the collection. [Api set: ExcelApi 1.1]</field>
 			/// <field name="items" type="Array" elementType="Excel.Binding">Gets the loaded child items in this collection.</field>
 		}
 
@@ -3671,7 +3671,7 @@ var Excel;
 	(function (Interfaces) {
 		var BindingSelectionChangedEventArgs = (function() {
 			function BindingSelectionChangedEventArgs() {
-				/// <summary> Provides information about the binding that raised the SelectionChanged event. [Api set: ExcelApi 1.2] </summary>
+				/// <summary> Provides information about the selection that raised the &quot;SelectionChanged&quot; event.                             **Note**: If multiple, discontiguous cells are selected, `Binding.onSelectionChanged` only reports row and column information for one selection. Use `Worksheet.onSelectionChanged` for multiple selected ranges. [Api set: ExcelApi 1.2] </summary>
 				/// <field name="binding" type="Excel.Binding">Gets the Binding object that represents the binding that raised the SelectionChanged event. [Api set: ExcelApi 1.2]</field>
 				/// <field name="columnCount" type="Number">Gets the number of columns selected. [Api set: ExcelApi 1.2]</field>
 				/// <field name="rowCount" type="Number">Gets the number of rows selected. [Api set: ExcelApi 1.2]</field>
@@ -3746,7 +3746,7 @@ var Excel;
 
 var Excel;
 (function (Excel) {
-	/// <summary> Represents a built-in PivotTable style [Api set: ExcelApi 1.12] </summary>
+	/// <summary> Represents a built-in PivotTable style [Api set: ExcelApi BETA (PREVIEW ONLY)] </summary>
 	var BuiltInPivotTableStyle = {
 		__proto__: null,
 		"none": "none",
@@ -3840,7 +3840,7 @@ var Excel;
 
 var Excel;
 (function (Excel) {
-	/// <summary> Represents a built-in slicer style. [Api set: ExcelApi 1.12] </summary>
+	/// <summary> Represents a built-in slicer style. [Api set: ExcelApi BETA (PREVIEW ONLY)] </summary>
 	var BuiltInSlicerStyle = {
 		__proto__: null,
 		"light1": "light1",
@@ -3924,7 +3924,7 @@ var Excel;
 
 var Excel;
 (function (Excel) {
-	/// <summary> Represents a built-in table style. [Api set: ExcelApi 1.12] </summary>
+	/// <summary> Represents a built-in table style. [Api set: ExcelApi BETA (PREVIEW ONLY)] </summary>
 	var BuiltInTableStyle = {
 		__proto__: null,
 		"light1": "light1",
@@ -4115,11 +4115,11 @@ var Excel;
 		var CellPropertiesFillLoadOptions = (function() {
 			function CellPropertiesFillLoadOptions() {
 				/// <summary> Specifies which properties to load on the `format.fill` object. [Api set: ExcelApi 1.9] </summary>
-				/// <field name="color" type="Boolean">Specifies whether to load on the `color` property. [Api set: ExcelApi 1.9]</field>
-				/// <field name="pattern" type="Boolean">Specifies whether to load on the `pattern` property. [Api set: ExcelApi 1.9]</field>
-				/// <field name="patternColor" type="Boolean">Specifies whether to load on the `patternColor` property. [Api set: ExcelApi 1.9]</field>
-				/// <field name="patternTintAndShade" type="Boolean">Specifies whether to load on the `patternTintAndShade` property. [Api set: ExcelApi 1.9]</field>
-				/// <field name="tintAndShade" type="Boolean">Specifies whether to load on the `tintAndShade` property. [Api set: ExcelApi 1.9]</field>
+				/// <field name="color" type="Boolean">Specifies whether to load the `color` property. [Api set: ExcelApi 1.9]</field>
+				/// <field name="pattern" type="Boolean">Specifies whether to load the `pattern` property. [Api set: ExcelApi 1.9]</field>
+				/// <field name="patternColor" type="Boolean">Specifies whether to load the `patternColor` property. [Api set: ExcelApi 1.9]</field>
+				/// <field name="patternTintAndShade" type="Boolean">Specifies whether to load the `patternTintAndShade` property. [Api set: ExcelApi 1.9]</field>
+				/// <field name="tintAndShade" type="Boolean">Specifies whether to load the `tintAndShade` property. [Api set: ExcelApi 1.9]</field>
 			}
 			return CellPropertiesFillLoadOptions;
 		})();
@@ -4204,7 +4204,7 @@ var Excel;
 			/// <field name="context" type="Excel.RequestContext">The request context associated with this object.</field>
 			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
 			/// <field name="format" type="Excel.ConditionalRangeFormat">Returns a format object, encapsulating the conditional formats font, fill, borders, and other properties. [Api set: ExcelApi 1.6]</field>
-			/// <field name="rule" type="Excel.Interfaces.ConditionalCellValueRule">Represents the Rule object on this conditional format. [Api set: ExcelApi 1.6]</field>
+			/// <field name="rule" type="Excel.Interfaces.ConditionalCellValueRule">Specifies the Rule object on this conditional format. [Api set: ExcelApi 1.6]</field>
 		}
 
 		CellValueConditionalFormat.prototype.load = function(option) {
@@ -4262,30 +4262,30 @@ var Excel;
 			/// <summary> Represents a chart object in a workbook.              To learn more about the Chart object model, see {@link https://docs.microsoft.com/office/dev/add-ins/excel/excel-add-ins-charts | Work with charts using the Excel JavaScript API}. [Api set: ExcelApi 1.1] </summary>
 			/// <field name="context" type="Excel.RequestContext">The request context associated with this object.</field>
 			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
-			/// <field name="axes" type="Excel.ChartAxes">Represents chart axes. Read-only. [Api set: ExcelApi 1.1]</field>
-			/// <field name="categoryLabelLevel" type="Number">Returns or sets a ChartCategoryLabelLevel enumeration constant referring to              the level of where the category labels are being sourced from. Read/Write. [Api set: ExcelApi 1.8]</field>
-			/// <field name="chartType" type="String">Represents the type of the chart. See Excel.ChartType for details. [Api set: ExcelApi 1.7]</field>
-			/// <field name="dataLabels" type="Excel.ChartDataLabels">Represents the datalabels on the chart. Read-only. [Api set: ExcelApi 1.1]</field>
-			/// <field name="displayBlanksAs" type="String">Returns or sets the way that blank cells are plotted on a chart. Read/Write. [Api set: ExcelApi 1.8]</field>
-			/// <field name="format" type="Excel.ChartAreaFormat">Encapsulates the format properties for the chart area. Read-only. [Api set: ExcelApi 1.1]</field>
-			/// <field name="height" type="Number">Represents the height, in points, of the chart object. [Api set: ExcelApi 1.1]</field>
-			/// <field name="id" type="String">The unique id of chart. Read-only. [Api set: ExcelApi 1.7]</field>
+			/// <field name="axes" type="Excel.ChartAxes">Represents chart axes. [Api set: ExcelApi 1.1]</field>
+			/// <field name="categoryLabelLevel" type="Number">Specifies a ChartCategoryLabelLevel enumeration constant referring to              the level of where the category labels are being sourced from. [Api set: ExcelApi 1.8]</field>
+			/// <field name="chartType" type="String">Specifies the type of the chart. See Excel.ChartType for details. [Api set: ExcelApi 1.7]</field>
+			/// <field name="dataLabels" type="Excel.ChartDataLabels">Represents the datalabels on the chart. [Api set: ExcelApi 1.1]</field>
+			/// <field name="displayBlanksAs" type="String">Specifies the way that blank cells are plotted on a chart. [Api set: ExcelApi 1.8]</field>
+			/// <field name="format" type="Excel.ChartAreaFormat">Encapsulates the format properties for the chart area. [Api set: ExcelApi 1.1]</field>
+			/// <field name="height" type="Number">Specifies the height, in points, of the chart object. [Api set: ExcelApi 1.1]</field>
+			/// <field name="id" type="String">The unique id of chart. [Api set: ExcelApi 1.7]</field>
 			/// <field name="left" type="Number">The distance, in points, from the left side of the chart to the worksheet origin. [Api set: ExcelApi 1.1]</field>
-			/// <field name="legend" type="Excel.ChartLegend">Represents the legend for the chart. Read-only. [Api set: ExcelApi 1.1]</field>
-			/// <field name="name" type="String">Represents the name of a chart object. [Api set: ExcelApi 1.1]</field>
-			/// <field name="pivotOptions" type="Excel.ChartPivotOptions">Encapsulates the options for a pivot chart. Read-only. [Api set: ExcelApi 1.9]</field>
+			/// <field name="legend" type="Excel.ChartLegend">Represents the legend for the chart. [Api set: ExcelApi 1.1]</field>
+			/// <field name="name" type="String">Specifies the name of a chart object. [Api set: ExcelApi 1.1]</field>
+			/// <field name="pivotOptions" type="Excel.ChartPivotOptions">Encapsulates the options for a pivot chart. [Api set: ExcelApi 1.9]</field>
 			/// <field name="plotArea" type="Excel.ChartPlotArea">Represents the plotArea for the chart. [Api set: ExcelApi 1.8]</field>
-			/// <field name="plotBy" type="String">Returns or sets the way columns or rows are used as data series on the chart. Read/Write. [Api set: ExcelApi 1.8]</field>
-			/// <field name="plotVisibleOnly" type="Boolean">True if only visible cells are plotted. False if both visible and hidden cells are plotted. Read/Write. [Api set: ExcelApi 1.8]</field>
-			/// <field name="series" type="Excel.ChartSeriesCollection">Represents either a single series or collection of series in the chart. Read-only. [Api set: ExcelApi 1.1]</field>
-			/// <field name="seriesNameLevel" type="Number">Returns or sets a ChartSeriesNameLevel enumeration constant referring to              the level of where the series names are being sourced from. Read/Write. [Api set: ExcelApi 1.8]</field>
-			/// <field name="showAllFieldButtons" type="Boolean">Represents whether to display all field buttons on a PivotChart. [Api set: ExcelApi 1.7]</field>
-			/// <field name="showDataLabelsOverMaximum" type="Boolean">Represents whether to show the data labels when the value is greater than the maximum value on the value axis.              If value axis became smaller than the size of data points, you can use this property to set whether to show the data labels.              This property applies to 2-D charts only. [Api set: ExcelApi 1.8]</field>
-			/// <field name="style" type="Number">Returns or sets the chart style for the chart. Read/Write. [Api set: ExcelApi 1.8]</field>
-			/// <field name="title" type="Excel.ChartTitle">Represents the title of the specified chart, including the text, visibility, position, and formatting of the title. Read-only. [Api set: ExcelApi 1.1]</field>
-			/// <field name="top" type="Number">Represents the distance, in points, from the top edge of the object to the top of row 1 (on a worksheet) or the top of the chart area (on a chart). [Api set: ExcelApi 1.1]</field>
-			/// <field name="width" type="Number">Represents the width, in points, of the chart object. [Api set: ExcelApi 1.1]</field>
-			/// <field name="worksheet" type="Excel.Worksheet">The worksheet containing the current chart. Read-only. [Api set: ExcelApi 1.2]</field>
+			/// <field name="plotBy" type="String">Specifies the way columns or rows are used as data series on the chart. [Api set: ExcelApi 1.8]</field>
+			/// <field name="plotVisibleOnly" type="Boolean">True if only visible cells are plotted. False if both visible and hidden cells are plotted. [Api set: ExcelApi 1.8]</field>
+			/// <field name="series" type="Excel.ChartSeriesCollection">Represents either a single series or collection of series in the chart. [Api set: ExcelApi 1.1]</field>
+			/// <field name="seriesNameLevel" type="Number">Specifies a ChartSeriesNameLevel enumeration constant referring to              the level of where the series names are being sourced from. [Api set: ExcelApi 1.8]</field>
+			/// <field name="showAllFieldButtons" type="Boolean">Specifies whether to display all field buttons on a PivotChart. [Api set: ExcelApi 1.7]</field>
+			/// <field name="showDataLabelsOverMaximum" type="Boolean">Specifies whether to show the data labels when the value is greater than the maximum value on the value axis.              If value axis became smaller than the size of data points, you can use this property to set whether to show the data labels.              This property applies to 2-D charts only. [Api set: ExcelApi 1.8]</field>
+			/// <field name="style" type="Number">Specifies the chart style for the chart. [Api set: ExcelApi 1.8]</field>
+			/// <field name="title" type="Excel.ChartTitle">Specifies the title of the specified chart, including the text, visibility, position, and formatting of the title. [Api set: ExcelApi 1.1]</field>
+			/// <field name="top" type="Number">Specifies the distance, in points, from the top edge of the object to the top of row 1 (on a worksheet) or the top of the chart area (on a chart). [Api set: ExcelApi 1.1]</field>
+			/// <field name="width" type="Number">Specifies the width, in points, of the chart object. [Api set: ExcelApi 1.1]</field>
+			/// <field name="worksheet" type="Excel.Worksheet">The worksheet containing the current chart. [Api set: ExcelApi 1.2]</field>
 			/// <field name="onActivated" type="OfficeExtension.EventHandlers">Occurs when the chart is activated. [Api set: ExcelApi 1.8]</field>
 			/// <field name="onDeactivated" type="OfficeExtension.EventHandlers">Occurs when the chart is deactivated. [Api set: ExcelApi 1.8]</field>
 		}
@@ -4432,11 +4432,11 @@ var Excel;
 			/// <summary> Encapsulates the format properties for the overall chart area. [Api set: ExcelApi 1.1] </summary>
 			/// <field name="context" type="Excel.RequestContext">The request context associated with this object.</field>
 			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
-			/// <field name="border" type="Excel.ChartBorder">Represents the border format of chart area, which includes color, linestyle, and weight. Read-only. [Api set: ExcelApi 1.7]</field>
-			/// <field name="colorScheme" type="String">Returns or sets color scheme of the chart. Read/Write. [Api set: ExcelApi 1.9]</field>
-			/// <field name="fill" type="Excel.ChartFill">Represents the fill format of an object, which includes background formatting information. Read-only. [Api set: ExcelApi 1.1]</field>
-			/// <field name="font" type="Excel.ChartFont">Represents the font attributes (font name, font size, color, etc.) for the current object. Read-only. [Api set: ExcelApi 1.1]</field>
-			/// <field name="roundedCorners" type="Boolean">Specifies whether or not chart area of the chart has rounded corners. Read/Write. [Api set: ExcelApi 1.9]</field>
+			/// <field name="border" type="Excel.ChartBorder">Represents the border format of chart area, which includes color, linestyle, and weight. [Api set: ExcelApi 1.7]</field>
+			/// <field name="colorScheme" type="String">Specifies the color scheme of the chart. [Api set: ExcelApi 1.9]</field>
+			/// <field name="fill" type="Excel.ChartFill">Represents the fill format of an object, which includes background formatting information. [Api set: ExcelApi 1.1]</field>
+			/// <field name="font" type="Excel.ChartFont">Represents the font attributes (font name, font size, color, etc.) for the current object. [Api set: ExcelApi 1.1]</field>
+			/// <field name="roundedCorners" type="Boolean">Specifies if the chart area of the chart has rounded corners. [Api set: ExcelApi 1.9]</field>
 		}
 
 		ChartAreaFormat.prototype.load = function(option) {
@@ -4475,9 +4475,9 @@ var Excel;
 			/// <summary> Represents the chart axes. [Api set: ExcelApi 1.1] </summary>
 			/// <field name="context" type="Excel.RequestContext">The request context associated with this object.</field>
 			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
-			/// <field name="categoryAxis" type="Excel.ChartAxis">Represents the category axis in a chart. Read-only. [Api set: ExcelApi 1.1]</field>
-			/// <field name="seriesAxis" type="Excel.ChartAxis">Represents the series axis of a 3-dimensional chart. Read-only. [Api set: ExcelApi 1.1]</field>
-			/// <field name="valueAxis" type="Excel.ChartAxis">Represents the value axis in an axis. Read-only. [Api set: ExcelApi 1.1]</field>
+			/// <field name="categoryAxis" type="Excel.ChartAxis">Represents the category axis in a chart. [Api set: ExcelApi 1.1]</field>
+			/// <field name="seriesAxis" type="Excel.ChartAxis">Represents the series axis of a 3-dimensional chart. [Api set: ExcelApi 1.1]</field>
+			/// <field name="valueAxis" type="Excel.ChartAxis">Represents the value axis in an axis. [Api set: ExcelApi 1.1]</field>
 		}
 
 		ChartAxes.prototype.load = function(option) {
@@ -4524,45 +4524,45 @@ var Excel;
 			/// <summary> Represents a single axis in a chart. [Api set: ExcelApi 1.1] </summary>
 			/// <field name="context" type="Excel.RequestContext">The request context associated with this object.</field>
 			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
-			/// <field name="alignment" type="String">Represents the alignment for the specified axis tick label. See Excel.ChartTextHorizontalAlignment for detail. [Api set: ExcelApi 1.8]</field>
-			/// <field name="axisGroup" type="String">Represents the group for the specified axis. See Excel.ChartAxisGroup for details. Read-only. [Api set: ExcelApi 1.7]</field>
-			/// <field name="baseTimeUnit" type="String">Returns or sets the base unit for the specified category axis. [Api set: ExcelApi 1.7]</field>
-			/// <field name="categoryType" type="String">Returns or sets the category axis type. [Api set: ExcelApi 1.7]</field>
-			/// <field name="customDisplayUnit" type="Number">Represents the custom axis display unit value. Read-only. To set this property, please use the SetCustomDisplayUnit(double) method. [Api set: ExcelApi 1.7]</field>
+			/// <field name="alignment" type="String">Specifies the alignment for the specified axis tick label. See Excel.ChartTextHorizontalAlignment for detail. [Api set: ExcelApi 1.8]</field>
+			/// <field name="axisGroup" type="String">Specifies the group for the specified axis. See Excel.ChartAxisGroup for details. [Api set: ExcelApi 1.7]</field>
+			/// <field name="baseTimeUnit" type="String">Specifies the base unit for the specified category axis. [Api set: ExcelApi 1.7]</field>
+			/// <field name="categoryType" type="String">Specifies the category axis type. [Api set: ExcelApi 1.7]</field>
+			/// <field name="customDisplayUnit" type="Number">Specifies the custom axis display unit value. To set this property, please use the SetCustomDisplayUnit(double) method. [Api set: ExcelApi 1.7]</field>
 			/// <field name="displayUnit" type="String">Represents the axis display unit. See Excel.ChartAxisDisplayUnit for details. [Api set: ExcelApi 1.7]</field>
-			/// <field name="format" type="Excel.ChartAxisFormat">Represents the formatting of a chart object, which includes line and font formatting. Read-only. [Api set: ExcelApi 1.1]</field>
-			/// <field name="height" type="Number">Represents the height, in points, of the chart axis. Null if the axis is not visible. Read-only. [Api set: ExcelApi 1.7]</field>
-			/// <field name="isBetweenCategories" type="Boolean">Represents whether value axis crosses the category axis between categories. [Api set: ExcelApi 1.8]</field>
-			/// <field name="left" type="Number">Represents the distance, in points, from the left edge of the axis to the left of chart area. Null if the axis is not visible. Read-only. [Api set: ExcelApi 1.7]</field>
-			/// <field name="linkNumberFormat" type="Boolean">Represents whether or not the number format is linked to the cells. If true, the number format will change in the labels when it changes in the cells. [Api set: ExcelApi 1.9]</field>
-			/// <field name="logBase" type="Number">Represents the base of the logarithm when using logarithmic scales. [Api set: ExcelApi 1.7]</field>
-			/// <field name="majorGridlines" type="Excel.ChartGridlines">Returns a Gridlines object that represents the major gridlines for the specified axis. Read-only. [Api set: ExcelApi 1.1]</field>
-			/// <field name="majorTickMark" type="String">Represents the type of major tick mark for the specified axis. See Excel.ChartAxisTickMark for details. [Api set: ExcelApi 1.7]</field>
-			/// <field name="majorTimeUnitScale" type="String">Returns or sets the major unit scale value for the category axis when the CategoryType property is set to TimeScale. [Api set: ExcelApi 1.7]</field>
+			/// <field name="format" type="Excel.ChartAxisFormat">Represents the formatting of a chart object, which includes line and font formatting. [Api set: ExcelApi 1.1]</field>
+			/// <field name="height" type="Number">Specifies the height, in points, of the chart axis. Null if the axis is not visible. [Api set: ExcelApi 1.7]</field>
+			/// <field name="isBetweenCategories" type="Boolean">Specifies if the value axis crosses the category axis between categories. [Api set: ExcelApi 1.8]</field>
+			/// <field name="left" type="Number">Specifies the distance, in points, from the left edge of the axis to the left of chart area. Null if the axis is not visible. [Api set: ExcelApi 1.7]</field>
+			/// <field name="linkNumberFormat" type="Boolean">Specifies if the number format is linked to the cells. If true, the number format will change in the labels when it changes in the cells. [Api set: ExcelApi 1.9]</field>
+			/// <field name="logBase" type="Number">Specifies the base of the logarithm when using logarithmic scales. [Api set: ExcelApi 1.7]</field>
+			/// <field name="majorGridlines" type="Excel.ChartGridlines">Returns a Gridlines object that represents the major gridlines for the specified axis. [Api set: ExcelApi 1.1]</field>
+			/// <field name="majorTickMark" type="String">Specifies the type of major tick mark for the specified axis. See Excel.ChartAxisTickMark for details. [Api set: ExcelApi 1.7]</field>
+			/// <field name="majorTimeUnitScale" type="String">Specifies the major unit scale value for the category axis when the CategoryType property is set to TimeScale. [Api set: ExcelApi 1.7]</field>
 			/// <field name="majorUnit" >Represents the interval between two major tick marks. Can be set to a numeric value or an empty string.  The returned value is always a number. [Api set: ExcelApi 1.1]</field>
 			/// <field name="maximum" >Represents the maximum value on the value axis.  Can be set to a numeric value or an empty string (for automatic axis values).  The returned value is always a number. [Api set: ExcelApi 1.1]</field>
 			/// <field name="minimum" >Represents the minimum value on the value axis. Can be set to a numeric value or an empty string (for automatic axis values).  The returned value is always a number. [Api set: ExcelApi 1.1]</field>
-			/// <field name="minorGridlines" type="Excel.ChartGridlines">Returns a Gridlines object that represents the minor gridlines for the specified axis. Read-only. [Api set: ExcelApi 1.1]</field>
-			/// <field name="minorTickMark" type="String">Represents the type of minor tick mark for the specified axis. See Excel.ChartAxisTickMark for details. [Api set: ExcelApi 1.7]</field>
-			/// <field name="minorTimeUnitScale" type="String">Returns or sets the minor unit scale value for the category axis when the CategoryType property is set to TimeScale. [Api set: ExcelApi 1.7]</field>
+			/// <field name="minorGridlines" type="Excel.ChartGridlines">Returns a Gridlines object that represents the minor gridlines for the specified axis. [Api set: ExcelApi 1.1]</field>
+			/// <field name="minorTickMark" type="String">Specifies the type of minor tick mark for the specified axis. See Excel.ChartAxisTickMark for details. [Api set: ExcelApi 1.7]</field>
+			/// <field name="minorTimeUnitScale" type="String">Specifies the minor unit scale value for the category axis when the CategoryType property is set to TimeScale. [Api set: ExcelApi 1.7]</field>
 			/// <field name="minorUnit" >Represents the interval between two minor tick marks. Can be set to a numeric value or an empty string (for automatic axis values). The returned value is always a number. [Api set: ExcelApi 1.1]</field>
-			/// <field name="multiLevel" type="Boolean">Represents whether an axis is multilevel or not. [Api set: ExcelApi 1.8]</field>
-			/// <field name="numberFormat" type="String">Represents the format code for the axis tick label. [Api set: ExcelApi 1.8]</field>
-			/// <field name="offset" type="Number">Represents the distance between the levels of labels, and the distance between the first level and the axis line. The value should be an integer from 0 to 1000. [Api set: ExcelApi 1.8]</field>
-			/// <field name="position" type="String">Represents the specified axis position where the other axis crosses. See Excel.ChartAxisPosition for details. [Api set: ExcelApi 1.8]</field>
-			/// <field name="positionAt" type="Number">Represents the specified axis position where the other axis crosses at. You should use the SetPositionAt(double) method to set this property. [Api set: ExcelApi 1.8]</field>
-			/// <field name="reversePlotOrder" type="Boolean">Represents whether Microsoft Excel plots data points from last to first. [Api set: ExcelApi 1.7]</field>
-			/// <field name="scaleType" type="String">Represents the value axis scale type. See Excel.ChartAxisScaleType for details. [Api set: ExcelApi 1.7]</field>
-			/// <field name="showDisplayUnitLabel" type="Boolean">Represents whether the axis display unit label is visible. [Api set: ExcelApi 1.7]</field>
-			/// <field name="textOrientation" >Represents the angle to which the text is oriented for the chart axis tick label. The value should either be an integer from -90 to 90 or the integer 180 for vertically-oriented text. [Api set: ExcelApi 1.8]</field>
-			/// <field name="tickLabelPosition" type="String">Represents the position of tick-mark labels on the specified axis. See Excel.ChartAxisTickLabelPosition for details. [Api set: ExcelApi 1.7]</field>
-			/// <field name="tickLabelSpacing" >Represents the number of categories or series between tick-mark labels. Can be a value from 1 through 31999 or an empty string for automatic setting. The returned value is always a number. [Api set: ExcelApi 1.7]</field>
-			/// <field name="tickMarkSpacing" type="Number">Represents the number of categories or series between tick marks. [Api set: ExcelApi 1.7]</field>
-			/// <field name="title" type="Excel.ChartAxisTitle">Represents the axis title. Read-only. [Api set: ExcelApi 1.1]</field>
-			/// <field name="top" type="Number">Represents the distance, in points, from the top edge of the axis to the top of chart area. Null if the axis is not visible. Read-only. [Api set: ExcelApi 1.7]</field>
-			/// <field name="type" type="String">Represents the axis type. See Excel.ChartAxisType for details. [Api set: ExcelApi 1.7]</field>
-			/// <field name="visible" type="Boolean">A boolean value represents the visibility of the axis. [Api set: ExcelApi 1.7]</field>
-			/// <field name="width" type="Number">Represents the width, in points, of the chart axis. Null if the axis is not visible. Read-only. [Api set: ExcelApi 1.7]</field>
+			/// <field name="multiLevel" type="Boolean">Specifies if an axis is multilevel. [Api set: ExcelApi 1.8]</field>
+			/// <field name="numberFormat" type="String">Specifies the format code for the axis tick label. [Api set: ExcelApi 1.8]</field>
+			/// <field name="offset" type="Number">Specifies the distance between the levels of labels, and the distance between the first level and the axis line. The value should be an integer from 0 to 1000. [Api set: ExcelApi 1.8]</field>
+			/// <field name="position" type="String">Specifies the specified axis position where the other axis crosses. See Excel.ChartAxisPosition for details. [Api set: ExcelApi 1.8]</field>
+			/// <field name="positionAt" type="Number">Specifies the specified axis position where the other axis crosses at. You should use the SetPositionAt(double) method to set this property. [Api set: ExcelApi 1.8]</field>
+			/// <field name="reversePlotOrder" type="Boolean">Specifies if Excel plots data points from last to first. [Api set: ExcelApi 1.7]</field>
+			/// <field name="scaleType" type="String">Specifies the value axis scale type. See Excel.ChartAxisScaleType for details. [Api set: ExcelApi 1.7]</field>
+			/// <field name="showDisplayUnitLabel" type="Boolean">Specifies if the axis display unit label is visible. [Api set: ExcelApi 1.7]</field>
+			/// <field name="textOrientation" >Specifies the angle to which the text is oriented for the chart axis tick label. The value should either be an integer from -90 to 90 or the integer 180 for vertically-oriented text. [Api set: ExcelApi 1.8]</field>
+			/// <field name="tickLabelPosition" type="String">Specifies the position of tick-mark labels on the specified axis. See Excel.ChartAxisTickLabelPosition for details. [Api set: ExcelApi 1.7]</field>
+			/// <field name="tickLabelSpacing" >Specifies the number of categories or series between tick-mark labels. Can be a value from 1 through 31999 or an empty string for automatic setting. The returned value is always a number. [Api set: ExcelApi 1.7]</field>
+			/// <field name="tickMarkSpacing" type="Number">Specifies the number of categories or series between tick marks. [Api set: ExcelApi 1.7]</field>
+			/// <field name="title" type="Excel.ChartAxisTitle">Represents the axis title. [Api set: ExcelApi 1.1]</field>
+			/// <field name="top" type="Number">Specifies the distance, in points, from the top edge of the axis to the top of chart area. Null if the axis is not visible. [Api set: ExcelApi 1.7]</field>
+			/// <field name="type" type="String">Specifies the axis type. See Excel.ChartAxisType for details. [Api set: ExcelApi 1.7]</field>
+			/// <field name="visible" type="Boolean">Specifies if the axis is visible. [Api set: ExcelApi 1.7]</field>
+			/// <field name="width" type="Number">Specifies the width, in points, of the chart axis. Null if the axis is not visible. [Api set: ExcelApi 1.7]</field>
 		}
 
 		ChartAxis.prototype.load = function(option) {
@@ -4603,7 +4603,7 @@ var Excel;
 		}
 		ChartAxis.prototype.setPositionAt = function(value) {
 			/// <summary>
-			/// Set the specified axis position where the other axis crosses at. [Api set: ExcelApi 1.8]
+			/// Sets the specified axis position where the other axis crosses at. [Api set: ExcelApi 1.8]
 			/// </summary>
 			/// <param name="value" type="Number">Custom value of the crosses at</param>
 			/// <returns ></returns>
@@ -4654,9 +4654,9 @@ var Excel;
 			/// <summary> Encapsulates the format properties for the chart axis. [Api set: ExcelApi 1.1] </summary>
 			/// <field name="context" type="Excel.RequestContext">The request context associated with this object.</field>
 			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
-			/// <field name="fill" type="Excel.ChartFill">Represents chart fill formatting. Read-only. [Api set: ExcelApi 1.8]</field>
-			/// <field name="font" type="Excel.ChartFont">Represents the font attributes (font name, font size, color, etc.) for a chart axis element. Read-only. [Api set: ExcelApi 1.1]</field>
-			/// <field name="line" type="Excel.ChartLineFormat">Represents chart line formatting. Read-only. [Api set: ExcelApi 1.1]</field>
+			/// <field name="fill" type="Excel.ChartFill">Specifies chart fill formatting. [Api set: ExcelApi 1.8]</field>
+			/// <field name="font" type="Excel.ChartFont">Specifies the font attributes (font name, font size, color, etc.) for a chart axis element. [Api set: ExcelApi 1.1]</field>
+			/// <field name="line" type="Excel.ChartLineFormat">Specifies chart line formatting. [Api set: ExcelApi 1.1]</field>
 		}
 
 		ChartAxisFormat.prototype.load = function(option) {
@@ -4768,10 +4768,10 @@ var Excel;
 			/// <summary> Represents the title of a chart axis. [Api set: ExcelApi 1.1] </summary>
 			/// <field name="context" type="Excel.RequestContext">The request context associated with this object.</field>
 			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
-			/// <field name="format" type="Excel.ChartAxisTitleFormat">Represents the formatting of chart axis title. Read-only. [Api set: ExcelApi 1.1]</field>
-			/// <field name="text" type="String">Represents the axis title. [Api set: ExcelApi 1.1]</field>
-			/// <field name="textOrientation" type="Number">Represents the angle to which the text is oriented for the chart axis title. The value should either be an integer from -90 to 90 or the integer 180 for vertically-oriented text. [Api set: ExcelApi 1.12]</field>
-			/// <field name="visible" type="Boolean">A boolean that specifies the visibility of an axis title. [Api set: ExcelApi 1.1]</field>
+			/// <field name="format" type="Excel.ChartAxisTitleFormat">Specifies the formatting of chart axis title. [Api set: ExcelApi 1.1]</field>
+			/// <field name="text" type="String">Specifies the axis title. [Api set: ExcelApi 1.1]</field>
+			/// <field name="textOrientation" type="Number">Specifies the angle to which the text is oriented for the chart axis title. The value should either be an integer from -90 to 90 or the integer 180 for vertically-oriented text. [Api set: ExcelApiOnline 1.1]</field>
+			/// <field name="visible" type="Boolean">Specifies if the axis title is visibile. [Api set: ExcelApi 1.1]</field>
 		}
 
 		ChartAxisTitle.prototype.load = function(option) {
@@ -4817,9 +4817,9 @@ var Excel;
 			/// <summary> Represents the chart axis title formatting. [Api set: ExcelApi 1.1] </summary>
 			/// <field name="context" type="Excel.RequestContext">The request context associated with this object.</field>
 			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
-			/// <field name="border" type="Excel.ChartBorder">Represents the border format, which includes color, linestyle, and weight. [Api set: ExcelApi 1.8]</field>
-			/// <field name="fill" type="Excel.ChartFill">Represents chart fill formatting. [Api set: ExcelApi 1.8]</field>
-			/// <field name="font" type="Excel.ChartFont">Represents the font attributes, such as font name, font size, color, etc. of chart axis title object. Read-only. [Api set: ExcelApi 1.1]</field>
+			/// <field name="border" type="Excel.ChartBorder">Specifies the chart axis title&apos;s border format, which includes color, linestyle, and weight. [Api set: ExcelApi 1.8]</field>
+			/// <field name="fill" type="Excel.ChartFill">Specifies the chart axis title&apos;s fill formatting. [Api set: ExcelApi 1.8]</field>
+			/// <field name="font" type="Excel.ChartFont">Specifies the chart axis title&apos;s font attributes, such as font name, font size, color, etc. of chart axis title object. [Api set: ExcelApi 1.1]</field>
 		}
 
 		ChartAxisTitleFormat.prototype.load = function(option) {
@@ -4871,13 +4871,13 @@ var Excel;
 			/// <summary> Encapsulates the bin options for histogram charts and pareto charts. [Api set: ExcelApi 1.9] </summary>
 			/// <field name="context" type="Excel.RequestContext">The request context associated with this object.</field>
 			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
-			/// <field name="allowOverflow" type="Boolean">Specifies whether or not the bin overflow is enabled in a histogram chart or pareto chart. Read/Write. [Api set: ExcelApi 1.9]</field>
-			/// <field name="allowUnderflow" type="Boolean">Specifies whether or not the bin underflow is enabled in a histogram chart or pareto chart. Read/Write. [Api set: ExcelApi 1.9]</field>
-			/// <field name="count" type="Number">Returns or sets the bin count of a histogram chart or pareto chart. Read/Write. [Api set: ExcelApi 1.9]</field>
-			/// <field name="overflowValue" type="Number">Returns or sets the bin overflow value of a histogram chart or pareto chart. Read/Write. [Api set: ExcelApi 1.9]</field>
-			/// <field name="type" type="String">Returns or sets the bin&apos;s type for a histogram chart or pareto chart. Read/Write. [Api set: ExcelApi 1.9]</field>
-			/// <field name="underflowValue" type="Number">Returns or sets the bin underflow value of a histogram chart or pareto chart. Read/Write. [Api set: ExcelApi 1.9]</field>
-			/// <field name="width" type="Number">Returns or sets the bin width value of a histogram chart or pareto chart. Read/Write. [Api set: ExcelApi 1.9]</field>
+			/// <field name="allowOverflow" type="Boolean">Specifies if bin overflow is enabled in a histogram chart or pareto chart. [Api set: ExcelApi 1.9]</field>
+			/// <field name="allowUnderflow" type="Boolean">Specifies if bin underflow is enabled in a histogram chart or pareto chart. [Api set: ExcelApi 1.9]</field>
+			/// <field name="count" type="Number">Specifies the bin count of a histogram chart or pareto chart. [Api set: ExcelApi 1.9]</field>
+			/// <field name="overflowValue" type="Number">Specifies the bin overflow value of a histogram chart or pareto chart. [Api set: ExcelApi 1.9]</field>
+			/// <field name="type" type="String">Specifies the bin&apos;s type for a histogram chart or pareto chart. [Api set: ExcelApi 1.9]</field>
+			/// <field name="underflowValue" type="Number">Specifies the bin underflow value of a histogram chart or pareto chart. [Api set: ExcelApi 1.9]</field>
+			/// <field name="width" type="Number">Specifies the bin width value of a histogram chart or pareto chart. [Api set: ExcelApi 1.9]</field>
 		}
 
 		ChartBinOptions.prototype.load = function(option) {
@@ -4987,11 +4987,11 @@ var Excel;
 			/// <summary> Represents the properties of a box and whisker chart. [Api set: ExcelApi 1.9] </summary>
 			/// <field name="context" type="Excel.RequestContext">The request context associated with this object.</field>
 			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
-			/// <field name="quartileCalculation" type="String">Returns or sets the quartile calculation type of a box and whisker chart. Read/Write. [Api set: ExcelApi 1.9]</field>
-			/// <field name="showInnerPoints" type="Boolean">Specifies whether or not the inner points are shown in a box and whisker chart. Read/Write. [Api set: ExcelApi 1.9]</field>
-			/// <field name="showMeanLine" type="Boolean">Specifies whether or not the mean line is shown in a box and whisker chart. Read/Write. [Api set: ExcelApi 1.9]</field>
-			/// <field name="showMeanMarker" type="Boolean">Specifies whether or not the mean marker is shown in a box and whisker chart. Read/Write. [Api set: ExcelApi 1.9]</field>
-			/// <field name="showOutlierPoints" type="Boolean">Specifies whether or not outlier points are shown in a box and whisker chart. Read/Write. [Api set: ExcelApi 1.9]</field>
+			/// <field name="quartileCalculation" type="String">Specifies if the quartile calculation type of a box and whisker chart. [Api set: ExcelApi 1.9]</field>
+			/// <field name="showInnerPoints" type="Boolean">Specifies if inner points are shown in a box and whisker chart. [Api set: ExcelApi 1.9]</field>
+			/// <field name="showMeanLine" type="Boolean">Specifies if the mean line is shown in a box and whisker chart. [Api set: ExcelApi 1.9]</field>
+			/// <field name="showMeanMarker" type="Boolean">Specifies if the mean marker is shown in a box and whisker chart. [Api set: ExcelApi 1.9]</field>
+			/// <field name="showOutlierPoints" type="Boolean">Specifies if outlier points are shown in a box and whisker chart. [Api set: ExcelApi 1.9]</field>
 		}
 
 		ChartBoxwhiskerOptions.prototype.load = function(option) {
@@ -5030,7 +5030,7 @@ var Excel;
 			/// <summary> A collection of all the chart objects on a worksheet. [Api set: ExcelApi 1.1] </summary>
 			/// <field name="context" type="Excel.RequestContext">The request context associated with this object.</field>
 			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
-			/// <field name="count" type="Number">Returns the number of charts in the worksheet. Read-only. [Api set: ExcelApi 1.1]</field>
+			/// <field name="count" type="Number">Returns the number of charts in the worksheet. [Api set: ExcelApi 1.1]</field>
 			/// <field name="onActivated" type="OfficeExtension.EventHandlers">Occurs when a chart is activated. [Api set: ExcelApi 1.8]</field>
 			/// <field name="onAdded" type="OfficeExtension.EventHandlers">Occurs when a new chart is added to the worksheet. [Api set: ExcelApi 1.8]</field>
 			/// <field name="onDeactivated" type="OfficeExtension.EventHandlers">Occurs when a chart is deactivated. [Api set: ExcelApi 1.8]</field>
@@ -5181,27 +5181,27 @@ var Excel;
 			/// <summary> Represents the data label of a chart point. [Api set: ExcelApi 1.7] </summary>
 			/// <field name="context" type="Excel.RequestContext">The request context associated with this object.</field>
 			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
-			/// <field name="autoText" type="Boolean">Boolean value representing if data label automatically generates appropriate text based on context. [Api set: ExcelApi 1.8]</field>
+			/// <field name="autoText" type="Boolean">Specifies if the data label automatically generates appropriate text based on context. [Api set: ExcelApi 1.8]</field>
 			/// <field name="format" type="Excel.ChartDataLabelFormat">Represents the format of chart data label. [Api set: ExcelApi 1.8]</field>
 			/// <field name="formula" type="String">String value that represents the formula of chart data label using A1-style notation. [Api set: ExcelApi 1.8]</field>
-			/// <field name="height" type="Number">Returns the height, in points, of the chart data label. Read-only. Null if chart data label is not visible. [Api set: ExcelApi 1.8]</field>
+			/// <field name="height" type="Number">Returns the height, in points, of the chart data label. Null if chart data label is not visible. [Api set: ExcelApi 1.8]</field>
 			/// <field name="horizontalAlignment" type="String">Represents the horizontal alignment for chart data label. See Excel.ChartTextHorizontalAlignment for details.              This property is valid only when TextOrientation of data label is -90, 90, or 180. [Api set: ExcelApi 1.8]</field>
 			/// <field name="left" type="Number">Represents the distance, in points, from the left edge of chart data label to the left edge of chart area. Null if chart data label is not visible. [Api set: ExcelApi 1.8]</field>
-			/// <field name="linkNumberFormat" type="Boolean">Boolean value representing if the number format is linked to the cells (so that the number format changes in the labels when it changes in the cells). [Api set: ExcelApi 1.9]</field>
+			/// <field name="linkNumberFormat" type="Boolean">Specifies if the number format is linked to the cells (so that the number format changes in the labels when it changes in the cells). [Api set: ExcelApi 1.9]</field>
 			/// <field name="numberFormat" type="String">String value that represents the format code for data label. [Api set: ExcelApi 1.8]</field>
 			/// <field name="position" type="String">DataLabelPosition value that represents the position of the data label. See Excel.ChartDataLabelPosition for details. [Api set: ExcelApi 1.7]</field>
 			/// <field name="separator" type="String">String representing the separator used for the data label on a chart. [Api set: ExcelApi 1.7]</field>
-			/// <field name="showBubbleSize" type="Boolean">Boolean value representing if the data label bubble size is visible or not. [Api set: ExcelApi 1.7]</field>
-			/// <field name="showCategoryName" type="Boolean">Boolean value representing if the data label category name is visible or not. [Api set: ExcelApi 1.7]</field>
-			/// <field name="showLegendKey" type="Boolean">Boolean value representing if the data label legend key is visible or not. [Api set: ExcelApi 1.7]</field>
-			/// <field name="showPercentage" type="Boolean">Boolean value representing if the data label percentage is visible or not. [Api set: ExcelApi 1.7]</field>
-			/// <field name="showSeriesName" type="Boolean">Boolean value representing if the data label series name is visible or not. [Api set: ExcelApi 1.7]</field>
-			/// <field name="showValue" type="Boolean">Boolean value representing if the data label value is visible or not. [Api set: ExcelApi 1.7]</field>
+			/// <field name="showBubbleSize" type="Boolean">Specifies if the data label bubble size is visible. [Api set: ExcelApi 1.7]</field>
+			/// <field name="showCategoryName" type="Boolean">Specifies if the data label category name is visible. [Api set: ExcelApi 1.7]</field>
+			/// <field name="showLegendKey" type="Boolean">Specifies if the data label legend key is visible. [Api set: ExcelApi 1.7]</field>
+			/// <field name="showPercentage" type="Boolean">Specifies if the data label percentage is visible. [Api set: ExcelApi 1.7]</field>
+			/// <field name="showSeriesName" type="Boolean">Specifies if the data label series name is visible. [Api set: ExcelApi 1.7]</field>
+			/// <field name="showValue" type="Boolean">Specifies if the data label value is visible. [Api set: ExcelApi 1.7]</field>
 			/// <field name="text" type="String">String representing the text of the data label on a chart. [Api set: ExcelApi 1.8]</field>
 			/// <field name="textOrientation" type="Number">Represents the angle to which the text is oriented for the chart data label. The value should either be an integer from -90 to 90 or the integer 180 for vertically-oriented text. [Api set: ExcelApi 1.8]</field>
 			/// <field name="top" type="Number">Represents the distance, in points, from the top edge of chart data label to the top of chart area. Null if chart data label is not visible. [Api set: ExcelApi 1.8]</field>
 			/// <field name="verticalAlignment" type="String">Represents the vertical alignment of chart data label. See Excel.ChartTextVerticalAlignment for details.              This property is valid only when TextOrientation of data label is 0. [Api set: ExcelApi 1.8]</field>
-			/// <field name="width" type="Number">Returns the width, in points, of the chart data label. Read-only. Null if chart data label is not visible. [Api set: ExcelApi 1.8]</field>
+			/// <field name="width" type="Number">Returns the width, in points, of the chart data label. Null if chart data label is not visible. [Api set: ExcelApi 1.8]</field>
 		}
 
 		ChartDataLabel.prototype.load = function(option) {
@@ -5240,9 +5240,9 @@ var Excel;
 			/// <summary> Encapsulates the format properties for the chart data labels. [Api set: ExcelApi 1.1] </summary>
 			/// <field name="context" type="Excel.RequestContext">The request context associated with this object.</field>
 			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
-			/// <field name="border" type="Excel.ChartBorder">Represents the border format, which includes color, linestyle, and weight. Read-only. [Api set: ExcelApi 1.8]</field>
-			/// <field name="fill" type="Excel.ChartFill">Represents the fill format of the current chart data label. Read-only. [Api set: ExcelApi 1.1]</field>
-			/// <field name="font" type="Excel.ChartFont">Represents the font attributes (font name, font size, color, etc.) for a chart data label. Read-only. [Api set: ExcelApi 1.1]</field>
+			/// <field name="border" type="Excel.ChartBorder">Represents the border format, which includes color, linestyle, and weight. [Api set: ExcelApi 1.8]</field>
+			/// <field name="fill" type="Excel.ChartFill">Represents the fill format of the current chart data label. [Api set: ExcelApi 1.1]</field>
+			/// <field name="font" type="Excel.ChartFont">Represents the font attributes (font name, font size, color, etc.) for a chart data label. [Api set: ExcelApi 1.1]</field>
 		}
 
 		ChartDataLabelFormat.prototype.load = function(option) {
@@ -5302,19 +5302,19 @@ var Excel;
 			/// <summary> Represents a collection of all the data labels on a chart point. [Api set: ExcelApi 1.1] </summary>
 			/// <field name="context" type="Excel.RequestContext">The request context associated with this object.</field>
 			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
-			/// <field name="autoText" type="Boolean">Represents whether data labels automatically generate appropriate text based on context. [Api set: ExcelApi 1.8]</field>
-			/// <field name="format" type="Excel.ChartDataLabelFormat">Represents the format of chart data labels, which includes fill and font formatting. Read-only. [Api set: ExcelApi 1.1]</field>
-			/// <field name="horizontalAlignment" type="String">Represents the horizontal alignment for chart data label. See Excel.ChartTextHorizontalAlignment for details.              This property is valid only when TextOrientation of data label is 0. [Api set: ExcelApi 1.8]</field>
-			/// <field name="linkNumberFormat" type="Boolean">Represents whether or not the number format is linked to the cells. If true, the number format will change in the labels when it changes in the cells [Api set: ExcelApi 1.9]</field>
-			/// <field name="numberFormat" type="String">Represents the format code for data labels. [Api set: ExcelApi 1.8]</field>
+			/// <field name="autoText" type="Boolean">Specifies if data labels automatically generate appropriate text based on context. [Api set: ExcelApi 1.8]</field>
+			/// <field name="format" type="Excel.ChartDataLabelFormat">Specifies the format of chart data labels, which includes fill and font formatting. [Api set: ExcelApi 1.1]</field>
+			/// <field name="horizontalAlignment" type="String">Specifies the horizontal alignment for chart data label. See Excel.ChartTextHorizontalAlignment for details.              This property is valid only when TextOrientation of data label is 0. [Api set: ExcelApi 1.8]</field>
+			/// <field name="linkNumberFormat" type="Boolean">Specifies if the number format is linked to the cells. If true, the number format will change in the labels when it changes in the cells. [Api set: ExcelApi 1.9]</field>
+			/// <field name="numberFormat" type="String">Specifies the format code for data labels. [Api set: ExcelApi 1.8]</field>
 			/// <field name="position" type="String">DataLabelPosition value that represents the position of the data label. See Excel.ChartDataLabelPosition for details. [Api set: ExcelApi 1.1]</field>
 			/// <field name="separator" type="String">String representing the separator used for the data labels on a chart. [Api set: ExcelApi 1.1]</field>
-			/// <field name="showBubbleSize" type="Boolean">Boolean value representing if the data label bubble size is visible or not. [Api set: ExcelApi 1.1]</field>
-			/// <field name="showCategoryName" type="Boolean">Boolean value representing if the data label category name is visible or not. [Api set: ExcelApi 1.1]</field>
-			/// <field name="showLegendKey" type="Boolean">Boolean value representing if the data label legend key is visible or not. [Api set: ExcelApi 1.1]</field>
-			/// <field name="showPercentage" type="Boolean">Boolean value representing if the data label percentage is visible or not. [Api set: ExcelApi 1.1]</field>
-			/// <field name="showSeriesName" type="Boolean">Boolean value representing if the data label series name is visible or not. [Api set: ExcelApi 1.1]</field>
-			/// <field name="showValue" type="Boolean">Boolean value representing if the data label value is visible or not. [Api set: ExcelApi 1.1]</field>
+			/// <field name="showBubbleSize" type="Boolean">Specifies if the data label bubble size is visible. [Api set: ExcelApi 1.1]</field>
+			/// <field name="showCategoryName" type="Boolean">Specifies if the data label category name is visible. [Api set: ExcelApi 1.1]</field>
+			/// <field name="showLegendKey" type="Boolean">Specifies if the data label legend key is visible. [Api set: ExcelApi 1.1]</field>
+			/// <field name="showPercentage" type="Boolean">Specifies if the data label percentage is visible. [Api set: ExcelApi 1.1]</field>
+			/// <field name="showSeriesName" type="Boolean">Specifies if the data label series name is visible. [Api set: ExcelApi 1.1]</field>
+			/// <field name="showValue" type="Boolean">Specifies if the data label value is visible. [Api set: ExcelApi 1.1]</field>
 			/// <field name="textOrientation" type="Number">Represents the angle to which the text is oriented for data labels. The value should either be an integer from -90 to 90 or the integer 180 for vertically-oriented text. [Api set: ExcelApi 1.8]</field>
 			/// <field name="verticalAlignment" type="String">Represents the vertical alignment of chart data label. See Excel.ChartTextVerticalAlignment for details.              This property is valid only when TextOrientation of data label is -90, 90, or 180. [Api set: ExcelApi 1.8]</field>
 		}
@@ -5404,11 +5404,11 @@ var Excel;
 			/// <summary> This object represents the attributes for a chart&apos;s error bars. [Api set: ExcelApi 1.9] </summary>
 			/// <field name="context" type="Excel.RequestContext">The request context associated with this object.</field>
 			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
-			/// <field name="endStyleCap" type="Boolean">Specifies whether or not the error bars have an end style cap. [Api set: ExcelApi 1.9]</field>
+			/// <field name="endStyleCap" type="Boolean">Specifies if error bars have an end style cap. [Api set: ExcelApi 1.9]</field>
 			/// <field name="format" type="Excel.ChartErrorBarsFormat">Specifies the formatting type of the error bars. [Api set: ExcelApi 1.9]</field>
 			/// <field name="include" type="String">Specifies which parts of the error bars to include. [Api set: ExcelApi 1.9]</field>
 			/// <field name="type" type="String">The type of range marked by the error bars. [Api set: ExcelApi 1.9]</field>
-			/// <field name="visible" type="Boolean">Specifies whether or not the error bars are displayed. [Api set: ExcelApi 1.9]</field>
+			/// <field name="visible" type="Boolean">Specifies whether the error bars are displayed. [Api set: ExcelApi 1.9]</field>
 		}
 
 		ChartErrorBars.prototype.load = function(option) {
@@ -5531,7 +5531,7 @@ var Excel;
 			/// <summary>
 			/// Sets the fill formatting of a chart element to a uniform color. [Api set: ExcelApi 1.1]
 			/// </summary>
-			/// <param name="color" type="String">HTML color code representing the color of the background, of the form #RRGGBB (e.g. &quot;FFA500&quot;) or as a named HTML color (e.g. &quot;orange&quot;).</param>
+			/// <param name="color" type="String">HTML color code representing the color of the background, of the form #RRGGBB (e.g., &quot;FFA500&quot;) or as a named HTML color (e.g., &quot;orange&quot;).</param>
 			/// <returns ></returns>
 		}
 
@@ -5549,10 +5549,10 @@ var Excel;
 			/// <field name="context" type="Excel.RequestContext">The request context associated with this object.</field>
 			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
 			/// <field name="bold" type="Boolean">Represents the bold status of font. [Api set: ExcelApi 1.1]</field>
-			/// <field name="color" type="String">HTML color code representation of the text color. E.g. #FF0000 represents Red. [Api set: ExcelApi 1.1]</field>
+			/// <field name="color" type="String">HTML color code representation of the text color (e.g., #FF0000 represents Red). [Api set: ExcelApi 1.1]</field>
 			/// <field name="italic" type="Boolean">Represents the italic status of the font. [Api set: ExcelApi 1.1]</field>
-			/// <field name="name" type="String">Font name (e.g. &quot;Calibri&quot;) [Api set: ExcelApi 1.1]</field>
-			/// <field name="size" type="Number">Size of the font (e.g. 11) [Api set: ExcelApi 1.1]</field>
+			/// <field name="name" type="String">Font name (e.g., &quot;Calibri&quot;) [Api set: ExcelApi 1.1]</field>
+			/// <field name="size" type="Number">Size of the font (e.g., 11) [Api set: ExcelApi 1.1]</field>
 			/// <field name="underline" type="String">Type of underline applied to the font. See Excel.ChartUnderlineStyle for details. [Api set: ExcelApi 1.1]</field>
 		}
 
@@ -5654,8 +5654,8 @@ var Excel;
 			/// <summary> Represents major or minor gridlines on a chart axis. [Api set: ExcelApi 1.1] </summary>
 			/// <field name="context" type="Excel.RequestContext">The request context associated with this object.</field>
 			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
-			/// <field name="format" type="Excel.ChartGridlinesFormat">Represents the formatting of chart gridlines. Read-only. [Api set: ExcelApi 1.1]</field>
-			/// <field name="visible" type="Boolean">Boolean value representing if the axis gridlines are visible or not. [Api set: ExcelApi 1.1]</field>
+			/// <field name="format" type="Excel.ChartGridlinesFormat">Represents the formatting of chart gridlines. [Api set: ExcelApi 1.1]</field>
+			/// <field name="visible" type="Boolean">Specifies if the axis gridlines are visible. [Api set: ExcelApi 1.1]</field>
 		}
 
 		ChartGridlines.prototype.load = function(option) {
@@ -5694,7 +5694,7 @@ var Excel;
 			/// <summary> Encapsulates the format properties for chart gridlines. [Api set: ExcelApi 1.1] </summary>
 			/// <field name="context" type="Excel.RequestContext">The request context associated with this object.</field>
 			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
-			/// <field name="line" type="Excel.ChartLineFormat">Represents chart line formatting. Read-only. [Api set: ExcelApi 1.1]</field>
+			/// <field name="line" type="Excel.ChartLineFormat">Represents chart line formatting. [Api set: ExcelApi 1.1]</field>
 		}
 
 		ChartGridlinesFormat.prototype.load = function(option) {
@@ -5733,16 +5733,16 @@ var Excel;
 			/// <summary> Represents the legend in a chart. [Api set: ExcelApi 1.1] </summary>
 			/// <field name="context" type="Excel.RequestContext">The request context associated with this object.</field>
 			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
-			/// <field name="format" type="Excel.ChartLegendFormat">Represents the formatting of a chart legend, which includes fill and font formatting. Read-only. [Api set: ExcelApi 1.1]</field>
-			/// <field name="height" type="Number">Represents the height, in points, of the legend on the chart. Null if legend is not visible. [Api set: ExcelApi 1.7]</field>
-			/// <field name="left" type="Number">Represents the left, in points, of a chart legend. Null if legend is not visible. [Api set: ExcelApi 1.7]</field>
-			/// <field name="legendEntries" type="Excel.ChartLegendEntryCollection">Represents a collection of legendEntries in the legend. Read-only. [Api set: ExcelApi 1.7]</field>
-			/// <field name="overlay" type="Boolean">Boolean value for whether the chart legend should overlap with the main body of the chart. [Api set: ExcelApi 1.1]</field>
-			/// <field name="position" type="String">Represents the position of the legend on the chart. See Excel.ChartLegendPosition for details. [Api set: ExcelApi 1.1]</field>
-			/// <field name="showShadow" type="Boolean">Represents if the legend has a shadow on the chart. [Api set: ExcelApi 1.7]</field>
-			/// <field name="top" type="Number">Represents the top of a chart legend. [Api set: ExcelApi 1.7]</field>
-			/// <field name="visible" type="Boolean">A boolean value the represents the visibility of a ChartLegend object. [Api set: ExcelApi 1.1]</field>
-			/// <field name="width" type="Number">Represents the width, in points, of the legend on the chart. Null if legend is not visible. [Api set: ExcelApi 1.7]</field>
+			/// <field name="format" type="Excel.ChartLegendFormat">Represents the formatting of a chart legend, which includes fill and font formatting. [Api set: ExcelApi 1.1]</field>
+			/// <field name="height" type="Number">Specifies the height, in points, of the legend on the chart. Null if legend is not visible. [Api set: ExcelApi 1.7]</field>
+			/// <field name="left" type="Number">Specifies the left, in points, of the legend on the chart. Null if legend is not visible. [Api set: ExcelApi 1.7]</field>
+			/// <field name="legendEntries" type="Excel.ChartLegendEntryCollection">Represents a collection of legendEntries in the legend. [Api set: ExcelApi 1.7]</field>
+			/// <field name="overlay" type="Boolean">Specifies if the chart legend should overlap with the main body of the chart. [Api set: ExcelApi 1.1]</field>
+			/// <field name="position" type="String">Specifies the position of the legend on the chart. See Excel.ChartLegendPosition for details. [Api set: ExcelApi 1.1]</field>
+			/// <field name="showShadow" type="Boolean">Specifies if the legend has a shadow on the chart. [Api set: ExcelApi 1.7]</field>
+			/// <field name="top" type="Number">Specifies the top of a chart legend. [Api set: ExcelApi 1.7]</field>
+			/// <field name="visible" type="Boolean">Specifies if the ChartLegend is visible. [Api set: ExcelApi 1.1]</field>
+			/// <field name="width" type="Number">Specifies the width, in points, of the legend on the chart. Null if legend is not visible. [Api set: ExcelApi 1.7]</field>
 		}
 
 		ChartLegend.prototype.load = function(option) {
@@ -5781,10 +5781,10 @@ var Excel;
 			/// <summary> Represents the legendEntry in legendEntryCollection. [Api set: ExcelApi 1.7] </summary>
 			/// <field name="context" type="Excel.RequestContext">The request context associated with this object.</field>
 			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
-			/// <field name="height" type="Number">Represents the height of the legendEntry on the chart legend. [Api set: ExcelApi 1.8]</field>
-			/// <field name="index" type="Number">Represents the index of the legendEntry in the chart legend. [Api set: ExcelApi 1.8]</field>
-			/// <field name="left" type="Number">Represents the left of a chart legendEntry. [Api set: ExcelApi 1.8]</field>
-			/// <field name="top" type="Number">Represents the top of a chart legendEntry. [Api set: ExcelApi 1.8]</field>
+			/// <field name="height" type="Number">Specifies the height of the legendEntry on the chart legend. [Api set: ExcelApi 1.8]</field>
+			/// <field name="index" type="Number">Specifies the index of the legendEntry in the chart legend. [Api set: ExcelApi 1.8]</field>
+			/// <field name="left" type="Number">Specifies the left of a chart legendEntry. [Api set: ExcelApi 1.8]</field>
+			/// <field name="top" type="Number">Specifies the top of a chart legendEntry. [Api set: ExcelApi 1.8]</field>
 			/// <field name="visible" type="Boolean">Represents the visible of a chart legend entry. [Api set: ExcelApi 1.7]</field>
 			/// <field name="width" type="Number">Represents the width of the legendEntry on the chart Legend. [Api set: ExcelApi 1.8]</field>
 		}
@@ -5866,9 +5866,9 @@ var Excel;
 			/// <summary> Encapsulates the format properties of a chart legend. [Api set: ExcelApi 1.1] </summary>
 			/// <field name="context" type="Excel.RequestContext">The request context associated with this object.</field>
 			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
-			/// <field name="border" type="Excel.ChartBorder">Represents the border format, which includes color, linestyle, and weight. Read-only. [Api set: ExcelApi 1.8]</field>
-			/// <field name="fill" type="Excel.ChartFill">Represents the fill format of an object, which includes background formatting information. Read-only. [Api set: ExcelApi 1.1]</field>
-			/// <field name="font" type="Excel.ChartFont">Represents the font attributes such as font name, font size, color, etc. of a chart legend. Read-only. [Api set: ExcelApi 1.1]</field>
+			/// <field name="border" type="Excel.ChartBorder">Represents the border format, which includes color, linestyle, and weight. [Api set: ExcelApi 1.8]</field>
+			/// <field name="fill" type="Excel.ChartFill">Represents the fill format of an object, which includes background formatting information. [Api set: ExcelApi 1.1]</field>
+			/// <field name="font" type="Excel.ChartFont">Represents the font attributes such as font name, font size, color, etc. of a chart legend. [Api set: ExcelApi 1.1]</field>
 		}
 
 		ChartLegendFormat.prototype.load = function(option) {
@@ -6019,9 +6019,9 @@ var Excel;
 			/// <summary> Encapsulates the properties for a region map chart. [Api set: ExcelApi 1.9] </summary>
 			/// <field name="context" type="Excel.RequestContext">The request context associated with this object.</field>
 			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
-			/// <field name="labelStrategy" type="String">Returns or sets the series map labels strategy of a region map chart. Read/Write. [Api set: ExcelApi 1.9]</field>
-			/// <field name="level" type="String">Returns or sets the series mapping level of a region map chart. Read/Write. [Api set: ExcelApi 1.9]</field>
-			/// <field name="projectionType" type="String">Returns or sets the series projection type of a region map chart. Read/Write. [Api set: ExcelApi 1.9]</field>
+			/// <field name="labelStrategy" type="String">Specifies the series map labels strategy of a region map chart. [Api set: ExcelApi 1.9]</field>
+			/// <field name="level" type="String">Specifies the series mapping level of a region map chart. [Api set: ExcelApi 1.9]</field>
+			/// <field name="projectionType" type="String">Specifies the series projection type of a region map chart. [Api set: ExcelApi 1.9]</field>
 		}
 
 		ChartMapOptions.prototype.load = function(option) {
@@ -6108,10 +6108,10 @@ var Excel;
 			/// <summary> Encapsulates the options for the pivot chart. [Api set: ExcelApi 1.9] </summary>
 			/// <field name="context" type="Excel.RequestContext">The request context associated with this object.</field>
 			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
-			/// <field name="showAxisFieldButtons" type="Boolean">Specifies whether or not to display the axis field buttons on a PivotChart. The ShowAxisFieldButtons property corresponds to the &quot;Show Axis Field Buttons&quot; command on the &quot;Field Buttons&quot; drop-down list of the &quot;Analyze&quot; tab, which is available when a PivotChart is selected. [Api set: ExcelApi 1.9]</field>
-			/// <field name="showLegendFieldButtons" type="Boolean">Specifies whether or not to display the legend field buttons on a PivotChart. [Api set: ExcelApi 1.9]</field>
-			/// <field name="showReportFilterFieldButtons" type="Boolean">Specifies whether or not to display the report filter field buttons on a PivotChart. [Api set: ExcelApi 1.9]</field>
-			/// <field name="showValueFieldButtons" type="Boolean">Specifies whether or not to display the show value field buttons on a PivotChart. [Api set: ExcelApi 1.9]</field>
+			/// <field name="showAxisFieldButtons" type="Boolean">Specifies whether to display the axis field buttons on a PivotChart. The ShowAxisFieldButtons property corresponds to the &quot;Show Axis Field Buttons&quot; command on the &quot;Field Buttons&quot; drop-down list of the &quot;Analyze&quot; tab, which is available when a PivotChart is selected. [Api set: ExcelApi 1.9]</field>
+			/// <field name="showLegendFieldButtons" type="Boolean">Specifies whether to display the legend field buttons on a PivotChart. [Api set: ExcelApi 1.9]</field>
+			/// <field name="showReportFilterFieldButtons" type="Boolean">Specifies whether to display the report filter field buttons on a PivotChart. [Api set: ExcelApi 1.9]</field>
+			/// <field name="showValueFieldButtons" type="Boolean">Specifies whether to display the show value field buttons on a PivotChart. [Api set: ExcelApi 1.9]</field>
 		}
 
 		ChartPivotOptions.prototype.load = function(option) {
@@ -6150,16 +6150,16 @@ var Excel;
 			/// <summary> This object represents the attributes for a chart plotArea object. [Api set: ExcelApi 1.8] </summary>
 			/// <field name="context" type="Excel.RequestContext">The request context associated with this object.</field>
 			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
-			/// <field name="format" type="Excel.ChartPlotAreaFormat">Represents the formatting of a chart plotArea. [Api set: ExcelApi 1.8]</field>
-			/// <field name="height" type="Number">Represents the height value of plotArea. [Api set: ExcelApi 1.8]</field>
-			/// <field name="insideHeight" type="Number">Represents the insideHeight value of plotArea. [Api set: ExcelApi 1.8]</field>
-			/// <field name="insideLeft" type="Number">Represents the insideLeft value of plotArea. [Api set: ExcelApi 1.8]</field>
-			/// <field name="insideTop" type="Number">Represents the insideTop value of plotArea. [Api set: ExcelApi 1.8]</field>
-			/// <field name="insideWidth" type="Number">Represents the insideWidth value of plotArea. [Api set: ExcelApi 1.8]</field>
-			/// <field name="left" type="Number">Represents the left value of plotArea. [Api set: ExcelApi 1.8]</field>
-			/// <field name="position" type="String">Represents the position of plotArea. [Api set: ExcelApi 1.8]</field>
-			/// <field name="top" type="Number">Represents the top value of plotArea. [Api set: ExcelApi 1.8]</field>
-			/// <field name="width" type="Number">Represents the width value of plotArea. [Api set: ExcelApi 1.8]</field>
+			/// <field name="format" type="Excel.ChartPlotAreaFormat">Specifies the formatting of a chart plotArea. [Api set: ExcelApi 1.8]</field>
+			/// <field name="height" type="Number">Specifies the height value of plotArea. [Api set: ExcelApi 1.8]</field>
+			/// <field name="insideHeight" type="Number">Specifies the insideHeight value of plotArea. [Api set: ExcelApi 1.8]</field>
+			/// <field name="insideLeft" type="Number">Specifies the insideLeft value of plotArea. [Api set: ExcelApi 1.8]</field>
+			/// <field name="insideTop" type="Number">Specifies the insideTop value of plotArea. [Api set: ExcelApi 1.8]</field>
+			/// <field name="insideWidth" type="Number">Specifies the insideWidth value of plotArea. [Api set: ExcelApi 1.8]</field>
+			/// <field name="left" type="Number">Specifies the left value of plotArea. [Api set: ExcelApi 1.8]</field>
+			/// <field name="position" type="String">Specifies the position of plotArea. [Api set: ExcelApi 1.8]</field>
+			/// <field name="top" type="Number">Specifies the top value of plotArea. [Api set: ExcelApi 1.8]</field>
+			/// <field name="width" type="Number">Specifies the width value of plotArea. [Api set: ExcelApi 1.8]</field>
 		}
 
 		ChartPlotArea.prototype.load = function(option) {
@@ -6198,8 +6198,8 @@ var Excel;
 			/// <summary> Represents the format properties for chart plotArea. [Api set: ExcelApi 1.8] </summary>
 			/// <field name="context" type="Excel.RequestContext">The request context associated with this object.</field>
 			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
-			/// <field name="border" type="Excel.ChartBorder">Represents the border attributes of a chart plotArea. [Api set: ExcelApi 1.8]</field>
-			/// <field name="fill" type="Excel.ChartFill">Represents the fill format of an object, which includes background formatting information. [Api set: ExcelApi 1.8]</field>
+			/// <field name="border" type="Excel.ChartBorder">Specifies the border attributes of a chart plotArea. [Api set: ExcelApi 1.8]</field>
+			/// <field name="fill" type="Excel.ChartFill">Specifies the fill format of an object, which includes background formatting information. [Api set: ExcelApi 1.8]</field>
 		}
 
 		ChartPlotAreaFormat.prototype.load = function(option) {
@@ -6260,14 +6260,14 @@ var Excel;
 			/// <summary> Represents a point of a series in a chart. [Api set: ExcelApi 1.1] </summary>
 			/// <field name="context" type="Excel.RequestContext">The request context associated with this object.</field>
 			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
-			/// <field name="dataLabel" type="Excel.ChartDataLabel">Returns the data label of a chart point. Read-only. [Api set: ExcelApi 1.7]</field>
-			/// <field name="format" type="Excel.ChartPointFormat">Encapsulates the format properties chart point. Read-only. [Api set: ExcelApi 1.1]</field>
+			/// <field name="dataLabel" type="Excel.ChartDataLabel">Returns the data label of a chart point. [Api set: ExcelApi 1.7]</field>
+			/// <field name="format" type="Excel.ChartPointFormat">Encapsulates the format properties chart point. [Api set: ExcelApi 1.1]</field>
 			/// <field name="hasDataLabel" type="Boolean">Represents whether a data point has a data label. Not applicable for surface charts. [Api set: ExcelApi 1.7]</field>
-			/// <field name="markerBackgroundColor" type="String">HTML color code representation of the marker background color of data point. E.g. #FF0000 represents Red. [Api set: ExcelApi 1.7]</field>
-			/// <field name="markerForegroundColor" type="String">HTML color code representation of the marker foreground color of data point. E.g. #FF0000 represents Red. [Api set: ExcelApi 1.7]</field>
+			/// <field name="markerBackgroundColor" type="String">HTML color code representation of the marker background color of data point (e.g., #FF0000 represents Red). [Api set: ExcelApi 1.7]</field>
+			/// <field name="markerForegroundColor" type="String">HTML color code representation of the marker foreground color of data point (e.g., #FF0000 represents Red). [Api set: ExcelApi 1.7]</field>
 			/// <field name="markerSize" type="Number">Represents marker size of data point. [Api set: ExcelApi 1.7]</field>
 			/// <field name="markerStyle" type="String">Represents marker style of a chart data point. See Excel.ChartMarkerStyle for details. [Api set: ExcelApi 1.7]</field>
-			/// <field name="value" >Returns the value of a chart point. Read-only. [Api set: ExcelApi 1.1]</field>
+			/// <field name="value" >Returns the value of a chart point. [Api set: ExcelApi 1.1]</field>
 		}
 
 		ChartPoint.prototype.load = function(option) {
@@ -6306,8 +6306,8 @@ var Excel;
 			/// <summary> Represents formatting object for chart points. [Api set: ExcelApi 1.1] </summary>
 			/// <field name="context" type="Excel.RequestContext">The request context associated with this object.</field>
 			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
-			/// <field name="border" type="Excel.ChartBorder">Represents the border format of a chart data point, which includes color, style, and weight information. Read-only. [Api set: ExcelApi 1.7]</field>
-			/// <field name="fill" type="Excel.ChartFill">Represents the fill format of a chart, which includes background formatting information. Read-only. [Api set: ExcelApi 1.1]</field>
+			/// <field name="border" type="Excel.ChartBorder">Represents the border format of a chart data point, which includes color, style, and weight information. [Api set: ExcelApi 1.7]</field>
+			/// <field name="fill" type="Excel.ChartFill">Represents the fill format of a chart, which includes background formatting information. [Api set: ExcelApi 1.1]</field>
 		}
 
 		ChartPointFormat.prototype.load = function(option) {
@@ -6346,7 +6346,7 @@ var Excel;
 			/// <summary> A collection of all the chart points within a series inside a chart. [Api set: ExcelApi 1.1] </summary>
 			/// <field name="context" type="Excel.RequestContext">The request context associated with this object.</field>
 			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
-			/// <field name="count" type="Number">Returns the number of chart points in the series. Read-only. [Api set: ExcelApi 1.1]</field>
+			/// <field name="count" type="Number">Returns the number of chart points in the series. [Api set: ExcelApi 1.1]</field>
 			/// <field name="items" type="Array" elementType="Excel.ChartPoint">Gets the loaded child items in this collection.</field>
 		}
 
@@ -6388,50 +6388,50 @@ var Excel;
 			/// <summary> Represents a series in a chart. [Api set: ExcelApi 1.1] </summary>
 			/// <field name="context" type="Excel.RequestContext">The request context associated with this object.</field>
 			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
-			/// <field name="axisGroup" type="String">Returns or sets the group for the specified series. Read/Write [Api set: ExcelApi 1.8]</field>
-			/// <field name="binOptions" type="Excel.ChartBinOptions">Encapsulates the bin options for histogram charts and pareto charts. Read-only. [Api set: ExcelApi 1.9]</field>
-			/// <field name="boxwhiskerOptions" type="Excel.ChartBoxwhiskerOptions">Encapsulates the options for the box and whisker charts. Read-only. [Api set: ExcelApi 1.9]</field>
-			/// <field name="bubbleScale" type="Number">This can be an integer value from 0 (zero) to 300, representing the percentage of the default size. This property only applies to bubble charts. Read/Write. [Api set: ExcelApi 1.9]</field>
+			/// <field name="axisGroup" type="String">Specifies the group for the specified series. [Api set: ExcelApi 1.8]</field>
+			/// <field name="binOptions" type="Excel.ChartBinOptions">Encapsulates the bin options for histogram charts and pareto charts. [Api set: ExcelApi 1.9]</field>
+			/// <field name="boxwhiskerOptions" type="Excel.ChartBoxwhiskerOptions">Encapsulates the options for the box and whisker charts. [Api set: ExcelApi 1.9]</field>
+			/// <field name="bubbleScale" type="Number">This can be an integer value from 0 (zero) to 300, representing the percentage of the default size. This property only applies to bubble charts. [Api set: ExcelApi 1.9]</field>
 			/// <field name="chartType" type="String">Represents the chart type of a series. See Excel.ChartType for details. [Api set: ExcelApi 1.7]</field>
 			/// <field name="dataLabels" type="Excel.ChartDataLabels">Represents a collection of all dataLabels in the series. [Api set: ExcelApi 1.8]</field>
 			/// <field name="doughnutHoleSize" type="Number">Represents the doughnut hole size of a chart series.  Only valid on doughnut and doughnutExploded charts.              Throws an invalid argument exception on invalid charts. [Api set: ExcelApi 1.7]</field>
-			/// <field name="explosion" type="Number">Returns or sets the explosion value for a pie-chart or doughnut-chart slice. Returns 0 (zero) if there&apos;s no explosion (the tip of the slice is in the center of the pie). Read/Write. [Api set: ExcelApi 1.8]</field>
-			/// <field name="filtered" type="Boolean">Boolean value representing if the series is filtered or not. Not applicable for surface charts. [Api set: ExcelApi 1.7]</field>
-			/// <field name="firstSliceAngle" type="Number">Returns or sets the angle of the first pie-chart or doughnut-chart slice, in degrees (clockwise from vertical). Applies only to pie, 3-D pie, and doughnut charts. Can be a value from 0 through 360. Read/Write [Api set: ExcelApi 1.8]</field>
-			/// <field name="format" type="Excel.ChartSeriesFormat">Represents the formatting of a chart series, which includes fill and line formatting. Read-only. [Api set: ExcelApi 1.1]</field>
+			/// <field name="explosion" type="Number">Specifies the explosion value for a pie-chart or doughnut-chart slice. Returns 0 (zero) if there&apos;s no explosion (the tip of the slice is in the center of the pie). [Api set: ExcelApi 1.8]</field>
+			/// <field name="filtered" type="Boolean">Specifies if the series is filtered. Not applicable for surface charts. [Api set: ExcelApi 1.7]</field>
+			/// <field name="firstSliceAngle" type="Number">Specifies the angle of the first pie-chart or doughnut-chart slice, in degrees (clockwise from vertical). Applies only to pie, 3-D pie, and doughnut charts. Can be a value from 0 through 360. [Api set: ExcelApi 1.8]</field>
+			/// <field name="format" type="Excel.ChartSeriesFormat">Represents the formatting of a chart series, which includes fill and line formatting. [Api set: ExcelApi 1.1]</field>
 			/// <field name="gapWidth" type="Number">Represents the gap width of a chart series.  Only valid on bar and column charts, as well as              specific classes of line and pie charts.  Throws an invalid argument exception on invalid charts. [Api set: ExcelApi 1.7]</field>
-			/// <field name="gradientMaximumColor" type="String">Returns or sets the color for maximum value of a region map chart series. Read/Write. [Api set: ExcelApi 1.9]</field>
-			/// <field name="gradientMaximumType" type="String">Returns or sets the type for maximum value of a region map chart series. Read/Write. [Api set: ExcelApi 1.9]</field>
-			/// <field name="gradientMaximumValue" type="Number">Returns or sets the maximum value of a region map chart series. Read/Write. [Api set: ExcelApi 1.9]</field>
-			/// <field name="gradientMidpointColor" type="String">Returns or sets the color for midpoint value of a region map chart series. Read/Write. [Api set: ExcelApi 1.9]</field>
-			/// <field name="gradientMidpointType" type="String">Returns or sets the type for midpoint value of a region map chart series. Read/Write. [Api set: ExcelApi 1.9]</field>
-			/// <field name="gradientMidpointValue" type="Number">Returns or sets the midpoint value of a region map chart series. Read/Write. [Api set: ExcelApi 1.9]</field>
-			/// <field name="gradientMinimumColor" type="String">Returns or sets the color for minimum value of a region map chart series. Read/Write. [Api set: ExcelApi 1.9]</field>
-			/// <field name="gradientMinimumType" type="String">Returns or sets the type for minimum value of a region map chart series. Read/Write. [Api set: ExcelApi 1.9]</field>
-			/// <field name="gradientMinimumValue" type="Number">Returns or sets the minimum value of a region map chart series. Read/Write. [Api set: ExcelApi 1.9]</field>
-			/// <field name="gradientStyle" type="String">Returns or sets series gradient style of a region map chart. Read/Write. [Api set: ExcelApi 1.9]</field>
-			/// <field name="hasDataLabels" type="Boolean">Boolean value representing if the series has data labels or not. [Api set: ExcelApi 1.7]</field>
-			/// <field name="invertColor" type="String">Returns or sets the fill color for negative data points in a series. Read/Write. [Api set: ExcelApi 1.9]</field>
-			/// <field name="invertIfNegative" type="Boolean">True if Microsoft Excel inverts the pattern in the item when it corresponds to a negative number. Read/Write. [Api set: ExcelApi 1.8]</field>
-			/// <field name="mapOptions" type="Excel.ChartMapOptions">Encapsulates the options for a region map chart. Read-only. [Api set: ExcelApi 1.9]</field>
-			/// <field name="markerBackgroundColor" type="String">Represents markers background color of a chart series. [Api set: ExcelApi 1.7]</field>
-			/// <field name="markerForegroundColor" type="String">Represents markers foreground color of a chart series. [Api set: ExcelApi 1.7]</field>
-			/// <field name="markerSize" type="Number">Represents marker size of a chart series. [Api set: ExcelApi 1.7]</field>
-			/// <field name="markerStyle" type="String">Represents marker style of a chart series. See Excel.ChartMarkerStyle for details. [Api set: ExcelApi 1.7]</field>
-			/// <field name="name" type="String">Represents the name of a series in a chart. [Api set: ExcelApi 1.1]</field>
-			/// <field name="overlap" type="Number">Specifies how bars and columns are positioned. Can be a value between –100 and 100. Applies only to 2-D bar and 2-D column charts. Read/Write. [Api set: ExcelApi 1.8]</field>
-			/// <field name="parentLabelStrategy" type="String">Returns or sets the series parent label strategy area for a treemap chart. Read/Write. [Api set: ExcelApi 1.9]</field>
-			/// <field name="plotOrder" type="Number">Represents the plot order of a chart series within the chart group. [Api set: ExcelApi 1.7]</field>
-			/// <field name="points" type="Excel.ChartPointsCollection">Represents a collection of all points in the series. Read-only. [Api set: ExcelApi 1.1]</field>
-			/// <field name="secondPlotSize" type="Number">Returns or sets the size of the secondary section of either a pie of pie chart or a bar of pie chart, as a percentage of the size of the primary pie. Can be a value from 5 to 200. Read/Write. [Api set: ExcelApi 1.8]</field>
-			/// <field name="showConnectorLines" type="Boolean">Specifies whether or not connector lines are shown in waterfall charts. Read/Write. [Api set: ExcelApi 1.9]</field>
-			/// <field name="showLeaderLines" type="Boolean">Specifies whether or not leader lines are displayed for each data label in the series. Read/Write. [Api set: ExcelApi 1.9]</field>
-			/// <field name="showShadow" type="Boolean">Boolean value representing if the series has a shadow or not. [Api set: ExcelApi 1.7]</field>
-			/// <field name="smooth" type="Boolean">Boolean value representing if the series is smooth or not. Only applicable to line and scatter charts. [Api set: ExcelApi 1.7]</field>
-			/// <field name="splitType" type="String">Returns or sets the way the two sections of either a pie of pie chart or a bar of pie chart are split. Read/Write. [Api set: ExcelApi 1.8]</field>
-			/// <field name="splitValue" type="Number">Returns or sets the threshold value that separates two sections of either a pie-of-pie chart or a bar-of-pie chart. Read/Write. [Api set: ExcelApi 1.9]</field>
-			/// <field name="trendlines" type="Excel.ChartTrendlineCollection">Represents a collection of trendlines in the series. Read-only. [Api set: ExcelApi 1.7]</field>
-			/// <field name="varyByCategories" type="Boolean">True if Microsoft Excel assigns a different color or pattern to each data marker. The chart must contain only one series. Read/Write. [Api set: ExcelApi 1.8]</field>
+			/// <field name="gradientMaximumColor" type="String">Specifies the color for maximum value of a region map chart series. [Api set: ExcelApi 1.9]</field>
+			/// <field name="gradientMaximumType" type="String">Specifies the type for maximum value of a region map chart series. [Api set: ExcelApi 1.9]</field>
+			/// <field name="gradientMaximumValue" type="Number">Specifies the maximum value of a region map chart series. [Api set: ExcelApi 1.9]</field>
+			/// <field name="gradientMidpointColor" type="String">Specifies the color for midpoint value of a region map chart series. [Api set: ExcelApi 1.9]</field>
+			/// <field name="gradientMidpointType" type="String">Specifies the type for midpoint value of a region map chart series. [Api set: ExcelApi 1.9]</field>
+			/// <field name="gradientMidpointValue" type="Number">Specifies the midpoint value of a region map chart series. [Api set: ExcelApi 1.9]</field>
+			/// <field name="gradientMinimumColor" type="String">Specifies the color for minimum value of a region map chart series. [Api set: ExcelApi 1.9]</field>
+			/// <field name="gradientMinimumType" type="String">Specifies the type for minimum value of a region map chart series. [Api set: ExcelApi 1.9]</field>
+			/// <field name="gradientMinimumValue" type="Number">Specifies the minimum value of a region map chart series. [Api set: ExcelApi 1.9]</field>
+			/// <field name="gradientStyle" type="String">Specifies the series gradient style of a region map chart. [Api set: ExcelApi 1.9]</field>
+			/// <field name="hasDataLabels" type="Boolean">Specifies if the series has data labels. [Api set: ExcelApi 1.7]</field>
+			/// <field name="invertColor" type="String">Specifies the fill color for negative data points in a series. [Api set: ExcelApi 1.9]</field>
+			/// <field name="invertIfNegative" type="Boolean">True if Excel inverts the pattern in the item when it corresponds to a negative number. [Api set: ExcelApi 1.8]</field>
+			/// <field name="mapOptions" type="Excel.ChartMapOptions">Encapsulates the options for a region map chart. [Api set: ExcelApi 1.9]</field>
+			/// <field name="markerBackgroundColor" type="String">Specifies the markers background color of a chart series. [Api set: ExcelApi 1.7]</field>
+			/// <field name="markerForegroundColor" type="String">Specifies the markers foreground color of a chart series. [Api set: ExcelApi 1.7]</field>
+			/// <field name="markerSize" type="Number">Specifies the marker size of a chart series. [Api set: ExcelApi 1.7]</field>
+			/// <field name="markerStyle" type="String">Specifies the marker style of a chart series. See Excel.ChartMarkerStyle for details. [Api set: ExcelApi 1.7]</field>
+			/// <field name="name" type="String">Specifies the name of a series in a chart. [Api set: ExcelApi 1.1]</field>
+			/// <field name="overlap" type="Number">Specifies how bars and columns are positioned. Can be a value between –100 and 100. Applies only to 2-D bar and 2-D column charts. [Api set: ExcelApi 1.8]</field>
+			/// <field name="parentLabelStrategy" type="String">Specifies the series parent label strategy area for a treemap chart. [Api set: ExcelApi 1.9]</field>
+			/// <field name="plotOrder" type="Number">Specifies the plot order of a chart series within the chart group. [Api set: ExcelApi 1.7]</field>
+			/// <field name="points" type="Excel.ChartPointsCollection">Returns a collection of all points in the series. [Api set: ExcelApi 1.1]</field>
+			/// <field name="secondPlotSize" type="Number">Specifies the size of the secondary section of either a pie-of-pie chart or a bar-of-pie chart, as a percentage of the size of the primary pie. Can be a value from 5 to 200. [Api set: ExcelApi 1.8]</field>
+			/// <field name="showConnectorLines" type="Boolean">Specifies whether connector lines are shown in waterfall charts. [Api set: ExcelApi 1.9]</field>
+			/// <field name="showLeaderLines" type="Boolean">Specifies whether leader lines are displayed for each data label in the series. [Api set: ExcelApi 1.9]</field>
+			/// <field name="showShadow" type="Boolean">Specifies if the series has a shadow. [Api set: ExcelApi 1.7]</field>
+			/// <field name="smooth" type="Boolean">Specifies if the series is smooth. Only applicable to line and scatter charts. [Api set: ExcelApi 1.7]</field>
+			/// <field name="splitType" type="String">Specifies the way the two sections of either a pie-of-pie chart or a bar-of-pie chart are split. [Api set: ExcelApi 1.8]</field>
+			/// <field name="splitValue" type="Number">Specifies the threshold value that separates two sections of either a pie-of-pie chart or a bar-of-pie chart. [Api set: ExcelApi 1.9]</field>
+			/// <field name="trendlines" type="Excel.ChartTrendlineCollection">The collection of trendlines in the series. [Api set: ExcelApi 1.7]</field>
+			/// <field name="varyByCategories" type="Boolean">True if Excel assigns a different color or pattern to each data marker. The chart must contain only one series. [Api set: ExcelApi 1.8]</field>
 			/// <field name="xErrorBars" type="Excel.ChartErrorBars">Represents the error bar object of a chart series. [Api set: ExcelApi 1.9]</field>
 			/// <field name="yErrorBars" type="Excel.ChartErrorBars">Represents the error bar object of a chart series. [Api set: ExcelApi 1.9]</field>
 		}
@@ -6466,7 +6466,7 @@ var Excel;
 		}
 		ChartSeries.prototype.getDimensionValues = function(dimension) {
 			/// <summary>
-			/// Gets the values from a single dimension of the chart series. These could be either category values or data values, depending on the dimension specified and how the data is mapped for the chart series. [Api set: ExcelApi 1.12]
+			/// Gets the values from a single dimension of the chart series. These could be either category values or data values, depending on the dimension specified and how the data is mapped for the chart series. [Api set: ExcelApi BETA (PREVIEW ONLY)]
 			/// </summary>
 			/// <param name="dimension" type="String">the dimension of axis where the data from</param>
 			/// <returns type="OfficeExtension.ClientResult&lt;string[]&gt;"></returns>
@@ -6477,21 +6477,21 @@ var Excel;
 		}
 		ChartSeries.prototype.setBubbleSizes = function(sourceData) {
 			/// <summary>
-			/// Set bubble sizes for a chart series. Only works for bubble charts. [Api set: ExcelApi 1.7]
+			/// Sets the bubble sizes for a chart series. Only works for bubble charts. [Api set: ExcelApi 1.7]
 			/// </summary>
 			/// <param name="sourceData" >The Range object corresponding to the source data.</param>
 			/// <returns ></returns>
 		}
 		ChartSeries.prototype.setValues = function(sourceData) {
 			/// <summary>
-			/// Set values for a chart series. For scatter chart, it means Y axis values. [Api set: ExcelApi 1.7]
+			/// Sets the values for a chart series. For scatter chart, it means Y axis values. [Api set: ExcelApi 1.7]
 			/// </summary>
 			/// <param name="sourceData" >The Range object corresponding to the source data.</param>
 			/// <returns ></returns>
 		}
 		ChartSeries.prototype.setXAxisValues = function(sourceData) {
 			/// <summary>
-			/// Set values of X axis for a chart series. Only works for scatter charts. [Api set: ExcelApi 1.7]
+			/// Sets the values of the X axis for a chart series. Only works for scatter charts. [Api set: ExcelApi 1.7]
 			/// </summary>
 			/// <param name="sourceData" >The Range object corresponding to the source data.</param>
 			/// <returns ></returns>
@@ -6522,7 +6522,7 @@ var Excel;
 			/// <summary> Represents a collection of chart series. [Api set: ExcelApi 1.1] </summary>
 			/// <field name="context" type="Excel.RequestContext">The request context associated with this object.</field>
 			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
-			/// <field name="count" type="Number">Returns the number of series in the collection. Read-only. [Api set: ExcelApi 1.1]</field>
+			/// <field name="count" type="Number">Returns the number of series in the collection. [Api set: ExcelApi 1.1]</field>
 			/// <field name="items" type="Array" elementType="Excel.ChartSeries">Gets the loaded child items in this collection.</field>
 		}
 
@@ -6566,7 +6566,7 @@ var Excel;
 
 var Excel;
 (function (Excel) {
-	/// <summary> Represents the dimensions when getting values from chart series. [Api set: ExcelApi 1.12] </summary>
+	/// <summary> Represents the dimensions when getting values from chart series. [Api set: ExcelApi BETA (PREVIEW ONLY)] </summary>
 	var ChartSeriesDimension = {
 		__proto__: null,
 		"categories": "categories",
@@ -6585,8 +6585,8 @@ var Excel;
 			/// <summary> Encapsulates the format properties for the chart series [Api set: ExcelApi 1.1] </summary>
 			/// <field name="context" type="Excel.RequestContext">The request context associated with this object.</field>
 			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
-			/// <field name="fill" type="Excel.ChartFill">Represents the fill format of a chart series, which includes background formatting information. Read-only. [Api set: ExcelApi 1.1]</field>
-			/// <field name="line" type="Excel.ChartLineFormat">Represents line formatting. Read-only. [Api set: ExcelApi 1.1]</field>
+			/// <field name="fill" type="Excel.ChartFill">Represents the fill format of a chart series, which includes background formatting information. [Api set: ExcelApi 1.1]</field>
+			/// <field name="line" type="Excel.ChartLineFormat">Represents line formatting. [Api set: ExcelApi 1.1]</field>
 		}
 
 		ChartSeriesFormat.prototype.load = function(option) {
@@ -6678,19 +6678,19 @@ var Excel;
 			/// <summary> Represents a chart title object of a chart. [Api set: ExcelApi 1.1] </summary>
 			/// <field name="context" type="Excel.RequestContext">The request context associated with this object.</field>
 			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
-			/// <field name="format" type="Excel.ChartTitleFormat">Represents the formatting of a chart title, which includes fill and font formatting. Read-only. [Api set: ExcelApi 1.1]</field>
-			/// <field name="height" type="Number">Returns the height, in points, of the chart title. Null if chart title is not visible. Read-only. [Api set: ExcelApi 1.7]</field>
-			/// <field name="horizontalAlignment" type="String">Represents the horizontal alignment for chart title. [Api set: ExcelApi 1.7]</field>
-			/// <field name="left" type="Number">Represents the distance, in points, from the left edge of chart title to the left edge of chart area. Null if chart title is not visible. [Api set: ExcelApi 1.7]</field>
-			/// <field name="overlay" type="Boolean">Boolean value representing if the chart title will overlay the chart or not. [Api set: ExcelApi 1.1]</field>
+			/// <field name="format" type="Excel.ChartTitleFormat">Represents the formatting of a chart title, which includes fill and font formatting. [Api set: ExcelApi 1.1]</field>
+			/// <field name="height" type="Number">Returns the height, in points, of the chart title. Null if chart title is not visible. [Api set: ExcelApi 1.7]</field>
+			/// <field name="horizontalAlignment" type="String">Specifies the horizontal alignment for chart title. [Api set: ExcelApi 1.7]</field>
+			/// <field name="left" type="Number">Specifies the distance, in points, from the left edge of chart title to the left edge of chart area. Null if chart title is not visible. [Api set: ExcelApi 1.7]</field>
+			/// <field name="overlay" type="Boolean">Specifies if the chart title will overlay the chart. [Api set: ExcelApi 1.1]</field>
 			/// <field name="position" type="String">Represents the position of chart title. See Excel.ChartTitlePosition for details. [Api set: ExcelApi 1.7]</field>
 			/// <field name="showShadow" type="Boolean">Represents a boolean value that determines if the chart title has a shadow. [Api set: ExcelApi 1.7]</field>
-			/// <field name="text" type="String">Represents the title text of a chart. [Api set: ExcelApi 1.1]</field>
-			/// <field name="textOrientation" type="Number">Represents the angle to which the text is oriented for the chart title. The value should either be an integer from -90 to 90 or the integer 180 for vertically-oriented text. [Api set: ExcelApi 1.7]</field>
-			/// <field name="top" type="Number">Represents the distance, in points, from the top edge of chart title to the top of chart area. Null if chart title is not visible. [Api set: ExcelApi 1.7]</field>
-			/// <field name="verticalAlignment" type="String">Represents the vertical alignment of chart title. See Excel.ChartTextVerticalAlignment for details. [Api set: ExcelApi 1.7]</field>
-			/// <field name="visible" type="Boolean">A boolean value the represents the visibility of a chart title object. [Api set: ExcelApi 1.1]</field>
-			/// <field name="width" type="Number">Returns the width, in points, of the chart title. Null if chart title is not visible. Read-only. [Api set: ExcelApi 1.7]</field>
+			/// <field name="text" type="String">Specifies the chart&apos;s title text. [Api set: ExcelApi 1.1]</field>
+			/// <field name="textOrientation" type="Number">Specifies the angle to which the text is oriented for the chart title. The value should either be an integer from -90 to 90 or the integer 180 for vertically-oriented text. [Api set: ExcelApi 1.7]</field>
+			/// <field name="top" type="Number">Specifies the distance, in points, from the top edge of chart title to the top of chart area. Null if chart title is not visible. [Api set: ExcelApi 1.7]</field>
+			/// <field name="verticalAlignment" type="String">Specifies the vertical alignment of chart title. See Excel.ChartTextVerticalAlignment for details. [Api set: ExcelApi 1.7]</field>
+			/// <field name="visible" type="Boolean">Specifies if the chart title is visibile. [Api set: ExcelApi 1.1]</field>
+			/// <field name="width" type="Number">Specifies the width, in points, of the chart title. Null if chart title is not visible. [Api set: ExcelApi 1.7]</field>
 		}
 
 		ChartTitle.prototype.load = function(option) {
@@ -6744,9 +6744,9 @@ var Excel;
 			/// <summary> Provides access to the office art formatting for chart title. [Api set: ExcelApi 1.1] </summary>
 			/// <field name="context" type="Excel.RequestContext">The request context associated with this object.</field>
 			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
-			/// <field name="border" type="Excel.ChartBorder">Represents the border format of chart title, which includes color, linestyle, and weight. Read-only. [Api set: ExcelApi 1.7]</field>
-			/// <field name="fill" type="Excel.ChartFill">Represents the fill format of an object, which includes background formatting information. Read-only. [Api set: ExcelApi 1.1]</field>
-			/// <field name="font" type="Excel.ChartFont">Represents the font attributes (font name, font size, color, etc.) for an object. Read-only. [Api set: ExcelApi 1.1]</field>
+			/// <field name="border" type="Excel.ChartBorder">Represents the border format of chart title, which includes color, linestyle, and weight. [Api set: ExcelApi 1.7]</field>
+			/// <field name="fill" type="Excel.ChartFill">Represents the fill format of an object, which includes background formatting information. [Api set: ExcelApi 1.1]</field>
+			/// <field name="font" type="Excel.ChartFont">Represents the font attributes (font name, font size, color, etc.) for an object. [Api set: ExcelApi 1.1]</field>
 		}
 
 		ChartTitleFormat.prototype.load = function(option) {
@@ -6902,7 +6902,7 @@ var Excel;
 			/// <summary> Represents the format properties for chart trendline. [Api set: ExcelApi 1.7] </summary>
 			/// <field name="context" type="Excel.RequestContext">The request context associated with this object.</field>
 			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
-			/// <field name="line" type="Excel.ChartLineFormat">Represents chart line formatting. Read-only. [Api set: ExcelApi 1.7]</field>
+			/// <field name="line" type="Excel.ChartLineFormat">Represents chart line formatting. [Api set: ExcelApi 1.7]</field>
 		}
 
 		ChartTrendlineFormat.prototype.load = function(option) {
@@ -6941,19 +6941,19 @@ var Excel;
 			/// <summary> This object represents the attributes for a chart trendline lable object. [Api set: ExcelApi 1.8] </summary>
 			/// <field name="context" type="Excel.RequestContext">The request context associated with this object.</field>
 			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
-			/// <field name="autoText" type="Boolean">Boolean value representing if trendline label automatically generates appropriate text based on context. [Api set: ExcelApi 1.8]</field>
-			/// <field name="format" type="Excel.ChartTrendlineLabelFormat">Represents the format of chart trendline label. [Api set: ExcelApi 1.8]</field>
+			/// <field name="autoText" type="Boolean">Specifies if trendline label automatically generate appropriate text based on context. [Api set: ExcelApi 1.8]</field>
+			/// <field name="format" type="Excel.ChartTrendlineLabelFormat">The format of chart trendline label. [Api set: ExcelApi 1.8]</field>
 			/// <field name="formula" type="String">String value that represents the formula of chart trendline label using A1-style notation. [Api set: ExcelApi 1.8]</field>
-			/// <field name="height" type="Number">Returns the height, in points, of the chart trendline label. Read-only. Null if chart trendline label is not visible. [Api set: ExcelApi 1.8]</field>
+			/// <field name="height" type="Number">Returns the height, in points, of the chart trendline label. Null if chart trendline label is not visible. [Api set: ExcelApi 1.8]</field>
 			/// <field name="horizontalAlignment" type="String">Represents the horizontal alignment for chart trendline label. See Excel.ChartTextHorizontalAlignment for details.              This property is valid only when TextOrientation of trendline label is -90, 90, or 180. [Api set: ExcelApi 1.8]</field>
 			/// <field name="left" type="Number">Represents the distance, in points, from the left edge of chart trendline label to the left edge of chart area. Null if chart trendline label is not visible. [Api set: ExcelApi 1.8]</field>
-			/// <field name="linkNumberFormat" type="Boolean">Boolean value representing if the number format is linked to the cells (so that the number format changes in the labels when it changes in the cells). [Api set: ExcelApi 1.9]</field>
+			/// <field name="linkNumberFormat" type="Boolean">Specifies if the number format is linked to the cells (so that the number format changes in the labels when it changes in the cells). [Api set: ExcelApi 1.9]</field>
 			/// <field name="numberFormat" type="String">String value that represents the format code for trendline label. [Api set: ExcelApi 1.8]</field>
 			/// <field name="text" type="String">String representing the text of the trendline label on a chart. [Api set: ExcelApi 1.8]</field>
 			/// <field name="textOrientation" type="Number">Represents the angle to which the text is oriented for the chart trendline label. The value should either be an integer from -90 to 90 or the integer 180 for vertically-oriented text. [Api set: ExcelApi 1.8]</field>
 			/// <field name="top" type="Number">Represents the distance, in points, from the top edge of chart trendline label to the top of chart area. Null if chart trendline label is not visible. [Api set: ExcelApi 1.8]</field>
 			/// <field name="verticalAlignment" type="String">Represents the vertical alignment of chart trendline label. See Excel.ChartTextVerticalAlignment for details.              This property is valid only when TextOrientation of trendline label is 0. [Api set: ExcelApi 1.8]</field>
-			/// <field name="width" type="Number">Returns the width, in points, of the chart trendline label. Read-only. Null if chart trendline label is not visible. [Api set: ExcelApi 1.8]</field>
+			/// <field name="width" type="Number">Returns the width, in points, of the chart trendline label. Null if chart trendline label is not visible. [Api set: ExcelApi 1.8]</field>
 		}
 
 		ChartTrendlineLabel.prototype.load = function(option) {
@@ -6992,9 +6992,9 @@ var Excel;
 			/// <summary> Encapsulates the format properties for the chart trendline label. [Api set: ExcelApi 1.8] </summary>
 			/// <field name="context" type="Excel.RequestContext">The request context associated with this object.</field>
 			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
-			/// <field name="border" type="Excel.ChartBorder">Represents the border format, which includes color, linestyle, and weight. [Api set: ExcelApi 1.8]</field>
-			/// <field name="fill" type="Excel.ChartFill">Represents the fill format of the current chart trendline label. [Api set: ExcelApi 1.8]</field>
-			/// <field name="font" type="Excel.ChartFont">Represents the font attributes (font name, font size, color, etc.) for a chart trendline label. [Api set: ExcelApi 1.8]</field>
+			/// <field name="border" type="Excel.ChartBorder">Specifies the border format, which includes color, linestyle, and weight. [Api set: ExcelApi 1.8]</field>
+			/// <field name="fill" type="Excel.ChartFill">Specifies the fill format of the current chart trendline label. [Api set: ExcelApi 1.8]</field>
+			/// <field name="font" type="Excel.ChartFont">Specifies the font attributes (font name, font size, color, etc.) for a chart trendline label. [Api set: ExcelApi 1.8]</field>
 		}
 
 		ChartTrendlineLabelFormat.prototype.load = function(option) {
@@ -7172,7 +7172,7 @@ var Excel;
 	var ColorScaleConditionalFormat = (function(_super) {
 		__extends(ColorScaleConditionalFormat, _super);
 		function ColorScaleConditionalFormat() {
-			/// <summary> Represents an IconSet criteria for conditional formatting. [Api set: ExcelApi 1.6] </summary>
+			/// <summary> Represents ColorScale criteria for conditional formatting. [Api set: ExcelApi 1.6] </summary>
 			/// <field name="context" type="Excel.RequestContext">The request context associated with this object.</field>
 			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
 			/// <field name="criteria" type="Excel.Interfaces.ConditionalColorScaleCriteria">The criteria of the color scale. Midpoint is optional when using a two point color scale. [Api set: ExcelApi 1.6]</field>
@@ -7217,14 +7217,14 @@ var Excel;
 			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
 			/// <field name="authorEmail" type="String">Gets the email of the comment&apos;s author. [Api set: ExcelApi 1.10]</field>
 			/// <field name="authorName" type="String">Gets the name of the comment&apos;s author. [Api set: ExcelApi 1.10]</field>
-			/// <field name="content" type="String">Gets or sets the comment&apos;s content. The string is plain text. [Api set: ExcelApi 1.10]</field>
-			/// <field name="contentType" type="String">Gets the content type of the comment. [Api set: ExcelApi 1.12]</field>
+			/// <field name="content" type="String">The comment&apos;s content. The string is plain text. [Api set: ExcelApi 1.10]</field>
+			/// <field name="contentType" type="String">Gets the content type of the comment. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
 			/// <field name="creationDate" type="Date">Gets the creation time of the comment. Returns null if the comment was converted from a note, since the comment does not have a creation date. [Api set: ExcelApi 1.10]</field>
-			/// <field name="id" type="String">Represents the comment identifier. Read-only. [Api set: ExcelApi 1.10]</field>
-			/// <field name="mentions" type="Array" elementType="Excel.Interfaces.CommentMention">Gets the entities (e.g. people) that are mentioned in comments. [Api set: ExcelApiOnline 1.1]</field>
-			/// <field name="replies" type="Excel.CommentReplyCollection">Represents a collection of reply objects associated with the comment. Read-only. [Api set: ExcelApi 1.10]</field>
-			/// <field name="resolved" type="Boolean">Gets or sets the comment thread status. A value of &quot;true&quot; means the comment thread is in the resolved state. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
-			/// <field name="richContent" type="String">Gets the rich comment content (e.g. mentions in comments). This string is not meant to be displayed to end-users. Your add-in should only use this to parse rich comment content. [Api set: ExcelApiOnline 1.1]</field>
+			/// <field name="id" type="String">Specifies the comment identifier. [Api set: ExcelApi 1.10]</field>
+			/// <field name="mentions" type="Array" elementType="Excel.Interfaces.CommentMention">Gets the entities (e.g., people) that are mentioned in comments. [Api set: ExcelApi 1.11]</field>
+			/// <field name="replies" type="Excel.CommentReplyCollection">Represents a collection of reply objects associated with the comment. [Api set: ExcelApi 1.10]</field>
+			/// <field name="resolved" type="Boolean">The comment thread status. A value of &quot;true&quot; means the comment thread is resolved. [Api set: ExcelApi 1.11]</field>
+			/// <field name="richContent" type="String">Gets the rich comment content (e.g., mentions in comments). This string is not meant to be displayed to end-users. Your add-in should only use this to parse rich comment content. [Api set: ExcelApi 1.11]</field>
 		}
 
 		Comment.prototype.load = function(option) {
@@ -7263,7 +7263,7 @@ var Excel;
 		}
 		Comment.prototype.updateMentions = function(contentWithMentions) {
 			/// <summary>
-			/// Updates the comment content with a specially formatted string and a list of mentions. [Api set: ExcelApiOnline 1.1]
+			/// Updates the comment content with a specially formatted string and a list of mentions. [Api set: ExcelApi 1.11]
 			/// </summary>
 			/// <param name="contentWithMentions" type="Excel.Interfaces.CommentRichContent">The content for the comment. This contains a specially formatted string and a list of mentions that will be parsed into the string when displayed by Excel.</param>
 			/// <returns ></returns>
@@ -7276,12 +7276,69 @@ var Excel;
 
 var Excel;
 (function (Excel) {
+	var Interfaces;
+	(function (Interfaces) {
+		var CommentAddedEventArgs = (function() {
+			function CommentAddedEventArgs() {
+				/// <summary> Provides information about the comment(s) that raised the Added event. [Api set: ExcelApi BETA (PREVIEW ONLY)] </summary>
+				/// <field name="commentDetails" type="Array" elementType="Excel.Interfaces.CommentDetail">Get the CommentDetail array which contains the comment Id and Ids of its related replies. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
+				/// <field name="source" type="String">Specifies the source of the event. See Excel.EventSource for details. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
+				/// <field name="type" type="String">Gets the type of the event. See Excel.EventType for details. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
+				/// <field name="worksheetId" type="String">Gets the Id of the worksheet in which the event happened. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
+			}
+			return CommentAddedEventArgs;
+		})();
+		Interfaces.CommentAddedEventArgs.__proto__ = null;
+		Interfaces.CommentAddedEventArgs = CommentAddedEventArgs;
+	})(Interfaces = Excel.Interfaces || (Excel.Interfaces = { __proto__: null}));
+})(Excel || (Excel = {__proto__: null}));
+
+var Excel;
+(function (Excel) {
+	var Interfaces;
+	(function (Interfaces) {
+		var CommentChangedEventArgs = (function() {
+			function CommentChangedEventArgs() {
+				/// <summary> Occurs when existing comments are changed. [Api set: ExcelApi BETA (PREVIEW ONLY)] </summary>
+				/// <field name="changeType" type="String">Gets the change type that represents how the changed event is triggered. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
+				/// <field name="commentDetails" type="Array" elementType="Excel.Interfaces.CommentDetail">Get the CommentDetail array which contains the comment Id and Ids of its related replies. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
+				/// <field name="source" type="String">Specifies the source of the event. See Excel.EventSource for details. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
+				/// <field name="type" type="String">Gets the type of the event. See Excel.EventType for details. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
+				/// <field name="worksheetId" type="String">Gets the Id of the worksheet in which the event happened. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
+			}
+			return CommentChangedEventArgs;
+		})();
+		Interfaces.CommentChangedEventArgs.__proto__ = null;
+		Interfaces.CommentChangedEventArgs = CommentChangedEventArgs;
+	})(Interfaces = Excel.Interfaces || (Excel.Interfaces = { __proto__: null}));
+})(Excel || (Excel = {__proto__: null}));
+
+var Excel;
+(function (Excel) {
+	/// <summary> Represents how the comment(s) in the event were changed. [Api set: ExcelApi BETA (PREVIEW ONLY)] </summary>
+	var CommentChangeType = {
+		__proto__: null,
+		"commentEdited": "commentEdited",
+		"commentResolved": "commentResolved",
+		"commentReopened": "commentReopened",
+		"replyAdded": "replyAdded",
+		"replyDeleted": "replyDeleted",
+		"replyEdited": "replyEdited",
+	}
+	Excel.CommentChangeType = CommentChangeType;
+})(Excel || (Excel = {__proto__: null}));
+
+var Excel;
+(function (Excel) {
 	var CommentCollection = (function(_super) {
 		__extends(CommentCollection, _super);
 		function CommentCollection() {
 			/// <summary> Represents a collection of comment objects that are part of the workbook. [Api set: ExcelApi 1.10] </summary>
 			/// <field name="context" type="Excel.RequestContext">The request context associated with this object.</field>
 			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
+			/// <field name="onAdded" type="OfficeExtension.EventHandlers">Occurs when the comments are added. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
+			/// <field name="onChanged" type="OfficeExtension.EventHandlers">Occurs when comments or replies in a comment collection are changed, including when replies are deleted. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
+			/// <field name="onDeleted" type="OfficeExtension.EventHandlers">Occurs when comments are deleted in the comment collection. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
 			/// <field name="items" type="Array" elementType="Excel.Comment">Gets the loaded child items in this collection.</field>
 		}
 
@@ -7297,8 +7354,8 @@ var Excel;
 			/// Creates a new comment with the given content on the given cell. An `InvalidArgument` error is thrown if the provided range is larger than one cell. [Api set: ExcelApi 1.10]
 			/// </summary>
 			/// <param name="cellAddress" >The cell to which the comment is added. This can be a Range object or a string. If it&apos;s a string, it must contain the full address, including the sheet name. An `InvalidArgument` error is thrown if the provided range is larger than one cell.</param>
-			/// <param name="content" >The comment&apos;s content. This can be either a string or CommentRichContent object. Strings are used for plain text. CommentRichContent objects allow for other comment features, such as mentions. [Api set: ExcelApi 1.10 for string, ExcelApiOnline 1.1 for CommentRichContent object]</param>
-			/// <param name="contentType" type="String" optional="true">Optional. The type of content contained within the comment. The default value is enum `ContentType.Plain`. [Api set: ExcelApi 1.10 for Enum ContentType.Plain, ExcelApiOnline 1.1 for Enum ContentType.Mention]</param>
+			/// <param name="content" >The comment&apos;s content. This can be either a string or CommentRichContent object. Strings are used for plain text. CommentRichContent objects allow for other comment features, such as mentions. [Api set: ExcelApi 1.10 for string, 1.11 for CommentRichContent object]</param>
+			/// <param name="contentType" type="String" optional="true">Optional. The type of content contained within the comment. The default value is enum `ContentType.Plain`. [Api set: ExcelApi 1.10 for Enum ContentType.Plain, 1.11 for Enum ContentType.Mention]</param>
 			/// <returns type="Excel.Comment"></returns>
 		}
 		CommentCollection.prototype.getCount = function() {
@@ -7313,7 +7370,7 @@ var Excel;
 		}
 		CommentCollection.prototype.getItem = function(commentId) {
 			/// <summary>
-			/// Gets a comment from the collection based on its ID. Read-only. [Api set: ExcelApi 1.10]
+			/// Gets a comment from the collection based on its ID. [Api set: ExcelApi 1.10]
 			/// </summary>
 			/// <param name="commentId" type="String">The identifier for the comment.</param>
 			/// <returns type="Excel.Comment"></returns>
@@ -7339,6 +7396,48 @@ var Excel;
 			/// <param name="replyId" type="String">The identifier of comment reply.</param>
 			/// <returns type="Excel.Comment"></returns>
 		}
+		CommentCollection.prototype.onAdded = {
+			__proto__: null,
+			add: function (handler) {
+				/// <param name="handler" type="function(eventArgs: Excel.Interfaces.CommentAddedEventArgs)">Handler for the event. EventArgs: Provides information about the comment(s) that raised the Added event. </param>
+				/// <returns type="OfficeExtension.EventHandlerResult"></returns>
+				var eventInfo = new Excel.Interfaces.CommentAddedEventArgs();
+				eventInfo.__proto__ = null;
+				handler(eventInfo);
+			},
+			remove: function (handler) {
+				/// <param name="handler" type="function(eventArgs: Excel.Interfaces.CommentAddedEventArgs)">Handler for the event.</param>
+				return;
+			}
+		};
+		CommentCollection.prototype.onChanged = {
+			__proto__: null,
+			add: function (handler) {
+				/// <param name="handler" type="function(eventArgs: Excel.Interfaces.CommentChangedEventArgs)">Handler for the event. EventArgs: Occurs when existing comments are changed. </param>
+				/// <returns type="OfficeExtension.EventHandlerResult"></returns>
+				var eventInfo = new Excel.Interfaces.CommentChangedEventArgs();
+				eventInfo.__proto__ = null;
+				handler(eventInfo);
+			},
+			remove: function (handler) {
+				/// <param name="handler" type="function(eventArgs: Excel.Interfaces.CommentChangedEventArgs)">Handler for the event.</param>
+				return;
+			}
+		};
+		CommentCollection.prototype.onDeleted = {
+			__proto__: null,
+			add: function (handler) {
+				/// <param name="handler" type="function(eventArgs: Excel.Interfaces.CommentDeletedEventArgs)">Handler for the event. EventArgs: Provides information about the comment(s) that raised the Deleted event. </param>
+				/// <returns type="OfficeExtension.EventHandlerResult"></returns>
+				var eventInfo = new Excel.Interfaces.CommentDeletedEventArgs();
+				eventInfo.__proto__ = null;
+				handler(eventInfo);
+			},
+			remove: function (handler) {
+				/// <param name="handler" type="function(eventArgs: Excel.Interfaces.CommentDeletedEventArgs)">Handler for the event.</param>
+				return;
+			}
+		};
 
 		return CommentCollection;
 	})(OfficeExtension.ClientObject);
@@ -7349,12 +7448,48 @@ var Excel;
 (function (Excel) {
 	var Interfaces;
 	(function (Interfaces) {
+		var CommentDeletedEventArgs = (function() {
+			function CommentDeletedEventArgs() {
+				/// <summary> Provides information about the comment(s) that raised the Deleted event. [Api set: ExcelApi BETA (PREVIEW ONLY)] </summary>
+				/// <field name="commentDetails" type="Array" elementType="Excel.Interfaces.CommentDetail">Get the CommentDetail array which contains the comment Id and Ids of its related replies. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
+				/// <field name="source" type="String">Specifies the source of the event. See Excel.EventSource for details. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
+				/// <field name="type" type="String">Gets the type of the event. See Excel.EventType for details. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
+				/// <field name="worksheetId" type="String">Gets the Id of the worksheet in which the event happened. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
+			}
+			return CommentDeletedEventArgs;
+		})();
+		Interfaces.CommentDeletedEventArgs.__proto__ = null;
+		Interfaces.CommentDeletedEventArgs = CommentDeletedEventArgs;
+	})(Interfaces = Excel.Interfaces || (Excel.Interfaces = { __proto__: null}));
+})(Excel || (Excel = {__proto__: null}));
+
+var Excel;
+(function (Excel) {
+	var Interfaces;
+	(function (Interfaces) {
+		var CommentDetail = (function() {
+			function CommentDetail() {
+				/// <summary> A structure for the comment Id and Ids of its related replies. [Api set: ExcelApi BETA (PREVIEW ONLY)] </summary>
+				/// <field name="replyIds" type="Array" elementType="String">Represents the ids of the related replies belong to comment. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
+				/// <field name="commentId" type="String">Represents the id of comment. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
+			}
+			return CommentDetail;
+		})();
+		Interfaces.CommentDetail.__proto__ = null;
+		Interfaces.CommentDetail = CommentDetail;
+	})(Interfaces = Excel.Interfaces || (Excel.Interfaces = { __proto__: null}));
+})(Excel || (Excel = {__proto__: null}));
+
+var Excel;
+(function (Excel) {
+	var Interfaces;
+	(function (Interfaces) {
 		var CommentMention = (function() {
 			function CommentMention() {
-				/// <summary> Represents the entity that is mentioned in comments. [Api set: ExcelApiOnline 1.1] </summary>
-				/// <field name="email" type="String">Gets or sets the email address of the entity that is mentioned in comment. [Api set: ExcelApiOnline 1.1]</field>
-				/// <field name="id" type="Number">Gets or sets the id of the entity. The id matches one of the ids in `CommentRichContent.richContent`. [Api set: ExcelApiOnline 1.1]</field>
-				/// <field name="name" type="String">Gets or sets the name of the entity that is mentioned in comment. [Api set: ExcelApiOnline 1.1]</field>
+				/// <summary> Represents the entity that is mentioned in comments. [Api set: ExcelApi 1.11] </summary>
+				/// <field name="email" type="String">The email address of the entity that is mentioned in comment. [Api set: ExcelApi 1.11]</field>
+				/// <field name="id" type="Number">The id of the entity. The id matches one of the ids in `CommentRichContent.richContent`. [Api set: ExcelApi 1.11]</field>
+				/// <field name="name" type="String">The name of the entity that is mentioned in comment. [Api set: ExcelApi 1.11]</field>
 			}
 			return CommentMention;
 		})();
@@ -7373,13 +7508,13 @@ var Excel;
 			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
 			/// <field name="authorEmail" type="String">Gets the email of the comment reply&apos;s author. [Api set: ExcelApi 1.10]</field>
 			/// <field name="authorName" type="String">Gets the name of the comment reply&apos;s author. [Api set: ExcelApi 1.10]</field>
-			/// <field name="content" type="String">Gets or sets the comment reply&apos;s content. The string is plain text. [Api set: ExcelApi 1.10]</field>
-			/// <field name="contentType" type="String">Gets the content type of the comment. [Api set: ExcelApi 1.12]</field>
+			/// <field name="content" type="String">The comment reply&apos;s content. The string is plain text. [Api set: ExcelApi 1.10]</field>
+			/// <field name="contentType" type="String">The content type of the reply. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
 			/// <field name="creationDate" type="Date">Gets the creation time of the comment reply. [Api set: ExcelApi 1.10]</field>
-			/// <field name="id" type="String">Represents the comment reply identifier. Read-only. [Api set: ExcelApi 1.10]</field>
-			/// <field name="mentions" type="Array" elementType="Excel.Interfaces.CommentMention">Gets the entities (e.g. people) that are mentioned in comments. [Api set: ExcelApiOnline 1.1]</field>
-			/// <field name="resolved" type="Boolean">Gets or sets the comment reply status. A value of &quot;true&quot; means the comment reply is in the resolved state. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
-			/// <field name="richContent" type="String">Gets the rich comment content (e.g. mentions in comments). This string is not meant to be displayed to end-users. Your add-in should only use this to parse rich comment content. [Api set: ExcelApiOnline 1.1]</field>
+			/// <field name="id" type="String">Specifies the comment reply identifier. [Api set: ExcelApi 1.10]</field>
+			/// <field name="mentions" type="Array" elementType="Excel.Interfaces.CommentMention">The entities (e.g., people) that are mentioned in comments. [Api set: ExcelApi 1.11]</field>
+			/// <field name="resolved" type="Boolean">The comment reply status. A value of &quot;true&quot; means the reply is in the resolved state. [Api set: ExcelApi 1.11]</field>
+			/// <field name="richContent" type="String">The rich comment content (e.g., mentions in comments). This string is not meant to be displayed to end-users. Your add-in should only use this to parse rich comment content. [Api set: ExcelApi 1.11]</field>
 		}
 
 		CommentReply.prototype.load = function(option) {
@@ -7424,7 +7559,7 @@ var Excel;
 		}
 		CommentReply.prototype.updateMentions = function(contentWithMentions) {
 			/// <summary>
-			/// Updates the comment content with a specially formatted string and a list of mentions. [Api set: ExcelApiOnline 1.1]
+			/// Updates the comment content with a specially formatted string and a list of mentions. [Api set: ExcelApi 1.11]
 			/// </summary>
 			/// <param name="contentWithMentions" type="Excel.Interfaces.CommentRichContent">The content for the comment. This contains a specially formatted string and a list of mentions that will be parsed into the string when displayed by Excel.</param>
 			/// <returns ></returns>
@@ -7457,8 +7592,8 @@ var Excel;
 			/// <summary>
 			/// Creates a comment reply for comment. [Api set: ExcelApi 1.10]
 			/// </summary>
-			/// <param name="content" >The comment&apos;s content. This can be either a string or Interface CommentRichContent (e.g. for comments with mentions). [Api set: ExcelApi 1.10 for string, ExcelApiOnline 1.1 for CommentRichContent object]</param>
-			/// <param name="contentType" type="String" optional="true">Optional. The type of content contained within the comment. The default value is enum `ContentType.Plain`. [Api set: ExcelApi 1.10 for Enum ContentType.Plain, ExcelApiOnline 1.1 for Enum ContentType.Mention]</param>
+			/// <param name="content" >The comment&apos;s content. This can be either a string or Interface CommentRichContent (e.g., for comments with mentions). [Api set: ExcelApi 1.10 for string, 1.11 for CommentRichContent object]</param>
+			/// <param name="contentType" type="String" optional="true">Optional. The type of content contained within the comment. The default value is enum `ContentType.Plain`. [Api set: ExcelApi 1.10 for Enum ContentType.Plain, 1.11 for Enum ContentType.Mention]</param>
 			/// <returns type="Excel.CommentReply"></returns>
 		}
 		CommentReplyCollection.prototype.getCount = function() {
@@ -7473,7 +7608,7 @@ var Excel;
 		}
 		CommentReplyCollection.prototype.getItem = function(commentReplyId) {
 			/// <summary>
-			/// Returns a comment reply identified by its ID. Read-only. [Api set: ExcelApi 1.10]
+			/// Returns a comment reply identified by its ID. [Api set: ExcelApi 1.10]
 			/// </summary>
 			/// <param name="commentReplyId" type="String">The identifier for the comment reply.</param>
 			/// <returns type="Excel.CommentReply"></returns>
@@ -7497,9 +7632,9 @@ var Excel;
 	(function (Interfaces) {
 		var CommentRichContent = (function() {
 			function CommentRichContent() {
-				/// <summary> Represents the content contained within a comment or comment reply. Rich content incudes the text string and any other objects contained within the comment body, such as mentions. [Api set: ExcelApiOnline 1.1] </summary>
-				/// <field name="mentions" type="Array" elementType="Excel.Interfaces.CommentMention">An array containing all the entities (e.g. people) mentioned within the comment. [Api set: ExcelApiOnline 1.1]</field>
-				/// <field name="richContent" type="String"> [Api set: ExcelApiOnline 1.1]</field>
+				/// <summary> Represents the content contained within a comment or comment reply. Rich content incudes the text string and any other objects contained within the comment body, such as mentions. [Api set: ExcelApi 1.11] </summary>
+				/// <field name="mentions" type="Array" elementType="Excel.Interfaces.CommentMention">An array containing all the entities (e.g., people) mentioned within the comment. [Api set: ExcelApi 1.11]</field>
+				/// <field name="richContent" type="String">Specifies the rich content of the comment (e.g., comment content with mentions, the first mentioned entity has an id attribute of 0, and the second mentioned entity has an id attribute of 1). [Api set: ExcelApi 1.11]</field>
 			}
 			return CommentRichContent;
 		})();
@@ -7535,7 +7670,7 @@ var Excel;
 				/// <summary> Represents a cell value conditional format rule. [Api set: ExcelApi 1.6] </summary>
 				/// <field name="formula1" >The formula, if required, to evaluate the conditional format rule on. [Api set: ExcelApi 1.6]</field>
 				/// <field name="formula2" >The formula, if required, to evaluate the conditional format rule on. [Api set: ExcelApi 1.6]</field>
-				/// <field name="operator" type="String">The operator of the text conditional format. [Api set: ExcelApi 1.6]</field>
+				/// <field name="operator" type="String">The operator of the cell value conditional format. [Api set: ExcelApi 1.6]</field>
 			}
 			return ConditionalCellValueRule;
 		})();
@@ -7569,7 +7704,7 @@ var Excel;
 		var ConditionalColorScaleCriterion = (function() {
 			function ConditionalColorScaleCriterion() {
 				/// <summary> Represents a Color Scale Criterion which contains a type, value, and a color. [Api set: ExcelApi 1.6] </summary>
-				/// <field name="color" type="String">HTML color code representation of the color scale color. E.g. #FF0000 represents Red. [Api set: ExcelApi 1.6]</field>
+				/// <field name="color" type="String">HTML color code representation of the color scale color (e.g., #FF0000 represents Red). [Api set: ExcelApi 1.6]</field>
 				/// <field name="formula" >A number, a formula, or null (if Type is LowestValue). [Api set: ExcelApi 1.6]</field>
 				/// <field name="type" type="String">What the criterion conditional formula should be based on. [Api set: ExcelApi 1.6]</field>
 			}
@@ -7612,10 +7747,10 @@ var Excel;
 			/// <summary> Represents a conditional format DataBar Format for the negative side of the data bar. [Api set: ExcelApi 1.6] </summary>
 			/// <field name="context" type="Excel.RequestContext">The request context associated with this object.</field>
 			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
-			/// <field name="borderColor" type="String">HTML color code representing the color of the border line, of the form #RRGGBB (e.g. &quot;FFA500&quot;) or as a named HTML color (e.g. &quot;orange&quot;).              &quot;Empty String&quot; if no border is present or set. [Api set: ExcelApi 1.6]</field>
-			/// <field name="fillColor" type="String">HTML color code representing the fill color, of the form #RRGGBB (e.g. &quot;FFA500&quot;) or as a named HTML color (e.g. &quot;orange&quot;). [Api set: ExcelApi 1.6]</field>
-			/// <field name="matchPositiveBorderColor" type="Boolean">Boolean representation of whether or not the negative DataBar has the same border color as the positive DataBar. [Api set: ExcelApi 1.6]</field>
-			/// <field name="matchPositiveFillColor" type="Boolean">Boolean representation of whether or not the negative DataBar has the same fill color as the positive DataBar. [Api set: ExcelApi 1.6]</field>
+			/// <field name="borderColor" type="String">HTML color code representing the color of the border line, of the form #RRGGBB (e.g., &quot;FFA500&quot;) or as a named HTML color (e.g., &quot;orange&quot;).              &quot;Empty String&quot; if no border is present or set. [Api set: ExcelApi 1.6]</field>
+			/// <field name="fillColor" type="String">HTML color code representing the fill color, of the form #RRGGBB (e.g., &quot;FFA500&quot;) or as a named HTML color (e.g., &quot;orange&quot;). [Api set: ExcelApi 1.6]</field>
+			/// <field name="matchPositiveBorderColor" type="Boolean">Specifies if the negative DataBar has the same border color as the positive DataBar. [Api set: ExcelApi 1.6]</field>
+			/// <field name="matchPositiveFillColor" type="Boolean">Specifies if the negative DataBar has the same fill color as the positive DataBar. [Api set: ExcelApi 1.6]</field>
 		}
 
 		ConditionalDataBarNegativeFormat.prototype.load = function(option) {
@@ -7654,9 +7789,9 @@ var Excel;
 			/// <summary> Represents a conditional format DataBar Format for the positive side of the data bar. [Api set: ExcelApi 1.6] </summary>
 			/// <field name="context" type="Excel.RequestContext">The request context associated with this object.</field>
 			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
-			/// <field name="borderColor" type="String">HTML color code representing the color of the border line, of the form #RRGGBB (e.g. &quot;FFA500&quot;) or as a named HTML color (e.g. &quot;orange&quot;).              &quot;&quot; (empty string) if no border is present or set. [Api set: ExcelApi 1.6]</field>
-			/// <field name="fillColor" type="String">HTML color code representing the fill color, of the form #RRGGBB (e.g. &quot;FFA500&quot;) or as a named HTML color (e.g. &quot;orange&quot;). [Api set: ExcelApi 1.6]</field>
-			/// <field name="gradientFill" type="Boolean">Boolean representation of whether or not the DataBar has a gradient. [Api set: ExcelApi 1.6]</field>
+			/// <field name="borderColor" type="String">HTML color code representing the color of the border line, of the form #RRGGBB (e.g., &quot;FFA500&quot;) or as a named HTML color (e.g., &quot;orange&quot;).              &quot;&quot; (empty string) if no border is present or set. [Api set: ExcelApi 1.6]</field>
+			/// <field name="fillColor" type="String">HTML color code representing the fill color, of the form #RRGGBB (e.g., &quot;FFA500&quot;) or as a named HTML color (e.g., &quot;orange&quot;). [Api set: ExcelApi 1.6]</field>
+			/// <field name="gradientFill" type="Boolean">Specifies if the DataBar has a gradient. [Api set: ExcelApi 1.6]</field>
 		}
 
 		ConditionalDataBarPositiveFormat.prototype.load = function(option) {
@@ -7712,26 +7847,26 @@ var Excel;
 			/// <summary> An object encapsulating a conditional format&apos;s range, format, rule, and other properties.              To learn more about the conditional formatting object model, read {@link https://docs.microsoft.com/office/dev/add-ins/excel/excel-add-ins-conditional-formatting | Apply conditional formatting to Excel ranges}. [Api set: ExcelApi 1.6] </summary>
 			/// <field name="context" type="Excel.RequestContext">The request context associated with this object.</field>
 			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
-			/// <field name="cellValue" type="Excel.CellValueConditionalFormat">Returns the cell value conditional format properties if the current conditional format is a CellValue type.              For example to format all cells between 5 and 10. Read-only. [Api set: ExcelApi 1.6]</field>
-			/// <field name="cellValueOrNullObject" type="Excel.CellValueConditionalFormat">Returns the cell value conditional format properties if the current conditional format is a CellValue type.              For example to format all cells between 5 and 10. Read-only. [Api set: ExcelApi 1.6]</field>
-			/// <field name="colorScale" type="Excel.ColorScaleConditionalFormat">Returns the ColorScale conditional format properties if the current conditional format is an ColorScale type. Read-only. [Api set: ExcelApi 1.6]</field>
-			/// <field name="colorScaleOrNullObject" type="Excel.ColorScaleConditionalFormat">Returns the ColorScale conditional format properties if the current conditional format is an ColorScale type. Read-only. [Api set: ExcelApi 1.6]</field>
-			/// <field name="custom" type="Excel.CustomConditionalFormat">Returns the custom conditional format properties if the current conditional format is a custom type. Read-only. [Api set: ExcelApi 1.6]</field>
-			/// <field name="customOrNullObject" type="Excel.CustomConditionalFormat">Returns the custom conditional format properties if the current conditional format is a custom type. Read-only. [Api set: ExcelApi 1.6]</field>
-			/// <field name="dataBar" type="Excel.DataBarConditionalFormat">Returns the data bar properties if the current conditional format is a data bar. Read-only. [Api set: ExcelApi 1.6]</field>
-			/// <field name="dataBarOrNullObject" type="Excel.DataBarConditionalFormat">Returns the data bar properties if the current conditional format is a data bar. Read-only. [Api set: ExcelApi 1.6]</field>
-			/// <field name="iconSet" type="Excel.IconSetConditionalFormat">Returns the IconSet conditional format properties if the current conditional format is an IconSet type. Read-only. [Api set: ExcelApi 1.6]</field>
-			/// <field name="iconSetOrNullObject" type="Excel.IconSetConditionalFormat">Returns the IconSet conditional format properties if the current conditional format is an IconSet type. Read-only. [Api set: ExcelApi 1.6]</field>
-			/// <field name="id" type="String">The Priority of the Conditional Format within the current ConditionalFormatCollection. Read-only. [Api set: ExcelApi 1.6]</field>
+			/// <field name="cellValue" type="Excel.CellValueConditionalFormat">Returns the cell value conditional format properties if the current conditional format is a CellValue type.              For example to format all cells between 5 and 10. [Api set: ExcelApi 1.6]</field>
+			/// <field name="cellValueOrNullObject" type="Excel.CellValueConditionalFormat">Returns the cell value conditional format properties if the current conditional format is a CellValue type.              For example to format all cells between 5 and 10. [Api set: ExcelApi 1.6]</field>
+			/// <field name="colorScale" type="Excel.ColorScaleConditionalFormat">Returns the ColorScale conditional format properties if the current conditional format is an ColorScale type. [Api set: ExcelApi 1.6]</field>
+			/// <field name="colorScaleOrNullObject" type="Excel.ColorScaleConditionalFormat">Returns the ColorScale conditional format properties if the current conditional format is an ColorScale type. [Api set: ExcelApi 1.6]</field>
+			/// <field name="custom" type="Excel.CustomConditionalFormat">Returns the custom conditional format properties if the current conditional format is a custom type. [Api set: ExcelApi 1.6]</field>
+			/// <field name="customOrNullObject" type="Excel.CustomConditionalFormat">Returns the custom conditional format properties if the current conditional format is a custom type. [Api set: ExcelApi 1.6]</field>
+			/// <field name="dataBar" type="Excel.DataBarConditionalFormat">Returns the data bar properties if the current conditional format is a data bar. [Api set: ExcelApi 1.6]</field>
+			/// <field name="dataBarOrNullObject" type="Excel.DataBarConditionalFormat">Returns the data bar properties if the current conditional format is a data bar. [Api set: ExcelApi 1.6]</field>
+			/// <field name="iconSet" type="Excel.IconSetConditionalFormat">Returns the IconSet conditional format properties if the current conditional format is an IconSet type. [Api set: ExcelApi 1.6]</field>
+			/// <field name="iconSetOrNullObject" type="Excel.IconSetConditionalFormat">Returns the IconSet conditional format properties if the current conditional format is an IconSet type. [Api set: ExcelApi 1.6]</field>
+			/// <field name="id" type="String">The Priority of the Conditional Format within the current ConditionalFormatCollection. [Api set: ExcelApi 1.6]</field>
 			/// <field name="preset" type="Excel.PresetCriteriaConditionalFormat">Returns the preset criteria conditional format. See Excel.PresetCriteriaConditionalFormat for more details. [Api set: ExcelApi 1.6]</field>
 			/// <field name="presetOrNullObject" type="Excel.PresetCriteriaConditionalFormat">Returns the preset criteria conditional format. See Excel.PresetCriteriaConditionalFormat for more details. [Api set: ExcelApi 1.6]</field>
-			/// <field name="priority" type="Number">The priority (or index) within the conditional format collection that this conditional format currently exists in. Changing this also              changes other conditional formats&apos; priorities, to allow for a contiguous priority order.              Use a negative priority to begin from the back.              Priorities greater than than bounds will get and set to the maximum (or minimum if negative) priority.              Also note that if you change the priority, you have to re-fetch a new copy of the object at that new priority location if you want to make further changes to it. Read-only. [Api set: ExcelApi 1.6]</field>
+			/// <field name="priority" type="Number">The priority (or index) within the conditional format collection that this conditional format currently exists in. Changing this also              changes other conditional formats&apos; priorities, to allow for a contiguous priority order.              Use a negative priority to begin from the back.              Priorities greater than than bounds will get and set to the maximum (or minimum if negative) priority.              Also note that if you change the priority, you have to re-fetch a new copy of the object at that new priority location if you want to make further changes to it. [Api set: ExcelApi 1.6]</field>
 			/// <field name="stopIfTrue" type="Boolean">If the conditions of this conditional format are met, no lower-priority formats shall take effect on that cell.              Null on databars, icon sets, and colorscales as there&apos;s no concept of StopIfTrue for these [Api set: ExcelApi 1.6]</field>
-			/// <field name="textComparison" type="Excel.TextConditionalFormat">Returns the specific text conditional format properties if the current conditional format is a text type.              For example to format cells matching the word &quot;Text&quot;. Read-only. [Api set: ExcelApi 1.6]</field>
-			/// <field name="textComparisonOrNullObject" type="Excel.TextConditionalFormat">Returns the specific text conditional format properties if the current conditional format is a text type.              For example to format cells matching the word &quot;Text&quot;. Read-only. [Api set: ExcelApi 1.6]</field>
-			/// <field name="topBottom" type="Excel.TopBottomConditionalFormat">Returns the Top/Bottom conditional format properties if the current conditional format is an TopBottom type.              For example to format the top 10% or bottom 10 items. Read-only. [Api set: ExcelApi 1.6]</field>
-			/// <field name="topBottomOrNullObject" type="Excel.TopBottomConditionalFormat">Returns the Top/Bottom conditional format properties if the current conditional format is an TopBottom type.              For example to format the top 10% or bottom 10 items. Read-only. [Api set: ExcelApi 1.6]</field>
-			/// <field name="type" type="String">A type of conditional format. Only one can be set at a time. Read-only. [Api set: ExcelApi 1.6]</field>
+			/// <field name="textComparison" type="Excel.TextConditionalFormat">Returns the specific text conditional format properties if the current conditional format is a text type.              For example to format cells matching the word &quot;Text&quot;. [Api set: ExcelApi 1.6]</field>
+			/// <field name="textComparisonOrNullObject" type="Excel.TextConditionalFormat">Returns the specific text conditional format properties if the current conditional format is a text type.              For example to format cells matching the word &quot;Text&quot;. [Api set: ExcelApi 1.6]</field>
+			/// <field name="topBottom" type="Excel.TopBottomConditionalFormat">Returns the Top/Bottom conditional format properties if the current conditional format is an TopBottom type.              For example to format the top 10% or bottom 10 items. [Api set: ExcelApi 1.6]</field>
+			/// <field name="topBottomOrNullObject" type="Excel.TopBottomConditionalFormat">Returns the Top/Bottom conditional format properties if the current conditional format is an TopBottom type.              For example to format the top 10% or bottom 10 items. [Api set: ExcelApi 1.6]</field>
+			/// <field name="type" type="String">A type of conditional format. Only one can be set at a time. [Api set: ExcelApi 1.6]</field>
 		}
 
 		ConditionalFormat.prototype.load = function(option) {
@@ -7764,19 +7899,19 @@ var Excel;
 		}
 		ConditionalFormat.prototype.getRange = function() {
 			/// <summary>
-			/// Returns the range the conditonal format is applied to. Throws an error if the conditional format is applied to multiple ranges. Read-only. [Api set: ExcelApi 1.6]
+			/// Returns the range the conditonal format is applied to. Throws an error if the conditional format is applied to multiple ranges. [Api set: ExcelApi 1.6]
 			/// </summary>
 			/// <returns type="Excel.Range"></returns>
 		}
 		ConditionalFormat.prototype.getRangeOrNullObject = function() {
 			/// <summary>
-			/// Returns the range the conditonal format is applied to, or a null object if the conditional format is applied to multiple ranges. Read-only. [Api set: ExcelApi 1.6]
+			/// Returns the range the conditonal format is applied to, or a null object if the conditional format is applied to multiple ranges. [Api set: ExcelApi 1.6]
 			/// </summary>
 			/// <returns type="Excel.Range"></returns>
 		}
 		ConditionalFormat.prototype.getRanges = function() {
 			/// <summary>
-			/// Returns the RangeAreas, comprising one or more rectangular ranges, the conditonal format is applied to. Read-only. [Api set: ExcelApi 1.9]
+			/// Returns the RangeAreas, comprising one or more rectangular ranges, the conditonal format is applied to. [Api set: ExcelApi 1.9]
 			/// </summary>
 			/// <returns type="Excel.RangeAreas"></returns>
 		}
@@ -7819,7 +7954,7 @@ var Excel;
 		}
 		ConditionalFormatCollection.prototype.getCount = function() {
 			/// <summary>
-			/// Returns the number of conditional formats in the workbook. Read-only. [Api set: ExcelApi 1.6]
+			/// Returns the number of conditional formats in the workbook. [Api set: ExcelApi 1.6]
 			/// </summary>
 			/// <returns type="OfficeExtension.ClientResult&lt;number&gt;"></returns>
 			var result = new OfficeExtension.ClientResult();
@@ -7849,7 +7984,7 @@ var Excel;
 
 var Excel;
 (function (Excel) {
-	/// <summary> Represents the types of conditional format values. [Api set: ExcelApi 1.6] </summary>
+	/// <summary> Represents the types of color criterion for conditional formatting. [Api set: ExcelApi 1.6] </summary>
 	var ConditionalFormatColorCriterionType = {
 		__proto__: null,
 		"invalid": "invalid",
@@ -7876,7 +8011,7 @@ var Excel;
 
 var Excel;
 (function (Excel) {
-	/// <summary> Represents the types of conditional format values. [Api set: ExcelApi 1.6] </summary>
+	/// <summary> Represents the types of icon conditional format. [Api set: ExcelApi 1.6] </summary>
 	var ConditionalFormatIconRuleType = {
 		__proto__: null,
 		"invalid": "invalid",
@@ -8054,8 +8189,8 @@ var Excel;
 			/// <summary> Represents the border of an object. [Api set: ExcelApi 1.6] </summary>
 			/// <field name="context" type="Excel.RequestContext">The request context associated with this object.</field>
 			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
-			/// <field name="color" type="String">HTML color code representing the color of the border line, of the form #RRGGBB (e.g. &quot;FFA500&quot;) or as a named HTML color (e.g. &quot;orange&quot;). [Api set: ExcelApi 1.6]</field>
-			/// <field name="sideIndex" type="String">Constant value that indicates the specific side of the border. See Excel.ConditionalRangeBorderIndex for details. Read-only. [Api set: ExcelApi 1.6]</field>
+			/// <field name="color" type="String">HTML color code representing the color of the border line, of the form #RRGGBB (e.g., &quot;FFA500&quot;) or as a named HTML color (e.g., &quot;orange&quot;). [Api set: ExcelApi 1.6]</field>
+			/// <field name="sideIndex" type="String">Constant value that indicates the specific side of the border. See Excel.ConditionalRangeBorderIndex for details. [Api set: ExcelApi 1.6]</field>
 			/// <field name="style" type="String">One of the constants of line style specifying the line style for the border. See Excel.BorderLineStyle for details. [Api set: ExcelApi 1.6]</field>
 		}
 
@@ -8095,11 +8230,11 @@ var Excel;
 			/// <summary> Represents the border objects that make up range border. [Api set: ExcelApi 1.6] </summary>
 			/// <field name="context" type="Excel.RequestContext">The request context associated with this object.</field>
 			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
-			/// <field name="bottom" type="Excel.ConditionalRangeBorder">Gets the bottom border. Read-only. [Api set: ExcelApi 1.6]</field>
-			/// <field name="count" type="Number">Number of border objects in the collection. Read-only. [Api set: ExcelApi 1.6]</field>
-			/// <field name="left" type="Excel.ConditionalRangeBorder">Gets the left border. Read-only. [Api set: ExcelApi 1.6]</field>
-			/// <field name="right" type="Excel.ConditionalRangeBorder">Gets the right border. Read-only. [Api set: ExcelApi 1.6]</field>
-			/// <field name="top" type="Excel.ConditionalRangeBorder">Gets the top border. Read-only. [Api set: ExcelApi 1.6]</field>
+			/// <field name="bottom" type="Excel.ConditionalRangeBorder">Gets the bottom border. [Api set: ExcelApi 1.6]</field>
+			/// <field name="count" type="Number">Number of border objects in the collection. [Api set: ExcelApi 1.6]</field>
+			/// <field name="left" type="Excel.ConditionalRangeBorder">Gets the left border. [Api set: ExcelApi 1.6]</field>
+			/// <field name="right" type="Excel.ConditionalRangeBorder">Gets the right border. [Api set: ExcelApi 1.6]</field>
+			/// <field name="top" type="Excel.ConditionalRangeBorder">Gets the top border. [Api set: ExcelApi 1.6]</field>
 			/// <field name="items" type="Array" elementType="Excel.ConditionalRangeBorder">Gets the loaded child items in this collection.</field>
 		}
 
@@ -8181,7 +8316,7 @@ var Excel;
 			/// <summary> Represents the background of a conditional range object. [Api set: ExcelApi 1.6] </summary>
 			/// <field name="context" type="Excel.RequestContext">The request context associated with this object.</field>
 			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
-			/// <field name="color" type="String">HTML color code representing the color of the fill, of the form #RRGGBB (e.g. &quot;FFA500&quot;) or as a named HTML color (e.g. &quot;orange&quot;). [Api set: ExcelApi 1.6]</field>
+			/// <field name="color" type="String">HTML color code representing the color of the fill, of the form #RRGGBB (e.g., &quot;FFA500&quot;) or as a named HTML color (e.g., &quot;orange&quot;). [Api set: ExcelApi 1.6]</field>
 		}
 
 		ConditionalRangeFill.prototype.load = function(option) {
@@ -8226,11 +8361,11 @@ var Excel;
 			/// <summary> This object represents the font attributes (font style, color, etc.) for an object. [Api set: ExcelApi 1.6] </summary>
 			/// <field name="context" type="Excel.RequestContext">The request context associated with this object.</field>
 			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
-			/// <field name="bold" type="Boolean">Represents the bold status of font. [Api set: ExcelApi 1.6]</field>
-			/// <field name="color" type="String">HTML color code representation of the text color. E.g. #FF0000 represents Red. [Api set: ExcelApi 1.6]</field>
-			/// <field name="italic" type="Boolean">Represents the italic status of the font. [Api set: ExcelApi 1.6]</field>
-			/// <field name="strikethrough" type="Boolean">Represents the strikethrough status of the font. [Api set: ExcelApi 1.6]</field>
-			/// <field name="underline" type="String">Type of underline applied to the font. See Excel.ConditionalRangeFontUnderlineStyle for details. [Api set: ExcelApi 1.6]</field>
+			/// <field name="bold" type="Boolean">Specifies if the font is bold. [Api set: ExcelApi 1.6]</field>
+			/// <field name="color" type="String">HTML color code representation of the text color (e.g., #FF0000 represents Red). [Api set: ExcelApi 1.6]</field>
+			/// <field name="italic" type="Boolean">Specifies if the font is italic. [Api set: ExcelApi 1.6]</field>
+			/// <field name="strikethrough" type="Boolean">Specifies the strikethrough status of the font. [Api set: ExcelApi 1.6]</field>
+			/// <field name="underline" type="String">The type of underline applied to the font. See Excel.ConditionalRangeFontUnderlineStyle for details. [Api set: ExcelApi 1.6]</field>
 		}
 
 		ConditionalRangeFont.prototype.load = function(option) {
@@ -8287,9 +8422,9 @@ var Excel;
 			/// <summary> A format object encapsulating the conditional formats range&apos;s font, fill, borders, and other properties. [Api set: ExcelApi 1.6] </summary>
 			/// <field name="context" type="Excel.RequestContext">The request context associated with this object.</field>
 			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
-			/// <field name="borders" type="Excel.ConditionalRangeBorderCollection">Collection of border objects that apply to the overall conditional format range. Read-only. [Api set: ExcelApi 1.6]</field>
-			/// <field name="fill" type="Excel.ConditionalRangeFill">Returns the fill object defined on the overall conditional format range. Read-only. [Api set: ExcelApi 1.6]</field>
-			/// <field name="font" type="Excel.ConditionalRangeFont">Returns the font object defined on the overall conditional format range. Read-only. [Api set: ExcelApi 1.6]</field>
+			/// <field name="borders" type="Excel.ConditionalRangeBorderCollection">Collection of border objects that apply to the overall conditional format range. [Api set: ExcelApi 1.6]</field>
+			/// <field name="fill" type="Excel.ConditionalRangeFill">Returns the fill object defined on the overall conditional format range. [Api set: ExcelApi 1.6]</field>
+			/// <field name="font" type="Excel.ConditionalRangeFont">Returns the font object defined on the overall conditional format range. [Api set: ExcelApi 1.6]</field>
 			/// <field name="numberFormat" >Represents Excel&apos;s number format code for the given range. Cleared if null is passed in. [Api set: ExcelApi 1.6]</field>
 		}
 
@@ -8411,12 +8546,12 @@ var Excel;
 	var CultureInfo = (function(_super) {
 		__extends(CultureInfo, _super);
 		function CultureInfo() {
-			/// <summary> Provides information based on current system culture settings. This includes the culture names, number formatting, and other culturally dependent settings. [Api set: ExcelApi BETA (PREVIEW ONLY)] </summary>
+			/// <summary> Provides information based on current system culture settings. This includes the culture names, number formatting, and other culturally dependent settings. [Api set: ExcelApi 1.11] </summary>
 			/// <field name="context" type="Excel.RequestContext">The request context associated with this object.</field>
 			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
-			/// <field name="datetimeFormat" type="Excel.DatetimeFormatInfo">Defines the culturally appropriate format of displaying date and time. This is based on current system culture settings. [Api set: ExcelApi 1.12]</field>
-			/// <field name="name" type="String">Gets the culture name in the format languagecode2-country/regioncode2 (e.g. &quot;zh-cn&quot; or &quot;en-us&quot;). This is based on current system settings. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
-			/// <field name="numberFormat" type="Excel.NumberFormatInfo">Defines the culturally appropriate format of displaying numbers. This is based on current system culture settings. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
+			/// <field name="datetimeFormat" type="Excel.DatetimeFormatInfo">Defines the culturally appropriate format of displaying date and time. This is based on current system culture settings. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
+			/// <field name="name" type="String">Gets the culture name in the format languagecode2-country/regioncode2 (e.g., &quot;zh-cn&quot; or &quot;en-us&quot;). This is based on current system settings. [Api set: ExcelApi 1.11]</field>
+			/// <field name="numberFormat" type="Excel.NumberFormatInfo">Defines the culturally appropriate format of displaying numbers. This is based on current system culture settings. [Api set: ExcelApi 1.11]</field>
 		}
 
 		CultureInfo.prototype.load = function(option) {
@@ -8440,8 +8575,8 @@ var Excel;
 			/// <summary> Represents a custom conditional format type. [Api set: ExcelApi 1.6] </summary>
 			/// <field name="context" type="Excel.RequestContext">The request context associated with this object.</field>
 			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
-			/// <field name="format" type="Excel.ConditionalRangeFormat">Returns a format object, encapsulating the conditional formats font, fill, borders, and other properties. Read-only. [Api set: ExcelApi 1.6]</field>
-			/// <field name="rule" type="Excel.ConditionalFormatRule">Represents the Rule object on this conditional format. Read-only. [Api set: ExcelApi 1.6]</field>
+			/// <field name="format" type="Excel.ConditionalRangeFormat">Returns a format object, encapsulating the conditional formats font, fill, borders, and other properties. [Api set: ExcelApi 1.6]</field>
+			/// <field name="rule" type="Excel.ConditionalFormatRule">Specifies the Rule object on this conditional format. [Api set: ExcelApi 1.6]</field>
 		}
 
 		CustomConditionalFormat.prototype.load = function(option) {
@@ -8490,38 +8625,15 @@ var Excel;
 
 var Excel;
 (function (Excel) {
-	/// <summary> [Api set: CustomFunctions 1.1] </summary>
-	var CustomFunctionMetadataFormat = {
-		__proto__: null,
-		"invalid": "invalid",
-		"openApi": "openApi",
-	}
-	Excel.CustomFunctionMetadataFormat = CustomFunctionMetadataFormat;
-})(Excel || (Excel = {__proto__: null}));
-
-var Excel;
-(function (Excel) {
-	/// <summary> [Api set: CustomFunctions 1.1] </summary>
-	var CustomFunctionType = {
-		__proto__: null,
-		"invalid": "invalid",
-		"script": "script",
-		"webService": "webService",
-	}
-	Excel.CustomFunctionType = CustomFunctionType;
-})(Excel || (Excel = {__proto__: null}));
-
-var Excel;
-(function (Excel) {
 	var CustomProperty = (function(_super) {
 		__extends(CustomProperty, _super);
 		function CustomProperty() {
 			/// <summary> Represents a custom property. [Api set: ExcelApi 1.7] </summary>
 			/// <field name="context" type="Excel.RequestContext">The request context associated with this object.</field>
 			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
-			/// <field name="key" type="String">Gets the key of the custom property. Read only. [Api set: ExcelApi 1.7]</field>
-			/// <field name="type" type="String">Gets the value type of the custom property. Read only. [Api set: ExcelApi 1.7]</field>
-			/// <field name="value" >Gets or sets the value of the custom property. [Api set: ExcelApi 1.7]</field>
+			/// <field name="key" type="String">The key of the custom property. The key is limited to 255 characters outside of Excel on the web (larger keys are automatically trimmed to 255 characters on other platforms). [Api set: ExcelApi 1.7]</field>
+			/// <field name="type" type="String">The type of the value used for the custom property. [Api set: ExcelApi 1.7]</field>
+			/// <field name="value" >The value of the custom property. The value is limited to 255 characters outside of Excel on the web (larger values are automatically trimmed to 255 characters on other platforms). [Api set: ExcelApi 1.7]</field>
 		}
 
 		CustomProperty.prototype.load = function(option) {
@@ -8580,8 +8692,8 @@ var Excel;
 			/// <summary>
 			/// Creates a new or sets an existing custom property. [Api set: ExcelApi 1.7]
 			/// </summary>
-			/// <param name="key" type="String">Required. The custom property&apos;s key, which is case-insensitive.</param>
-			/// <param name="value" >Required. The custom property&apos;s value.</param>
+			/// <param name="key" type="String">Required. The custom property&apos;s key, which is case-insensitive. The key is limited to 255 characters outside of Excel on the web (larger keys are automatically trimmed to 255 characters on other platforms).</param>
+			/// <param name="value" >Required. The custom property&apos;s value. The value is limited to 255 characters outside of Excel on the web (larger values are automatically trimmed to 255 characters on other platforms).</param>
 			/// <returns type="Excel.CustomProperty"></returns>
 		}
 		CustomPropertyCollection.prototype.deleteAll = function() {
@@ -8628,8 +8740,8 @@ var Excel;
 			/// <summary> Represents a custom XML part object in a workbook. [Api set: ExcelApi 1.5] </summary>
 			/// <field name="context" type="Excel.RequestContext">The request context associated with this object.</field>
 			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
-			/// <field name="id" type="String">The custom XML part&apos;s ID. Read-only. [Api set: ExcelApi 1.5]</field>
-			/// <field name="namespaceUri" type="String">The custom XML part&apos;s namespace URI. Read-only. [Api set: ExcelApi 1.5]</field>
+			/// <field name="id" type="String">The custom XML part&apos;s ID. [Api set: ExcelApi 1.5]</field>
+			/// <field name="namespaceUri" type="String">The custom XML part&apos;s namespace URI. [Api set: ExcelApi 1.5]</field>
 		}
 
 		CustomXmlPart.prototype.load = function(option) {
@@ -8735,7 +8847,7 @@ var Excel;
 	var CustomXmlPartScopedCollection = (function(_super) {
 		__extends(CustomXmlPartScopedCollection, _super);
 		function CustomXmlPartScopedCollection() {
-			/// <summary> A scoped collection of custom XML parts.              A scoped collection is the result of some operation, e.g. filtering by namespace.              A scoped collection cannot be scoped any further. [Api set: ExcelApi 1.5] </summary>
+			/// <summary> A scoped collection of custom XML parts.              A scoped collection is the result of some operation (e.g., filtering by namespace).              A scoped collection cannot be scoped any further. [Api set: ExcelApi 1.5] </summary>
 			/// <field name="context" type="Excel.RequestContext">The request context associated with this object.</field>
 			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
 			/// <field name="items" type="Array" elementType="Excel.CustomXmlPart">Gets the loaded child items in this collection.</field>
@@ -8798,12 +8910,12 @@ var Excel;
 			/// <summary> Represents an Excel Conditional Data Bar Type. [Api set: ExcelApi 1.6] </summary>
 			/// <field name="context" type="Excel.RequestContext">The request context associated with this object.</field>
 			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
-			/// <field name="axisColor" type="String">HTML color code representing the color of the Axis line, of the form #RRGGBB (e.g. &quot;FFA500&quot;) or as a named HTML color (e.g. &quot;orange&quot;).              &quot;&quot; (empty string) if no axis is present or set. [Api set: ExcelApi 1.6]</field>
+			/// <field name="axisColor" type="String">HTML color code representing the color of the Axis line, of the form #RRGGBB (e.g., &quot;FFA500&quot;) or as a named HTML color (e.g., &quot;orange&quot;).              &quot;&quot; (empty string) if no axis is present or set. [Api set: ExcelApi 1.6]</field>
 			/// <field name="axisFormat" type="String">Representation of how the axis is determined for an Excel data bar. [Api set: ExcelApi 1.6]</field>
-			/// <field name="barDirection" type="String">Represents the direction that the data bar graphic should be based on. [Api set: ExcelApi 1.6]</field>
+			/// <field name="barDirection" type="String">Specifies the direction that the data bar graphic should be based on. [Api set: ExcelApi 1.6]</field>
 			/// <field name="lowerBoundRule" type="Excel.Interfaces.ConditionalDataBarRule">The rule for what consistutes the lower bound (and how to calculate it, if applicable) for a data bar.              The `ConditionalDataBarRule` object must be set as a JSON object (use `x.lowerBoundRule = {...}` instead of `x.lowerBoundRule.formula = ...`). [Api set: ExcelApi 1.6]</field>
-			/// <field name="negativeFormat" type="Excel.ConditionalDataBarNegativeFormat">Representation of all values to the left of the axis in an Excel data bar. Read-only. [Api set: ExcelApi 1.6]</field>
-			/// <field name="positiveFormat" type="Excel.ConditionalDataBarPositiveFormat">Representation of all values to the right of the axis in an Excel data bar. Read-only. [Api set: ExcelApi 1.6]</field>
+			/// <field name="negativeFormat" type="Excel.ConditionalDataBarNegativeFormat">Representation of all values to the left of the axis in an Excel data bar. [Api set: ExcelApi 1.6]</field>
+			/// <field name="positiveFormat" type="Excel.ConditionalDataBarPositiveFormat">Representation of all values to the right of the axis in an Excel data bar. [Api set: ExcelApi 1.6]</field>
 			/// <field name="showDataBarOnly" type="Boolean">If true, hides the values from the cells where the data bar is applied. [Api set: ExcelApi 1.6]</field>
 			/// <field name="upperBoundRule" type="Excel.Interfaces.ConditionalDataBarRule">The rule for what constitutes the upper bound (and how to calculate it, if applicable) for a data bar.              The `ConditionalDataBarRule` object must be set as a JSON object (use `x.upperBoundRule = {...}` instead of `x.upperBoundRule.formula = ...`). [Api set: ExcelApi 1.6]</field>
 		}
@@ -8895,8 +9007,8 @@ var Excel;
 			/// <field name="name" type="String">Name of the DataPivotHierarchy. [Api set: ExcelApi 1.8]</field>
 			/// <field name="numberFormat" type="String">Number format of the DataPivotHierarchy. [Api set: ExcelApi 1.8]</field>
 			/// <field name="position" type="Number">Position of the DataPivotHierarchy. [Api set: ExcelApi 1.8]</field>
-			/// <field name="showAs" type="Excel.Interfaces.ShowAsRule">Determines whether the data should be shown as a specific summary calculation or not. [Api set: ExcelApi 1.8]</field>
-			/// <field name="summarizeBy" type="String">Determines whether to show all items of the DataPivotHierarchy. [Api set: ExcelApi 1.8]</field>
+			/// <field name="showAs" type="Excel.Interfaces.ShowAsRule">Specifies if the data should be shown as a specific summary calculation. [Api set: ExcelApi 1.8]</field>
+			/// <field name="summarizeBy" type="String">Specifies if all items of the DataPivotHierarchy are shown. [Api set: ExcelApi 1.8]</field>
 		}
 
 		DataPivotHierarchy.prototype.load = function(option) {
@@ -9002,7 +9114,7 @@ var Excel;
 			/// <field name="context" type="Excel.RequestContext">The request context associated with this object.</field>
 			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
 			/// <field name="errorAlert" type="Excel.Interfaces.DataValidationErrorAlert">Error alert when user enters invalid data. [Api set: ExcelApi 1.8]</field>
-			/// <field name="ignoreBlanks" type="Boolean">Ignore blanks: no data validation will be performed on blank cells, it defaults to true. [Api set: ExcelApi 1.8]</field>
+			/// <field name="ignoreBlanks" type="Boolean">Specifies if data validation will be performed on blank cells, it defaults to true. [Api set: ExcelApi 1.8]</field>
 			/// <field name="prompt" type="Excel.Interfaces.DataValidationPrompt">Prompt when users select a cell. [Api set: ExcelApi 1.8]</field>
 			/// <field name="rule" type="Excel.Interfaces.DataValidationRule">Data validation rule that contains different type of data validation criteria. [Api set: ExcelApi 1.8]</field>
 			/// <field name="type" type="String">Type of the data validation, see Excel.DataValidationType for details. [Api set: ExcelApi 1.8]</field>
@@ -9075,8 +9187,8 @@ var Excel;
 			function DataValidationErrorAlert() {
 				/// <summary> Represents the error alert properties for the data validation. [Api set: ExcelApi 1.8] </summary>
 				/// <field name="message" type="String">Represents error alert message. [Api set: ExcelApi 1.8]</field>
-				/// <field name="showAlert" type="Boolean">Determines whether to show an error alert dialog or not when a user enters invalid data. The default is true. [Api set: ExcelApi 1.8]</field>
-				/// <field name="style" type="String">Represents data validation alert type, please see Excel.DataValidationAlertStyle for details. [Api set: ExcelApi 1.8]</field>
+				/// <field name="showAlert" type="Boolean">Specifies whether to show an error alert dialog when a user enters invalid data. The default is true. [Api set: ExcelApi 1.8]</field>
+				/// <field name="style" type="String">The data validation alert type, please see Excel.DataValidationAlertStyle for details. [Api set: ExcelApi 1.8]</field>
 				/// <field name="title" type="String">Represents error alert dialog title. [Api set: ExcelApi 1.8]</field>
 			}
 			return DataValidationErrorAlert;
@@ -9110,9 +9222,9 @@ var Excel;
 		var DataValidationPrompt = (function() {
 			function DataValidationPrompt() {
 				/// <summary> Represents the user prompt properties for the data validation. [Api set: ExcelApi 1.8] </summary>
-				/// <field name="message" type="String">Represents the message of the prompt. [Api set: ExcelApi 1.8]</field>
-				/// <field name="showPrompt" type="Boolean">Determines whether or not to show the prompt when user selects a cell with data validation. [Api set: ExcelApi 1.8]</field>
-				/// <field name="title" type="String">Represents the title for the prompt. [Api set: ExcelApi 1.8]</field>
+				/// <field name="message" type="String">Specifies the message of the prompt. [Api set: ExcelApi 1.8]</field>
+				/// <field name="showPrompt" type="Boolean">Specifies if a prompt is shown when a user selects a cell with data validation. [Api set: ExcelApi 1.8]</field>
+				/// <field name="title" type="String">Specifies the title for the prompt. [Api set: ExcelApi 1.8]</field>
 			}
 			return DataValidationPrompt;
 		})();
@@ -9233,14 +9345,14 @@ var Excel;
 	var DatetimeFormatInfo = (function(_super) {
 		__extends(DatetimeFormatInfo, _super);
 		function DatetimeFormatInfo() {
-			/// <summary> Defines the culturally appropriate format of displaying numbers. This is based on current system culture settings. [Api set: ExcelApi 1.12] </summary>
+			/// <summary> Defines the culturally appropriate format of displaying numbers. This is based on current system culture settings. [Api set: ExcelApi BETA (PREVIEW ONLY)] </summary>
 			/// <field name="context" type="Excel.RequestContext">The request context associated with this object.</field>
 			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
-			/// <field name="dateSeparator" type="String">Gets the string used as the date separator. This is based on current system settings. [Api set: ExcelApi 1.12]</field>
-			/// <field name="longDatePattern" type="String">Gets the format string for a long date value. This is based on current system settings. [Api set: ExcelApi 1.12]</field>
-			/// <field name="longTimePattern" type="String">Gets the format string for a long time value. This is based on current system settings. [Api set: ExcelApi 1.12]</field>
-			/// <field name="shortDatePattern" type="String">Gets the format string for a short date value. This is based on current system settings. [Api set: ExcelApi 1.12]</field>
-			/// <field name="timeSeparator" type="String">Gets the string used as the time separator. This is based on current system settings. [Api set: ExcelApi 1.12]</field>
+			/// <field name="dateSeparator" type="String">Gets the string used as the date separator. This is based on current system settings. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
+			/// <field name="longDatePattern" type="String">Gets the format string for a long date value. This is based on current system settings. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
+			/// <field name="longTimePattern" type="String">Gets the format string for a long time value. This is based on current system settings. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
+			/// <field name="shortDatePattern" type="String">Gets the format string for a short date value. This is based on current system settings. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
+			/// <field name="timeSeparator" type="String">Gets the string used as the time separator. This is based on current system settings. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
 		}
 
 		DatetimeFormatInfo.prototype.load = function(option) {
@@ -9275,18 +9387,18 @@ var Excel;
 			/// <summary> Represents workbook properties. [Api set: ExcelApi 1.7] </summary>
 			/// <field name="context" type="Excel.RequestContext">The request context associated with this object.</field>
 			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
-			/// <field name="author" type="String">Gets or sets the author of the workbook. [Api set: ExcelApi 1.7]</field>
-			/// <field name="category" type="String">Gets or sets the category of the workbook. [Api set: ExcelApi 1.7]</field>
-			/// <field name="comments" type="String">Gets or sets the comments of the workbook. [Api set: ExcelApi 1.7]</field>
-			/// <field name="company" type="String">Gets or sets the company of the workbook. [Api set: ExcelApi 1.7]</field>
+			/// <field name="author" type="String">The author of the workbook. [Api set: ExcelApi 1.7]</field>
+			/// <field name="category" type="String">The category of the workbook. [Api set: ExcelApi 1.7]</field>
+			/// <field name="comments" type="String">The comments of the workbook. [Api set: ExcelApi 1.7]</field>
+			/// <field name="company" type="String">The company of the workbook. [Api set: ExcelApi 1.7]</field>
 			/// <field name="creationDate" type="Date">Gets the creation date of the workbook. Read only. [Api set: ExcelApi 1.7]</field>
 			/// <field name="custom" type="Excel.CustomPropertyCollection">Gets the collection of custom properties of the workbook. Read only. [Api set: ExcelApi 1.7]</field>
-			/// <field name="keywords" type="String">Gets or sets the keywords of the workbook. [Api set: ExcelApi 1.7]</field>
+			/// <field name="keywords" type="String">The keywords of the workbook. [Api set: ExcelApi 1.7]</field>
 			/// <field name="lastAuthor" type="String">Gets the last author of the workbook. Read only. [Api set: ExcelApi 1.7]</field>
-			/// <field name="manager" type="String">Gets or sets the manager of the workbook. [Api set: ExcelApi 1.7]</field>
+			/// <field name="manager" type="String">The manager of the workbook. [Api set: ExcelApi 1.7]</field>
 			/// <field name="revisionNumber" type="Number">Gets the revision number of the workbook. Read only. [Api set: ExcelApi 1.7]</field>
-			/// <field name="subject" type="String">Gets or sets the subject of the workbook. [Api set: ExcelApi 1.7]</field>
-			/// <field name="title" type="String">Gets or sets the title of the workbook. [Api set: ExcelApi 1.7]</field>
+			/// <field name="subject" type="String">The subject of the workbook. [Api set: ExcelApi 1.7]</field>
+			/// <field name="title" type="String">The title of the workbook. [Api set: ExcelApi 1.7]</field>
 		}
 
 		DocumentProperties.prototype.load = function(option) {
@@ -9446,6 +9558,13 @@ var Excel;
 		"worksheetColumnSorted": "worksheetColumnSorted",
 		"worksheetSingleClicked": "worksheetSingleClicked",
 		"worksheetRowHiddenChanged": "worksheetRowHiddenChanged",
+		"recordingStateChangedEvent": "recordingStateChangedEvent",
+		"commentAdded": "commentAdded",
+		"commentDeleted": "commentDeleted",
+		"commentChanged": "commentChanged",
+		"linkedDataTypeRefreshRequestCompleted": "linkedDataTypeRefreshRequestCompleted",
+		"linkedDataTypeRefreshModeChanged": "linkedDataTypeRefreshModeChanged",
+		"linkedDataTypeLinkedDataTypeAdded": "linkedDataTypeLinkedDataTypeAdded",
 	}
 	Excel.EventType = EventType;
 })(Excel || (Excel = {__proto__: null}));
@@ -9488,7 +9607,7 @@ var Excel;
 			/// <summary> Manages the filtering of a table&apos;s column. [Api set: ExcelApi 1.2] </summary>
 			/// <field name="context" type="Excel.RequestContext">The request context associated with this object.</field>
 			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
-			/// <field name="criteria" type="Excel.Interfaces.FilterCriteria">The currently applied filter on the given column. Read-only. [Api set: ExcelApi 1.2]</field>
+			/// <field name="criteria" type="Excel.Interfaces.FilterCriteria">The currently applied filter on the given column. [Api set: ExcelApi 1.2]</field>
 		}
 
 		Filter.prototype.load = function(option) {
@@ -9597,7 +9716,7 @@ var Excel;
 			function FilterCriteria() {
 				/// <summary> Represents the filtering criteria applied to a column. [Api set: ExcelApi 1.2] </summary>
 				/// <field name="color" type="String">The HTML color string used to filter cells. Used with &quot;cellColor&quot; and &quot;fontColor&quot; filtering. [Api set: ExcelApi 1.2]</field>
-				/// <field name="criterion1" type="String">The first criterion used to filter data. Used as an operator in the case of &quot;custom&quot; filtering.               For example &quot;&gt;50&quot; for number greater than 50 or &quot;=*s&quot; for values ending in &quot;s&quot;.                             Used as a number in the case of top/bottom items/percents. E.g. &quot;5&quot; for the top 5 items if filterOn is set to &quot;topItems&quot; [Api set: ExcelApi 1.2]</field>
+				/// <field name="criterion1" type="String">The first criterion used to filter data. Used as an operator in the case of &quot;custom&quot; filtering.               For example &quot;&gt;50&quot; for number greater than 50 or &quot;=*s&quot; for values ending in &quot;s&quot;.                             Used as a number in the case of top/bottom items/percents (e.g., &quot;5&quot; for the top 5 items if filterOn is set to &quot;topItems&quot;). [Api set: ExcelApi 1.2]</field>
 				/// <field name="criterion2" type="String">The second criterion used to filter data. Only used as an operator in the case of &quot;custom&quot; filtering. [Api set: ExcelApi 1.2]</field>
 				/// <field name="dynamicCriteria" type="String">The dynamic criteria from the Excel.DynamicFilterCriteria set to apply on this column. Used with &quot;dynamic&quot; filtering. [Api set: ExcelApi 1.2]</field>
 				/// <field name="filterOn" type="String">The property used by the filter to determine whether the values should stay visible. [Api set: ExcelApi 1.2]</field>
@@ -9792,8 +9911,8 @@ var Excel;
 			/// <summary> Represents the format protection of a range object. [Api set: ExcelApi 1.2] </summary>
 			/// <field name="context" type="Excel.RequestContext">The request context associated with this object.</field>
 			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
-			/// <field name="formulaHidden" type="Boolean">Indicates if Excel hides the formula for the cells in the range. A null value indicates that the entire range doesn&apos;t have uniform formula hidden setting. [Api set: ExcelApi 1.2]</field>
-			/// <field name="locked" type="Boolean">Indicates if Excel locks the cells in the object. A null value indicates that the entire range doesn&apos;t have uniform lock setting. [Api set: ExcelApi 1.2]</field>
+			/// <field name="formulaHidden" type="Boolean">Specifies if Excel hides the formula for the cells in the range. A null value indicates that the entire range doesn&apos;t have uniform formula hidden setting. [Api set: ExcelApi 1.2]</field>
+			/// <field name="locked" type="Boolean">Specifies if Excel locks the cells in the object. A null value indicates that the entire range doesn&apos;t have uniform lock setting. [Api set: ExcelApi 1.2]</field>
 		}
 
 		FormatProtection.prototype.load = function(option) {
@@ -12891,8 +13010,8 @@ var Excel;
 			/// <summary> Represents a geometric shape inside a worksheet. A geometric shape can be a rectangle, block arrow, equation symbol, flowchart item, star, banner, callout, or any other basic shape in Excel. [Api set: ExcelApi 1.9] </summary>
 			/// <field name="context" type="Excel.RequestContext">The request context associated with this object.</field>
 			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
-			/// <field name="id" type="String">Returns the shape identifier. Read-only. [Api set: ExcelApi 1.9]</field>
-			/// <field name="shape" type="Excel.Shape">Returns the Shape object for the geometric shape. Read-only. [Api set: ExcelApi 1.9]</field>
+			/// <field name="id" type="String">Returns the shape identifier. [Api set: ExcelApi 1.9]</field>
+			/// <field name="shape" type="Excel.Shape">Returns the Shape object for the geometric shape. [Api set: ExcelApi 1.9]</field>
 		}
 
 		GeometricShape.prototype.load = function(option) {
@@ -13125,7 +13244,7 @@ var Excel;
 		}
 		GroupShapeCollection.prototype.getCount = function() {
 			/// <summary>
-			/// Returns the number of shapes in the shape group. Read-only. [Api set: ExcelApi 1.9]
+			/// Returns the number of shapes in the shape group. [Api set: ExcelApi 1.9]
 			/// </summary>
 			/// <returns type="OfficeExtension.ClientResult&lt;number&gt;"></returns>
 			var result = new OfficeExtension.ClientResult();
@@ -13161,12 +13280,12 @@ var Excel;
 			/// <summary> [Api set: ExcelApi 1.9] </summary>
 			/// <field name="context" type="Excel.RequestContext">The request context associated with this object.</field>
 			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
-			/// <field name="centerFooter" type="String">Gets or sets the center footer of the worksheet.              To apply font formatting or insert a variable value, use format codes specified here: https://msdn.microsoft.com/en-us/library/bb225426.aspx. [Api set: ExcelApi 1.9]</field>
-			/// <field name="centerHeader" type="String">Gets or sets the center header of the worksheet.              To apply font formatting or insert a variable value, use format codes specified here: https://msdn.microsoft.com/en-us/library/bb225426.aspx. [Api set: ExcelApi 1.9]</field>
-			/// <field name="leftFooter" type="String">Gets or sets the left footer of the worksheet.              To apply font formatting or insert a variable value, use format codes specified here: https://msdn.microsoft.com/en-us/library/bb225426.aspx. [Api set: ExcelApi 1.9]</field>
-			/// <field name="leftHeader" type="String">Gets or sets the left header of the worksheet.              To apply font formatting or insert a variable value, use format codes specified here: https://msdn.microsoft.com/en-us/library/bb225426.aspx. [Api set: ExcelApi 1.9]</field>
-			/// <field name="rightFooter" type="String">Gets or sets the right footer of the worksheet.              To apply font formatting or insert a variable value, use format codes specified here: https://msdn.microsoft.com/en-us/library/bb225426.aspx. [Api set: ExcelApi 1.9]</field>
-			/// <field name="rightHeader" type="String">Gets or sets the right header of the worksheet.              To apply font formatting or insert a variable value, use format codes specified here: https://msdn.microsoft.com/en-us/library/bb225426.aspx. [Api set: ExcelApi 1.9]</field>
+			/// <field name="centerFooter" type="String">The center footer of the worksheet.              To apply font formatting or insert a variable value, use format codes specified here: https://msdn.microsoft.com/library/bb225426.aspx. [Api set: ExcelApi 1.9]</field>
+			/// <field name="centerHeader" type="String">The center header of the worksheet.              To apply font formatting or insert a variable value, use format codes specified here: https://msdn.microsoft.com/library/bb225426.aspx. [Api set: ExcelApi 1.9]</field>
+			/// <field name="leftFooter" type="String">The left footer of the worksheet.              To apply font formatting or insert a variable value, use format codes specified here: https://msdn.microsoft.com/library/bb225426.aspx. [Api set: ExcelApi 1.9]</field>
+			/// <field name="leftHeader" type="String">The left header of the worksheet.              To apply font formatting or insert a variable value, use format codes specified here: https://msdn.microsoft.com/library/bb225426.aspx. [Api set: ExcelApi 1.9]</field>
+			/// <field name="rightFooter" type="String">The right footer of the worksheet.              To apply font formatting or insert a variable value, use format codes specified here: https://msdn.microsoft.com/library/bb225426.aspx. [Api set: ExcelApi 1.9]</field>
+			/// <field name="rightHeader" type="String">The right header of the worksheet.              To apply font formatting or insert a variable value, use format codes specified here: https://msdn.microsoft.com/library/bb225426.aspx. [Api set: ExcelApi 1.9]</field>
 		}
 
 		HeaderFooter.prototype.load = function(option) {
@@ -13209,7 +13328,7 @@ var Excel;
 			/// <field name="evenPages" type="Excel.HeaderFooter">The header/footer to use for even pages, odd header/footer needs to be specified for odd pages. [Api set: ExcelApi 1.9]</field>
 			/// <field name="firstPage" type="Excel.HeaderFooter">The first page header/footer, for all other pages general or even/odd is used. [Api set: ExcelApi 1.9]</field>
 			/// <field name="oddPages" type="Excel.HeaderFooter">The header/footer to use for odd pages, even header/footer needs to be specified for even pages. [Api set: ExcelApi 1.9]</field>
-			/// <field name="state" type="String">Gets or sets the state of which headers/footers are set. See Excel.HeaderFooterState for details. [Api set: ExcelApi 1.9]</field>
+			/// <field name="state" type="String">The state by which headers/footers are set. See Excel.HeaderFooterState for details. [Api set: ExcelApi 1.9]</field>
 			/// <field name="useSheetMargins" type="Boolean">Gets or sets a flag indicating if headers/footers are aligned with the page margins set in the page layout options for the worksheet. [Api set: ExcelApi 1.9]</field>
 			/// <field name="useSheetScale" type="Boolean">Gets or sets a flag indicating if headers/footers should be scaled by the page percentage scale set in the page layout options for the worksheet. [Api set: ExcelApi 1.9]</field>
 		}
@@ -13279,8 +13398,8 @@ var Excel;
 		var Icon = (function() {
 			function Icon() {
 				/// <summary> Represents a cell icon. [Api set: ExcelApi 1.2] </summary>
-				/// <field name="index" type="Number">Represents the index of the icon in the given set. [Api set: ExcelApi 1.2]</field>
-				/// <field name="set" type="String">Represents the set that the icon is part of. [Api set: ExcelApi 1.2]</field>
+				/// <field name="index" type="Number">Specifies the index of the icon in the given set. [Api set: ExcelApi 1.2]</field>
+				/// <field name="set" type="String">Specifies the set that the icon is part of. [Api set: ExcelApi 1.2]</field>
 			}
 			return Icon;
 		})();
@@ -13369,9 +13488,9 @@ var Excel;
 			/// <summary> Represents an image in the worksheet. To get the corresponding Shape object, use Image.shape. [Api set: ExcelApi 1.9] </summary>
 			/// <field name="context" type="Excel.RequestContext">The request context associated with this object.</field>
 			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
-			/// <field name="id" type="String">Represents the shape identifier for the image object. Read-only. [Api set: ExcelApi 1.9]</field>
-			/// <field name="shape" type="Excel.Shape">Returns the Shape object associated with the image. Read-only. [Api set: ExcelApi 1.9]</field>
-			/// <field name="format" type="String">Returns the format of the image. Read-only. [Api set: ExcelApi 1.9]</field>
+			/// <field name="id" type="String">Specifies the shape identifier for the image object. [Api set: ExcelApi 1.9]</field>
+			/// <field name="shape" type="Excel.Shape">Returns the Shape object associated with the image. [Api set: ExcelApi 1.9]</field>
+			/// <field name="format" type="String">Returns the format of the image. [Api set: ExcelApi 1.9]</field>
 		}
 
 		Image.prototype.load = function(option) {
@@ -13419,8 +13538,8 @@ var Excel;
 			/// <field name="context" type="Excel.RequestContext">The request context associated with this object.</field>
 			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
 			/// <field name="enabled" type="Boolean">True if Excel will use iteration to resolve circular references. [Api set: ExcelApi 1.9]</field>
-			/// <field name="maxChange" type="Number">Returns or sets the maximum amount of change between each iteration as Excel resolves circular references. [Api set: ExcelApi 1.9]</field>
-			/// <field name="maxIteration" type="Number">Returns or sets the maximum number of iterations that Excel can use to resolve a circular reference. [Api set: ExcelApi 1.9]</field>
+			/// <field name="maxChange" type="Number">Specifies the maximum amount of change between each iteration as Excel resolves circular references. [Api set: ExcelApi 1.9]</field>
+			/// <field name="maxIteration" type="Number">Specifies the maximum number of iterations that Excel can use to resolve a circular reference. [Api set: ExcelApi 1.9]</field>
 		}
 
 		IterativeCalculation.prototype.load = function(option) {
@@ -13481,17 +13600,17 @@ var Excel;
 			/// <field name="beginArrowheadLength" type="String">Represents the length of the arrowhead at the beginning of the specified line. [Api set: ExcelApi 1.9]</field>
 			/// <field name="beginArrowheadStyle" type="String">Represents the style of the arrowhead at the beginning of the specified line. [Api set: ExcelApi 1.9]</field>
 			/// <field name="beginArrowheadWidth" type="String">Represents the width of the arrowhead at the beginning of the specified line. [Api set: ExcelApi 1.9]</field>
-			/// <field name="beginConnectedShape" type="Excel.Shape">Represents the shape to which the beginning of the specified line is attached. Read-only. [Api set: ExcelApi 1.9]</field>
-			/// <field name="beginConnectedSite" type="Number">Represents the connection site to which the beginning of a connector is connected. Read-only. Returns null when the beginning of the line is not attached to any shape. [Api set: ExcelApi 1.9]</field>
+			/// <field name="beginConnectedShape" type="Excel.Shape">Represents the shape to which the beginning of the specified line is attached. [Api set: ExcelApi 1.9]</field>
+			/// <field name="beginConnectedSite" type="Number">Represents the connection site to which the beginning of a connector is connected. Returns null when the beginning of the line is not attached to any shape. [Api set: ExcelApi 1.9]</field>
 			/// <field name="endArrowheadLength" type="String">Represents the length of the arrowhead at the end of the specified line. [Api set: ExcelApi 1.9]</field>
 			/// <field name="endArrowheadStyle" type="String">Represents the style of the arrowhead at the end of the specified line. [Api set: ExcelApi 1.9]</field>
 			/// <field name="endArrowheadWidth" type="String">Represents the width of the arrowhead at the end of the specified line. [Api set: ExcelApi 1.9]</field>
-			/// <field name="endConnectedShape" type="Excel.Shape">Represents the shape to which the end of the specified line is attached. Read-only. [Api set: ExcelApi 1.9]</field>
-			/// <field name="endConnectedSite" type="Number">Represents the connection site to which the end of a connector is connected. Read-only. Returns null when the end of the line is not attached to any shape. [Api set: ExcelApi 1.9]</field>
-			/// <field name="id" type="String">Represents the shape identifier. Read-only. [Api set: ExcelApi 1.9]</field>
-			/// <field name="isBeginConnected" type="Boolean">Specifies whether or not the beginning of the specified line is connected to a shape. Read-only. [Api set: ExcelApi 1.9]</field>
-			/// <field name="isEndConnected" type="Boolean">Specifies whether or not the end of the specified line is connected to a shape. Read-only. [Api set: ExcelApi 1.9]</field>
-			/// <field name="shape" type="Excel.Shape">Returns the Shape object associated with the line. Read-only. [Api set: ExcelApi 1.9]</field>
+			/// <field name="endConnectedShape" type="Excel.Shape">Represents the shape to which the end of the specified line is attached. [Api set: ExcelApi 1.9]</field>
+			/// <field name="endConnectedSite" type="Number">Represents the connection site to which the end of a connector is connected. Returns null when the end of the line is not attached to any shape. [Api set: ExcelApi 1.9]</field>
+			/// <field name="id" type="String">Specifies the shape identifier. [Api set: ExcelApi 1.9]</field>
+			/// <field name="isBeginConnected" type="Boolean">Specifies if the beginning of the specified line is connected to a shape. [Api set: ExcelApi 1.9]</field>
+			/// <field name="isEndConnected" type="Boolean">Specifies if the end of the specified line is connected to a shape. [Api set: ExcelApi 1.9]</field>
+			/// <field name="shape" type="Excel.Shape">Returns the Shape object associated with the line. [Api set: ExcelApi 1.9]</field>
 			/// <field name="connectorType" type="String">Represents the connector type for the line. [Api set: ExcelApi 1.9]</field>
 		}
 
@@ -13590,14 +13709,14 @@ var Excel;
 			/// <summary> Represents a defined name for a range of cells or value. Names can be primitive named objects (as seen in the type below), range object, or a reference to a range. This object can be used to obtain range object associated with names. [Api set: ExcelApi 1.1] </summary>
 			/// <field name="context" type="Excel.RequestContext">The request context associated with this object.</field>
 			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
-			/// <field name="arrayValues" type="Excel.NamedItemArrayValues">Returns an object containing values and types of the named item. Read-only. [Api set: ExcelApi 1.7]</field>
-			/// <field name="comment" type="String">Represents the comment associated with this name. [Api set: ExcelApi 1.4]</field>
-			/// <field name="formula" >Gets or sets the formula of the named item.  Formula always starts with a &apos;=&apos; sign. [Api set: ExcelApi 1.7]</field>
-			/// <field name="name" type="String">The name of the object. Read-only. [Api set: ExcelApi 1.1]</field>
-			/// <field name="scope" type="String">Indicates whether the name is scoped to the workbook or to a specific worksheet. Possible values are: Worksheet, Workbook. Read-only. [Api set: ExcelApi 1.4]</field>
-			/// <field name="type" type="String">Indicates the type of the value returned by the name&apos;s formula. See Excel.NamedItemType for details. Read-only. [Api set: ExcelApi 1.1 for String,Integer,Double,Boolean,Range,Error; 1.7 for Array]</field>
-			/// <field name="value" >Represents the value computed by the name&apos;s formula. For a named range, will return the range address. Read-only. [Api set: ExcelApi 1.1]</field>
-			/// <field name="visible" type="Boolean">Specifies whether the object is visible or not. [Api set: ExcelApi 1.1]</field>
+			/// <field name="arrayValues" type="Excel.NamedItemArrayValues">Returns an object containing values and types of the named item. [Api set: ExcelApi 1.7]</field>
+			/// <field name="comment" type="String">Specifies the comment associated with this name. [Api set: ExcelApi 1.4]</field>
+			/// <field name="formula" >The formula of the named item. Formula always starts with a &apos;=&apos; sign. [Api set: ExcelApi 1.7]</field>
+			/// <field name="name" type="String">The name of the object. [Api set: ExcelApi 1.1]</field>
+			/// <field name="scope" type="String">Specifies if the name is scoped to the workbook or to a specific worksheet. Possible values are: Worksheet, Workbook. [Api set: ExcelApi 1.4]</field>
+			/// <field name="type" type="String">Specifies the type of the value returned by the name&apos;s formula. See Excel.NamedItemType for details. [Api set: ExcelApi 1.1 for String,Integer,Double,Boolean,Range,Error; 1.7 for Array]</field>
+			/// <field name="value" >Represents the value computed by the name&apos;s formula. For a named range, will return the range address. [Api set: ExcelApi 1.1]</field>
+			/// <field name="visible" type="Boolean">Specifies if the object is visible. [Api set: ExcelApi 1.1]</field>
 			/// <field name="worksheet" type="Excel.Worksheet">Returns the worksheet on which the named item is scoped to. Throws an error if the item is scoped to the workbook instead. [Api set: ExcelApi 1.4]</field>
 			/// <field name="worksheetOrNullObject" type="Excel.Worksheet">Returns the worksheet on which the named item is scoped to. Returns a null object if the item is scoped to the workbook instead. [Api set: ExcelApi 1.4]</field>
 		}
@@ -13768,7 +13887,138 @@ var Excel;
 
 var Excel;
 (function (Excel) {
-	/// <summary> Represents a category of number formats. [Api set: ExcelApi 1.12] </summary>
+	var NamedSheetView = (function(_super) {
+		__extends(NamedSheetView, _super);
+		function NamedSheetView() {
+			/// <summary> Represents a named sheet view of a worksheet. A sheet view stores the sort and filter rules for a particular worksheet.              Every sheet view (even a temporary sheet view) has a unique, worksheet-scoped name that is used to access the view. [Api set: ExcelApi BETA (PREVIEW ONLY)] </summary>
+			/// <field name="context" type="Excel.RequestContext">The request context associated with this object.</field>
+			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
+			/// <field name="name" type="String">Gets or sets the name of the sheet view.              The temporary sheet view name is the empty string (&quot;&quot;).  Naming the view by using the name property causes the sheet view to be saved. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
+		}
+
+		NamedSheetView.prototype.load = function(option) {
+			/// <summary>
+			/// Queues up a command to load the specified properties of the object. You must call "context.sync()" before reading the properties.
+			/// </summary>
+			/// <param name="option" type="string | string[] | OfficeExtension.LoadOption"/>
+			/// <returns type="Excel.NamedSheetView"/>
+		}
+
+		NamedSheetView.prototype.set = function() {
+			/// <signature>
+			/// <summary>Sets multiple properties on the object at the same time, based on JSON input.</summary>
+			/// <param name="properties" type="Excel.Interfaces.NamedSheetViewUpdateData">Properties described by the Excel.Interfaces.NamedSheetViewUpdateData interface.</param>
+			/// <param name="options" type="string">Options of the form { throwOnReadOnly?: boolean }
+			/// <br />
+			/// * throwOnReadOnly: Throw an error if the passed-in property list includes read-only properties (default = true).
+			/// </param>
+			/// </signature>
+			/// <signature>
+			/// <summary>Sets multiple properties on the object at the same time, based on an existing loaded object.</summary>
+			/// <param name="properties" type="NamedSheetView">An existing NamedSheetView object, with properties that have already been loaded and synced.</param>
+			/// </signature>
+		}
+		NamedSheetView.prototype.activate = function() {
+			/// <summary>
+			/// Activates this sheet view. This is equivalent to using &quot;Switch To&quot; in the Excel UI. [Api set: ExcelApi BETA (PREVIEW ONLY)]
+			/// </summary>
+			/// <returns ></returns>
+		}
+		NamedSheetView.prototype.delete = function() {
+			/// <summary>
+			/// Removes the sheet view from the worksheet. [Api set: ExcelApi BETA (PREVIEW ONLY)]
+			/// </summary>
+			/// <returns ></returns>
+		}
+		NamedSheetView.prototype.duplicate = function(name) {
+			/// <summary>
+			/// Creates a copy of this sheet view. [Api set: ExcelApi BETA (PREVIEW ONLY)]
+			/// </summary>
+			/// <param name="name" type="String" optional="true">The name of the duplicated sheet view. If no name is provided, one will be generated.</param>
+			/// <returns type="Excel.NamedSheetView">The new, duplicated sheet view.</returns>
+		}
+
+		return NamedSheetView;
+	})(OfficeExtension.ClientObject);
+	Excel.NamedSheetView = NamedSheetView;
+})(Excel || (Excel = {__proto__: null}));
+
+var Excel;
+(function (Excel) {
+	var NamedSheetViewCollection = (function(_super) {
+		__extends(NamedSheetViewCollection, _super);
+		function NamedSheetViewCollection() {
+			/// <summary> Represents the collection of sheet views in the worksheet. [Api set: ExcelApi BETA (PREVIEW ONLY)] </summary>
+			/// <field name="context" type="Excel.RequestContext">The request context associated with this object.</field>
+			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
+			/// <field name="items" type="Array" elementType="Excel.NamedSheetView">Gets the loaded child items in this collection.</field>
+		}
+
+		NamedSheetViewCollection.prototype.load = function(option) {
+			/// <summary>
+			/// Queues up a command to load the specified properties of the object. You must call "context.sync()" before reading the properties.
+			/// </summary>
+			/// <param name="option" type="string | string[] | OfficeExtension.LoadOption"/>
+			/// <returns type="Excel.NamedSheetViewCollection"/>
+		}
+		NamedSheetViewCollection.prototype.add = function(name) {
+			/// <summary>
+			/// Creates a new sheet view with the given name. [Api set: ExcelApi BETA (PREVIEW ONLY)]
+			/// </summary>
+			/// <param name="name" type="String">The name of the sheet view to be created.              Throws an error when the provided name already exists, is empty, or is a name reserved by the worksheet.</param>
+			/// <returns type="Excel.NamedSheetView">The newly created sheet view object.</returns>
+		}
+		NamedSheetViewCollection.prototype.enterTemporary = function() {
+			/// <summary>
+			/// Creates and activates a new temporary sheet view.              Temporary views are removed when closing the application, exiting the temporary view with the exit method, or switching to another sheet view.              The temporary sheet view can also be acccessed with the empty string (&quot;&quot;), if the temporary view exists. [Api set: ExcelApi BETA (PREVIEW ONLY)]
+			/// </summary>
+			/// <returns type="Excel.NamedSheetView">The newly created sheet view object.</returns>
+		}
+		NamedSheetViewCollection.prototype.exit = function() {
+			/// <summary>
+			/// Exits the currently active sheet view. [Api set: ExcelApi BETA (PREVIEW ONLY)]
+			/// </summary>
+			/// <returns ></returns>
+		}
+		NamedSheetViewCollection.prototype.getActive = function() {
+			/// <summary>
+			/// Gets the worksheet&apos;s currently active sheet view. [Api set: ExcelApi BETA (PREVIEW ONLY)]
+			/// </summary>
+			/// <returns type="Excel.NamedSheetView">The currently active sheet view for this worksheet.</returns>
+		}
+		NamedSheetViewCollection.prototype.getCount = function() {
+			/// <summary>
+			/// Gets the number of sheet views in this worksheet.              Includes the temporary sheet view if it exists. [Api set: ExcelApi BETA (PREVIEW ONLY)]
+			/// </summary>
+			/// <returns type="OfficeExtension.ClientResult&lt;number&gt;"></returns>
+			var result = new OfficeExtension.ClientResult();
+			result.__proto__ = null;
+			result.value = 0;
+			return result;
+		}
+		NamedSheetViewCollection.prototype.getItem = function(key) {
+			/// <summary>
+			/// Gets a sheet view using its name. [Api set: ExcelApi BETA (PREVIEW ONLY)]
+			/// </summary>
+			/// <param name="key" type="String">The case-sensitive name of the sheet view. Use the empty string (&quot;&quot;) to get the temporary sheet view, if the temporary view exists.</param>
+			/// <returns type="Excel.NamedSheetView">The sheet view with the given name, or the temporary view if the empty string was provided. If there is no current temporary view and the empty string was provided, then an error is thrown.</returns>
+		}
+		NamedSheetViewCollection.prototype.getItemAt = function(index) {
+			/// <summary>
+			/// Gets a sheet view by its index in the collection. [Api set: ExcelApi BETA (PREVIEW ONLY)]
+			/// </summary>
+			/// <param name="index" type="Number">The index of the sheet view object in the collection.</param>
+			/// <returns type="Excel.NamedSheetView">The sheet view at the given index.</returns>
+		}
+
+		return NamedSheetViewCollection;
+	})(OfficeExtension.ClientObject);
+	Excel.NamedSheetViewCollection = NamedSheetViewCollection;
+})(Excel || (Excel = {__proto__: null}));
+
+var Excel;
+(function (Excel) {
+	/// <summary> Represents a category of number formats. [Api set: ExcelApi BETA (PREVIEW ONLY)] </summary>
 	var NumberFormatCategory = {
 		__proto__: null,
 		"general": "general",
@@ -13792,11 +14042,11 @@ var Excel;
 	var NumberFormatInfo = (function(_super) {
 		__extends(NumberFormatInfo, _super);
 		function NumberFormatInfo() {
-			/// <summary> Defines the culturally appropriate format of displaying numbers. This is based on current system culture settings. [Api set: ExcelApi BETA (PREVIEW ONLY)] </summary>
+			/// <summary> Defines the culturally appropriate format of displaying numbers. This is based on current system culture settings. [Api set: ExcelApi 1.11] </summary>
 			/// <field name="context" type="Excel.RequestContext">The request context associated with this object.</field>
 			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
-			/// <field name="numberDecimalSeparator" type="String">Gets the string used as the decimal separator for numeric values. This is based on current system settings. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
-			/// <field name="numberGroupSeparator" type="String">Gets the string used to separate groups of digits to the left of the decimal for numeric values. This is based on current system settings. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
+			/// <field name="numberDecimalSeparator" type="String">Gets the string used as the decimal separator for numeric values. This is based on current system settings. [Api set: ExcelApi 1.11]</field>
+			/// <field name="numberGroupSeparator" type="String">Gets the string used to separate groups of digits to the left of the decimal for numeric values. This is based on current system settings. [Api set: ExcelApi 1.11]</field>
 		}
 
 		NumberFormatInfo.prototype.load = function(option) {
@@ -13820,8 +14070,8 @@ var Excel;
 			/// <summary> [Api set: ExcelApi 1.9] </summary>
 			/// <field name="context" type="Excel.RequestContext">The request context associated with this object.</field>
 			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
-			/// <field name="columnIndex" type="Number">Represents the column index for the page break [Api set: ExcelApi 1.9]</field>
-			/// <field name="rowIndex" type="Number">Represents the row index for the page break [Api set: ExcelApi 1.9]</field>
+			/// <field name="columnIndex" type="Number">Specifies the column index for the page break [Api set: ExcelApi 1.9]</field>
+			/// <field name="rowIndex" type="Number">Specifies the row index for the page break [Api set: ExcelApi 1.9]</field>
 		}
 
 		PageBreak.prototype.load = function(option) {
@@ -13911,26 +14161,26 @@ var Excel;
 			/// <summary> Represents layout and print settings that are not dependent any printer-specific implementation. These settings include margins, orientation, page numbering, title rows, and print area. [Api set: ExcelApi 1.9] </summary>
 			/// <field name="context" type="Excel.RequestContext">The request context associated with this object.</field>
 			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
-			/// <field name="blackAndWhite" type="Boolean">Gets or sets the worksheet&apos;s black and white print option. [Api set: ExcelApi 1.9]</field>
-			/// <field name="bottomMargin" type="Number">Gets or sets the worksheet&apos;s bottom page margin to use for printing in points. [Api set: ExcelApi 1.9]</field>
-			/// <field name="centerHorizontally" type="Boolean">Gets or sets the worksheet&apos;s center horizontally flag. This flag determines whether the worksheet will be centered horizontally when it&apos;s printed. [Api set: ExcelApi 1.9]</field>
-			/// <field name="centerVertically" type="Boolean">Gets or sets the worksheet&apos;s center vertically flag. This flag determines whether the worksheet will be centered vertically when it&apos;s printed. [Api set: ExcelApi 1.9]</field>
-			/// <field name="draftMode" type="Boolean">Gets or sets the worksheet&apos;s draft mode option. If true the sheet will be printed without graphics. [Api set: ExcelApi 1.9]</field>
-			/// <field name="firstPageNumber" >Gets or sets the worksheet&apos;s first page number to print. Null value represents &quot;auto&quot; page numbering. [Api set: ExcelApi 1.9]</field>
-			/// <field name="footerMargin" type="Number">Gets or sets the worksheet&apos;s footer margin, in points, for use when printing. [Api set: ExcelApi 1.9]</field>
-			/// <field name="headerMargin" type="Number">Gets or sets the worksheet&apos;s header margin, in points, for use when printing. [Api set: ExcelApi 1.9]</field>
+			/// <field name="blackAndWhite" type="Boolean">The worksheet&apos;s black and white print option. [Api set: ExcelApi 1.9]</field>
+			/// <field name="bottomMargin" type="Number">The worksheet&apos;s bottom page margin to use for printing in points. [Api set: ExcelApi 1.9]</field>
+			/// <field name="centerHorizontally" type="Boolean">The worksheet&apos;s center horizontally flag. This flag determines whether the worksheet will be centered horizontally when it&apos;s printed. [Api set: ExcelApi 1.9]</field>
+			/// <field name="centerVertically" type="Boolean">The worksheet&apos;s center vertically flag. This flag determines whether the worksheet will be centered vertically when it&apos;s printed. [Api set: ExcelApi 1.9]</field>
+			/// <field name="draftMode" type="Boolean">The worksheet&apos;s draft mode option. If true the sheet will be printed without graphics. [Api set: ExcelApi 1.9]</field>
+			/// <field name="firstPageNumber" >The worksheet&apos;s first page number to print. Null value represents &quot;auto&quot; page numbering. [Api set: ExcelApi 1.9]</field>
+			/// <field name="footerMargin" type="Number">The worksheet&apos;s footer margin, in points, for use when printing. [Api set: ExcelApi 1.9]</field>
+			/// <field name="headerMargin" type="Number">The worksheet&apos;s header margin, in points, for use when printing. [Api set: ExcelApi 1.9]</field>
 			/// <field name="headersFooters" type="Excel.HeaderFooterGroup">Header and footer configuration for the worksheet. [Api set: ExcelApi 1.9]</field>
-			/// <field name="leftMargin" type="Number">Gets or sets the worksheet&apos;s left margin, in points, for use when printing. [Api set: ExcelApi 1.9]</field>
-			/// <field name="orientation" type="String">Gets or sets the worksheet&apos;s orientation of the page. [Api set: ExcelApi 1.9]</field>
-			/// <field name="paperSize" type="String">Gets or sets the worksheet&apos;s paper size of the page. [Api set: ExcelApi 1.9]</field>
-			/// <field name="printComments" type="String">Gets or sets whether the worksheet&apos;s comments should be displayed when printing. [Api set: ExcelApi 1.9]</field>
-			/// <field name="printErrors" type="String">Gets or sets the worksheet&apos;s print errors option. [Api set: ExcelApi 1.9]</field>
-			/// <field name="printGridlines" type="Boolean">Gets or sets the worksheet&apos;s print gridlines flag. This flag determines whether gridlines will be printed or not. [Api set: ExcelApi 1.9]</field>
-			/// <field name="printHeadings" type="Boolean">Gets or sets the worksheet&apos;s print headings flag. This flag determines whether headings will be printed or not. [Api set: ExcelApi 1.9]</field>
-			/// <field name="printOrder" type="String">Gets or sets the worksheet&apos;s page print order option. This specifies the order to use for processing the page number printed. [Api set: ExcelApi 1.9]</field>
-			/// <field name="rightMargin" type="Number">Gets or sets the worksheet&apos;s right margin, in points, for use when printing. [Api set: ExcelApi 1.9]</field>
-			/// <field name="topMargin" type="Number">Gets or sets the worksheet&apos;s top margin, in points, for use when printing. [Api set: ExcelApi 1.9]</field>
-			/// <field name="zoom" type="Excel.Interfaces.PageLayoutZoomOptions">Gets or sets the worksheet&apos;s print zoom options.              The `PageLayoutZoomOptions` object must be set as a JSON object (use `x.zoom = {...}` instead of `x.zoom.scale = ...`). [Api set: ExcelApi 1.9]</field>
+			/// <field name="leftMargin" type="Number">The worksheet&apos;s left margin, in points, for use when printing. [Api set: ExcelApi 1.9]</field>
+			/// <field name="orientation" type="String">The worksheet&apos;s orientation of the page. [Api set: ExcelApi 1.9]</field>
+			/// <field name="paperSize" type="String">The worksheet&apos;s paper size of the page. [Api set: ExcelApi 1.9]</field>
+			/// <field name="printComments" type="String">Specifies if the worksheet&apos;s comments should be displayed when printing. [Api set: ExcelApi 1.9]</field>
+			/// <field name="printErrors" type="String">The worksheet&apos;s print errors option. [Api set: ExcelApi 1.9]</field>
+			/// <field name="printGridlines" type="Boolean">Specifies if the worksheet&apos;s gridlines will be printed. [Api set: ExcelApi 1.9]</field>
+			/// <field name="printHeadings" type="Boolean">Specifies if the worksheet&apos;s headings will be printed. [Api set: ExcelApi 1.9]</field>
+			/// <field name="printOrder" type="String">The worksheet&apos;s page print order option. This specifies the order to use for processing the page number printed. [Api set: ExcelApi 1.9]</field>
+			/// <field name="rightMargin" type="Number">The worksheet&apos;s right margin, in points, for use when printing. [Api set: ExcelApi 1.9]</field>
+			/// <field name="topMargin" type="Number">The worksheet&apos;s top margin, in points, for use when printing. [Api set: ExcelApi 1.9]</field>
+			/// <field name="zoom" type="Excel.Interfaces.PageLayoutZoomOptions">The worksheet&apos;s print zoom options.              The `PageLayoutZoomOptions` object must be set as a JSON object (use `x.zoom = {...}` instead of `x.zoom.scale = ...`). [Api set: ExcelApi 1.9]</field>
 		}
 
 		PageLayout.prototype.load = function(option) {
@@ -14033,12 +14283,12 @@ var Excel;
 		var PageLayoutMarginOptions = (function() {
 			function PageLayoutMarginOptions() {
 				/// <summary> Represents the options in page layout margins. [Api set: ExcelApi 1.9] </summary>
-				/// <field name="bottom" type="Number">Represents the page layout bottom margin in the unit specified to use for printing. [Api set: ExcelApi 1.9]</field>
-				/// <field name="footer" type="Number">Represents the page layout footer margin in the unit specified to use for printing. [Api set: ExcelApi 1.9]</field>
-				/// <field name="header" type="Number">Represents the page layout header margin in the unit specified to use for printing. [Api set: ExcelApi 1.9]</field>
-				/// <field name="left" type="Number">Represents the page layout left margin in the unit specified to use for printing. [Api set: ExcelApi 1.9]</field>
-				/// <field name="right" type="Number">Represents the page layout right margin in the unit specified to use for printing. [Api set: ExcelApi 1.9]</field>
-				/// <field name="top" type="Number">Represents the page layout top margin in the unit specified to use for printing. [Api set: ExcelApi 1.9]</field>
+				/// <field name="bottom" type="Number">Specifies the page layout bottom margin in the unit specified to use for printing. [Api set: ExcelApi 1.9]</field>
+				/// <field name="footer" type="Number">Specifies the page layout footer margin in the unit specified to use for printing. [Api set: ExcelApi 1.9]</field>
+				/// <field name="header" type="Number">Specifies the page layout header margin in the unit specified to use for printing. [Api set: ExcelApi 1.9]</field>
+				/// <field name="left" type="Number">Specifies the page layout left margin in the unit specified to use for printing. [Api set: ExcelApi 1.9]</field>
+				/// <field name="right" type="Number">Specifies the page layout right margin in the unit specified to use for printing. [Api set: ExcelApi 1.9]</field>
+				/// <field name="top" type="Number">Specifies the page layout top margin in the unit specified to use for printing. [Api set: ExcelApi 1.9]</field>
 			}
 			return PageLayoutMarginOptions;
 		})();
@@ -14143,7 +14393,7 @@ var Excel;
 
 var Excel;
 (function (Excel) {
-	/// <summary> The ShowAs Calculation function for the Data Pivot Field. [Api set: ExcelApi 1.9] </summary>
+	/// <summary> Represents the axis from which to get the PivotItems. [Api set: ExcelApi 1.9] </summary>
 	var PivotAxis = {
 		__proto__: null,
 		"unknown": "unknown",
@@ -14163,7 +14413,7 @@ var Excel;
 			function PivotDateFilter() {
 				/// <summary> Configurable template for a date filter to apply to a PivotField.              The `condition` defines what criteria need to be set in order for the filter to operate. [Api set: ExcelApi BETA (PREVIEW ONLY)] </summary>
 				/// <field name="comparator" type="Excel.Interfaces.FilterDatetime">The comparator is the static value to which other values are compared. The type of comparison is defined by the condition. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
-				/// <field name="condition" type="String">Indicates the condition for the filter, which defines the necessary filtering criteria. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
+				/// <field name="condition" type="String">Specifies the condition for the filter, which defines the necessary filtering criteria. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
 				/// <field name="exclusive" type="Boolean">If true, filter *excludes* items that meet criteria. The default is false (filter to include items that meet criteria). [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
 				/// <field name="lowerBound" type="Excel.Interfaces.FilterDatetime">The lower-bound of the range for the `Between` filter condition. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
 				/// <field name="upperBound" type="Excel.Interfaces.FilterDatetime">The upper-bound of the range for the `Between` filter condition. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
@@ -14215,9 +14465,9 @@ var Excel;
 		}
 		PivotField.prototype.applyFilter = function(filter) {
 			/// <summary>
-			/// Sets one or multiple of the field&apos;s current PivotFilters and applies them to the field.              If the provided filter(s) are invalid or cannot be applied, an exception is thrown. [Api set: ExcelApi BETA (PREVIEW ONLY)]
+			/// Sets one or more of the field&apos;s current PivotFilters and applies them to the field.               If the provided filters are invalid or cannot be applied, an exception is thrown. [Api set: ExcelApi BETA (PREVIEW ONLY)]
 			/// </summary>
-			/// <param name="filter" >A configured specific PivotFilter or a PivotFilters interface containing multiple configured filters.</param>
+			/// <param name="filter" type="Excel.Interfaces.PivotFilters">A configured specific PivotFilter or a PivotFilters interface containing multiple configured filters.</param>
 			/// <returns ></returns>
 		}
 		PivotField.prototype.clearAllFilters = function() {
@@ -14258,14 +14508,14 @@ var Excel;
 			/// <summary>
 			/// Sorts the PivotField. If a DataPivotHierarchy is specified, then sort will be applied based on it, if not sort will be based on the PivotField itself. [Api set: ExcelApi 1.8]
 			/// </summary>
-			/// <param name="sortBy" >Represents whether the sorting is done in an ascending or descending order.</param>
+			/// <param name="sortBy" >Specifies if the sorting is done in ascending or descending order.</param>
 			/// <returns ></returns>
 		}
 		PivotField.prototype.sortByValues = function(sortBy, valuesHierarchy, pivotItemScope) {
 			/// <summary>
 			/// Sorts the PivotField by specified values in a given scope. The scope defines which specific values will be used to sort when              there are multiple values from the same DataPivotHierarchy. [Api set: ExcelApi 1.9]
 			/// </summary>
-			/// <param name="sortBy" type="String">Represents whether the sorting is done in an ascending or descending order.</param>
+			/// <param name="sortBy" type="String">Specifies if the sorting is done in ascending or descending order.</param>
 			/// <param name="valuesHierarchy" type="Excel.DataPivotHierarchy">Specifies the values hierarchy on the data axis to be used for sorting.</param>
 			/// <param name="pivotItemScope" type="Array"  optional="true">The items that should be used for the scope of the sorting. These will be the              items that make up the row or column that you want to sort on. If a string is used instead of a PivotItem,              the string represents the ID of the PivotItem. If there are no items other than data hierarchy on the axis              you want to sort on, this can be empty.</param>
 			/// <returns ></returns>
@@ -14473,7 +14723,7 @@ var Excel;
 			/// <field name="id" type="String">Id of the PivotItem. [Api set: ExcelApi 1.8]</field>
 			/// <field name="isExpanded" type="Boolean">Determines whether the item is expanded to show child items or if it&apos;s collapsed and child items are hidden. [Api set: ExcelApi 1.8]</field>
 			/// <field name="name" type="String">Name of the PivotItem. [Api set: ExcelApi 1.8]</field>
-			/// <field name="visible" type="Boolean">Determines whether the PivotItem is visible or not. [Api set: ExcelApi 1.8]</field>
+			/// <field name="visible" type="Boolean">Specifies if the PivotItem is visible. [Api set: ExcelApi 1.8]</field>
 		}
 
 		PivotItem.prototype.load = function(option) {
@@ -14560,7 +14810,7 @@ var Excel;
 			function PivotLabelFilter() {
 				/// <summary> Configurable template for a label filter to apply to a PivotField.              The `condition` defines what criteria need to be set in order for the filter to operate. [Api set: ExcelApi BETA (PREVIEW ONLY)] </summary>
 				/// <field name="comparator" type="String">The comparator is the static value to which other values are compared. The type of comparison is defined by the condition.               Note: A numeric string is treated as a number when being compared against other numeric strings. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
-				/// <field name="condition" type="String">Indicates the condition for the filter, which defines the necessary filtering criteria. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
+				/// <field name="condition" type="String">Specifies the condition for the filter, which defines the necessary filtering criteria. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
 				/// <field name="exclusive" type="Boolean">If true, filter *excludes* items that meet criteria. The default is false (filter to include items that meet criteria). [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
 				/// <field name="lowerBound" type="String">The lower-bound of the range for the Between filter condition.               Note: A numeric string is treated as a number when being compared against other numeric strings. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
 				/// <field name="substring" type="String">The substring used for `BeginsWith`, `EndsWith`, and `Contains` filter conditions. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
@@ -14581,13 +14831,13 @@ var Excel;
 			/// <summary> Represents the visual layout of the PivotTable. [Api set: ExcelApi 1.8] </summary>
 			/// <field name="context" type="Excel.RequestContext">The request context associated with this object.</field>
 			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
-			/// <field name="autoFormat" type="Boolean">Specifies whether formatting will be automatically formatted when it’s refreshed or when fields are moved [Api set: ExcelApi 1.9]</field>
-			/// <field name="enableFieldList" type="Boolean">Specifies whether the field list can be shown in the UI. [Api set: ExcelApi 1.10]</field>
+			/// <field name="autoFormat" type="Boolean">Specifies if formatting will be automatically formatted when it’s refreshed or when fields are moved. [Api set: ExcelApi 1.9]</field>
+			/// <field name="enableFieldList" type="Boolean">Specifies if the field list can be shown in the UI. [Api set: ExcelApi 1.10]</field>
 			/// <field name="layoutType" type="String">This property indicates the PivotLayoutType of all fields on the PivotTable. If fields have different states, this will be null. [Api set: ExcelApi 1.8]</field>
-			/// <field name="pivotStyle" type="Excel.PivotTableStyle">The style applied to the PivotTable. [Api set: ExcelApi 1.12]</field>
-			/// <field name="preserveFormatting" type="Boolean">Specifies whether formatting is preserved when the report is refreshed or recalculated by operations such as pivoting, sorting, or changing page field items. [Api set: ExcelApi 1.9]</field>
-			/// <field name="showColumnGrandTotals" type="Boolean">Specifies whether the PivotTable report shows grand totals for columns. [Api set: ExcelApi 1.8]</field>
-			/// <field name="showRowGrandTotals" type="Boolean">Specifies whether the PivotTable report shows grand totals for rows. [Api set: ExcelApi 1.8]</field>
+			/// <field name="pivotStyle" type="Excel.PivotTableStyle">The style applied to the PivotTable. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
+			/// <field name="preserveFormatting" type="Boolean">Specifies if formatting is preserved when the report is refreshed or recalculated by operations such as pivoting, sorting, or changing page field items. [Api set: ExcelApi 1.9]</field>
+			/// <field name="showColumnGrandTotals" type="Boolean">Specifies if the PivotTable report shows grand totals for columns. [Api set: ExcelApi 1.8]</field>
+			/// <field name="showRowGrandTotals" type="Boolean">Specifies if the PivotTable report shows grand totals for rows. [Api set: ExcelApi 1.8]</field>
 			/// <field name="subtotalLocation" type="String">This property indicates the SubtotalLocationType of all fields on the PivotTable. If fields have different states, this will be null. [Api set: ExcelApi 1.8]</field>
 		}
 
@@ -14615,7 +14865,7 @@ var Excel;
 		}
 		PivotLayout.prototype.getCell = function(dataHierarchy, rowItems, columnItems) {
 			/// <summary>
-			/// Gets a unique cell in the PivotTable based on a data hierarchy and the row and column items of their respective hierarchies. The returned cell is the intersection of the given row and column that contains the data from the given hierarchy. This method is the inverse of calling getPivotItems and getDataHierarchy on a particular cell. [Api set: ExcelApi 1.12]
+			/// Gets a unique cell in the PivotTable based on a data hierarchy and the row and column items of their respective hierarchies. The returned cell is the intersection of the given row and column that contains the data from the given hierarchy. This method is the inverse of calling getPivotItems and getDataHierarchy on a particular cell. [Api set: ExcelApi BETA (PREVIEW ONLY)]
 			/// </summary>
 			/// <param name="dataHierarchy" >The dataHierarchy that provides the data item to find.</param>
 			/// <param name="rowItems" type="Array" >The PivotItems from the row axis that make up the value to find.</param>
@@ -14681,7 +14931,7 @@ var Excel;
 		}
 		PivotLayout.prototype.setStyle = function(style) {
 			/// <summary>
-			/// Sets the style applied to the PivotTable. [Api set: ExcelApi 1.12]
+			/// Sets the style applied to the PivotTable. [Api set: ExcelApi BETA (PREVIEW ONLY)]
 			/// </summary>
 			/// <param name="style" >The style to apply to the PivotTable. An `InvalidArgumentException` is thrown if a string is provided that does not match the name of any style.</param>
 			/// <returns ></returns>
@@ -14728,17 +14978,17 @@ var Excel;
 			/// <summary> Represents an Excel PivotTable.              To learn more about the PivotTable object model, read {@link https://docs.microsoft.com/office/dev/add-ins/excel/excel-add-ins-pivottables | Work with PivotTables using the Excel JavaScript API}. [Api set: ExcelApi 1.3] </summary>
 			/// <field name="context" type="Excel.RequestContext">The request context associated with this object.</field>
 			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
-			/// <field name="allowMultipleFiltersPerField" type="Boolean">Specifies whether the PivotTable allows the application of multiple PivotFilters on a given PivotField in the table. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
+			/// <field name="allowMultipleFiltersPerField" type="Boolean">Specifies if the PivotTable allows the application of multiple PivotFilters on a given PivotField in the table. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
 			/// <field name="columnHierarchies" type="Excel.RowColumnPivotHierarchyCollection">The Column Pivot Hierarchies of the PivotTable. [Api set: ExcelApi 1.8]</field>
 			/// <field name="dataHierarchies" type="Excel.DataPivotHierarchyCollection">The Data Pivot Hierarchies of the PivotTable. [Api set: ExcelApi 1.8]</field>
-			/// <field name="enableDataValueEditing" type="Boolean">Specifies whether the PivotTable allows values in the data body to be edited by the user. [Api set: ExcelApi 1.9]</field>
+			/// <field name="enableDataValueEditing" type="Boolean">Specifies if the PivotTable allows values in the data body to be edited by the user. [Api set: ExcelApi 1.9]</field>
 			/// <field name="filterHierarchies" type="Excel.FilterPivotHierarchyCollection">The Filter Pivot Hierarchies of the PivotTable. [Api set: ExcelApi 1.8]</field>
 			/// <field name="hierarchies" type="Excel.PivotHierarchyCollection">The Pivot Hierarchies of the PivotTable. [Api set: ExcelApi 1.8]</field>
-			/// <field name="id" type="String">Id of the PivotTable. Read-only. [Api set: ExcelApi 1.5]</field>
+			/// <field name="id" type="String">Id of the PivotTable. [Api set: ExcelApi 1.5]</field>
 			/// <field name="layout" type="Excel.PivotLayout">The PivotLayout describing the layout and visual structure of the PivotTable. [Api set: ExcelApi 1.8]</field>
 			/// <field name="name" type="String">Name of the PivotTable. [Api set: ExcelApi 1.3]</field>
 			/// <field name="rowHierarchies" type="Excel.RowColumnPivotHierarchyCollection">The Row Pivot Hierarchies of the PivotTable. [Api set: ExcelApi 1.8]</field>
-			/// <field name="useCustomSortLists" type="Boolean">Specifies whether the PivotTable uses custom lists when sorting. [Api set: ExcelApi 1.9]</field>
+			/// <field name="useCustomSortLists" type="Boolean">Specifies if the PivotTable uses custom lists when sorting. [Api set: ExcelApi 1.9]</field>
 			/// <field name="worksheet" type="Excel.Worksheet">The worksheet containing the current PivotTable. [Api set: ExcelApi 1.3]</field>
 		}
 
@@ -14850,7 +15100,7 @@ var Excel;
 	var PivotTableScopedCollection = (function(_super) {
 		__extends(PivotTableScopedCollection, _super);
 		function PivotTableScopedCollection() {
-			/// <summary> Represents a scoped collection of PivotTables. The PivotTables are sorted based on the location of the PivotTable&apos;s top-left corner. They are ordered top to bottom and then left to right. [Api set: ExcelApi 1.12] </summary>
+			/// <summary> Represents a scoped collection of PivotTables. The PivotTables are sorted based on the location of the PivotTable&apos;s top-left corner. They are ordered top to bottom and then left to right. [Api set: ExcelApiOnline 1.1] </summary>
 			/// <field name="context" type="Excel.RequestContext">The request context associated with this object.</field>
 			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
 			/// <field name="items" type="Array" elementType="Excel.PivotTable">Gets the loaded child items in this collection.</field>
@@ -14865,7 +15115,7 @@ var Excel;
 		}
 		PivotTableScopedCollection.prototype.getCount = function() {
 			/// <summary>
-			/// Gets the number of PivotTables in the collection. [Api set: ExcelApi 1.12]
+			/// Gets the number of PivotTables in the collection. [Api set: ExcelApiOnline 1.1]
 			/// </summary>
 			/// <returns type="OfficeExtension.ClientResult&lt;number&gt;"></returns>
 			var result = new OfficeExtension.ClientResult();
@@ -14875,20 +15125,20 @@ var Excel;
 		}
 		PivotTableScopedCollection.prototype.getFirst = function() {
 			/// <summary>
-			/// Gets the first PivotTable in the collection. The PivotTables in the collection are sorted top to bottom and left to right, such that top-left table is the first PivotTable in the collection. [Api set: ExcelApi 1.12]
+			/// Gets the first PivotTable in the collection. The PivotTables in the collection are sorted top to bottom and left to right, such that top-left table is the first PivotTable in the collection. [Api set: ExcelApiOnline 1.1]
 			/// </summary>
 			/// <returns type="Excel.PivotTable"></returns>
 		}
 		PivotTableScopedCollection.prototype.getItem = function(key) {
 			/// <summary>
-			/// Gets a PivotTable by name. [Api set: ExcelApi 1.12]
+			/// Gets a PivotTable by name. [Api set: ExcelApiOnline 1.1]
 			/// </summary>
 			/// <param name="key" type="String">Name of the PivotTable to be retrieved.</param>
 			/// <returns type="Excel.PivotTable"></returns>
 		}
 		PivotTableScopedCollection.prototype.getItemOrNullObject = function(name) {
 			/// <summary>
-			/// Gets a PivotTable by name. If the PivotTable does not exist, will return a null object. [Api set: ExcelApi 1.12]
+			/// Gets a PivotTable by name. If the PivotTable does not exist, will return a null object. [Api set: ExcelApiOnline 1.1]
 			/// </summary>
 			/// <param name="name" type="String">Name of the PivotTable to be retrieved.</param>
 			/// <returns type="Excel.PivotTable"></returns>
@@ -14908,7 +15158,7 @@ var Excel;
 			/// <field name="context" type="Excel.RequestContext">The request context associated with this object.</field>
 			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
 			/// <field name="name" type="String">Gets the name of the PivotTableStyle. [Api set: ExcelApi 1.10]</field>
-			/// <field name="readOnly" type="Boolean">Specifies whether this PivotTableStyle object is read-only. Read-only. [Api set: ExcelApi 1.10]</field>
+			/// <field name="readOnly" type="Boolean">Specifies if this PivotTableStyle object is read-only. [Api set: ExcelApi 1.10]</field>
 		}
 
 		PivotTableStyle.prototype.load = function(option) {
@@ -15028,10 +15278,10 @@ var Excel;
 			function PivotValueFilter() {
 				/// <summary> Configurable template for a value filter to apply to a PivotField.              The `condition` defines what criteria need to be set in order for the filter to operate. [Api set: ExcelApi BETA (PREVIEW ONLY)] </summary>
 				/// <field name="comparator" type="Number">The comparator is the static value to which other values are compared. The type of comparison is defined by the condition.               For example, if comparator is &quot;50&quot; and condition is &quot;GreaterThan&quot;, all item values that are not greater than 50 will be removed by the filter. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
-				/// <field name="condition" type="String">Indicates the condition for the filter, which defines the necessary filtering criteria. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
+				/// <field name="condition" type="String">Specifies the condition for the filter, which defines the necessary filtering criteria. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
 				/// <field name="exclusive" type="Boolean">If true, filter *excludes* items that meet criteria. The default is false (filter to include items that meet criteria). [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
 				/// <field name="lowerBound" type="Number">The lower-bound of the range for the `Between` filter condition. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
-				/// <field name="selectionType" type="String">Indicates whether the filter is for the top/bottom N items, top/bottom N percent, or top/bottom N sum. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
+				/// <field name="selectionType" type="String">Specifies if the filter is for the top/bottom N items, top/bottom N percent, or top/bottom N sum. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
 				/// <field name="threshold" type="Number">The &quot;N&quot; threshold number of items, percent, or sum to be filtered for a Top/Bottom filter condition. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
 				/// <field name="upperBound" type="Number">The upper-bound of the range for the `Between` filter condition. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
 				/// <field name="value" type="String">Name of the chosen &quot;value&quot; in the field by which to filter. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
@@ -15163,41 +15413,41 @@ var Excel;
 			/// <summary> Range represents a set of one or more contiguous cells such as a cell, a row, a column, block of cells, etc.               To learn more about how ranges are used throughout the API, read {@link https://docs.microsoft.com/office/dev/add-ins/excel/excel-add-ins-ranges | Work with ranges using the Excel JavaScript API}               and {@link https://docs.microsoft.com/office/dev/add-ins/excel/excel-add-ins-ranges-advanced | Work with ranges using the Excel JavaScript API (advanced)}. [Api set: ExcelApi 1.1] </summary>
 			/// <field name="context" type="Excel.RequestContext">The request context associated with this object.</field>
 			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
-			/// <field name="address" type="String">Represents the range reference in A1-style. Address value will contain the Sheet reference (e.g. &quot;Sheet1!A1:B4&quot;). Read-only. [Api set: ExcelApi 1.1]</field>
-			/// <field name="addressLocal" type="String">Represents range reference for the specified range in the language of the user. Read-only. [Api set: ExcelApi 1.1]</field>
-			/// <field name="cellCount" type="Number">Number of cells in the range. This API will return -1 if the cell count exceeds 2^31-1 (2,147,483,647). Read-only. [Api set: ExcelApi 1.1]</field>
-			/// <field name="columnCount" type="Number">Represents the total number of columns in the range. Read-only. [Api set: ExcelApi 1.1]</field>
+			/// <field name="address" type="String">Specifies the range reference in A1-style. Address value will contain the Sheet reference (e.g., &quot;Sheet1!A1:B4&quot;). [Api set: ExcelApi 1.1]</field>
+			/// <field name="addressLocal" type="String">Specifies the range reference for the specified range in the language of the user. [Api set: ExcelApi 1.1]</field>
+			/// <field name="cellCount" type="Number">Specifies the number of cells in the range. This API will return -1 if the cell count exceeds 2^31-1 (2,147,483,647). [Api set: ExcelApi 1.1]</field>
+			/// <field name="columnCount" type="Number">Specifies the total number of columns in the range. [Api set: ExcelApi 1.1]</field>
 			/// <field name="columnHidden" type="Boolean">Represents if all columns of the current range are hidden. [Api set: ExcelApi 1.2]</field>
-			/// <field name="columnIndex" type="Number">Represents the column number of the first cell in the range. Zero-indexed. Read-only. [Api set: ExcelApi 1.1]</field>
-			/// <field name="conditionalFormats" type="Excel.ConditionalFormatCollection">Collection of ConditionalFormats that intersect the range. Read-only. [Api set: ExcelApi 1.6]</field>
+			/// <field name="columnIndex" type="Number">Specifies the column number of the first cell in the range. Zero-indexed. [Api set: ExcelApi 1.1]</field>
+			/// <field name="conditionalFormats" type="Excel.ConditionalFormatCollection">The collection of ConditionalFormats that intersect the range. [Api set: ExcelApi 1.6]</field>
 			/// <field name="dataValidation" type="Excel.DataValidation">Returns a data validation object. [Api set: ExcelApi 1.8]</field>
-			/// <field name="format" type="Excel.RangeFormat">Returns a format object, encapsulating the range&apos;s font, fill, borders, alignment, and other properties. Read-only. [Api set: ExcelApi 1.1]</field>
+			/// <field name="format" type="Excel.RangeFormat">Returns a format object, encapsulating the range&apos;s font, fill, borders, alignment, and other properties. [Api set: ExcelApi 1.1]</field>
 			/// <field name="formulas" type="Array" elementType="Array">Represents the formula in A1-style notation. [Api set: ExcelApi 1.1]</field>
 			/// <field name="formulasLocal" type="Array" elementType="Array">Represents the formula in A1-style notation, in the user&apos;s language and number-formatting locale.  For example, the English &quot;=SUM(A1, 1.5)&quot; formula would become &quot;=SUMME(A1; 1,5)&quot; in German. [Api set: ExcelApi 1.1]</field>
 			/// <field name="formulasR1C1" type="Array" elementType="Array">Represents the formula in R1C1-style notation. [Api set: ExcelApi 1.2]</field>
-			/// <field name="hasSpill" type="Boolean">Represents if all cells have a spill border.              Returns true if all cells have a spill border, or false if all cells do not have a spill border.              Returns null if there are cells both with and without spill borders within the range. [Api set: ExcelApi 1.12]</field>
-			/// <field name="height" type="Number">Returns the distance in points, for 100% zoom, from top edge of the range to bottom edge of the range. Read-only. [Api set: ExcelApi 1.10]</field>
-			/// <field name="hidden" type="Boolean">Represents if all cells of the current range are hidden. Read-only. [Api set: ExcelApi 1.2]</field>
+			/// <field name="hasSpill" type="Boolean">Represents if all cells have a spill border.              Returns true if all cells have a spill border, or false if all cells do not have a spill border.              Returns null if there are cells both with and without spill borders within the range. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
+			/// <field name="height" type="Number">Returns the distance in points, for 100% zoom, from top edge of the range to bottom edge of the range. [Api set: ExcelApi 1.10]</field>
+			/// <field name="hidden" type="Boolean">Represents if all cells of the current range are hidden. [Api set: ExcelApi 1.2]</field>
 			/// <field name="hyperlink" type="Excel.Interfaces.RangeHyperlink">Represents the hyperlink for the current range. [Api set: ExcelApi 1.7]</field>
-			/// <field name="isEntireColumn" type="Boolean">Represents if the current range is an entire column. Read-only. [Api set: ExcelApi 1.7]</field>
-			/// <field name="isEntireRow" type="Boolean">Represents if the current range is an entire row. Read-only. [Api set: ExcelApi 1.7]</field>
-			/// <field name="left" type="Number">Returns the distance in points, for 100% zoom, from left edge of the worksheet to left edge of the range. Read-only. [Api set: ExcelApi 1.10]</field>
-			/// <field name="linkedDataTypeState" type="Array" elementType="Array">Represents the data type state of each cell. Read-only. [Api set: ExcelApi 1.9]</field>
+			/// <field name="isEntireColumn" type="Boolean">Represents if the current range is an entire column. [Api set: ExcelApi 1.7]</field>
+			/// <field name="isEntireRow" type="Boolean">Represents if the current range is an entire row. [Api set: ExcelApi 1.7]</field>
+			/// <field name="left" type="Number">Returns the distance in points, for 100% zoom, from left edge of the worksheet to left edge of the range. [Api set: ExcelApi 1.10]</field>
+			/// <field name="linkedDataTypeState" type="Array" elementType="Array">Represents the data type state of each cell. [Api set: ExcelApi 1.9]</field>
 			/// <field name="numberFormat" type="Array" elementType="Array">Represents Excel&apos;s number format code for the given range. [Api set: ExcelApi 1.1]</field>
-			/// <field name="numberFormatCategories" type="Array" elementType="Array">Represents the category of number format of each cell. Read-only. [Api set: ExcelApi 1.12]</field>
+			/// <field name="numberFormatCategories" type="Array" elementType="Array">Represents the category of number format of each cell. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
 			/// <field name="numberFormatLocal" type="Array" elementType="Array">Represents Excel&apos;s number format code for the given range, based on the language settings of the user.​               Excel does not perform any language or format coercion when getting or setting the `numberFormatLocal` property.               Any returned text uses the locally-formatted strings based on the language specified in the system settings. [Api set: ExcelApi 1.7]</field>
-			/// <field name="rowCount" type="Number">Returns the total number of rows in the range. Read-only. [Api set: ExcelApi 1.1]</field>
+			/// <field name="rowCount" type="Number">Returns the total number of rows in the range. [Api set: ExcelApi 1.1]</field>
 			/// <field name="rowHidden" type="Boolean">Represents if all rows of the current range are hidden. [Api set: ExcelApi 1.2]</field>
-			/// <field name="rowIndex" type="Number">Returns the row number of the first cell in the range. Zero-indexed. Read-only. [Api set: ExcelApi 1.1]</field>
-			/// <field name="savedAsArray" type="Boolean">Represents if ALL the cells would be saved as an array formula.              Returns true if ALL cells would be saved as an array formula, or false if ALL cells would NOT be saved as an array formula.              Returns null if some cells would be saved as an array formula and some would not be. [Api set: ExcelApi 1.12]</field>
-			/// <field name="sort" type="Excel.RangeSort">Represents the range sort of the current range. Read-only. [Api set: ExcelApi 1.2]</field>
+			/// <field name="rowIndex" type="Number">Returns the row number of the first cell in the range. Zero-indexed. [Api set: ExcelApi 1.1]</field>
+			/// <field name="savedAsArray" type="Boolean">Represents if ALL the cells would be saved as an array formula.              Returns true if ALL cells would be saved as an array formula, or false if ALL cells would NOT be saved as an array formula.              Returns null if some cells would be saved as an array formula and some would not be. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
+			/// <field name="sort" type="Excel.RangeSort">Represents the range sort of the current range. [Api set: ExcelApi 1.2]</field>
 			/// <field name="style" type="String">Represents the style of the current range.              If the styles of the cells are inconsistent, null will be returned.              For custom styles, the style name will be returned. For built-in styles, a string representing a value in the BuiltInStyle enum will be returned. [Api set: ExcelApi 1.7]</field>
-			/// <field name="text" type="Array" elementType="Array">Text values of the specified range. The Text value will not depend on the cell width. The # sign substitution that happens in Excel UI will not affect the text value returned by the API. Read-only. [Api set: ExcelApi 1.1]</field>
-			/// <field name="top" type="Number">Returns the distance in points, for 100% zoom, from top edge of the worksheet to top edge of the range. Read-only. [Api set: ExcelApi 1.10]</field>
-			/// <field name="valueTypes" type="Array" elementType="Array">Represents the type of data of each cell. Read-only. [Api set: ExcelApi 1.1]</field>
+			/// <field name="text" type="Array" elementType="Array">Text values of the specified range. The Text value will not depend on the cell width. The # sign substitution that happens in Excel UI will not affect the text value returned by the API. [Api set: ExcelApi 1.1]</field>
+			/// <field name="top" type="Number">Returns the distance in points, for 100% zoom, from top edge of the worksheet to top edge of the range. [Api set: ExcelApi 1.10]</field>
+			/// <field name="valueTypes" type="Array" elementType="Array">Specifies the type of data in each cell. [Api set: ExcelApi 1.1]</field>
 			/// <field name="values" type="Array" elementType="Array">Represents the raw values of the specified range. The data returned could be of type string, number, or a boolean. Cells that contain an error will return the error string. [Api set: ExcelApi 1.1]</field>
-			/// <field name="width" type="Number">Returns the distance in points, for 100% zoom, from left edge of the range to right edge of the range. Read-only. [Api set: ExcelApi 1.10]</field>
-			/// <field name="worksheet" type="Excel.Worksheet">The worksheet containing the current range. Read-only. [Api set: ExcelApi 1.1]</field>
+			/// <field name="width" type="Number">Returns the distance in points, for 100% zoom, from left edge of the range to right edge of the range. [Api set: ExcelApi 1.10]</field>
+			/// <field name="worksheet" type="Excel.Worksheet">The worksheet containing the current range. [Api set: ExcelApi 1.1]</field>
 		}
 
 		Range.prototype.load = function(option) {
@@ -15362,6 +15612,12 @@ var Excel;
 			/// <param name="count" type="Number" optional="true">Optional. The number of columns to include in the resulting range. In general, use a positive number to create a range outside the current range. You can also use a negative number to create a range within the current range. The default value is 1.</param>
 			/// <returns type="Excel.Range"></returns>
 		}
+		Range.prototype.getDirectPrecedents = function() {
+			/// <summary>
+			/// Returns a WorkbookRangeAreas object that represents the range containing all the direct precedents of a cell in same worksheet or in multiple worksheets. [Api set: ExcelApi BETA (PREVIEW ONLY)]
+			/// </summary>
+			/// <returns type="Excel.WorkbookRangeAreas"></returns>
+		}
 		Range.prototype.getEntireColumn = function() {
 			/// <summary>
 			/// Gets an object that represents the entire column of the range (for example, if the current range represents cells &quot;B4:E11&quot;, its `getEntireColumn` is a range that represents columns &quot;B:E&quot;). [Api set: ExcelApi 1.1]
@@ -15416,6 +15672,12 @@ var Excel;
 			/// </summary>
 			/// <returns type="Excel.Range"></returns>
 		}
+		Range.prototype.getMergedAreas = function() {
+			/// <summary>
+			/// Returns a RangeAreas object that represents the merged areas in this range. Note that if the merged areas count in this range is more than 512, the API will fail to return the result. [Api set: ExcelApi BETA (PREVIEW ONLY)]
+			/// </summary>
+			/// <returns type="Excel.RangeAreas"></returns>
+		}
 		Range.prototype.getOffsetRange = function(rowOffset, columnOffset) {
 			/// <summary>
 			/// Gets an object which represents a range that&apos;s offset from the specified range. The dimension of the returned range will match this range. If the resulting range is forced outside the bounds of the worksheet grid, an error will be thrown. [Api set: ExcelApi 1.1]
@@ -15426,10 +15688,16 @@ var Excel;
 		}
 		Range.prototype.getPivotTables = function(fullyContained) {
 			/// <summary>
-			/// Gets a scoped collection of PivotTables that overlap with the range. [Api set: ExcelApi 1.12]
+			/// Gets a scoped collection of PivotTables that overlap with the range. [Api set: ExcelApiOnline 1.1]
 			/// </summary>
 			/// <param name="fullyContained" type="Boolean" optional="true">If true, returns only PivotTables that are fully contained within the range bounds. The default value is false.</param>
 			/// <returns type="Excel.PivotTableScopedCollection"></returns>
+		}
+		Range.prototype.getPrecedents = function() {
+			/// <summary>
+			/// Returns a WorkbookRangeAreas object that represents the range containing all the precedents of a cell in same worksheet or in multiple worksheets. [Api set: ExcelApi BETA (PREVIEW ONLY)]
+			/// </summary>
+			/// <returns type="Excel.WorkbookRangeAreas"></returns>
 		}
 		Range.prototype.getResizedRange = function(deltaRows, deltaColumns) {
 			/// <summary>
@@ -15489,25 +15757,25 @@ var Excel;
 		}
 		Range.prototype.getSpillParent = function() {
 			/// <summary>
-			/// Gets the range object containing the anchor cell for a cell getting spilled into. Fails if applied to a range with more than one cell. Read-only. [Api set: ExcelApi 1.12]
+			/// Gets the range object containing the anchor cell for a cell getting spilled into. Fails if applied to a range with more than one cell. [Api set: ExcelApi BETA (PREVIEW ONLY)]
 			/// </summary>
 			/// <returns type="Excel.Range"></returns>
 		}
 		Range.prototype.getSpillParentOrNullObject = function() {
 			/// <summary>
-			/// Gets the range object containing the anchor cell for a cell getting spilled into. Read-only.              If it is not a spill cell or more than once cells are give, a null object will be returned. [Api set: ExcelApi 1.12]
+			/// Gets the range object containing the anchor cell for a cell getting spilled into.              If it is not a spill cell or more than once cells are give, a null object will be returned. [Api set: ExcelApi BETA (PREVIEW ONLY)]
 			/// </summary>
 			/// <returns type="Excel.Range"></returns>
 		}
 		Range.prototype.getSpillingToRange = function() {
 			/// <summary>
-			/// Gets the range object containing the spill range when called on an anchor cell. Fails if applied to a range with more than one cell. Read-only. [Api set: ExcelApi 1.12]
+			/// Gets the range object containing the spill range when called on an anchor cell. Fails if applied to a range with more than one cell. [Api set: ExcelApi BETA (PREVIEW ONLY)]
 			/// </summary>
 			/// <returns type="Excel.Range"></returns>
 		}
 		Range.prototype.getSpillingToRangeOrNullObject = function() {
 			/// <summary>
-			/// Gets the range object containing the spill range when called on an anchor cell. Read-only.              If the range is not an anchor cell or spill range can&apos;t be found, a null object will be returned. [Api set: ExcelApi 1.12]
+			/// Gets the range object containing the spill range when called on an anchor cell.              If the range is not an anchor cell or spill range can&apos;t be found, a null object will be returned. [Api set: ExcelApi BETA (PREVIEW ONLY)]
 			/// </summary>
 			/// <returns type="Excel.Range"></returns>
 		}
@@ -15574,7 +15842,7 @@ var Excel;
 		}
 		Range.prototype.moveTo = function(destinationRange) {
 			/// <summary>
-			/// Moves cell values, formatting, and formulas from current range to the destination range, replacing the old information in those cells.               The destination range will be expanded automatically if it is smaller than the current range. Any cells in the destination range that are outside of the original range&apos;s area are not changed. [Api set: ExcelApiOnline 1.1]
+			/// Moves cell values, formatting, and formulas from current range to the destination range, replacing the old information in those cells.               The destination range will be expanded automatically if it is smaller than the current range. Any cells in the destination range that are outside of the original range&apos;s area are not changed. [Api set: ExcelApi 1.11]
 			/// </summary>
 			/// <param name="destinationRange" >destinationRange Specifies the range to where the information in this range will be moved.</param>
 			/// <returns ></returns>
@@ -15687,18 +15955,18 @@ var Excel;
 			/// <summary> RangeAreas represents a collection of one or more rectangular ranges in the same worksheet.              To learn how to use discontinguous ranges, read {@link https://docs.microsoft.com/office/dev/add-ins/excel/excel-add-ins-multiple-ranges | Work with multiple ranges simultaneously in Excel add-ins}. [Api set: ExcelApi 1.9] </summary>
 			/// <field name="context" type="Excel.RequestContext">The request context associated with this object.</field>
 			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
-			/// <field name="address" type="String">Returns the RageAreas reference in A1-style. Address value will contain the worksheet name for each rectangular block of cells (e.g. &quot;Sheet1!A1:B4, Sheet1!D1:D4&quot;). Read-only. [Api set: ExcelApi 1.9]</field>
-			/// <field name="addressLocal" type="String">Returns the RageAreas reference in the user locale. Read-only. [Api set: ExcelApi 1.9]</field>
+			/// <field name="address" type="String">Returns the RangeAreas reference in A1-style. Address value will contain the worksheet name for each rectangular block of cells (e.g., &quot;Sheet1!A1:B4, Sheet1!D1:D4&quot;). [Api set: ExcelApi 1.9]</field>
+			/// <field name="addressLocal" type="String">Returns the RangeAreas reference in the user locale. [Api set: ExcelApi 1.9]</field>
 			/// <field name="areaCount" type="Number">Returns the number of rectangular ranges that comprise this RangeAreas object. [Api set: ExcelApi 1.9]</field>
 			/// <field name="areas" type="Excel.RangeCollection">Returns a collection of rectangular ranges that comprise this RangeAreas object. [Api set: ExcelApi 1.9]</field>
-			/// <field name="cellCount" type="Number">Returns the number of cells in the RangeAreas object, summing up the cell counts of all of the individual rectangular ranges. Returns -1 if the cell count exceeds 2^31-1 (2,147,483,647). Read-only. [Api set: ExcelApi 1.9]</field>
-			/// <field name="conditionalFormats" type="Excel.ConditionalFormatCollection">Returns a collection of ConditionalFormats that intersect with any cells in this RangeAreas object. Read-only. [Api set: ExcelApi 1.9]</field>
+			/// <field name="cellCount" type="Number">Returns the number of cells in the RangeAreas object, summing up the cell counts of all of the individual rectangular ranges. Returns -1 if the cell count exceeds 2^31-1 (2,147,483,647). [Api set: ExcelApi 1.9]</field>
+			/// <field name="conditionalFormats" type="Excel.ConditionalFormatCollection">Returns a collection of ConditionalFormats that intersect with any cells in this RangeAreas object. [Api set: ExcelApi 1.9]</field>
 			/// <field name="dataValidation" type="Excel.DataValidation">Returns a dataValidation object for all ranges in the RangeAreas. [Api set: ExcelApi 1.9]</field>
-			/// <field name="format" type="Excel.RangeFormat">Returns a rangeFormat object, encapsulating the the font, fill, borders, alignment, and other properties for all ranges in the RangeAreas object. Read-only. [Api set: ExcelApi 1.9]</field>
-			/// <field name="isEntireColumn" type="Boolean">Indicates whether all the ranges on this RangeAreas object represent entire columns (e.g., &quot;A:C, Q:Z&quot;). Read-only. [Api set: ExcelApi 1.9]</field>
-			/// <field name="isEntireRow" type="Boolean">Indicates whether all the ranges on this RangeAreas object represent entire rows (e.g., &quot;1:3, 5:7&quot;). Read-only. [Api set: ExcelApi 1.9]</field>
+			/// <field name="format" type="Excel.RangeFormat">Returns a RangeFormat object, encapsulating the the font, fill, borders, alignment, and other properties for all ranges in the RangeAreas object. [Api set: ExcelApi 1.9]</field>
+			/// <field name="isEntireColumn" type="Boolean">Specifies if all the ranges on this RangeAreas object represent entire columns (e.g., &quot;A:C, Q:Z&quot;). [Api set: ExcelApi 1.9]</field>
+			/// <field name="isEntireRow" type="Boolean">Specifies if all the ranges on this RangeAreas object represent entire rows (e.g., &quot;1:3, 5:7&quot;). [Api set: ExcelApi 1.9]</field>
 			/// <field name="style" type="String">Represents the style for all ranges in this RangeAreas object.              If the styles of the cells are inconsistent, null will be returned.              For custom styles, the style name will be returned. For built-in styles, a string representing a value in the BuiltInStyle enum will be returned. [Api set: ExcelApi 1.9]</field>
-			/// <field name="worksheet" type="Excel.Worksheet">Returns the worksheet for the current RangeAreas. Read-only. [Api set: ExcelApi 1.9]</field>
+			/// <field name="worksheet" type="Excel.Worksheet">Returns the worksheet for the current RangeAreas. [Api set: ExcelApi 1.9]</field>
 		}
 
 		RangeAreas.prototype.load = function(option) {
@@ -15859,16 +16127,57 @@ var Excel;
 
 var Excel;
 (function (Excel) {
+	var RangeAreasCollection = (function(_super) {
+		__extends(RangeAreasCollection, _super);
+		function RangeAreasCollection() {
+			/// <summary> Contains the collection of cross-worksheets level Ranges. [Api set: ExcelApi BETA (PREVIEW ONLY)] </summary>
+			/// <field name="context" type="Excel.RequestContext">The request context associated with this object.</field>
+			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
+			/// <field name="items" type="Array" elementType="Excel.RangeAreas">Gets the loaded child items in this collection.</field>
+		}
+
+		RangeAreasCollection.prototype.load = function(option) {
+			/// <summary>
+			/// Queues up a command to load the specified properties of the object. You must call "context.sync()" before reading the properties.
+			/// </summary>
+			/// <param name="option" type="string | string[] | OfficeExtension.LoadOption"/>
+			/// <returns type="Excel.RangeAreasCollection"/>
+		}
+		RangeAreasCollection.prototype.getCount = function() {
+			/// <summary>
+			/// Gets the number of RangeAreas objects in this collection. [Api set: ExcelApi BETA (PREVIEW ONLY)]
+			/// </summary>
+			/// <returns type="OfficeExtension.ClientResult&lt;number&gt;"></returns>
+			var result = new OfficeExtension.ClientResult();
+			result.__proto__ = null;
+			result.value = 0;
+			return result;
+		}
+		RangeAreasCollection.prototype.getItemAt = function(index) {
+			/// <summary>
+			/// Returns the RangeAreas object based on position in the collection. [Api set: ExcelApi BETA (PREVIEW ONLY)]
+			/// </summary>
+			/// <param name="index" type="Number">Index value of the range object to be retrieved. Zero-indexed.</param>
+			/// <returns type="Excel.RangeAreas"></returns>
+		}
+
+		return RangeAreasCollection;
+	})(OfficeExtension.ClientObject);
+	Excel.RangeAreasCollection = RangeAreasCollection;
+})(Excel || (Excel = {__proto__: null}));
+
+var Excel;
+(function (Excel) {
 	var RangeBorder = (function(_super) {
 		__extends(RangeBorder, _super);
 		function RangeBorder() {
 			/// <summary> Represents the border of an object. [Api set: ExcelApi 1.1] </summary>
 			/// <field name="context" type="Excel.RequestContext">The request context associated with this object.</field>
 			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
-			/// <field name="color" type="String">HTML color code representing the color of the border line, of the form #RRGGBB (e.g. &quot;FFA500&quot;) or as a named HTML color (e.g. &quot;orange&quot;). [Api set: ExcelApi 1.1]</field>
-			/// <field name="sideIndex" type="String">Constant value that indicates the specific side of the border. See Excel.BorderIndex for details. Read-only. [Api set: ExcelApi 1.1]</field>
+			/// <field name="color" type="String">HTML color code representing the color of the border line, of the form #RRGGBB (e.g., &quot;FFA500&quot;) or as a named HTML color (e.g., &quot;orange&quot;). [Api set: ExcelApi 1.1]</field>
+			/// <field name="sideIndex" type="String">Constant value that indicates the specific side of the border. See Excel.BorderIndex for details. [Api set: ExcelApi 1.1]</field>
 			/// <field name="style" type="String">One of the constants of line style specifying the line style for the border. See Excel.BorderLineStyle for details. [Api set: ExcelApi 1.1]</field>
-			/// <field name="tintAndShade" type="Number">Returns or sets a double that lightens or darkens a color for Range Border, the value is between -1 (darkest) and 1 (brightest), with 0 for the original color.              A null value indicates that the border doesn&apos;t have uniform tintAndShade setting. [Api set: ExcelApi 1.9]</field>
+			/// <field name="tintAndShade" type="Number">Specifies a double that lightens or darkens a color for Range Border, the value is between -1 (darkest) and 1 (brightest), with 0 for the original color.              A null value indicates that the border doesn&apos;t have uniform tintAndShade setting. [Api set: ExcelApi 1.9]</field>
 			/// <field name="weight" type="String">Specifies the weight of the border around a range. See Excel.BorderWeight for details. [Api set: ExcelApi 1.1]</field>
 		}
 
@@ -15908,8 +16217,8 @@ var Excel;
 			/// <summary> Represents the border objects that make up the range border. [Api set: ExcelApi 1.1] </summary>
 			/// <field name="context" type="Excel.RequestContext">The request context associated with this object.</field>
 			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
-			/// <field name="count" type="Number">Number of border objects in the collection. Read-only. [Api set: ExcelApi 1.1]</field>
-			/// <field name="tintAndShade" type="Number">Returns or sets a double that lightens or darkens a color for Range Borders, the value is between -1 (darkest) and 1 (brightest), with 0 for the original color.              A null value indicates that the entire border collections don&apos;t have uniform tintAndShade setting. [Api set: ExcelApi 1.9]</field>
+			/// <field name="count" type="Number">Number of border objects in the collection. [Api set: ExcelApi 1.1]</field>
+			/// <field name="tintAndShade" type="Number">Specifies a double that lightens or darkens a color for Range Borders, the value is between -1 (darkest) and 1 (brightest), with 0 for the original color.              A null value indicates that the entire border collections don&apos;t have uniform tintAndShade setting. [Api set: ExcelApi 1.9]</field>
 			/// <field name="items" type="Array" elementType="Excel.RangeBorder">Gets the loaded child items in this collection.</field>
 		}
 
@@ -16017,11 +16326,11 @@ var Excel;
 			/// <summary> Represents the background of a range object. [Api set: ExcelApi 1.1] </summary>
 			/// <field name="context" type="Excel.RequestContext">The request context associated with this object.</field>
 			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
-			/// <field name="color" type="String">HTML color code representing the color of the background, of the form #RRGGBB (e.g. &quot;FFA500&quot;) or as a named HTML color (e.g. &quot;orange&quot;) [Api set: ExcelApi 1.1]</field>
-			/// <field name="pattern" type="String">Gets or sets the pattern of a Range. See Excel.FillPattern for details. LinearGradient and RectangularGradient are not supported.              A null value indicates that the entire range doesn&apos;t have uniform pattern setting. [Api set: ExcelApi 1.9]</field>
-			/// <field name="patternColor" type="String">Sets HTML color code representing the color of the Range pattern, of the form #RRGGBB (e.g. &quot;FFA500&quot;) or as a named HTML color (e.g. &quot;orange&quot;).              Gets HTML color code representing the color of the Range pattern, of the form #RRGGBB (e.g. &quot;FFA500&quot;). [Api set: ExcelApi 1.9]</field>
-			/// <field name="patternTintAndShade" type="Number">Returns or sets a double that lightens or darkens a pattern color for Range Fill, the value is between -1 (darkest) and 1 (brightest), with 0 for the original color.              If the pattern tintAndShades are not uniform, null will be returned. [Api set: ExcelApi 1.9]</field>
-			/// <field name="tintAndShade" type="Number">Returns or sets a double that lightens or darkens a color for Range Fill, the value is between -1 (darkest) and 1 (brightest), with 0 for the original color.              If the tintAndShades are not uniform, null will be returned. [Api set: ExcelApi 1.9]</field>
+			/// <field name="color" type="String">HTML color code representing the color of the background, of the form #RRGGBB (e.g., &quot;FFA500&quot;) or as a named HTML color (e.g., &quot;orange&quot;) [Api set: ExcelApi 1.1]</field>
+			/// <field name="pattern" type="String">The pattern of a range. See Excel.FillPattern for details. LinearGradient and RectangularGradient are not supported.              A null value indicates that the entire range doesn&apos;t have uniform pattern setting. [Api set: ExcelApi 1.9]</field>
+			/// <field name="patternColor" type="String">The HTML color code representing the color of the range pattern, of the form #RRGGBB (e.g., &quot;FFA500&quot;) or as a named HTML color (e.g., &quot;orange&quot;). [Api set: ExcelApi 1.9]</field>
+			/// <field name="patternTintAndShade" type="Number">Specifies a double that lightens or darkens a pattern color for Range Fill, the value is between -1 (darkest) and 1 (brightest), with 0 for the original color.              If the pattern tintAndShades are not uniform, null will be returned. [Api set: ExcelApi 1.9]</field>
+			/// <field name="tintAndShade" type="Number">Specifies a double that lightens or darkens a color for Range Fill, the value is between -1 (darkest) and 1 (brightest), with 0 for the original color.              If the tintAndShades are not uniform, null will be returned. [Api set: ExcelApi 1.9]</field>
 		}
 
 		RangeFill.prototype.load = function(option) {
@@ -16067,14 +16376,14 @@ var Excel;
 			/// <field name="context" type="Excel.RequestContext">The request context associated with this object.</field>
 			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
 			/// <field name="bold" type="Boolean">Represents the bold status of font. [Api set: ExcelApi 1.1]</field>
-			/// <field name="color" type="String">HTML color code representation of the text color. E.g. #FF0000 represents Red. [Api set: ExcelApi 1.1]</field>
-			/// <field name="italic" type="Boolean">Represents the italic status of the font. [Api set: ExcelApi 1.1]</field>
-			/// <field name="name" type="String">Font name (e.g. &quot;Calibri&quot;) [Api set: ExcelApi 1.1]</field>
+			/// <field name="color" type="String">HTML color code representation of the text color (e.g., #FF0000 represents Red). [Api set: ExcelApi 1.1]</field>
+			/// <field name="italic" type="Boolean">Specifies the italic status of the font. [Api set: ExcelApi 1.1]</field>
+			/// <field name="name" type="String">Font name (e.g., &quot;Calibri&quot;) [Api set: ExcelApi 1.1]</field>
 			/// <field name="size" type="Number">Font size. [Api set: ExcelApi 1.1]</field>
-			/// <field name="strikethrough" type="Boolean">Represents the strikethrough status of font. A null value indicates that the entire range doesn&apos;t have uniform Strikethrough setting. [Api set: ExcelApi 1.9]</field>
-			/// <field name="subscript" type="Boolean">Represents the Subscript status of font.              Returns True if all the fonts of the range are Subscript.              Returns False if all the fonts of the range are Superscript or normal (neither Superscript, nor Subscript).              Returns Null otherwise. [Api set: ExcelApi 1.9]</field>
-			/// <field name="superscript" type="Boolean">Represents the Superscript status of font.              Returns True if all the fonts of the range are Superscript.              Returns False if all the fonts of the range are Subscript or normal (neither Superscript, nor Subscript).              Returns Null otherwise. [Api set: ExcelApi 1.9]</field>
-			/// <field name="tintAndShade" type="Number">Returns or sets a double that lightens or darkens a color for Range Font, the value is between -1 (darkest) and 1 (brightest), with 0 for the original color.              A null value indicates that the entire range doesn&apos;t have uniform font tintAndShade setting. [Api set: ExcelApi 1.9]</field>
+			/// <field name="strikethrough" type="Boolean">Specifies the strikethrough status of font. A null value indicates that the entire range doesn&apos;t have uniform Strikethrough setting. [Api set: ExcelApi 1.9]</field>
+			/// <field name="subscript" type="Boolean">Specifies the Subscript status of font.              Returns True if all the fonts of the range are Subscript.              Returns False if all the fonts of the range are Superscript or normal (neither Superscript, nor Subscript).              Returns Null otherwise. [Api set: ExcelApi 1.9]</field>
+			/// <field name="superscript" type="Boolean">Specifies the Superscript status of font.              Returns True if all the fonts of the range are Superscript.              Returns False if all the fonts of the range are Subscript or normal (neither Superscript, nor Subscript).              Returns Null otherwise. [Api set: ExcelApi 1.9]</field>
+			/// <field name="tintAndShade" type="Number">Specifies a double that lightens or darkens a color for Range Font, the value is between -1 (darkest) and 1 (brightest), with 0 for the original color.              A null value indicates that the entire range doesn&apos;t have uniform font tintAndShade setting. [Api set: ExcelApi 1.9]</field>
 			/// <field name="underline" type="String">Type of underline applied to the font. See Excel.RangeUnderlineStyle for details. [Api set: ExcelApi 1.1]</field>
 		}
 
@@ -16114,22 +16423,22 @@ var Excel;
 			/// <summary> A format object encapsulating the range&apos;s font, fill, borders, alignment, and other properties. [Api set: ExcelApi 1.1] </summary>
 			/// <field name="context" type="Excel.RequestContext">The request context associated with this object.</field>
 			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
-			/// <field name="autoIndent" type="Boolean">Indicates if text is automatically indented when text alignment is set to equal distribution. [Api set: ExcelApi 1.9]</field>
-			/// <field name="borders" type="Excel.RangeBorderCollection">Collection of border objects that apply to the overall range. Read-only. [Api set: ExcelApi 1.1]</field>
-			/// <field name="columnWidth" type="Number">Gets or sets the width of all colums within the range. If the column widths are not uniform, null will be returned. [Api set: ExcelApi 1.2]</field>
-			/// <field name="fill" type="Excel.RangeFill">Returns the fill object defined on the overall range. Read-only. [Api set: ExcelApi 1.1]</field>
-			/// <field name="font" type="Excel.RangeFont">Returns the font object defined on the overall range. Read-only. [Api set: ExcelApi 1.1]</field>
+			/// <field name="autoIndent" type="Boolean">Specifies if text is automatically indented when text alignment is set to equal distribution. [Api set: ExcelApi 1.9]</field>
+			/// <field name="borders" type="Excel.RangeBorderCollection">Collection of border objects that apply to the overall range. [Api set: ExcelApi 1.1]</field>
+			/// <field name="columnWidth" type="Number">Specifies the width of all colums within the range. If the column widths are not uniform, null will be returned. [Api set: ExcelApi 1.2]</field>
+			/// <field name="fill" type="Excel.RangeFill">Returns the fill object defined on the overall range. [Api set: ExcelApi 1.1]</field>
+			/// <field name="font" type="Excel.RangeFont">Returns the font object defined on the overall range. [Api set: ExcelApi 1.1]</field>
 			/// <field name="horizontalAlignment" type="String">Represents the horizontal alignment for the specified object. See Excel.HorizontalAlignment for details. [Api set: ExcelApi 1.1]</field>
 			/// <field name="indentLevel" type="Number">An integer from 0 to 250 that indicates the indent level. [Api set: ExcelApi 1.9]</field>
-			/// <field name="protection" type="Excel.FormatProtection">Returns the format protection object for a range. Read-only. [Api set: ExcelApi 1.2]</field>
+			/// <field name="protection" type="Excel.FormatProtection">Returns the format protection object for a range. [Api set: ExcelApi 1.2]</field>
 			/// <field name="readingOrder" type="String">The reading order for the range. [Api set: ExcelApi 1.9]</field>
-			/// <field name="rowHeight" type="Number">Gets or sets the height of all rows in the range. If the row heights are not uniform, null will be returned. [Api set: ExcelApi 1.2]</field>
-			/// <field name="shrinkToFit" type="Boolean">Indicates if text automatically shrinks to fit in the available column width. [Api set: ExcelApi 1.9]</field>
-			/// <field name="textOrientation" type="Number">Gets or sets the text orientation of all the cells within the range.              The text orientation should be an integer either from -90 to 90, or 180 for vertically-oriented text.              If the orientation within a range are not uniform, then null will be returned. [Api set: ExcelApi 1.7]</field>
+			/// <field name="rowHeight" type="Number">The height of all rows in the range. If the row heights are not uniform, null will be returned. [Api set: ExcelApi 1.2]</field>
+			/// <field name="shrinkToFit" type="Boolean">Specifies if text automatically shrinks to fit in the available column width. [Api set: ExcelApi 1.9]</field>
+			/// <field name="textOrientation" type="Number">The text orientation of all the cells within the range.              The text orientation should be an integer either from -90 to 90, or 180 for vertically-oriented text.              If the orientation within a range are not uniform, then null will be returned. [Api set: ExcelApi 1.7]</field>
 			/// <field name="useStandardHeight" type="Boolean">Determines if the row height of the Range object equals the standard height of the sheet.              Returns True if the row height of the Range object equals the standard height of the sheet.              Returns Null if the range contains more than one row and the rows aren&apos;t all the same height.              Returns False otherwise. [Api set: ExcelApi 1.7]</field>
-			/// <field name="useStandardWidth" type="Boolean">Indicates whether the column width of the Range object equals the standard width of the sheet.              Returns True if the column width of the Range object equals the standard width of the sheet.              Returns Null if the range contains more than one column and the columns aren&apos;t all the same height.              Returns False otherwise. [Api set: ExcelApi 1.7]</field>
+			/// <field name="useStandardWidth" type="Boolean">Specifies if the column width of the Range object equals the standard width of the sheet.              Returns True if the column width of the Range object equals the standard width of the sheet.              Returns Null if the range contains more than one column and the columns aren&apos;t all the same height.              Returns False otherwise. [Api set: ExcelApi 1.7]</field>
 			/// <field name="verticalAlignment" type="String">Represents the vertical alignment for the specified object. See Excel.VerticalAlignment for details. [Api set: ExcelApi 1.1]</field>
-			/// <field name="wrapText" type="Boolean">Indicates if Excel wraps the text in the object. A null value indicates that the entire range doesn&apos;t have uniform wrap setting [Api set: ExcelApi 1.1]</field>
+			/// <field name="wrapText" type="Boolean">Specifies if Excel wraps the text in the object. A null value indicates that the entire range doesn&apos;t have uniform wrap setting [Api set: ExcelApi 1.1]</field>
 		}
 
 		RangeFormat.prototype.load = function(option) {
@@ -16156,7 +16465,7 @@ var Excel;
 		}
 		RangeFormat.prototype.adjustIndent = function(amount) {
 			/// <summary>
-			/// Adjusts the indentation of the range formatting. The indent value ranges from 0 to 250 and is measured in characters. [Api set: ExcelApiOnline 1.1]
+			/// Adjusts the indentation of the range formatting. The indent value ranges from 0 to 250 and is measured in characters. [Api set: ExcelApi 1.11]
 			/// </summary>
 			/// <param name="amount" type="Number">The number of character spaces by which the current indent is adjusted. This value should be between -250 and 250.              **Note**: If the amount would raise the indent level above 250, the indent level stays with 250.              Similarly, if the amount would lower the indent level below 0, the indent level stays 0.</param>
 			/// <returns ></returns>
@@ -16205,7 +16514,7 @@ var Excel;
 		var RangeReference = (function() {
 			function RangeReference() {
 				/// <summary> Represents a string reference of the form SheetName!A1:B5, or a global or local named range. [Api set: ExcelApi 1.2] </summary>
-				/// <field name="address" type="String">Gets or sets the address of the range; for example &apos;SheetName!A1:B5&apos;. [Api set: ExcelApi 1.2]</field>
+				/// <field name="address" type="String">The address of the range; for example &apos;SheetName!A1:B5&apos;. [Api set: ExcelApi 1.2]</field>
 			}
 			return RangeReference;
 		})();
@@ -16287,17 +16596,17 @@ var Excel;
 			/// <summary> RangeView represents a set of visible cells of the parent range. [Api set: ExcelApi 1.3] </summary>
 			/// <field name="context" type="Excel.RequestContext">The request context associated with this object.</field>
 			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
-			/// <field name="cellAddresses" type="Array" elementType="Array">Represents the cell addresses of the RangeView. Read-only. [Api set: ExcelApi 1.3]</field>
-			/// <field name="columnCount" type="Number">Returns the number of visible columns. Read-only. [Api set: ExcelApi 1.3]</field>
+			/// <field name="cellAddresses" type="Array" elementType="Array">Represents the cell addresses of the RangeView. [Api set: ExcelApi 1.3]</field>
+			/// <field name="columnCount" type="Number">The number of visible columns. [Api set: ExcelApi 1.3]</field>
 			/// <field name="formulas" type="Array" elementType="Array">Represents the formula in A1-style notation. [Api set: ExcelApi 1.3]</field>
 			/// <field name="formulasLocal" type="Array" elementType="Array">Represents the formula in A1-style notation, in the user&apos;s language and number-formatting locale.  For example, the English &quot;=SUM(A1, 1.5)&quot; formula would become &quot;=SUMME(A1; 1,5)&quot; in German. [Api set: ExcelApi 1.3]</field>
 			/// <field name="formulasR1C1" type="Array" elementType="Array">Represents the formula in R1C1-style notation. [Api set: ExcelApi 1.3]</field>
-			/// <field name="index" type="Number">Returns a value that represents the index of the RangeView. Read-only. [Api set: ExcelApi 1.3]</field>
+			/// <field name="index" type="Number">Returns a value that represents the index of the RangeView. [Api set: ExcelApi 1.3]</field>
 			/// <field name="numberFormat" type="Array" elementType="Array">Represents Excel&apos;s number format code for the given cell. [Api set: ExcelApi 1.3]</field>
-			/// <field name="rowCount" type="Number">Returns the number of visible rows. Read-only. [Api set: ExcelApi 1.3]</field>
-			/// <field name="rows" type="Excel.RangeViewCollection">Represents a collection of range views associated with the range. Read-only. [Api set: ExcelApi 1.3]</field>
-			/// <field name="text" type="Array" elementType="Array">Text values of the specified range. The Text value will not depend on the cell width. The # sign substitution that happens in Excel UI will not affect the text value returned by the API. Read-only. [Api set: ExcelApi 1.3]</field>
-			/// <field name="valueTypes" type="Array" elementType="Array">Represents the type of data of each cell. Read-only. [Api set: ExcelApi 1.3]</field>
+			/// <field name="rowCount" type="Number">The number of visible rows. [Api set: ExcelApi 1.3]</field>
+			/// <field name="rows" type="Excel.RangeViewCollection">Represents a collection of range views associated with the range. [Api set: ExcelApi 1.3]</field>
+			/// <field name="text" type="Array" elementType="Array">Text values of the specified range. The Text value will not depend on the cell width. The # sign substitution that happens in Excel UI will not affect the text value returned by the API. [Api set: ExcelApi 1.3]</field>
+			/// <field name="valueTypes" type="Array" elementType="Array">Represents the type of data of each cell. [Api set: ExcelApi 1.3]</field>
 			/// <field name="values" type="Array" elementType="Array">Represents the raw values of the specified range view. The data returned could be of type string, number, or a boolean. Cells that contain an error will return the error string. [Api set: ExcelApi 1.3]</field>
 		}
 
@@ -16420,8 +16729,8 @@ var Excel;
 		var ReplaceCriteria = (function() {
 			function ReplaceCriteria() {
 				/// <summary> Represents the replace criteria to be used. [Api set: ExcelApi 1.9] </summary>
-				/// <field name="completeMatch" type="Boolean">Specifies whether the match needs to be complete or partial.               A complete match matches the entire contents of the cell. A partial match matches a substring within the content of the cell (e.g., `cat` partially matches `caterpillar` and `scatter`).              Default is false (partial). [Api set: ExcelApi 1.9]</field>
-				/// <field name="matchCase" type="Boolean">Specifies whether the match is case sensitive. Default is false (insensitive). [Api set: ExcelApi 1.9]</field>
+				/// <field name="completeMatch" type="Boolean">Specifies if the match needs to be complete or partial.               A complete match matches the entire contents of the cell. A partial match matches a substring within the content of the cell (e.g., `cat` partially matches `caterpillar` and `scatter`).              Default is false (partial). [Api set: ExcelApi 1.9]</field>
+				/// <field name="matchCase" type="Boolean">Specifies if the match is case sensitive. Default is false (insensitive). [Api set: ExcelApi 1.9]</field>
 			}
 			return ReplaceCriteria;
 		})();
@@ -16561,7 +16870,7 @@ var Excel;
 
 var Excel;
 (function (Excel) {
-	/// <summary> [Api set: ExcelApi BETA (PREVIEW ONLY)] </summary>
+	/// <summary> [Api set: ExcelApi 1.11] </summary>
 	var RowHiddenChangeType = {
 		__proto__: null,
 		"unhidden": "unhidden",
@@ -16627,8 +16936,8 @@ var Excel;
 		var SearchCriteria = (function() {
 			function SearchCriteria() {
 				/// <summary> Represents the search criteria to be used. [Api set: ExcelApi 1.9] </summary>
-				/// <field name="completeMatch" type="Boolean">Specifies whether the match needs to be complete or partial.               A complete match matches the entire contents of the cell. A partial match matches a substring within the content of the cell (e.g., `cat` partially matches `caterpillar` and `scatter`).              Default is false (partial). [Api set: ExcelApi 1.9]</field>
-				/// <field name="matchCase" type="Boolean">Specifies whether the match is case sensitive. Default is false (insensitive). [Api set: ExcelApi 1.9]</field>
+				/// <field name="completeMatch" type="Boolean">Specifies if the match needs to be complete or partial.               A complete match matches the entire contents of the cell. A partial match matches a substring within the content of the cell (e.g., `cat` partially matches `caterpillar` and `scatter`).              Default is false (partial). [Api set: ExcelApi 1.9]</field>
+				/// <field name="matchCase" type="Boolean">Specifies if the match is case sensitive. Default is false (insensitive). [Api set: ExcelApi 1.9]</field>
 				/// <field name="searchDirection" type="String">Specifies the search direction. Default is forward. See Excel.SearchDirection. [Api set: ExcelApi 1.9]</field>
 			}
 			return SearchCriteria;
@@ -16673,7 +16982,7 @@ var Excel;
 			/// <summary> Setting represents a key-value pair of a setting persisted to the document (per file per add-in). These custom key-value pair can be used to store state or lifecycle information needed by the content or task-pane add-in. Note that settings are persisted in the document and hence it is not a place to store any sensitive or protected information such as user information and password. [Api set: ExcelApi 1.4] </summary>
 			/// <field name="context" type="Excel.RequestContext">The request context associated with this object.</field>
 			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
-			/// <field name="key" type="String">Returns the key that represents the id of the Setting. Read-only. [Api set: ExcelApi 1.4]</field>
+			/// <field name="key" type="String">The key that represents the id of the Setting. [Api set: ExcelApi 1.4]</field>
 			/// <field name="value" >Represents the value stored for this setting. [Api set: ExcelApi 1.4]</field>
 		}
 
@@ -16806,31 +17115,31 @@ var Excel;
 			/// <summary> Represents a generic shape object in the worksheet. A shape could be a geometric shape, a line, a group of shapes, etc.              To learn more about the shape object model, read {@link https://docs.microsoft.com/office/dev/add-ins/excel/excel-add-ins-shapes | Work with shapes using the Excel JavaScript API}. [Api set: ExcelApi 1.9] </summary>
 			/// <field name="context" type="Excel.RequestContext">The request context associated with this object.</field>
 			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
-			/// <field name="altTextDescription" type="String">Returns or sets the alternative description text for a Shape object. [Api set: ExcelApi 1.9]</field>
-			/// <field name="altTextTitle" type="String">Returns or sets the alternative title text for a Shape object. [Api set: ExcelApi 1.9]</field>
-			/// <field name="connectionSiteCount" type="Number">Returns the number of connection sites on this shape. Read-only. [Api set: ExcelApi 1.9]</field>
-			/// <field name="fill" type="Excel.ShapeFill">Returns the fill formatting of this shape. Read-only. [Api set: ExcelApi 1.9]</field>
+			/// <field name="altTextDescription" type="String">Specifies the alternative description text for a Shape object. [Api set: ExcelApi 1.9]</field>
+			/// <field name="altTextTitle" type="String">Specifies the alternative title text for a Shape object. [Api set: ExcelApi 1.9]</field>
+			/// <field name="connectionSiteCount" type="Number">Returns the number of connection sites on this shape. [Api set: ExcelApi 1.9]</field>
+			/// <field name="fill" type="Excel.ShapeFill">Returns the fill formatting of this shape. [Api set: ExcelApi 1.9]</field>
 			/// <field name="geometricShape" type="Excel.GeometricShape">Returns the geometric shape associated with the shape. An error will be thrown if the shape type is not &quot;GeometricShape&quot;. [Api set: ExcelApi 1.9]</field>
-			/// <field name="geometricShapeType" type="String">Represents the geometric shape type of this geometric shape. See Excel.GeometricShapeType for details. Returns null if the shape type is not &quot;GeometricShape&quot;. [Api set: ExcelApi 1.9]</field>
+			/// <field name="geometricShapeType" type="String">Specifies the geometric shape type of this geometric shape. See Excel.GeometricShapeType for details. Returns null if the shape type is not &quot;GeometricShape&quot;. [Api set: ExcelApi 1.9]</field>
 			/// <field name="group" type="Excel.ShapeGroup">Returns the shape group associated with the shape. An error will be thrown if the shape type is not &quot;GroupShape&quot;. [Api set: ExcelApi 1.9]</field>
-			/// <field name="height" type="Number">Represents the height, in points, of the shape.              Throws an invalid argument exception when set with a negative value or zero as input. [Api set: ExcelApi 1.9]</field>
-			/// <field name="id" type="String">Represents the shape identifier. Read-only. [Api set: ExcelApi 1.9]</field>
+			/// <field name="height" type="Number">Specifies the height, in points, of the shape.              Throws an invalid argument exception when set with a negative value or zero as input. [Api set: ExcelApi 1.9]</field>
+			/// <field name="id" type="String">Specifies the shape identifier. [Api set: ExcelApi 1.9]</field>
 			/// <field name="image" type="Excel.Image">Returns the image associated with the shape. An error will be thrown if the shape type is not &quot;Image&quot;. [Api set: ExcelApi 1.9]</field>
 			/// <field name="left" type="Number">The distance, in points, from the left side of the shape to the left side of the worksheet.              Throws an invalid argument exception when set with a negative value as input. [Api set: ExcelApi 1.9]</field>
-			/// <field name="level" type="Number">Represents the level of the specified shape. For example, a level of 0 means that the shape is not part of any groups, a level of 1 means the shape is part of a top-level group, and a level of 2 means the shape is part of a sub-group of the top level. [Api set: ExcelApi 1.9]</field>
+			/// <field name="level" type="Number">Specifies the level of the specified shape. For example, a level of 0 means that the shape is not part of any groups, a level of 1 means the shape is part of a top-level group, and a level of 2 means the shape is part of a sub-group of the top level. [Api set: ExcelApi 1.9]</field>
 			/// <field name="line" type="Excel.Line">Returns the line associated with the shape. An error will be thrown if the shape type is not &quot;Line&quot;. [Api set: ExcelApi 1.9]</field>
-			/// <field name="lineFormat" type="Excel.ShapeLineFormat">Returns the line formatting of this shape. Read-only. [Api set: ExcelApi 1.9]</field>
-			/// <field name="lockAspectRatio" type="Boolean">Specifies whether or not the aspect ratio of this shape is locked. [Api set: ExcelApi 1.9]</field>
-			/// <field name="name" type="String">Represents the name of the shape. [Api set: ExcelApi 1.9]</field>
-			/// <field name="parentGroup" type="Excel.Shape">Represents the parent group of this shape. [Api set: ExcelApi 1.9]</field>
+			/// <field name="lineFormat" type="Excel.ShapeLineFormat">Returns the line formatting of this shape. [Api set: ExcelApi 1.9]</field>
+			/// <field name="lockAspectRatio" type="Boolean">Specifies if the aspect ratio of this shape is locked. [Api set: ExcelApi 1.9]</field>
+			/// <field name="name" type="String">Specifies the name of the shape. [Api set: ExcelApi 1.9]</field>
+			/// <field name="parentGroup" type="Excel.Shape">Specifies the parent group of this shape. [Api set: ExcelApi 1.9]</field>
 			/// <field name="placement" type="String">Represents how the object is attached to the cells below it. [Api set: ExcelApi 1.10]</field>
-			/// <field name="rotation" type="Number">Represents the rotation, in degrees, of the shape. [Api set: ExcelApi 1.9]</field>
+			/// <field name="rotation" type="Number">Specifies the rotation, in degrees, of the shape. [Api set: ExcelApi 1.9]</field>
 			/// <field name="textFrame" type="Excel.TextFrame">Returns the text frame object of this shape. Read only. [Api set: ExcelApi 1.9]</field>
 			/// <field name="top" type="Number">The distance, in points, from the top edge of the shape to the top edge of the worksheet.              Throws an invalid argument exception when set with a negative value as input. [Api set: ExcelApi 1.9]</field>
-			/// <field name="type" type="String">Returns the type of this shape. See Excel.ShapeType for details. Read-only. [Api set: ExcelApi 1.9]</field>
-			/// <field name="visible" type="Boolean">Represents the visibility of this shape. [Api set: ExcelApi 1.9]</field>
-			/// <field name="width" type="Number">Represents the width, in points, of the shape.              Throws an invalid argument exception when set with a negative value or zero as input. [Api set: ExcelApi 1.9]</field>
-			/// <field name="zOrderPosition" type="Number">Returns the position of the specified shape in the z-order, with 0 representing the bottom of the order stack. Read-only. [Api set: ExcelApi 1.9]</field>
+			/// <field name="type" type="String">Returns the type of this shape. See Excel.ShapeType for details. [Api set: ExcelApi 1.9]</field>
+			/// <field name="visible" type="Boolean">Specifies if the shape is visible. [Api set: ExcelApi 1.9]</field>
+			/// <field name="width" type="Number">Specifies the width, in points, of the shape.              Throws an invalid argument exception when set with a negative value or zero as input. [Api set: ExcelApi 1.9]</field>
+			/// <field name="zOrderPosition" type="Number">Returns the position of the specified shape in the z-order, with 0 representing the bottom of the order stack. [Api set: ExcelApi 1.9]</field>
 			/// <field name="onActivated" type="OfficeExtension.EventHandlers">Occurs when the shape is activated. [Api set: ExcelApi 1.9]</field>
 			/// <field name="onDeactivated" type="OfficeExtension.EventHandlers">Occurs when the shape is deactivated. [Api set: ExcelApi 1.9]</field>
 		}
@@ -17044,7 +17353,7 @@ var Excel;
 		}
 		ShapeCollection.prototype.addSvg = function(xml) {
 			/// <summary>
-			/// Creates a scalable vector graphic (SVG) from an XML string and adds it to the worksheet. Returns a Shape object that represents the new image. [Api set: ExcelApi 1.12]
+			/// Creates a scalable vector graphic (SVG) from an XML string and adds it to the worksheet. Returns a Shape object that represents the new image. [Api set: ExcelApi BETA (PREVIEW ONLY)]
 			/// </summary>
 			/// <param name="xml" type="String">An XML string that represents the SVG.</param>
 			/// <returns type="Excel.Shape"></returns>
@@ -17058,7 +17367,7 @@ var Excel;
 		}
 		ShapeCollection.prototype.getCount = function() {
 			/// <summary>
-			/// Returns the number of shapes in the worksheet. Read-only. [Api set: ExcelApi 1.9]
+			/// Returns the number of shapes in the worksheet. [Api set: ExcelApi 1.9]
 			/// </summary>
 			/// <returns type="OfficeExtension.ClientResult&lt;number&gt;"></returns>
 			var result = new OfficeExtension.ClientResult();
@@ -17112,9 +17421,9 @@ var Excel;
 			/// <summary> Represents the fill formatting of a shape object. [Api set: ExcelApi 1.9] </summary>
 			/// <field name="context" type="Excel.RequestContext">The request context associated with this object.</field>
 			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
-			/// <field name="foregroundColor" type="String">Represents the shape fill foreground color in HTML color format, of the form #RRGGBB (e.g. &quot;FFA500&quot;) or as a named HTML color (e.g. &quot;orange&quot;) [Api set: ExcelApi 1.9]</field>
-			/// <field name="transparency" type="Number">Returns or sets the transparency percentage of the fill as a value from 0.0 (opaque) through 1.0 (clear). Returns null if the shape type does not support transparency or the shape fill has inconsistent transparency, such as with a gradient fill type. [Api set: ExcelApi 1.9]</field>
-			/// <field name="type" type="String">Returns the fill type of the shape. Read-only. See Excel.ShapeFillType for details. [Api set: ExcelApi 1.9]</field>
+			/// <field name="foregroundColor" type="String">Represents the shape fill foreground color in HTML color format, of the form #RRGGBB (e.g., &quot;FFA500&quot;) or as a named HTML color (e.g., &quot;orange&quot;) [Api set: ExcelApi 1.9]</field>
+			/// <field name="transparency" type="Number">Specifies the transparency percentage of the fill as a value from 0.0 (opaque) through 1.0 (clear). Returns null if the shape type does not support transparency or the shape fill has inconsistent transparency, such as with a gradient fill type. [Api set: ExcelApi 1.9]</field>
+			/// <field name="type" type="String">Returns the fill type of the shape. See Excel.ShapeFillType for details. [Api set: ExcelApi 1.9]</field>
 		}
 
 		ShapeFill.prototype.load = function(option) {
@@ -17149,7 +17458,7 @@ var Excel;
 			/// <summary>
 			/// Sets the fill formatting of the shape to a uniform color. This changes the fill type to &quot;Solid&quot;. [Api set: ExcelApi 1.9]
 			/// </summary>
-			/// <param name="color" type="String">A string that represents the fill color in HTML color format, of the form #RRGGBB (e.g. &quot;FFA500&quot;) or as a named HTML color (e.g. &quot;orange&quot;).</param>
+			/// <param name="color" type="String">A string that represents the fill color in HTML color format, of the form #RRGGBB (e.g., &quot;FFA500&quot;) or as a named HTML color (e.g., &quot;orange&quot;).</param>
 			/// <returns ></returns>
 		}
 
@@ -17182,10 +17491,10 @@ var Excel;
 			/// <field name="context" type="Excel.RequestContext">The request context associated with this object.</field>
 			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
 			/// <field name="bold" type="Boolean">Represents the bold status of font. Returns null the TextRange includes both bold and non-bold text fragments. [Api set: ExcelApi 1.9]</field>
-			/// <field name="color" type="String">The HTML color code representation of the text color (e.g. &quot;#FF0000&quot; represents red). Returns null if the TextRange includes text fragments with different colors. [Api set: ExcelApi 1.9]</field>
+			/// <field name="color" type="String">HTML color code representation of the text color (e.g., &quot;#FF0000&quot; represents red). Returns null if the TextRange includes text fragments with different colors. [Api set: ExcelApi 1.9]</field>
 			/// <field name="italic" type="Boolean">Represents the italic status of font. Returns null if the TextRange includes both italic and non-italic text fragments. [Api set: ExcelApi 1.9]</field>
-			/// <field name="name" type="String">Represents font name (e.g. &quot;Calibri&quot;). If the text is Complex Script or East Asian language, this is the corresponding font name; otherwise it is the Latin font name. [Api set: ExcelApi 1.9]</field>
-			/// <field name="size" type="Number">Represents font size in points (e.g. 11). Returns null if the TextRange includes text fragments with different font sizes. [Api set: ExcelApi 1.9]</field>
+			/// <field name="name" type="String">Represents font name (e.g., &quot;Calibri&quot;). If the text is Complex Script or East Asian language, this is the corresponding font name; otherwise it is the Latin font name. [Api set: ExcelApi 1.9]</field>
+			/// <field name="size" type="Number">Represents font size in points (e.g., 11). Returns null if the TextRange includes text fragments with different font sizes. [Api set: ExcelApi 1.9]</field>
 			/// <field name="underline" type="String">Type of underline applied to the font. Returns null if the TextRange includes text fragments with different underline styles. See Excel.ShapeFontUnderlineStyle for details. [Api set: ExcelApi 1.9]</field>
 		}
 
@@ -17251,9 +17560,9 @@ var Excel;
 			/// <summary> Represents a shape group inside a worksheet. To get the corresponding Shape object, use `ShapeGroup.shape`. [Api set: ExcelApi 1.9] </summary>
 			/// <field name="context" type="Excel.RequestContext">The request context associated with this object.</field>
 			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
-			/// <field name="id" type="String">Represents the shape identifier. Read-only. [Api set: ExcelApi 1.9]</field>
-			/// <field name="shape" type="Excel.Shape">Returns the Shape object associated with the group. Read-only. [Api set: ExcelApi 1.9]</field>
-			/// <field name="shapes" type="Excel.GroupShapeCollection">Returns the collection of Shape objects. Read-only. [Api set: ExcelApi 1.9]</field>
+			/// <field name="id" type="String">Specifies the shape identifier. [Api set: ExcelApi 1.9]</field>
+			/// <field name="shape" type="Excel.Shape">Returns the Shape object associated with the group. [Api set: ExcelApi 1.9]</field>
+			/// <field name="shapes" type="Excel.GroupShapeCollection">Returns the collection of Shape objects. [Api set: ExcelApi 1.9]</field>
 		}
 
 		ShapeGroup.prototype.load = function(option) {
@@ -17304,11 +17613,11 @@ var Excel;
 			/// <summary> Represents the line formatting for the shape object. For images and geometric shapes, line formatting represents the border of the shape. [Api set: ExcelApi 1.9] </summary>
 			/// <field name="context" type="Excel.RequestContext">The request context associated with this object.</field>
 			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
-			/// <field name="color" type="String">Represents the line color in HTML color format, of the form #RRGGBB (e.g. &quot;FFA500&quot;) or as a named HTML color (e.g. &quot;orange&quot;). [Api set: ExcelApi 1.9]</field>
+			/// <field name="color" type="String">Represents the line color in HTML color format, of the form #RRGGBB (e.g., &quot;FFA500&quot;) or as a named HTML color (e.g., &quot;orange&quot;). [Api set: ExcelApi 1.9]</field>
 			/// <field name="dashStyle" type="String">Represents the line style of the shape. Returns null when the line is not visible or there are inconsistent dash styles. See Excel.ShapeLineStyle for details. [Api set: ExcelApi 1.9]</field>
 			/// <field name="style" type="String">Represents the line style of the shape. Returns null when the line is not visible or there are inconsistent styles. See Excel.ShapeLineStyle for details. [Api set: ExcelApi 1.9]</field>
 			/// <field name="transparency" type="Number">Represents the degree of transparency of the specified line as a value from 0.0 (opaque) through 1.0 (clear). Returns null when the shape has inconsistent transparencies. [Api set: ExcelApi 1.9]</field>
-			/// <field name="visible" type="Boolean">Represents whether or not the line formatting of a shape element is visible. Returns null when the shape has inconsistent visibilities. [Api set: ExcelApi 1.9]</field>
+			/// <field name="visible" type="Boolean">Specifies if the line formatting of a shape element is visible. Returns null when the shape has inconsistent visibilities. [Api set: ExcelApi 1.9]</field>
 			/// <field name="weight" type="Number">Represents the weight of the line, in points. Returns null when the line is not visible or there are inconsistent line weights. [Api set: ExcelApi 1.9]</field>
 		}
 
@@ -17549,18 +17858,18 @@ var Excel;
 			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
 			/// <field name="caption" type="String">Represents the caption of slicer. [Api set: ExcelApi 1.10]</field>
 			/// <field name="height" type="Number">Represents the height, in points, of the slicer.              Throws an &quot;The argument is invalid or missing or has an incorrect format.&quot; exception when set with negative value or zero as input. [Api set: ExcelApi 1.10]</field>
-			/// <field name="id" type="String">Represents the unique id of slicer. Read-only. [Api set: ExcelApi 1.10]</field>
+			/// <field name="id" type="String">Represents the unique id of slicer. [Api set: ExcelApi 1.10]</field>
 			/// <field name="isFilterCleared" type="Boolean">True if all filters currently applied on the slicer are cleared. [Api set: ExcelApi 1.10]</field>
 			/// <field name="left" type="Number">Represents the distance, in points, from the left side of the slicer to the left of the worksheet.              Throws an &quot;The argument is invalid or missing or has an incorrect format.&quot; exception when set with negative value as input. [Api set: ExcelApi 1.10]</field>
 			/// <field name="name" type="String">Represents the name of slicer. [Api set: ExcelApi 1.10]</field>
 			/// <field name="nameInFormula" type="String">Represents the slicer name used in the formula. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
-			/// <field name="slicerItems" type="Excel.SlicerItemCollection">Represents the collection of SlicerItems that are part of the slicer. Read-only. [Api set: ExcelApi 1.10]</field>
-			/// <field name="slicerStyle" type="Excel.SlicerStyle">The style applied to the Slicer. [Api set: ExcelApi 1.12]</field>
+			/// <field name="slicerItems" type="Excel.SlicerItemCollection">Represents the collection of SlicerItems that are part of the slicer. [Api set: ExcelApi 1.10]</field>
+			/// <field name="slicerStyle" type="Excel.SlicerStyle">The style applied to the Slicer. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
 			/// <field name="sortBy" type="String">Represents the sort order of the items in the slicer. Possible values are: &quot;DataSourceOrder&quot;, &quot;Ascending&quot;, &quot;Descending&quot;. [Api set: ExcelApi 1.10]</field>
 			/// <field name="style" type="String">Constant value that represents the Slicer style. Possible values are: &quot;SlicerStyleLight1&quot; through &quot;SlicerStyleLight6&quot;, &quot;TableStyleOther1&quot; through &quot;TableStyleOther2&quot;, &quot;SlicerStyleDark1&quot; through &quot;SlicerStyleDark6&quot;. A custom user-defined style present in the workbook can also be specified. [Api set: ExcelApi 1.10]</field>
 			/// <field name="top" type="Number">Represents the distance, in points, from the top edge of the slicer to the top of the worksheet.              Throws an &quot;The argument is invalid or missing or has an incorrect format.&quot; exception when set with negative value as input. [Api set: ExcelApi 1.10]</field>
 			/// <field name="width" type="Number">Represents the width, in points, of the slicer.              Throws an &quot;The argument is invalid or missing or has an incorrect format.&quot; exception when set with negative value or zero as input. [Api set: ExcelApi 1.10]</field>
-			/// <field name="worksheet" type="Excel.Worksheet">Represents the worksheet containing the slicer. Read-only. [Api set: ExcelApi 1.10]</field>
+			/// <field name="worksheet" type="Excel.Worksheet">Represents the worksheet containing the slicer. [Api set: ExcelApi 1.10]</field>
 		}
 
 		Slicer.prototype.load = function(option) {
@@ -17599,7 +17908,7 @@ var Excel;
 		}
 		Slicer.prototype.getSelectedItems = function() {
 			/// <summary>
-			/// Returns an array of selected items&apos; keys. Read-only. [Api set: ExcelApi 1.10]
+			/// Returns an array of selected items&apos; keys. [Api set: ExcelApi 1.10]
 			/// </summary>
 			/// <returns type="OfficeExtension.ClientResult&lt;string[]&gt;"></returns>
 			var result = new OfficeExtension.ClientResult();
@@ -17616,7 +17925,7 @@ var Excel;
 		}
 		Slicer.prototype.setStyle = function(style) {
 			/// <summary>
-			/// Sets the style applied to the slicer. [Api set: ExcelApi 1.12]
+			/// Sets the style applied to the slicer. [Api set: ExcelApi BETA (PREVIEW ONLY)]
 			/// </summary>
 			/// <param name="style" >The style to apply to the PivotTable. An `InvalidArgumentException` is thrown if a string is provided that does not match the name of any style.</param>
 			/// <returns ></returns>
@@ -17809,7 +18118,7 @@ var Excel;
 			/// <field name="context" type="Excel.RequestContext">The request context associated with this object.</field>
 			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
 			/// <field name="name" type="String">Gets the name of the SlicerStyle. [Api set: ExcelApi 1.10]</field>
-			/// <field name="readOnly" type="Boolean">Specifies whether this SlicerStyle object is read-only. Read-only. [Api set: ExcelApi 1.10]</field>
+			/// <field name="readOnly" type="Boolean">Specifies if this SlicerStyle object is read-only. [Api set: ExcelApi 1.10]</field>
 		}
 
 		SlicerStyle.prototype.load = function(option) {
@@ -17950,13 +18259,13 @@ var Excel;
 		var SortField = (function() {
 			function SortField() {
 				/// <summary> Represents a condition in a sorting operation. [Api set: ExcelApi 1.2] </summary>
-				/// <field name="ascending" type="Boolean">Represents whether the sorting is done in an ascending fashion. [Api set: ExcelApi 1.2]</field>
-				/// <field name="color" type="String">Represents the color that is the target of the condition if the sorting is on font or cell color. [Api set: ExcelApi 1.2]</field>
+				/// <field name="ascending" type="Boolean">Specifies if the sorting is done in an ascending fashion. [Api set: ExcelApi 1.2]</field>
+				/// <field name="color" type="String">Specifies the color that is the target of the condition if the sorting is on font or cell color. [Api set: ExcelApi 1.2]</field>
 				/// <field name="dataOption" type="String">Represents additional sorting options for this field. [Api set: ExcelApi 1.2]</field>
-				/// <field name="icon" type="Excel.Interfaces.Icon">Represents the icon that is the target of the condition if the sorting is on the cell&apos;s icon. [Api set: ExcelApi 1.2]</field>
-				/// <field name="key" type="Number">Represents the column (or row, depending on the sort orientation) that the condition is on. Represented as an offset from the first column (or row). [Api set: ExcelApi 1.2]</field>
-				/// <field name="sortOn" type="String">Represents the type of sorting of this condition. [Api set: ExcelApi 1.2]</field>
-				/// <field name="subField" type="String">Represents the subfield that is the target property name of a rich value to sort on. [Api set: ExcelApi 1.9]</field>
+				/// <field name="icon" type="Excel.Interfaces.Icon">Specifies the icon that is the target of the condition if the sorting is on the cell&apos;s icon. [Api set: ExcelApi 1.2]</field>
+				/// <field name="key" type="Number">Specifies the column (or row, depending on the sort orientation) that the condition is on. Represented as an offset from the first column (or row). [Api set: ExcelApi 1.2]</field>
+				/// <field name="sortOn" type="String">Specifies the type of sorting of this condition. [Api set: ExcelApi 1.2]</field>
+				/// <field name="subField" type="String">Specifies the subfield that is the target property name of a rich value to sort on. [Api set: ExcelApi 1.9]</field>
 			}
 			return SortField;
 		})();
@@ -18049,29 +18358,29 @@ var Excel;
 			/// <summary> An object encapsulating a style&apos;s format and other properties. [Api set: ExcelApi 1.7] </summary>
 			/// <field name="context" type="Excel.RequestContext">The request context associated with this object.</field>
 			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
-			/// <field name="autoIndent" type="Boolean">Indicates if text is automatically indented when the text alignment in a cell is set to equal distribution. [Api set: ExcelApi 1.8]</field>
+			/// <field name="autoIndent" type="Boolean">Specifies if text is automatically indented when the text alignment in a cell is set to equal distribution. [Api set: ExcelApi 1.8]</field>
 			/// <field name="borders" type="Excel.RangeBorderCollection">A Border collection of four Border objects that represent the style of the four borders. [Api set: ExcelApi 1.7]</field>
-			/// <field name="builtIn" type="Boolean">Indicates if the style is a built-in style. [Api set: ExcelApi 1.7]</field>
+			/// <field name="builtIn" type="Boolean">Specifies if the style is a built-in style. [Api set: ExcelApi 1.7]</field>
 			/// <field name="fill" type="Excel.RangeFill">The Fill of the style. [Api set: ExcelApi 1.7]</field>
 			/// <field name="font" type="Excel.RangeFont">A Font object that represents the font of the style. [Api set: ExcelApi 1.7]</field>
-			/// <field name="formulaHidden" type="Boolean">Indicates if the formula will be hidden when the worksheet is protected. [Api set: ExcelApi 1.7]</field>
+			/// <field name="formulaHidden" type="Boolean">Specifies if the formula will be hidden when the worksheet is protected. [Api set: ExcelApi 1.7]</field>
 			/// <field name="horizontalAlignment" type="String">Represents the horizontal alignment for the style. See Excel.HorizontalAlignment for details. [Api set: ExcelApi 1.7]</field>
-			/// <field name="includeAlignment" type="Boolean">Indicates if the style includes the AutoIndent, HorizontalAlignment, VerticalAlignment, WrapText, IndentLevel, and TextOrientation properties. [Api set: ExcelApi 1.7]</field>
-			/// <field name="includeBorder" type="Boolean">Indicates if the style includes the Color, ColorIndex, LineStyle, and Weight border properties. [Api set: ExcelApi 1.7]</field>
-			/// <field name="includeFont" type="Boolean">Indicates if the style includes the Background, Bold, Color, ColorIndex, FontStyle, Italic, Name, Size, Strikethrough, Subscript, Superscript, and Underline font properties. [Api set: ExcelApi 1.7]</field>
-			/// <field name="includeNumber" type="Boolean">Indicates if the style includes the NumberFormat property. [Api set: ExcelApi 1.7]</field>
-			/// <field name="includePatterns" type="Boolean">Indicates if the style includes the Color, ColorIndex, InvertIfNegative, Pattern, PatternColor, and PatternColorIndex interior properties. [Api set: ExcelApi 1.7]</field>
-			/// <field name="includeProtection" type="Boolean">Indicates if the style includes the FormulaHidden and Locked protection properties. [Api set: ExcelApi 1.7]</field>
+			/// <field name="includeAlignment" type="Boolean">Specifies if the style includes the AutoIndent, HorizontalAlignment, VerticalAlignment, WrapText, IndentLevel, and TextOrientation properties. [Api set: ExcelApi 1.7]</field>
+			/// <field name="includeBorder" type="Boolean">Specifies if the style includes the Color, ColorIndex, LineStyle, and Weight border properties. [Api set: ExcelApi 1.7]</field>
+			/// <field name="includeFont" type="Boolean">Specifies if the style includes the Background, Bold, Color, ColorIndex, FontStyle, Italic, Name, Size, Strikethrough, Subscript, Superscript, and Underline font properties. [Api set: ExcelApi 1.7]</field>
+			/// <field name="includeNumber" type="Boolean">Specifies if the style includes the NumberFormat property. [Api set: ExcelApi 1.7]</field>
+			/// <field name="includePatterns" type="Boolean">Specifies if the style includes the Color, ColorIndex, InvertIfNegative, Pattern, PatternColor, and PatternColorIndex interior properties. [Api set: ExcelApi 1.7]</field>
+			/// <field name="includeProtection" type="Boolean">Specifies if the style includes the FormulaHidden and Locked protection properties. [Api set: ExcelApi 1.7]</field>
 			/// <field name="indentLevel" type="Number">An integer from 0 to 250 that indicates the indent level for the style. [Api set: ExcelApi 1.7]</field>
-			/// <field name="locked" type="Boolean">Indicates if the object is locked when the worksheet is protected. [Api set: ExcelApi 1.7]</field>
+			/// <field name="locked" type="Boolean">Specifies if the object is locked when the worksheet is protected. [Api set: ExcelApi 1.7]</field>
 			/// <field name="name" type="String">The name of the style. [Api set: ExcelApi 1.7]</field>
 			/// <field name="numberFormat" type="String">The format code of the number format for the style. [Api set: ExcelApi 1.7]</field>
 			/// <field name="numberFormatLocal" type="String">The localized format code of the number format for the style. [Api set: ExcelApi 1.7]</field>
 			/// <field name="readingOrder" type="String">The reading order for the style. [Api set: ExcelApi 1.7]</field>
-			/// <field name="shrinkToFit" type="Boolean">Indicates if text automatically shrinks to fit in the available column width. [Api set: ExcelApi 1.7]</field>
+			/// <field name="shrinkToFit" type="Boolean">Specifies if text automatically shrinks to fit in the available column width. [Api set: ExcelApi 1.7]</field>
 			/// <field name="textOrientation" type="Number">The text orientation for the style. [Api set: ExcelApi 1.8]</field>
-			/// <field name="verticalAlignment" type="String">Represents the vertical alignment for the style. See Excel.VerticalAlignment for details. [Api set: ExcelApi 1.7]</field>
-			/// <field name="wrapText" type="Boolean">Indicates if Microsoft Excel wraps the text in the object. [Api set: ExcelApi 1.7]</field>
+			/// <field name="verticalAlignment" type="String">Specifies the vertical alignment for the style. See Excel.VerticalAlignment for details. [Api set: ExcelApi 1.7]</field>
+			/// <field name="wrapText" type="Boolean">Specifies if Excel wraps the text in the object. [Api set: ExcelApi 1.7]</field>
 		}
 
 		Style.prototype.load = function(option) {
@@ -18210,25 +18519,25 @@ var Excel;
 			/// <summary> Represents an Excel table.              To learn more about the table object model, read {@link https://docs.microsoft.com/office/dev/add-ins/excel/excel-add-ins-tables | Work with tables using the Excel JavaScript API}. [Api set: ExcelApi 1.1] </summary>
 			/// <field name="context" type="Excel.RequestContext">The request context associated with this object.</field>
 			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
-			/// <field name="autoFilter" type="Excel.AutoFilter">Represents the AutoFilter object of the table. Read-Only. [Api set: ExcelApi 1.9]</field>
-			/// <field name="columns" type="Excel.TableColumnCollection">Represents a collection of all the columns in the table. Read-only. [Api set: ExcelApi 1.1]</field>
-			/// <field name="highlightFirstColumn" type="Boolean">Indicates whether the first column contains special formatting. [Api set: ExcelApi 1.3]</field>
-			/// <field name="highlightLastColumn" type="Boolean">Indicates whether the last column contains special formatting. [Api set: ExcelApi 1.3]</field>
-			/// <field name="id" type="String">Returns a value that uniquely identifies the table in a given workbook. The value of the identifier remains the same even when the table is renamed. Read-only. [Api set: ExcelApi 1.1]</field>
+			/// <field name="autoFilter" type="Excel.AutoFilter">Represents the AutoFilter object of the table. [Api set: ExcelApi 1.9]</field>
+			/// <field name="columns" type="Excel.TableColumnCollection">Represents a collection of all the columns in the table. [Api set: ExcelApi 1.1]</field>
+			/// <field name="highlightFirstColumn" type="Boolean">Specifies if the first column contains special formatting. [Api set: ExcelApi 1.3]</field>
+			/// <field name="highlightLastColumn" type="Boolean">Specifies if the last column contains special formatting. [Api set: ExcelApi 1.3]</field>
+			/// <field name="id" type="String">Returns a value that uniquely identifies the table in a given workbook. The value of the identifier remains the same even when the table is renamed. [Api set: ExcelApi 1.1]</field>
 			/// <field name="legacyId" type="String">Returns a numeric id. [Api set: ExcelApi 1.8]</field>
 			/// <field name="name" type="String">Name of the table.                              The set name of the table must follow the guidelines specified in the {@link https://support.office.com/article/Rename-an-Excel-table-FBF49A4F-82A3-43EB-8BA2-44D21233B114 | Rename an Excel table} article. [Api set: ExcelApi 1.1]</field>
-			/// <field name="rows" type="Excel.TableRowCollection">Represents a collection of all the rows in the table. Read-only. [Api set: ExcelApi 1.1]</field>
-			/// <field name="showBandedColumns" type="Boolean">Indicates whether the columns show banded formatting in which odd columns are highlighted differently from even ones to make reading the table easier. [Api set: ExcelApi 1.3]</field>
-			/// <field name="showBandedRows" type="Boolean">Indicates whether the rows show banded formatting in which odd rows are highlighted differently from even ones to make reading the table easier. [Api set: ExcelApi 1.3]</field>
-			/// <field name="showFilterButton" type="Boolean">Indicates whether the filter buttons are visible at the top of each column header. Setting this is only allowed if the table contains a header row. [Api set: ExcelApi 1.3]</field>
-			/// <field name="showHeaders" type="Boolean">Indicates whether the header row is visible or not. This value can be set to show or remove the header row. [Api set: ExcelApi 1.1]</field>
-			/// <field name="showTotals" type="Boolean">Indicates whether the total row is visible or not. This value can be set to show or remove the total row. [Api set: ExcelApi 1.1]</field>
-			/// <field name="sort" type="Excel.TableSort">Represents the sorting for the table. Read-only. [Api set: ExcelApi 1.2]</field>
+			/// <field name="rows" type="Excel.TableRowCollection">Represents a collection of all the rows in the table. [Api set: ExcelApi 1.1]</field>
+			/// <field name="showBandedColumns" type="Boolean">Specifies if the columns show banded formatting in which odd columns are highlighted differently from even ones to make reading the table easier. [Api set: ExcelApi 1.3]</field>
+			/// <field name="showBandedRows" type="Boolean">Specifies if the rows show banded formatting in which odd rows are highlighted differently from even ones to make reading the table easier. [Api set: ExcelApi 1.3]</field>
+			/// <field name="showFilterButton" type="Boolean">Specifies if the filter buttons are visible at the top of each column header. Setting this is only allowed if the table contains a header row. [Api set: ExcelApi 1.3]</field>
+			/// <field name="showHeaders" type="Boolean">Specifies if the header row is visible. This value can be set to show or remove the header row. [Api set: ExcelApi 1.1]</field>
+			/// <field name="showTotals" type="Boolean">Specifies if the total row is visible. This value can be set to show or remove the total row. [Api set: ExcelApi 1.1]</field>
+			/// <field name="sort" type="Excel.TableSort">Represents the sorting for the table. [Api set: ExcelApi 1.2]</field>
 			/// <field name="style" type="String">Constant value that represents the Table style. Possible values are: &quot;TableStyleLight1&quot; through &quot;TableStyleLight21&quot;, &quot;TableStyleMedium1&quot; through &quot;TableStyleMedium28&quot;, &quot;TableStyleDark1&quot; through &quot;TableStyleDark11&quot;. A custom user-defined style present in the workbook can also be specified. [Api set: ExcelApi 1.1]</field>
-			/// <field name="tableStyle" type="Excel.TableStyle">The style applied to the Table. [Api set: ExcelApi 1.12]</field>
-			/// <field name="worksheet" type="Excel.Worksheet">The worksheet containing the current table. Read-only. [Api set: ExcelApi 1.2]</field>
+			/// <field name="tableStyle" type="Excel.TableStyle">The style applied to the Table. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
+			/// <field name="worksheet" type="Excel.Worksheet">The worksheet containing the current table. [Api set: ExcelApi 1.2]</field>
 			/// <field name="onChanged" type="OfficeExtension.EventHandlers">Occurs when data in cells changes on a specific table. [Api set: ExcelApi 1.7]</field>
-			/// <field name="onFiltered" type="OfficeExtension.EventHandlers">Occurs when filter is applied on a specific table. [Api set: ExcelApi 1.12]</field>
+			/// <field name="onFiltered" type="OfficeExtension.EventHandlers">Occurs when filter is applied on a specific table. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
 			/// <field name="onSelectionChanged" type="OfficeExtension.EventHandlers">Occurs when the selection changes on a specific table. [Api set: ExcelApi 1.7]</field>
 		}
 
@@ -18262,7 +18571,7 @@ var Excel;
 		}
 		Table.prototype.clearStyle = function() {
 			/// <summary>
-			/// Changes the table to use the default table style. [Api set: ExcelApi 1.12]
+			/// Changes the table to use the default table style. [Api set: ExcelApi BETA (PREVIEW ONLY)]
 			/// </summary>
 			/// <returns ></returns>
 		}
@@ -18310,7 +18619,7 @@ var Excel;
 		}
 		Table.prototype.setStyle = function(style) {
 			/// <summary>
-			/// Sets the style applied to the slicer. [Api set: ExcelApi 1.12]
+			/// Sets the style applied to the slicer. [Api set: ExcelApi BETA (PREVIEW ONLY)]
 			/// </summary>
 			/// <param name="style" >The style to apply to the PivotTable. An `InvalidArgumentException` is thrown if a string is provided that does not match the name of any style.</param>
 			/// <returns ></returns>
@@ -18412,11 +18721,11 @@ var Excel;
 			/// <summary> Represents a collection of all the tables that are part of the workbook or worksheet, depending on how it was reached. [Api set: ExcelApi 1.1] </summary>
 			/// <field name="context" type="Excel.RequestContext">The request context associated with this object.</field>
 			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
-			/// <field name="count" type="Number">Returns the number of tables in the workbook. Read-only. [Api set: ExcelApi 1.1]</field>
+			/// <field name="count" type="Number">Returns the number of tables in the workbook. [Api set: ExcelApi 1.1]</field>
 			/// <field name="onAdded" type="OfficeExtension.EventHandlers">Occurs when new table is added in a workbook. [Api set: ExcelApi 1.9]</field>
 			/// <field name="onChanged" type="OfficeExtension.EventHandlers">Occurs when data changes on any table in a workbook, or a worksheet. [Api set: ExcelApi 1.7]</field>
 			/// <field name="onDeleted" type="OfficeExtension.EventHandlers">Occurs when the specified table is deleted in a workbook. [Api set: ExcelApi 1.9]</field>
-			/// <field name="onFiltered" type="OfficeExtension.EventHandlers">Occurs when filter is applied on any table in a workbook, or a worksheet. [Api set: ExcelApi 1.12]</field>
+			/// <field name="onFiltered" type="OfficeExtension.EventHandlers">Occurs when filter is applied on any table in a workbook, or a worksheet. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
 			/// <field name="items" type="Array" elementType="Excel.Table">Gets the loaded child items in this collection.</field>
 		}
 
@@ -18536,10 +18845,10 @@ var Excel;
 			/// <summary> Represents a column in a table. [Api set: ExcelApi 1.1] </summary>
 			/// <field name="context" type="Excel.RequestContext">The request context associated with this object.</field>
 			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
-			/// <field name="filter" type="Excel.Filter">Retrieve the filter applied to the column. Read-only. [Api set: ExcelApi 1.2]</field>
-			/// <field name="id" type="Number">Returns a unique key that identifies the column within the table. Read-only. [Api set: ExcelApi 1.1]</field>
-			/// <field name="index" type="Number">Returns the index number of the column within the columns collection of the table. Zero-indexed. Read-only. [Api set: ExcelApi 1.1]</field>
-			/// <field name="name" type="String">Represents the name of the table column. [Api set: ExcelApi 1.1 for getting the name; 1.4 for setting it.]</field>
+			/// <field name="filter" type="Excel.Filter">Retrieve the filter applied to the column. [Api set: ExcelApi 1.2]</field>
+			/// <field name="id" type="Number">Returns a unique key that identifies the column within the table. [Api set: ExcelApi 1.1]</field>
+			/// <field name="index" type="Number">Returns the index number of the column within the columns collection of the table. Zero-indexed. [Api set: ExcelApi 1.1]</field>
+			/// <field name="name" type="String">Specifies the name of the table column. [Api set: ExcelApi 1.1 for getting the name; 1.4 for setting it.]</field>
 			/// <field name="values" type="Array" elementType="Array">Represents the raw values of the specified range. The data returned could be of type string, number, or a boolean. Cells that contain an error will return the error string. [Api set: ExcelApi 1.1]</field>
 		}
 
@@ -18609,7 +18918,7 @@ var Excel;
 			/// <summary> Represents a collection of all the columns that are part of the table. [Api set: ExcelApi 1.1] </summary>
 			/// <field name="context" type="Excel.RequestContext">The request context associated with this object.</field>
 			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
-			/// <field name="count" type="Number">Returns the number of columns in the table. Read-only. [Api set: ExcelApi 1.1]</field>
+			/// <field name="count" type="Number">Returns the number of columns in the table. [Api set: ExcelApi 1.1]</field>
 			/// <field name="items" type="Array" elementType="Excel.TableColumn">Gets the loaded child items in this collection.</field>
 		}
 
@@ -18692,10 +19001,10 @@ var Excel;
 	(function (Interfaces) {
 		var TableFilteredEventArgs = (function() {
 			function TableFilteredEventArgs() {
-				/// <summary> Provides information about the table that raised the filter applied event. [Api set: ExcelApi 1.12] </summary>
-				/// <field name="tableId" type="String">Gets the id of the table in which the filter is applied. [Api set: ExcelApi 1.12]</field>
-				/// <field name="type" type="String">Gets the type of the event. See Excel.EventType for details. [Api set: ExcelApi 1.12]</field>
-				/// <field name="worksheetId" type="String">Gets the id of the worksheet which contains the table. [Api set: ExcelApi 1.12]</field>
+				/// <summary> Provides information about the table that raised the filter applied event. [Api set: ExcelApi BETA (PREVIEW ONLY)] </summary>
+				/// <field name="tableId" type="String">Gets the id of the table in which the filter is applied. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
+				/// <field name="type" type="String">Gets the type of the event. See Excel.EventType for details. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
+				/// <field name="worksheetId" type="String">Gets the id of the worksheet which contains the table. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
 			}
 			return TableFilteredEventArgs;
 		})();
@@ -18712,7 +19021,7 @@ var Excel;
 			/// <summary> Represents a row in a table.                             Note that unlike Ranges or Columns, which will adjust if new rows/columns are added before them,               a TableRow object represent the physical location of the table row, but not the data.               That is, if the data is sorted or if new rows are added, a table row will continue               to point at the index for which it was created. [Api set: ExcelApi 1.1] </summary>
 			/// <field name="context" type="Excel.RequestContext">The request context associated with this object.</field>
 			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
-			/// <field name="index" type="Number">Returns the index number of the row within the rows collection of the table. Zero-indexed. Read-only. [Api set: ExcelApi 1.1]</field>
+			/// <field name="index" type="Number">Returns the index number of the row within the rows collection of the table. Zero-indexed. [Api set: ExcelApi 1.1]</field>
 			/// <field name="values" type="Array" elementType="Array">Represents the raw values of the specified range. The data returned could be of type string, number, or a boolean. Cells that contain an error will return the error string. [Api set: ExcelApi 1.1]</field>
 		}
 
@@ -18764,7 +19073,7 @@ var Excel;
 			/// <summary> Represents a collection of all the rows that are part of the table.                             Note that unlike Ranges or Columns, which will adjust if new rows/columns are added before them,               a TableRow object represent the physical location of the table row, but not the data.               That is, if the data is sorted or if new rows are added, a table row will continue               to point at the index for which it was created. [Api set: ExcelApi 1.1] </summary>
 			/// <field name="context" type="Excel.RequestContext">The request context associated with this object.</field>
 			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
-			/// <field name="count" type="Number">Returns the number of rows in the table. Read-only. [Api set: ExcelApi 1.1]</field>
+			/// <field name="count" type="Number">Returns the number of rows in the table. [Api set: ExcelApi 1.1]</field>
 			/// <field name="items" type="Array" elementType="Excel.TableRow">Gets the loaded child items in this collection.</field>
 		}
 
@@ -18861,9 +19170,9 @@ var Excel;
 			function TableSelectionChangedEventArgs() {
 				/// <summary> Provides information about the table that raised the SelectionChanged event. [Api set: ExcelApi 1.7] </summary>
 				/// <field name="address" type="String">Gets the range address that represents the selected area of the table on a specific worksheet. [Api set: ExcelApi 1.7]</field>
-				/// <field name="isInsideTable" type="Boolean">Indicates if the selection is inside a table, address will be useless if IsInsideTable is false. [Api set: ExcelApi 1.7]</field>
+				/// <field name="isInsideTable" type="Boolean">Specifies if the selection is inside a table, address will be useless if IsInsideTable is false. [Api set: ExcelApi 1.7]</field>
 				/// <field name="tableId" type="String">Gets the id of the table in which the selection changed. [Api set: ExcelApi 1.7]</field>
-				/// <field name="type" type="String">Gets the type of the event. See Excel.EventType for details. Read-only. [Api set: ExcelApi 1.7]</field>
+				/// <field name="type" type="String">Gets the type of the event. See Excel.EventType for details. [Api set: ExcelApi 1.7]</field>
 				/// <field name="worksheetId" type="String">Gets the id of the worksheet in which the selection changed. [Api set: ExcelApi 1.7]</field>
 			}
 			return TableSelectionChangedEventArgs;
@@ -18881,9 +19190,9 @@ var Excel;
 			/// <summary> Manages sorting operations on Table objects. [Api set: ExcelApi 1.2] </summary>
 			/// <field name="context" type="Excel.RequestContext">The request context associated with this object.</field>
 			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
-			/// <field name="fields" type="Array" elementType="Excel.Interfaces.SortField">Represents the current conditions used to last sort the table. Read-only. [Api set: ExcelApi 1.2]</field>
-			/// <field name="matchCase" type="Boolean">Represents whether the casing impacted the last sort of the table. Read-only. [Api set: ExcelApi 1.2]</field>
-			/// <field name="method" type="String">Represents Chinese character ordering method last used to sort the table. Read-only. [Api set: ExcelApi 1.2]</field>
+			/// <field name="fields" type="Array" elementType="Excel.Interfaces.SortField">Specifies the current conditions used to last sort the table. [Api set: ExcelApi 1.2]</field>
+			/// <field name="matchCase" type="Boolean">Specifies if the casing impacts the last sort of the table. [Api set: ExcelApi 1.2]</field>
+			/// <field name="method" type="String">Represents Chinese character ordering method last used to sort the table. [Api set: ExcelApi 1.2]</field>
 		}
 
 		TableSort.prototype.load = function(option) {
@@ -18929,7 +19238,7 @@ var Excel;
 			/// <field name="context" type="Excel.RequestContext">The request context associated with this object.</field>
 			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
 			/// <field name="name" type="String">Gets the name of the TableStyle. [Api set: ExcelApi 1.10]</field>
-			/// <field name="readOnly" type="Boolean">Specifies whether this TableStyle object is read-only. Read-only. [Api set: ExcelApi 1.10]</field>
+			/// <field name="readOnly" type="Boolean">Specifies if this TableStyle object is read-only. [Api set: ExcelApi 1.10]</field>
 		}
 
 		TableStyle.prototype.load = function(option) {
@@ -19049,7 +19358,7 @@ var Excel;
 			/// <summary> Represents a specific text conditional format. [Api set: ExcelApi 1.6] </summary>
 			/// <field name="context" type="Excel.RequestContext">The request context associated with this object.</field>
 			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
-			/// <field name="format" type="Excel.ConditionalRangeFormat">Returns a format object, encapsulating the conditional formats font, fill, borders, and other properties. Read-only. [Api set: ExcelApi 1.6]</field>
+			/// <field name="format" type="Excel.ConditionalRangeFormat">Returns a format object, encapsulating the conditional formats font, fill, borders, and other properties. [Api set: ExcelApi 1.6]</field>
 			/// <field name="rule" type="Excel.Interfaces.ConditionalTextComparisonRule">The rule of the conditional format. [Api set: ExcelApi 1.6]</field>
 		}
 
@@ -19089,9 +19398,9 @@ var Excel;
 			/// <summary> Represents the text frame of a shape object. [Api set: ExcelApi 1.9] </summary>
 			/// <field name="context" type="Excel.RequestContext">The request context associated with this object.</field>
 			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
-			/// <field name="autoSizeSetting" type="String">Gets or sets the automatic sizing settings for the text frame. A text frame can be set to automatically fit the text to the text frame, to automatically fit the text frame to the text, or not perform any automatic sizing. [Api set: ExcelApi 1.9]</field>
+			/// <field name="autoSizeSetting" type="String">The automatic sizing settings for the text frame. A text frame can be set to automatically fit the text to the text frame, to automatically fit the text frame to the text, or not perform any automatic sizing. [Api set: ExcelApi 1.9]</field>
 			/// <field name="bottomMargin" type="Number">Represents the bottom margin, in points, of the text frame. [Api set: ExcelApi 1.9]</field>
-			/// <field name="hasText" type="Boolean">Specifies whether the text frame contains text. [Api set: ExcelApi 1.9]</field>
+			/// <field name="hasText" type="Boolean">Specifies if the text frame contains text. [Api set: ExcelApi 1.9]</field>
 			/// <field name="horizontalAlignment" type="String">Represents the horizontal alignment of the text frame. See Excel.ShapeTextHorizontalAlignment for details. [Api set: ExcelApi 1.9]</field>
 			/// <field name="horizontalOverflow" type="String">Represents the horizontal overflow behavior of the text frame. See Excel.ShapeTextHorizontalOverflow for details. [Api set: ExcelApi 1.9]</field>
 			/// <field name="leftMargin" type="Number">Represents the left margin, in points, of the text frame. [Api set: ExcelApi 1.9]</field>
@@ -19146,7 +19455,7 @@ var Excel;
 			/// <summary> Contains the text that is attached to a shape, in addition to properties and methods for manipulating the text. [Api set: ExcelApi 1.9] </summary>
 			/// <field name="context" type="Excel.RequestContext">The request context associated with this object.</field>
 			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
-			/// <field name="font" type="Excel.ShapeFont">Returns a ShapeFont object that represents the font attributes for the text range. Read-only. [Api set: ExcelApi 1.9]</field>
+			/// <field name="font" type="Excel.ShapeFont">Returns a ShapeFont object that represents the font attributes for the text range. [Api set: ExcelApi 1.9]</field>
 			/// <field name="text" type="String">Represents the plain text content of the text range. [Api set: ExcelApi 1.9]</field>
 		}
 
@@ -19195,7 +19504,7 @@ var Excel;
 			/// <field name="context" type="Excel.RequestContext">The request context associated with this object.</field>
 			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
 			/// <field name="name" type="String">Gets the name of the TimelineStyle. [Api set: ExcelApi 1.10]</field>
-			/// <field name="readOnly" type="Boolean">Specifies whether this TimelineStyle object is read-only. Read-only. [Api set: ExcelApi 1.10]</field>
+			/// <field name="readOnly" type="Boolean">Specifies if this TimelineStyle object is read-only. [Api set: ExcelApi 1.10]</field>
 		}
 
 		TimelineStyle.prototype.load = function(option) {
@@ -19315,7 +19624,7 @@ var Excel;
 			/// <summary> Represents a Top/Bottom conditional format. [Api set: ExcelApi 1.6] </summary>
 			/// <field name="context" type="Excel.RequestContext">The request context associated with this object.</field>
 			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
-			/// <field name="format" type="Excel.ConditionalRangeFormat">Returns a format object, encapsulating the conditional formats font, fill, borders, and other properties. Read-only. [Api set: ExcelApi 1.6]</field>
+			/// <field name="format" type="Excel.ConditionalRangeFormat">Returns a format object, encapsulating the conditional formats font, fill, borders, and other properties. [Api set: ExcelApi 1.6]</field>
 			/// <field name="rule" type="Excel.Interfaces.ConditionalTopBottomRule">The criteria of the Top/Bottom conditional format. [Api set: ExcelApi 1.6]</field>
 		}
 
@@ -19425,34 +19734,35 @@ var Excel;
 			/// <summary> Workbook is the top level object which contains related workbook objects such as worksheets, tables, ranges, etc.              To learn more about the workbook object model, read {@link https://docs.microsoft.com/office/dev/add-ins/excel/excel-add-ins-workbooks | Work with workbooks using the Excel JavaScript API}. [Api set: ExcelApi 1.1] </summary>
 			/// <field name="context" type="Excel.RequestContext">The request context associated with this object.</field>
 			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
-			/// <field name="application" type="Excel.Application">Represents the Excel application instance that contains this workbook. Read-only. [Api set: ExcelApi 1.1]</field>
-			/// <field name="autoSave" type="Boolean">Specifies whether or not the workbook is in autosave mode. Read-Only. [Api set: ExcelApi 1.9]</field>
-			/// <field name="bindings" type="Excel.BindingCollection">Represents a collection of bindings that are part of the workbook. Read-only. [Api set: ExcelApi 1.1]</field>
-			/// <field name="calculationEngineVersion" type="Number">Returns a number about the version of Excel Calculation Engine. Read-Only. [Api set: ExcelApi 1.9]</field>
+			/// <field name="application" type="Excel.Application">Represents the Excel application instance that contains this workbook. [Api set: ExcelApi 1.1]</field>
+			/// <field name="autoSave" type="Boolean">Specifies if the workbook is in autosave mode. [Api set: ExcelApi 1.9]</field>
+			/// <field name="bindings" type="Excel.BindingCollection">Represents a collection of bindings that are part of the workbook. [Api set: ExcelApi 1.1]</field>
+			/// <field name="calculationEngineVersion" type="Number">Returns a number about the version of Excel Calculation Engine. [Api set: ExcelApi 1.9]</field>
 			/// <field name="chartDataPointTrack" type="Boolean">True if all charts in the workbook are tracking the actual data points to which they are attached.              False if the charts track the index of the data points. [Api set: ExcelApi 1.9]</field>
-			/// <field name="comments" type="Excel.CommentCollection">Represents a collection of Comments associated with the workbook. Read-only. [Api set: ExcelApi 1.10]</field>
-			/// <field name="customXmlParts" type="Excel.CustomXmlPartCollection">Represents the collection of custom XML parts contained by this workbook. Read-only. [Api set: ExcelApi 1.5]</field>
-			/// <field name="dataConnections" type="Excel.DataConnectionCollection">Represents all data connections in the workbook. Read-only. [Api set: ExcelApi 1.7]</field>
-			/// <field name="functions" type="Excel.Functions">Represents a collection of worksheet functions that can be used for computation. Read-only. [Api set: ExcelApi 1.2]</field>
-			/// <field name="isDirty" type="Boolean">Specifies whether or not changes have been made since the workbook was last saved.              You can set this property to true if you want to close a modified workbook without either saving it or being prompted to save it. [Api set: ExcelApi 1.9]</field>
-			/// <field name="name" type="String">Gets the workbook name. Read-only. [Api set: ExcelApi 1.7]</field>
-			/// <field name="names" type="Excel.NamedItemCollection">Represents a collection of workbook scoped named items (named ranges and constants). Read-only. [Api set: ExcelApi 1.1]</field>
-			/// <field name="pivotTableStyles" type="Excel.PivotTableStyleCollection">Represents a collection of PivotTableStyles associated with the workbook. Read-only. [Api set: ExcelApi 1.10]</field>
-			/// <field name="pivotTables" type="Excel.PivotTableCollection">Represents a collection of PivotTables associated with the workbook. Read-only. [Api set: ExcelApi 1.3]</field>
-			/// <field name="previouslySaved" type="Boolean">Specifies whether or not the workbook has ever been saved locally or online. Read-Only. [Api set: ExcelApi 1.9]</field>
-			/// <field name="properties" type="Excel.DocumentProperties">Gets the workbook properties. Read-only. [Api set: ExcelApi 1.7]</field>
-			/// <field name="protection" type="Excel.WorkbookProtection">Returns workbook protection object for a workbook. Read-only. [Api set: ExcelApi 1.7]</field>
-			/// <field name="readOnly" type="Boolean">True if the workbook is open in Read-only mode. Read-only. [Api set: ExcelApi 1.8]</field>
-			/// <field name="settings" type="Excel.SettingCollection">Represents a collection of Settings associated with the workbook. Read-only. [Api set: ExcelApi 1.4]</field>
-			/// <field name="slicerStyles" type="Excel.SlicerStyleCollection">Represents a collection of SlicerStyles associated with the workbook. Read-only. [Api set: ExcelApi 1.10]</field>
-			/// <field name="slicers" type="Excel.SlicerCollection">Represents a collection of Slicers associated with the workbook. Read-only. [Api set: ExcelApi 1.10]</field>
-			/// <field name="styles" type="Excel.StyleCollection">Represents a collection of styles associated with the workbook. Read-only. [Api set: ExcelApi 1.7]</field>
-			/// <field name="tableStyles" type="Excel.TableStyleCollection">Represents a collection of TableStyles associated with the workbook. Read-only. [Api set: ExcelApi 1.10]</field>
-			/// <field name="tables" type="Excel.TableCollection">Represents a collection of tables associated with the workbook. Read-only. [Api set: ExcelApi 1.1]</field>
-			/// <field name="timelineStyles" type="Excel.TimelineStyleCollection">Represents a collection of TimelineStyles associated with the workbook. Read-only. [Api set: ExcelApi 1.10]</field>
-			/// <field name="use1904DateSystem" type="Boolean">True if the workbook uses the 1904 date system. [Api set: ExcelApi 1.12]</field>
+			/// <field name="comments" type="Excel.CommentCollection">Represents a collection of Comments associated with the workbook. [Api set: ExcelApi 1.10]</field>
+			/// <field name="customXmlParts" type="Excel.CustomXmlPartCollection">Represents the collection of custom XML parts contained by this workbook. [Api set: ExcelApi 1.5]</field>
+			/// <field name="dataConnections" type="Excel.DataConnectionCollection">Represents all data connections in the workbook. [Api set: ExcelApi 1.7]</field>
+			/// <field name="functions" type="Excel.Functions">Represents a collection of worksheet functions that can be used for computation. [Api set: ExcelApi 1.2]</field>
+			/// <field name="isDirty" type="Boolean">Specifies if changes have been made since the workbook was last saved.              You can set this property to true if you want to close a modified workbook without either saving it or being prompted to save it. [Api set: ExcelApi 1.9]</field>
+			/// <field name="name" type="String">Gets the workbook name. [Api set: ExcelApi 1.7]</field>
+			/// <field name="names" type="Excel.NamedItemCollection">Represents a collection of workbook scoped named items (named ranges and constants). [Api set: ExcelApi 1.1]</field>
+			/// <field name="pivotTableStyles" type="Excel.PivotTableStyleCollection">Represents a collection of PivotTableStyles associated with the workbook. [Api set: ExcelApi 1.10]</field>
+			/// <field name="pivotTables" type="Excel.PivotTableCollection">Represents a collection of PivotTables associated with the workbook. [Api set: ExcelApi 1.3]</field>
+			/// <field name="previouslySaved" type="Boolean">Specifies if the workbook has ever been saved locally or online. [Api set: ExcelApi 1.9]</field>
+			/// <field name="properties" type="Excel.DocumentProperties">Gets the workbook properties. [Api set: ExcelApi 1.7]</field>
+			/// <field name="protection" type="Excel.WorkbookProtection">Returns the protection object for a workbook. [Api set: ExcelApi 1.7]</field>
+			/// <field name="readOnly" type="Boolean">True if the workbook is open in Read-only mode. [Api set: ExcelApi 1.8]</field>
+			/// <field name="settings" type="Excel.SettingCollection">Represents a collection of Settings associated with the workbook. [Api set: ExcelApi 1.4]</field>
+			/// <field name="showPivotFieldList" type="Boolean">Specifies whether the PivotTable&apos;s field list pane is shown at the workbook level. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
+			/// <field name="slicerStyles" type="Excel.SlicerStyleCollection">Represents a collection of SlicerStyles associated with the workbook. [Api set: ExcelApi 1.10]</field>
+			/// <field name="slicers" type="Excel.SlicerCollection">Represents a collection of Slicers associated with the workbook. [Api set: ExcelApi 1.10]</field>
+			/// <field name="styles" type="Excel.StyleCollection">Represents a collection of styles associated with the workbook. [Api set: ExcelApi 1.7]</field>
+			/// <field name="tableStyles" type="Excel.TableStyleCollection">Represents a collection of TableStyles associated with the workbook. [Api set: ExcelApi 1.10]</field>
+			/// <field name="tables" type="Excel.TableCollection">Represents a collection of tables associated with the workbook. [Api set: ExcelApi 1.1]</field>
+			/// <field name="timelineStyles" type="Excel.TimelineStyleCollection">Represents a collection of TimelineStyles associated with the workbook. [Api set: ExcelApi 1.10]</field>
+			/// <field name="use1904DateSystem" type="Boolean">True if the workbook uses the 1904 date system. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
 			/// <field name="usePrecisionAsDisplayed" type="Boolean">True if calculations in this workbook will be done using only the precision of the numbers as they&apos;re displayed.              Data will permanently lose accuracy when switching this property from false to true. [Api set: ExcelApi 1.9]</field>
-			/// <field name="worksheets" type="Excel.WorksheetCollection">Represents a collection of worksheets associated with the workbook. Read-only. [Api set: ExcelApi 1.1]</field>
+			/// <field name="worksheets" type="Excel.WorksheetCollection">Represents a collection of worksheets associated with the workbook. [Api set: ExcelApi 1.1]</field>
 			/// <field name="onAutoSaveSettingChanged" type="OfficeExtension.EventHandlers">Occurs when the autoSave setting is changed on the workbook. [Api set: ExcelApi 1.9]</field>
 			/// <field name="onSelectionChanged" type="OfficeExtension.EventHandlers">Occurs when the selection in the document is changed. [Api set: ExcelApi 1.2]</field>
 		}
@@ -19481,7 +19791,7 @@ var Excel;
 		}
 		Workbook.prototype.close = function(closeBehavior) {
 			/// <summary>
-			/// Close current workbook. [Api set: ExcelApi BETA (PREVIEW ONLY)]
+			/// Close current workbook. [Api set: ExcelApi 1.11]
 			/// </summary>
 			/// <param name="closeBehavior" type="String" optional="true">workbook close behavior.</param>
 			/// <returns ></returns>
@@ -19540,7 +19850,7 @@ var Excel;
 		}
 		Workbook.prototype.save = function(saveBehavior) {
 			/// <summary>
-			/// Save current workbook. [Api set: ExcelApi BETA (PREVIEW ONLY)]
+			/// Save current workbook. [Api set: ExcelApi 1.11]
 			/// </summary>
 			/// <param name="saveBehavior" type="String" optional="true">workbook save behavior.</param>
 			/// <returns ></returns>
@@ -19626,7 +19936,7 @@ var Excel;
 			/// <summary> Represents the protection of a workbook object. [Api set: ExcelApi 1.7] </summary>
 			/// <field name="context" type="Excel.RequestContext">The request context associated with this object.</field>
 			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
-			/// <field name="protected" type="Boolean">Indicates if the workbook is protected. Read-Only. [Api set: ExcelApi 1.7]</field>
+			/// <field name="protected" type="Boolean">Specifies if the workbook is protected. [Api set: ExcelApi 1.7]</field>
 		}
 
 		WorkbookProtection.prototype.load = function(option) {
@@ -19658,34 +19968,89 @@ var Excel;
 
 var Excel;
 (function (Excel) {
+	var WorkbookRangeAreas = (function(_super) {
+		__extends(WorkbookRangeAreas, _super);
+		function WorkbookRangeAreas() {
+			/// <summary> WorkbookRangeAreas represents a collection of one or more rectangular ranges in multi worksheet. [Api set: ExcelApi BETA (PREVIEW ONLY)] </summary>
+			/// <field name="context" type="Excel.RequestContext">The request context associated with this object.</field>
+			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
+			/// <field name="addresses" type="Array" elementType="String">Returns an array of address in A1-style. Address value will contain the worksheet name for each rectangular block of cells (e.g., &quot;Sheet1!A1:B4, Sheet1!D1:D4&quot;). Read-only. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
+			/// <field name="areas" type="Excel.RangeAreasCollection">Returns the RangeAreasCollection object, each RangeAreas in the collection represent one or more rectangle ranges in one worksheet. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
+			/// <field name="ranges" type="Excel.RangeCollection">Returns a collection of ranges that comprise this WorkbookRangeAreas object. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
+		}
+
+		WorkbookRangeAreas.prototype.load = function(option) {
+			/// <summary>
+			/// Queues up a command to load the specified properties of the object. You must call "context.sync()" before reading the properties.
+			/// </summary>
+			/// <param name="option" type="string | string[] | OfficeExtension.LoadOption"/>
+			/// <returns type="Excel.WorkbookRangeAreas"/>
+		}
+		WorkbookRangeAreas.prototype.getRangeAreasBySheet = function(key) {
+			/// <summary>
+			/// Returns the RangeAreas object based on worksheet id or name in the collection. [Api set: ExcelApi BETA (PREVIEW ONLY)]
+			/// </summary>
+			/// <param name="key" type="String">The name or id of the worksheet.</param>
+			/// <returns type="Excel.RangeAreas"></returns>
+		}
+		WorkbookRangeAreas.prototype.getRangeAreasOrNullObjectBySheet = function(key) {
+			/// <summary>
+			/// Returns the RangeAreas object based on worksheet name or id in the collection. If the worksheet does not exist, will return a null object. [Api set: ExcelApi BETA (PREVIEW ONLY)]
+			/// </summary>
+			/// <param name="key" type="String">The name or id of the worksheet.</param>
+			/// <returns type="Excel.RangeAreas"></returns>
+		}
+
+		WorkbookRangeAreas.prototype.track = function() {
+			/// <summary>
+			/// Track the object for automatic adjustment based on surrounding changes in the document. This call is a shorthand for context.trackedObjects.add(thisObject). If you are using this object across ".sync" calls and outside the sequential execution of a ".run" batch, and get an "InvalidObjectPath" error when setting a property or invoking a method on the object, you needed to have added the object to the tracked object collection when the object was first created.
+			/// </summary>
+			/// <returns type="Excel.WorkbookRangeAreas"/>
+		}
+
+		WorkbookRangeAreas.prototype.untrack = function() {
+			/// <summary>
+			/// Release the memory associated with this object, if has previous been tracked. This call is shorthand for context.trackedObjects.remove(thisObject). Having many tracked objects slows down the host application, so please remember to free any objects you add, once you're done using them. You will need to call "context.sync()" before the memory release takes effect.
+			/// </summary>
+			/// <returns type="Excel.WorkbookRangeAreas"/>
+		}
+
+		return WorkbookRangeAreas;
+	})(OfficeExtension.ClientObject);
+	Excel.WorkbookRangeAreas = WorkbookRangeAreas;
+})(Excel || (Excel = {__proto__: null}));
+
+var Excel;
+(function (Excel) {
 	var Worksheet = (function(_super) {
 		__extends(Worksheet, _super);
 		function Worksheet() {
 			/// <summary> An Excel worksheet is a grid of cells. It can contain data, tables, charts, etc.              To learn more about the worksheet object model, read {@link https://docs.microsoft.com/office/dev/add-ins/excel/excel-add-ins-worksheets | Work with worksheets using the Excel JavaScript API}. [Api set: ExcelApi 1.1] </summary>
 			/// <field name="context" type="Excel.RequestContext">The request context associated with this object.</field>
 			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
-			/// <field name="autoFilter" type="Excel.AutoFilter">Represents the AutoFilter object of the worksheet. Read-Only. [Api set: ExcelApi 1.9]</field>
-			/// <field name="charts" type="Excel.ChartCollection">Returns a collection of charts that are part of the worksheet. Read-only. [Api set: ExcelApi 1.1]</field>
-			/// <field name="comments" type="Excel.CommentCollection">Returns a collection of all the Comments objects on the worksheet. Read-only. [Api set: ExcelApi 1.10]</field>
-			/// <field name="customProperties" type="Excel.WorksheetCustomPropertyCollection">Returns a collection of worksheet-level custom properties. [Api set: ExcelApi 1.12]</field>
-			/// <field name="enableCalculation" type="Boolean">Gets or sets the enableCalculation property of the worksheet.              True if Excel recalculates the worksheet when necessary. False if Excel doesn&apos;t recalculate the sheet. [Api set: ExcelApi 1.9]</field>
-			/// <field name="freezePanes" type="Excel.WorksheetFreezePanes">Gets an object that can be used to manipulate frozen panes on the worksheet. Read-only. [Api set: ExcelApi 1.7]</field>
+			/// <field name="autoFilter" type="Excel.AutoFilter">Represents the AutoFilter object of the worksheet. [Api set: ExcelApi 1.9]</field>
+			/// <field name="charts" type="Excel.ChartCollection">Returns a collection of charts that are part of the worksheet. [Api set: ExcelApi 1.1]</field>
+			/// <field name="comments" type="Excel.CommentCollection">Returns a collection of all the Comments objects on the worksheet. [Api set: ExcelApi 1.10]</field>
+			/// <field name="customProperties" type="Excel.WorksheetCustomPropertyCollection">Gets a collection of worksheet-level custom properties. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
+			/// <field name="enableCalculation" type="Boolean">Determines if Excel should recalculate the worksheet when necessary.              True if Excel recalculates the worksheet when necessary. False if Excel doesn&apos;t recalculate the sheet. [Api set: ExcelApi 1.9]</field>
+			/// <field name="freezePanes" type="Excel.WorksheetFreezePanes">Gets an object that can be used to manipulate frozen panes on the worksheet. [Api set: ExcelApi 1.7]</field>
 			/// <field name="horizontalPageBreaks" type="Excel.PageBreakCollection">Gets the horizontal page break collection for the worksheet. This collection only contains manual page breaks. [Api set: ExcelApi 1.9]</field>
-			/// <field name="id" type="String">Returns a value that uniquely identifies the worksheet in a given workbook. The value of the identifier remains the same even when the worksheet is renamed or moved. Read-only. [Api set: ExcelApi 1.1]</field>
+			/// <field name="id" type="String">Returns a value that uniquely identifies the worksheet in a given workbook. The value of the identifier remains the same even when the worksheet is renamed or moved. [Api set: ExcelApi 1.1]</field>
 			/// <field name="name" type="String">The display name of the worksheet. [Api set: ExcelApi 1.1]</field>
-			/// <field name="names" type="Excel.NamedItemCollection">Collection of names scoped to the current worksheet. Read-only. [Api set: ExcelApi 1.4]</field>
+			/// <field name="namedSheetViews" type="Excel.NamedSheetViewCollection">Returns a collection of sheet views that are present in the worksheet. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
+			/// <field name="names" type="Excel.NamedItemCollection">Collection of names scoped to the current worksheet. [Api set: ExcelApi 1.4]</field>
 			/// <field name="pageLayout" type="Excel.PageLayout">Gets the PageLayout object of the worksheet. [Api set: ExcelApi 1.9]</field>
-			/// <field name="pivotTables" type="Excel.PivotTableCollection">Collection of PivotTables that are part of the worksheet. Read-only. [Api set: ExcelApi 1.3]</field>
+			/// <field name="pivotTables" type="Excel.PivotTableCollection">Collection of PivotTables that are part of the worksheet. [Api set: ExcelApi 1.3]</field>
 			/// <field name="position" type="Number">The zero-based position of the worksheet within the workbook. [Api set: ExcelApi 1.1]</field>
-			/// <field name="protection" type="Excel.WorksheetProtection">Returns sheet protection object for a worksheet. Read-only. [Api set: ExcelApi 1.2]</field>
-			/// <field name="shapes" type="Excel.ShapeCollection">Returns the collection of all the Shape objects on the worksheet. Read-only. [Api set: ExcelApi 1.9]</field>
-			/// <field name="showGridlines" type="Boolean">Gets or sets the worksheet&apos;s gridlines flag.              This flag determines whether gridlines are visible to the user. [Api set: ExcelApi 1.8]</field>
-			/// <field name="showHeadings" type="Boolean">Gets or sets the worksheet&apos;s headings flag.              This flag determines whether headings are visible to the user. [Api set: ExcelApi 1.8]</field>
-			/// <field name="slicers" type="Excel.SlicerCollection">Returns a collection of slicers that are part of the worksheet. Read-only. [Api set: ExcelApi 1.10]</field>
-			/// <field name="standardHeight" type="Number">Returns the standard (default) height of all the rows in the worksheet, in points. Read-only. [Api set: ExcelApi 1.7]</field>
-			/// <field name="standardWidth" type="Number">Returns or sets the standard (default) width of all the columns in the worksheet.              One unit of column width is equal to the width of one character in the Normal style. For proportional fonts, the width of the character 0 (zero) is used. [Api set: ExcelApi 1.7]</field>
-			/// <field name="tabColor" type="String">Gets or sets the worksheet tab color.              When retrieving the tab color, if the worksheet is invisible, the value will be null. If the worksheet is visible but the tab color is set to auto, an empty string will be returned. Otherwise, the property will be set to a color, in the form &quot;#123456&quot;              When setting the color, use an empty-string to set an &quot;auto&quot; color, or a real color otherwise. [Api set: ExcelApi 1.7]</field>
-			/// <field name="tables" type="Excel.TableCollection">Collection of tables that are part of the worksheet. Read-only. [Api set: ExcelApi 1.1]</field>
+			/// <field name="protection" type="Excel.WorksheetProtection">Returns sheet protection object for a worksheet. [Api set: ExcelApi 1.2]</field>
+			/// <field name="shapes" type="Excel.ShapeCollection">Returns the collection of all the Shape objects on the worksheet. [Api set: ExcelApi 1.9]</field>
+			/// <field name="showGridlines" type="Boolean">Specifies if gridlines are visible to the user. [Api set: ExcelApi 1.8]</field>
+			/// <field name="showHeadings" type="Boolean">Specifies if headings are visible to the user. [Api set: ExcelApi 1.8]</field>
+			/// <field name="slicers" type="Excel.SlicerCollection">Returns a collection of slicers that are part of the worksheet. [Api set: ExcelApi 1.10]</field>
+			/// <field name="standardHeight" type="Number">Returns the standard (default) height of all the rows in the worksheet, in points. [Api set: ExcelApi 1.7]</field>
+			/// <field name="standardWidth" type="Number">Specifies the standard (default) width of all the columns in the worksheet.              One unit of column width is equal to the width of one character in the Normal style. For proportional fonts, the width of the character 0 (zero) is used. [Api set: ExcelApi 1.7]</field>
+			/// <field name="tabColor" type="String">The tab color of the worksheet.              When retrieving the tab color, if the worksheet is invisible, the value will be null. If the worksheet is visible but the tab color is set to auto, an empty string will be returned. Otherwise, the property will be set to a color, in the form &quot;#123456&quot;              When setting the color, use an empty-string to set an &quot;auto&quot; color, or a real color otherwise. [Api set: ExcelApi 1.7]</field>
+			/// <field name="tables" type="Excel.TableCollection">Collection of tables that are part of the worksheet. [Api set: ExcelApi 1.1]</field>
 			/// <field name="verticalPageBreaks" type="Excel.PageBreakCollection">Gets the vertical page break collection for the worksheet. This collection only contains manual page breaks. [Api set: ExcelApi 1.9]</field>
 			/// <field name="visibility" type="String">The Visibility of the worksheet. [Api set: ExcelApi 1.1 for reading visibility; 1.2 for setting it.]</field>
 			/// <field name="onActivated" type="OfficeExtension.EventHandlers">Occurs when the worksheet is activated. [Api set: ExcelApi 1.7]</field>
@@ -19693,9 +20058,9 @@ var Excel;
 			/// <field name="onChanged" type="OfficeExtension.EventHandlers">Occurs when data changed on a specific worksheet. [Api set: ExcelApi 1.7]</field>
 			/// <field name="onColumnSorted" type="OfficeExtension.EventHandlers">Occurs when one or more columns have been sorted. This happens as the result of a left-to-right sort operation. [Api set: ExcelApi 1.10]</field>
 			/// <field name="onDeactivated" type="OfficeExtension.EventHandlers">Occurs when the worksheet is deactivated. [Api set: ExcelApi 1.7]</field>
-			/// <field name="onFiltered" type="OfficeExtension.EventHandlers">Occurs when filter is applied on a specific worksheet. [Api set: ExcelApi 1.12]</field>
+			/// <field name="onFiltered" type="OfficeExtension.EventHandlers">Occurs when filter is applied on a specific worksheet. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
 			/// <field name="onFormatChanged" type="OfficeExtension.EventHandlers">Occurs when format changed on a specific worksheet. [Api set: ExcelApi 1.9]</field>
-			/// <field name="onRowHiddenChanged" type="OfficeExtension.EventHandlers">Occurs when the hidden state of one or more rows has changed on a specific worksheet. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
+			/// <field name="onRowHiddenChanged" type="OfficeExtension.EventHandlers">Occurs when the hidden state of one or more rows has changed on a specific worksheet. [Api set: ExcelApi 1.11]</field>
 			/// <field name="onRowSorted" type="OfficeExtension.EventHandlers">Occurs when one or more rows have been sorted. This happens as the result of a top-to-bottom sort operation. [Api set: ExcelApi 1.10]</field>
 			/// <field name="onSelectionChanged" type="OfficeExtension.EventHandlers">Occurs when the selection changes on a specific worksheet. [Api set: ExcelApi 1.7]</field>
 			/// <field name="onSingleClicked" type="OfficeExtension.EventHandlers">Occurs when a left-clicked/tapped action happens in the worksheet. This event will not be fired when clicking in the following cases:                            - The user drags the mouse for multi-selection.                            - The user selects a cell in the mode when cell arguments are selected for formula references. [Api set: ExcelApi 1.10]</field>
@@ -20063,7 +20428,7 @@ var Excel;
 		var WorksheetCalculatedEventArgs = (function() {
 			function WorksheetCalculatedEventArgs() {
 				/// <summary> Provides information about the worksheet that raised the Calculated event. [Api set: ExcelApi 1.8] </summary>
-				/// <field name="address" type="String">The address of the range that completed calculation.              If multiple ranges completed calculation, the string is a comma-separated list of those range addresses. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
+				/// <field name="address" type="String">The address of the range that completed calculation.              If multiple ranges completed calculation, the string is a comma-separated list of those range addresses. [Api set: ExcelApi 1.11]</field>
 				/// <field name="type" type="String">Gets the type of the event. See Excel.EventType for details. [Api set: ExcelApi 1.8]</field>
 				/// <field name="worksheetId" type="String">Gets the id of the worksheet in which the calculation occurred. [Api set: ExcelApi 1.8]</field>
 			}
@@ -20110,9 +20475,9 @@ var Excel;
 			/// <field name="onColumnSorted" type="OfficeExtension.EventHandlers">Occurs when one or more columns have been sorted. This happens as the result of a left-to-right sort operation. [Api set: ExcelApi 1.10]</field>
 			/// <field name="onDeactivated" type="OfficeExtension.EventHandlers">Occurs when any worksheet in the workbook is deactivated. [Api set: ExcelApi 1.7]</field>
 			/// <field name="onDeleted" type="OfficeExtension.EventHandlers">Occurs when a worksheet is deleted from the workbook. [Api set: ExcelApi 1.7]</field>
-			/// <field name="onFiltered" type="OfficeExtension.EventHandlers">Occurs when any worksheet&apos;s filter is applied in the workbook. [Api set: ExcelApi 1.12]</field>
+			/// <field name="onFiltered" type="OfficeExtension.EventHandlers">Occurs when any worksheet&apos;s filter is applied in the workbook. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
 			/// <field name="onFormatChanged" type="OfficeExtension.EventHandlers">Occurs when any worksheet in the workbook has format changed. [Api set: ExcelApi 1.9]</field>
-			/// <field name="onRowHiddenChanged" type="OfficeExtension.EventHandlers">Occurs when the hidden state of one or more rows has changed on a specific worksheet. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
+			/// <field name="onRowHiddenChanged" type="OfficeExtension.EventHandlers">Occurs when the hidden state of one or more rows has changed on a specific worksheet. [Api set: ExcelApi 1.11]</field>
 			/// <field name="onRowSorted" type="OfficeExtension.EventHandlers">Occurs when one or more rows have been sorted. This happens as the result of a top-to-bottom sort operation. [Api set: ExcelApi 1.10]</field>
 			/// <field name="onSelectionChanged" type="OfficeExtension.EventHandlers">Occurs when the selection changes on any worksheet. [Api set: ExcelApi 1.9]</field>
 			/// <field name="onSingleClicked" type="OfficeExtension.EventHandlers">Occurs when left-clicked/tapped operation happens in the worksheet collection. This event will not be fired when clicking in the following cases:              - The user drags the mouse for multi-selection.              - The user selects a cell in the mode when cell arguments are selected for formula references. [Api set: ExcelApi 1.10]</field>
@@ -20135,7 +20500,7 @@ var Excel;
 		}
 		WorksheetCollection.prototype.addFromBase64 = function(base64File, sheetNamesToInsert, positionType, relativeTo) {
 			/// <summary>
-			/// Inserts the specified worksheets of a workbook into the current workbook.                             **Note**: This API is currently only supported for Office on Windows and Mac. [Api set: ExcelApi 1.12]
+			/// Inserts the specified worksheets of a workbook into the current workbook.                             **Note**: This API is currently only supported for Office on Windows and Mac. [Api set: ExcelApi BETA (PREVIEW ONLY)]
 			/// </summary>
 			/// <param name="base64File" type="String">Required. The base64-encoded string representing the source workbook file.</param>
 			/// <param name="sheetNamesToInsert" type="Array" elementType="String" optional="true">Optional. The names of individual worksheets to insert. By default, all the worksheets from the source workbook are inserted.</param>
@@ -20404,11 +20769,11 @@ var Excel;
 	var WorksheetCustomProperty = (function(_super) {
 		__extends(WorksheetCustomProperty, _super);
 		function WorksheetCustomProperty() {
-			/// <summary> Represents a worksheet-level custom property. [Api set: ExcelApi 1.12] </summary>
+			/// <summary> Represents a worksheet-level custom property. [Api set: ExcelApi BETA (PREVIEW ONLY)] </summary>
 			/// <field name="context" type="Excel.RequestContext">The request context associated with this object.</field>
 			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
-			/// <field name="key" type="String">Gets the key of the custom property. Read only. [Api set: ExcelApi 1.12]</field>
-			/// <field name="value" type="String">Gets the value of the custom property. Read only. [Api set: ExcelApi 1.12]</field>
+			/// <field name="key" type="String">Gets the key of the custom property. Custom property keys are case-insensitive. The key is limited to 255 characters (larger values will cause an &quot;InvalidArgument&quot; error to be thrown.) [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
+			/// <field name="value" type="String">Gets or sets the value of the custom property. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
 		}
 
 		WorksheetCustomProperty.prototype.load = function(option) {
@@ -20417,6 +20782,27 @@ var Excel;
 			/// </summary>
 			/// <param name="option" type="string | string[] | OfficeExtension.LoadOption"/>
 			/// <returns type="Excel.WorksheetCustomProperty"/>
+		}
+
+		WorksheetCustomProperty.prototype.set = function() {
+			/// <signature>
+			/// <summary>Sets multiple properties on the object at the same time, based on JSON input.</summary>
+			/// <param name="properties" type="Excel.Interfaces.WorksheetCustomPropertyUpdateData">Properties described by the Excel.Interfaces.WorksheetCustomPropertyUpdateData interface.</param>
+			/// <param name="options" type="string">Options of the form { throwOnReadOnly?: boolean }
+			/// <br />
+			/// * throwOnReadOnly: Throw an error if the passed-in property list includes read-only properties (default = true).
+			/// </param>
+			/// </signature>
+			/// <signature>
+			/// <summary>Sets multiple properties on the object at the same time, based on an existing loaded object.</summary>
+			/// <param name="properties" type="WorksheetCustomProperty">An existing WorksheetCustomProperty object, with properties that have already been loaded and synced.</param>
+			/// </signature>
+		}
+		WorksheetCustomProperty.prototype.delete = function() {
+			/// <summary>
+			/// Deletes the custom property. [Api set: ExcelApi BETA (PREVIEW ONLY)]
+			/// </summary>
+			/// <returns ></returns>
 		}
 
 		return WorksheetCustomProperty;
@@ -20429,7 +20815,7 @@ var Excel;
 	var WorksheetCustomPropertyCollection = (function(_super) {
 		__extends(WorksheetCustomPropertyCollection, _super);
 		function WorksheetCustomPropertyCollection() {
-			/// <summary> Contains the collection of worksheet-level custom property. [Api set: ExcelApi 1.12] </summary>
+			/// <summary> Contains the collection of worksheet-level custom property. [Api set: ExcelApi BETA (PREVIEW ONLY)] </summary>
 			/// <field name="context" type="Excel.RequestContext">The request context associated with this object.</field>
 			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
 			/// <field name="items" type="Array" elementType="Excel.WorksheetCustomProperty">Gets the loaded child items in this collection.</field>
@@ -20442,9 +20828,17 @@ var Excel;
 			/// <param name="option" type="string | string[] | OfficeExtension.LoadOption"/>
 			/// <returns type="Excel.WorksheetCustomPropertyCollection"/>
 		}
+		WorksheetCustomPropertyCollection.prototype.add = function(key, value) {
+			/// <summary>
+			/// Adds a new custom property that maps to the provided key. This overwrites existing custom properties with that key. [Api set: ExcelApi BETA (PREVIEW ONLY)]
+			/// </summary>
+			/// <param name="key" type="String">The key that identifies the custom property object. It is case-insensitive.The key is limited to 255 characters (larger values will cause an &quot;InvalidArgument&quot; error to be thrown.)</param>
+			/// <param name="value" type="String">The value of this custom property.</param>
+			/// <returns type="Excel.WorksheetCustomProperty"></returns>
+		}
 		WorksheetCustomPropertyCollection.prototype.getCount = function() {
 			/// <summary>
-			/// Gets the number of custom properties on this worksheet. [Api set: ExcelApi 1.12]
+			/// Gets the number of custom properties on this worksheet. [Api set: ExcelApi BETA (PREVIEW ONLY)]
 			/// </summary>
 			/// <returns type="OfficeExtension.ClientResult&lt;number&gt;"></returns>
 			var result = new OfficeExtension.ClientResult();
@@ -20454,16 +20848,16 @@ var Excel;
 		}
 		WorksheetCustomPropertyCollection.prototype.getItem = function(key) {
 			/// <summary>
-			/// Gets a custom property object by its key, which is case-insensitive. Throws if the custom property does not exist. [Api set: ExcelApi 1.12]
+			/// Gets a custom property object by its key, which is case-insensitive. Throws if the custom property does not exist. [Api set: ExcelApi BETA (PREVIEW ONLY)]
 			/// </summary>
-			/// <param name="key" type="String">The key that identifies the custom property object.</param>
+			/// <param name="key" type="String">The key that identifies the custom property object. It is case-insensitive.</param>
 			/// <returns type="Excel.WorksheetCustomProperty"></returns>
 		}
 		WorksheetCustomPropertyCollection.prototype.getItemOrNullObject = function(key) {
 			/// <summary>
-			/// Gets a custom property object by its key, which is case-insensitive. Returns a null object if the custom property does not exist. [Api set: ExcelApi 1.12]
+			/// Gets a custom property object by its key, which is case-insensitive. Returns a null object if the custom property does not exist. [Api set: ExcelApi BETA (PREVIEW ONLY)]
 			/// </summary>
-			/// <param name="key" type="String">The key that identifies the custom property object.</param>
+			/// <param name="key" type="String">The key that identifies the custom property object. It is case-insensitive.</param>
 			/// <returns type="Excel.WorksheetCustomProperty"></returns>
 		}
 
@@ -20513,9 +20907,9 @@ var Excel;
 	(function (Interfaces) {
 		var WorksheetFilteredEventArgs = (function() {
 			function WorksheetFilteredEventArgs() {
-				/// <summary> Provides information about the worksheet that raised the filter applied event. [Api set: ExcelApi 1.12] </summary>
-				/// <field name="type" type="String">Gets the type of the event. See Excel.EventType for details. [Api set: ExcelApi 1.12]</field>
-				/// <field name="worksheetId" type="String">Gets the id of the worksheet in which the filter is applied. [Api set: ExcelApi 1.12]</field>
+				/// <summary> Provides information about the worksheet that raised the filter applied event. [Api set: ExcelApi BETA (PREVIEW ONLY)] </summary>
+				/// <field name="type" type="String">Gets the type of the event. See Excel.EventType for details. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
+				/// <field name="worksheetId" type="String">Gets the id of the worksheet in which the filter is applied. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
 			}
 			return WorksheetFilteredEventArgs;
 		})();
@@ -20627,8 +21021,8 @@ var Excel;
 			/// <summary> Represents the protection of a sheet object. [Api set: ExcelApi 1.2] </summary>
 			/// <field name="context" type="Excel.RequestContext">The request context associated with this object.</field>
 			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
-			/// <field name="options" type="Excel.Interfaces.WorksheetProtectionOptions">Sheet protection options. Read-only. [Api set: ExcelApi 1.2]</field>
-			/// <field name="protected" type="Boolean">Indicates if the worksheet is protected. Read-only. [Api set: ExcelApi 1.2]</field>
+			/// <field name="options" type="Excel.Interfaces.WorksheetProtectionOptions">Specifies the protection options for the worksheet. [Api set: ExcelApi 1.2]</field>
+			/// <field name="protected" type="Boolean">Specifies if the worksheet is protected. [Api set: ExcelApi 1.2]</field>
 		}
 
 		WorksheetProtection.prototype.load = function(option) {
@@ -20694,12 +21088,12 @@ var Excel;
 	(function (Interfaces) {
 		var WorksheetRowHiddenChangedEventArgs = (function() {
 			function WorksheetRowHiddenChangedEventArgs() {
-				/// <summary> Provides information about the worksheet&apos;s row hidden change event. [Api set: ExcelApi BETA (PREVIEW ONLY)] </summary>
-				/// <field name="address" type="String">Gets the range address that represents the changed area of a specific worksheet. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
-				/// <field name="changeType" type="String">Gets the type of change that represents how the event was triggered. See `Excel.RowHiddenChangeType` for details. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
-				/// <field name="source" type="String">Gets the source of the event. See Excel.EventSource for details. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
-				/// <field name="type" type="String">Gets the type of the event. See Excel.EventType for details. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
-				/// <field name="worksheetId" type="String">Gets the id of the worksheet in which the data changed. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
+				/// <summary> Provides information about the worksheet&apos;s row hidden change event. [Api set: ExcelApi 1.11] </summary>
+				/// <field name="address" type="String">Gets the range address that represents the changed area of a specific worksheet. [Api set: ExcelApi 1.11]</field>
+				/// <field name="changeType" type="String">Gets the type of change that represents how the event was triggered. See `Excel.RowHiddenChangeType` for details. [Api set: ExcelApi 1.11]</field>
+				/// <field name="source" type="String">Gets the source of the event. See Excel.EventSource for details. [Api set: ExcelApi 1.11]</field>
+				/// <field name="type" type="String">Gets the type of the event. See Excel.EventType for details. [Api set: ExcelApi 1.11]</field>
+				/// <field name="worksheetId" type="String">Gets the id of the worksheet in which the data changed. [Api set: ExcelApi 1.11]</field>
 			}
 			return WorksheetRowHiddenChangedEventArgs;
 		})();
@@ -20734,8 +21128,8 @@ var Excel;
 		var WorksheetSearchCriteria = (function() {
 			function WorksheetSearchCriteria() {
 				/// <summary> Represents the worksheet search criteria to be used. [Api set: ExcelApi 1.9] </summary>
-				/// <field name="completeMatch" type="Boolean">Specifies whether the match needs to be complete or partial.               A complete match matches the entire contents of the cell. A partial match matches a substring within the content of the cell (e.g., `cat` partially matches `caterpillar` and `scatter`).              Default is false (partial). [Api set: ExcelApi 1.9]</field>
-				/// <field name="matchCase" type="Boolean">Specifies whether the match is case sensitive. Default is false (insensitive). [Api set: ExcelApi 1.9]</field>
+				/// <field name="completeMatch" type="Boolean">Specifies if the match needs to be complete or partial.               A complete match matches the entire contents of the cell. A partial match matches a substring within the content of the cell (e.g., `cat` partially matches `caterpillar` and `scatter`).              Default is false (partial). [Api set: ExcelApi 1.9]</field>
+				/// <field name="matchCase" type="Boolean">Specifies if the match is case sensitive. Default is false (insensitive). [Api set: ExcelApi 1.9]</field>
 			}
 			return WorksheetSearchCriteria;
 		})();
@@ -20824,8 +21218,8 @@ var Excel;
 			function IterativeCalculationUpdateData() {
 				/// <summary>An interface for updating data on the IterativeCalculation object, for use in "iterativeCalculation.set({ ... })".</summary>
 				/// <field name="enabled" type="Boolean">True if Excel will use iteration to resolve circular references. [Api set: ExcelApi 1.9]</field>;
-				/// <field name="maxChange" type="Number">Returns or sets the maximum amount of change between each iteration as Excel resolves circular references. [Api set: ExcelApi 1.9]</field>;
-				/// <field name="maxIteration" type="Number">Returns or sets the maximum number of iterations that Excel can use to resolve a circular reference. [Api set: ExcelApi 1.9]</field>;
+				/// <field name="maxChange" type="Number">Specifies the maximum amount of change between each iteration as Excel resolves circular references. [Api set: ExcelApi 1.9]</field>;
+				/// <field name="maxIteration" type="Number">Specifies the maximum number of iterations that Excel can use to resolve a circular reference. [Api set: ExcelApi 1.9]</field>;
 			}
 			return IterativeCalculationUpdateData;
 		})();
@@ -20843,8 +21237,9 @@ var Excel;
 				/// <summary>An interface for updating data on the Workbook object, for use in "workbook.set({ ... })".</summary>
 				/// <field name="properties" type="Excel.Interfaces.DocumentPropertiesUpdateData">Gets the workbook properties. [Api set: ExcelApi 1.7]</field>
 				/// <field name="chartDataPointTrack" type="Boolean">True if all charts in the workbook are tracking the actual data points to which they are attached.              False if the charts track the index of the data points. [Api set: ExcelApi 1.9]</field>;
-				/// <field name="isDirty" type="Boolean">Specifies whether or not changes have been made since the workbook was last saved.              You can set this property to true if you want to close a modified workbook without either saving it or being prompted to save it. [Api set: ExcelApi 1.9]</field>;
-				/// <field name="use1904DateSystem" type="Boolean">True if the workbook uses the 1904 date system. [Api set: ExcelApi 1.12]</field>;
+				/// <field name="isDirty" type="Boolean">Specifies if changes have been made since the workbook was last saved.              You can set this property to true if you want to close a modified workbook without either saving it or being prompted to save it. [Api set: ExcelApi 1.9]</field>;
+				/// <field name="showPivotFieldList" type="Boolean">Specifies whether the PivotTable&apos;s field list pane is shown at the workbook level. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>;
+				/// <field name="use1904DateSystem" type="Boolean">True if the workbook uses the 1904 date system. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>;
 				/// <field name="usePrecisionAsDisplayed" type="Boolean">True if calculations in this workbook will be done using only the precision of the numbers as they&apos;re displayed.              Data will permanently lose accuracy when switching this property from false to true. [Api set: ExcelApi 1.9]</field>;
 			}
 			return WorkbookUpdateData;
@@ -20862,13 +21257,13 @@ var Excel;
 			function WorksheetUpdateData() {
 				/// <summary>An interface for updating data on the Worksheet object, for use in "worksheet.set({ ... })".</summary>
 				/// <field name="pageLayout" type="Excel.Interfaces.PageLayoutUpdateData">Gets the PageLayout object of the worksheet. [Api set: ExcelApi 1.9]</field>
-				/// <field name="enableCalculation" type="Boolean">Gets or sets the enableCalculation property of the worksheet.              True if Excel recalculates the worksheet when necessary. False if Excel doesn&apos;t recalculate the sheet. [Api set: ExcelApi 1.9]</field>;
+				/// <field name="enableCalculation" type="Boolean">Determines if Excel should recalculate the worksheet when necessary.              True if Excel recalculates the worksheet when necessary. False if Excel doesn&apos;t recalculate the sheet. [Api set: ExcelApi 1.9]</field>;
 				/// <field name="name" type="String">The display name of the worksheet. [Api set: ExcelApi 1.1]</field>;
 				/// <field name="position" type="Number">The zero-based position of the worksheet within the workbook. [Api set: ExcelApi 1.1]</field>;
-				/// <field name="showGridlines" type="Boolean">Gets or sets the worksheet&apos;s gridlines flag.              This flag determines whether gridlines are visible to the user. [Api set: ExcelApi 1.8]</field>;
-				/// <field name="showHeadings" type="Boolean">Gets or sets the worksheet&apos;s headings flag.              This flag determines whether headings are visible to the user. [Api set: ExcelApi 1.8]</field>;
-				/// <field name="standardWidth" type="Number">Returns or sets the standard (default) width of all the columns in the worksheet.              One unit of column width is equal to the width of one character in the Normal style. For proportional fonts, the width of the character 0 (zero) is used. [Api set: ExcelApi 1.7]</field>;
-				/// <field name="tabColor" type="String">Gets or sets the worksheet tab color.              When retrieving the tab color, if the worksheet is invisible, the value will be null. If the worksheet is visible but the tab color is set to auto, an empty string will be returned. Otherwise, the property will be set to a color, in the form &quot;#123456&quot;              When setting the color, use an empty-string to set an &quot;auto&quot; color, or a real color otherwise. [Api set: ExcelApi 1.7]</field>;
+				/// <field name="showGridlines" type="Boolean">Specifies if gridlines are visible to the user. [Api set: ExcelApi 1.8]</field>;
+				/// <field name="showHeadings" type="Boolean">Specifies if headings are visible to the user. [Api set: ExcelApi 1.8]</field>;
+				/// <field name="standardWidth" type="Number">Specifies the standard (default) width of all the columns in the worksheet.              One unit of column width is equal to the width of one character in the Normal style. For proportional fonts, the width of the character 0 (zero) is used. [Api set: ExcelApi 1.7]</field>;
+				/// <field name="tabColor" type="String">The tab color of the worksheet.              When retrieving the tab color, if the worksheet is invisible, the value will be null. If the worksheet is visible but the tab color is set to auto, an empty string will be returned. Otherwise, the property will be set to a color, in the form &quot;#123456&quot;              When setting the color, use an empty-string to set an &quot;auto&quot; color, or a real color otherwise. [Api set: ExcelApi 1.7]</field>;
 				/// <field name="visibility" type="String">The Visibility of the worksheet. [Api set: ExcelApi 1.1 for reading visibility; 1.2 for setting it.]</field>;
 			}
 			return WorksheetUpdateData;
@@ -20913,7 +21308,7 @@ var Excel;
 			function RangeAreasUpdateData() {
 				/// <summary>An interface for updating data on the RangeAreas object, for use in "rangeAreas.set({ ... })".</summary>
 				/// <field name="dataValidation" type="Excel.Interfaces.DataValidationUpdateData">Returns a dataValidation object for all ranges in the RangeAreas. [Api set: ExcelApi 1.9]</field>
-				/// <field name="format" type="Excel.Interfaces.RangeFormatUpdateData">Returns a rangeFormat object, encapsulating the the font, fill, borders, alignment, and other properties for all ranges in the RangeAreas object. [Api set: ExcelApi 1.9]</field>
+				/// <field name="format" type="Excel.Interfaces.RangeFormatUpdateData">Returns a RangeFormat object, encapsulating the the font, fill, borders, alignment, and other properties for all ranges in the RangeAreas object. [Api set: ExcelApi 1.9]</field>
 				/// <field name="style" type="String">Represents the style for all ranges in this RangeAreas object.              If the styles of the cells are inconsistent, null will be returned.              For custom styles, the style name will be returned. For built-in styles, a string representing a value in the BuiltInStyle enum will be returned. [Api set: ExcelApi 1.9]</field>;
 			}
 			return RangeAreasUpdateData;
@@ -20966,9 +21361,9 @@ var Excel;
 		var NamedItemUpdateData = (function() {
 			function NamedItemUpdateData() {
 				/// <summary>An interface for updating data on the NamedItem object, for use in "namedItem.set({ ... })".</summary>
-				/// <field name="comment" type="String">Represents the comment associated with this name. [Api set: ExcelApi 1.4]</field>;
-				/// <field name="formula" >Gets or sets the formula of the named item.  Formula always starts with a &apos;=&apos; sign. [Api set: ExcelApi 1.7]</field>;
-				/// <field name="visible" type="Boolean">Specifies whether the object is visible or not. [Api set: ExcelApi 1.1]</field>;
+				/// <field name="comment" type="String">Specifies the comment associated with this name. [Api set: ExcelApi 1.4]</field>;
+				/// <field name="formula" >The formula of the named item. Formula always starts with a &apos;=&apos; sign. [Api set: ExcelApi 1.7]</field>;
+				/// <field name="visible" type="Boolean">Specifies if the object is visible. [Api set: ExcelApi 1.1]</field>;
 			}
 			return NamedItemUpdateData;
 		})();
@@ -20984,15 +21379,15 @@ var Excel;
 		var TableUpdateData = (function() {
 			function TableUpdateData() {
 				/// <summary>An interface for updating data on the Table object, for use in "table.set({ ... })".</summary>
-				/// <field name="tableStyle" type="Excel.Interfaces.TableStyleUpdateData">The style applied to the Table. [Api set: ExcelApi 1.12]</field>
-				/// <field name="highlightFirstColumn" type="Boolean">Indicates whether the first column contains special formatting. [Api set: ExcelApi 1.3]</field>;
-				/// <field name="highlightLastColumn" type="Boolean">Indicates whether the last column contains special formatting. [Api set: ExcelApi 1.3]</field>;
+				/// <field name="tableStyle" type="Excel.Interfaces.TableStyleUpdateData">The style applied to the Table. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
+				/// <field name="highlightFirstColumn" type="Boolean">Specifies if the first column contains special formatting. [Api set: ExcelApi 1.3]</field>;
+				/// <field name="highlightLastColumn" type="Boolean">Specifies if the last column contains special formatting. [Api set: ExcelApi 1.3]</field>;
 				/// <field name="name" type="String">Name of the table.                              The set name of the table must follow the guidelines specified in the {@link https://support.office.com/article/Rename-an-Excel-table-FBF49A4F-82A3-43EB-8BA2-44D21233B114 | Rename an Excel table} article. [Api set: ExcelApi 1.1]</field>;
-				/// <field name="showBandedColumns" type="Boolean">Indicates whether the columns show banded formatting in which odd columns are highlighted differently from even ones to make reading the table easier. [Api set: ExcelApi 1.3]</field>;
-				/// <field name="showBandedRows" type="Boolean">Indicates whether the rows show banded formatting in which odd rows are highlighted differently from even ones to make reading the table easier. [Api set: ExcelApi 1.3]</field>;
-				/// <field name="showFilterButton" type="Boolean">Indicates whether the filter buttons are visible at the top of each column header. Setting this is only allowed if the table contains a header row. [Api set: ExcelApi 1.3]</field>;
-				/// <field name="showHeaders" type="Boolean">Indicates whether the header row is visible or not. This value can be set to show or remove the header row. [Api set: ExcelApi 1.1]</field>;
-				/// <field name="showTotals" type="Boolean">Indicates whether the total row is visible or not. This value can be set to show or remove the total row. [Api set: ExcelApi 1.1]</field>;
+				/// <field name="showBandedColumns" type="Boolean">Specifies if the columns show banded formatting in which odd columns are highlighted differently from even ones to make reading the table easier. [Api set: ExcelApi 1.3]</field>;
+				/// <field name="showBandedRows" type="Boolean">Specifies if the rows show banded formatting in which odd rows are highlighted differently from even ones to make reading the table easier. [Api set: ExcelApi 1.3]</field>;
+				/// <field name="showFilterButton" type="Boolean">Specifies if the filter buttons are visible at the top of each column header. Setting this is only allowed if the table contains a header row. [Api set: ExcelApi 1.3]</field>;
+				/// <field name="showHeaders" type="Boolean">Specifies if the header row is visible. This value can be set to show or remove the header row. [Api set: ExcelApi 1.1]</field>;
+				/// <field name="showTotals" type="Boolean">Specifies if the total row is visible. This value can be set to show or remove the total row. [Api set: ExcelApi 1.1]</field>;
 				/// <field name="style" type="String">Constant value that represents the Table style. Possible values are: &quot;TableStyleLight1&quot; through &quot;TableStyleLight21&quot;, &quot;TableStyleMedium1&quot; through &quot;TableStyleMedium28&quot;, &quot;TableStyleDark1&quot; through &quot;TableStyleDark11&quot;. A custom user-defined style present in the workbook can also be specified. [Api set: ExcelApi 1.1]</field>;
 			}
 			return TableUpdateData;
@@ -21009,7 +21404,7 @@ var Excel;
 		var TableColumnUpdateData = (function() {
 			function TableColumnUpdateData() {
 				/// <summary>An interface for updating data on the TableColumn object, for use in "tableColumn.set({ ... })".</summary>
-				/// <field name="name" type="String">Represents the name of the table column. [Api set: ExcelApi 1.1 for getting the name; 1.4 for setting it.]</field>;
+				/// <field name="name" type="String">Specifies the name of the table column. [Api set: ExcelApi 1.1 for getting the name; 1.4 for setting it.]</field>;
 				/// <field name="values" type="Array" elementType="Array">Represents the raw values of the specified range. The data returned could be of type string, number, or a boolean. Cells that contain an error will return the error string. [Api set: ExcelApi 1.1]</field>;
 			}
 			return TableColumnUpdateData;
@@ -21043,7 +21438,7 @@ var Excel;
 			function DataValidationUpdateData() {
 				/// <summary>An interface for updating data on the DataValidation object, for use in "dataValidation.set({ ... })".</summary>
 				/// <field name="errorAlert" type="Excel.Interfaces.DataValidationErrorAlert">Error alert when user enters invalid data. [Api set: ExcelApi 1.8]</field>;
-				/// <field name="ignoreBlanks" type="Boolean">Ignore blanks: no data validation will be performed on blank cells, it defaults to true. [Api set: ExcelApi 1.8]</field>;
+				/// <field name="ignoreBlanks" type="Boolean">Specifies if data validation will be performed on blank cells, it defaults to true. [Api set: ExcelApi 1.8]</field>;
 				/// <field name="prompt" type="Excel.Interfaces.DataValidationPrompt">Prompt when users select a cell. [Api set: ExcelApi 1.8]</field>;
 				/// <field name="rule" type="Excel.Interfaces.DataValidationRule">Data validation rule that contains different type of data validation criteria. [Api set: ExcelApi 1.8]</field>;
 			}
@@ -21065,18 +21460,18 @@ var Excel;
 				/// <field name="fill" type="Excel.Interfaces.RangeFillUpdateData">Returns the fill object defined on the overall range. [Api set: ExcelApi 1.1]</field>
 				/// <field name="font" type="Excel.Interfaces.RangeFontUpdateData">Returns the font object defined on the overall range. [Api set: ExcelApi 1.1]</field>
 				/// <field name="protection" type="Excel.Interfaces.FormatProtectionUpdateData">Returns the format protection object for a range. [Api set: ExcelApi 1.2]</field>
-				/// <field name="autoIndent" type="Boolean">Indicates if text is automatically indented when text alignment is set to equal distribution. [Api set: ExcelApi 1.9]</field>;
-				/// <field name="columnWidth" type="Number">Gets or sets the width of all colums within the range. If the column widths are not uniform, null will be returned. [Api set: ExcelApi 1.2]</field>;
+				/// <field name="autoIndent" type="Boolean">Specifies if text is automatically indented when text alignment is set to equal distribution. [Api set: ExcelApi 1.9]</field>;
+				/// <field name="columnWidth" type="Number">Specifies the width of all colums within the range. If the column widths are not uniform, null will be returned. [Api set: ExcelApi 1.2]</field>;
 				/// <field name="horizontalAlignment" type="String">Represents the horizontal alignment for the specified object. See Excel.HorizontalAlignment for details. [Api set: ExcelApi 1.1]</field>;
 				/// <field name="indentLevel" type="Number">An integer from 0 to 250 that indicates the indent level. [Api set: ExcelApi 1.9]</field>;
 				/// <field name="readingOrder" type="String">The reading order for the range. [Api set: ExcelApi 1.9]</field>;
-				/// <field name="rowHeight" type="Number">Gets or sets the height of all rows in the range. If the row heights are not uniform, null will be returned. [Api set: ExcelApi 1.2]</field>;
-				/// <field name="shrinkToFit" type="Boolean">Indicates if text automatically shrinks to fit in the available column width. [Api set: ExcelApi 1.9]</field>;
-				/// <field name="textOrientation" type="Number">Gets or sets the text orientation of all the cells within the range.              The text orientation should be an integer either from -90 to 90, or 180 for vertically-oriented text.              If the orientation within a range are not uniform, then null will be returned. [Api set: ExcelApi 1.7]</field>;
+				/// <field name="rowHeight" type="Number">The height of all rows in the range. If the row heights are not uniform, null will be returned. [Api set: ExcelApi 1.2]</field>;
+				/// <field name="shrinkToFit" type="Boolean">Specifies if text automatically shrinks to fit in the available column width. [Api set: ExcelApi 1.9]</field>;
+				/// <field name="textOrientation" type="Number">The text orientation of all the cells within the range.              The text orientation should be an integer either from -90 to 90, or 180 for vertically-oriented text.              If the orientation within a range are not uniform, then null will be returned. [Api set: ExcelApi 1.7]</field>;
 				/// <field name="useStandardHeight" type="Boolean">Determines if the row height of the Range object equals the standard height of the sheet.              Returns True if the row height of the Range object equals the standard height of the sheet.              Returns Null if the range contains more than one row and the rows aren&apos;t all the same height.              Returns False otherwise. [Api set: ExcelApi 1.7]</field>;
-				/// <field name="useStandardWidth" type="Boolean">Indicates whether the column width of the Range object equals the standard width of the sheet.              Returns True if the column width of the Range object equals the standard width of the sheet.              Returns Null if the range contains more than one column and the columns aren&apos;t all the same height.              Returns False otherwise. [Api set: ExcelApi 1.7]</field>;
+				/// <field name="useStandardWidth" type="Boolean">Specifies if the column width of the Range object equals the standard width of the sheet.              Returns True if the column width of the Range object equals the standard width of the sheet.              Returns Null if the range contains more than one column and the columns aren&apos;t all the same height.              Returns False otherwise. [Api set: ExcelApi 1.7]</field>;
 				/// <field name="verticalAlignment" type="String">Represents the vertical alignment for the specified object. See Excel.VerticalAlignment for details. [Api set: ExcelApi 1.1]</field>;
-				/// <field name="wrapText" type="Boolean">Indicates if Excel wraps the text in the object. A null value indicates that the entire range doesn&apos;t have uniform wrap setting [Api set: ExcelApi 1.1]</field>;
+				/// <field name="wrapText" type="Boolean">Specifies if Excel wraps the text in the object. A null value indicates that the entire range doesn&apos;t have uniform wrap setting [Api set: ExcelApi 1.1]</field>;
 			}
 			return RangeFormatUpdateData;
 		})();
@@ -21092,8 +21487,8 @@ var Excel;
 		var FormatProtectionUpdateData = (function() {
 			function FormatProtectionUpdateData() {
 				/// <summary>An interface for updating data on the FormatProtection object, for use in "formatProtection.set({ ... })".</summary>
-				/// <field name="formulaHidden" type="Boolean">Indicates if Excel hides the formula for the cells in the range. A null value indicates that the entire range doesn&apos;t have uniform formula hidden setting. [Api set: ExcelApi 1.2]</field>;
-				/// <field name="locked" type="Boolean">Indicates if Excel locks the cells in the object. A null value indicates that the entire range doesn&apos;t have uniform lock setting. [Api set: ExcelApi 1.2]</field>;
+				/// <field name="formulaHidden" type="Boolean">Specifies if Excel hides the formula for the cells in the range. A null value indicates that the entire range doesn&apos;t have uniform formula hidden setting. [Api set: ExcelApi 1.2]</field>;
+				/// <field name="locked" type="Boolean">Specifies if Excel locks the cells in the object. A null value indicates that the entire range doesn&apos;t have uniform lock setting. [Api set: ExcelApi 1.2]</field>;
 			}
 			return FormatProtectionUpdateData;
 		})();
@@ -21109,11 +21504,11 @@ var Excel;
 		var RangeFillUpdateData = (function() {
 			function RangeFillUpdateData() {
 				/// <summary>An interface for updating data on the RangeFill object, for use in "rangeFill.set({ ... })".</summary>
-				/// <field name="color" type="String">HTML color code representing the color of the background, of the form #RRGGBB (e.g. &quot;FFA500&quot;) or as a named HTML color (e.g. &quot;orange&quot;) [Api set: ExcelApi 1.1]</field>;
-				/// <field name="pattern" type="String">Gets or sets the pattern of a Range. See Excel.FillPattern for details. LinearGradient and RectangularGradient are not supported.              A null value indicates that the entire range doesn&apos;t have uniform pattern setting. [Api set: ExcelApi 1.9]</field>;
-				/// <field name="patternColor" type="String">Sets HTML color code representing the color of the Range pattern, of the form #RRGGBB (e.g. &quot;FFA500&quot;) or as a named HTML color (e.g. &quot;orange&quot;).              Gets HTML color code representing the color of the Range pattern, of the form #RRGGBB (e.g. &quot;FFA500&quot;). [Api set: ExcelApi 1.9]</field>;
-				/// <field name="patternTintAndShade" type="Number">Returns or sets a double that lightens or darkens a pattern color for Range Fill, the value is between -1 (darkest) and 1 (brightest), with 0 for the original color.              If the pattern tintAndShades are not uniform, null will be returned. [Api set: ExcelApi 1.9]</field>;
-				/// <field name="tintAndShade" type="Number">Returns or sets a double that lightens or darkens a color for Range Fill, the value is between -1 (darkest) and 1 (brightest), with 0 for the original color.              If the tintAndShades are not uniform, null will be returned. [Api set: ExcelApi 1.9]</field>;
+				/// <field name="color" type="String">HTML color code representing the color of the background, of the form #RRGGBB (e.g., &quot;FFA500&quot;) or as a named HTML color (e.g., &quot;orange&quot;) [Api set: ExcelApi 1.1]</field>;
+				/// <field name="pattern" type="String">The pattern of a range. See Excel.FillPattern for details. LinearGradient and RectangularGradient are not supported.              A null value indicates that the entire range doesn&apos;t have uniform pattern setting. [Api set: ExcelApi 1.9]</field>;
+				/// <field name="patternColor" type="String">The HTML color code representing the color of the range pattern, of the form #RRGGBB (e.g., &quot;FFA500&quot;) or as a named HTML color (e.g., &quot;orange&quot;). [Api set: ExcelApi 1.9]</field>;
+				/// <field name="patternTintAndShade" type="Number">Specifies a double that lightens or darkens a pattern color for Range Fill, the value is between -1 (darkest) and 1 (brightest), with 0 for the original color.              If the pattern tintAndShades are not uniform, null will be returned. [Api set: ExcelApi 1.9]</field>;
+				/// <field name="tintAndShade" type="Number">Specifies a double that lightens or darkens a color for Range Fill, the value is between -1 (darkest) and 1 (brightest), with 0 for the original color.              If the tintAndShades are not uniform, null will be returned. [Api set: ExcelApi 1.9]</field>;
 			}
 			return RangeFillUpdateData;
 		})();
@@ -21129,9 +21524,9 @@ var Excel;
 		var RangeBorderUpdateData = (function() {
 			function RangeBorderUpdateData() {
 				/// <summary>An interface for updating data on the RangeBorder object, for use in "rangeBorder.set({ ... })".</summary>
-				/// <field name="color" type="String">HTML color code representing the color of the border line, of the form #RRGGBB (e.g. &quot;FFA500&quot;) or as a named HTML color (e.g. &quot;orange&quot;). [Api set: ExcelApi 1.1]</field>;
+				/// <field name="color" type="String">HTML color code representing the color of the border line, of the form #RRGGBB (e.g., &quot;FFA500&quot;) or as a named HTML color (e.g., &quot;orange&quot;). [Api set: ExcelApi 1.1]</field>;
 				/// <field name="style" type="String">One of the constants of line style specifying the line style for the border. See Excel.BorderLineStyle for details. [Api set: ExcelApi 1.1]</field>;
-				/// <field name="tintAndShade" type="Number">Returns or sets a double that lightens or darkens a color for Range Border, the value is between -1 (darkest) and 1 (brightest), with 0 for the original color.              A null value indicates that the border doesn&apos;t have uniform tintAndShade setting. [Api set: ExcelApi 1.9]</field>;
+				/// <field name="tintAndShade" type="Number">Specifies a double that lightens or darkens a color for Range Border, the value is between -1 (darkest) and 1 (brightest), with 0 for the original color.              A null value indicates that the border doesn&apos;t have uniform tintAndShade setting. [Api set: ExcelApi 1.9]</field>;
 				/// <field name="weight" type="String">Specifies the weight of the border around a range. See Excel.BorderWeight for details. [Api set: ExcelApi 1.1]</field>;
 			}
 			return RangeBorderUpdateData;
@@ -21148,7 +21543,7 @@ var Excel;
 		var RangeBorderCollectionUpdateData = (function() {
 			function RangeBorderCollectionUpdateData() {
 				/// <summary>An interface for updating data on the RangeBorderCollection object, for use in "rangeBorderCollection.set({ ... })".</summary>
-				/// <field name="tintAndShade" type="Number">Returns or sets a double that lightens or darkens a color for Range Borders, the value is between -1 (darkest) and 1 (brightest), with 0 for the original color.              A null value indicates that the entire border collections don&apos;t have uniform tintAndShade setting. [Api set: ExcelApi 1.9]</field>;
+				/// <field name="tintAndShade" type="Number">Specifies a double that lightens or darkens a color for Range Borders, the value is between -1 (darkest) and 1 (brightest), with 0 for the original color.              A null value indicates that the entire border collections don&apos;t have uniform tintAndShade setting. [Api set: ExcelApi 1.9]</field>;
 			}
 			return RangeBorderCollectionUpdateData;
 		})();
@@ -21165,14 +21560,14 @@ var Excel;
 			function RangeFontUpdateData() {
 				/// <summary>An interface for updating data on the RangeFont object, for use in "rangeFont.set({ ... })".</summary>
 				/// <field name="bold" type="Boolean">Represents the bold status of font. [Api set: ExcelApi 1.1]</field>;
-				/// <field name="color" type="String">HTML color code representation of the text color. E.g. #FF0000 represents Red. [Api set: ExcelApi 1.1]</field>;
-				/// <field name="italic" type="Boolean">Represents the italic status of the font. [Api set: ExcelApi 1.1]</field>;
-				/// <field name="name" type="String">Font name (e.g. &quot;Calibri&quot;) [Api set: ExcelApi 1.1]</field>;
+				/// <field name="color" type="String">HTML color code representation of the text color (e.g., #FF0000 represents Red). [Api set: ExcelApi 1.1]</field>;
+				/// <field name="italic" type="Boolean">Specifies the italic status of the font. [Api set: ExcelApi 1.1]</field>;
+				/// <field name="name" type="String">Font name (e.g., &quot;Calibri&quot;) [Api set: ExcelApi 1.1]</field>;
 				/// <field name="size" type="Number">Font size. [Api set: ExcelApi 1.1]</field>;
-				/// <field name="strikethrough" type="Boolean">Represents the strikethrough status of font. A null value indicates that the entire range doesn&apos;t have uniform Strikethrough setting. [Api set: ExcelApi 1.9]</field>;
-				/// <field name="subscript" type="Boolean">Represents the Subscript status of font.              Returns True if all the fonts of the range are Subscript.              Returns False if all the fonts of the range are Superscript or normal (neither Superscript, nor Subscript).              Returns Null otherwise. [Api set: ExcelApi 1.9]</field>;
-				/// <field name="superscript" type="Boolean">Represents the Superscript status of font.              Returns True if all the fonts of the range are Superscript.              Returns False if all the fonts of the range are Subscript or normal (neither Superscript, nor Subscript).              Returns Null otherwise. [Api set: ExcelApi 1.9]</field>;
-				/// <field name="tintAndShade" type="Number">Returns or sets a double that lightens or darkens a color for Range Font, the value is between -1 (darkest) and 1 (brightest), with 0 for the original color.              A null value indicates that the entire range doesn&apos;t have uniform font tintAndShade setting. [Api set: ExcelApi 1.9]</field>;
+				/// <field name="strikethrough" type="Boolean">Specifies the strikethrough status of font. A null value indicates that the entire range doesn&apos;t have uniform Strikethrough setting. [Api set: ExcelApi 1.9]</field>;
+				/// <field name="subscript" type="Boolean">Specifies the Subscript status of font.              Returns True if all the fonts of the range are Subscript.              Returns False if all the fonts of the range are Superscript or normal (neither Superscript, nor Subscript).              Returns Null otherwise. [Api set: ExcelApi 1.9]</field>;
+				/// <field name="superscript" type="Boolean">Specifies the Superscript status of font.              Returns True if all the fonts of the range are Superscript.              Returns False if all the fonts of the range are Subscript or normal (neither Superscript, nor Subscript).              Returns Null otherwise. [Api set: ExcelApi 1.9]</field>;
+				/// <field name="tintAndShade" type="Number">Specifies a double that lightens or darkens a color for Range Font, the value is between -1 (darkest) and 1 (brightest), with 0 for the original color.              A null value indicates that the entire range doesn&apos;t have uniform font tintAndShade setting. [Api set: ExcelApi 1.9]</field>;
 				/// <field name="underline" type="String">Type of underline applied to the font. See Excel.RangeUnderlineStyle for details. [Api set: ExcelApi 1.1]</field>;
 			}
 			return RangeFontUpdateData;
@@ -21195,21 +21590,21 @@ var Excel;
 				/// <field name="legend" type="Excel.Interfaces.ChartLegendUpdateData">Represents the legend for the chart. [Api set: ExcelApi 1.1]</field>
 				/// <field name="pivotOptions" type="Excel.Interfaces.ChartPivotOptionsUpdateData">Encapsulates the options for a pivot chart. [Api set: ExcelApi 1.9]</field>
 				/// <field name="plotArea" type="Excel.Interfaces.ChartPlotAreaUpdateData">Represents the plotArea for the chart. [Api set: ExcelApi 1.8]</field>
-				/// <field name="title" type="Excel.Interfaces.ChartTitleUpdateData">Represents the title of the specified chart, including the text, visibility, position, and formatting of the title. [Api set: ExcelApi 1.1]</field>
-				/// <field name="categoryLabelLevel" type="Number">Returns or sets a ChartCategoryLabelLevel enumeration constant referring to              the level of where the category labels are being sourced from. Read/Write. [Api set: ExcelApi 1.8]</field>;
-				/// <field name="chartType" type="String">Represents the type of the chart. See Excel.ChartType for details. [Api set: ExcelApi 1.7]</field>;
-				/// <field name="displayBlanksAs" type="String">Returns or sets the way that blank cells are plotted on a chart. Read/Write. [Api set: ExcelApi 1.8]</field>;
-				/// <field name="height" type="Number">Represents the height, in points, of the chart object. [Api set: ExcelApi 1.1]</field>;
+				/// <field name="title" type="Excel.Interfaces.ChartTitleUpdateData">Specifies the title of the specified chart, including the text, visibility, position, and formatting of the title. [Api set: ExcelApi 1.1]</field>
+				/// <field name="categoryLabelLevel" type="Number">Specifies a ChartCategoryLabelLevel enumeration constant referring to              the level of where the category labels are being sourced from. [Api set: ExcelApi 1.8]</field>;
+				/// <field name="chartType" type="String">Specifies the type of the chart. See Excel.ChartType for details. [Api set: ExcelApi 1.7]</field>;
+				/// <field name="displayBlanksAs" type="String">Specifies the way that blank cells are plotted on a chart. [Api set: ExcelApi 1.8]</field>;
+				/// <field name="height" type="Number">Specifies the height, in points, of the chart object. [Api set: ExcelApi 1.1]</field>;
 				/// <field name="left" type="Number">The distance, in points, from the left side of the chart to the worksheet origin. [Api set: ExcelApi 1.1]</field>;
-				/// <field name="name" type="String">Represents the name of a chart object. [Api set: ExcelApi 1.1]</field>;
-				/// <field name="plotBy" type="String">Returns or sets the way columns or rows are used as data series on the chart. Read/Write. [Api set: ExcelApi 1.8]</field>;
-				/// <field name="plotVisibleOnly" type="Boolean">True if only visible cells are plotted. False if both visible and hidden cells are plotted. Read/Write. [Api set: ExcelApi 1.8]</field>;
-				/// <field name="seriesNameLevel" type="Number">Returns or sets a ChartSeriesNameLevel enumeration constant referring to              the level of where the series names are being sourced from. Read/Write. [Api set: ExcelApi 1.8]</field>;
-				/// <field name="showAllFieldButtons" type="Boolean">Represents whether to display all field buttons on a PivotChart. [Api set: ExcelApi 1.7]</field>;
-				/// <field name="showDataLabelsOverMaximum" type="Boolean">Represents whether to show the data labels when the value is greater than the maximum value on the value axis.              If value axis became smaller than the size of data points, you can use this property to set whether to show the data labels.              This property applies to 2-D charts only. [Api set: ExcelApi 1.8]</field>;
-				/// <field name="style" type="Number">Returns or sets the chart style for the chart. Read/Write. [Api set: ExcelApi 1.8]</field>;
-				/// <field name="top" type="Number">Represents the distance, in points, from the top edge of the object to the top of row 1 (on a worksheet) or the top of the chart area (on a chart). [Api set: ExcelApi 1.1]</field>;
-				/// <field name="width" type="Number">Represents the width, in points, of the chart object. [Api set: ExcelApi 1.1]</field>;
+				/// <field name="name" type="String">Specifies the name of a chart object. [Api set: ExcelApi 1.1]</field>;
+				/// <field name="plotBy" type="String">Specifies the way columns or rows are used as data series on the chart. [Api set: ExcelApi 1.8]</field>;
+				/// <field name="plotVisibleOnly" type="Boolean">True if only visible cells are plotted. False if both visible and hidden cells are plotted. [Api set: ExcelApi 1.8]</field>;
+				/// <field name="seriesNameLevel" type="Number">Specifies a ChartSeriesNameLevel enumeration constant referring to              the level of where the series names are being sourced from. [Api set: ExcelApi 1.8]</field>;
+				/// <field name="showAllFieldButtons" type="Boolean">Specifies whether to display all field buttons on a PivotChart. [Api set: ExcelApi 1.7]</field>;
+				/// <field name="showDataLabelsOverMaximum" type="Boolean">Specifies whether to show the data labels when the value is greater than the maximum value on the value axis.              If value axis became smaller than the size of data points, you can use this property to set whether to show the data labels.              This property applies to 2-D charts only. [Api set: ExcelApi 1.8]</field>;
+				/// <field name="style" type="Number">Specifies the chart style for the chart. [Api set: ExcelApi 1.8]</field>;
+				/// <field name="top" type="Number">Specifies the distance, in points, from the top edge of the object to the top of row 1 (on a worksheet) or the top of the chart area (on a chart). [Api set: ExcelApi 1.1]</field>;
+				/// <field name="width" type="Number">Specifies the width, in points, of the chart object. [Api set: ExcelApi 1.1]</field>;
 			}
 			return ChartUpdateData;
 		})();
@@ -21225,10 +21620,10 @@ var Excel;
 		var ChartPivotOptionsUpdateData = (function() {
 			function ChartPivotOptionsUpdateData() {
 				/// <summary>An interface for updating data on the ChartPivotOptions object, for use in "chartPivotOptions.set({ ... })".</summary>
-				/// <field name="showAxisFieldButtons" type="Boolean">Specifies whether or not to display the axis field buttons on a PivotChart. The ShowAxisFieldButtons property corresponds to the &quot;Show Axis Field Buttons&quot; command on the &quot;Field Buttons&quot; drop-down list of the &quot;Analyze&quot; tab, which is available when a PivotChart is selected. [Api set: ExcelApi 1.9]</field>;
-				/// <field name="showLegendFieldButtons" type="Boolean">Specifies whether or not to display the legend field buttons on a PivotChart. [Api set: ExcelApi 1.9]</field>;
-				/// <field name="showReportFilterFieldButtons" type="Boolean">Specifies whether or not to display the report filter field buttons on a PivotChart. [Api set: ExcelApi 1.9]</field>;
-				/// <field name="showValueFieldButtons" type="Boolean">Specifies whether or not to display the show value field buttons on a PivotChart. [Api set: ExcelApi 1.9]</field>;
+				/// <field name="showAxisFieldButtons" type="Boolean">Specifies whether to display the axis field buttons on a PivotChart. The ShowAxisFieldButtons property corresponds to the &quot;Show Axis Field Buttons&quot; command on the &quot;Field Buttons&quot; drop-down list of the &quot;Analyze&quot; tab, which is available when a PivotChart is selected. [Api set: ExcelApi 1.9]</field>;
+				/// <field name="showLegendFieldButtons" type="Boolean">Specifies whether to display the legend field buttons on a PivotChart. [Api set: ExcelApi 1.9]</field>;
+				/// <field name="showReportFilterFieldButtons" type="Boolean">Specifies whether to display the report filter field buttons on a PivotChart. [Api set: ExcelApi 1.9]</field>;
+				/// <field name="showValueFieldButtons" type="Boolean">Specifies whether to display the show value field buttons on a PivotChart. [Api set: ExcelApi 1.9]</field>;
 			}
 			return ChartPivotOptionsUpdateData;
 		})();
@@ -21246,8 +21641,8 @@ var Excel;
 				/// <summary>An interface for updating data on the ChartAreaFormat object, for use in "chartAreaFormat.set({ ... })".</summary>
 				/// <field name="border" type="Excel.Interfaces.ChartBorderUpdateData">Represents the border format of chart area, which includes color, linestyle, and weight. [Api set: ExcelApi 1.7]</field>
 				/// <field name="font" type="Excel.Interfaces.ChartFontUpdateData">Represents the font attributes (font name, font size, color, etc.) for the current object. [Api set: ExcelApi 1.1]</field>
-				/// <field name="colorScheme" type="String">Returns or sets color scheme of the chart. Read/Write. [Api set: ExcelApi 1.9]</field>;
-				/// <field name="roundedCorners" type="Boolean">Specifies whether or not chart area of the chart has rounded corners. Read/Write. [Api set: ExcelApi 1.9]</field>;
+				/// <field name="colorScheme" type="String">Specifies the color scheme of the chart. [Api set: ExcelApi 1.9]</field>;
+				/// <field name="roundedCorners" type="Boolean">Specifies if the chart area of the chart has rounded corners. [Api set: ExcelApi 1.9]</field>;
 			}
 			return ChartAreaFormatUpdateData;
 		})();
@@ -21270,43 +21665,43 @@ var Excel;
 				/// <field name="mapOptions" type="Excel.Interfaces.ChartMapOptionsUpdateData">Encapsulates the options for a region map chart. [Api set: ExcelApi 1.9]</field>
 				/// <field name="xErrorBars" type="Excel.Interfaces.ChartErrorBarsUpdateData">Represents the error bar object of a chart series. [Api set: ExcelApi 1.9]</field>
 				/// <field name="yErrorBars" type="Excel.Interfaces.ChartErrorBarsUpdateData">Represents the error bar object of a chart series. [Api set: ExcelApi 1.9]</field>
-				/// <field name="axisGroup" type="String">Returns or sets the group for the specified series. Read/Write [Api set: ExcelApi 1.8]</field>;
-				/// <field name="bubbleScale" type="Number">This can be an integer value from 0 (zero) to 300, representing the percentage of the default size. This property only applies to bubble charts. Read/Write. [Api set: ExcelApi 1.9]</field>;
+				/// <field name="axisGroup" type="String">Specifies the group for the specified series. [Api set: ExcelApi 1.8]</field>;
+				/// <field name="bubbleScale" type="Number">This can be an integer value from 0 (zero) to 300, representing the percentage of the default size. This property only applies to bubble charts. [Api set: ExcelApi 1.9]</field>;
 				/// <field name="chartType" type="String">Represents the chart type of a series. See Excel.ChartType for details. [Api set: ExcelApi 1.7]</field>;
 				/// <field name="doughnutHoleSize" type="Number">Represents the doughnut hole size of a chart series.  Only valid on doughnut and doughnutExploded charts.              Throws an invalid argument exception on invalid charts. [Api set: ExcelApi 1.7]</field>;
-				/// <field name="explosion" type="Number">Returns or sets the explosion value for a pie-chart or doughnut-chart slice. Returns 0 (zero) if there&apos;s no explosion (the tip of the slice is in the center of the pie). Read/Write. [Api set: ExcelApi 1.8]</field>;
-				/// <field name="filtered" type="Boolean">Boolean value representing if the series is filtered or not. Not applicable for surface charts. [Api set: ExcelApi 1.7]</field>;
-				/// <field name="firstSliceAngle" type="Number">Returns or sets the angle of the first pie-chart or doughnut-chart slice, in degrees (clockwise from vertical). Applies only to pie, 3-D pie, and doughnut charts. Can be a value from 0 through 360. Read/Write [Api set: ExcelApi 1.8]</field>;
+				/// <field name="explosion" type="Number">Specifies the explosion value for a pie-chart or doughnut-chart slice. Returns 0 (zero) if there&apos;s no explosion (the tip of the slice is in the center of the pie). [Api set: ExcelApi 1.8]</field>;
+				/// <field name="filtered" type="Boolean">Specifies if the series is filtered. Not applicable for surface charts. [Api set: ExcelApi 1.7]</field>;
+				/// <field name="firstSliceAngle" type="Number">Specifies the angle of the first pie-chart or doughnut-chart slice, in degrees (clockwise from vertical). Applies only to pie, 3-D pie, and doughnut charts. Can be a value from 0 through 360. [Api set: ExcelApi 1.8]</field>;
 				/// <field name="gapWidth" type="Number">Represents the gap width of a chart series.  Only valid on bar and column charts, as well as              specific classes of line and pie charts.  Throws an invalid argument exception on invalid charts. [Api set: ExcelApi 1.7]</field>;
-				/// <field name="gradientMaximumColor" type="String">Returns or sets the color for maximum value of a region map chart series. Read/Write. [Api set: ExcelApi 1.9]</field>;
-				/// <field name="gradientMaximumType" type="String">Returns or sets the type for maximum value of a region map chart series. Read/Write. [Api set: ExcelApi 1.9]</field>;
-				/// <field name="gradientMaximumValue" type="Number">Returns or sets the maximum value of a region map chart series. Read/Write. [Api set: ExcelApi 1.9]</field>;
-				/// <field name="gradientMidpointColor" type="String">Returns or sets the color for midpoint value of a region map chart series. Read/Write. [Api set: ExcelApi 1.9]</field>;
-				/// <field name="gradientMidpointType" type="String">Returns or sets the type for midpoint value of a region map chart series. Read/Write. [Api set: ExcelApi 1.9]</field>;
-				/// <field name="gradientMidpointValue" type="Number">Returns or sets the midpoint value of a region map chart series. Read/Write. [Api set: ExcelApi 1.9]</field>;
-				/// <field name="gradientMinimumColor" type="String">Returns or sets the color for minimum value of a region map chart series. Read/Write. [Api set: ExcelApi 1.9]</field>;
-				/// <field name="gradientMinimumType" type="String">Returns or sets the type for minimum value of a region map chart series. Read/Write. [Api set: ExcelApi 1.9]</field>;
-				/// <field name="gradientMinimumValue" type="Number">Returns or sets the minimum value of a region map chart series. Read/Write. [Api set: ExcelApi 1.9]</field>;
-				/// <field name="gradientStyle" type="String">Returns or sets series gradient style of a region map chart. Read/Write. [Api set: ExcelApi 1.9]</field>;
-				/// <field name="hasDataLabels" type="Boolean">Boolean value representing if the series has data labels or not. [Api set: ExcelApi 1.7]</field>;
-				/// <field name="invertColor" type="String">Returns or sets the fill color for negative data points in a series. Read/Write. [Api set: ExcelApi 1.9]</field>;
-				/// <field name="invertIfNegative" type="Boolean">True if Microsoft Excel inverts the pattern in the item when it corresponds to a negative number. Read/Write. [Api set: ExcelApi 1.8]</field>;
-				/// <field name="markerBackgroundColor" type="String">Represents markers background color of a chart series. [Api set: ExcelApi 1.7]</field>;
-				/// <field name="markerForegroundColor" type="String">Represents markers foreground color of a chart series. [Api set: ExcelApi 1.7]</field>;
-				/// <field name="markerSize" type="Number">Represents marker size of a chart series. [Api set: ExcelApi 1.7]</field>;
-				/// <field name="markerStyle" type="String">Represents marker style of a chart series. See Excel.ChartMarkerStyle for details. [Api set: ExcelApi 1.7]</field>;
-				/// <field name="name" type="String">Represents the name of a series in a chart. [Api set: ExcelApi 1.1]</field>;
-				/// <field name="overlap" type="Number">Specifies how bars and columns are positioned. Can be a value between –100 and 100. Applies only to 2-D bar and 2-D column charts. Read/Write. [Api set: ExcelApi 1.8]</field>;
-				/// <field name="parentLabelStrategy" type="String">Returns or sets the series parent label strategy area for a treemap chart. Read/Write. [Api set: ExcelApi 1.9]</field>;
-				/// <field name="plotOrder" type="Number">Represents the plot order of a chart series within the chart group. [Api set: ExcelApi 1.7]</field>;
-				/// <field name="secondPlotSize" type="Number">Returns or sets the size of the secondary section of either a pie of pie chart or a bar of pie chart, as a percentage of the size of the primary pie. Can be a value from 5 to 200. Read/Write. [Api set: ExcelApi 1.8]</field>;
-				/// <field name="showConnectorLines" type="Boolean">Specifies whether or not connector lines are shown in waterfall charts. Read/Write. [Api set: ExcelApi 1.9]</field>;
-				/// <field name="showLeaderLines" type="Boolean">Specifies whether or not leader lines are displayed for each data label in the series. Read/Write. [Api set: ExcelApi 1.9]</field>;
-				/// <field name="showShadow" type="Boolean">Boolean value representing if the series has a shadow or not. [Api set: ExcelApi 1.7]</field>;
-				/// <field name="smooth" type="Boolean">Boolean value representing if the series is smooth or not. Only applicable to line and scatter charts. [Api set: ExcelApi 1.7]</field>;
-				/// <field name="splitType" type="String">Returns or sets the way the two sections of either a pie of pie chart or a bar of pie chart are split. Read/Write. [Api set: ExcelApi 1.8]</field>;
-				/// <field name="splitValue" type="Number">Returns or sets the threshold value that separates two sections of either a pie-of-pie chart or a bar-of-pie chart. Read/Write. [Api set: ExcelApi 1.9]</field>;
-				/// <field name="varyByCategories" type="Boolean">True if Microsoft Excel assigns a different color or pattern to each data marker. The chart must contain only one series. Read/Write. [Api set: ExcelApi 1.8]</field>;
+				/// <field name="gradientMaximumColor" type="String">Specifies the color for maximum value of a region map chart series. [Api set: ExcelApi 1.9]</field>;
+				/// <field name="gradientMaximumType" type="String">Specifies the type for maximum value of a region map chart series. [Api set: ExcelApi 1.9]</field>;
+				/// <field name="gradientMaximumValue" type="Number">Specifies the maximum value of a region map chart series. [Api set: ExcelApi 1.9]</field>;
+				/// <field name="gradientMidpointColor" type="String">Specifies the color for midpoint value of a region map chart series. [Api set: ExcelApi 1.9]</field>;
+				/// <field name="gradientMidpointType" type="String">Specifies the type for midpoint value of a region map chart series. [Api set: ExcelApi 1.9]</field>;
+				/// <field name="gradientMidpointValue" type="Number">Specifies the midpoint value of a region map chart series. [Api set: ExcelApi 1.9]</field>;
+				/// <field name="gradientMinimumColor" type="String">Specifies the color for minimum value of a region map chart series. [Api set: ExcelApi 1.9]</field>;
+				/// <field name="gradientMinimumType" type="String">Specifies the type for minimum value of a region map chart series. [Api set: ExcelApi 1.9]</field>;
+				/// <field name="gradientMinimumValue" type="Number">Specifies the minimum value of a region map chart series. [Api set: ExcelApi 1.9]</field>;
+				/// <field name="gradientStyle" type="String">Specifies the series gradient style of a region map chart. [Api set: ExcelApi 1.9]</field>;
+				/// <field name="hasDataLabels" type="Boolean">Specifies if the series has data labels. [Api set: ExcelApi 1.7]</field>;
+				/// <field name="invertColor" type="String">Specifies the fill color for negative data points in a series. [Api set: ExcelApi 1.9]</field>;
+				/// <field name="invertIfNegative" type="Boolean">True if Excel inverts the pattern in the item when it corresponds to a negative number. [Api set: ExcelApi 1.8]</field>;
+				/// <field name="markerBackgroundColor" type="String">Specifies the markers background color of a chart series. [Api set: ExcelApi 1.7]</field>;
+				/// <field name="markerForegroundColor" type="String">Specifies the markers foreground color of a chart series. [Api set: ExcelApi 1.7]</field>;
+				/// <field name="markerSize" type="Number">Specifies the marker size of a chart series. [Api set: ExcelApi 1.7]</field>;
+				/// <field name="markerStyle" type="String">Specifies the marker style of a chart series. See Excel.ChartMarkerStyle for details. [Api set: ExcelApi 1.7]</field>;
+				/// <field name="name" type="String">Specifies the name of a series in a chart. [Api set: ExcelApi 1.1]</field>;
+				/// <field name="overlap" type="Number">Specifies how bars and columns are positioned. Can be a value between –100 and 100. Applies only to 2-D bar and 2-D column charts. [Api set: ExcelApi 1.8]</field>;
+				/// <field name="parentLabelStrategy" type="String">Specifies the series parent label strategy area for a treemap chart. [Api set: ExcelApi 1.9]</field>;
+				/// <field name="plotOrder" type="Number">Specifies the plot order of a chart series within the chart group. [Api set: ExcelApi 1.7]</field>;
+				/// <field name="secondPlotSize" type="Number">Specifies the size of the secondary section of either a pie-of-pie chart or a bar-of-pie chart, as a percentage of the size of the primary pie. Can be a value from 5 to 200. [Api set: ExcelApi 1.8]</field>;
+				/// <field name="showConnectorLines" type="Boolean">Specifies whether connector lines are shown in waterfall charts. [Api set: ExcelApi 1.9]</field>;
+				/// <field name="showLeaderLines" type="Boolean">Specifies whether leader lines are displayed for each data label in the series. [Api set: ExcelApi 1.9]</field>;
+				/// <field name="showShadow" type="Boolean">Specifies if the series has a shadow. [Api set: ExcelApi 1.7]</field>;
+				/// <field name="smooth" type="Boolean">Specifies if the series is smooth. Only applicable to line and scatter charts. [Api set: ExcelApi 1.7]</field>;
+				/// <field name="splitType" type="String">Specifies the way the two sections of either a pie-of-pie chart or a bar-of-pie chart are split. [Api set: ExcelApi 1.8]</field>;
+				/// <field name="splitValue" type="Number">Specifies the threshold value that separates two sections of either a pie-of-pie chart or a bar-of-pie chart. [Api set: ExcelApi 1.9]</field>;
+				/// <field name="varyByCategories" type="Boolean">True if Excel assigns a different color or pattern to each data marker. The chart must contain only one series. [Api set: ExcelApi 1.8]</field>;
 			}
 			return ChartSeriesUpdateData;
 		})();
@@ -21341,8 +21736,8 @@ var Excel;
 				/// <field name="dataLabel" type="Excel.Interfaces.ChartDataLabelUpdateData">Returns the data label of a chart point. [Api set: ExcelApi 1.7]</field>
 				/// <field name="format" type="Excel.Interfaces.ChartPointFormatUpdateData">Encapsulates the format properties chart point. [Api set: ExcelApi 1.1]</field>
 				/// <field name="hasDataLabel" type="Boolean">Represents whether a data point has a data label. Not applicable for surface charts. [Api set: ExcelApi 1.7]</field>;
-				/// <field name="markerBackgroundColor" type="String">HTML color code representation of the marker background color of data point. E.g. #FF0000 represents Red. [Api set: ExcelApi 1.7]</field>;
-				/// <field name="markerForegroundColor" type="String">HTML color code representation of the marker foreground color of data point. E.g. #FF0000 represents Red. [Api set: ExcelApi 1.7]</field>;
+				/// <field name="markerBackgroundColor" type="String">HTML color code representation of the marker background color of data point (e.g., #FF0000 represents Red). [Api set: ExcelApi 1.7]</field>;
+				/// <field name="markerForegroundColor" type="String">HTML color code representation of the marker foreground color of data point (e.g., #FF0000 represents Red). [Api set: ExcelApi 1.7]</field>;
 				/// <field name="markerSize" type="Number">Represents marker size of data point. [Api set: ExcelApi 1.7]</field>;
 				/// <field name="markerStyle" type="String">Represents marker style of a chart data point. See Excel.ChartMarkerStyle for details. [Api set: ExcelApi 1.7]</field>;
 			}
@@ -21398,34 +21793,34 @@ var Excel;
 				/// <field name="majorGridlines" type="Excel.Interfaces.ChartGridlinesUpdateData">Returns a Gridlines object that represents the major gridlines for the specified axis. [Api set: ExcelApi 1.1]</field>
 				/// <field name="minorGridlines" type="Excel.Interfaces.ChartGridlinesUpdateData">Returns a Gridlines object that represents the minor gridlines for the specified axis. [Api set: ExcelApi 1.1]</field>
 				/// <field name="title" type="Excel.Interfaces.ChartAxisTitleUpdateData">Represents the axis title. [Api set: ExcelApi 1.1]</field>
-				/// <field name="alignment" type="String">Represents the alignment for the specified axis tick label. See Excel.ChartTextHorizontalAlignment for detail. [Api set: ExcelApi 1.8]</field>;
-				/// <field name="baseTimeUnit" type="String">Returns or sets the base unit for the specified category axis. [Api set: ExcelApi 1.7]</field>;
-				/// <field name="categoryType" type="String">Returns or sets the category axis type. [Api set: ExcelApi 1.7]</field>;
-				/// <field name="crosses" type="String">Represents the specified axis where the other axis crosses. See Excel.ChartAxisPosition for details. [Api set: ExcelApi 1.7]</field>;
+				/// <field name="alignment" type="String">Specifies the alignment for the specified axis tick label. See Excel.ChartTextHorizontalAlignment for detail. [Api set: ExcelApi 1.8]</field>;
+				/// <field name="baseTimeUnit" type="String">Specifies the base unit for the specified category axis. [Api set: ExcelApi 1.7]</field>;
+				/// <field name="categoryType" type="String">Specifies the category axis type. [Api set: ExcelApi 1.7]</field>;
+				/// <field name="crosses" type="String">Specifies the specified axis where the other axis crosses. See Excel.ChartAxisPosition for details. [Api set: ExcelApi 1.7]</field>;
 				/// <field name="displayUnit" type="String">Represents the axis display unit. See Excel.ChartAxisDisplayUnit for details. [Api set: ExcelApi 1.7]</field>;
-				/// <field name="isBetweenCategories" type="Boolean">Represents whether value axis crosses the category axis between categories. [Api set: ExcelApi 1.8]</field>;
-				/// <field name="linkNumberFormat" type="Boolean">Represents whether or not the number format is linked to the cells. If true, the number format will change in the labels when it changes in the cells. [Api set: ExcelApi 1.9]</field>;
-				/// <field name="logBase" type="Number">Represents the base of the logarithm when using logarithmic scales. [Api set: ExcelApi 1.7]</field>;
-				/// <field name="majorTickMark" type="String">Represents the type of major tick mark for the specified axis. See Excel.ChartAxisTickMark for details. [Api set: ExcelApi 1.7]</field>;
-				/// <field name="majorTimeUnitScale" type="String">Returns or sets the major unit scale value for the category axis when the CategoryType property is set to TimeScale. [Api set: ExcelApi 1.7]</field>;
+				/// <field name="isBetweenCategories" type="Boolean">Specifies if the value axis crosses the category axis between categories. [Api set: ExcelApi 1.8]</field>;
+				/// <field name="linkNumberFormat" type="Boolean">Specifies if the number format is linked to the cells. If true, the number format will change in the labels when it changes in the cells. [Api set: ExcelApi 1.9]</field>;
+				/// <field name="logBase" type="Number">Specifies the base of the logarithm when using logarithmic scales. [Api set: ExcelApi 1.7]</field>;
+				/// <field name="majorTickMark" type="String">Specifies the type of major tick mark for the specified axis. See Excel.ChartAxisTickMark for details. [Api set: ExcelApi 1.7]</field>;
+				/// <field name="majorTimeUnitScale" type="String">Specifies the major unit scale value for the category axis when the CategoryType property is set to TimeScale. [Api set: ExcelApi 1.7]</field>;
 				/// <field name="majorUnit" >Represents the interval between two major tick marks. Can be set to a numeric value or an empty string.  The returned value is always a number. [Api set: ExcelApi 1.1]</field>;
 				/// <field name="maximum" >Represents the maximum value on the value axis.  Can be set to a numeric value or an empty string (for automatic axis values).  The returned value is always a number. [Api set: ExcelApi 1.1]</field>;
 				/// <field name="minimum" >Represents the minimum value on the value axis. Can be set to a numeric value or an empty string (for automatic axis values).  The returned value is always a number. [Api set: ExcelApi 1.1]</field>;
-				/// <field name="minorTickMark" type="String">Represents the type of minor tick mark for the specified axis. See Excel.ChartAxisTickMark for details. [Api set: ExcelApi 1.7]</field>;
-				/// <field name="minorTimeUnitScale" type="String">Returns or sets the minor unit scale value for the category axis when the CategoryType property is set to TimeScale. [Api set: ExcelApi 1.7]</field>;
+				/// <field name="minorTickMark" type="String">Specifies the type of minor tick mark for the specified axis. See Excel.ChartAxisTickMark for details. [Api set: ExcelApi 1.7]</field>;
+				/// <field name="minorTimeUnitScale" type="String">Specifies the minor unit scale value for the category axis when the CategoryType property is set to TimeScale. [Api set: ExcelApi 1.7]</field>;
 				/// <field name="minorUnit" >Represents the interval between two minor tick marks. Can be set to a numeric value or an empty string (for automatic axis values). The returned value is always a number. [Api set: ExcelApi 1.1]</field>;
-				/// <field name="multiLevel" type="Boolean">Represents whether an axis is multilevel or not. [Api set: ExcelApi 1.8]</field>;
-				/// <field name="numberFormat" type="String">Represents the format code for the axis tick label. [Api set: ExcelApi 1.8]</field>;
-				/// <field name="offset" type="Number">Represents the distance between the levels of labels, and the distance between the first level and the axis line. The value should be an integer from 0 to 1000. [Api set: ExcelApi 1.8]</field>;
-				/// <field name="position" type="String">Represents the specified axis position where the other axis crosses. See Excel.ChartAxisPosition for details. [Api set: ExcelApi 1.8]</field>;
-				/// <field name="reversePlotOrder" type="Boolean">Represents whether Microsoft Excel plots data points from last to first. [Api set: ExcelApi 1.7]</field>;
-				/// <field name="scaleType" type="String">Represents the value axis scale type. See Excel.ChartAxisScaleType for details. [Api set: ExcelApi 1.7]</field>;
-				/// <field name="showDisplayUnitLabel" type="Boolean">Represents whether the axis display unit label is visible. [Api set: ExcelApi 1.7]</field>;
-				/// <field name="textOrientation" >Represents the angle to which the text is oriented for the chart axis tick label. The value should either be an integer from -90 to 90 or the integer 180 for vertically-oriented text. [Api set: ExcelApi 1.8]</field>;
-				/// <field name="tickLabelPosition" type="String">Represents the position of tick-mark labels on the specified axis. See Excel.ChartAxisTickLabelPosition for details. [Api set: ExcelApi 1.7]</field>;
-				/// <field name="tickLabelSpacing" >Represents the number of categories or series between tick-mark labels. Can be a value from 1 through 31999 or an empty string for automatic setting. The returned value is always a number. [Api set: ExcelApi 1.7]</field>;
-				/// <field name="tickMarkSpacing" type="Number">Represents the number of categories or series between tick marks. [Api set: ExcelApi 1.7]</field>;
-				/// <field name="visible" type="Boolean">A boolean value represents the visibility of the axis. [Api set: ExcelApi 1.7]</field>;
+				/// <field name="multiLevel" type="Boolean">Specifies if an axis is multilevel. [Api set: ExcelApi 1.8]</field>;
+				/// <field name="numberFormat" type="String">Specifies the format code for the axis tick label. [Api set: ExcelApi 1.8]</field>;
+				/// <field name="offset" type="Number">Specifies the distance between the levels of labels, and the distance between the first level and the axis line. The value should be an integer from 0 to 1000. [Api set: ExcelApi 1.8]</field>;
+				/// <field name="position" type="String">Specifies the specified axis position where the other axis crosses. See Excel.ChartAxisPosition for details. [Api set: ExcelApi 1.8]</field>;
+				/// <field name="reversePlotOrder" type="Boolean">Specifies if Excel plots data points from last to first. [Api set: ExcelApi 1.7]</field>;
+				/// <field name="scaleType" type="String">Specifies the value axis scale type. See Excel.ChartAxisScaleType for details. [Api set: ExcelApi 1.7]</field>;
+				/// <field name="showDisplayUnitLabel" type="Boolean">Specifies if the axis display unit label is visible. [Api set: ExcelApi 1.7]</field>;
+				/// <field name="textOrientation" >Specifies the angle to which the text is oriented for the chart axis tick label. The value should either be an integer from -90 to 90 or the integer 180 for vertically-oriented text. [Api set: ExcelApi 1.8]</field>;
+				/// <field name="tickLabelPosition" type="String">Specifies the position of tick-mark labels on the specified axis. See Excel.ChartAxisTickLabelPosition for details. [Api set: ExcelApi 1.7]</field>;
+				/// <field name="tickLabelSpacing" >Specifies the number of categories or series between tick-mark labels. Can be a value from 1 through 31999 or an empty string for automatic setting. The returned value is always a number. [Api set: ExcelApi 1.7]</field>;
+				/// <field name="tickMarkSpacing" type="Number">Specifies the number of categories or series between tick marks. [Api set: ExcelApi 1.7]</field>;
+				/// <field name="visible" type="Boolean">Specifies if the axis is visible. [Api set: ExcelApi 1.7]</field>;
 			}
 			return ChartAxisUpdateData;
 		})();
@@ -21441,8 +21836,8 @@ var Excel;
 		var ChartAxisFormatUpdateData = (function() {
 			function ChartAxisFormatUpdateData() {
 				/// <summary>An interface for updating data on the ChartAxisFormat object, for use in "chartAxisFormat.set({ ... })".</summary>
-				/// <field name="font" type="Excel.Interfaces.ChartFontUpdateData">Represents the font attributes (font name, font size, color, etc.) for a chart axis element. [Api set: ExcelApi 1.1]</field>
-				/// <field name="line" type="Excel.Interfaces.ChartLineFormatUpdateData">Represents chart line formatting. [Api set: ExcelApi 1.1]</field>
+				/// <field name="font" type="Excel.Interfaces.ChartFontUpdateData">Specifies the font attributes (font name, font size, color, etc.) for a chart axis element. [Api set: ExcelApi 1.1]</field>
+				/// <field name="line" type="Excel.Interfaces.ChartLineFormatUpdateData">Specifies chart line formatting. [Api set: ExcelApi 1.1]</field>
 			}
 			return ChartAxisFormatUpdateData;
 		})();
@@ -21458,10 +21853,10 @@ var Excel;
 		var ChartAxisTitleUpdateData = (function() {
 			function ChartAxisTitleUpdateData() {
 				/// <summary>An interface for updating data on the ChartAxisTitle object, for use in "chartAxisTitle.set({ ... })".</summary>
-				/// <field name="format" type="Excel.Interfaces.ChartAxisTitleFormatUpdateData">Represents the formatting of chart axis title. [Api set: ExcelApi 1.1]</field>
-				/// <field name="text" type="String">Represents the axis title. [Api set: ExcelApi 1.1]</field>;
-				/// <field name="textOrientation" type="Number">Represents the angle to which the text is oriented for the chart axis title. The value should either be an integer from -90 to 90 or the integer 180 for vertically-oriented text. [Api set: ExcelApi 1.12]</field>;
-				/// <field name="visible" type="Boolean">A boolean that specifies the visibility of an axis title. [Api set: ExcelApi 1.1]</field>;
+				/// <field name="format" type="Excel.Interfaces.ChartAxisTitleFormatUpdateData">Specifies the formatting of chart axis title. [Api set: ExcelApi 1.1]</field>
+				/// <field name="text" type="String">Specifies the axis title. [Api set: ExcelApi 1.1]</field>;
+				/// <field name="textOrientation" type="Number">Specifies the angle to which the text is oriented for the chart axis title. The value should either be an integer from -90 to 90 or the integer 180 for vertically-oriented text. [Api set: ExcelApiOnline 1.1]</field>;
+				/// <field name="visible" type="Boolean">Specifies if the axis title is visibile. [Api set: ExcelApi 1.1]</field>;
 			}
 			return ChartAxisTitleUpdateData;
 		})();
@@ -21477,8 +21872,8 @@ var Excel;
 		var ChartAxisTitleFormatUpdateData = (function() {
 			function ChartAxisTitleFormatUpdateData() {
 				/// <summary>An interface for updating data on the ChartAxisTitleFormat object, for use in "chartAxisTitleFormat.set({ ... })".</summary>
-				/// <field name="border" type="Excel.Interfaces.ChartBorderUpdateData">Represents the border format, which includes color, linestyle, and weight. [Api set: ExcelApi 1.8]</field>
-				/// <field name="font" type="Excel.Interfaces.ChartFontUpdateData">Represents the font attributes, such as font name, font size, color, etc. of chart axis title object. [Api set: ExcelApi 1.1]</field>
+				/// <field name="border" type="Excel.Interfaces.ChartBorderUpdateData">Specifies the chart axis title&apos;s border format, which includes color, linestyle, and weight. [Api set: ExcelApi 1.8]</field>
+				/// <field name="font" type="Excel.Interfaces.ChartFontUpdateData">Specifies the chart axis title&apos;s font attributes, such as font name, font size, color, etc. of chart axis title object. [Api set: ExcelApi 1.1]</field>
 			}
 			return ChartAxisTitleFormatUpdateData;
 		})();
@@ -21494,19 +21889,19 @@ var Excel;
 		var ChartDataLabelsUpdateData = (function() {
 			function ChartDataLabelsUpdateData() {
 				/// <summary>An interface for updating data on the ChartDataLabels object, for use in "chartDataLabels.set({ ... })".</summary>
-				/// <field name="format" type="Excel.Interfaces.ChartDataLabelFormatUpdateData">Represents the format of chart data labels, which includes fill and font formatting. [Api set: ExcelApi 1.1]</field>
-				/// <field name="autoText" type="Boolean">Represents whether data labels automatically generate appropriate text based on context. [Api set: ExcelApi 1.8]</field>;
-				/// <field name="horizontalAlignment" type="String">Represents the horizontal alignment for chart data label. See Excel.ChartTextHorizontalAlignment for details.              This property is valid only when TextOrientation of data label is 0. [Api set: ExcelApi 1.8]</field>;
-				/// <field name="linkNumberFormat" type="Boolean">Represents whether or not the number format is linked to the cells. If true, the number format will change in the labels when it changes in the cells [Api set: ExcelApi 1.9]</field>;
-				/// <field name="numberFormat" type="String">Represents the format code for data labels. [Api set: ExcelApi 1.8]</field>;
+				/// <field name="format" type="Excel.Interfaces.ChartDataLabelFormatUpdateData">Specifies the format of chart data labels, which includes fill and font formatting. [Api set: ExcelApi 1.1]</field>
+				/// <field name="autoText" type="Boolean">Specifies if data labels automatically generate appropriate text based on context. [Api set: ExcelApi 1.8]</field>;
+				/// <field name="horizontalAlignment" type="String">Specifies the horizontal alignment for chart data label. See Excel.ChartTextHorizontalAlignment for details.              This property is valid only when TextOrientation of data label is 0. [Api set: ExcelApi 1.8]</field>;
+				/// <field name="linkNumberFormat" type="Boolean">Specifies if the number format is linked to the cells. If true, the number format will change in the labels when it changes in the cells. [Api set: ExcelApi 1.9]</field>;
+				/// <field name="numberFormat" type="String">Specifies the format code for data labels. [Api set: ExcelApi 1.8]</field>;
 				/// <field name="position" type="String">DataLabelPosition value that represents the position of the data label. See Excel.ChartDataLabelPosition for details. [Api set: ExcelApi 1.1]</field>;
 				/// <field name="separator" type="String">String representing the separator used for the data labels on a chart. [Api set: ExcelApi 1.1]</field>;
-				/// <field name="showBubbleSize" type="Boolean">Boolean value representing if the data label bubble size is visible or not. [Api set: ExcelApi 1.1]</field>;
-				/// <field name="showCategoryName" type="Boolean">Boolean value representing if the data label category name is visible or not. [Api set: ExcelApi 1.1]</field>;
-				/// <field name="showLegendKey" type="Boolean">Boolean value representing if the data label legend key is visible or not. [Api set: ExcelApi 1.1]</field>;
-				/// <field name="showPercentage" type="Boolean">Boolean value representing if the data label percentage is visible or not. [Api set: ExcelApi 1.1]</field>;
-				/// <field name="showSeriesName" type="Boolean">Boolean value representing if the data label series name is visible or not. [Api set: ExcelApi 1.1]</field>;
-				/// <field name="showValue" type="Boolean">Boolean value representing if the data label value is visible or not. [Api set: ExcelApi 1.1]</field>;
+				/// <field name="showBubbleSize" type="Boolean">Specifies if the data label bubble size is visible. [Api set: ExcelApi 1.1]</field>;
+				/// <field name="showCategoryName" type="Boolean">Specifies if the data label category name is visible. [Api set: ExcelApi 1.1]</field>;
+				/// <field name="showLegendKey" type="Boolean">Specifies if the data label legend key is visible. [Api set: ExcelApi 1.1]</field>;
+				/// <field name="showPercentage" type="Boolean">Specifies if the data label percentage is visible. [Api set: ExcelApi 1.1]</field>;
+				/// <field name="showSeriesName" type="Boolean">Specifies if the data label series name is visible. [Api set: ExcelApi 1.1]</field>;
+				/// <field name="showValue" type="Boolean">Specifies if the data label value is visible. [Api set: ExcelApi 1.1]</field>;
 				/// <field name="textOrientation" type="Number">Represents the angle to which the text is oriented for data labels. The value should either be an integer from -90 to 90 or the integer 180 for vertically-oriented text. [Api set: ExcelApi 1.8]</field>;
 				/// <field name="verticalAlignment" type="String">Represents the vertical alignment of chart data label. See Excel.ChartTextVerticalAlignment for details.              This property is valid only when TextOrientation of data label is -90, 90, or 180. [Api set: ExcelApi 1.8]</field>;
 			}
@@ -21525,20 +21920,20 @@ var Excel;
 			function ChartDataLabelUpdateData() {
 				/// <summary>An interface for updating data on the ChartDataLabel object, for use in "chartDataLabel.set({ ... })".</summary>
 				/// <field name="format" type="Excel.Interfaces.ChartDataLabelFormatUpdateData">Represents the format of chart data label. [Api set: ExcelApi 1.8]</field>
-				/// <field name="autoText" type="Boolean">Boolean value representing if data label automatically generates appropriate text based on context. [Api set: ExcelApi 1.8]</field>;
+				/// <field name="autoText" type="Boolean">Specifies if the data label automatically generates appropriate text based on context. [Api set: ExcelApi 1.8]</field>;
 				/// <field name="formula" type="String">String value that represents the formula of chart data label using A1-style notation. [Api set: ExcelApi 1.8]</field>;
 				/// <field name="horizontalAlignment" type="String">Represents the horizontal alignment for chart data label. See Excel.ChartTextHorizontalAlignment for details.              This property is valid only when TextOrientation of data label is -90, 90, or 180. [Api set: ExcelApi 1.8]</field>;
 				/// <field name="left" type="Number">Represents the distance, in points, from the left edge of chart data label to the left edge of chart area. Null if chart data label is not visible. [Api set: ExcelApi 1.8]</field>;
-				/// <field name="linkNumberFormat" type="Boolean">Boolean value representing if the number format is linked to the cells (so that the number format changes in the labels when it changes in the cells). [Api set: ExcelApi 1.9]</field>;
+				/// <field name="linkNumberFormat" type="Boolean">Specifies if the number format is linked to the cells (so that the number format changes in the labels when it changes in the cells). [Api set: ExcelApi 1.9]</field>;
 				/// <field name="numberFormat" type="String">String value that represents the format code for data label. [Api set: ExcelApi 1.8]</field>;
 				/// <field name="position" type="String">DataLabelPosition value that represents the position of the data label. See Excel.ChartDataLabelPosition for details. [Api set: ExcelApi 1.7]</field>;
 				/// <field name="separator" type="String">String representing the separator used for the data label on a chart. [Api set: ExcelApi 1.7]</field>;
-				/// <field name="showBubbleSize" type="Boolean">Boolean value representing if the data label bubble size is visible or not. [Api set: ExcelApi 1.7]</field>;
-				/// <field name="showCategoryName" type="Boolean">Boolean value representing if the data label category name is visible or not. [Api set: ExcelApi 1.7]</field>;
-				/// <field name="showLegendKey" type="Boolean">Boolean value representing if the data label legend key is visible or not. [Api set: ExcelApi 1.7]</field>;
-				/// <field name="showPercentage" type="Boolean">Boolean value representing if the data label percentage is visible or not. [Api set: ExcelApi 1.7]</field>;
-				/// <field name="showSeriesName" type="Boolean">Boolean value representing if the data label series name is visible or not. [Api set: ExcelApi 1.7]</field>;
-				/// <field name="showValue" type="Boolean">Boolean value representing if the data label value is visible or not. [Api set: ExcelApi 1.7]</field>;
+				/// <field name="showBubbleSize" type="Boolean">Specifies if the data label bubble size is visible. [Api set: ExcelApi 1.7]</field>;
+				/// <field name="showCategoryName" type="Boolean">Specifies if the data label category name is visible. [Api set: ExcelApi 1.7]</field>;
+				/// <field name="showLegendKey" type="Boolean">Specifies if the data label legend key is visible. [Api set: ExcelApi 1.7]</field>;
+				/// <field name="showPercentage" type="Boolean">Specifies if the data label percentage is visible. [Api set: ExcelApi 1.7]</field>;
+				/// <field name="showSeriesName" type="Boolean">Specifies if the data label series name is visible. [Api set: ExcelApi 1.7]</field>;
+				/// <field name="showValue" type="Boolean">Specifies if the data label value is visible. [Api set: ExcelApi 1.7]</field>;
 				/// <field name="text" type="String">String representing the text of the data label on a chart. [Api set: ExcelApi 1.8]</field>;
 				/// <field name="textOrientation" type="Number">Represents the angle to which the text is oriented for the chart data label. The value should either be an integer from -90 to 90 or the integer 180 for vertically-oriented text. [Api set: ExcelApi 1.8]</field>;
 				/// <field name="top" type="Number">Represents the distance, in points, from the top edge of chart data label to the top of chart area. Null if chart data label is not visible. [Api set: ExcelApi 1.8]</field>;
@@ -21576,10 +21971,10 @@ var Excel;
 			function ChartErrorBarsUpdateData() {
 				/// <summary>An interface for updating data on the ChartErrorBars object, for use in "chartErrorBars.set({ ... })".</summary>
 				/// <field name="format" type="Excel.Interfaces.ChartErrorBarsFormatUpdateData">Specifies the formatting type of the error bars. [Api set: ExcelApi 1.9]</field>
-				/// <field name="endStyleCap" type="Boolean">Specifies whether or not the error bars have an end style cap. [Api set: ExcelApi 1.9]</field>;
+				/// <field name="endStyleCap" type="Boolean">Specifies if error bars have an end style cap. [Api set: ExcelApi 1.9]</field>;
 				/// <field name="include" type="String">Specifies which parts of the error bars to include. [Api set: ExcelApi 1.9]</field>;
 				/// <field name="type" type="String">The type of range marked by the error bars. [Api set: ExcelApi 1.9]</field>;
-				/// <field name="visible" type="Boolean">Specifies whether or not the error bars are displayed. [Api set: ExcelApi 1.9]</field>;
+				/// <field name="visible" type="Boolean">Specifies whether the error bars are displayed. [Api set: ExcelApi 1.9]</field>;
 			}
 			return ChartErrorBarsUpdateData;
 		})();
@@ -21612,7 +22007,7 @@ var Excel;
 			function ChartGridlinesUpdateData() {
 				/// <summary>An interface for updating data on the ChartGridlines object, for use in "chartGridlines.set({ ... })".</summary>
 				/// <field name="format" type="Excel.Interfaces.ChartGridlinesFormatUpdateData">Represents the formatting of chart gridlines. [Api set: ExcelApi 1.1]</field>
-				/// <field name="visible" type="Boolean">Boolean value representing if the axis gridlines are visible or not. [Api set: ExcelApi 1.1]</field>;
+				/// <field name="visible" type="Boolean">Specifies if the axis gridlines are visible. [Api set: ExcelApi 1.1]</field>;
 			}
 			return ChartGridlinesUpdateData;
 		})();
@@ -21645,14 +22040,14 @@ var Excel;
 			function ChartLegendUpdateData() {
 				/// <summary>An interface for updating data on the ChartLegend object, for use in "chartLegend.set({ ... })".</summary>
 				/// <field name="format" type="Excel.Interfaces.ChartLegendFormatUpdateData">Represents the formatting of a chart legend, which includes fill and font formatting. [Api set: ExcelApi 1.1]</field>
-				/// <field name="height" type="Number">Represents the height, in points, of the legend on the chart. Null if legend is not visible. [Api set: ExcelApi 1.7]</field>;
-				/// <field name="left" type="Number">Represents the left, in points, of a chart legend. Null if legend is not visible. [Api set: ExcelApi 1.7]</field>;
-				/// <field name="overlay" type="Boolean">Boolean value for whether the chart legend should overlap with the main body of the chart. [Api set: ExcelApi 1.1]</field>;
-				/// <field name="position" type="String">Represents the position of the legend on the chart. See Excel.ChartLegendPosition for details. [Api set: ExcelApi 1.1]</field>;
-				/// <field name="showShadow" type="Boolean">Represents if the legend has a shadow on the chart. [Api set: ExcelApi 1.7]</field>;
-				/// <field name="top" type="Number">Represents the top of a chart legend. [Api set: ExcelApi 1.7]</field>;
-				/// <field name="visible" type="Boolean">A boolean value the represents the visibility of a ChartLegend object. [Api set: ExcelApi 1.1]</field>;
-				/// <field name="width" type="Number">Represents the width, in points, of the legend on the chart. Null if legend is not visible. [Api set: ExcelApi 1.7]</field>;
+				/// <field name="height" type="Number">Specifies the height, in points, of the legend on the chart. Null if legend is not visible. [Api set: ExcelApi 1.7]</field>;
+				/// <field name="left" type="Number">Specifies the left, in points, of the legend on the chart. Null if legend is not visible. [Api set: ExcelApi 1.7]</field>;
+				/// <field name="overlay" type="Boolean">Specifies if the chart legend should overlap with the main body of the chart. [Api set: ExcelApi 1.1]</field>;
+				/// <field name="position" type="String">Specifies the position of the legend on the chart. See Excel.ChartLegendPosition for details. [Api set: ExcelApi 1.1]</field>;
+				/// <field name="showShadow" type="Boolean">Specifies if the legend has a shadow on the chart. [Api set: ExcelApi 1.7]</field>;
+				/// <field name="top" type="Number">Specifies the top of a chart legend. [Api set: ExcelApi 1.7]</field>;
+				/// <field name="visible" type="Boolean">Specifies if the ChartLegend is visible. [Api set: ExcelApi 1.1]</field>;
+				/// <field name="width" type="Number">Specifies the width, in points, of the legend on the chart. Null if legend is not visible. [Api set: ExcelApi 1.7]</field>;
 			}
 			return ChartLegendUpdateData;
 		})();
@@ -21701,9 +22096,9 @@ var Excel;
 		var ChartMapOptionsUpdateData = (function() {
 			function ChartMapOptionsUpdateData() {
 				/// <summary>An interface for updating data on the ChartMapOptions object, for use in "chartMapOptions.set({ ... })".</summary>
-				/// <field name="labelStrategy" type="String">Returns or sets the series map labels strategy of a region map chart. Read/Write. [Api set: ExcelApi 1.9]</field>;
-				/// <field name="level" type="String">Returns or sets the series mapping level of a region map chart. Read/Write. [Api set: ExcelApi 1.9]</field>;
-				/// <field name="projectionType" type="String">Returns or sets the series projection type of a region map chart. Read/Write. [Api set: ExcelApi 1.9]</field>;
+				/// <field name="labelStrategy" type="String">Specifies the series map labels strategy of a region map chart. [Api set: ExcelApi 1.9]</field>;
+				/// <field name="level" type="String">Specifies the series mapping level of a region map chart. [Api set: ExcelApi 1.9]</field>;
+				/// <field name="projectionType" type="String">Specifies the series projection type of a region map chart. [Api set: ExcelApi 1.9]</field>;
 			}
 			return ChartMapOptionsUpdateData;
 		})();
@@ -21720,16 +22115,16 @@ var Excel;
 			function ChartTitleUpdateData() {
 				/// <summary>An interface for updating data on the ChartTitle object, for use in "chartTitle.set({ ... })".</summary>
 				/// <field name="format" type="Excel.Interfaces.ChartTitleFormatUpdateData">Represents the formatting of a chart title, which includes fill and font formatting. [Api set: ExcelApi 1.1]</field>
-				/// <field name="horizontalAlignment" type="String">Represents the horizontal alignment for chart title. [Api set: ExcelApi 1.7]</field>;
-				/// <field name="left" type="Number">Represents the distance, in points, from the left edge of chart title to the left edge of chart area. Null if chart title is not visible. [Api set: ExcelApi 1.7]</field>;
-				/// <field name="overlay" type="Boolean">Boolean value representing if the chart title will overlay the chart or not. [Api set: ExcelApi 1.1]</field>;
+				/// <field name="horizontalAlignment" type="String">Specifies the horizontal alignment for chart title. [Api set: ExcelApi 1.7]</field>;
+				/// <field name="left" type="Number">Specifies the distance, in points, from the left edge of chart title to the left edge of chart area. Null if chart title is not visible. [Api set: ExcelApi 1.7]</field>;
+				/// <field name="overlay" type="Boolean">Specifies if the chart title will overlay the chart. [Api set: ExcelApi 1.1]</field>;
 				/// <field name="position" type="String">Represents the position of chart title. See Excel.ChartTitlePosition for details. [Api set: ExcelApi 1.7]</field>;
 				/// <field name="showShadow" type="Boolean">Represents a boolean value that determines if the chart title has a shadow. [Api set: ExcelApi 1.7]</field>;
-				/// <field name="text" type="String">Represents the title text of a chart. [Api set: ExcelApi 1.1]</field>;
-				/// <field name="textOrientation" type="Number">Represents the angle to which the text is oriented for the chart title. The value should either be an integer from -90 to 90 or the integer 180 for vertically-oriented text. [Api set: ExcelApi 1.7]</field>;
-				/// <field name="top" type="Number">Represents the distance, in points, from the top edge of chart title to the top of chart area. Null if chart title is not visible. [Api set: ExcelApi 1.7]</field>;
-				/// <field name="verticalAlignment" type="String">Represents the vertical alignment of chart title. See Excel.ChartTextVerticalAlignment for details. [Api set: ExcelApi 1.7]</field>;
-				/// <field name="visible" type="Boolean">A boolean value the represents the visibility of a chart title object. [Api set: ExcelApi 1.1]</field>;
+				/// <field name="text" type="String">Specifies the chart&apos;s title text. [Api set: ExcelApi 1.1]</field>;
+				/// <field name="textOrientation" type="Number">Specifies the angle to which the text is oriented for the chart title. The value should either be an integer from -90 to 90 or the integer 180 for vertically-oriented text. [Api set: ExcelApi 1.7]</field>;
+				/// <field name="top" type="Number">Specifies the distance, in points, from the top edge of chart title to the top of chart area. Null if chart title is not visible. [Api set: ExcelApi 1.7]</field>;
+				/// <field name="verticalAlignment" type="String">Specifies the vertical alignment of chart title. See Excel.ChartTextVerticalAlignment for details. [Api set: ExcelApi 1.7]</field>;
+				/// <field name="visible" type="Boolean">Specifies if the chart title is visibile. [Api set: ExcelApi 1.1]</field>;
 			}
 			return ChartTitleUpdateData;
 		})();
@@ -21796,13 +22191,13 @@ var Excel;
 		var ChartBinOptionsUpdateData = (function() {
 			function ChartBinOptionsUpdateData() {
 				/// <summary>An interface for updating data on the ChartBinOptions object, for use in "chartBinOptions.set({ ... })".</summary>
-				/// <field name="allowOverflow" type="Boolean">Specifies whether or not the bin overflow is enabled in a histogram chart or pareto chart. Read/Write. [Api set: ExcelApi 1.9]</field>;
-				/// <field name="allowUnderflow" type="Boolean">Specifies whether or not the bin underflow is enabled in a histogram chart or pareto chart. Read/Write. [Api set: ExcelApi 1.9]</field>;
-				/// <field name="count" type="Number">Returns or sets the bin count of a histogram chart or pareto chart. Read/Write. [Api set: ExcelApi 1.9]</field>;
-				/// <field name="overflowValue" type="Number">Returns or sets the bin overflow value of a histogram chart or pareto chart. Read/Write. [Api set: ExcelApi 1.9]</field>;
-				/// <field name="type" type="String">Returns or sets the bin&apos;s type for a histogram chart or pareto chart. Read/Write. [Api set: ExcelApi 1.9]</field>;
-				/// <field name="underflowValue" type="Number">Returns or sets the bin underflow value of a histogram chart or pareto chart. Read/Write. [Api set: ExcelApi 1.9]</field>;
-				/// <field name="width" type="Number">Returns or sets the bin width value of a histogram chart or pareto chart. Read/Write. [Api set: ExcelApi 1.9]</field>;
+				/// <field name="allowOverflow" type="Boolean">Specifies if bin overflow is enabled in a histogram chart or pareto chart. [Api set: ExcelApi 1.9]</field>;
+				/// <field name="allowUnderflow" type="Boolean">Specifies if bin underflow is enabled in a histogram chart or pareto chart. [Api set: ExcelApi 1.9]</field>;
+				/// <field name="count" type="Number">Specifies the bin count of a histogram chart or pareto chart. [Api set: ExcelApi 1.9]</field>;
+				/// <field name="overflowValue" type="Number">Specifies the bin overflow value of a histogram chart or pareto chart. [Api set: ExcelApi 1.9]</field>;
+				/// <field name="type" type="String">Specifies the bin&apos;s type for a histogram chart or pareto chart. [Api set: ExcelApi 1.9]</field>;
+				/// <field name="underflowValue" type="Number">Specifies the bin underflow value of a histogram chart or pareto chart. [Api set: ExcelApi 1.9]</field>;
+				/// <field name="width" type="Number">Specifies the bin width value of a histogram chart or pareto chart. [Api set: ExcelApi 1.9]</field>;
 			}
 			return ChartBinOptionsUpdateData;
 		})();
@@ -21818,11 +22213,11 @@ var Excel;
 		var ChartBoxwhiskerOptionsUpdateData = (function() {
 			function ChartBoxwhiskerOptionsUpdateData() {
 				/// <summary>An interface for updating data on the ChartBoxwhiskerOptions object, for use in "chartBoxwhiskerOptions.set({ ... })".</summary>
-				/// <field name="quartileCalculation" type="String">Returns or sets the quartile calculation type of a box and whisker chart. Read/Write. [Api set: ExcelApi 1.9]</field>;
-				/// <field name="showInnerPoints" type="Boolean">Specifies whether or not the inner points are shown in a box and whisker chart. Read/Write. [Api set: ExcelApi 1.9]</field>;
-				/// <field name="showMeanLine" type="Boolean">Specifies whether or not the mean line is shown in a box and whisker chart. Read/Write. [Api set: ExcelApi 1.9]</field>;
-				/// <field name="showMeanMarker" type="Boolean">Specifies whether or not the mean marker is shown in a box and whisker chart. Read/Write. [Api set: ExcelApi 1.9]</field>;
-				/// <field name="showOutlierPoints" type="Boolean">Specifies whether or not outlier points are shown in a box and whisker chart. Read/Write. [Api set: ExcelApi 1.9]</field>;
+				/// <field name="quartileCalculation" type="String">Specifies if the quartile calculation type of a box and whisker chart. [Api set: ExcelApi 1.9]</field>;
+				/// <field name="showInnerPoints" type="Boolean">Specifies if inner points are shown in a box and whisker chart. [Api set: ExcelApi 1.9]</field>;
+				/// <field name="showMeanLine" type="Boolean">Specifies if the mean line is shown in a box and whisker chart. [Api set: ExcelApi 1.9]</field>;
+				/// <field name="showMeanMarker" type="Boolean">Specifies if the mean marker is shown in a box and whisker chart. [Api set: ExcelApi 1.9]</field>;
+				/// <field name="showOutlierPoints" type="Boolean">Specifies if outlier points are shown in a box and whisker chart. [Api set: ExcelApi 1.9]</field>;
 			}
 			return ChartBoxwhiskerOptionsUpdateData;
 		})();
@@ -21857,10 +22252,10 @@ var Excel;
 			function ChartFontUpdateData() {
 				/// <summary>An interface for updating data on the ChartFont object, for use in "chartFont.set({ ... })".</summary>
 				/// <field name="bold" type="Boolean">Represents the bold status of font. [Api set: ExcelApi 1.1]</field>;
-				/// <field name="color" type="String">HTML color code representation of the text color. E.g. #FF0000 represents Red. [Api set: ExcelApi 1.1]</field>;
+				/// <field name="color" type="String">HTML color code representation of the text color (e.g., #FF0000 represents Red). [Api set: ExcelApi 1.1]</field>;
 				/// <field name="italic" type="Boolean">Represents the italic status of the font. [Api set: ExcelApi 1.1]</field>;
-				/// <field name="name" type="String">Font name (e.g. &quot;Calibri&quot;) [Api set: ExcelApi 1.1]</field>;
-				/// <field name="size" type="Number">Size of the font (e.g. 11) [Api set: ExcelApi 1.1]</field>;
+				/// <field name="name" type="String">Font name (e.g., &quot;Calibri&quot;) [Api set: ExcelApi 1.1]</field>;
+				/// <field name="size" type="Number">Size of the font (e.g., 11) [Api set: ExcelApi 1.1]</field>;
 				/// <field name="underline" type="String">Type of underline applied to the font. See Excel.ChartUnderlineStyle for details. [Api set: ExcelApi 1.1]</field>;
 			}
 			return ChartFontUpdateData;
@@ -21919,12 +22314,12 @@ var Excel;
 		var ChartTrendlineLabelUpdateData = (function() {
 			function ChartTrendlineLabelUpdateData() {
 				/// <summary>An interface for updating data on the ChartTrendlineLabel object, for use in "chartTrendlineLabel.set({ ... })".</summary>
-				/// <field name="format" type="Excel.Interfaces.ChartTrendlineLabelFormatUpdateData">Represents the format of chart trendline label. [Api set: ExcelApi 1.8]</field>
-				/// <field name="autoText" type="Boolean">Boolean value representing if trendline label automatically generates appropriate text based on context. [Api set: ExcelApi 1.8]</field>;
+				/// <field name="format" type="Excel.Interfaces.ChartTrendlineLabelFormatUpdateData">The format of chart trendline label. [Api set: ExcelApi 1.8]</field>
+				/// <field name="autoText" type="Boolean">Specifies if trendline label automatically generate appropriate text based on context. [Api set: ExcelApi 1.8]</field>;
 				/// <field name="formula" type="String">String value that represents the formula of chart trendline label using A1-style notation. [Api set: ExcelApi 1.8]</field>;
 				/// <field name="horizontalAlignment" type="String">Represents the horizontal alignment for chart trendline label. See Excel.ChartTextHorizontalAlignment for details.              This property is valid only when TextOrientation of trendline label is -90, 90, or 180. [Api set: ExcelApi 1.8]</field>;
 				/// <field name="left" type="Number">Represents the distance, in points, from the left edge of chart trendline label to the left edge of chart area. Null if chart trendline label is not visible. [Api set: ExcelApi 1.8]</field>;
-				/// <field name="linkNumberFormat" type="Boolean">Boolean value representing if the number format is linked to the cells (so that the number format changes in the labels when it changes in the cells). [Api set: ExcelApi 1.9]</field>;
+				/// <field name="linkNumberFormat" type="Boolean">Specifies if the number format is linked to the cells (so that the number format changes in the labels when it changes in the cells). [Api set: ExcelApi 1.9]</field>;
 				/// <field name="numberFormat" type="String">String value that represents the format code for trendline label. [Api set: ExcelApi 1.8]</field>;
 				/// <field name="text" type="String">String representing the text of the trendline label on a chart. [Api set: ExcelApi 1.8]</field>;
 				/// <field name="textOrientation" type="Number">Represents the angle to which the text is oriented for the chart trendline label. The value should either be an integer from -90 to 90 or the integer 180 for vertically-oriented text. [Api set: ExcelApi 1.8]</field>;
@@ -21945,8 +22340,8 @@ var Excel;
 		var ChartTrendlineLabelFormatUpdateData = (function() {
 			function ChartTrendlineLabelFormatUpdateData() {
 				/// <summary>An interface for updating data on the ChartTrendlineLabelFormat object, for use in "chartTrendlineLabelFormat.set({ ... })".</summary>
-				/// <field name="border" type="Excel.Interfaces.ChartBorderUpdateData">Represents the border format, which includes color, linestyle, and weight. [Api set: ExcelApi 1.8]</field>
-				/// <field name="font" type="Excel.Interfaces.ChartFontUpdateData">Represents the font attributes (font name, font size, color, etc.) for a chart trendline label. [Api set: ExcelApi 1.8]</field>
+				/// <field name="border" type="Excel.Interfaces.ChartBorderUpdateData">Specifies the border format, which includes color, linestyle, and weight. [Api set: ExcelApi 1.8]</field>
+				/// <field name="font" type="Excel.Interfaces.ChartFontUpdateData">Specifies the font attributes (font name, font size, color, etc.) for a chart trendline label. [Api set: ExcelApi 1.8]</field>
 			}
 			return ChartTrendlineLabelFormatUpdateData;
 		})();
@@ -21962,16 +22357,16 @@ var Excel;
 		var ChartPlotAreaUpdateData = (function() {
 			function ChartPlotAreaUpdateData() {
 				/// <summary>An interface for updating data on the ChartPlotArea object, for use in "chartPlotArea.set({ ... })".</summary>
-				/// <field name="format" type="Excel.Interfaces.ChartPlotAreaFormatUpdateData">Represents the formatting of a chart plotArea. [Api set: ExcelApi 1.8]</field>
-				/// <field name="height" type="Number">Represents the height value of plotArea. [Api set: ExcelApi 1.8]</field>;
-				/// <field name="insideHeight" type="Number">Represents the insideHeight value of plotArea. [Api set: ExcelApi 1.8]</field>;
-				/// <field name="insideLeft" type="Number">Represents the insideLeft value of plotArea. [Api set: ExcelApi 1.8]</field>;
-				/// <field name="insideTop" type="Number">Represents the insideTop value of plotArea. [Api set: ExcelApi 1.8]</field>;
-				/// <field name="insideWidth" type="Number">Represents the insideWidth value of plotArea. [Api set: ExcelApi 1.8]</field>;
-				/// <field name="left" type="Number">Represents the left value of plotArea. [Api set: ExcelApi 1.8]</field>;
-				/// <field name="position" type="String">Represents the position of plotArea. [Api set: ExcelApi 1.8]</field>;
-				/// <field name="top" type="Number">Represents the top value of plotArea. [Api set: ExcelApi 1.8]</field>;
-				/// <field name="width" type="Number">Represents the width value of plotArea. [Api set: ExcelApi 1.8]</field>;
+				/// <field name="format" type="Excel.Interfaces.ChartPlotAreaFormatUpdateData">Specifies the formatting of a chart plotArea. [Api set: ExcelApi 1.8]</field>
+				/// <field name="height" type="Number">Specifies the height value of plotArea. [Api set: ExcelApi 1.8]</field>;
+				/// <field name="insideHeight" type="Number">Specifies the insideHeight value of plotArea. [Api set: ExcelApi 1.8]</field>;
+				/// <field name="insideLeft" type="Number">Specifies the insideLeft value of plotArea. [Api set: ExcelApi 1.8]</field>;
+				/// <field name="insideTop" type="Number">Specifies the insideTop value of plotArea. [Api set: ExcelApi 1.8]</field>;
+				/// <field name="insideWidth" type="Number">Specifies the insideWidth value of plotArea. [Api set: ExcelApi 1.8]</field>;
+				/// <field name="left" type="Number">Specifies the left value of plotArea. [Api set: ExcelApi 1.8]</field>;
+				/// <field name="position" type="String">Specifies the position of plotArea. [Api set: ExcelApi 1.8]</field>;
+				/// <field name="top" type="Number">Specifies the top value of plotArea. [Api set: ExcelApi 1.8]</field>;
+				/// <field name="width" type="Number">Specifies the width value of plotArea. [Api set: ExcelApi 1.8]</field>;
 			}
 			return ChartPlotAreaUpdateData;
 		})();
@@ -21987,7 +22382,7 @@ var Excel;
 		var ChartPlotAreaFormatUpdateData = (function() {
 			function ChartPlotAreaFormatUpdateData() {
 				/// <summary>An interface for updating data on the ChartPlotAreaFormat object, for use in "chartPlotAreaFormat.set({ ... })".</summary>
-				/// <field name="border" type="Excel.Interfaces.ChartBorderUpdateData">Represents the border attributes of a chart plotArea. [Api set: ExcelApi 1.8]</field>
+				/// <field name="border" type="Excel.Interfaces.ChartBorderUpdateData">Specifies the border attributes of a chart plotArea. [Api set: ExcelApi 1.8]</field>
 			}
 			return ChartPlotAreaFormatUpdateData;
 		})();
@@ -22003,10 +22398,10 @@ var Excel;
 		var PivotTableUpdateData = (function() {
 			function PivotTableUpdateData() {
 				/// <summary>An interface for updating data on the PivotTable object, for use in "pivotTable.set({ ... })".</summary>
-				/// <field name="allowMultipleFiltersPerField" type="Boolean">Specifies whether the PivotTable allows the application of multiple PivotFilters on a given PivotField in the table. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>;
-				/// <field name="enableDataValueEditing" type="Boolean">Specifies whether the PivotTable allows values in the data body to be edited by the user. [Api set: ExcelApi 1.9]</field>;
+				/// <field name="allowMultipleFiltersPerField" type="Boolean">Specifies if the PivotTable allows the application of multiple PivotFilters on a given PivotField in the table. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>;
+				/// <field name="enableDataValueEditing" type="Boolean">Specifies if the PivotTable allows values in the data body to be edited by the user. [Api set: ExcelApi 1.9]</field>;
 				/// <field name="name" type="String">Name of the PivotTable. [Api set: ExcelApi 1.3]</field>;
-				/// <field name="useCustomSortLists" type="Boolean">Specifies whether the PivotTable uses custom lists when sorting. [Api set: ExcelApi 1.9]</field>;
+				/// <field name="useCustomSortLists" type="Boolean">Specifies if the PivotTable uses custom lists when sorting. [Api set: ExcelApi 1.9]</field>;
 			}
 			return PivotTableUpdateData;
 		})();
@@ -22022,13 +22417,13 @@ var Excel;
 		var PivotLayoutUpdateData = (function() {
 			function PivotLayoutUpdateData() {
 				/// <summary>An interface for updating data on the PivotLayout object, for use in "pivotLayout.set({ ... })".</summary>
-				/// <field name="pivotStyle" type="Excel.Interfaces.PivotTableStyleUpdateData">The style applied to the PivotTable. [Api set: ExcelApi 1.12]</field>
-				/// <field name="autoFormat" type="Boolean">Specifies whether formatting will be automatically formatted when it’s refreshed or when fields are moved [Api set: ExcelApi 1.9]</field>;
-				/// <field name="enableFieldList" type="Boolean">Specifies whether the field list can be shown in the UI. [Api set: ExcelApi 1.10]</field>;
+				/// <field name="pivotStyle" type="Excel.Interfaces.PivotTableStyleUpdateData">The style applied to the PivotTable. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
+				/// <field name="autoFormat" type="Boolean">Specifies if formatting will be automatically formatted when it’s refreshed or when fields are moved. [Api set: ExcelApi 1.9]</field>;
+				/// <field name="enableFieldList" type="Boolean">Specifies if the field list can be shown in the UI. [Api set: ExcelApi 1.10]</field>;
 				/// <field name="layoutType" type="String">This property indicates the PivotLayoutType of all fields on the PivotTable. If fields have different states, this will be null. [Api set: ExcelApi 1.8]</field>;
-				/// <field name="preserveFormatting" type="Boolean">Specifies whether formatting is preserved when the report is refreshed or recalculated by operations such as pivoting, sorting, or changing page field items. [Api set: ExcelApi 1.9]</field>;
-				/// <field name="showColumnGrandTotals" type="Boolean">Specifies whether the PivotTable report shows grand totals for columns. [Api set: ExcelApi 1.8]</field>;
-				/// <field name="showRowGrandTotals" type="Boolean">Specifies whether the PivotTable report shows grand totals for rows. [Api set: ExcelApi 1.8]</field>;
+				/// <field name="preserveFormatting" type="Boolean">Specifies if formatting is preserved when the report is refreshed or recalculated by operations such as pivoting, sorting, or changing page field items. [Api set: ExcelApi 1.9]</field>;
+				/// <field name="showColumnGrandTotals" type="Boolean">Specifies if the PivotTable report shows grand totals for columns. [Api set: ExcelApi 1.8]</field>;
+				/// <field name="showRowGrandTotals" type="Boolean">Specifies if the PivotTable report shows grand totals for rows. [Api set: ExcelApi 1.8]</field>;
 				/// <field name="subtotalLocation" type="String">This property indicates the SubtotalLocationType of all fields on the PivotTable. If fields have different states, this will be null. [Api set: ExcelApi 1.8]</field>;
 			}
 			return PivotLayoutUpdateData;
@@ -22100,8 +22495,8 @@ var Excel;
 				/// <field name="name" type="String">Name of the DataPivotHierarchy. [Api set: ExcelApi 1.8]</field>;
 				/// <field name="numberFormat" type="String">Number format of the DataPivotHierarchy. [Api set: ExcelApi 1.8]</field>;
 				/// <field name="position" type="Number">Position of the DataPivotHierarchy. [Api set: ExcelApi 1.8]</field>;
-				/// <field name="showAs" type="Excel.Interfaces.ShowAsRule">Determines whether the data should be shown as a specific summary calculation or not. [Api set: ExcelApi 1.8]</field>;
-				/// <field name="summarizeBy" type="String">Determines whether to show all items of the DataPivotHierarchy. [Api set: ExcelApi 1.8]</field>;
+				/// <field name="showAs" type="Excel.Interfaces.ShowAsRule">Specifies if the data should be shown as a specific summary calculation. [Api set: ExcelApi 1.8]</field>;
+				/// <field name="summarizeBy" type="String">Specifies if all items of the DataPivotHierarchy are shown. [Api set: ExcelApi 1.8]</field>;
 			}
 			return DataPivotHierarchyUpdateData;
 		})();
@@ -22137,7 +22532,7 @@ var Excel;
 				/// <summary>An interface for updating data on the PivotItem object, for use in "pivotItem.set({ ... })".</summary>
 				/// <field name="isExpanded" type="Boolean">Determines whether the item is expanded to show child items or if it&apos;s collapsed and child items are hidden. [Api set: ExcelApi 1.8]</field>;
 				/// <field name="name" type="String">Name of the PivotItem. [Api set: ExcelApi 1.8]</field>;
-				/// <field name="visible" type="Boolean">Determines whether the PivotItem is visible or not. [Api set: ExcelApi 1.8]</field>;
+				/// <field name="visible" type="Boolean">Specifies if the PivotItem is visible. [Api set: ExcelApi 1.8]</field>;
 			}
 			return PivotItemUpdateData;
 		})();
@@ -22150,18 +22545,34 @@ var Excel;
 (function (Excel) {
 	var Interfaces;
 	(function (Interfaces) {
+		var WorksheetCustomPropertyUpdateData = (function() {
+			function WorksheetCustomPropertyUpdateData() {
+				/// <summary>An interface for updating data on the WorksheetCustomProperty object, for use in "worksheetCustomProperty.set({ ... })".</summary>
+				/// <field name="value" type="String">Gets or sets the value of the custom property. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>;
+			}
+			return WorksheetCustomPropertyUpdateData;
+		})();
+		Interfaces.WorksheetCustomPropertyUpdateData.__proto__ = null;
+		Interfaces.WorksheetCustomPropertyUpdateData = WorksheetCustomPropertyUpdateData;
+	})(Interfaces = Excel.Interfaces || (Excel.Interfaces = { __proto__: null}));
+})(Excel || (Excel = {__proto__: null}));
+
+var Excel;
+(function (Excel) {
+	var Interfaces;
+	(function (Interfaces) {
 		var DocumentPropertiesUpdateData = (function() {
 			function DocumentPropertiesUpdateData() {
 				/// <summary>An interface for updating data on the DocumentProperties object, for use in "documentProperties.set({ ... })".</summary>
-				/// <field name="author" type="String">Gets or sets the author of the workbook. [Api set: ExcelApi 1.7]</field>;
-				/// <field name="category" type="String">Gets or sets the category of the workbook. [Api set: ExcelApi 1.7]</field>;
-				/// <field name="comments" type="String">Gets or sets the comments of the workbook. [Api set: ExcelApi 1.7]</field>;
-				/// <field name="company" type="String">Gets or sets the company of the workbook. [Api set: ExcelApi 1.7]</field>;
-				/// <field name="keywords" type="String">Gets or sets the keywords of the workbook. [Api set: ExcelApi 1.7]</field>;
-				/// <field name="manager" type="String">Gets or sets the manager of the workbook. [Api set: ExcelApi 1.7]</field>;
+				/// <field name="author" type="String">The author of the workbook. [Api set: ExcelApi 1.7]</field>;
+				/// <field name="category" type="String">The category of the workbook. [Api set: ExcelApi 1.7]</field>;
+				/// <field name="comments" type="String">The comments of the workbook. [Api set: ExcelApi 1.7]</field>;
+				/// <field name="company" type="String">The company of the workbook. [Api set: ExcelApi 1.7]</field>;
+				/// <field name="keywords" type="String">The keywords of the workbook. [Api set: ExcelApi 1.7]</field>;
+				/// <field name="manager" type="String">The manager of the workbook. [Api set: ExcelApi 1.7]</field>;
 				/// <field name="revisionNumber" type="Number">Gets the revision number of the workbook. Read only. [Api set: ExcelApi 1.7]</field>;
-				/// <field name="subject" type="String">Gets or sets the subject of the workbook. [Api set: ExcelApi 1.7]</field>;
-				/// <field name="title" type="String">Gets or sets the title of the workbook. [Api set: ExcelApi 1.7]</field>;
+				/// <field name="subject" type="String">The subject of the workbook. [Api set: ExcelApi 1.7]</field>;
+				/// <field name="title" type="String">The title of the workbook. [Api set: ExcelApi 1.7]</field>;
 			}
 			return DocumentPropertiesUpdateData;
 		})();
@@ -22177,7 +22588,7 @@ var Excel;
 		var CustomPropertyUpdateData = (function() {
 			function CustomPropertyUpdateData() {
 				/// <summary>An interface for updating data on the CustomProperty object, for use in "customProperty.set({ ... })".</summary>
-				/// <field name="value" >Gets or sets the value of the custom property. [Api set: ExcelApi 1.7]</field>;
+				/// <field name="value" >The value of the custom property. The value is limited to 255 characters outside of Excel on the web (larger values are automatically trimmed to 255 characters on other platforms). [Api set: ExcelApi 1.7]</field>;
 			}
 			return CustomPropertyUpdateData;
 		})();
@@ -22209,7 +22620,7 @@ var Excel;
 				/// <field name="textComparisonOrNullObject" type="Excel.Interfaces.TextConditionalFormatUpdateData">Returns the specific text conditional format properties if the current conditional format is a text type.              For example to format cells matching the word &quot;Text&quot;. [Api set: ExcelApi 1.6]</field>
 				/// <field name="topBottom" type="Excel.Interfaces.TopBottomConditionalFormatUpdateData">Returns the Top/Bottom conditional format properties if the current conditional format is an TopBottom type.              For example to format the top 10% or bottom 10 items. [Api set: ExcelApi 1.6]</field>
 				/// <field name="topBottomOrNullObject" type="Excel.Interfaces.TopBottomConditionalFormatUpdateData">Returns the Top/Bottom conditional format properties if the current conditional format is an TopBottom type.              For example to format the top 10% or bottom 10 items. [Api set: ExcelApi 1.6]</field>
-				/// <field name="priority" type="Number">The priority (or index) within the conditional format collection that this conditional format currently exists in. Changing this also              changes other conditional formats&apos; priorities, to allow for a contiguous priority order.              Use a negative priority to begin from the back.              Priorities greater than than bounds will get and set to the maximum (or minimum if negative) priority.              Also note that if you change the priority, you have to re-fetch a new copy of the object at that new priority location if you want to make further changes to it. Read-only. [Api set: ExcelApi 1.6]</field>;
+				/// <field name="priority" type="Number">The priority (or index) within the conditional format collection that this conditional format currently exists in. Changing this also              changes other conditional formats&apos; priorities, to allow for a contiguous priority order.              Use a negative priority to begin from the back.              Priorities greater than than bounds will get and set to the maximum (or minimum if negative) priority.              Also note that if you change the priority, you have to re-fetch a new copy of the object at that new priority location if you want to make further changes to it. [Api set: ExcelApi 1.6]</field>;
 				/// <field name="stopIfTrue" type="Boolean">If the conditions of this conditional format are met, no lower-priority formats shall take effect on that cell.              Null on databars, icon sets, and colorscales as there&apos;s no concept of StopIfTrue for these [Api set: ExcelApi 1.6]</field>;
 			}
 			return ConditionalFormatUpdateData;
@@ -22228,9 +22639,9 @@ var Excel;
 				/// <summary>An interface for updating data on the DataBarConditionalFormat object, for use in "dataBarConditionalFormat.set({ ... })".</summary>
 				/// <field name="negativeFormat" type="Excel.Interfaces.ConditionalDataBarNegativeFormatUpdateData">Representation of all values to the left of the axis in an Excel data bar. [Api set: ExcelApi 1.6]</field>
 				/// <field name="positiveFormat" type="Excel.Interfaces.ConditionalDataBarPositiveFormatUpdateData">Representation of all values to the right of the axis in an Excel data bar. [Api set: ExcelApi 1.6]</field>
-				/// <field name="axisColor" type="String">HTML color code representing the color of the Axis line, of the form #RRGGBB (e.g. &quot;FFA500&quot;) or as a named HTML color (e.g. &quot;orange&quot;).              &quot;&quot; (empty string) if no axis is present or set. [Api set: ExcelApi 1.6]</field>;
+				/// <field name="axisColor" type="String">HTML color code representing the color of the Axis line, of the form #RRGGBB (e.g., &quot;FFA500&quot;) or as a named HTML color (e.g., &quot;orange&quot;).              &quot;&quot; (empty string) if no axis is present or set. [Api set: ExcelApi 1.6]</field>;
 				/// <field name="axisFormat" type="String">Representation of how the axis is determined for an Excel data bar. [Api set: ExcelApi 1.6]</field>;
-				/// <field name="barDirection" type="String">Represents the direction that the data bar graphic should be based on. [Api set: ExcelApi 1.6]</field>;
+				/// <field name="barDirection" type="String">Specifies the direction that the data bar graphic should be based on. [Api set: ExcelApi 1.6]</field>;
 				/// <field name="lowerBoundRule" type="Excel.Interfaces.ConditionalDataBarRule">The rule for what consistutes the lower bound (and how to calculate it, if applicable) for a data bar.              The `ConditionalDataBarRule` object must be set as a JSON object (use `x.lowerBoundRule = {...}` instead of `x.lowerBoundRule.formula = ...`). [Api set: ExcelApi 1.6]</field>;
 				/// <field name="showDataBarOnly" type="Boolean">If true, hides the values from the cells where the data bar is applied. [Api set: ExcelApi 1.6]</field>;
 				/// <field name="upperBoundRule" type="Excel.Interfaces.ConditionalDataBarRule">The rule for what constitutes the upper bound (and how to calculate it, if applicable) for a data bar.              The `ConditionalDataBarRule` object must be set as a JSON object (use `x.upperBoundRule = {...}` instead of `x.upperBoundRule.formula = ...`). [Api set: ExcelApi 1.6]</field>;
@@ -22249,9 +22660,9 @@ var Excel;
 		var ConditionalDataBarPositiveFormatUpdateData = (function() {
 			function ConditionalDataBarPositiveFormatUpdateData() {
 				/// <summary>An interface for updating data on the ConditionalDataBarPositiveFormat object, for use in "conditionalDataBarPositiveFormat.set({ ... })".</summary>
-				/// <field name="borderColor" type="String">HTML color code representing the color of the border line, of the form #RRGGBB (e.g. &quot;FFA500&quot;) or as a named HTML color (e.g. &quot;orange&quot;).              &quot;&quot; (empty string) if no border is present or set. [Api set: ExcelApi 1.6]</field>;
-				/// <field name="fillColor" type="String">HTML color code representing the fill color, of the form #RRGGBB (e.g. &quot;FFA500&quot;) or as a named HTML color (e.g. &quot;orange&quot;). [Api set: ExcelApi 1.6]</field>;
-				/// <field name="gradientFill" type="Boolean">Boolean representation of whether or not the DataBar has a gradient. [Api set: ExcelApi 1.6]</field>;
+				/// <field name="borderColor" type="String">HTML color code representing the color of the border line, of the form #RRGGBB (e.g., &quot;FFA500&quot;) or as a named HTML color (e.g., &quot;orange&quot;).              &quot;&quot; (empty string) if no border is present or set. [Api set: ExcelApi 1.6]</field>;
+				/// <field name="fillColor" type="String">HTML color code representing the fill color, of the form #RRGGBB (e.g., &quot;FFA500&quot;) or as a named HTML color (e.g., &quot;orange&quot;). [Api set: ExcelApi 1.6]</field>;
+				/// <field name="gradientFill" type="Boolean">Specifies if the DataBar has a gradient. [Api set: ExcelApi 1.6]</field>;
 			}
 			return ConditionalDataBarPositiveFormatUpdateData;
 		})();
@@ -22267,10 +22678,10 @@ var Excel;
 		var ConditionalDataBarNegativeFormatUpdateData = (function() {
 			function ConditionalDataBarNegativeFormatUpdateData() {
 				/// <summary>An interface for updating data on the ConditionalDataBarNegativeFormat object, for use in "conditionalDataBarNegativeFormat.set({ ... })".</summary>
-				/// <field name="borderColor" type="String">HTML color code representing the color of the border line, of the form #RRGGBB (e.g. &quot;FFA500&quot;) or as a named HTML color (e.g. &quot;orange&quot;).              &quot;Empty String&quot; if no border is present or set. [Api set: ExcelApi 1.6]</field>;
-				/// <field name="fillColor" type="String">HTML color code representing the fill color, of the form #RRGGBB (e.g. &quot;FFA500&quot;) or as a named HTML color (e.g. &quot;orange&quot;). [Api set: ExcelApi 1.6]</field>;
-				/// <field name="matchPositiveBorderColor" type="Boolean">Boolean representation of whether or not the negative DataBar has the same border color as the positive DataBar. [Api set: ExcelApi 1.6]</field>;
-				/// <field name="matchPositiveFillColor" type="Boolean">Boolean representation of whether or not the negative DataBar has the same fill color as the positive DataBar. [Api set: ExcelApi 1.6]</field>;
+				/// <field name="borderColor" type="String">HTML color code representing the color of the border line, of the form #RRGGBB (e.g., &quot;FFA500&quot;) or as a named HTML color (e.g., &quot;orange&quot;).              &quot;Empty String&quot; if no border is present or set. [Api set: ExcelApi 1.6]</field>;
+				/// <field name="fillColor" type="String">HTML color code representing the fill color, of the form #RRGGBB (e.g., &quot;FFA500&quot;) or as a named HTML color (e.g., &quot;orange&quot;). [Api set: ExcelApi 1.6]</field>;
+				/// <field name="matchPositiveBorderColor" type="Boolean">Specifies if the negative DataBar has the same border color as the positive DataBar. [Api set: ExcelApi 1.6]</field>;
+				/// <field name="matchPositiveFillColor" type="Boolean">Specifies if the negative DataBar has the same fill color as the positive DataBar. [Api set: ExcelApi 1.6]</field>;
 			}
 			return ConditionalDataBarNegativeFormatUpdateData;
 		})();
@@ -22287,7 +22698,7 @@ var Excel;
 			function CustomConditionalFormatUpdateData() {
 				/// <summary>An interface for updating data on the CustomConditionalFormat object, for use in "customConditionalFormat.set({ ... })".</summary>
 				/// <field name="format" type="Excel.Interfaces.ConditionalRangeFormatUpdateData">Returns a format object, encapsulating the conditional formats font, fill, borders, and other properties. [Api set: ExcelApi 1.6]</field>
-				/// <field name="rule" type="Excel.Interfaces.ConditionalFormatRuleUpdateData">Represents the Rule object on this conditional format. [Api set: ExcelApi 1.6]</field>
+				/// <field name="rule" type="Excel.Interfaces.ConditionalFormatRuleUpdateData">Specifies the Rule object on this conditional format. [Api set: ExcelApi 1.6]</field>
 			}
 			return CustomConditionalFormatUpdateData;
 		})();
@@ -22408,7 +22819,7 @@ var Excel;
 			function CellValueConditionalFormatUpdateData() {
 				/// <summary>An interface for updating data on the CellValueConditionalFormat object, for use in "cellValueConditionalFormat.set({ ... })".</summary>
 				/// <field name="format" type="Excel.Interfaces.ConditionalRangeFormatUpdateData">Returns a format object, encapsulating the conditional formats font, fill, borders, and other properties. [Api set: ExcelApi 1.6]</field>
-				/// <field name="rule" type="Excel.Interfaces.ConditionalCellValueRule">Represents the Rule object on this conditional format. [Api set: ExcelApi 1.6]</field>;
+				/// <field name="rule" type="Excel.Interfaces.ConditionalCellValueRule">Specifies the Rule object on this conditional format. [Api set: ExcelApi 1.6]</field>;
 			}
 			return CellValueConditionalFormatUpdateData;
 		})();
@@ -22443,11 +22854,11 @@ var Excel;
 		var ConditionalRangeFontUpdateData = (function() {
 			function ConditionalRangeFontUpdateData() {
 				/// <summary>An interface for updating data on the ConditionalRangeFont object, for use in "conditionalRangeFont.set({ ... })".</summary>
-				/// <field name="bold" type="Boolean">Represents the bold status of font. [Api set: ExcelApi 1.6]</field>;
-				/// <field name="color" type="String">HTML color code representation of the text color. E.g. #FF0000 represents Red. [Api set: ExcelApi 1.6]</field>;
-				/// <field name="italic" type="Boolean">Represents the italic status of the font. [Api set: ExcelApi 1.6]</field>;
-				/// <field name="strikethrough" type="Boolean">Represents the strikethrough status of the font. [Api set: ExcelApi 1.6]</field>;
-				/// <field name="underline" type="String">Type of underline applied to the font. See Excel.ConditionalRangeFontUnderlineStyle for details. [Api set: ExcelApi 1.6]</field>;
+				/// <field name="bold" type="Boolean">Specifies if the font is bold. [Api set: ExcelApi 1.6]</field>;
+				/// <field name="color" type="String">HTML color code representation of the text color (e.g., #FF0000 represents Red). [Api set: ExcelApi 1.6]</field>;
+				/// <field name="italic" type="Boolean">Specifies if the font is italic. [Api set: ExcelApi 1.6]</field>;
+				/// <field name="strikethrough" type="Boolean">Specifies the strikethrough status of the font. [Api set: ExcelApi 1.6]</field>;
+				/// <field name="underline" type="String">The type of underline applied to the font. See Excel.ConditionalRangeFontUnderlineStyle for details. [Api set: ExcelApi 1.6]</field>;
 			}
 			return ConditionalRangeFontUpdateData;
 		})();
@@ -22463,7 +22874,7 @@ var Excel;
 		var ConditionalRangeFillUpdateData = (function() {
 			function ConditionalRangeFillUpdateData() {
 				/// <summary>An interface for updating data on the ConditionalRangeFill object, for use in "conditionalRangeFill.set({ ... })".</summary>
-				/// <field name="color" type="String">HTML color code representing the color of the fill, of the form #RRGGBB (e.g. &quot;FFA500&quot;) or as a named HTML color (e.g. &quot;orange&quot;). [Api set: ExcelApi 1.6]</field>;
+				/// <field name="color" type="String">HTML color code representing the color of the fill, of the form #RRGGBB (e.g., &quot;FFA500&quot;) or as a named HTML color (e.g., &quot;orange&quot;). [Api set: ExcelApi 1.6]</field>;
 			}
 			return ConditionalRangeFillUpdateData;
 		})();
@@ -22479,7 +22890,7 @@ var Excel;
 		var ConditionalRangeBorderUpdateData = (function() {
 			function ConditionalRangeBorderUpdateData() {
 				/// <summary>An interface for updating data on the ConditionalRangeBorder object, for use in "conditionalRangeBorder.set({ ... })".</summary>
-				/// <field name="color" type="String">HTML color code representing the color of the border line, of the form #RRGGBB (e.g. &quot;FFA500&quot;) or as a named HTML color (e.g. &quot;orange&quot;). [Api set: ExcelApi 1.6]</field>;
+				/// <field name="color" type="String">HTML color code representing the color of the border line, of the form #RRGGBB (e.g., &quot;FFA500&quot;) or as a named HTML color (e.g., &quot;orange&quot;). [Api set: ExcelApi 1.6]</field>;
 				/// <field name="style" type="String">One of the constants of line style specifying the line style for the border. See Excel.BorderLineStyle for details. [Api set: ExcelApi 1.6]</field>;
 			}
 			return ConditionalRangeBorderUpdateData;
@@ -22518,24 +22929,24 @@ var Excel;
 				/// <field name="borders" type="Excel.Interfaces.RangeBorderCollectionUpdateData">A Border collection of four Border objects that represent the style of the four borders. [Api set: ExcelApi 1.7]</field>
 				/// <field name="fill" type="Excel.Interfaces.RangeFillUpdateData">The Fill of the style. [Api set: ExcelApi 1.7]</field>
 				/// <field name="font" type="Excel.Interfaces.RangeFontUpdateData">A Font object that represents the font of the style. [Api set: ExcelApi 1.7]</field>
-				/// <field name="autoIndent" type="Boolean">Indicates if text is automatically indented when the text alignment in a cell is set to equal distribution. [Api set: ExcelApi 1.8]</field>;
-				/// <field name="formulaHidden" type="Boolean">Indicates if the formula will be hidden when the worksheet is protected. [Api set: ExcelApi 1.7]</field>;
+				/// <field name="autoIndent" type="Boolean">Specifies if text is automatically indented when the text alignment in a cell is set to equal distribution. [Api set: ExcelApi 1.8]</field>;
+				/// <field name="formulaHidden" type="Boolean">Specifies if the formula will be hidden when the worksheet is protected. [Api set: ExcelApi 1.7]</field>;
 				/// <field name="horizontalAlignment" type="String">Represents the horizontal alignment for the style. See Excel.HorizontalAlignment for details. [Api set: ExcelApi 1.7]</field>;
-				/// <field name="includeAlignment" type="Boolean">Indicates if the style includes the AutoIndent, HorizontalAlignment, VerticalAlignment, WrapText, IndentLevel, and TextOrientation properties. [Api set: ExcelApi 1.7]</field>;
-				/// <field name="includeBorder" type="Boolean">Indicates if the style includes the Color, ColorIndex, LineStyle, and Weight border properties. [Api set: ExcelApi 1.7]</field>;
-				/// <field name="includeFont" type="Boolean">Indicates if the style includes the Background, Bold, Color, ColorIndex, FontStyle, Italic, Name, Size, Strikethrough, Subscript, Superscript, and Underline font properties. [Api set: ExcelApi 1.7]</field>;
-				/// <field name="includeNumber" type="Boolean">Indicates if the style includes the NumberFormat property. [Api set: ExcelApi 1.7]</field>;
-				/// <field name="includePatterns" type="Boolean">Indicates if the style includes the Color, ColorIndex, InvertIfNegative, Pattern, PatternColor, and PatternColorIndex interior properties. [Api set: ExcelApi 1.7]</field>;
-				/// <field name="includeProtection" type="Boolean">Indicates if the style includes the FormulaHidden and Locked protection properties. [Api set: ExcelApi 1.7]</field>;
+				/// <field name="includeAlignment" type="Boolean">Specifies if the style includes the AutoIndent, HorizontalAlignment, VerticalAlignment, WrapText, IndentLevel, and TextOrientation properties. [Api set: ExcelApi 1.7]</field>;
+				/// <field name="includeBorder" type="Boolean">Specifies if the style includes the Color, ColorIndex, LineStyle, and Weight border properties. [Api set: ExcelApi 1.7]</field>;
+				/// <field name="includeFont" type="Boolean">Specifies if the style includes the Background, Bold, Color, ColorIndex, FontStyle, Italic, Name, Size, Strikethrough, Subscript, Superscript, and Underline font properties. [Api set: ExcelApi 1.7]</field>;
+				/// <field name="includeNumber" type="Boolean">Specifies if the style includes the NumberFormat property. [Api set: ExcelApi 1.7]</field>;
+				/// <field name="includePatterns" type="Boolean">Specifies if the style includes the Color, ColorIndex, InvertIfNegative, Pattern, PatternColor, and PatternColorIndex interior properties. [Api set: ExcelApi 1.7]</field>;
+				/// <field name="includeProtection" type="Boolean">Specifies if the style includes the FormulaHidden and Locked protection properties. [Api set: ExcelApi 1.7]</field>;
 				/// <field name="indentLevel" type="Number">An integer from 0 to 250 that indicates the indent level for the style. [Api set: ExcelApi 1.7]</field>;
-				/// <field name="locked" type="Boolean">Indicates if the object is locked when the worksheet is protected. [Api set: ExcelApi 1.7]</field>;
+				/// <field name="locked" type="Boolean">Specifies if the object is locked when the worksheet is protected. [Api set: ExcelApi 1.7]</field>;
 				/// <field name="numberFormat" type="String">The format code of the number format for the style. [Api set: ExcelApi 1.7]</field>;
 				/// <field name="numberFormatLocal" type="String">The localized format code of the number format for the style. [Api set: ExcelApi 1.7]</field>;
 				/// <field name="readingOrder" type="String">The reading order for the style. [Api set: ExcelApi 1.7]</field>;
-				/// <field name="shrinkToFit" type="Boolean">Indicates if text automatically shrinks to fit in the available column width. [Api set: ExcelApi 1.7]</field>;
+				/// <field name="shrinkToFit" type="Boolean">Specifies if text automatically shrinks to fit in the available column width. [Api set: ExcelApi 1.7]</field>;
 				/// <field name="textOrientation" type="Number">The text orientation for the style. [Api set: ExcelApi 1.8]</field>;
-				/// <field name="verticalAlignment" type="String">Represents the vertical alignment for the style. See Excel.VerticalAlignment for details. [Api set: ExcelApi 1.7]</field>;
-				/// <field name="wrapText" type="Boolean">Indicates if Microsoft Excel wraps the text in the object. [Api set: ExcelApi 1.7]</field>;
+				/// <field name="verticalAlignment" type="String">Specifies the vertical alignment for the style. See Excel.VerticalAlignment for details. [Api set: ExcelApi 1.7]</field>;
+				/// <field name="wrapText" type="Boolean">Specifies if Excel wraps the text in the object. [Api set: ExcelApi 1.7]</field>;
 			}
 			return StyleUpdateData;
 		})();
@@ -22616,25 +23027,25 @@ var Excel;
 			function PageLayoutUpdateData() {
 				/// <summary>An interface for updating data on the PageLayout object, for use in "pageLayout.set({ ... })".</summary>
 				/// <field name="headersFooters" type="Excel.Interfaces.HeaderFooterGroupUpdateData">Header and footer configuration for the worksheet. [Api set: ExcelApi 1.9]</field>
-				/// <field name="blackAndWhite" type="Boolean">Gets or sets the worksheet&apos;s black and white print option. [Api set: ExcelApi 1.9]</field>;
-				/// <field name="bottomMargin" type="Number">Gets or sets the worksheet&apos;s bottom page margin to use for printing in points. [Api set: ExcelApi 1.9]</field>;
-				/// <field name="centerHorizontally" type="Boolean">Gets or sets the worksheet&apos;s center horizontally flag. This flag determines whether the worksheet will be centered horizontally when it&apos;s printed. [Api set: ExcelApi 1.9]</field>;
-				/// <field name="centerVertically" type="Boolean">Gets or sets the worksheet&apos;s center vertically flag. This flag determines whether the worksheet will be centered vertically when it&apos;s printed. [Api set: ExcelApi 1.9]</field>;
-				/// <field name="draftMode" type="Boolean">Gets or sets the worksheet&apos;s draft mode option. If true the sheet will be printed without graphics. [Api set: ExcelApi 1.9]</field>;
-				/// <field name="firstPageNumber" >Gets or sets the worksheet&apos;s first page number to print. Null value represents &quot;auto&quot; page numbering. [Api set: ExcelApi 1.9]</field>;
-				/// <field name="footerMargin" type="Number">Gets or sets the worksheet&apos;s footer margin, in points, for use when printing. [Api set: ExcelApi 1.9]</field>;
-				/// <field name="headerMargin" type="Number">Gets or sets the worksheet&apos;s header margin, in points, for use when printing. [Api set: ExcelApi 1.9]</field>;
-				/// <field name="leftMargin" type="Number">Gets or sets the worksheet&apos;s left margin, in points, for use when printing. [Api set: ExcelApi 1.9]</field>;
-				/// <field name="orientation" type="String">Gets or sets the worksheet&apos;s orientation of the page. [Api set: ExcelApi 1.9]</field>;
-				/// <field name="paperSize" type="String">Gets or sets the worksheet&apos;s paper size of the page. [Api set: ExcelApi 1.9]</field>;
-				/// <field name="printComments" type="String">Gets or sets whether the worksheet&apos;s comments should be displayed when printing. [Api set: ExcelApi 1.9]</field>;
-				/// <field name="printErrors" type="String">Gets or sets the worksheet&apos;s print errors option. [Api set: ExcelApi 1.9]</field>;
-				/// <field name="printGridlines" type="Boolean">Gets or sets the worksheet&apos;s print gridlines flag. This flag determines whether gridlines will be printed or not. [Api set: ExcelApi 1.9]</field>;
-				/// <field name="printHeadings" type="Boolean">Gets or sets the worksheet&apos;s print headings flag. This flag determines whether headings will be printed or not. [Api set: ExcelApi 1.9]</field>;
-				/// <field name="printOrder" type="String">Gets or sets the worksheet&apos;s page print order option. This specifies the order to use for processing the page number printed. [Api set: ExcelApi 1.9]</field>;
-				/// <field name="rightMargin" type="Number">Gets or sets the worksheet&apos;s right margin, in points, for use when printing. [Api set: ExcelApi 1.9]</field>;
-				/// <field name="topMargin" type="Number">Gets or sets the worksheet&apos;s top margin, in points, for use when printing. [Api set: ExcelApi 1.9]</field>;
-				/// <field name="zoom" type="Excel.Interfaces.PageLayoutZoomOptions">Gets or sets the worksheet&apos;s print zoom options.              The `PageLayoutZoomOptions` object must be set as a JSON object (use `x.zoom = {...}` instead of `x.zoom.scale = ...`). [Api set: ExcelApi 1.9]</field>;
+				/// <field name="blackAndWhite" type="Boolean">The worksheet&apos;s black and white print option. [Api set: ExcelApi 1.9]</field>;
+				/// <field name="bottomMargin" type="Number">The worksheet&apos;s bottom page margin to use for printing in points. [Api set: ExcelApi 1.9]</field>;
+				/// <field name="centerHorizontally" type="Boolean">The worksheet&apos;s center horizontally flag. This flag determines whether the worksheet will be centered horizontally when it&apos;s printed. [Api set: ExcelApi 1.9]</field>;
+				/// <field name="centerVertically" type="Boolean">The worksheet&apos;s center vertically flag. This flag determines whether the worksheet will be centered vertically when it&apos;s printed. [Api set: ExcelApi 1.9]</field>;
+				/// <field name="draftMode" type="Boolean">The worksheet&apos;s draft mode option. If true the sheet will be printed without graphics. [Api set: ExcelApi 1.9]</field>;
+				/// <field name="firstPageNumber" >The worksheet&apos;s first page number to print. Null value represents &quot;auto&quot; page numbering. [Api set: ExcelApi 1.9]</field>;
+				/// <field name="footerMargin" type="Number">The worksheet&apos;s footer margin, in points, for use when printing. [Api set: ExcelApi 1.9]</field>;
+				/// <field name="headerMargin" type="Number">The worksheet&apos;s header margin, in points, for use when printing. [Api set: ExcelApi 1.9]</field>;
+				/// <field name="leftMargin" type="Number">The worksheet&apos;s left margin, in points, for use when printing. [Api set: ExcelApi 1.9]</field>;
+				/// <field name="orientation" type="String">The worksheet&apos;s orientation of the page. [Api set: ExcelApi 1.9]</field>;
+				/// <field name="paperSize" type="String">The worksheet&apos;s paper size of the page. [Api set: ExcelApi 1.9]</field>;
+				/// <field name="printComments" type="String">Specifies if the worksheet&apos;s comments should be displayed when printing. [Api set: ExcelApi 1.9]</field>;
+				/// <field name="printErrors" type="String">The worksheet&apos;s print errors option. [Api set: ExcelApi 1.9]</field>;
+				/// <field name="printGridlines" type="Boolean">Specifies if the worksheet&apos;s gridlines will be printed. [Api set: ExcelApi 1.9]</field>;
+				/// <field name="printHeadings" type="Boolean">Specifies if the worksheet&apos;s headings will be printed. [Api set: ExcelApi 1.9]</field>;
+				/// <field name="printOrder" type="String">The worksheet&apos;s page print order option. This specifies the order to use for processing the page number printed. [Api set: ExcelApi 1.9]</field>;
+				/// <field name="rightMargin" type="Number">The worksheet&apos;s right margin, in points, for use when printing. [Api set: ExcelApi 1.9]</field>;
+				/// <field name="topMargin" type="Number">The worksheet&apos;s top margin, in points, for use when printing. [Api set: ExcelApi 1.9]</field>;
+				/// <field name="zoom" type="Excel.Interfaces.PageLayoutZoomOptions">The worksheet&apos;s print zoom options.              The `PageLayoutZoomOptions` object must be set as a JSON object (use `x.zoom = {...}` instead of `x.zoom.scale = ...`). [Api set: ExcelApi 1.9]</field>;
 			}
 			return PageLayoutUpdateData;
 		})();
@@ -22650,12 +23061,12 @@ var Excel;
 		var HeaderFooterUpdateData = (function() {
 			function HeaderFooterUpdateData() {
 				/// <summary>An interface for updating data on the HeaderFooter object, for use in "headerFooter.set({ ... })".</summary>
-				/// <field name="centerFooter" type="String">Gets or sets the center footer of the worksheet.              To apply font formatting or insert a variable value, use format codes specified here: https://msdn.microsoft.com/en-us/library/bb225426.aspx. [Api set: ExcelApi 1.9]</field>;
-				/// <field name="centerHeader" type="String">Gets or sets the center header of the worksheet.              To apply font formatting or insert a variable value, use format codes specified here: https://msdn.microsoft.com/en-us/library/bb225426.aspx. [Api set: ExcelApi 1.9]</field>;
-				/// <field name="leftFooter" type="String">Gets or sets the left footer of the worksheet.              To apply font formatting or insert a variable value, use format codes specified here: https://msdn.microsoft.com/en-us/library/bb225426.aspx. [Api set: ExcelApi 1.9]</field>;
-				/// <field name="leftHeader" type="String">Gets or sets the left header of the worksheet.              To apply font formatting or insert a variable value, use format codes specified here: https://msdn.microsoft.com/en-us/library/bb225426.aspx. [Api set: ExcelApi 1.9]</field>;
-				/// <field name="rightFooter" type="String">Gets or sets the right footer of the worksheet.              To apply font formatting or insert a variable value, use format codes specified here: https://msdn.microsoft.com/en-us/library/bb225426.aspx. [Api set: ExcelApi 1.9]</field>;
-				/// <field name="rightHeader" type="String">Gets or sets the right header of the worksheet.              To apply font formatting or insert a variable value, use format codes specified here: https://msdn.microsoft.com/en-us/library/bb225426.aspx. [Api set: ExcelApi 1.9]</field>;
+				/// <field name="centerFooter" type="String">The center footer of the worksheet.              To apply font formatting or insert a variable value, use format codes specified here: https://msdn.microsoft.com/library/bb225426.aspx. [Api set: ExcelApi 1.9]</field>;
+				/// <field name="centerHeader" type="String">The center header of the worksheet.              To apply font formatting or insert a variable value, use format codes specified here: https://msdn.microsoft.com/library/bb225426.aspx. [Api set: ExcelApi 1.9]</field>;
+				/// <field name="leftFooter" type="String">The left footer of the worksheet.              To apply font formatting or insert a variable value, use format codes specified here: https://msdn.microsoft.com/library/bb225426.aspx. [Api set: ExcelApi 1.9]</field>;
+				/// <field name="leftHeader" type="String">The left header of the worksheet.              To apply font formatting or insert a variable value, use format codes specified here: https://msdn.microsoft.com/library/bb225426.aspx. [Api set: ExcelApi 1.9]</field>;
+				/// <field name="rightFooter" type="String">The right footer of the worksheet.              To apply font formatting or insert a variable value, use format codes specified here: https://msdn.microsoft.com/library/bb225426.aspx. [Api set: ExcelApi 1.9]</field>;
+				/// <field name="rightHeader" type="String">The right header of the worksheet.              To apply font formatting or insert a variable value, use format codes specified here: https://msdn.microsoft.com/library/bb225426.aspx. [Api set: ExcelApi 1.9]</field>;
 			}
 			return HeaderFooterUpdateData;
 		})();
@@ -22675,7 +23086,7 @@ var Excel;
 				/// <field name="evenPages" type="Excel.Interfaces.HeaderFooterUpdateData">The header/footer to use for even pages, odd header/footer needs to be specified for odd pages. [Api set: ExcelApi 1.9]</field>
 				/// <field name="firstPage" type="Excel.Interfaces.HeaderFooterUpdateData">The first page header/footer, for all other pages general or even/odd is used. [Api set: ExcelApi 1.9]</field>
 				/// <field name="oddPages" type="Excel.Interfaces.HeaderFooterUpdateData">The header/footer to use for odd pages, even header/footer needs to be specified for even pages. [Api set: ExcelApi 1.9]</field>
-				/// <field name="state" type="String">Gets or sets the state of which headers/footers are set. See Excel.HeaderFooterState for details. [Api set: ExcelApi 1.9]</field>;
+				/// <field name="state" type="String">The state by which headers/footers are set. See Excel.HeaderFooterState for details. [Api set: ExcelApi 1.9]</field>;
 				/// <field name="useSheetMargins" type="Boolean">Gets or sets a flag indicating if headers/footers are aligned with the page margins set in the page layout options for the worksheet. [Api set: ExcelApi 1.9]</field>;
 				/// <field name="useSheetScale" type="Boolean">Gets or sets a flag indicating if headers/footers should be scaled by the page percentage scale set in the page layout options for the worksheet. [Api set: ExcelApi 1.9]</field>;
 			}
@@ -22693,8 +23104,8 @@ var Excel;
 		var CommentUpdateData = (function() {
 			function CommentUpdateData() {
 				/// <summary>An interface for updating data on the Comment object, for use in "comment.set({ ... })".</summary>
-				/// <field name="content" type="String">Gets or sets the comment&apos;s content. The string is plain text. [Api set: ExcelApi 1.10]</field>;
-				/// <field name="resolved" type="Boolean">Gets or sets the comment thread status. A value of &quot;true&quot; means the comment thread is in the resolved state. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>;
+				/// <field name="content" type="String">The comment&apos;s content. The string is plain text. [Api set: ExcelApi 1.10]</field>;
+				/// <field name="resolved" type="Boolean">The comment thread status. A value of &quot;true&quot; means the comment thread is resolved. [Api set: ExcelApi 1.11]</field>;
 			}
 			return CommentUpdateData;
 		})();
@@ -22710,7 +23121,7 @@ var Excel;
 		var CommentReplyUpdateData = (function() {
 			function CommentReplyUpdateData() {
 				/// <summary>An interface for updating data on the CommentReply object, for use in "commentReply.set({ ... })".</summary>
-				/// <field name="content" type="String">Gets or sets the comment reply&apos;s content. The string is plain text. [Api set: ExcelApi 1.10]</field>;
+				/// <field name="content" type="String">The comment reply&apos;s content. The string is plain text. [Api set: ExcelApi 1.10]</field>;
 			}
 			return CommentReplyUpdateData;
 		})();
@@ -22728,18 +23139,18 @@ var Excel;
 				/// <summary>An interface for updating data on the Shape object, for use in "shape.set({ ... })".</summary>
 				/// <field name="fill" type="Excel.Interfaces.ShapeFillUpdateData">Returns the fill formatting of this shape. [Api set: ExcelApi 1.9]</field>
 				/// <field name="lineFormat" type="Excel.Interfaces.ShapeLineFormatUpdateData">Returns the line formatting of this shape. [Api set: ExcelApi 1.9]</field>
-				/// <field name="altTextDescription" type="String">Returns or sets the alternative description text for a Shape object. [Api set: ExcelApi 1.9]</field>;
-				/// <field name="altTextTitle" type="String">Returns or sets the alternative title text for a Shape object. [Api set: ExcelApi 1.9]</field>;
-				/// <field name="geometricShapeType" type="String">Represents the geometric shape type of this geometric shape. See Excel.GeometricShapeType for details. Returns null if the shape type is not &quot;GeometricShape&quot;. [Api set: ExcelApi 1.9]</field>;
-				/// <field name="height" type="Number">Represents the height, in points, of the shape.              Throws an invalid argument exception when set with a negative value or zero as input. [Api set: ExcelApi 1.9]</field>;
+				/// <field name="altTextDescription" type="String">Specifies the alternative description text for a Shape object. [Api set: ExcelApi 1.9]</field>;
+				/// <field name="altTextTitle" type="String">Specifies the alternative title text for a Shape object. [Api set: ExcelApi 1.9]</field>;
+				/// <field name="geometricShapeType" type="String">Specifies the geometric shape type of this geometric shape. See Excel.GeometricShapeType for details. Returns null if the shape type is not &quot;GeometricShape&quot;. [Api set: ExcelApi 1.9]</field>;
+				/// <field name="height" type="Number">Specifies the height, in points, of the shape.              Throws an invalid argument exception when set with a negative value or zero as input. [Api set: ExcelApi 1.9]</field>;
 				/// <field name="left" type="Number">The distance, in points, from the left side of the shape to the left side of the worksheet.              Throws an invalid argument exception when set with a negative value as input. [Api set: ExcelApi 1.9]</field>;
-				/// <field name="lockAspectRatio" type="Boolean">Specifies whether or not the aspect ratio of this shape is locked. [Api set: ExcelApi 1.9]</field>;
-				/// <field name="name" type="String">Represents the name of the shape. [Api set: ExcelApi 1.9]</field>;
+				/// <field name="lockAspectRatio" type="Boolean">Specifies if the aspect ratio of this shape is locked. [Api set: ExcelApi 1.9]</field>;
+				/// <field name="name" type="String">Specifies the name of the shape. [Api set: ExcelApi 1.9]</field>;
 				/// <field name="placement" type="String">Represents how the object is attached to the cells below it. [Api set: ExcelApi 1.10]</field>;
-				/// <field name="rotation" type="Number">Represents the rotation, in degrees, of the shape. [Api set: ExcelApi 1.9]</field>;
+				/// <field name="rotation" type="Number">Specifies the rotation, in degrees, of the shape. [Api set: ExcelApi 1.9]</field>;
 				/// <field name="top" type="Number">The distance, in points, from the top edge of the shape to the top edge of the worksheet.              Throws an invalid argument exception when set with a negative value as input. [Api set: ExcelApi 1.9]</field>;
-				/// <field name="visible" type="Boolean">Represents the visibility of this shape. [Api set: ExcelApi 1.9]</field>;
-				/// <field name="width" type="Number">Represents the width, in points, of the shape.              Throws an invalid argument exception when set with a negative value or zero as input. [Api set: ExcelApi 1.9]</field>;
+				/// <field name="visible" type="Boolean">Specifies if the shape is visible. [Api set: ExcelApi 1.9]</field>;
+				/// <field name="width" type="Number">Specifies the width, in points, of the shape.              Throws an invalid argument exception when set with a negative value or zero as input. [Api set: ExcelApi 1.9]</field>;
 			}
 			return ShapeUpdateData;
 		})();
@@ -22777,8 +23188,8 @@ var Excel;
 		var ShapeFillUpdateData = (function() {
 			function ShapeFillUpdateData() {
 				/// <summary>An interface for updating data on the ShapeFill object, for use in "shapeFill.set({ ... })".</summary>
-				/// <field name="foregroundColor" type="String">Represents the shape fill foreground color in HTML color format, of the form #RRGGBB (e.g. &quot;FFA500&quot;) or as a named HTML color (e.g. &quot;orange&quot;) [Api set: ExcelApi 1.9]</field>;
-				/// <field name="transparency" type="Number">Returns or sets the transparency percentage of the fill as a value from 0.0 (opaque) through 1.0 (clear). Returns null if the shape type does not support transparency or the shape fill has inconsistent transparency, such as with a gradient fill type. [Api set: ExcelApi 1.9]</field>;
+				/// <field name="foregroundColor" type="String">Represents the shape fill foreground color in HTML color format, of the form #RRGGBB (e.g., &quot;FFA500&quot;) or as a named HTML color (e.g., &quot;orange&quot;) [Api set: ExcelApi 1.9]</field>;
+				/// <field name="transparency" type="Number">Specifies the transparency percentage of the fill as a value from 0.0 (opaque) through 1.0 (clear). Returns null if the shape type does not support transparency or the shape fill has inconsistent transparency, such as with a gradient fill type. [Api set: ExcelApi 1.9]</field>;
 			}
 			return ShapeFillUpdateData;
 		})();
@@ -22794,11 +23205,11 @@ var Excel;
 		var ShapeLineFormatUpdateData = (function() {
 			function ShapeLineFormatUpdateData() {
 				/// <summary>An interface for updating data on the ShapeLineFormat object, for use in "shapeLineFormat.set({ ... })".</summary>
-				/// <field name="color" type="String">Represents the line color in HTML color format, of the form #RRGGBB (e.g. &quot;FFA500&quot;) or as a named HTML color (e.g. &quot;orange&quot;). [Api set: ExcelApi 1.9]</field>;
+				/// <field name="color" type="String">Represents the line color in HTML color format, of the form #RRGGBB (e.g., &quot;FFA500&quot;) or as a named HTML color (e.g., &quot;orange&quot;). [Api set: ExcelApi 1.9]</field>;
 				/// <field name="dashStyle" type="String">Represents the line style of the shape. Returns null when the line is not visible or there are inconsistent dash styles. See Excel.ShapeLineStyle for details. [Api set: ExcelApi 1.9]</field>;
 				/// <field name="style" type="String">Represents the line style of the shape. Returns null when the line is not visible or there are inconsistent styles. See Excel.ShapeLineStyle for details. [Api set: ExcelApi 1.9]</field>;
 				/// <field name="transparency" type="Number">Represents the degree of transparency of the specified line as a value from 0.0 (opaque) through 1.0 (clear). Returns null when the shape has inconsistent transparencies. [Api set: ExcelApi 1.9]</field>;
-				/// <field name="visible" type="Boolean">Represents whether or not the line formatting of a shape element is visible. Returns null when the shape has inconsistent visibilities. [Api set: ExcelApi 1.9]</field>;
+				/// <field name="visible" type="Boolean">Specifies if the line formatting of a shape element is visible. Returns null when the shape has inconsistent visibilities. [Api set: ExcelApi 1.9]</field>;
 				/// <field name="weight" type="Number">Represents the weight of the line, in points. Returns null when the line is not visible or there are inconsistent line weights. [Api set: ExcelApi 1.9]</field>;
 			}
 			return ShapeLineFormatUpdateData;
@@ -22815,7 +23226,7 @@ var Excel;
 		var TextFrameUpdateData = (function() {
 			function TextFrameUpdateData() {
 				/// <summary>An interface for updating data on the TextFrame object, for use in "textFrame.set({ ... })".</summary>
-				/// <field name="autoSizeSetting" type="String">Gets or sets the automatic sizing settings for the text frame. A text frame can be set to automatically fit the text to the text frame, to automatically fit the text frame to the text, or not perform any automatic sizing. [Api set: ExcelApi 1.9]</field>;
+				/// <field name="autoSizeSetting" type="String">The automatic sizing settings for the text frame. A text frame can be set to automatically fit the text to the text frame, to automatically fit the text frame to the text, or not perform any automatic sizing. [Api set: ExcelApi 1.9]</field>;
 				/// <field name="bottomMargin" type="Number">Represents the bottom margin, in points, of the text frame. [Api set: ExcelApi 1.9]</field>;
 				/// <field name="horizontalAlignment" type="String">Represents the horizontal alignment of the text frame. See Excel.ShapeTextHorizontalAlignment for details. [Api set: ExcelApi 1.9]</field>;
 				/// <field name="horizontalOverflow" type="String">Represents the horizontal overflow behavior of the text frame. See Excel.ShapeTextHorizontalOverflow for details. [Api set: ExcelApi 1.9]</field>;
@@ -22859,10 +23270,10 @@ var Excel;
 			function ShapeFontUpdateData() {
 				/// <summary>An interface for updating data on the ShapeFont object, for use in "shapeFont.set({ ... })".</summary>
 				/// <field name="bold" type="Boolean">Represents the bold status of font. Returns null the TextRange includes both bold and non-bold text fragments. [Api set: ExcelApi 1.9]</field>;
-				/// <field name="color" type="String">The HTML color code representation of the text color (e.g. &quot;#FF0000&quot; represents red). Returns null if the TextRange includes text fragments with different colors. [Api set: ExcelApi 1.9]</field>;
+				/// <field name="color" type="String">HTML color code representation of the text color (e.g., &quot;#FF0000&quot; represents red). Returns null if the TextRange includes text fragments with different colors. [Api set: ExcelApi 1.9]</field>;
 				/// <field name="italic" type="Boolean">Represents the italic status of font. Returns null if the TextRange includes both italic and non-italic text fragments. [Api set: ExcelApi 1.9]</field>;
-				/// <field name="name" type="String">Represents font name (e.g. &quot;Calibri&quot;). If the text is Complex Script or East Asian language, this is the corresponding font name; otherwise it is the Latin font name. [Api set: ExcelApi 1.9]</field>;
-				/// <field name="size" type="Number">Represents font size in points (e.g. 11). Returns null if the TextRange includes text fragments with different font sizes. [Api set: ExcelApi 1.9]</field>;
+				/// <field name="name" type="String">Represents font name (e.g., &quot;Calibri&quot;). If the text is Complex Script or East Asian language, this is the corresponding font name; otherwise it is the Latin font name. [Api set: ExcelApi 1.9]</field>;
+				/// <field name="size" type="Number">Represents font size in points (e.g., 11). Returns null if the TextRange includes text fragments with different font sizes. [Api set: ExcelApi 1.9]</field>;
 				/// <field name="underline" type="String">Type of underline applied to the font. Returns null if the TextRange includes text fragments with different underline styles. See Excel.ShapeFontUnderlineStyle for details. [Api set: ExcelApi 1.9]</field>;
 			}
 			return ShapeFontUpdateData;
@@ -22879,7 +23290,7 @@ var Excel;
 		var SlicerUpdateData = (function() {
 			function SlicerUpdateData() {
 				/// <summary>An interface for updating data on the Slicer object, for use in "slicer.set({ ... })".</summary>
-				/// <field name="slicerStyle" type="Excel.Interfaces.SlicerStyleUpdateData">The style applied to the Slicer. [Api set: ExcelApi 1.12]</field>
+				/// <field name="slicerStyle" type="Excel.Interfaces.SlicerStyleUpdateData">The style applied to the Slicer. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>
 				/// <field name="worksheet" type="Excel.Interfaces.WorksheetUpdateData">Represents the worksheet containing the slicer. [Api set: ExcelApi 1.10]</field>
 				/// <field name="caption" type="String">Represents the caption of slicer. [Api set: ExcelApi 1.10]</field>;
 				/// <field name="height" type="Number">Represents the height, in points, of the slicer.              Throws an &quot;The argument is invalid or missing or has an incorrect format.&quot; exception when set with negative value or zero as input. [Api set: ExcelApi 1.10]</field>;
@@ -22921,12 +23332,28 @@ var Excel;
 		var RibbonUpdateData = (function() {
 			function RibbonUpdateData() {
 				/// <summary>An interface for updating data on the Ribbon object, for use in "ribbon.set({ ... })".</summary>
-				/// <field name="activeTab" type="String">Gets or sets the active ribbon tab. [Api set: ExcelApi 1.9]</field>;
+				/// <field name="activeTab" type="String">The active ribbon tab. [Api set: ExcelApi 1.9]</field>;
 			}
 			return RibbonUpdateData;
 		})();
 		Interfaces.RibbonUpdateData.__proto__ = null;
 		Interfaces.RibbonUpdateData = RibbonUpdateData;
+	})(Interfaces = Excel.Interfaces || (Excel.Interfaces = { __proto__: null}));
+})(Excel || (Excel = {__proto__: null}));
+
+var Excel;
+(function (Excel) {
+	var Interfaces;
+	(function (Interfaces) {
+		var NamedSheetViewUpdateData = (function() {
+			function NamedSheetViewUpdateData() {
+				/// <summary>An interface for updating data on the NamedSheetView object, for use in "namedSheetView.set({ ... })".</summary>
+				/// <field name="name" type="String">Gets or sets the name of the sheet view.              The temporary sheet view name is the empty string (&quot;&quot;).  Naming the view by using the name property causes the sheet view to be saved. [Api set: ExcelApi BETA (PREVIEW ONLY)]</field>;
+			}
+			return NamedSheetViewUpdateData;
+		})();
+		Interfaces.NamedSheetViewUpdateData.__proto__ = null;
+		Interfaces.NamedSheetViewUpdateData = NamedSheetViewUpdateData;
 	})(Interfaces = Excel.Interfaces || (Excel.Interfaces = { __proto__: null}));
 })(Excel || (Excel = {__proto__: null}));
 var Excel;

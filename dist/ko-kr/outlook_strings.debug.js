@@ -48,6 +48,7 @@ _u.ExtensibilityStrings.l_InvalidParameterValueError_Text = "'{0}' 매개 변수
 _u.ExtensibilityStrings.l_InvalidSelection_Text = "선택이 잘못되었습니다.";
 _u.ExtensibilityStrings.l_InvalidTime_Text = "입력이 유효한 날짜로 확인되지 않습니다.";
 _u.ExtensibilityStrings.l_Invalid_Category_Error_Text = "제공된 카테고리가 잘못되었습니다.";
+_u.ExtensibilityStrings.l_ItemNotFound_Text = "항목이 없거나 만들어지지 않았습니다.";
 _u.ExtensibilityStrings.l_Item_Not_Saved_Error_Text = "항목을 저장 해야 id를 검색할 수 있습니다.";
 _u.ExtensibilityStrings.l_MessageInDifferentStoreError_Text = "메시지가 다른 저장소에 저장되어 EWS ID를 검색할 수 없습니다.";
 _u.ExtensibilityStrings.l_Missing_Extended_Permissions_For_API = "API 호출에 대한 확장된 사용 권한이 누락되었습니다.";

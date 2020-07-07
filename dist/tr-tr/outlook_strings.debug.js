@@ -48,6 +48,7 @@ _u.ExtensibilityStrings.l_InvalidParameterValueError_Text = "'{0}' parametresini
 _u.ExtensibilityStrings.l_InvalidSelection_Text = "Seçim geçersiz.";
 _u.ExtensibilityStrings.l_InvalidTime_Text = "Giriş, geçerli bir tarihe çözümlenemiyor.";
 _u.ExtensibilityStrings.l_Invalid_Category_Error_Text = "Geçersiz kategoriler girildi.";
+_u.ExtensibilityStrings.l_ItemNotFound_Text = "Öğe yok veya oluşturulmamış.";
 _u.ExtensibilityStrings.l_Item_Not_Saved_Error_Text = "Öğe kaydedilene kadar kimlik alınamaz.";
 _u.ExtensibilityStrings.l_MessageInDifferentStoreError_Text = "İleti farklı bir depoya kaydedildiğinden EWS kimliği alınamıyor.";
 _u.ExtensibilityStrings.l_Missing_Extended_Permissions_For_API = "API çağrısı için Genişletilmiş İzin bulunmuyor.";

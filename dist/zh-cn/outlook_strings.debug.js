@@ -48,6 +48,7 @@ _u.ExtensibilityStrings.l_InvalidParameterValueError_Text = "参数“{0}”的�
 _u.ExtensibilityStrings.l_InvalidSelection_Text = "所选内容无效。";
 _u.ExtensibilityStrings.l_InvalidTime_Text = "输入未解析为有效日期。";
 _u.ExtensibilityStrings.l_Invalid_Category_Error_Text = "提供的类别无效。";
+_u.ExtensibilityStrings.l_ItemNotFound_Text = "该项目不存在或尚未创建。";
 _u.ExtensibilityStrings.l_Item_Not_Saved_Error_Text = "保存此项后，才能检索 ID。";
 _u.ExtensibilityStrings.l_MessageInDifferentStoreError_Text = "无法检索 EWS ID，因为邮件保存在其他存储区中。";
 _u.ExtensibilityStrings.l_Missing_Extended_Permissions_For_API = "缺少 API 调用扩展权限。";

@@ -48,6 +48,7 @@ _u.ExtensibilityStrings.l_InvalidParameterValueError_Text = 'Стойностт�
 _u.ExtensibilityStrings.l_InvalidSelection_Text = "Селекцията е невалидна.";
 _u.ExtensibilityStrings.l_InvalidTime_Text = "Въведеното не е валиден час.";
 _u.ExtensibilityStrings.l_Invalid_Category_Error_Text = "Предоставени са невалидни категории.";
+_u.ExtensibilityStrings.l_ItemNotFound_Text = "Елементът не съществува или не е създаден.";
 _u.ExtensibilityStrings.l_Item_Not_Saved_Error_Text = "ИД не може да бъде извлечен, докато елементът не бъде записан.";
 _u.ExtensibilityStrings.l_MessageInDifferentStoreError_Text = "ИД на EWS не може да бъде извлечен, защото съобщението е записано в друго хранилище.";
 _u.ExtensibilityStrings.l_Missing_Extended_Permissions_For_API = "За повикването на API липсва разширено разрешение.";

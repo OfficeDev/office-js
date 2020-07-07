@@ -48,6 +48,7 @@ _u.ExtensibilityStrings.l_InvalidParameterValueError_Text = "Parametrin {0} arvo
 _u.ExtensibilityStrings.l_InvalidSelection_Text = "Valinta on virheellinen.";
 _u.ExtensibilityStrings.l_InvalidTime_Text = "Syöte ei tuota kelvollista aikaa.";
 _u.ExtensibilityStrings.l_Invalid_Category_Error_Text = "Virheellisiä luokkia annettiin.";
+_u.ExtensibilityStrings.l_ItemNotFound_Text = "Kohdetta ei ole, tai sitä ei ole luotu.";
 _u.ExtensibilityStrings.l_Item_Not_Saved_Error_Text = "Tunnusta ei voi noutaa, ennen kuin osa on tallennettu.";
 _u.ExtensibilityStrings.l_MessageInDifferentStoreError_Text = "EWS-tunnusta ei voi noutaa, koska viesti on tallennettu toiseen säilöön.";
 _u.ExtensibilityStrings.l_Missing_Extended_Permissions_For_API = "API-kutsusta puuttuu laajennettu käyttöoikeus.";

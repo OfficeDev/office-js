@@ -48,6 +48,7 @@ _u.ExtensibilityStrings.l_InvalidParameterValueError_Text = "Parametro {0} reik�
 _u.ExtensibilityStrings.l_InvalidSelection_Text = "Pasirinkimas yra neleistinas.";
 _u.ExtensibilityStrings.l_InvalidTime_Text = "Įvestis nėra paverčiama tinkamu laiku.";
 _u.ExtensibilityStrings.l_Invalid_Category_Error_Text = "Pateiktos neleistinos kategorijos.";
+_u.ExtensibilityStrings.l_ItemNotFound_Text = "Elemento nėra arba jis nebuvo sukurtas.";
 _u.ExtensibilityStrings.l_Item_Not_Saved_Error_Text = "Nepavyks gauti ID, kol neįrašytas elementas.";
 _u.ExtensibilityStrings.l_MessageInDifferentStoreError_Text = "Negalima nuskaityti EWS ID, nes pranešimas įrašytas kitoje saugykloje.";
 _u.ExtensibilityStrings.l_Missing_Extended_Permissions_For_API = "API iškvietimui trūksta išplėstinio leidimo.";

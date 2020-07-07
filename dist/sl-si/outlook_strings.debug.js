@@ -48,6 +48,7 @@ _u.ExtensibilityStrings.l_InvalidParameterValueError_Text = "Vrednost parametra 
 _u.ExtensibilityStrings.l_InvalidSelection_Text = "Izbor ni veljaven.";
 _u.ExtensibilityStrings.l_InvalidTime_Text = "Vnosa ni mogoče razrešiti v veljavno uro.";
 _u.ExtensibilityStrings.l_Invalid_Category_Error_Text = "Navedene so bile neveljavne kategorije.";
+_u.ExtensibilityStrings.l_ItemNotFound_Text = "Element ne obstaja ali pa ni bil ustvarjen.";
 _u.ExtensibilityStrings.l_Item_Not_Saved_Error_Text = "ID-ja ni mogoče pridobiti, dokler element ne bo shranjen.";
 _u.ExtensibilityStrings.l_MessageInDifferentStoreError_Text = "ID-ja EWS ni mogoče pridobiti, ker je bilo sporočilo shranjeno v drugi shrambi.";
 _u.ExtensibilityStrings.l_Missing_Extended_Permissions_For_API = "Razširjeno dovoljenje manjka za klic API.";

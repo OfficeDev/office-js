@@ -48,6 +48,7 @@ _u.ExtensibilityStrings.l_InvalidParameterValueError_Text = '"{0}" параме�
 _u.ExtensibilityStrings.l_InvalidSelection_Text = "Таңдау жарамсыз.";
 _u.ExtensibilityStrings.l_InvalidTime_Text = "Енгізілген деректерді жарамды уақытқа айналдыру мүмкін емес.";
 _u.ExtensibilityStrings.l_Invalid_Category_Error_Text = "Жарамсыз санаттар көрсетілді.";
+_u.ExtensibilityStrings.l_ItemNotFound_Text = "Элемент жоқ немесе жасалмады.";
 _u.ExtensibilityStrings.l_Item_Not_Saved_Error_Text = "Идентификаторды алу мүмкін емес. Алдымен элементті сақтау қажет.";
 _u.ExtensibilityStrings.l_MessageInDifferentStoreError_Text = "EWS идентификаторын алу мүмкін емес, себебі хабар басқа сақтау орнында сақталған.";
 _u.ExtensibilityStrings.l_Missing_Extended_Permissions_For_API = "API қоңырауы үшін Кеңейтілген рұқсат жоқ.";

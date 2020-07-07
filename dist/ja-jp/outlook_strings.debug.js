@@ -48,6 +48,7 @@ _u.ExtensibilityStrings.l_InvalidParameterValueError_Text = "'{0}' パラメー�
 _u.ExtensibilityStrings.l_InvalidSelection_Text = "選択内容が正しくありません。";
 _u.ExtensibilityStrings.l_InvalidTime_Text = "有効な時刻に解決される入力ではありません。";
 _u.ExtensibilityStrings.l_Invalid_Category_Error_Text = "無効なカテゴリが指定されています。";
+_u.ExtensibilityStrings.l_ItemNotFound_Text = "アイテムが存在しないか、作成されていません。";
 _u.ExtensibilityStrings.l_Item_Not_Saved_Error_Text = "アイテムが保存されるまで id を取得できません。";
 _u.ExtensibilityStrings.l_MessageInDifferentStoreError_Text = "メッセージが別のストアに保存されているため、EWS ID を取得できません。";
 _u.ExtensibilityStrings.l_Missing_Extended_Permissions_For_API = "API 呼び出しの拡張アクセス許可がありません。";

@@ -1,5 +1,5 @@
 /* Excel specific API library */
-/* Version: 15.0.5226.3000 */
+/* Version: 15.0.5233.3000 */
 /*
 	Copyright (c) Microsoft Corporation.  All rights reserved.
 */
@@ -6380,7 +6380,7 @@ AriaLogger=(function() {
 				_loadAriaScriptAndLog(data["Table"], data);
 			}
 		},
-		EnableSendingTelemetryWithLegacyAria: true,
+		EnableSendingTelemetryWithLegacyAria: false,
 		EnableSendingTelemetryWithOTel: true
 	}
 })();

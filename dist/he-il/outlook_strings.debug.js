@@ -48,6 +48,7 @@ _u.ExtensibilityStrings.l_InvalidParameterValueError_Text = "הערך של הפ�
 _u.ExtensibilityStrings.l_InvalidSelection_Text = "הבחירה אינה חוקית.";
 _u.ExtensibilityStrings.l_InvalidTime_Text = "הקלט אינו מזוהה כשעה חוקית.";
 _u.ExtensibilityStrings.l_Invalid_Category_Error_Text = "סופקו קטגוריות לא חוקיות.";
+_u.ExtensibilityStrings.l_ItemNotFound_Text = "הפריט לא קיים או לא נוצר.";
 _u.ExtensibilityStrings.l_Item_Not_Saved_Error_Text = "לא ניתן לאחזר את המזהה עד לשמירת הפריט.";
 _u.ExtensibilityStrings.l_MessageInDifferentStoreError_Text = "אין אפשרות לאחזר את מזהה EWS מכיוון שההודעה נשמרה במאגר אחר.";
 _u.ExtensibilityStrings.l_Missing_Extended_Permissions_For_API = "הרשאה ממושכת חסרה עבור שיחת API.";

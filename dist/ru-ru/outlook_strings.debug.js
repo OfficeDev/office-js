@@ -48,6 +48,7 @@ _u.ExtensibilityStrings.l_InvalidParameterValueError_Text = "Параметр {0
 _u.ExtensibilityStrings.l_InvalidSelection_Text = "Недопустимый выбор.";
 _u.ExtensibilityStrings.l_InvalidTime_Text = "Не удается преобразовать входные данные в допустимое значение времени.";
 _u.ExtensibilityStrings.l_Invalid_Category_Error_Text = "Указаны недопустимые категории.";
+_u.ExtensibilityStrings.l_ItemNotFound_Text = "Элемент не существует или не был создан.";
 _u.ExtensibilityStrings.l_Item_Not_Saved_Error_Text = "Чтобы получить идентификатор, сначала необходимо сохранить элемент.";
 _u.ExtensibilityStrings.l_MessageInDifferentStoreError_Text = "Не удалось получить ИД EWS, так как сообщение сохранено в другом хранилище.";
 _u.ExtensibilityStrings.l_Missing_Extended_Permissions_For_API = "Отсутствует расширенное разрешение для вызова API.";

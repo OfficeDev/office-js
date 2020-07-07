@@ -48,6 +48,7 @@ _u.ExtensibilityStrings.l_InvalidParameterValueError_Text = "Érvénytelen a(z) 
 _u.ExtensibilityStrings.l_InvalidSelection_Text = "Érvénytelen a kijelölt rész.";
 _u.ExtensibilityStrings.l_InvalidTime_Text = "A beírt érték nem értelmezhető érvényes időpontként.";
 _u.ExtensibilityStrings.l_Invalid_Category_Error_Text = "Érvénytelen kategóriák lettek megadva.";
+_u.ExtensibilityStrings.l_ItemNotFound_Text = "Az elem nem létezik vagy nincs létrehozva.";
 _u.ExtensibilityStrings.l_Item_Not_Saved_Error_Text = "Az azonosító nem olvasható be az elem mentésekor.";
 _u.ExtensibilityStrings.l_MessageInDifferentStoreError_Text = "Nem sikerült beolvasni az EWS-azonosítót, mert egy másik tárolóba lett mentve az üzenet.";
 _u.ExtensibilityStrings.l_Missing_Extended_Permissions_For_API = "A bővített engedély hiányzik az API-híváshoz.";

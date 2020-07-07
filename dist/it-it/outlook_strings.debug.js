@@ -48,6 +48,7 @@ _u.ExtensibilityStrings.l_InvalidParameterValueError_Text = "Il valore del param
 _u.ExtensibilityStrings.l_InvalidSelection_Text = "La selezione non è valida.";
 _u.ExtensibilityStrings.l_InvalidTime_Text = "L'input non viene risolto in un'ora valida.";
 _u.ExtensibilityStrings.l_Invalid_Category_Error_Text = "Sono state fornite delle categorie non valide.";
+_u.ExtensibilityStrings.l_ItemNotFound_Text = "L'elemento non esiste o non è stato creato.";
 _u.ExtensibilityStrings.l_Item_Not_Saved_Error_Text = "L\\'ID non può essere recuperato fino a quando l\\'elemento non viene salvato.";
 _u.ExtensibilityStrings.l_MessageInDifferentStoreError_Text = "L'ID di Servizi Web Exchange non è stato recuperato perché il messaggio è stato salvato in un archivio diverso.";
 _u.ExtensibilityStrings.l_Missing_Extended_Permissions_For_API = "Autorizzazione estesa mancante per la chiamata API.";

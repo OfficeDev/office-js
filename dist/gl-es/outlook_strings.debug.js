@@ -48,6 +48,7 @@ _u.ExtensibilityStrings.l_InvalidParameterValueError_Text = 'O valor do parámet
 _u.ExtensibilityStrings.l_InvalidSelection_Text = "A selección non é válida.";
 _u.ExtensibilityStrings.l_InvalidTime_Text = "A entrada non se resolve como unha hora válida.";
 _u.ExtensibilityStrings.l_Invalid_Category_Error_Text = "Se forneceron categorías non válidas.";
+_u.ExtensibilityStrings.l_ItemNotFound_Text = "O elemento non existe ou non se creou.";
 _u.ExtensibilityStrings.l_Item_Not_Saved_Error_Text = "Non se pode recuperar o ID mentres non se garde o elemento.";
 _u.ExtensibilityStrings.l_MessageInDifferentStoreError_Text = "Non se pode recuperar o ID de EWS porque a mensaxe está gardada noutro almacén.";
 _u.ExtensibilityStrings.l_Missing_Extended_Permissions_For_API = "Falta o permiso ampliado para a chamada á API.";

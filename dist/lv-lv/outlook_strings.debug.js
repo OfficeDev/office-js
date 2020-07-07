@@ -48,6 +48,7 @@ _u.ExtensibilityStrings.l_InvalidParameterValueError_Text = "Parametra {0} vērt
 _u.ExtensibilityStrings.l_InvalidSelection_Text = "Atlase nav derīga.";
 _u.ExtensibilityStrings.l_InvalidTime_Text = "Ievade netiek atrisināta kā derīgs laiks.";
 _u.ExtensibilityStrings.l_Invalid_Category_Error_Text = "Tika ievadītas nederīgas kategorijas.";
+_u.ExtensibilityStrings.l_ItemNotFound_Text = "Vienums nepastāv vai nav izveidots.";
 _u.ExtensibilityStrings.l_Item_Not_Saved_Error_Text = "ID nevar izgūt, kamēr vienums nav saglabāts.";
 _u.ExtensibilityStrings.l_MessageInDifferentStoreError_Text = "EWS ID nevar izgūt, jo ziņojums ir saglabāts citā veikalā.";
 _u.ExtensibilityStrings.l_Missing_Extended_Permissions_For_API = "API izsaukumam trūkst paplašinātas atļaujas.";

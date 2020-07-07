@@ -48,6 +48,7 @@ _u.ExtensibilityStrings.l_InvalidParameterValueError_Text = "La valeur du param�
 _u.ExtensibilityStrings.l_InvalidSelection_Text = "La sélection n’est pas valide.";
 _u.ExtensibilityStrings.l_InvalidTime_Text = "L’entrée ne correspond pas à une heure valide.";
 _u.ExtensibilityStrings.l_Invalid_Category_Error_Text = "Des catégories non valides ont été fournies.";
+_u.ExtensibilityStrings.l_ItemNotFound_Text = "L’élément n’existe pas ou n’a pas été créé.";
 _u.ExtensibilityStrings.l_Item_Not_Saved_Error_Text = "Nous ne pouvons pas récupérer l’ID tant que l’élément n’a pas été enregistré.";
 _u.ExtensibilityStrings.l_MessageInDifferentStoreError_Text = "Nous n’avons pas pu récupérer l’ID EWS, car le message est enregistré dans une autre banque.";
 _u.ExtensibilityStrings.l_Missing_Extended_Permissions_For_API = "Autorisation étendue manquante pour l’appel d'API.";

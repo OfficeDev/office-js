@@ -48,6 +48,7 @@ _u.ExtensibilityStrings.l_InvalidParameterValueError_Text = "Vrednost parametra 
 _u.ExtensibilityStrings.l_InvalidSelection_Text = "Izbor je nevažeći.";
 _u.ExtensibilityStrings.l_InvalidTime_Text = "Unos se ne razrešava na važeće vreme.";
 _u.ExtensibilityStrings.l_Invalid_Category_Error_Text = "Obezbeđene su nevažeće kategorije.";
+_u.ExtensibilityStrings.l_ItemNotFound_Text = "Stavka ne postoji ili nije kreirana.";
 _u.ExtensibilityStrings.l_Item_Not_Saved_Error_Text = "Није могуће преузети ID док се ставка не сачува.";
 _u.ExtensibilityStrings.l_MessageInDifferentStoreError_Text = "Nije moguće preuzeti EWS ID zato što je poruka sačuvana u drugom skladištu.";
 _u.ExtensibilityStrings.l_Missing_Extended_Permissions_For_API = "Nedostaje proširena dozvola za API poziv.";

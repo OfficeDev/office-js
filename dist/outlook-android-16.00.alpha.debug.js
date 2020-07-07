@@ -1,6 +1,6 @@
 /* Outlook Android specific API library */
 /* osfweb version: 16.0.12419.10000 */
-/* office-js-api version: 20200319.5 */
+/* office-js-api version: 20200408.2 */
 /*
 	Copyright (c) Microsoft Corporation.  All rights reserved.
 */
@@ -7846,6 +7846,11 @@ MailboxEnums.Folder = {
   Junk: "junk",
   DeletedItems: "deletedItems"
 };
+MailboxEnums.ComposeType = {
+  Forward: "forward",
+  NewMail: "newMail",
+  Reply: "reply"
+};
 var CoercionType = {
   Text: "text",
   Html: "html"
@@ -8938,6 +8943,31 @@ function saveCustomProperties_validateParameters(customProperties) {
     throw createArgumentOutOfRange("customProperties");
   }
 }
+// CONCATENATED MODULE: ./src/utils/RuntimeFlighting.ts
+
+var beta = 2;
+var production = 1;
+var currentLevel;
+currentLevel = beta;
+var getCurrentLevel = function getCurrentLevel() {
+  return currentLevel;
+};
+var Features = {
+  featureSampleProduction: production,
+  featureSampleBeta: beta,
+  calendarItems: beta,
+  signature: beta,
+  replyCallback: beta,
+  propertyGetAll: beta
+};
+function isFeatureEnabled(feature) {
+  return feature <= getCurrentLevel();
+}
+function checkFeatureEnabledAndThrow(feature, featureName) {
+  if (!isFeatureEnabled(feature)) {
+    throw createBetaError(featureName);
+  }
+}
 // CONCATENATED MODULE: ./src/api/CustomProperties.ts
 var __spreadArrays = undefined && undefined.__spreadArrays || function () {
   for (var s = 0, i = 0, il = arguments.length; i < il; i++) {
@@ -8952,6 +8982,7 @@ var __spreadArrays = undefined && undefined.__spreadArrays || function () {
 
   return r;
 };
+
 
 
 
@@ -9020,6 +9051,18 @@ var CustomProperties_CustomProperties = function () {
     }
 
     saveCustomProperties.apply(void 0, __spreadArrays([this.rawData], args));
+  };
+
+  CustomProperties.prototype.getAll = function () {
+    var _this = this;
+
+    checkFeatureEnabledAndThrow(Features.propertyGetAll, "getAll");
+    var dictionary = {};
+    var keys = Object.keys(this.rawData);
+    keys.forEach(function (key) {
+      dictionary[key] = _this.get(key);
+    });
+    return dictionary;
   };
 
   return CustomProperties;
@@ -9281,30 +9324,6 @@ function setSelectedData(dispid) {
 
     standardInvokeHostMethod(dispid, commonParameters.asyncContext, commonParameters.callback, parameters, undefined);
   };
-}
-// CONCATENATED MODULE: ./src/utils/RuntimeFlighting.ts
-
-var beta = 2;
-var production = 1;
-var currentLevel;
-currentLevel = beta;
-var getCurrentLevel = function getCurrentLevel() {
-  return currentLevel;
-};
-var Features = {
-  featureSampleProduction: production,
-  featureSampleBeta: beta,
-  calendarItems: beta,
-  signature: beta,
-  replyCallback: beta
-};
-function isFeatureEnabled(feature) {
-  return feature <= getCurrentLevel();
-}
-function checkFeatureEnabledAndThrow(feature, featureName) {
-  if (!isFeatureEnabled(feature)) {
-    throw createBetaError(featureName);
-  }
 }
 // CONCATENATED MODULE: ./src/methods/setSignature.ts
 

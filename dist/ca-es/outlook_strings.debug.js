@@ -48,6 +48,7 @@ _u.ExtensibilityStrings.l_InvalidParameterValueError_Text = 'El valor del paràm
 _u.ExtensibilityStrings.l_InvalidSelection_Text = "La selecció no és vàlida.";
 _u.ExtensibilityStrings.l_InvalidTime_Text = "L'entrada no es resol en una hora vàlida.";
 _u.ExtensibilityStrings.l_Invalid_Category_Error_Text = "S'han proporcionat categories no vàlides.";
+_u.ExtensibilityStrings.l_ItemNotFound_Text = "L'element no existeix o no s'ha creat.";
 _u.ExtensibilityStrings.l_Item_Not_Saved_Error_Text = "L'id no es poden recuperar fins que es desa l'element.";
 _u.ExtensibilityStrings.l_MessageInDifferentStoreError_Text = "L'identificador de l'EWS ID no es pot recuperar perquè el missatge està desat en un altre emmagatzematge.";
 _u.ExtensibilityStrings.l_Missing_Extended_Permissions_For_API = "Falta un permís ampliat per a la crida d'API.";

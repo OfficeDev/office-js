@@ -48,6 +48,7 @@ _u.ExtensibilityStrings.l_InvalidParameterValueError_Text = "ค่าของ 
 _u.ExtensibilityStrings.l_InvalidSelection_Text = "ส่วนที่เลือกไม่ถูกต้อง";
 _u.ExtensibilityStrings.l_InvalidTime_Text = "ค่าป้อนเข้าไม่ได้แก้ไขเป็นเวลาที่ถูกต้อง";
 _u.ExtensibilityStrings.l_Invalid_Category_Error_Text = "ระบุประเภทไม่ถูกต้อง";
+_u.ExtensibilityStrings.l_ItemNotFound_Text = "ไม่มีรายการอยู่หรือไม่ได้ถูกสร้างขึ้น";
 _u.ExtensibilityStrings.l_Item_Not_Saved_Error_Text = "ไม่สามารถเรียกใช้รหัสได้เว้นแต่จะบันทึกรายการก่อน";
 _u.ExtensibilityStrings.l_MessageInDifferentStoreError_Text = "ไม่สามารถเรียกใช้รหัส EWS เนื่องจากข้อความจะถูกบันทึกในร้านค้าอื่น";
 _u.ExtensibilityStrings.l_Missing_Extended_Permissions_For_API = "ไม่มีสิทธิ์เพิ่มเติมสำหรับการเรียก API";

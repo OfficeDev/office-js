@@ -48,6 +48,7 @@ _u.ExtensibilityStrings.l_InvalidParameterValueError_Text = "Valoarea parametrul
 _u.ExtensibilityStrings.l_InvalidSelection_Text = "Selecția este nevalidă.";
 _u.ExtensibilityStrings.l_InvalidTime_Text = "Intrarea nu are ca rezultat o oră corectă.";
 _u.ExtensibilityStrings.l_Invalid_Category_Error_Text = "S-au furnizat categorii nevalide.";
+_u.ExtensibilityStrings.l_ItemNotFound_Text = "Elementul nu există sau nu a fost creat.";
 _u.ExtensibilityStrings.l_Item_Not_Saved_Error_Text = "ID-ul nu poate fi regăsit până când elementul nu este salvat.";
 _u.ExtensibilityStrings.l_MessageInDifferentStoreError_Text = "ID-ul EWS nu poate fi regăsit, deoarece mesajul este salvat într-un alt spațiu de stocare.";
 _u.ExtensibilityStrings.l_Missing_Extended_Permissions_For_API = "Lipsește permisiunea extinsă pentru apelul API.";

@@ -48,6 +48,7 @@ _u.ExtensibilityStrings.l_InvalidParameterValueError_Text = "Ogiltigt värde fö
 _u.ExtensibilityStrings.l_InvalidSelection_Text = "Markeringen är ogiltig.";
 _u.ExtensibilityStrings.l_InvalidTime_Text = "Indata omvandlas inte till en giltig tid.";
 _u.ExtensibilityStrings.l_Invalid_Category_Error_Text = "Ogiltig kategorier angavs.";
+_u.ExtensibilityStrings.l_ItemNotFound_Text = "Objektet finns inte eller har inte skapats.";
 _u.ExtensibilityStrings.l_Item_Not_Saved_Error_Text = "Det går inte att hämta ID förrän objektet har sparats.";
 _u.ExtensibilityStrings.l_MessageInDifferentStoreError_Text = "EWS-ID kan inte hämtas eftersom meddelandet har sparats i en annan lagring.";
 _u.ExtensibilityStrings.l_Missing_Extended_Permissions_For_API = "Utökad behörighet saknas i API-anropet.";

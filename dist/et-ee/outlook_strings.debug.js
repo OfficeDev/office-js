@@ -48,6 +48,7 @@ _u.ExtensibilityStrings.l_InvalidParameterValueError_Text = 'Parameetri "{0}" v�
 _u.ExtensibilityStrings.l_InvalidSelection_Text = "Valik ei sobi.";
 _u.ExtensibilityStrings.l_InvalidTime_Text = "Sisend ei lahene sobivaks kellaajaks.";
 _u.ExtensibilityStrings.l_Invalid_Category_Error_Text = "Esitati sobimatud kategooriad.";
+_u.ExtensibilityStrings.l_ItemNotFound_Text = "Üksust pole olemas või seda pole loodud.";
 _u.ExtensibilityStrings.l_Item_Not_Saved_Error_Text = "ID-d ei saa tuua enne üksuse salvestamist.";
 _u.ExtensibilityStrings.l_MessageInDifferentStoreError_Text = "EWS-i ID-d ei saa tuua, kuna sõnum on salvestatud mõnda teise salve.";
 _u.ExtensibilityStrings.l_Missing_Extended_Permissions_For_API = "Laiendatud õigus on API-kutse jaoks puudu.";

@@ -48,6 +48,7 @@ _u.ExtensibilityStrings.l_InvalidParameterValueError_Text = 'Η τιμή της 
 _u.ExtensibilityStrings.l_InvalidSelection_Text = "Η επιλογή δεν είναι έγκυρη.";
 _u.ExtensibilityStrings.l_InvalidTime_Text = "Τα στοιχεία εισόδου δεν αναλύονται σε έγκυρη ώρα.";
 _u.ExtensibilityStrings.l_Invalid_Category_Error_Text = "Δόθηκαν μη έγκυρες κατηγορίες.";
+_u.ExtensibilityStrings.l_ItemNotFound_Text = "Το στοιχείο δεν υπάρχει ή δεν έχει δημιουργηθεί.";
 _u.ExtensibilityStrings.l_Item_Not_Saved_Error_Text = "Το αναγνωριστικό δεν μπορεί να ανακτηθεί μέχρι να αποθηκευτεί το στοιχείο.";
 _u.ExtensibilityStrings.l_MessageInDifferentStoreError_Text = "Δεν είναι δυνατή η ανάκτηση του αναγνωριστικού EWS καθώς το μήνυμα έχει αποθηκευτεί σε διαφορετικό χώρο αποθήκευσης.";
 _u.ExtensibilityStrings.l_Missing_Extended_Permissions_For_API = "Λείπει το πρόσθετο δικαίωμα για την κλήση API.";

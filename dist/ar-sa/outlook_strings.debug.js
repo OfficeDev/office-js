@@ -48,6 +48,7 @@ _u.ExtensibilityStrings.l_InvalidParameterValueError_Text = "قيمة المعل
 _u.ExtensibilityStrings.l_InvalidSelection_Text = "التحديد غير صالح.";
 _u.ExtensibilityStrings.l_InvalidTime_Text = "لا يتم حل الإدخال إلى تاريخ صالح.";
 _u.ExtensibilityStrings.l_Invalid_Category_Error_Text = "تم تقديم فئات غير صالحة.";
+_u.ExtensibilityStrings.l_ItemNotFound_Text = "العنصر غير موجود أو لم يتم إنشاؤه.";
 _u.ExtensibilityStrings.l_Item_Not_Saved_Error_Text = "لا يمكن استرداد المعرف حتى يتم حفظ العنصر.";
 _u.ExtensibilityStrings.l_MessageInDifferentStoreError_Text = "لا يمكن استرداد معرّف EWS لأن الرسالة محفوظة في مخزن آخر.";
 _u.ExtensibilityStrings.l_Missing_Extended_Permissions_For_API = "الإذن الموسع مفقود لاستدعاء API.";

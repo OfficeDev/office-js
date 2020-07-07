@@ -48,6 +48,7 @@ _u.ExtensibilityStrings.l_InvalidParameterValueError_Text = "'{0}' पैरा�
 _u.ExtensibilityStrings.l_InvalidSelection_Text = "चयन मान्य नहीं है.";
 _u.ExtensibilityStrings.l_InvalidTime_Text = "इनपुट मान्य दिनांक को स्पष्ट नहीं करता.";
 _u.ExtensibilityStrings.l_Invalid_Category_Error_Text = "अमान्य श्रेणियाँ प्रदान की गई थीं.";
+_u.ExtensibilityStrings.l_ItemNotFound_Text = "आइटम मौजूद नहीं है या बनाया नहीं गया है.";
 _u.ExtensibilityStrings.l_Item_Not_Saved_Error_Text = "आइटम सहेजे जाने तक id को पुनर्प्राप्त नहीं किया जा सकता.";
 _u.ExtensibilityStrings.l_MessageInDifferentStoreError_Text = "EWS ID पुनर्प्राप्त नहीं की जा सकती क्योंकि संदेश किसी अन्य स्टोर में सहेजा जाता है.";
 _u.ExtensibilityStrings.l_Missing_Extended_Permissions_For_API = "API कॉल के लिए विस्तृत अनुमति अनुपलब्ध है.";

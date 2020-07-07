@@ -48,6 +48,7 @@ _u.ExtensibilityStrings.l_InvalidParameterValueError_Text = "Wartość parametru
 _u.ExtensibilityStrings.l_InvalidSelection_Text = "Zaznaczenie jest nieprawidłowe.";
 _u.ExtensibilityStrings.l_InvalidTime_Text = "Dane wejściowe nie są prawidłową godziną.";
 _u.ExtensibilityStrings.l_Invalid_Category_Error_Text = "Dostarczono nieprawidłowe kategorie.";
+_u.ExtensibilityStrings.l_ItemNotFound_Text = "Element nie istnieje lub nie został utworzony.";
 _u.ExtensibilityStrings.l_Item_Not_Saved_Error_Text = "Nie można pobrać identyfikatora przed zapisaniem elementu.";
 _u.ExtensibilityStrings.l_MessageInDifferentStoreError_Text = "Nie można pobrać identyfikatora usług EWS, ponieważ wiadomość jest zapisana w innym magazynie.";
 _u.ExtensibilityStrings.l_Missing_Extended_Permissions_For_API = "Brak uprawnienia rozszerzonego dla wywołania interfejsu API.";
