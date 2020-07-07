@@ -29,8 +29,12 @@ Strings.OfficeOM.L_CloseFileBeforeRetrieve = "قبل از بازیابی فای�
 Strings.OfficeOM.L_CoercionTypeNotMatchBinding = "نوع تبدیل داده معین شده با این نوع پیوستگی سازگار نیست.";
 Strings.OfficeOM.L_CoercionTypeNotSupported = "نوع تبدیل داده معین شده پشتیبانی نمیشود.";
 Strings.OfficeOM.L_ColIndexOutOfRange = "مقدار فهرست ستون خارج از محدوده مجاز است. از مقداری (0 یا بیشتر) استفاده کنید که کمتر از تعداد ستون ها باشد.";
+Strings.OfficeOM.L_ConfirmCancelMessage = "با عرض پوزش، نمی‌توانیم ادامه دهیم.";
+Strings.OfficeOM.L_ConfirmDialog = "آیا به دامنه {0} که این جلسه Office در آن میزبانی می‌شود اعتماد دارید؟";
+Strings.OfficeOM.L_ConfirmRefreshMessage = "برای ادامه، افزونه را حذف و دوباره آن را اضافه کنید، یا صفحه را تازه‌سازی کنید.";
 Strings.OfficeOM.L_ConnectionFailureWithDetails = "درخواست با کد وضعیت {0}، کد خطای {1} و پیام خطای زیر انجام نشد: {2}";
 Strings.OfficeOM.L_ConnectionFailureWithStatus = "درخواست با کد وضعیت {0} انجام نشد.";
+Strings.OfficeOM.L_ContinueButton = "ادامه";
 Strings.OfficeOM.L_CustomFunctionDefinitionMissing = "مشخصه‌ای با این نام که نشان‌دهنده تعریف تابع است باید در Excel.Script.CustomFunctions موجود باشد.";
 Strings.OfficeOM.L_CustomFunctionImplementationMissing = 'مشخصه‌ای با این نام در Excel.Script.CustomFunctions که نشان‌دهنده تعریف تابع است باید شامل ویژگی "call" باشد که این تابع را اجرا کند.';
 Strings.OfficeOM.L_CustomFunctionNameCannotSplit = "نام تابع باید شامل فضای نام غیر خالی و نام کوتاه غیر خالی باشد.";
@@ -128,12 +132,14 @@ Strings.OfficeOM.L_NewWindowCrossZone = "تنظیمات امنیتی در مرو
 Strings.OfficeOM.L_NewWindowCrossZoneConfigureBrowserLink = "مرورگر خود را پیکربندی کنید";
 Strings.OfficeOM.L_NewWindowCrossZoneErrorString = "محدودیت‌های مرورگر مانع از ایجاد کادر گفتگو می‌شود. دامنه کادر گفتگو و دامنه میزبان افزونه در یک منطقه امنیتی مشابه نیستند.";
 Strings.OfficeOM.L_NoCapability = "شما مجوزهای لازم برای این اقدام را ندارید.";
+Strings.OfficeOM.L_NoHttpsWAC = "این جلسه Office از اتصال امن استفاده نمی‌کند. توصیه می‌کنیم که اقدامات احتیاطی بیشتری انجام دهید.";
 Strings.OfficeOM.L_NonUniformPartialGetNotSupported = "نمی توان از پارامترهای مختصات برای جدول تبدیل خودکار، هنگامی که جدول حاوی سلول‌های ادغام شده است، استفاده کرد.";
 Strings.OfficeOM.L_NonUniformPartialSetNotSupported = "نمی توان از پارامترهای مختصات برای جدول تبدیل خودکار، هنگامی که جدول حاوی سلول‌های ادغام شده است، استفاده کرد.";
 Strings.OfficeOM.L_NotImplemented = "کارکرد {0} اجرا نمی‌شود.";
 Strings.OfficeOM.L_NotSupported = "کارکرد {0} پشتیبانی نمی‌شود.";
 Strings.OfficeOM.L_NotSupportedBindingType = "نوع پیوستگی معین شده {0} پشتیبانی نمیشود.";
 Strings.OfficeOM.L_NotSupportedEventType = "نوع رویداد معین شده {0} پشتیبانی نمیشود.";
+Strings.OfficeOM.L_NotTrustedWAC = "این افزونه غیرفعال شده است تا به حفظ امنیت شما کمک کند. برای ادامه استفاده از این افزونه، تأیید کنید که این مورد در دامنه‌ای مورد اعتمادی میزبانی می‌شود یا آن را در برنامه Office رایانه باز کنید.";
 Strings.OfficeOM.L_OperationCancelledError = "عملیات لغو شد";
 Strings.OfficeOM.L_OperationCancelledErrorMessage = "عملیات توسط کاربر لغو شد.";
 Strings.OfficeOM.L_OperationNotSupported = "این عملیات پشتیبانی نمیشود.";

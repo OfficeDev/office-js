@@ -4,6 +4,7 @@ _u.ExtensibilityStrings = function()
 };
 _u.ExtensibilityStrings.registerClass("_u.ExtensibilityStrings");
 _u.ExtensibilityStrings.l_APICallFailedDueToItemChange_Text = "Item yang dipilih telah diubah.";
+_u.ExtensibilityStrings.l_API_Not_Supported_By_ExtensionPoint_Error_Text = "API tidak didukung untuk titik ekstensi.";
 _u.ExtensibilityStrings.l_ActionsDefinitionMultipleActionsError_Text = "Hanya satu tindakan yang didukung saat ini.";
 _u.ExtensibilityStrings.l_ActionsDefinitionWrongNotificationMessageError_Text = "Tindakan tidak dapat didefinisikan untuk tipe pesan pemberitahuan ini.";
 _u.ExtensibilityStrings.l_AttachmentDeleteGeneralFailure_Text = "Lampiran tidak dapat dihapus dari item.";
@@ -47,8 +48,10 @@ _u.ExtensibilityStrings.l_InvalidParameterValueError_Text = "Nilai parameter '{0
 _u.ExtensibilityStrings.l_InvalidSelection_Text = "Pilihan tidak valid.";
 _u.ExtensibilityStrings.l_InvalidTime_Text = "Input tidak ditetapkan ke tanggal yang valid.";
 _u.ExtensibilityStrings.l_Invalid_Category_Error_Text = "Kategori yang diberikan tidak valid.";
+_u.ExtensibilityStrings.l_ItemNotFound_Text = "Item tidak ada atau belum dibuat.";
 _u.ExtensibilityStrings.l_Item_Not_Saved_Error_Text = "ID tidak dapat diambil hingga item disimpan.";
 _u.ExtensibilityStrings.l_MessageInDifferentStoreError_Text = "ID EWS tidak dapat diambil karena pesan disimpan di bursa yang berbeda.";
+_u.ExtensibilityStrings.l_Missing_Extended_Permissions_For_API = "Izin yang Diperluas tidak ditemukan untuk panggilan API.";
 _u.ExtensibilityStrings.l_NoValidRecipientsProvided_Text = "Tidak tersedia penerima valid.";
 _u.ExtensibilityStrings.l_NotificationKeyNotFound_Text = "Tidak ada pemberitahuan dengan tombol yang disediakan.";
 _u.ExtensibilityStrings.l_NullOrEmptyParameterError_Text = "Parameter '{0}' bersifat wajib dan tidak boleh null atau kosong.";
@@ -67,3 +70,4 @@ _u.ExtensibilityStrings.l_RecurrenceUnsupportedAlternateCalendar_Text = "Pola pe
 _u.ExtensibilityStrings.l_Recurrence_Error_Instance_SetAsync_Text = "Pola pengulangan tidak dapat diatur untuk satu kemunculan dalam seri.";
 _u.ExtensibilityStrings.l_Recurrence_Error_Properties_Invalid_Text = "Pola pengulangan tidak valid. Harap periksa bahwa properti pengulangan tertentu selaras dengan tipe pengulangan.";
 _u.ExtensibilityStrings.l_SaveError_Text = "Kesalahan koneksi terjadi ketika mencoba menyimpan item di server.";
+_u.ExtensibilityStrings.l_TokenAccessDeniedWithoutItemContext_Text = "Token sisanya hanya tersedia dengan izin ReadWriteMailbox jika tidak ada konteks item.";

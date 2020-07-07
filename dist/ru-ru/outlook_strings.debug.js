@@ -4,6 +4,7 @@ _u.ExtensibilityStrings = function()
 };
 _u.ExtensibilityStrings.registerClass("_u.ExtensibilityStrings");
 _u.ExtensibilityStrings.l_APICallFailedDueToItemChange_Text = "Выбранный элемент изменен.";
+_u.ExtensibilityStrings.l_API_Not_Supported_By_ExtensionPoint_Error_Text = "API для точки расширения не поддерживается.";
 _u.ExtensibilityStrings.l_ActionsDefinitionMultipleActionsError_Text = "В настоящее время поддерживается только одно действие.";
 _u.ExtensibilityStrings.l_ActionsDefinitionWrongNotificationMessageError_Text = "Для этого типа уведомлений невозможно определить действия.";
 _u.ExtensibilityStrings.l_AttachmentDeleteGeneralFailure_Text = "Не удается удалить вложение из элемента.";
@@ -47,8 +48,10 @@ _u.ExtensibilityStrings.l_InvalidParameterValueError_Text = "Параметр {0
 _u.ExtensibilityStrings.l_InvalidSelection_Text = "Недопустимый выбор.";
 _u.ExtensibilityStrings.l_InvalidTime_Text = "Не удается преобразовать входные данные в допустимое значение времени.";
 _u.ExtensibilityStrings.l_Invalid_Category_Error_Text = "Указаны недопустимые категории.";
+_u.ExtensibilityStrings.l_ItemNotFound_Text = "Элемент не существует или не был создан.";
 _u.ExtensibilityStrings.l_Item_Not_Saved_Error_Text = "Чтобы получить идентификатор, сначала необходимо сохранить элемент.";
 _u.ExtensibilityStrings.l_MessageInDifferentStoreError_Text = "Не удалось получить ИД EWS, так как сообщение сохранено в другом хранилище.";
+_u.ExtensibilityStrings.l_Missing_Extended_Permissions_For_API = "Отсутствует расширенное разрешение для вызова API.";
 _u.ExtensibilityStrings.l_NoValidRecipientsProvided_Text = "Не указаны допустимые получатели.";
 _u.ExtensibilityStrings.l_NotificationKeyNotFound_Text = "Уведомления с указанным ключом не найдены.";
 _u.ExtensibilityStrings.l_NullOrEmptyParameterError_Text = "Параметр {0} обязателен и не может быть пустым или иметь значение NULL.";
@@ -67,3 +70,4 @@ _u.ExtensibilityStrings.l_RecurrenceUnsupportedAlternateCalendar_Text = "Рас�
 _u.ExtensibilityStrings.l_Recurrence_Error_Instance_SetAsync_Text = "Невозможно задать расписание повторения для отдельного события в серии.";
 _u.ExtensibilityStrings.l_Recurrence_Error_Properties_Invalid_Text = "Расписание повторения недопустимо. Убедитесь в том, что указанные свойства повторения согласуются с его типом.";
 _u.ExtensibilityStrings.l_SaveError_Text = "Ошибка подключения при сохранении элемента на сервере.";
+_u.ExtensibilityStrings.l_TokenAccessDeniedWithoutItemContext_Text = "Маркер REST доступен только с использованием разрешения ReadWriteMailbox, если отсутствует контекст элемента.";

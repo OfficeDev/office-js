@@ -1,6 +1,6 @@
 /* Outlook Web specific API library */
-/* osfweb version: 16.0.12312.10000 */
-/* office-js-api version: 20191204.1 */
+/* osfweb version: 16.0.12419.10000 */
+/* office-js-api version: 20200408.2 */
 /*
 	Copyright (c) Microsoft Corporation.  All rights reserved.
 */
@@ -15,7 +15,7 @@
         * @version   2.3.0
 */
 /* Outlook OWA specific API library */
-/* Version: 16.0.12312.10000 */
+/* Version: 16.0.12419.10000 */
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
@@ -1274,6 +1274,7 @@ Microsoft.Office.WebExtension.Parameters = {
     UseDeviceIndependentPixels: "useDeviceIndependentPixels",
     PromptBeforeOpen: "promptBeforeOpen",
     EnforceAppDomain: "enforceAppDomain",
+    UrlNoHostInfo: "urlNoHostInfo",
     AppCommandInvocationCompletedData: "appCommandInvocationCompletedData",
     Base64: "base64",
     FormId: "formId"
@@ -3566,7 +3567,8 @@ OSF.ShowWindowDialogParameterKeys = {
     HideTitle: "hideTitle",
     UseDeviceIndependentPixels: "useDeviceIndependentPixels",
     PromptBeforeOpen: "promptBeforeOpen",
-    EnforceAppDomain: "enforceAppDomain"
+    EnforceAppDomain: "enforceAppDomain",
+    UrlNoHostInfo: "urlNoHostInfo"
 };
 OSF.HostThemeButtonStyleKeys = {
     ButtonBorderColor: "buttonBorderColor",
@@ -4482,7 +4484,7 @@ Microsoft.Office.Common.Message = function Microsoft_Office_Common_Message(messa
     this._actionName = actionName;
     this._conversationId = conversationId;
     this._correlationId = correlationId;
-    this._origin = window.location.href;
+    this._origin = window.location.origin;
     if (typeof data == "undefined") {
         this._data = null;
     }
@@ -4894,17 +4896,6 @@ OSF.InitializationHelper = function OSF_InitializationHelper(hostInfo, webAppSta
     this._initializeSettings = function OSF_InitializationHelper$initializeSettings(appContext, refreshSupported) {
         var settings;
         var serializedSettings = appContext.get_settings();
-        var osfSessionStorage = OSF.OUtil.getSessionStorage();
-        if (osfSessionStorage) {
-            var storageSettings = osfSessionStorage.getItem(OSF._OfficeAppFactory.getCachedSessionSettingsKey());
-            if (storageSettings) {
-                serializedSettings = JSON.parse(storageSettings);
-            }
-            else {
-                storageSettings = JSON.stringify(serializedSettings);
-                osfSessionStorage.setItem(OSF._OfficeAppFactory.getCachedSessionSettingsKey(), storageSettings);
-            }
-        }
         var deserializedSettings = OSF.DDA.SettingsManager.deserializeSettings(serializedSettings);
         if (refreshSupported) {
             settings = new OSF.DDA.RefreshableSettings(deserializedSettings);
@@ -6277,7 +6268,7 @@ var OSFAppTelemetry;
         }
         appInfo.message = context.get_hostCustomMessage();
         appInfo.officeJSVersion = OSF.ConstantNames.FileVersion;
-        appInfo.hostJSVersion = "16.0.12312.10000";
+        appInfo.hostJSVersion = "16.0.12419.10000";
         if (context._wacHostEnvironment) {
             appInfo.wacHostEnvironment = context._wacHostEnvironment;
         }
@@ -7166,8 +7157,9 @@ OSF.DDA.AsyncMethodNames.addNames({
 });
 OSF.DDA.SyncMethodNames.addNames({
     MessageParent: "messageParent",
-    AddMessageHandler: "addEventHandler",
-    SendMessage: "sendMessage"
+    MessageChild: "messageChild",
+    SendMessage: "sendMessage",
+    AddMessageHandler: "addEventHandler"
 });
 OSF.DDA.UI.ParentUI = function OSF_DDA_ParentUI() {
     var eventDispatch;
@@ -7310,6 +7302,13 @@ OSF.DDA.AsyncMethodCalls.define({
                 "types": ["boolean"],
                 "defaultValue": false
             }
+        },
+        {
+            name: Microsoft.Office.WebExtension.Parameters.UrlNoHostInfo,
+            value: {
+                "types": ["boolean"],
+                "defaultValue": false
+            }
         }
     ],
     privateStateCallbacks: [],
@@ -7334,13 +7333,24 @@ OSF.DDA.AsyncMethodCalls.define({
                 return eventDispatch.addEventHandlerAndFireQueuedEvent(eventType, handler);
             }
         });
-        var sendMessage = OSF.DDA.SyncMethodNames.SendMessage.displayName;
-        OSF.OUtil.defineEnumerableProperty(dialog, sendMessage, {
-            value: function () {
-                var execute = OSF._OfficeAppFactory.getHostFacade()[OSF.DDA.DispIdHost.Methods.SendMessage];
-                return execute(arguments, eventDispatch, dialog);
-            }
-        });
+        if (OSF.DDA.UI.EnableSendMessageDialogAPI === true) {
+            var sendMessage = OSF.DDA.SyncMethodNames.SendMessage.displayName;
+            OSF.OUtil.defineEnumerableProperty(dialog, sendMessage, {
+                value: function () {
+                    var execute = OSF._OfficeAppFactory.getHostFacade()[OSF.DDA.DispIdHost.Methods.SendMessage];
+                    return execute(arguments, eventDispatch, dialog);
+                }
+            });
+        }
+        if (OSF.DDA.UI.EnableMessageChildDialogAPI === true) {
+            var messageChild = OSF.DDA.SyncMethodNames.MessageChild.displayName;
+            OSF.OUtil.defineEnumerableProperty(dialog, messageChild, {
+                value: function () {
+                    var execute = OSF._OfficeAppFactory.getHostFacade()[OSF.DDA.DispIdHost.Methods.SendMessage];
+                    return execute(arguments, eventDispatch, dialog);
+                }
+            });
+        }
         return dialog;
     },
     checkCallArgs: function (callArgs, caller, stateInfo) {
@@ -7882,7 +7892,9 @@ var OfficeExt;
                 var hostInfo = hostInfoVals.join("|");
                 var appContext = OSF._OfficeAppFactory.getInitializationHelper()._appContext;
                 var windowUrl = dialogInfo[OSF.ShowWindowDialogParameterKeys.Url];
-                windowUrl = OfficeExt.WACUtils.addHostInfoAsQueryParam(windowUrl, hostInfo);
+                if (!dialogInfo[OSF.ShowWindowDialogParameterKeys.UrlNoHostInfo]) {
+                    windowUrl = OfficeExt.WACUtils.addHostInfoAsQueryParam(windowUrl, hostInfo);
+                }
                 var windowName = JSON.parse(window.name);
                 windowName[OSF.WindowNameItemKeys.HostInfo] = hostInfo;
                 windowName[OSF.WindowNameItemKeys.AppContext] = appContext;
@@ -8535,7 +8547,8 @@ OSF.DDA.WAC.Delegate.ParameterMap.define({
 window.OfficeRuntime = window.OfficeRuntime || {};
 window.OfficeRuntime.auth = {
     getAccessToken: function (params) {
-        return new window.Promise(function (resolve, reject) {
+        var internalPromise = window.Promise ? window.Promise : window.Office.Promise;
+        return new internalPromise(function (resolve, reject) {
             try {
                 window.Office.context.auth.getAccessTokenAsync(params || {}, function (result) {
                     if (result.status === "succeeded") {
@@ -8547,12 +8560,7 @@ window.OfficeRuntime.auth = {
                 });
             }
             catch (error) {
-                if (error && error.message) {
-                    reject(error.message);
-                }
-                else {
-                    reject(error);
-                }
+                reject(error);
             }
         });
     }
@@ -8932,6 +8940,7 @@ function initialize() {
   addErrorMessage(9029, "CanOnlyGetTokenForSavedItem", getString("l_CallSaveAsyncBeforeToken_Text"));
   addErrorMessage(9030, "APICallFailedDueToItemChange", getString("l_APICallFailedDueToItemChange_Text"));
   addErrorMessage(9031, "InvalidParameterValueError", getString("l_InvalidParameterValueError_Text"));
+  addErrorMessage(9032, "ApiCallNotSupportedByExtensionPoint", getString("l_API_Not_Supported_By_ExtensionPoint_Error_Text"));
   addErrorMessage(9033, "SetRecurrenceOnInstanceError", getString("l_Recurrence_Error_Instance_SetAsync_Text"));
   addErrorMessage(9034, "InvalidRecurrenceError", getString("l_Recurrence_Error_Properties_Invalid_Text"));
   addErrorMessage(9035, "RecurrenceZeroOccurrences", getString("l_RecurrenceErrorZeroOccurrences_Text"));
@@ -8946,6 +8955,8 @@ function initialize() {
   addErrorMessage(9044, "InvalidCategory", getString("l_Invalid_Category_Error_Text"));
   addErrorMessage(9045, "DuplicateCategory", getString("l_Duplicate_Category_Error_Text"));
   addErrorMessage(9046, "ItemNotSaved", getString("l_Item_Not_Saved_Error_Text"));
+  addErrorMessage(9047, "MissingExtendedPermissionsForAPIError", getString("l_Missing_Extended_Permissions_For_API"));
+  addErrorMessage(9048, "TokenAccessDenied", getString("l_TokenAccessDeniedWithoutItemContext_Text"));
   isInitialized = true;
 }
 function addErrorMessage(code, error, message) {
@@ -9006,6 +9017,8 @@ var AdditionalGlobalParameters = function () {
   });
 
   AdditionalGlobalParameters.prototype.updateOutlookExecuteParameters = function (executeParameters, additionalApiParameters) {
+    var outParameters = executeParameters;
+
     if (this._parameterBlobSupported) {
       if (this._itemNumber > 0) {
         additionalApiParameters.itemNumber = this._itemNumber.toString();
@@ -9016,15 +9029,17 @@ var AdditionalGlobalParameters = function () {
       }
 
       if (Object.keys(additionalApiParameters).length === 0) {
-        return;
+        return outParameters;
       }
 
-      if (executeParameters == null) {
-        executeParameters = new Array();
+      if (outParameters == null) {
+        outParameters = [];
       }
 
-      executeParameters.push(JSON.stringify(additionalApiParameters));
+      outParameters.push(JSON.stringify(additionalApiParameters));
     }
+
+    return outParameters;
   };
 
   return AdditionalGlobalParameters;
@@ -9055,7 +9070,7 @@ var callOutlookNativeDispatcher_callOutlookNativeDispatcher = function callOutlo
   });
 };
 var callOutlookNativeDispatcher_convertToOutlookNativeParameters = function convertToOutlookNativeParameters(dispid, data) {
-  var executeParameters = [];
+  var executeParameters = null;
   var optionalParameters = {};
 
   switch (dispid) {
@@ -9178,7 +9193,7 @@ var callOutlookNativeDispatcher_convertToOutlookNativeParameters = function conv
   }
 
   if (dispid !== 1) {
-    getAdditionalGlobalParametersSingleton().updateOutlookExecuteParameters(executeParameters, optionalParameters);
+    executeParameters = getAdditionalGlobalParametersSingleton().updateOutlookExecuteParameters(executeParameters, optionalParameters);
   }
 
   return executeParameters;
@@ -9294,11 +9309,11 @@ function standardInvokeHostMethod(dispid, userContext, callback, data, format, c
         }
 
         if (!asyncResult && resultCode !== InvokeResultCode.noError) {
-          asyncResult = createAsyncResult(undefined, standardInvokeHostMethod_OSF.DDA.AsyncResultEnum.ErrorCode.Failed, standardInvokeHostMethod_OSF.DDA.ErrorCodes.InternalFormatError, userContext);
+          asyncResult = createAsyncResult(undefined, standardInvokeHostMethod_OSF.DDA.AsyncResultEnum.ErrorCode.Failed, 9002, userContext);
         }
 
         if (!asyncResult && resultCode === InvokeResultCode.noError && wasSuccessful === false) {
-          asyncResult = createAsyncResult(undefined, standardInvokeHostMethod_OSF.DDA.AsyncResultEnum.ErrorCode.Failed, standardInvokeHostMethod_OSF.DDA.ErrorCodes.OoeOperationNotSupported, userContext);
+          asyncResult = createAsyncResult(undefined, standardInvokeHostMethod_OSF.DDA.AsyncResultEnum.ErrorCode.Failed, standardInvokeHostMethod_OSF.DDA.ErrorCodeManager.errorCodes.ooeOperationNotSupported, userContext);
         }
 
         callback(asyncResult);
@@ -9373,6 +9388,13 @@ function createError(message, errorInfo) {
     }
   }
 
+  return err;
+}
+function createBetaError(featureName) {
+  var displayMessage = "The feature {0}, is only enabled on the beta api endpoint".replace("{0}", featureName);
+  var err = createError(displayMessage, {
+    name: "Sys.FeatureNotEnabled"
+  });
   return err;
 }
 function createParameterCountError(message) {
@@ -9616,6 +9638,11 @@ MailboxEnums.Folder = {
   Junk: "junk",
   DeletedItems: "deletedItems"
 };
+MailboxEnums.ComposeType = {
+  Forward: "forward",
+  NewMail: "newMail",
+  Reply: "reply"
+};
 var CoercionType = {
   Text: "text",
   Html: "html"
@@ -9825,6 +9852,12 @@ MailboxEnums.TimeZone = {
 MailboxEnums.LocationType = {
   Custom: "custom",
   Room: "room"
+};
+MailboxEnums.AppointmentSensitivityType = {
+  Normal: "normal",
+  Personal: "personal",
+  Private: "private",
+  Confidential: "confidential"
 };
 MailboxEnums.CategoryColor = {
   None: "None",
@@ -10332,6 +10365,10 @@ function handleTokenResponse(response, context, resultCode) {
 
 
 
+
+
+
+
 function getCallbackToken() {
   var args = [];
 
@@ -10345,6 +10382,12 @@ function getCallbackToken() {
 
   if (commonParameters.options && !!commonParameters.options.isRest) {
     isRest = true;
+  }
+
+  if (getIsNoItemContextWebExt()) {
+    if (!isRest || getPermissionLevel_getPermissionLevel() < 3) {
+      throw createError(getString("l_TokenAccessDeniedWithoutItemContext_Text"));
+    }
   }
 
   standardInvokeHostMethod(12, commonParameters.asyncContext, commonParameters.callback, {
@@ -10679,7 +10722,7 @@ function saveCustomProperties(customProperties) {
     args[_i - 1] = arguments[_i];
   }
 
-  checkPermissionsAndThrow(2, "item.saveCustomProperties");
+  checkPermissionsAndThrow(1, "item.saveCustomProperties");
   var commonParameters = parseCommonArgs(args, false, true);
   saveCustomProperties_validateParameters(customProperties);
   standardInvokeHostMethod(4, commonParameters.asyncContext, commonParameters.callback, {
@@ -10690,6 +10733,31 @@ function saveCustomProperties(customProperties) {
 function saveCustomProperties_validateParameters(customProperties) {
   if (JSON.stringify(customProperties).length > MaxCustomPropertiesLength) {
     throw createArgumentOutOfRange("customProperties");
+  }
+}
+// CONCATENATED MODULE: ./src/utils/RuntimeFlighting.ts
+
+var beta = 2;
+var production = 1;
+var currentLevel;
+currentLevel = production;
+var getCurrentLevel = function getCurrentLevel() {
+  return currentLevel;
+};
+var Features = {
+  featureSampleProduction: production,
+  featureSampleBeta: beta,
+  calendarItems: beta,
+  signature: beta,
+  replyCallback: beta,
+  propertyGetAll: beta
+};
+function isFeatureEnabled(feature) {
+  return feature <= getCurrentLevel();
+}
+function checkFeatureEnabledAndThrow(feature, featureName) {
+  if (!isFeatureEnabled(feature)) {
+    throw createBetaError(featureName);
   }
 }
 // CONCATENATED MODULE: ./src/api/CustomProperties.ts
@@ -10706,6 +10774,7 @@ var __spreadArrays = undefined && undefined.__spreadArrays || function () {
 
   return r;
 };
+
 
 
 
@@ -10774,6 +10843,18 @@ var CustomProperties_CustomProperties = function () {
     }
 
     saveCustomProperties.apply(void 0, __spreadArrays([this.rawData], args));
+  };
+
+  CustomProperties.prototype.getAll = function () {
+    var _this = this;
+
+    checkFeatureEnabledAndThrow(Features.propertyGetAll, "getAll");
+    var dictionary = {};
+    var keys = Object.keys(this.rawData);
+    keys.forEach(function (key) {
+      dictionary[key] = _this.get(key);
+    });
+    return dictionary;
   };
 
   return CustomProperties;
@@ -10887,9 +10968,10 @@ function getBodyType() {
 
 var maxDataLengthForBodyApi = 1000000;
 var maxAppendOnSendLength = 5000;
+var maxDataLengthForSignatureBodyApi = 30000;
 function validateAppendOnSendBodyParamters(parameters) {
   if (typeof parameters.appendTxt !== "string") {
-    throw createArgumentTypeError("data", typeof parameters.data, "string");
+    throw createArgumentTypeError("data", typeof parameters.appendTxt, "string");
   }
 
   if (parameters.appendTxt.length > maxAppendOnSendLength) {
@@ -10902,6 +10984,15 @@ function validateBodyParameters(parameters) {
   }
 
   if (parameters.data.length > maxDataLengthForBodyApi) {
+    throw createArgumentOutOfRange("data", parameters.data.length);
+  }
+}
+function validateSignatureBodyParameters(parameters) {
+  if (typeof parameters.data !== "string") {
+    throw createArgumentTypeError("data", typeof parameters.data, "string");
+  }
+
+  if (parameters.data.length > maxDataLengthForSignatureBodyApi) {
     throw createArgumentOutOfRange("data", parameters.data.length);
   }
 }
@@ -10980,10 +11071,11 @@ function appendOnSend(data) {
   var parameters = {
     appendTxt: data
   };
-  validateAppendOnSendBodyParamters(parameters);
 
-  if (parameters.data && parameters.data.length > maxAppendOnSendLength) {
-    throw createArgumentOutOfRange("data", data.length);
+  if (isNullOrUndefined(parameters.appendTxt)) {
+    parameters.appendTxt = "";
+  } else {
+    validateAppendOnSendBodyParamters(parameters);
   }
 
   addCoercionTypeParameter(parameters, commonParameters);
@@ -11025,7 +11117,45 @@ function setSelectedData(dispid) {
     standardInvokeHostMethod(dispid, commonParameters.asyncContext, commonParameters.callback, parameters, undefined);
   };
 }
+// CONCATENATED MODULE: ./src/methods/setSignature.ts
+
+
+
+
+
+
+
+function setSignature(data) {
+  var args = [];
+
+  for (var _i = 1; _i < arguments.length; _i++) {
+    args[_i - 1] = arguments[_i];
+  }
+
+  checkPermissionsAndThrow(2, "item.body.setSignatureAsync");
+  var commonParameters = parseCommonArgs(args, false, false);
+  var parameters = {
+    data: data
+  };
+  checkFeatureEnabledAndThrow(Features.signature, "setSignatureAsync");
+
+  if (isNullOrUndefined(parameters.data)) {
+    parameters.data = "";
+  } else {
+    validateSignatureBodyParameters(parameters);
+  }
+
+  addCoercionTypeParameter(parameters, commonParameters);
+
+  if (parameters.coercionType === undefined) {
+    invokeCallbackWithCoercionTypeError(commonParameters);
+    return;
+  }
+
+  standardInvokeHostMethod(173, commonParameters.asyncContext, commonParameters.callback, parameters, undefined);
+}
 // CONCATENATED MODULE: ./src/api/getBodySurface.ts
+
 
 
 
@@ -11044,7 +11174,8 @@ function getBodySurface(isCompose) {
       getTypeAsync: getBodyType,
       prependAsync: bodyPrepend,
       setAsync: setBody,
-      setSelectedDataAsync: setSelectedData(13)
+      setSelectedDataAsync: setSelectedData(13),
+      setSignatureAsync: setSignature
     });
   }
 
@@ -11390,7 +11521,25 @@ function validateAndGetAttachments(data) {
 
   return attachments;
 }
+// CONCATENATED MODULE: ./src/utils/getOptionsAndCallback.ts
+
+function getOptionsAndCallback(data) {
+  var args = [];
+
+  if (!isNullOrUndefined(data.options)) {
+    args[0] = data.options;
+  }
+
+  if (!isNullOrUndefined(data.callback)) {
+    args[args.length] = data.callback;
+  }
+
+  return args;
+}
 // CONCATENATED MODULE: ./src/methods/displayReplyForm.ts
+
+
+
 
 
 
@@ -11405,7 +11554,14 @@ function displayReplyForm(formData) {
   }
 
   checkPermissionsAndThrow(1, "mailbox.displayReplyForm");
-  var commonParameters = parseCommonArgs(args, false, false);
+  var commonParameters = parseCommonArgs(getOptionsAndCallback(formData), false, false);
+
+  if (isFeatureEnabled(Features.replyCallback)) {
+    if (isNullOrUndefined(commonParameters) || commonParameters.options === undefined && commonParameters.callback === undefined) {
+      commonParameters = parseCommonArgs(args, false, false);
+    }
+  }
+
   var parameters = {
     formData: formData
   };
@@ -11435,6 +11591,9 @@ function displayReplyForm(formData) {
 
 
 
+
+
+
 function displayReplyAllForm(formData) {
   var args = [];
 
@@ -11443,7 +11602,14 @@ function displayReplyAllForm(formData) {
   }
 
   checkPermissionsAndThrow(1, "mailbox.displayReplyAllForm");
-  var commonParameters = parseCommonArgs(args, false, false);
+  var commonParameters = parseCommonArgs(getOptionsAndCallback(formData), false, false);
+
+  if (isFeatureEnabled(Features.replyCallback)) {
+    if (isNullOrUndefined(commonParameters) || commonParameters.options === undefined && commonParameters.callback === undefined) {
+      commonParameters = parseCommonArgs(args, false, false);
+    }
+  }
+
   var parameters = {
     formData: formData
   };
@@ -12846,7 +13012,9 @@ function getMessageRead() {
     getSelectedEntities: Entities_getSelectedEntities,
     getSelectedRegExMatches: Entities_getSelectedRegExMatches,
     loadCustomPropertiesAsync: loadCustomProperties,
-    delayDeliveryTime: getDelayDeliverySurface(false)
+    delayDeliveryTime: getDelayDeliverySurface(false),
+    isAllDayEvent: getInitialDataProp("isAllDayEvent"),
+    sensitivity: getInitialDataProp("sensitivity")
   });
   return messageRead;
 }
@@ -13443,7 +13611,61 @@ function getItemId() {
   var commonParameters = parseCommonArgs(args, true, false);
   standardInvokeHostMethod(164, commonParameters.asyncContext, commonParameters.callback, undefined, undefined);
 }
+// CONCATENATED MODULE: ./src/methods/getComposeType.ts
+
+
+
+
+function getComposeType() {
+  var args = [];
+
+  for (var _i = 0; _i < arguments.length; _i++) {
+    args[_i] = arguments[_i];
+  }
+
+  checkPermissionsAndThrow(1, "item.getComposeTypeAsync");
+  var commonParameters = parseCommonArgs(args, true, false);
+  checkFeatureEnabledAndThrow(Features.signature, "getComposeTypeAsync");
+  standardInvokeHostMethod(174, commonParameters.asyncContext, commonParameters.callback, undefined, undefined);
+}
+// CONCATENATED MODULE: ./src/methods/isClientSignatureEnabled.ts
+
+
+
+
+function isClientSignatureEnabled() {
+  var args = [];
+
+  for (var _i = 0; _i < arguments.length; _i++) {
+    args[_i] = arguments[_i];
+  }
+
+  checkPermissionsAndThrow(1, "isClientSignatureEnabledAsync");
+  var commonParameters = parseCommonArgs(args, true, false);
+  checkFeatureEnabledAndThrow(Features.signature, "isClientSignatureEnabledAsync");
+  standardInvokeHostMethod(175, commonParameters.asyncContext, commonParameters.callback, undefined, undefined);
+}
+// CONCATENATED MODULE: ./src/methods/disableClientSignature.ts
+
+
+
+
+function disableClientSignature() {
+  var args = [];
+
+  for (var _i = 0; _i < arguments.length; _i++) {
+    args[_i] = arguments[_i];
+  }
+
+  checkPermissionsAndThrow(2, "disableClientSignatureAsync");
+  var commonParameters = parseCommonArgs(args, true, false);
+  checkFeatureEnabledAndThrow(Features.signature, "disableClientSignatureAsync");
+  standardInvokeHostMethod(176, commonParameters.asyncContext, commonParameters.callback, undefined, undefined);
+}
 // CONCATENATED MODULE: ./src/api/getMessageCompose.ts
+
+
+
 
 
 
@@ -13494,7 +13716,10 @@ function getMessageCompose() {
     removeAttachmentAsync: removeAttachment,
     saveAsync: save,
     setSelectedDataAsync: setSelectedData(29),
-    delayDeliveryTime: getDelayDeliverySurface(true)
+    delayDeliveryTime: getDelayDeliverySurface(true),
+    getComposeTypeAsync: getComposeType,
+    isClientSignatureEnabledAsync: isClientSignatureEnabled,
+    disableClientSignatureAsync: disableClientSignature
   });
   return messageCompose;
 }
@@ -13681,7 +13906,9 @@ function getAppointmentRead() {
     getRegExMatchesByName: Entities_getRegExMatchesByName,
     getSelectedEntities: Entities_getSelectedEntities,
     getSelectedRegExMatches: Entities_getSelectedRegExMatches,
-    loadCustomPropertiesAsync: loadCustomProperties
+    loadCustomPropertiesAsync: loadCustomProperties,
+    isAllDayEvent: getInitialDataProp("isAllDayEvent"),
+    sensitivity: getInitialDataProp("sensitivity")
   });
   return appointmentRead;
 }
@@ -14143,7 +14370,133 @@ function getRecurrenceSurface(isCompose) {
 
   return recurrence;
 }
+// CONCATENATED MODULE: ./src/methods/getAllDayEvent.ts
+
+
+
+
+function getAllDayEvent() {
+  var args = [];
+
+  for (var _i = 0; _i < arguments.length; _i++) {
+    args[_i] = arguments[_i];
+  }
+
+  checkPermissionsAndThrow(1, "isAllDayEvent.getAsync");
+  var commonParameters = parseCommonArgs(args, true, false);
+  checkFeatureEnabledAndThrow(Features.calendarItems, "isAllDayEvent.getAsync");
+  standardInvokeHostMethod(169, commonParameters.asyncContext, commonParameters.callback, undefined, undefined);
+}
+// CONCATENATED MODULE: ./src/methods/setAllDayEvent.ts
+
+
+
+
+
+
+function setAllDayEvent(isAllDayEvent) {
+  var args = [];
+
+  for (var _i = 1; _i < arguments.length; _i++) {
+    args[_i - 1] = arguments[_i];
+  }
+
+  checkPermissionsAndThrow(2, "isAllDayEvent.setAsync");
+  var commonParameters = parseCommonArgs(args, true, false);
+  var parameters = {
+    isAllDayEvent: isAllDayEvent
+  };
+  checkFeatureEnabledAndThrow(Features.calendarItems, "isAllDayEvent.setAsync");
+  setAllDayEvent_validateParameters(parameters);
+  standardInvokeHostMethod(170, commonParameters.asyncContext, commonParameters.callback, parameters, undefined);
+}
+
+function setAllDayEvent_validateParameters(parameters) {
+  if (isNullOrUndefined(parameters.isAllDayEvent)) {
+    throw createNullArgumentError("isAllDayEvent");
+  }
+
+  if (typeof parameters.isAllDayEvent !== "boolean") {
+    throw createArgumentTypeError("isAllDayEvent", typeof parameters.isAllDayEvent, "boolean");
+  }
+}
+// CONCATENATED MODULE: ./src/api/getAllDayEventSurface.ts
+
+
+
+function getAllDayEventSurface() {
+  return objectDefine({}, {
+    getAsync: getAllDayEvent,
+    setAsync: setAllDayEvent
+  });
+}
+// CONCATENATED MODULE: ./src/methods/setSensitivity.ts
+
+
+
+
+
+
+
+function setSensitivity(sensitivity) {
+  var args = [];
+
+  for (var _i = 1; _i < arguments.length; _i++) {
+    args[_i - 1] = arguments[_i];
+  }
+
+  checkPermissionsAndThrow(2, "sensitivity.setAsync");
+  var commonParameters = parseCommonArgs(args, true, false);
+  var parameters = {
+    sensitivity: sensitivity
+  };
+  checkFeatureEnabledAndThrow(Features.calendarItems, "sensitivity.setAsync");
+  setSensitivity_validateParameters(parameters);
+  standardInvokeHostMethod(172, commonParameters.asyncContext, commonParameters.callback, parameters, undefined);
+}
+
+function setSensitivity_validateParameters(parameters) {
+  validateStringParam("sensitivity", parameters.sensitivity);
+  throwOnInvalidSensitivityType(parameters.sensitivity);
+}
+
+function throwOnInvalidSensitivityType(sensitivity) {
+  if (sensitivity !== MailboxEnums.AppointmentSensitivityType.Normal && sensitivity !== MailboxEnums.AppointmentSensitivityType.Personal && sensitivity !== MailboxEnums.AppointmentSensitivityType.Private && sensitivity !== MailboxEnums.AppointmentSensitivityType.Confidential) {
+    throw createArgumentError("sensitivity");
+  }
+}
+// CONCATENATED MODULE: ./src/methods/getSensitivity.ts
+
+
+
+
+function getSensitivity() {
+  var args = [];
+
+  for (var _i = 0; _i < arguments.length; _i++) {
+    args[_i] = arguments[_i];
+  }
+
+  checkPermissionsAndThrow(1, "sensitivity.getAsync");
+  var commonParameters = parseCommonArgs(args, true, false);
+  checkFeatureEnabledAndThrow(Features.calendarItems, "sensitivity.getAsync");
+  standardInvokeHostMethod(171, commonParameters.asyncContext, commonParameters.callback, undefined, undefined);
+}
+// CONCATENATED MODULE: ./src/api/getSensitivitySurface.ts
+
+
+
+function getSensitivitySurface() {
+  return objectDefine({}, {
+    getAsync: getSensitivity,
+    setAsync: setSensitivity
+  });
+}
 // CONCATENATED MODULE: ./src/api/getAppointmentCompose.ts
+
+
+
+
 
 
 
@@ -14197,7 +14550,11 @@ function getAppointmentCompose() {
     loadCustomPropertiesAsync: loadCustomProperties,
     removeAttachmentAsync: removeAttachment,
     saveAsync: save,
-    setSelectedDataAsync: setSelectedData(29)
+    setSelectedDataAsync: setSelectedData(29),
+    isAllDayEvent: getAllDayEventSurface(),
+    sensitivity: getSensitivitySurface(),
+    isClientSignatureEnabledAsync: isClientSignatureEnabled,
+    disableClientSignatureAsync: disableClientSignature
   });
   return appointmentCompose;
 }
@@ -14613,6 +14970,9 @@ var whenStringsFinish;
 var getInitialDataProp = function getInitialDataProp(key) {
   return appInstance && appInstance.getInitialDataProp(key);
 };
+var getIsNoItemContextWebExt = function getIsNoItemContextWebExt() {
+  return !appInstance || !appInstance.item;
+};
 var getAppName = function getAppName() {
   return appInstance && appInstance.getAppName();
 };
@@ -14636,7 +14996,7 @@ var OutlookAppOm_OutlookAppOm = function () {
     };
 
     this.initialize = function (data) {
-      if (data === null) {
+      if (data === null || data === undefined) {
         recreateAdditionalGlobalParametersSingleton(true);
         _this.initialData = null;
         _this.item = null;

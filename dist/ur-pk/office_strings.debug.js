@@ -29,8 +29,12 @@ Strings.OfficeOM.L_CloseFileBeforeRetrieve = "دوسرے کے بازگیر کر�
 Strings.OfficeOM.L_CoercionTypeNotMatchBinding = "اختصاصی جبر کی قسم بائنڈنگ قسم کے ساتھ ہم آہنگ نہیں ہے۔";
 Strings.OfficeOM.L_CoercionTypeNotSupported = "اختصاصی جبر کی قسم معاون نہیں ہے۔";
 Strings.OfficeOM.L_ColIndexOutOfRange = "قدر کا اشاریہ کالم اجازت یافتہ حد اطلاق سے باہر ہے۔ (0 یا اعلی) قدر جو کالموں کی تعداد کے مقابلہ میں کم ہو اسے استعمال کریں۔";
+Strings.OfficeOM.L_ConfirmCancelMessage = "معافی چاہتے ہیں، ہم جاری نہیں رکھ سکتے۔";
+Strings.OfficeOM.L_ConfirmDialog = "کیا آپ اس عمل داری {0} پر بھروسا کرتے ہیں جہاں یہ Office سیشن میزبان ہے؟";
+Strings.OfficeOM.L_ConfirmRefreshMessage = "جاری رکھنے کے لئے، ایڈ کو ہٹائیں اور اسے دوبارہ شامل کریں، یا صفحہ کو تازہ دم کریں۔";
 Strings.OfficeOM.L_ConnectionFailureWithDetails = "{0} کے حالت کوڈ کے ساتھ درخواست ناکام ہوگئی، نقص کوڈ {1} اور مندرجہ زیل نقص پیغام: {2}";
 Strings.OfficeOM.L_ConnectionFailureWithStatus = "{0} کے حالت کوڈ کے ساتھ درخواست ناکام ہوگئی۔";
+Strings.OfficeOM.L_ContinueButton = "جاری رکھیں";
 Strings.OfficeOM.L_CustomFunctionDefinitionMissing = "اس نام کے ساتھ خاصیت جو کہ فعل کہ تعریف کو ظاہر کرتی ہو Excel.Script.CustomFunctions پر موجود ہونی چاہیئے۔";
 Strings.OfficeOM.L_CustomFunctionImplementationMissing = "Excel.Script.CustomFunctions پر اس نام کے ساتھ خاصیت جوکہ فعل کی تعریف کو ظاہر کرتی ہو 'کال' خاصیت کی حامل ہونی چاہیئے جوکہ فعل کا نفاذ کرتی ہو۔";
 Strings.OfficeOM.L_CustomFunctionNameCannotSplit = "عملیے کا نام ایک غیر خالی نام جگہ اور غیر خالی مختصر نام کا حامل ہونا ضروری ہے۔";
@@ -128,12 +132,14 @@ Strings.OfficeOM.L_NewWindowCrossZone = "آپ کے براؤزر میں موجو�
 Strings.OfficeOM.L_NewWindowCrossZoneConfigureBrowserLink = "اپنا براؤزر تشکیل دیں";
 Strings.OfficeOM.L_NewWindowCrossZoneErrorString = "براؤزر کی پابندیوں نے ہمیں مکالمہ خانہ بنانے سے روک دیا۔ مکالمہ خانے کے ڈومین اور در اضافہ میزبان کا ڈومین ایک جیسے سلامتی منطقہ میں نہیں ہیں۔";
 Strings.OfficeOM.L_NoCapability = "آپ کو اس عمل کے لیے کافی اجازت نہیں۔";
+Strings.OfficeOM.L_NoHttpsWAC = "Office کا یہ سیشن محفوظ کنکشن کا استعمال نہیں کررہا ہے۔ ہمارا مشورہ ہے کہ آپ اضافی احتیاط برتیں۔";
 Strings.OfficeOM.L_NonUniformPartialGetNotSupported = "محدود پیرامیٹر جبر قسم کی جدول کے ساتھ استعمال نہیں کیا جاسکتا جب تک کہ جدول ضم سیلوں کا حامل نہ ہوجائے۔";
 Strings.OfficeOM.L_NonUniformPartialSetNotSupported = "محدود پیرامیٹر جبر قسم کی جدول کے ساتھ استعمال نہیں کیا جاسکتا جب تک کہ جدول ضم سیلوں کا حامل نہ ہوجائے۔";
 Strings.OfficeOM.L_NotImplemented = "فعل {0} نافذ نہیں کیا گیا ہے۔";
 Strings.OfficeOM.L_NotSupported = "فعل {0} معاون نہیں ہے۔";
 Strings.OfficeOM.L_NotSupportedBindingType = "اختصاصی بائنڈنگ کی {0} قسم معاون نہیں ہے۔";
 Strings.OfficeOM.L_NotSupportedEventType = "اختصاصی وقوعہ کی {0} قسم معاون نہیں ہے۔";
+Strings.OfficeOM.L_NotTrustedWAC = "آپ کو محفوظ رکھنے میں مدد کرنے کے لئے اس ایڈ کو غیر فعال کردیا گیا ہے۔ ایڈ کا استعمال جاری رکھنے کے لیے، توثیق کریں کہ اس آئٹم کو کسی قابل اعتماد ڈومین میں میزبان کیا گیا ہے یا اسے آفس ڈیسک ٹاپ ایپ میں کھولیں۔";
 Strings.OfficeOM.L_OperationCancelledError = "عملیہ منسوخ ہو گیا";
 Strings.OfficeOM.L_OperationCancelledErrorMessage = "صارف کی جانب سے عملیہ منسوخ ہو گیا ہے۔";
 Strings.OfficeOM.L_OperationNotSupported = "يہ آپریشن معاون نہیں ہے۔";

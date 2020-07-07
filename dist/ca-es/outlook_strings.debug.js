@@ -4,6 +4,7 @@ _u.ExtensibilityStrings = function()
 };
 _u.ExtensibilityStrings.registerClass("_u.ExtensibilityStrings");
 _u.ExtensibilityStrings.l_APICallFailedDueToItemChange_Text = "S'ha canviat l'element seleccionat.";
+_u.ExtensibilityStrings.l_API_Not_Supported_By_ExtensionPoint_Error_Text = "L'API no s'admet per al punt d'extensió.";
 _u.ExtensibilityStrings.l_ActionsDefinitionMultipleActionsError_Text = "En aquest moment només s'admeten les accions úniques.";
 _u.ExtensibilityStrings.l_ActionsDefinitionWrongNotificationMessageError_Text = "No es poden definir accions per a aquest tipus de missatge de notificació.";
 _u.ExtensibilityStrings.l_AttachmentDeleteGeneralFailure_Text = "No es pot suprimir el fitxer adjunt de l'element.";
@@ -47,8 +48,10 @@ _u.ExtensibilityStrings.l_InvalidParameterValueError_Text = 'El valor del paràm
 _u.ExtensibilityStrings.l_InvalidSelection_Text = "La selecció no és vàlida.";
 _u.ExtensibilityStrings.l_InvalidTime_Text = "L'entrada no es resol en una hora vàlida.";
 _u.ExtensibilityStrings.l_Invalid_Category_Error_Text = "S'han proporcionat categories no vàlides.";
+_u.ExtensibilityStrings.l_ItemNotFound_Text = "L'element no existeix o no s'ha creat.";
 _u.ExtensibilityStrings.l_Item_Not_Saved_Error_Text = "L'id no es poden recuperar fins que es desa l'element.";
 _u.ExtensibilityStrings.l_MessageInDifferentStoreError_Text = "L'identificador de l'EWS ID no es pot recuperar perquè el missatge està desat en un altre emmagatzematge.";
+_u.ExtensibilityStrings.l_Missing_Extended_Permissions_For_API = "Falta un permís ampliat per a la crida d'API.";
 _u.ExtensibilityStrings.l_NoValidRecipientsProvided_Text = "No s'han subministrat destinataris vàlids.";
 _u.ExtensibilityStrings.l_NotificationKeyNotFound_Text = "No hi ha cap notificació amb la clau que heu proporcionat.";
 _u.ExtensibilityStrings.l_NullOrEmptyParameterError_Text = 'El paràmetre "{0}" és obligatori i no pot ser nul ni estar buit.';
@@ -67,3 +70,4 @@ _u.ExtensibilityStrings.l_RecurrenceUnsupportedAlternateCalendar_Text = "L'usuar
 _u.ExtensibilityStrings.l_Recurrence_Error_Instance_SetAsync_Text = "No es pot establir un patró de periodicitat en una única ocurrència d'una sèrie.";
 _u.ExtensibilityStrings.l_Recurrence_Error_Properties_Invalid_Text = "El patró de periodicitat no és vàlid. Comproveu que les propietats de periodicitat que heu especificat coincideixin amb el tipus de periodicitat.";
 _u.ExtensibilityStrings.l_SaveError_Text = "S'ha produït un error de connexió en provar de desar l'element al servidor.";
+_u.ExtensibilityStrings.l_TokenAccessDeniedWithoutItemContext_Text = "Un testimoni de descans només està disponible amb el permís ReadWriteMailbox quan no hi ha cap context d'element.";

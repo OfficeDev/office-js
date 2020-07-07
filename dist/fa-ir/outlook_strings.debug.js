@@ -4,6 +4,7 @@ _u.ExtensibilityStrings = function()
 };
 _u.ExtensibilityStrings.registerClass("_u.ExtensibilityStrings");
 _u.ExtensibilityStrings.l_APICallFailedDueToItemChange_Text = "مورد انتخابی تغییر کرده است.";
+_u.ExtensibilityStrings.l_API_Not_Supported_By_ExtensionPoint_Error_Text = "API برای نقطه پسوند پشتیبانی نمی‌شود.";
 _u.ExtensibilityStrings.l_ActionsDefinitionMultipleActionsError_Text = "در حال حاضر تنها از یک اقدام پشتیبانی می‌شود.";
 _u.ExtensibilityStrings.l_ActionsDefinitionWrongNotificationMessageError_Text = "امکان شرح این نوع پیام اعلان وجود ندارد.";
 _u.ExtensibilityStrings.l_AttachmentDeleteGeneralFailure_Text = "پیوست را نمی‌توان از این مورد حذف کرد.";
@@ -47,8 +48,10 @@ _u.ExtensibilityStrings.l_InvalidParameterValueError_Text = "مقدار پارا
 _u.ExtensibilityStrings.l_InvalidSelection_Text = "حالت انتخاب نامعتبر است.";
 _u.ExtensibilityStrings.l_InvalidTime_Text = "ورودی به زمان معتبری تبدیل نمی‌شود.";
 _u.ExtensibilityStrings.l_Invalid_Category_Error_Text = "رده‌های نامعتبری ارائه شد.";
+_u.ExtensibilityStrings.l_ItemNotFound_Text = "مورد وجود ندارد یا ایجاد نشده است.";
 _u.ExtensibilityStrings.l_Item_Not_Saved_Error_Text = "تا زمانی که آیتم ذخیره نشده باشد، امکان بازیابی شناسه وجود ندارد.";
 _u.ExtensibilityStrings.l_MessageInDifferentStoreError_Text = "شناسه EWS قابل بازیابی نیست زیرا پیام در حافظه ذخیره‌سازی دیگری دخیره شده است.";
+_u.ExtensibilityStrings.l_Missing_Extended_Permissions_For_API = "مجوز تمدیدشده برای فراخوانی API موجود نیست.";
 _u.ExtensibilityStrings.l_NoValidRecipientsProvided_Text = "گیرنده معتبری ارائه نشده است.";
 _u.ExtensibilityStrings.l_NotificationKeyNotFound_Text = "هیچ اعلانی همراه با کلید ارائه‌شده وجود ندارد.";
 _u.ExtensibilityStrings.l_NullOrEmptyParameterError_Text = "پارامتر '{0}' الزامی است و نباید تهی یا خالی باشد.";
@@ -67,3 +70,4 @@ _u.ExtensibilityStrings.l_RecurrenceUnsupportedAlternateCalendar_Text = "الگ�
 _u.ExtensibilityStrings.l_Recurrence_Error_Instance_SetAsync_Text = "امکان تنظیم الگوی تکرار برای رویدادی خاص در یک مجموعه وجود ندارد.";
 _u.ExtensibilityStrings.l_Recurrence_Error_Properties_Invalid_Text = "الگوی تکرار معتبر نیست. لطفاً بررسی کنید که خصوصیات ویژه تکرار با نوع تکرار همخوانی داشته باشد.";
 _u.ExtensibilityStrings.l_SaveError_Text = "هنگام تلاش برای ذخیره این مورد در سرور، خطایی در اتصال رخ داد.";
+_u.ExtensibilityStrings.l_TokenAccessDeniedWithoutItemContext_Text = "یک رمز REST فقط با مجوز ReadWriteMailbox در دسترس است، زمانی که هیچ زمینه موردی وجود ندارد.";

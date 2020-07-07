@@ -4,6 +4,7 @@ _u.ExtensibilityStrings = function()
 };
 _u.ExtensibilityStrings.registerClass("_u.ExtensibilityStrings");
 _u.ExtensibilityStrings.l_APICallFailedDueToItemChange_Text = "Det valde elementet er endra.";
+_u.ExtensibilityStrings.l_API_Not_Supported_By_ExtensionPoint_Error_Text = "API er ikkje støtta for utvidingspunkt.";
 _u.ExtensibilityStrings.l_ActionsDefinitionMultipleActionsError_Text = "Berre ei enkelt handling blir støtta for tida.";
 _u.ExtensibilityStrings.l_ActionsDefinitionWrongNotificationMessageError_Text = "Kan ikkje definere handlingar for denne typen varslingsmelding.";
 _u.ExtensibilityStrings.l_AttachmentDeleteGeneralFailure_Text = "Vedlegget kan ikkje slettast frå elementet.";
@@ -47,8 +48,10 @@ _u.ExtensibilityStrings.l_InvalidParameterValueError_Text = "Verdien for {0}-par
 _u.ExtensibilityStrings.l_InvalidSelection_Text = "Ugyldig val.";
 _u.ExtensibilityStrings.l_InvalidTime_Text = "Inndataa blir ikkje løyste til ei gyldig tid.";
 _u.ExtensibilityStrings.l_Invalid_Category_Error_Text = "Ugyldige kategoriar blei angitte.";
+_u.ExtensibilityStrings.l_ItemNotFound_Text = "Elementet eksisterer ikkje eller har ikkje blitt oppretta.";
 _u.ExtensibilityStrings.l_Item_Not_Saved_Error_Text = "Kan ikkje hente ID-en før elementet er lagra.";
 _u.ExtensibilityStrings.l_MessageInDifferentStoreError_Text = "Kan ikkje hente EWS-ID-en fordi meldinga er lagra i ein annan butikk.";
+_u.ExtensibilityStrings.l_Missing_Extended_Permissions_For_API = "Utvida løyve manglar for API-kallet.";
 _u.ExtensibilityStrings.l_NoValidRecipientsProvided_Text = "Ingen gyldige mottakarar er oppgitte.";
 _u.ExtensibilityStrings.l_NotificationKeyNotFound_Text = "Det finst ingen varslingar med den angitte nøkkelen.";
 _u.ExtensibilityStrings.l_NullOrEmptyParameterError_Text = "Parameteren {0} er obligatorisk, og han kan ikkje vere null eller tom.";
@@ -67,3 +70,4 @@ _u.ExtensibilityStrings.l_RecurrenceUnsupportedAlternateCalendar_Text = "Mønste
 _u.ExtensibilityStrings.l_Recurrence_Error_Instance_SetAsync_Text = "Kan ikkje angi eit mønster for gjentaking for éin enkelt førekomst i ein serie.";
 _u.ExtensibilityStrings.l_Recurrence_Error_Properties_Invalid_Text = "Mønsteret for gjentaking er ikkje gyldig. Kontroller at dei angitte eigenskapane for gjentakinga stemmer overeins med gjentakingstypen.";
 _u.ExtensibilityStrings.l_SaveError_Text = "Tilkoplingsfeil oppstod under forsøk på å lagre elementet på tenaren.";
+_u.ExtensibilityStrings.l_TokenAccessDeniedWithoutItemContext_Text = "Eit REST token er berre tilgjengeleg med ReadWriteMailbox-løyve når det er ingen element kontekst.";

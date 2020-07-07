@@ -4,6 +4,7 @@ _u.ExtensibilityStrings = function()
 };
 _u.ExtensibilityStrings.registerClass("_u.ExtensibilityStrings");
 _u.ExtensibilityStrings.l_APICallFailedDueToItemChange_Text = "Το επιλεγμένο στοιχείο έχει τροποποιηθεί.";
+_u.ExtensibilityStrings.l_API_Not_Supported_By_ExtensionPoint_Error_Text = "Το API δεν υποστηρίζεται για το σημείο επέκτασης.";
 _u.ExtensibilityStrings.l_ActionsDefinitionMultipleActionsError_Text = "Αυτήν τη στιγμή υποστηρίζεται η εκτέλεση μόνο μίας ενέργειας.";
 _u.ExtensibilityStrings.l_ActionsDefinitionWrongNotificationMessageError_Text = "Δεν είναι δυνατός ο ορισμός ενεργειών για αυτόν τον τύπο μηνύματος ειδοποίησης.";
 _u.ExtensibilityStrings.l_AttachmentDeleteGeneralFailure_Text = "Δεν είναι δυνατή η διαγραφή του συνημμένου από το στοιχείο.";
@@ -47,8 +48,10 @@ _u.ExtensibilityStrings.l_InvalidParameterValueError_Text = 'Η τιμή της 
 _u.ExtensibilityStrings.l_InvalidSelection_Text = "Η επιλογή δεν είναι έγκυρη.";
 _u.ExtensibilityStrings.l_InvalidTime_Text = "Τα στοιχεία εισόδου δεν αναλύονται σε έγκυρη ώρα.";
 _u.ExtensibilityStrings.l_Invalid_Category_Error_Text = "Δόθηκαν μη έγκυρες κατηγορίες.";
+_u.ExtensibilityStrings.l_ItemNotFound_Text = "Το στοιχείο δεν υπάρχει ή δεν έχει δημιουργηθεί.";
 _u.ExtensibilityStrings.l_Item_Not_Saved_Error_Text = "Το αναγνωριστικό δεν μπορεί να ανακτηθεί μέχρι να αποθηκευτεί το στοιχείο.";
 _u.ExtensibilityStrings.l_MessageInDifferentStoreError_Text = "Δεν είναι δυνατή η ανάκτηση του αναγνωριστικού EWS καθώς το μήνυμα έχει αποθηκευτεί σε διαφορετικό χώρο αποθήκευσης.";
+_u.ExtensibilityStrings.l_Missing_Extended_Permissions_For_API = "Λείπει το πρόσθετο δικαίωμα για την κλήση API.";
 _u.ExtensibilityStrings.l_NoValidRecipientsProvided_Text = "Δεν δόθηκαν έγκυροι παραλήπτες.";
 _u.ExtensibilityStrings.l_NotificationKeyNotFound_Text = "Δεν υπάρχουν ειδοποιήσεις με το παρεχόμενο κλειδί.";
 _u.ExtensibilityStrings.l_NullOrEmptyParameterError_Text = 'Η παράμετρος "{0}" είναι υποχρεωτική και δεν μπορεί να είναι null ή κενή.';
@@ -67,3 +70,4 @@ _u.ExtensibilityStrings.l_RecurrenceUnsupportedAlternateCalendar_Text = "Το μ
 _u.ExtensibilityStrings.l_Recurrence_Error_Instance_SetAsync_Text = "Δεν είναι δυνατός ο ορισμός ενός μοτίβου περιοδικότητας για μία μεμονωμένη εμφάνιση σε μια σειρά.";
 _u.ExtensibilityStrings.l_Recurrence_Error_Properties_Invalid_Text = "Το μοτίβο περιοδικότητας δεν είναι έγκυρο. Βεβαιωθείτε ότι οι καθορισμένες ιδιότητες περιοδικότητας συμφωνούν με τον τύπο περιοδικότητας.";
 _u.ExtensibilityStrings.l_SaveError_Text = "Παρουσιάστηκε σφάλμα σύνδεσης κατά την προσπάθεια αποθήκευσης του στοιχείου στον διακομιστή.";
+_u.ExtensibilityStrings.l_TokenAccessDeniedWithoutItemContext_Text = "Ένα διακριτικό ΑΝΆΠΑΥΣΗς είναι διαθέσιμο μόνο με δικαίωμα ReadWriteMailbox όταν δεν υπάρχει περιβάλλον στοιχείου.";

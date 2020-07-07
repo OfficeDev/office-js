@@ -1,5 +1,5 @@
 /* Excel specific API library */
-/* Version: 15.0.5177.1000 */
+/* Version: 15.0.5233.3000 */
 /*
 	Copyright (c) Microsoft Corporation.  All rights reserved.
 */
@@ -1951,7 +1951,7 @@ Microsoft.Office.Common.Message=function Microsoft_Office_Common_Message(message
 	this._actionName=actionName;
 	this._conversationId=conversationId;
 	this._correlationId=correlationId;
-	this._origin=window.location.href;
+	this._origin=window.location.origin;
 	if (typeof data=="undefined") {
 		this._data=null;
 	} else {
@@ -6380,7 +6380,7 @@ AriaLogger=(function() {
 				_loadAriaScriptAndLog(data["Table"], data);
 			}
 		},
-		EnableSendingTelemetryWithLegacyAria: true,
+		EnableSendingTelemetryWithLegacyAria: false,
 		EnableSendingTelemetryWithOTel: true
 	}
 })();

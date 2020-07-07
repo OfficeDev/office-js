@@ -4,6 +4,7 @@ _u.ExtensibilityStrings = function()
 };
 _u.ExtensibilityStrings.registerClass("_u.ExtensibilityStrings");
 _u.ExtensibilityStrings.l_APICallFailedDueToItemChange_Text = "Napalitan ang piniling item.";
+_u.ExtensibilityStrings.l_API_Not_Supported_By_ExtensionPoint_Error_Text = "Hindi sinusuportahan ang API para sa extension point.";
 _u.ExtensibilityStrings.l_ActionsDefinitionMultipleActionsError_Text = "Isang pagkilos lang ang kasalukuyang sinusuportahan.";
 _u.ExtensibilityStrings.l_ActionsDefinitionWrongNotificationMessageError_Text = "Hindi makapagtukoy ng mga pagkilos para sa ganitong uri ng mensahe ng notification.";
 _u.ExtensibilityStrings.l_AttachmentDeleteGeneralFailure_Text = "Hindi matanggal sa item ang attachment.";
@@ -47,8 +48,10 @@ _u.ExtensibilityStrings.l_InvalidParameterValueError_Text = "Hindi tama ang valu
 _u.ExtensibilityStrings.l_InvalidSelection_Text = "Hindi tama ang napili.";
 _u.ExtensibilityStrings.l_InvalidTime_Text = "Hindi nagre-resolve sa tamang oras ang input.";
 _u.ExtensibilityStrings.l_Invalid_Category_Error_Text = "Nagbigay ng mga hindi wastong kategorya.";
+_u.ExtensibilityStrings.l_ItemNotFound_Text = "ang aytem na ito ay hindi umiiral o hindi ba nagagawa.";
 _u.ExtensibilityStrings.l_Item_Not_Saved_Error_Text = "Hindi makukuha ang id hangga\\'t hindi nase-save ang item.";
 _u.ExtensibilityStrings.l_MessageInDifferentStoreError_Text = "Hindi makuha ang EWS ID dahil na-save ang mensahe sa ibang store.";
+_u.ExtensibilityStrings.l_Missing_Extended_Permissions_For_API = "Ang Pinalawak na Pahintulot ay nawawala para sa API call.";
 _u.ExtensibilityStrings.l_NoValidRecipientsProvided_Text = "Walang ibinigay na tamang mga tatanggap.";
 _u.ExtensibilityStrings.l_NotificationKeyNotFound_Text = "Walang mga notification kasama ng ibinigay na key.";
 _u.ExtensibilityStrings.l_NullOrEmptyParameterError_Text = "Kinakailangan ang parameter na '{0}' at hindi ito maaaring null o walang laman.";
@@ -67,3 +70,4 @@ _u.ExtensibilityStrings.l_RecurrenceUnsupportedAlternateCalendar_Text = "Itinakd
 _u.ExtensibilityStrings.l_Recurrence_Error_Instance_SetAsync_Text = "Hindi makakapagtakda ng pattern ng pag-uulit-ulit para sa iisang pangyayari sa isang series.";
 _u.ExtensibilityStrings.l_Recurrence_Error_Properties_Invalid_Text = "Hindi tama ang pattern ng pag-uulit. Pakisuri na nagtutugma ang tinukoy na mga katangian ng pag-uulit sa uri ng pag-uulit.";
 _u.ExtensibilityStrings.l_SaveError_Text = "Nagkaroon ng error sa koneksyon habang sinusubukang i-save ang item sa server.";
+_u.ExtensibilityStrings.l_TokenAccessDeniedWithoutItemContext_Text = "Ang isang REST token ay magagamit lamang kasama ang pahintulot sa ReadWriteMailbox kapag walang konteksto ng item.";

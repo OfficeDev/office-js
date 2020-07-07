@@ -29,8 +29,12 @@ Strings.OfficeOM.L_CloseFileBeforeRetrieve = "استدعاء closeAsync على �
 Strings.OfficeOM.L_CoercionTypeNotMatchBinding = "نوع الاندماج المحدد غير متوافق مع هذا النوع من الربط.";
 Strings.OfficeOM.L_CoercionTypeNotSupported = "نوع الاندماج المحدد غير معتمد.";
 Strings.OfficeOM.L_ColIndexOutOfRange = "إن قيمة فهرس العمود خارج النطاق المسموح به. استخدم قيمة (0 أو أعلى) تكون أصغر من عدد الأعمدة.";
+Strings.OfficeOM.L_ConfirmCancelMessage = "عذراً، يتعذر علينا المتابعة.";
+Strings.OfficeOM.L_ConfirmDialog = "هل تثق بمجال {0} الذي يستضيف جلسة عمل Office؟";
+Strings.OfficeOM.L_ConfirmRefreshMessage = "للمتابعة، قم بإزالة الوظيفة الإضافية وإضافتها مرة أخرى أو تحديث الصفحة.";
 Strings.OfficeOM.L_ConnectionFailureWithDetails = "فشل الطلب برمز الحالة {0} ورمز الخطأ {1} وظهرت رسالة الخطأ التالية: {2}";
 Strings.OfficeOM.L_ConnectionFailureWithStatus = "فشل الطلب برمز الحالة {0}.";
+Strings.OfficeOM.L_ContinueButton = "متابعة";
 Strings.OfficeOM.L_CustomFunctionDefinitionMissing = "يلزم وجود خاصية تحمل هذا الاسم تمثل تعريف الدالة في Excel.Script.CustomFunctions.";
 Strings.OfficeOM.L_CustomFunctionImplementationMissing = "يجب أن تحتوي الخاصية التي تحمل هذا الاسم في Excel.Script.CustomFunctions الذي يمثل تعريف الدالة على الخاصية 'استدعاء' المسؤولة عن تنفيذ الدالة.";
 Strings.OfficeOM.L_CustomFunctionNameCannotSplit = "يجب أن يحتوي اسم الدالة على مساحة اسم غير فارغة واسم قصير غير فارغ.";
@@ -102,8 +106,8 @@ Strings.OfficeOM.L_InvalidNamedItemForBindingType = "نوع الربط المح�
 Strings.OfficeOM.L_InvalidNode = "العقدة غير صالحة";
 Strings.OfficeOM.L_InvalidObjectPath = 'لا يعمل مسار العنصر "{0}" لما تحاول القيام به. إذا كنت تستخدم العنصر عبر عدة استدعاءات "context.sync" وخارج التنفيذ المتسلسل لدفعة "‎.run"، يرجى استخدام الأسلوبين "context.trackedObjects.add()‎" و"context.trackedObjects.remove()‎" لإدارة مدة بقاء العنصر.';
 Strings.OfficeOM.L_InvalidOperationInCellEditMode = "Excel الآن في وضع تحرير الخلية. الرجاء إنهاء وضع التحرير بالضغط على مفتاح الإدخال ENTER أو مفتاح TAB أو تحديد خلية أخرى، ثم إعادة المحاولة.";
-Strings.OfficeOM.L_InvalidOrTimedOutSession = "جلسة عمل غير صالحة أو انتهت مهلتها";
-Strings.OfficeOM.L_InvalidOrTimedOutSessionMessage = "انتهت صلاحيه جلسة عمل Office أو انها غير صالحه. للمتابعة ، قم بتحديث الصفحة.";
+Strings.OfficeOM.L_InvalidOrTimedOutSession = "جلسة غير صالحة أو انتهت مهلتها";
+Strings.OfficeOM.L_InvalidOrTimedOutSessionMessage = "انتهت صلاحيه جلسة Office أو انها غير صالحه. للمتابعة ، قم بتحديث الصفحة.";
 Strings.OfficeOM.L_InvalidParameters = "للدالة {0} معلمات غير صالحة.";
 Strings.OfficeOM.L_InvalidReadForBlankRow = "إن الصف المحدد فارغ.";
 Strings.OfficeOM.L_InvalidRequestContext = "لا يمكن استخدام العنصر عبر سياقات طلب مختلفة.";
@@ -128,12 +132,14 @@ Strings.OfficeOM.L_NewWindowCrossZone = "إعدادات الأمان في الم
 Strings.OfficeOM.L_NewWindowCrossZoneConfigureBrowserLink = "تكوين المستعرض";
 Strings.OfficeOM.L_NewWindowCrossZoneErrorString = "منعتنا قيود المستعرض من إنشاء مربع الحوار. مجال مربع الحوار ومجال مضيف الوظيفة الإضافية ليسا في نفس منطقة الأمان.";
 Strings.OfficeOM.L_NoCapability = "لا تملك الأذونات الكافية لهذا الإجراء.";
+Strings.OfficeOM.L_NoHttpsWAC = "لا تستخدم جلسة عمل Office هذه اتصالاً أمناً. نوصي باتخاذ احتياطات إضافية.";
 Strings.OfficeOM.L_NonUniformPartialGetNotSupported = 'لا يمكن استخدام معلمات الإحداثيات مع "جدول" بنوع الاندماج عندما يحتوي الجدول على خلايا مدمجة.';
 Strings.OfficeOM.L_NonUniformPartialSetNotSupported = 'لا يمكن استخدام معلمات الإحداثيات مع "جدول" بنوع الاندماج عندما يحتوي الجدول على خلايا مدمجة.';
 Strings.OfficeOM.L_NotImplemented = "لم يتم تنفيذ الدالة {0}.";
 Strings.OfficeOM.L_NotSupported = "الدالة {0} غير معتمدة.";
 Strings.OfficeOM.L_NotSupportedBindingType = "نوع الربط المحدد {0} غير معتمد.";
 Strings.OfficeOM.L_NotSupportedEventType = "نوع الحدث المحدد {0} غير معتمد.";
+Strings.OfficeOM.L_NotTrustedWAC = "تم تعطيل هذه الوظيفة الاضافيه للمساعدة في الحفاظ علي أمانك. لمتابعه استخدام الوظيفة الاضافيه ، تحقق من ان هذا العنصر تمت استضافته في مجال موثوق به أو قم بفتحه في تطبيق Office لسطح المكتب.";
 Strings.OfficeOM.L_OperationCancelledError = "تم إلغاء العملية";
 Strings.OfficeOM.L_OperationCancelledErrorMessage = "تم إلغاء العملية بواسطة المستخدم.";
 Strings.OfficeOM.L_OperationNotSupported = "العملية غير معتمدة.";

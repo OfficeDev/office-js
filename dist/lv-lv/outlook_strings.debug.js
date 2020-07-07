@@ -4,6 +4,7 @@ _u.ExtensibilityStrings = function()
 };
 _u.ExtensibilityStrings.registerClass("_u.ExtensibilityStrings");
 _u.ExtensibilityStrings.l_APICallFailedDueToItemChange_Text = "Atlasītais vienums ir mainīts.";
+_u.ExtensibilityStrings.l_API_Not_Supported_By_ExtensionPoint_Error_Text = "API netiek atbalstīts paplašinājuma punktam.";
 _u.ExtensibilityStrings.l_ActionsDefinitionMultipleActionsError_Text = "Šobrīd tiek atbalstīta tikai viena darbība.";
 _u.ExtensibilityStrings.l_ActionsDefinitionWrongNotificationMessageError_Text = "Šim paziņojuma ziņojuma tipam darbības nevar definēt.";
 _u.ExtensibilityStrings.l_AttachmentDeleteGeneralFailure_Text = "Pielikumu no šī vienuma nevar izdzēst.";
@@ -47,8 +48,10 @@ _u.ExtensibilityStrings.l_InvalidParameterValueError_Text = "Parametra {0} vērt
 _u.ExtensibilityStrings.l_InvalidSelection_Text = "Atlase nav derīga.";
 _u.ExtensibilityStrings.l_InvalidTime_Text = "Ievade netiek atrisināta kā derīgs laiks.";
 _u.ExtensibilityStrings.l_Invalid_Category_Error_Text = "Tika ievadītas nederīgas kategorijas.";
+_u.ExtensibilityStrings.l_ItemNotFound_Text = "Vienums nepastāv vai nav izveidots.";
 _u.ExtensibilityStrings.l_Item_Not_Saved_Error_Text = "ID nevar izgūt, kamēr vienums nav saglabāts.";
 _u.ExtensibilityStrings.l_MessageInDifferentStoreError_Text = "EWS ID nevar izgūt, jo ziņojums ir saglabāts citā veikalā.";
+_u.ExtensibilityStrings.l_Missing_Extended_Permissions_For_API = "API izsaukumam trūkst paplašinātas atļaujas.";
 _u.ExtensibilityStrings.l_NoValidRecipientsProvided_Text = "Netika norādīts neviens derīgs adresāts.";
 _u.ExtensibilityStrings.l_NotificationKeyNotFound_Text = "Nav neviena paziņojuma ar norādīto atslēgu.";
 _u.ExtensibilityStrings.l_NullOrEmptyParameterError_Text = "Parametrs {0} ir obligāts, un tas nevar būt Null vai tukšs.";
@@ -67,3 +70,4 @@ _u.ExtensibilityStrings.l_RecurrenceUnsupportedAlternateCalendar_Text = "Atkārt
 _u.ExtensibilityStrings.l_Recurrence_Error_Instance_SetAsync_Text = "Atkārtošanās shēmu nevar iestatīt atsevišķam sērijas gadījumam.";
 _u.ExtensibilityStrings.l_Recurrence_Error_Properties_Invalid_Text = "Atkārtošanās shēma nav derīga. Lūdzu, pārbaudiet, vai norādītie atkārtošanās rekvizīti atbilst atkārtošanās tipam.";
 _u.ExtensibilityStrings.l_SaveError_Text = "Mēģinot serverī saglabāt vienumu, radās savienojuma kļūda.";
+_u.ExtensibilityStrings.l_TokenAccessDeniedWithoutItemContext_Text = "ATPŪTAS pilnvara ir pieejama tikai ar atļauju ReadWriteMailbox, ja nav vienuma konteksta.";

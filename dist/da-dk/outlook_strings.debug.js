@@ -4,6 +4,7 @@ _u.ExtensibilityStrings = function()
 };
 _u.ExtensibilityStrings.registerClass("_u.ExtensibilityStrings");
 _u.ExtensibilityStrings.l_APICallFailedDueToItemChange_Text = "Det valgte element er blevet ændret.";
+_u.ExtensibilityStrings.l_API_Not_Supported_By_ExtensionPoint_Error_Text = "API'et understøttes ikke for udvidelsespunktet.";
 _u.ExtensibilityStrings.l_ActionsDefinitionMultipleActionsError_Text = "Kun en enkelt handling understøttes i øjeblikket.";
 _u.ExtensibilityStrings.l_ActionsDefinitionWrongNotificationMessageError_Text = "Handlinger kan ikke defineres for denne meddelelsestype.";
 _u.ExtensibilityStrings.l_AttachmentDeleteGeneralFailure_Text = "Den vedhæftede fil kan ikke slettes fra elementet.";
@@ -47,8 +48,10 @@ _u.ExtensibilityStrings.l_InvalidParameterValueError_Text = 'Værdien af paramet
 _u.ExtensibilityStrings.l_InvalidSelection_Text = "Markeringen er ugyldig.";
 _u.ExtensibilityStrings.l_InvalidTime_Text = "Inputtet er ikke et gyldigt tidspunkt.";
 _u.ExtensibilityStrings.l_Invalid_Category_Error_Text = "Der blev angivet ugyldige kategorier.";
+_u.ExtensibilityStrings.l_ItemNotFound_Text = "Elementet findes ikke eller er ikke blevet oprettet.";
 _u.ExtensibilityStrings.l_Item_Not_Saved_Error_Text = "Id'et kan ikke hentes, før elementet er gemt.";
 _u.ExtensibilityStrings.l_MessageInDifferentStoreError_Text = "EWS-id'et kan ikke hentes, fordi meddelelsen er gemt på et andet lager.";
+_u.ExtensibilityStrings.l_Missing_Extended_Permissions_For_API = "Udvidet tilladelse mangler for API-opkald.";
 _u.ExtensibilityStrings.l_NoValidRecipientsProvided_Text = "Der blev ikke angivet nogen gyldige modtagere.";
 _u.ExtensibilityStrings.l_NotificationKeyNotFound_Text = "Der er ingen meddelelser med den angivne nøgle.";
 _u.ExtensibilityStrings.l_NullOrEmptyParameterError_Text = 'Parameteren "{0}" er obligatorisk og må ikke være null eller tom.';
@@ -67,3 +70,4 @@ _u.ExtensibilityStrings.l_RecurrenceUnsupportedAlternateCalendar_Text = "Gentage
 _u.ExtensibilityStrings.l_Recurrence_Error_Instance_SetAsync_Text = "Der kan ikke angives et gentagelsesmønster for en enkelt forekomst i en serie.";
 _u.ExtensibilityStrings.l_Recurrence_Error_Properties_Invalid_Text = "Gentagelsesmønsteret er ikke gyldigt. Kontrollér, at de angivne egenskaber for gentagelse justeres til gentagelsestypen.";
 _u.ExtensibilityStrings.l_SaveError_Text = "Der opstod forbindelsesfejl under forsøget på at gemme elementet på serveren.";
+_u.ExtensibilityStrings.l_TokenAccessDeniedWithoutItemContext_Text = "Et REST-token er kun tilgængelig med ReadWriteMailbox-tilladelse, når der ikke er nogen elementkontekst.";

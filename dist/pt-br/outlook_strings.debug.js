@@ -4,6 +4,7 @@ _u.ExtensibilityStrings = function()
 };
 _u.ExtensibilityStrings.registerClass("_u.ExtensibilityStrings");
 _u.ExtensibilityStrings.l_APICallFailedDueToItemChange_Text = "O item selecionado foi alterado.";
+_u.ExtensibilityStrings.l_API_Not_Supported_By_ExtensionPoint_Error_Text = "Não há suporte para a API no ponto de extensão.";
 _u.ExtensibilityStrings.l_ActionsDefinitionMultipleActionsError_Text = "No momento, há suporte somente para uma única ação.";
 _u.ExtensibilityStrings.l_ActionsDefinitionWrongNotificationMessageError_Text = "Não é possível definir ações para esse tipo de mensagem de notificação.";
 _u.ExtensibilityStrings.l_AttachmentDeleteGeneralFailure_Text = "O anexo não pode ser excluído do item.";
@@ -47,8 +48,10 @@ _u.ExtensibilityStrings.l_InvalidParameterValueError_Text = 'O valor do parâmet
 _u.ExtensibilityStrings.l_InvalidSelection_Text = "A seleção é inválida.";
 _u.ExtensibilityStrings.l_InvalidTime_Text = "A entrada não resolve para uma hora válida.";
 _u.ExtensibilityStrings.l_Invalid_Category_Error_Text = "Foram fornecidas categorias inválidas.";
+_u.ExtensibilityStrings.l_ItemNotFound_Text = "O item não existe ou não foi criado.";
 _u.ExtensibilityStrings.l_Item_Not_Saved_Error_Text = "A ID não pode ser recuperada até que o item seja salvo.";
 _u.ExtensibilityStrings.l_MessageInDifferentStoreError_Text = "Não foi possível recuperar a ID do EWS porque a mensagem está salva em um repositório diferente.";
+_u.ExtensibilityStrings.l_Missing_Extended_Permissions_For_API = "Permissão estendida ausente para a chamada à API.";
 _u.ExtensibilityStrings.l_NoValidRecipientsProvided_Text = "Não foram fornecidos destinatários válidos.";
 _u.ExtensibilityStrings.l_NotificationKeyNotFound_Text = "Não há nenhuma notificação com a chave fornecida.";
 _u.ExtensibilityStrings.l_NullOrEmptyParameterError_Text = 'O parâmetro "{0}" é obrigatório e não pode ser nulo ou vazio.';
@@ -67,3 +70,4 @@ _u.ExtensibilityStrings.l_RecurrenceUnsupportedAlternateCalendar_Text = "O padr�
 _u.ExtensibilityStrings.l_Recurrence_Error_Instance_SetAsync_Text = "Não é possível definir um padrão de recorrência para uma única ocorrência de uma série.";
 _u.ExtensibilityStrings.l_Recurrence_Error_Properties_Invalid_Text = "O padrão de recorrência não é válido. Verifique se as propriedades de recorrência especificadas estão de acordo com o tipo de recorrência.";
 _u.ExtensibilityStrings.l_SaveError_Text = "Ocorreu um erro de conexão ao tentar salvar o item no servidor.";
+_u.ExtensibilityStrings.l_TokenAccessDeniedWithoutItemContext_Text = "Um token REST está disponível somente com a permissão ReadWriteMailbox quando não há um contexto de item.";

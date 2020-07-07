@@ -4,6 +4,7 @@ _u.ExtensibilityStrings = function()
 };
 _u.ExtensibilityStrings.registerClass("_u.ExtensibilityStrings");
 _u.ExtensibilityStrings.l_APICallFailedDueToItemChange_Text = "Kipengee kilichoteuliwa kimebadilishwa.";
+_u.ExtensibilityStrings.l_API_Not_Supported_By_ExtensionPoint_Error_Text = "API haiauniwi kwa pointi ya kiendelezi.";
 _u.ExtensibilityStrings.l_ActionsDefinitionMultipleActionsError_Text = "Kitendo kimoja ndicho kinachoauniwa.";
 _u.ExtensibilityStrings.l_ActionsDefinitionWrongNotificationMessageError_Text = "Vitendo haviwezi kufafanuliwa kwa aina hii ya ujumbe wa taarifa.";
 _u.ExtensibilityStrings.l_AttachmentDeleteGeneralFailure_Text = "Kiambatisho hakiwezi kufutwa kwenye kipengee.";
@@ -47,8 +48,10 @@ _u.ExtensibilityStrings.l_InvalidParameterValueError_Text = "Thamani ya parameta
 _u.ExtensibilityStrings.l_InvalidSelection_Text = "Uteuzi si sahihi.";
 _u.ExtensibilityStrings.l_InvalidTime_Text = "Ingizo halitatuliki kuwa wakati halali.";
 _u.ExtensibilityStrings.l_Invalid_Category_Error_Text = "Kategoria za batili walitolewa.";
+_u.ExtensibilityStrings.l_ItemNotFound_Text = "The item does not exist or has not been created.";
 _u.ExtensibilityStrings.l_Item_Not_Saved_Error_Text = "Kitambulisho hakiwezi kurejeshwa hadi kipengee kihifadhiwe.";
 _u.ExtensibilityStrings.l_MessageInDifferentStoreError_Text = "EWS ID haiwezi kurejeshwa kwa sababu ujumbe unahifadhiwa katika hifadhi tofauti.";
+_u.ExtensibilityStrings.l_Missing_Extended_Permissions_For_API = "Kibali Kilichoongezwa kinakosekana cha simu ya API.";
 _u.ExtensibilityStrings.l_NoValidRecipientsProvided_Text = "Hakuna wapokeaji halali walitolewa.";
 _u.ExtensibilityStrings.l_NotificationKeyNotFound_Text = "Hakuna taarifa zenye ufunguo ulioteuliwa.";
 _u.ExtensibilityStrings.l_NullOrEmptyParameterError_Text = "Parameta '{0}' ni ya lazima na haiwezi kuwa tupu.";
@@ -67,3 +70,4 @@ _u.ExtensibilityStrings.l_RecurrenceUnsupportedAlternateCalendar_Text = "Ruwaza 
 _u.ExtensibilityStrings.l_Recurrence_Error_Instance_SetAsync_Text = "Mtindo wa kurudia hauwezi kuwekwa kwa tukio moja katika mfululizo.";
 _u.ExtensibilityStrings.l_Recurrence_Error_Properties_Invalid_Text = "Ruwaza ya kurudiarudia si sahihi. Tafadhali hakikisha kuwa sifa za kurudiarudia zilizobainishwa zinalingana na aina ya kurudiarudia.";
 _u.ExtensibilityStrings.l_SaveError_Text = "Hitilafu ya muunganisho imetokea wakati wa kujaribu kuhifadhi kipengee kwenye seva.";
+_u.ExtensibilityStrings.l_TokenAccessDeniedWithoutItemContext_Text = "A REST token is only available with ReadWriteMailbox permission when there is no item context.";

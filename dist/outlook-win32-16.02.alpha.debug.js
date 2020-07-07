@@ -1,6 +1,6 @@
 /* Outlook Win32 specific API library */
-/* osfweb version: 16.0.12312.10000 */
-/* office-js-api version: 20191204.1 */
+/* osfweb version: 16.0.12813.10000 */
+/* office-js-api version: 20200512.1 */
 /*
 	Copyright (c) Microsoft Corporation.  All rights reserved.
 */
@@ -15,7 +15,7 @@
         * @version   2.3.0
 */
 /* Outlook rich client specific API library */
-/* Version: 16.0.12312.10000 */
+/* Version: 16.0.12813.10000 */
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
@@ -146,19 +146,28 @@ OSF.XdmFieldName = {
     ConversationUrl: "ConversationUrl",
     AppId: "AppId"
 };
+OSF.FlightNames = {
+    UseOriginNotUrl: 0,
+    CheckReceiverOrigin: 1,
+    AddinEnforceHttps: 2
+};
+OSF.Flights = [];
 OSF.WindowNameItemKeys = {
     BaseFrameName: "baseFrameName",
     HostInfo: "hostInfo",
     XdmInfo: "xdmInfo",
     SerializerVersion: "serializerVersion",
-    AppContext: "appContext"
+    AppContext: "appContext",
+    Flights: "flights"
 };
 OSF.OUtil = (function () {
     var _uniqueId = -1;
     var _xdmInfoKey = '&_xdm_Info=';
     var _serializerVersionKey = '&_serializer_version=';
+    var _flightsKey = '&_flights=';
     var _xdmSessionKeyPrefix = '_xdm_';
     var _serializerVersionKeyPrefix = '_serializer_version=';
+    var _flightsKeyPrefix = '_flights=';
     var _fragmentSeparator = '#';
     var _fragmentInfoDelimiter = '&';
     var _classN = "class";
@@ -414,6 +423,9 @@ OSF.OUtil = (function () {
         addSerializerVersionAsHash: function OSF_OUtil$addSerializerVersionAsHash(url, serializerVersion) {
             return OSF.OUtil.addInfoAsHash(url, _serializerVersionKey, serializerVersion, true);
         },
+        addFlightsAsHash: function OSF_OUtil$addFlightsAsHash(url, flights) {
+            return OSF.OUtil.addInfoAsHash(url, _flightsKey, flights, true);
+        },
         addInfoAsHash: function OSF_OUtil$addInfoAsHash(url, keyName, infoValue, encodeInfo) {
             url = url.trim() || '';
             var urlParts = url.split(_fragmentSeparator);
@@ -456,6 +468,40 @@ OSF.OUtil = (function () {
         },
         parseSerializerVersionWithGivenFragment: function OSF_OUtil$parseSerializerVersionWithGivenFragment(skipSessionStorage, fragment) {
             return parseInt(OSF.OUtil.parseInfoWithGivenFragment(_serializerVersionKey, _serializerVersionKeyPrefix, true, skipSessionStorage, fragment));
+        },
+        parseFlights: function OSF_OUtil$parseFlights(skipSessionStorage) {
+            var flights = OSF.OUtil.parseFlightsWithGivenFragment(skipSessionStorage, window.location.hash);
+            if (flights.length == 0) {
+                flights = OSF.OUtil.parseFlightsFromWindowName(skipSessionStorage, window.name);
+            }
+            return flights;
+        },
+        checkFlight: function OSF_OUtil$checkFlightEnabled(flight) {
+            return OSF.Flights && OSF.Flights.indexOf(flight) >= 0;
+        },
+        pushFlight: function OSF_OUtil$pushFlight(flight) {
+            if (OSF.Flights.indexOf(flight) < 0) {
+                OSF.Flights.push(flight);
+                return true;
+            }
+            return false;
+        },
+        parseFlightsFromWindowName: function OSF_OUtil$parseFlightsFromWindowName(skipSessionStorage, windowName) {
+            return OSF.OUtil.parseArrayWithDefault(OSF.OUtil.parseInfoFromWindowName(skipSessionStorage, windowName, OSF.WindowNameItemKeys.Flights));
+        },
+        parseFlightsWithGivenFragment: function OSF_OUtil$parseFlightsWithGivenFragment(skipSessionStorage, fragment) {
+            return OSF.OUtil.parseArrayWithDefault(OSF.OUtil.parseInfoWithGivenFragment(_flightsKey, _flightsKeyPrefix, true, skipSessionStorage, fragment));
+        },
+        parseArrayWithDefault: function OSF_OUtil$parseArrayWithDefault(jsonString) {
+            var array = [];
+            try {
+                array = JSON.parse(jsonString);
+            }
+            catch (ex) { }
+            if (!Array.isArray(array)) {
+                array = [];
+            }
+            return array;
         },
         parseInfoFromWindowName: function OSF_OUtil$parseInfoFromWindowName(skipSessionStorage, windowName, infoKey) {
             try {
@@ -837,6 +883,58 @@ OSF.OUtil = (function () {
         isFirefox: function OSF_Outil$isFirefox() {
             return window.navigator.userAgent.indexOf("Firefox") > 0;
         },
+        parseUrl: function OSF_Outil$parseUrl(url, enforceHttps) {
+            if (enforceHttps === void 0) { enforceHttps = false; }
+            if (typeof url === "undefined" || !url) {
+                return undefined;
+            }
+            var notHttpsErrorMessage = "NotHttps";
+            var isIEBoolean = this.isIE();
+            var isEdgeBoolean = this.isEdge();
+            var parsedUrlObj = {
+                protocol: undefined,
+                hostname: undefined,
+                port: undefined
+            };
+            try {
+                if (isIEBoolean)
+                    throw "Browser doesn't support new URL library";
+                else if (isEdgeBoolean)
+                    throw "Browser has inconsistent URL library";
+                var urlObj = new URL(url);
+                if (urlObj) {
+                    parsedUrlObj.protocol = urlObj.protocol;
+                    parsedUrlObj.hostname = urlObj.hostname;
+                    parsedUrlObj.port = urlObj.port;
+                    if (OSF.OUtil.checkFlight(OSF.FlightNames.AddinEnforceHttps)) {
+                        if (enforceHttps && urlObj.protocol != "https:")
+                            throw new Error(notHttpsErrorMessage);
+                    }
+                }
+            }
+            catch (err) {
+                if (err.message === notHttpsErrorMessage)
+                    throw err;
+                var parser = document.createElement("a");
+                parser.href = url;
+                if ((parser.pathname == '' || parser.pathname == '/')
+                    && !(url.substring(url.length - 1, url.length) === '/')) {
+                    url += '/';
+                }
+                if (OSF.OUtil.checkFlight(OSF.FlightNames.AddinEnforceHttps)) {
+                    if (enforceHttps && parser.protocol != "https:")
+                        throw new Error(notHttpsErrorMessage);
+                }
+                var parsedUrlWithoutPort = parser.protocol + "//" + parser.hostname + (isIEBoolean ? "/" : "") + parser.pathname + parser.search + parser.hash;
+                var parsedUrlWithPort = parser.protocol + "//" + parser.host + (isIEBoolean ? "/" : "") + parser.pathname + parser.search + parser.hash;
+                if (url == parsedUrlWithoutPort || url == parsedUrlWithPort) {
+                    parsedUrlObj.protocol = parser.protocol;
+                    parsedUrlObj.hostname = parser.hostname;
+                    parsedUrlObj.port = parser.port;
+                }
+            }
+            return parsedUrlObj;
+        },
         shallowCopy: function OSF_Outil$shallowCopy(sourceObj) {
             if (sourceObj == null) {
                 return null;
@@ -998,6 +1096,26 @@ OSF.OUtil = (function () {
             else {
                 return null;
             }
+        },
+        isNullOrUndefined: function OSF_OUtil$isNullOrUndefined(value) {
+            if (typeof (value) === "undefined") {
+                return true;
+            }
+            if (value === null) {
+                return true;
+            }
+            return false;
+        },
+        stringEndsWith: function OSF_OUtil$stringEndsWith(value, subString) {
+            if (!OSF.OUtil.isNullOrUndefined(value) && !OSF.OUtil.isNullOrUndefined(subString)) {
+                if (subString.length > value.length) {
+                    return false;
+                }
+                if (value.substr(value.length - subString.length) === subString) {
+                    return true;
+                }
+            }
+            return false;
         }
     };
 })();
@@ -1025,6 +1143,12 @@ OSF.OUtil.Guid = (function () {
         }
     };
 })();
+try {
+    (function () {
+        OSF.Flights = OSF.OUtil.parseFlights(true);
+    })();
+}
+catch (ex) { }
 window.OSF = OSF;
 OSF.OUtil.setNamespace("OSF", window);
 OSF.MessageIDs = {
@@ -1120,7 +1244,7 @@ OSF.DialogMessageType = {
     DialogParentMessageReceived: 1,
     DialogClosed: 12006
 };
-OSF.OfficeAppContext = function OSF_OfficeAppContext(id, appName, appVersion, appUILocale, dataLocale, docUrl, clientMode, settings, reason, osfControlType, eToken, correlationId, appInstanceId, touchEnabled, commerceAllowed, appMinorVersion, requirementMatrix, hostCustomMessage, hostFullVersion, clientWindowHeight, clientWindowWidth, addinName, appDomains, dialogRequirementMatrix, featureGates, officeTheme) {
+OSF.OfficeAppContext = function OSF_OfficeAppContext(id, appName, appVersion, appUILocale, dataLocale, docUrl, clientMode, settings, reason, osfControlType, eToken, correlationId, appInstanceId, touchEnabled, commerceAllowed, appMinorVersion, requirementMatrix, hostCustomMessage, hostFullVersion, clientWindowHeight, clientWindowWidth, addinName, appDomains, dialogRequirementMatrix, featureGates, officeTheme, initialDisplayMode) {
     this._id = id;
     this._appName = appName;
     this._appVersion = appVersion;
@@ -1148,6 +1272,7 @@ OSF.OfficeAppContext = function OSF_OfficeAppContext(id, appName, appVersion, ap
     this._dialogRequirementMatrix = dialogRequirementMatrix;
     this._featureGates = featureGates;
     this._officeTheme = officeTheme;
+    this._initialDisplayMode = initialDisplayMode;
     this.get_id = function get_id() { return this._id; };
     this.get_appName = function get_appName() { return this._appName; };
     this.get_appVersion = function get_appVersion() { return this._appVersion; };
@@ -1176,6 +1301,7 @@ OSF.OfficeAppContext = function OSF_OfficeAppContext(id, appName, appVersion, ap
     this.get_appDomains = function get_appDomains() { return this._appDomains; };
     this.get_featureGates = function get_featureGates() { return this._featureGates; };
     this.get_officeTheme = function get_officeTheme() { return this._officeTheme; };
+    this.get_initialDisplayMode = function get_initialDisplayMode() { return this._initialDisplayMode ? this._initialDisplayMode : 0; };
 };
 OSF.OsfControlType = {
     DocumentLevel: 0,
@@ -1274,6 +1400,7 @@ Microsoft.Office.WebExtension.Parameters = {
     UseDeviceIndependentPixels: "useDeviceIndependentPixels",
     PromptBeforeOpen: "promptBeforeOpen",
     EnforceAppDomain: "enforceAppDomain",
+    UrlNoHostInfo: "urlNoHostInfo",
     AppCommandInvocationCompletedData: "appCommandInvocationCompletedData",
     Base64: "base64",
     FormId: "formId"
@@ -3893,17 +4020,6 @@ OSF.InitializationHelper = function OSF_InitializationHelper(hostInfo, webAppSta
 };
 OSF.InitializationHelper.prototype.deserializeSettings = function OSF_InitializationHelper$deserializeSettings(serializedSettings, refreshSupported) {
     var settings;
-    var osfSessionStorage = OSF.OUtil.getSessionStorage();
-    if (osfSessionStorage) {
-        var storageSettings = osfSessionStorage.getItem(OSF._OfficeAppFactory.getCachedSessionSettingsKey());
-        if (storageSettings) {
-            serializedSettings = JSON.parse(storageSettings);
-        }
-        else {
-            storageSettings = JSON.stringify(serializedSettings);
-            osfSessionStorage.setItem(OSF._OfficeAppFactory.getCachedSessionSettingsKey(), storageSettings);
-        }
-    }
     var deserializedSettings = OSF.DDA.SettingsManager.deserializeSettings(serializedSettings);
     if (refreshSupported) {
         settings = new OSF.DDA.RefreshableSettings(deserializedSettings);
@@ -4031,6 +4147,8 @@ var OfficeExt;
             this.unregisterEvent(id, targetId, callback);
         };
         Win32RichClientHostController.prototype.sendMessage = function (params) {
+            var message = params[Microsoft.Office.WebExtension.Parameters.MessageContent];
+            window.external.MessageChild(message);
         };
         return Win32RichClientHostController;
     })(OfficeExt.RichClientHostController);
@@ -4087,21 +4205,28 @@ OSF.initializeRichCommon = function OSF_initializeRichCommon() {
     OSF.DDA.ClientSettingsManager = {
         getSettingsExecuteMethod: function OSF_DDA_ClientSettingsManager$getSettingsExecuteMethod(hostDelegateMethod) {
             return function (args) {
-                var status, response;
+                var onComplete = function onComplete(status, response) {
+                    if (args.onReceiving) {
+                        args.onReceiving();
+                    }
+                    if (args.onComplete) {
+                        args.onComplete(status, response);
+                    }
+                };
+                var response;
                 try {
-                    response = hostDelegateMethod(args.hostCallArgs, args.onCalling, args.onReceiving);
-                    status = OSF.DDA.ErrorCodeManager.errorCodes.ooeSuccess;
+                    response = hostDelegateMethod(args.hostCallArgs, args.onCalling, onComplete);
                 }
                 catch (ex) {
-                    status = OSF.DDA.ErrorCodeManager.errorCodes.ooeInternalError;
+                    var status = OSF.DDA.ErrorCodeManager.errorCodes.ooeInternalError;
                     response = { name: Strings.OfficeOM.L_InternalError, message: ex };
-                }
-                if (args.onComplete) {
-                    args.onComplete(status, response);
+                    if (args.onComplete) {
+                        args.onComplete(status, response);
+                    }
                 }
             };
         },
-        read: function OSF_DDA_ClientSettingsManager$read(onCalling, onReceiving) {
+        read: function OSF_DDA_ClientSettingsManager$read(onCalling, onComplete) {
             var keys = [];
             var values = [];
             if (onCalling) {
@@ -4113,16 +4238,16 @@ OSF.initializeRichCommon = function OSF_initializeRichCommon() {
             else {
                 OSF.DDA._OsfControlContext.GetSettings().Read(keys, values);
             }
-            if (onReceiving) {
-                onReceiving();
-            }
             var serializedSettings = {};
             for (var index = 0; index < keys.length; index++) {
                 serializedSettings[keys[index]] = values[index];
             }
+            if (onComplete) {
+                onComplete(OSF.DDA.ErrorCodeManager.errorCodes.ooeSuccess, serializedSettings);
+            }
             return serializedSettings;
         },
-        write: function OSF_DDA_ClientSettingsManager$write(serializedSettings, overwriteIfStale, onCalling, onReceiving) {
+        write: function OSF_DDA_ClientSettingsManager$write(serializedSettings, overwriteIfStale, onCalling, onComplete) {
             var keys = [];
             var values = [];
             for (var key in serializedSettings) {
@@ -4132,14 +4257,21 @@ OSF.initializeRichCommon = function OSF_initializeRichCommon() {
             if (onCalling) {
                 onCalling();
             }
+            var settingObj;
             if (typeof OsfOMToken != 'undefined' && OsfOMToken) {
-                OSF.DDA._OsfControlContext.GetSettings(OsfOMToken).Write(keys, values);
+                settingObj = OSF.DDA._OsfControlContext.GetSettings(OsfOMToken);
             }
             else {
-                OSF.DDA._OsfControlContext.GetSettings().Write(keys, values);
+                settingObj = OSF.DDA._OsfControlContext.GetSettings();
             }
-            if (onReceiving) {
-                onReceiving();
+            if (typeof settingObj.WriteAsync != 'undefined') {
+                settingObj.WriteAsync(keys, values, onComplete);
+            }
+            else {
+                settingObj.Write(keys, values);
+                if (onComplete) {
+                    onComplete(OSF.DDA.ErrorCodeManager.errorCodes.ooeSuccess);
+                }
             }
         }
     };
@@ -4226,8 +4358,12 @@ OSF.initializeRichCommon = function OSF_initializeRichCommon() {
                 OsfMsAjaxFactory.msAjaxDebug.trace("Exception while creating the SDX FeatureGates object. Details: " + ex);
             }
         }
+        var initialDisplayMode = 0;
+        if (typeof context.GetInitialDisplayMode != "undefined") {
+            initialDisplayMode = context.GetInitialDisplayMode();
+        }
         eToken = eToken ? eToken.toString() : "";
-        returnedContext = new OSF.OfficeAppContext(id, appType, version, UILocale, dataLocale, docUrl, clientMode, settings, reason, osfControlType, eToken, correlationId, appInstanceId, touchEnabled, commerceAllowed, minorVersion, requirementMatrix, hostCustomMessage, hostFullVersion, undefined, undefined, undefined, undefined, dialogRequirementMatrix, sdxFeatureGates);
+        returnedContext = new OSF.OfficeAppContext(id, appType, version, UILocale, dataLocale, docUrl, clientMode, settings, reason, osfControlType, eToken, correlationId, appInstanceId, touchEnabled, commerceAllowed, minorVersion, requirementMatrix, hostCustomMessage, hostFullVersion, undefined, undefined, undefined, undefined, dialogRequirementMatrix, sdxFeatureGates, undefined, initialDisplayMode);
         if (OSF.AppTelemetry) {
             OSF.AppTelemetry.initialize(returnedContext);
         }
@@ -4692,8 +4828,9 @@ OSF.DDA.AsyncMethodNames.addNames({
 });
 OSF.DDA.SyncMethodNames.addNames({
     MessageParent: "messageParent",
-    AddMessageHandler: "addEventHandler",
-    SendMessage: "sendMessage"
+    MessageChild: "messageChild",
+    SendMessage: "sendMessage",
+    AddMessageHandler: "addEventHandler"
 });
 OSF.DDA.UI.ParentUI = function OSF_DDA_ParentUI() {
     var eventDispatch;
@@ -4836,6 +4973,13 @@ OSF.DDA.AsyncMethodCalls.define({
                 "types": ["boolean"],
                 "defaultValue": false
             }
+        },
+        {
+            name: Microsoft.Office.WebExtension.Parameters.UrlNoHostInfo,
+            value: {
+                "types": ["boolean"],
+                "defaultValue": false
+            }
         }
     ],
     privateStateCallbacks: [],
@@ -4860,13 +5004,24 @@ OSF.DDA.AsyncMethodCalls.define({
                 return eventDispatch.addEventHandlerAndFireQueuedEvent(eventType, handler);
             }
         });
-        var sendMessage = OSF.DDA.SyncMethodNames.SendMessage.displayName;
-        OSF.OUtil.defineEnumerableProperty(dialog, sendMessage, {
-            value: function () {
-                var execute = OSF._OfficeAppFactory.getHostFacade()[OSF.DDA.DispIdHost.Methods.SendMessage];
-                return execute(arguments, eventDispatch, dialog);
-            }
-        });
+        if (OSF.DDA.UI.EnableSendMessageDialogAPI === true) {
+            var sendMessage = OSF.DDA.SyncMethodNames.SendMessage.displayName;
+            OSF.OUtil.defineEnumerableProperty(dialog, sendMessage, {
+                value: function () {
+                    var execute = OSF._OfficeAppFactory.getHostFacade()[OSF.DDA.DispIdHost.Methods.SendMessage];
+                    return execute(arguments, eventDispatch, dialog);
+                }
+            });
+        }
+        if (OSF.DDA.UI.EnableMessageChildDialogAPI === true) {
+            var messageChild = OSF.DDA.SyncMethodNames.MessageChild.displayName;
+            OSF.OUtil.defineEnumerableProperty(dialog, messageChild, {
+                value: function () {
+                    var execute = OSF._OfficeAppFactory.getHostFacade()[OSF.DDA.DispIdHost.Methods.SendMessage];
+                    return execute(arguments, eventDispatch, dialog);
+                }
+            });
+        }
         return dialog;
     },
     checkCallArgs: function (callArgs, caller, stateInfo) {
@@ -5635,9 +5790,9 @@ var OSFLog;
             enumerable: true,
             configurable: true
         });
-        Object.defineProperty(CheckWACHostUsageData.prototype, "solutionId", {
-            get: function () { return this.Fields["solutionId"]; },
-            set: function (value) { this.Fields["solutionId"] = value; },
+        Object.defineProperty(CheckWACHostUsageData.prototype, "instanceId", {
+            get: function () { return this.Fields["instanceId"]; },
+            set: function (value) { this.Fields["instanceId"] = value; },
             enumerable: true,
             configurable: true
         });
@@ -5659,19 +5814,12 @@ var OSFLog;
             enumerable: true,
             configurable: true
         });
-        Object.defineProperty(CheckWACHostUsageData.prototype, "correlationId", {
-            get: function () { return this.Fields["correlationId"]; },
-            set: function (value) { this.Fields["correlationId"] = value; },
-            enumerable: true,
-            configurable: true
-        });
         CheckWACHostUsageData.prototype.SerializeFields = function () {
             this.SetSerializedField("isWacKnownHost", this.isWacKnownHost);
-            this.SetSerializedField("solutionId", this.solutionId);
+            this.SetSerializedField("instanceId", this.instanceId);
             this.SetSerializedField("hostType", this.hostType);
             this.SetSerializedField("hostPlatform", this.hostPlatform);
             this.SetSerializedField("wacDomain", this.wacDomain);
-            this.SetSerializedField("correlationId", this.correlationId);
         };
         return CheckWACHostUsageData;
     })(BaseUsageData);
@@ -6185,7 +6333,7 @@ var OSFAppTelemetry;
         }
         appInfo.message = context.get_hostCustomMessage();
         appInfo.officeJSVersion = OSF.ConstantNames.FileVersion;
-        appInfo.hostJSVersion = "16.0.12312.10000";
+        appInfo.hostJSVersion = "16.0.12813.10000";
         if (context._wacHostEnvironment) {
             appInfo.wacHostEnvironment = context._wacHostEnvironment;
         }
@@ -6365,13 +6513,12 @@ var OSFAppTelemetry;
         OSF.AppTelemetry.onCallDone("property", -1, propertyName, msResponseTime);
     }
     OSFAppTelemetry.onPropertyDone = onPropertyDone;
-    function onCheckWACHost(isWacKnownHost, solutionId, hostType, hostPlatform, correlationId, wacDomain) {
+    function onCheckWACHost(isWacKnownHost, instanceId, hostType, hostPlatform, wacDomain) {
         var data = new OSFLog.CheckWACHostUsageData();
         data.isWacKnownHost = isWacKnownHost;
-        data.solutionId = solutionId;
+        data.instanceId = instanceId;
         data.hostType = hostType;
         data.hostPlatform = hostPlatform;
-        data.correlationId = correlationId;
         data.wacDomain = UrlFilter.filter(wacDomain);
         (new AppLogger()).LogData(data);
     }
@@ -6911,7 +7058,8 @@ OSF.DDA.SafeArray.Delegate.ParameterMap.define({
 window.OfficeRuntime = window.OfficeRuntime || {};
 window.OfficeRuntime.auth = {
     getAccessToken: function (params) {
-        return new window.Promise(function (resolve, reject) {
+        var internalPromise = window.Promise ? window.Promise : window.Office.Promise;
+        return new internalPromise(function (resolve, reject) {
             try {
                 window.Office.context.auth.getAccessTokenAsync(params || {}, function (result) {
                     if (result.status === "succeeded") {
@@ -6923,16 +7071,38 @@ window.OfficeRuntime.auth = {
                 });
             }
             catch (error) {
-                if (error && error.message) {
-                    reject(error.message);
-                }
-                else {
-                    reject(error);
-                }
+                reject(error);
             }
         });
     }
 };
+OSF.OUtil.augmentList(OSF.DDA.EventDescriptors, {
+    DialogParentMessageReceivedEvent: "DialogParentMessageReceivedEvent"
+});
+OSF.OUtil.augmentList(Microsoft.Office.WebExtension.EventType, {
+    DialogParentMessageReceived: "dialogParentMessageReceived",
+    DialogParentEventReceived: "dialogParentEventReceived"
+});
+OSF.DialogParentMessageEventDispatch = new OSF.EventDispatch([
+    Microsoft.Office.WebExtension.EventType.DialogParentMessageReceived,
+    Microsoft.Office.WebExtension.EventType.DialogParentEventReceived
+]);
+OSF.DDA.SafeArray.Delegate.ParameterMap.define({
+    type: OSF.DDA.EventDispId.dispidDialogParentMessageReceivedEvent,
+    fromHost: [
+        { name: OSF.DDA.EventDescriptors.DialogParentMessageReceivedEvent, value: OSF.DDA.SafeArray.Delegate.ParameterMap.self }
+    ],
+    isComplexType: true
+});
+OSF.DDA.SafeArray.Delegate.ParameterMap.define({
+    type: OSF.DDA.EventDescriptors.DialogParentMessageReceivedEvent,
+    fromHost: [
+        { name: OSF.DDA.PropertyDescriptors.MessageType, value: 0 },
+        { name: OSF.DDA.PropertyDescriptors.MessageContent, value: 1 }
+    ],
+    isComplexType: true
+});
+OSF.DDA.UI.EnableMessageChildDialogAPI = true;
 var OfficeJsClient_OutlookWin32;
 (function (OfficeJsClient_OutlookWin32) {
     function prepareApiSurface(appContext) {
@@ -6945,6 +7115,9 @@ var OfficeJsClient_OutlookWin32;
         }
         appContext.auth = new OSF.DDA.Auth();
         OSF.DDA.DispIdHost.addAsyncMethods(appContext.auth, [OSF.DDA.AsyncMethodNames.GetAccessTokenAsync]);
+        if (OSF.DDA.OpenBrowser) {
+            OSF.DDA.DispIdHost.addAsyncMethods(appContext.ui, [OSF.DDA.AsyncMethodNames.OpenBrowserWindow]);
+        }
     }
     OfficeJsClient_OutlookWin32.prepareApiSurface = prepareApiSurface;
     function prepareRightAfterWebExtensionInitialize() {
@@ -7312,6 +7485,7 @@ function initialize() {
   addErrorMessage(9029, "CanOnlyGetTokenForSavedItem", getString("l_CallSaveAsyncBeforeToken_Text"));
   addErrorMessage(9030, "APICallFailedDueToItemChange", getString("l_APICallFailedDueToItemChange_Text"));
   addErrorMessage(9031, "InvalidParameterValueError", getString("l_InvalidParameterValueError_Text"));
+  addErrorMessage(9032, "ApiCallNotSupportedByExtensionPoint", getString("l_API_Not_Supported_By_ExtensionPoint_Error_Text"));
   addErrorMessage(9033, "SetRecurrenceOnInstanceError", getString("l_Recurrence_Error_Instance_SetAsync_Text"));
   addErrorMessage(9034, "InvalidRecurrenceError", getString("l_Recurrence_Error_Properties_Invalid_Text"));
   addErrorMessage(9035, "RecurrenceZeroOccurrences", getString("l_RecurrenceErrorZeroOccurrences_Text"));
@@ -7326,6 +7500,9 @@ function initialize() {
   addErrorMessage(9044, "InvalidCategory", getString("l_Invalid_Category_Error_Text"));
   addErrorMessage(9045, "DuplicateCategory", getString("l_Duplicate_Category_Error_Text"));
   addErrorMessage(9046, "ItemNotSaved", getString("l_Item_Not_Saved_Error_Text"));
+  addErrorMessage(9047, "MissingExtendedPermissionsForAPIError", getString("l_Missing_Extended_Permissions_For_API"));
+  addErrorMessage(9048, "TokenAccessDenied", getString("l_TokenAccessDeniedWithoutItemContext_Text"));
+  addErrorMessage(9049, "ItemNotFound", getString("l_ItemNotFound_Text"));
   isInitialized = true;
 }
 function addErrorMessage(code, error, message) {
@@ -7386,6 +7563,8 @@ var AdditionalGlobalParameters = function () {
   });
 
   AdditionalGlobalParameters.prototype.updateOutlookExecuteParameters = function (executeParameters, additionalApiParameters) {
+    var outParameters = executeParameters;
+
     if (this._parameterBlobSupported) {
       if (this._itemNumber > 0) {
         additionalApiParameters.itemNumber = this._itemNumber.toString();
@@ -7396,15 +7575,17 @@ var AdditionalGlobalParameters = function () {
       }
 
       if (Object.keys(additionalApiParameters).length === 0) {
-        return;
+        return outParameters;
       }
 
-      if (executeParameters == null) {
-        executeParameters = new Array();
+      if (outParameters == null) {
+        outParameters = [];
       }
 
-      executeParameters.push(JSON.stringify(additionalApiParameters));
+      outParameters.push(JSON.stringify(additionalApiParameters));
     }
+
+    return outParameters;
   };
 
   return AdditionalGlobalParameters;
@@ -7435,7 +7616,7 @@ var callOutlookNativeDispatcher_callOutlookNativeDispatcher = function callOutlo
   });
 };
 var callOutlookNativeDispatcher_convertToOutlookNativeParameters = function convertToOutlookNativeParameters(dispid, data) {
-  var executeParameters = [];
+  var executeParameters = null;
   var optionalParameters = {};
 
   switch (dispid) {
@@ -7456,14 +7637,18 @@ var callOutlookNativeDispatcher_convertToOutlookNativeParameters = function conv
 
     case 8:
     case 9:
+    case 179:
+    case 180:
       executeParameters = new Array(data.itemId);
       break;
 
     case 7:
+    case 177:
       executeParameters = new Array(convertRecipientArrayParameterForOutlookForDisplayApi(data.requiredAttendees), convertRecipientArrayParameterForOutlookForDisplayApi(data.optionalAttendees), data.start, data.end, data.location, convertRecipientArrayParameterForOutlookForDisplayApi(data.resources), data.subject, data.body);
       break;
 
     case 44:
+    case 178:
       executeParameters = [convertRecipientArrayParameterForOutlookForDisplayApi(data.toRecipients), convertRecipientArrayParameterForOutlookForDisplayApi(data.ccRecipients), convertRecipientArrayParameterForOutlookForDisplayApi(data.bccRecipients), data.subject, data.htmlBody, data.attachments];
       break;
 
@@ -7481,11 +7666,15 @@ var callOutlookNativeDispatcher_convertToOutlookNativeParameters = function conv
 
     case 11:
     case 10:
+    case 184:
+    case 183:
       executeParameters = [data.htmlBody];
       break;
 
     case 31:
     case 30:
+    case 182:
+    case 181:
       executeParameters = [data.htmlBody, data.attachments];
       break;
 
@@ -7558,7 +7747,7 @@ var callOutlookNativeDispatcher_convertToOutlookNativeParameters = function conv
   }
 
   if (dispid !== 1) {
-    getAdditionalGlobalParametersSingleton().updateOutlookExecuteParameters(executeParameters, optionalParameters);
+    executeParameters = getAdditionalGlobalParametersSingleton().updateOutlookExecuteParameters(executeParameters, optionalParameters);
   }
 
   return executeParameters;
@@ -7674,11 +7863,11 @@ function standardInvokeHostMethod(dispid, userContext, callback, data, format, c
         }
 
         if (!asyncResult && resultCode !== InvokeResultCode.noError) {
-          asyncResult = createAsyncResult(undefined, standardInvokeHostMethod_OSF.DDA.AsyncResultEnum.ErrorCode.Failed, standardInvokeHostMethod_OSF.DDA.ErrorCodes.InternalFormatError, userContext);
+          asyncResult = createAsyncResult(undefined, standardInvokeHostMethod_OSF.DDA.AsyncResultEnum.ErrorCode.Failed, 9002, userContext);
         }
 
         if (!asyncResult && resultCode === InvokeResultCode.noError && wasSuccessful === false) {
-          asyncResult = createAsyncResult(undefined, standardInvokeHostMethod_OSF.DDA.AsyncResultEnum.ErrorCode.Failed, standardInvokeHostMethod_OSF.DDA.ErrorCodes.OoeOperationNotSupported, userContext);
+          asyncResult = createAsyncResult(undefined, standardInvokeHostMethod_OSF.DDA.AsyncResultEnum.ErrorCode.Failed, standardInvokeHostMethod_OSF.DDA.ErrorCodeManager.errorCodes.ooeOperationNotSupported, userContext);
         }
 
         callback(asyncResult);
@@ -7753,6 +7942,13 @@ function createError(message, errorInfo) {
     }
   }
 
+  return err;
+}
+function createBetaError(featureName) {
+  var displayMessage = "The feature {0}, is only enabled on the beta api endpoint".replace("{0}", featureName);
+  var err = createError(displayMessage, {
+    name: "Sys.FeatureNotEnabled"
+  });
   return err;
 }
 function createParameterCountError(message) {
@@ -7996,6 +8192,11 @@ MailboxEnums.Folder = {
   Junk: "junk",
   DeletedItems: "deletedItems"
 };
+MailboxEnums.ComposeType = {
+  Forward: "forward",
+  NewMail: "newMail",
+  Reply: "reply"
+};
 var CoercionType = {
   Text: "text",
   Html: "html"
@@ -8206,6 +8407,12 @@ MailboxEnums.LocationType = {
   Custom: "custom",
   Room: "room"
 };
+MailboxEnums.AppointmentSensitivityType = {
+  Normal: "normal",
+  Personal: "personal",
+  Private: "private",
+  Confidential: "confidential"
+};
 MailboxEnums.CategoryColor = {
   None: "None",
   Preset0: "Preset0",
@@ -8322,13 +8529,13 @@ function throwOnInvalidEmailAddressDetails(originalAttendee) {
   }
 
   if (!isNullOrUndefined(originalAttendee.appointmentResponse)) {
-    if (typeof originalAttendee.appointmentResponse === "string") {
+    if (typeof originalAttendee.appointmentResponse !== "string") {
       throw createArgumentOutOfRange("appointmentResponse");
     }
   }
 
   if (!isNullOrUndefined(originalAttendee.recipientType)) {
-    if (typeof originalAttendee.recipientType === "string") {
+    if (typeof originalAttendee.recipientType !== "string") {
       throw createArgumentOutOfRange("recipientType");
     }
   }
@@ -8354,7 +8561,48 @@ function getItemIdBasedOnHost(itemId) {
 
   return convertToEwsId(itemId, MailboxEnums.RestVersion.v1_0);
 }
+// CONCATENATED MODULE: ./src/utils/RuntimeFlighting.ts
+
+var beta = 2;
+var production = 1;
+var currentLevel;
+currentLevel = production;
+var getCurrentLevel = function getCurrentLevel() {
+  return currentLevel;
+};
+var Features = {
+  featureSampleProduction: production,
+  featureSampleBeta: beta,
+  calendarItems: beta,
+  signature: beta,
+  replyCallback: beta,
+  displayXAsync: beta,
+  propertyGetAll: beta
+};
+function isFeatureEnabled(feature) {
+  return feature <= getCurrentLevel();
+}
+function checkFeatureEnabledAndThrow(feature, featureName) {
+  if (!isFeatureEnabled(feature)) {
+    throw createBetaError(featureName);
+  }
+}
 // CONCATENATED MODULE: ./src/methods/displayAppointmentForm.ts
+var __spreadArrays = undefined && undefined.__spreadArrays || function () {
+  for (var s = 0, i = 0, il = arguments.length; i < il; i++) {
+    s += arguments[i].length;
+  }
+
+  for (var r = Array(s), k = 0, i = 0; i < il; i++) {
+    for (var a = arguments[i], j = 0, jl = a.length; j < jl; j++, k++) {
+      r[k] = a[j];
+    }
+  }
+
+  return r;
+};
+
+
 
 
 
@@ -8366,13 +8614,33 @@ function displayAppointmentForm(itemId) {
     args[_i - 1] = arguments[_i];
   }
 
+  displayAppointmentFormHelper.apply(void 0, __spreadArrays([9, itemId], args));
+}
+function displayAppointmentFormAsync(itemId) {
+  var args = [];
+
+  for (var _i = 1; _i < arguments.length; _i++) {
+    args[_i - 1] = arguments[_i];
+  }
+
+  checkFeatureEnabledAndThrow(Features.displayXAsync, "displayAppointmentFormAsync");
+  displayAppointmentFormHelper.apply(void 0, __spreadArrays([180, itemId], args));
+}
+
+function displayAppointmentFormHelper(dispidToInvoke, itemId) {
+  var args = [];
+
+  for (var _i = 2; _i < arguments.length; _i++) {
+    args[_i - 2] = arguments[_i];
+  }
+
   checkPermissionsAndThrow(1, "mailbox.displayAppointmentForm");
   var commonParameters = parseCommonArgs(args, false, false);
   var parameters = {
     itemId: itemId
   };
   validateParameters(parameters);
-  standardInvokeHostMethod(9, commonParameters.asyncContext, commonParameters.callback, {
+  standardInvokeHostMethod(dispidToInvoke, commonParameters.asyncContext, commonParameters.callback, {
     itemId: getItemIdBasedOnHost(parameters.itemId)
   }, undefined);
 }
@@ -8381,6 +8649,21 @@ function validateParameters(parameters) {
   validateDisplayFormParameters(parameters.itemId);
 }
 // CONCATENATED MODULE: ./src/methods/displayMessageForm.ts
+var displayMessageForm_spreadArrays = undefined && undefined.__spreadArrays || function () {
+  for (var s = 0, i = 0, il = arguments.length; i < il; i++) {
+    s += arguments[i].length;
+  }
+
+  for (var r = Array(s), k = 0, i = 0; i < il; i++) {
+    for (var a = arguments[i], j = 0, jl = a.length; j < jl; j++, k++) {
+      r[k] = a[j];
+    }
+  }
+
+  return r;
+};
+
+
 
 
 
@@ -8392,13 +8675,33 @@ function displayMessageForm(itemId) {
     args[_i - 1] = arguments[_i];
   }
 
+  displayMessageFormHelper.apply(void 0, displayMessageForm_spreadArrays([8, itemId], args));
+}
+function displayMessageFormAsync(itemId) {
+  var args = [];
+
+  for (var _i = 1; _i < arguments.length; _i++) {
+    args[_i - 1] = arguments[_i];
+  }
+
+  checkFeatureEnabledAndThrow(Features.displayXAsync, "displayMessageFormAsync");
+  displayMessageFormHelper.apply(void 0, displayMessageForm_spreadArrays([179, itemId], args));
+}
+
+function displayMessageFormHelper(dispidToInvoke, itemId) {
+  var args = [];
+
+  for (var _i = 2; _i < arguments.length; _i++) {
+    args[_i - 2] = arguments[_i];
+  }
+
   checkPermissionsAndThrow(1, "mailbox.displayMessageForm");
   var commonParameters = parseCommonArgs(args, false, false);
   var parameters = {
     itemId: itemId
   };
   displayMessageForm_validateParameters(parameters);
-  standardInvokeHostMethod(8, commonParameters.asyncContext, commonParameters.callback, {
+  standardInvokeHostMethod(dispidToInvoke, commonParameters.asyncContext, commonParameters.callback, {
     itemId: getItemIdBasedOnHost(parameters.itemId)
   }, undefined);
 }
@@ -8417,6 +8720,21 @@ function validateOptionalStringParameter(value, minLength, maxlength, name) {
   }
 }
 // CONCATENATED MODULE: ./src/methods/displayNewAppointmentForm.ts
+var displayNewAppointmentForm_spreadArrays = undefined && undefined.__spreadArrays || function () {
+  for (var s = 0, i = 0, il = arguments.length; i < il; i++) {
+    s += arguments[i].length;
+  }
+
+  for (var r = Array(s), k = 0, i = 0; i < il; i++) {
+    for (var a = arguments[i], j = 0, jl = a.length; j < jl; j++, k++) {
+      r[k] = a[j];
+    }
+  }
+
+  return r;
+};
+
+
 
 
 
@@ -8433,11 +8751,31 @@ function displayNewAppointmentForm(parameters) {
     args[_i - 1] = arguments[_i];
   }
 
+  return displayNewAppointmentFormHelper.apply(void 0, displayNewAppointmentForm_spreadArrays([7, parameters], args));
+}
+function displayNewAppointmentFormAsync(parameters) {
+  var args = [];
+
+  for (var _i = 1; _i < arguments.length; _i++) {
+    args[_i - 1] = arguments[_i];
+  }
+
+  checkFeatureEnabledAndThrow(Features.displayXAsync, "displayNewAppointmentFormAsync");
+  return displayNewAppointmentFormHelper.apply(void 0, displayNewAppointmentForm_spreadArrays([177, parameters], args));
+}
+
+function displayNewAppointmentFormHelper(dispidToInvoke, parameters) {
+  var args = [];
+
+  for (var _i = 2; _i < arguments.length; _i++) {
+    args[_i - 2] = arguments[_i];
+  }
+
   checkPermissionsAndThrow(1, "mailbox.displayNewAppointmentForm");
   var commonParameters = parseCommonArgs(args, false, false);
   displayNewAppointmentForm_validateParameters(parameters);
   var updatedParameters = normalizeParameters(parameters);
-  standardInvokeHostMethod(7, commonParameters.asyncContext, commonParameters.callback, updatedParameters, undefined);
+  standardInvokeHostMethod(dispidToInvoke, commonParameters.asyncContext, commonParameters.callback, updatedParameters, undefined);
 }
 
 function displayNewAppointmentForm_validateParameters(parameters) {
@@ -8515,6 +8853,21 @@ function normalizeParameters(parameters) {
   return updatedParameters;
 }
 // CONCATENATED MODULE: ./src/methods/displayNewMessageForm.ts
+var displayNewMessageForm_spreadArrays = undefined && undefined.__spreadArrays || function () {
+  for (var s = 0, i = 0, il = arguments.length; i < il; i++) {
+    s += arguments[i].length;
+  }
+
+  for (var r = Array(s), k = 0, i = 0; i < il; i++) {
+    for (var a = arguments[i], j = 0, jl = a.length; j < jl; j++, k++) {
+      r[k] = a[j];
+    }
+  }
+
+  return r;
+};
+
+
 
 
 
@@ -8532,11 +8885,31 @@ function displayNewMessageForm(parameters) {
     args[_i - 1] = arguments[_i];
   }
 
+  return displayNewMessageFormHelper.apply(void 0, displayNewMessageForm_spreadArrays([44, parameters], args));
+}
+function displayNewMessageFormAsync(parameters) {
+  var args = [];
+
+  for (var _i = 1; _i < arguments.length; _i++) {
+    args[_i - 1] = arguments[_i];
+  }
+
+  checkFeatureEnabledAndThrow(Features.displayXAsync, "displayNewMessageFormAsync");
+  return displayNewMessageFormHelper.apply(void 0, displayNewMessageForm_spreadArrays([178, parameters], args));
+}
+
+function displayNewMessageFormHelper(dispidToInvoke, parameters) {
+  var args = [];
+
+  for (var _i = 2; _i < arguments.length; _i++) {
+    args[_i - 2] = arguments[_i];
+  }
+
   checkPermissionsAndThrow(1, "mailbox.displayNewMessageForm");
   var commonParameters = parseCommonArgs(args, false, false);
   displayNewMessageForm_validateParameters(parameters);
   var updatedParameters = normailzeParameters(parameters);
-  standardInvokeHostMethod(44, commonParameters.asyncContext, commonParameters.callback, updatedParameters === null || updatedParameters === undefined ? parameters : updatedParameters, undefined);
+  standardInvokeHostMethod(dispidToInvoke, commonParameters.asyncContext, commonParameters.callback, updatedParameters === null || updatedParameters === undefined ? parameters : updatedParameters, undefined);
 }
 
 function displayNewMessageForm_validateParameters(parameters) {
@@ -8691,6 +9064,12 @@ function handleTokenResponse(response, context, resultCode) {
 
   if (!!resultCode && resultCode !== InvokeResultCode.noError) {
     asyncResult = createAsyncResult(undefined, handleTokenResponse_OSF.DDA.AsyncResultEnum.ErrorCode.Failed, 9017, context, getString("l_InternalProtocolError_Text").replace("{0}", resultCode));
+
+    if (!!asyncResult) {
+      asyncResult.diagnostics = {
+        InvokeCodeResult: resultCode
+      };
+    }
   } else {
     if (getAppName() === handleTokenResponse_OSF.AppName.Outlook && response.error !== undefined && response.errorCode !== undefined && !!response.error && response.errorCode === 9030) {
       asyncResult = createAsyncResult(undefined, handleTokenResponse_OSF.DDA.AsyncResultEnum.ErrorCode.Failed, response.errorCode, context, response.errorMessage);
@@ -8712,6 +9091,10 @@ function handleTokenResponse(response, context, resultCode) {
 
 
 
+
+
+
+
 function getCallbackToken() {
   var args = [];
 
@@ -8725,6 +9108,12 @@ function getCallbackToken() {
 
   if (commonParameters.options && !!commonParameters.options.isRest) {
     isRest = true;
+  }
+
+  if (getIsNoItemContextWebExt()) {
+    if (!isRest || getPermissionLevel_getPermissionLevel() < 3) {
+      throw createError(getString("l_TokenAccessDeniedWithoutItemContext_Text"));
+    }
   }
 
   standardInvokeHostMethod(12, commonParameters.asyncContext, commonParameters.callback, {
@@ -9059,7 +9448,7 @@ function saveCustomProperties(customProperties) {
     args[_i - 1] = arguments[_i];
   }
 
-  checkPermissionsAndThrow(2, "item.saveCustomProperties");
+  checkPermissionsAndThrow(1, "item.saveCustomProperties");
   var commonParameters = parseCommonArgs(args, false, true);
   saveCustomProperties_validateParameters(customProperties);
   standardInvokeHostMethod(4, commonParameters.asyncContext, commonParameters.callback, {
@@ -9073,7 +9462,7 @@ function saveCustomProperties_validateParameters(customProperties) {
   }
 }
 // CONCATENATED MODULE: ./src/api/CustomProperties.ts
-var __spreadArrays = undefined && undefined.__spreadArrays || function () {
+var CustomProperties_spreadArrays = undefined && undefined.__spreadArrays || function () {
   for (var s = 0, i = 0, il = arguments.length; i < il; i++) {
     s += arguments[i].length;
   }
@@ -9086,6 +9475,7 @@ var __spreadArrays = undefined && undefined.__spreadArrays || function () {
 
   return r;
 };
+
 
 
 
@@ -9153,7 +9543,19 @@ var CustomProperties_CustomProperties = function () {
       args[_i] = arguments[_i];
     }
 
-    saveCustomProperties.apply(void 0, __spreadArrays([this.rawData], args));
+    saveCustomProperties.apply(void 0, CustomProperties_spreadArrays([this.rawData], args));
+  };
+
+  CustomProperties.prototype.getAll = function () {
+    var _this = this;
+
+    checkFeatureEnabledAndThrow(Features.propertyGetAll, "getAll");
+    var dictionary = {};
+    var keys = Object.keys(this.rawData);
+    keys.forEach(function (key) {
+      dictionary[key] = _this.get(key);
+    });
+    return dictionary;
   };
 
   return CustomProperties;
@@ -9267,9 +9669,10 @@ function getBodyType() {
 
 var maxDataLengthForBodyApi = 1000000;
 var maxAppendOnSendLength = 5000;
+var maxDataLengthForSignatureBodyApi = 30000;
 function validateAppendOnSendBodyParamters(parameters) {
   if (typeof parameters.appendTxt !== "string") {
-    throw createArgumentTypeError("data", typeof parameters.data, "string");
+    throw createArgumentTypeError("data", typeof parameters.appendTxt, "string");
   }
 
   if (parameters.appendTxt.length > maxAppendOnSendLength) {
@@ -9282,6 +9685,15 @@ function validateBodyParameters(parameters) {
   }
 
   if (parameters.data.length > maxDataLengthForBodyApi) {
+    throw createArgumentOutOfRange("data", parameters.data.length);
+  }
+}
+function validateSignatureBodyParameters(parameters) {
+  if (typeof parameters.data !== "string") {
+    throw createArgumentTypeError("data", typeof parameters.data, "string");
+  }
+
+  if (parameters.data.length > maxDataLengthForSignatureBodyApi) {
     throw createArgumentOutOfRange("data", parameters.data.length);
   }
 }
@@ -9360,10 +9772,11 @@ function appendOnSend(data) {
   var parameters = {
     appendTxt: data
   };
-  validateAppendOnSendBodyParamters(parameters);
 
-  if (parameters.data && parameters.data.length > maxAppendOnSendLength) {
-    throw createArgumentOutOfRange("data", data.length);
+  if (isNullOrUndefined(parameters.appendTxt)) {
+    parameters.appendTxt = "";
+  } else {
+    validateAppendOnSendBodyParamters(parameters);
   }
 
   addCoercionTypeParameter(parameters, commonParameters);
@@ -9405,7 +9818,45 @@ function setSelectedData(dispid) {
     standardInvokeHostMethod(dispid, commonParameters.asyncContext, commonParameters.callback, parameters, undefined);
   };
 }
+// CONCATENATED MODULE: ./src/methods/setSignature.ts
+
+
+
+
+
+
+
+function setSignature(data) {
+  var args = [];
+
+  for (var _i = 1; _i < arguments.length; _i++) {
+    args[_i - 1] = arguments[_i];
+  }
+
+  checkPermissionsAndThrow(2, "item.body.setSignatureAsync");
+  var commonParameters = parseCommonArgs(args, false, false);
+  var parameters = {
+    data: data
+  };
+  checkFeatureEnabledAndThrow(Features.signature, "setSignatureAsync");
+
+  if (isNullOrUndefined(parameters.data)) {
+    parameters.data = "";
+  } else {
+    validateSignatureBodyParameters(parameters);
+  }
+
+  addCoercionTypeParameter(parameters, commonParameters);
+
+  if (parameters.coercionType === undefined) {
+    invokeCallbackWithCoercionTypeError(commonParameters);
+    return;
+  }
+
+  standardInvokeHostMethod(173, commonParameters.asyncContext, commonParameters.callback, parameters, undefined);
+}
 // CONCATENATED MODULE: ./src/api/getBodySurface.ts
+
 
 
 
@@ -9424,7 +9875,8 @@ function getBodySurface(isCompose) {
       getTypeAsync: getBodyType,
       prependAsync: bodyPrepend,
       setAsync: setBody,
-      setSelectedDataAsync: setSelectedData(13)
+      setSelectedDataAsync: setSelectedData(13),
+      setSignatureAsync: setSignature
     });
   }
 
@@ -9770,7 +10222,39 @@ function validateAndGetAttachments(data) {
 
   return attachments;
 }
+// CONCATENATED MODULE: ./src/utils/getOptionsAndCallback.ts
+
+function getOptionsAndCallback(data) {
+  var args = [];
+
+  if (!isNullOrUndefined(data.options)) {
+    args[0] = data.options;
+  }
+
+  if (!isNullOrUndefined(data.callback)) {
+    args[args.length] = data.callback;
+  }
+
+  return args;
+}
 // CONCATENATED MODULE: ./src/methods/displayReplyForm.ts
+var displayReplyForm_spreadArrays = undefined && undefined.__spreadArrays || function () {
+  for (var s = 0, i = 0, il = arguments.length; i < il; i++) {
+    s += arguments[i].length;
+  }
+
+  for (var r = Array(s), k = 0, i = 0; i < il; i++) {
+    for (var a = arguments[i], j = 0, jl = a.length; j < jl; j++, k++) {
+      r[k] = a[j];
+    }
+  }
+
+  return r;
+};
+
+
+
+
 
 
 
@@ -9784,37 +10268,8 @@ function displayReplyForm(formData) {
     args[_i - 1] = arguments[_i];
   }
 
-  checkPermissionsAndThrow(1, "mailbox.displayReplyForm");
-  var commonParameters = parseCommonArgs(args, false, false);
-  var parameters = {
-    formData: formData
-  };
-  var updatedHtmlBody = null;
-  var updateAttachments = null;
-
-  if (typeof parameters.formData === "string") {
-    validateStringParameters(parameters.formData);
-    standardInvokeHostMethod(10, commonParameters.asyncContext, commonParameters.callback, {
-      htmlBody: parameters.formData
-    }, undefined);
-  } else if (typeof parameters.formData === "object") {
-    updatedHtmlBody = validateAndGetHtmlBody(parameters.formData);
-    updateAttachments = createAttachmentsDataForHost(validateAndGetAttachments(parameters.formData));
-    standardInvokeHostMethod(30, commonParameters.asyncContext, commonParameters.callback, {
-      htmlBody: updatedHtmlBody,
-      attachments: updateAttachments
-    }, undefined);
-  } else {
-    throw createArgumentError();
-  }
+  return displayReplyFormHelper.apply(void 0, displayReplyForm_spreadArrays([false, false, formData], args));
 }
-// CONCATENATED MODULE: ./src/methods/displayReplyAllForm.ts
-
-
-
-
-
-
 function displayReplyAllForm(formData) {
   var args = [];
 
@@ -9822,8 +10277,46 @@ function displayReplyAllForm(formData) {
     args[_i - 1] = arguments[_i];
   }
 
-  checkPermissionsAndThrow(1, "mailbox.displayReplyAllForm");
-  var commonParameters = parseCommonArgs(args, false, false);
+  return displayReplyFormHelper.apply(void 0, displayReplyForm_spreadArrays([true, false, formData], args));
+}
+function displayReplyFormAsync(formData) {
+  var args = [];
+
+  for (var _i = 1; _i < arguments.length; _i++) {
+    args[_i - 1] = arguments[_i];
+  }
+
+  checkFeatureEnabledAndThrow(Features.displayXAsync, "displayReplyFormAsync");
+  return displayReplyFormHelper.apply(void 0, displayReplyForm_spreadArrays([false, true, formData], args));
+}
+function displayReplyAllFormAsync(formData) {
+  var args = [];
+
+  for (var _i = 1; _i < arguments.length; _i++) {
+    args[_i - 1] = arguments[_i];
+  }
+
+  checkFeatureEnabledAndThrow(Features.displayXAsync, "displayReplyAllFormAsync");
+  return displayReplyFormHelper.apply(void 0, displayReplyForm_spreadArrays([true, true, formData], args));
+}
+
+function displayReplyFormHelper(isReplyAll, isAsync, formData) {
+  var args = [];
+
+  for (var _i = 3; _i < arguments.length; _i++) {
+    args[_i - 3] = arguments[_i];
+  }
+
+  var dispidToInvoke;
+  checkPermissionsAndThrow(1, "mailbox.displayReplyForm");
+  var commonParameters = parseCommonArgs(getOptionsAndCallback(formData), false, false);
+
+  if (isFeatureEnabled(Features.replyCallback)) {
+    if (isNullOrUndefined(commonParameters) || commonParameters.options === undefined && commonParameters.callback === undefined) {
+      commonParameters = parseCommonArgs(args, false, false);
+    }
+  }
+
   var parameters = {
     formData: formData
   };
@@ -9831,14 +10324,43 @@ function displayReplyAllForm(formData) {
   var updateAttachments = null;
 
   if (typeof parameters.formData === "string") {
+    if (isReplyAll) {
+      if (isAsync) {
+        dispidToInvoke = 184;
+      } else {
+        dispidToInvoke = 11;
+      }
+    } else {
+      if (isAsync) {
+        dispidToInvoke = 183;
+      } else {
+        dispidToInvoke = 10;
+      }
+    }
+
     validateStringParameters(parameters.formData);
-    standardInvokeHostMethod(11, commonParameters.asyncContext, commonParameters.callback, {
+    standardInvokeHostMethod(dispidToInvoke, commonParameters.asyncContext, commonParameters.callback, {
       htmlBody: parameters.formData
     }, undefined);
   } else if (typeof parameters.formData === "object") {
     updatedHtmlBody = validateAndGetHtmlBody(parameters.formData);
     updateAttachments = createAttachmentsDataForHost(validateAndGetAttachments(parameters.formData));
-    standardInvokeHostMethod(31, commonParameters.asyncContext, commonParameters.callback, {
+
+    if (isReplyAll) {
+      if (isAsync) {
+        dispidToInvoke = 182;
+      } else {
+        dispidToInvoke = 31;
+      }
+    } else {
+      if (isAsync) {
+        dispidToInvoke = 181;
+      } else {
+        dispidToInvoke = 30;
+      }
+    }
+
+    standardInvokeHostMethod(dispidToInvoke, commonParameters.asyncContext, commonParameters.callback, {
       htmlBody: updatedHtmlBody,
       attachments: updateAttachments
     }, undefined);
@@ -11180,7 +11702,6 @@ function copyRecurrenceObjectConvertSeriesTimeJson(recurrenceOriginal) {
 
 
 
-
 function getMessageRead() {
   var sender = getInitialDataProp("sender");
   var from = getInitialDataProp("from");
@@ -11215,7 +11736,9 @@ function getMessageRead() {
     subject: getInitialDataProp("subject"),
     to: (getInitialDataProp("to") || []).map(createEmailAddressDetails),
     displayReplyForm: displayReplyForm,
+    displayReplyFormAsync: displayReplyFormAsync,
     displayReplyAllForm: displayReplyAllForm,
+    displayReplyAllFormAsync: displayReplyAllFormAsync,
     getAttachmentContentAsync: getAttachmentContent,
     getEntities: Entities_getEntities,
     getEntitiesByType: Entities_getEntitiesByType,
@@ -11226,7 +11749,9 @@ function getMessageRead() {
     getSelectedEntities: Entities_getSelectedEntities,
     getSelectedRegExMatches: Entities_getSelectedRegExMatches,
     loadCustomPropertiesAsync: loadCustomProperties,
-    delayDeliveryTime: getDelayDeliverySurface(false)
+    delayDeliveryTime: getDelayDeliverySurface(false),
+    isAllDayEvent: getInitialDataProp("isAllDayEvent"),
+    sensitivity: getInitialDataProp("sensitivity")
   });
   return messageRead;
 }
@@ -11823,7 +12348,61 @@ function getItemId() {
   var commonParameters = parseCommonArgs(args, true, false);
   standardInvokeHostMethod(164, commonParameters.asyncContext, commonParameters.callback, undefined, undefined);
 }
+// CONCATENATED MODULE: ./src/methods/getComposeType.ts
+
+
+
+
+function getComposeType() {
+  var args = [];
+
+  for (var _i = 0; _i < arguments.length; _i++) {
+    args[_i] = arguments[_i];
+  }
+
+  checkPermissionsAndThrow(1, "item.getComposeTypeAsync");
+  var commonParameters = parseCommonArgs(args, true, false);
+  checkFeatureEnabledAndThrow(Features.signature, "getComposeTypeAsync");
+  standardInvokeHostMethod(174, commonParameters.asyncContext, commonParameters.callback, undefined, undefined);
+}
+// CONCATENATED MODULE: ./src/methods/isClientSignatureEnabled.ts
+
+
+
+
+function isClientSignatureEnabled() {
+  var args = [];
+
+  for (var _i = 0; _i < arguments.length; _i++) {
+    args[_i] = arguments[_i];
+  }
+
+  checkPermissionsAndThrow(1, "isClientSignatureEnabledAsync");
+  var commonParameters = parseCommonArgs(args, true, false);
+  checkFeatureEnabledAndThrow(Features.signature, "isClientSignatureEnabledAsync");
+  standardInvokeHostMethod(175, commonParameters.asyncContext, commonParameters.callback, undefined, undefined);
+}
+// CONCATENATED MODULE: ./src/methods/disableClientSignature.ts
+
+
+
+
+function disableClientSignature() {
+  var args = [];
+
+  for (var _i = 0; _i < arguments.length; _i++) {
+    args[_i] = arguments[_i];
+  }
+
+  checkPermissionsAndThrow(2, "disableClientSignatureAsync");
+  var commonParameters = parseCommonArgs(args, true, false);
+  checkFeatureEnabledAndThrow(Features.signature, "disableClientSignatureAsync");
+  standardInvokeHostMethod(176, commonParameters.asyncContext, commonParameters.callback, undefined, undefined);
+}
 // CONCATENATED MODULE: ./src/api/getMessageCompose.ts
+
+
+
 
 
 
@@ -11874,7 +12453,10 @@ function getMessageCompose() {
     removeAttachmentAsync: removeAttachment,
     saveAsync: save,
     setSelectedDataAsync: setSelectedData(29),
-    delayDeliveryTime: getDelayDeliverySurface(true)
+    delayDeliveryTime: getDelayDeliverySurface(true),
+    getComposeTypeAsync: getComposeType,
+    isClientSignatureEnabledAsync: isClientSignatureEnabled,
+    disableClientSignatureAsync: disableClientSignature
   });
   return messageCompose;
 }
@@ -12022,7 +12604,6 @@ function getEnhancedLocationsSurface(isCompose) {
 
 
 
-
 function getAppointmentRead() {
   var organizer = getInitialDataProp("organizer");
   var dateTimeCreated = getInitialDataProp("dateTimeCreated");
@@ -12051,7 +12632,9 @@ function getAppointmentRead() {
     seriesId: getInitialDataProp("seriesId"),
     subject: getInitialDataProp("subject"),
     displayReplyForm: displayReplyForm,
+    displayReplyFormAsync: displayReplyFormAsync,
     displayReplyAllForm: displayReplyAllForm,
+    displayReplyAllFormAsync: displayReplyAllFormAsync,
     getAttachmentContentAsync: getAttachmentContent,
     getEntities: Entities_getEntities,
     getEntitiesByType: Entities_getEntitiesByType,
@@ -12061,7 +12644,9 @@ function getAppointmentRead() {
     getRegExMatchesByName: Entities_getRegExMatchesByName,
     getSelectedEntities: Entities_getSelectedEntities,
     getSelectedRegExMatches: Entities_getSelectedRegExMatches,
-    loadCustomPropertiesAsync: loadCustomProperties
+    loadCustomPropertiesAsync: loadCustomProperties,
+    isAllDayEvent: getInitialDataProp("isAllDayEvent"),
+    sensitivity: getInitialDataProp("sensitivity")
   });
   return appointmentRead;
 }
@@ -12523,7 +13108,133 @@ function getRecurrenceSurface(isCompose) {
 
   return recurrence;
 }
+// CONCATENATED MODULE: ./src/methods/getAllDayEvent.ts
+
+
+
+
+function getAllDayEvent() {
+  var args = [];
+
+  for (var _i = 0; _i < arguments.length; _i++) {
+    args[_i] = arguments[_i];
+  }
+
+  checkPermissionsAndThrow(1, "isAllDayEvent.getAsync");
+  var commonParameters = parseCommonArgs(args, true, false);
+  checkFeatureEnabledAndThrow(Features.calendarItems, "isAllDayEvent.getAsync");
+  standardInvokeHostMethod(169, commonParameters.asyncContext, commonParameters.callback, undefined, undefined);
+}
+// CONCATENATED MODULE: ./src/methods/setAllDayEvent.ts
+
+
+
+
+
+
+function setAllDayEvent(isAllDayEvent) {
+  var args = [];
+
+  for (var _i = 1; _i < arguments.length; _i++) {
+    args[_i - 1] = arguments[_i];
+  }
+
+  checkPermissionsAndThrow(2, "isAllDayEvent.setAsync");
+  var commonParameters = parseCommonArgs(args, true, false);
+  var parameters = {
+    isAllDayEvent: isAllDayEvent
+  };
+  checkFeatureEnabledAndThrow(Features.calendarItems, "isAllDayEvent.setAsync");
+  setAllDayEvent_validateParameters(parameters);
+  standardInvokeHostMethod(170, commonParameters.asyncContext, commonParameters.callback, parameters, undefined);
+}
+
+function setAllDayEvent_validateParameters(parameters) {
+  if (isNullOrUndefined(parameters.isAllDayEvent)) {
+    throw createNullArgumentError("isAllDayEvent");
+  }
+
+  if (typeof parameters.isAllDayEvent !== "boolean") {
+    throw createArgumentTypeError("isAllDayEvent", typeof parameters.isAllDayEvent, "boolean");
+  }
+}
+// CONCATENATED MODULE: ./src/api/getAllDayEventSurface.ts
+
+
+
+function getAllDayEventSurface() {
+  return objectDefine({}, {
+    getAsync: getAllDayEvent,
+    setAsync: setAllDayEvent
+  });
+}
+// CONCATENATED MODULE: ./src/methods/setSensitivity.ts
+
+
+
+
+
+
+
+function setSensitivity(sensitivity) {
+  var args = [];
+
+  for (var _i = 1; _i < arguments.length; _i++) {
+    args[_i - 1] = arguments[_i];
+  }
+
+  checkPermissionsAndThrow(2, "sensitivity.setAsync");
+  var commonParameters = parseCommonArgs(args, true, false);
+  var parameters = {
+    sensitivity: sensitivity
+  };
+  checkFeatureEnabledAndThrow(Features.calendarItems, "sensitivity.setAsync");
+  setSensitivity_validateParameters(parameters);
+  standardInvokeHostMethod(172, commonParameters.asyncContext, commonParameters.callback, parameters, undefined);
+}
+
+function setSensitivity_validateParameters(parameters) {
+  validateStringParam("sensitivity", parameters.sensitivity);
+  throwOnInvalidSensitivityType(parameters.sensitivity);
+}
+
+function throwOnInvalidSensitivityType(sensitivity) {
+  if (sensitivity !== MailboxEnums.AppointmentSensitivityType.Normal && sensitivity !== MailboxEnums.AppointmentSensitivityType.Personal && sensitivity !== MailboxEnums.AppointmentSensitivityType.Private && sensitivity !== MailboxEnums.AppointmentSensitivityType.Confidential) {
+    throw createArgumentError("sensitivity");
+  }
+}
+// CONCATENATED MODULE: ./src/methods/getSensitivity.ts
+
+
+
+
+function getSensitivity() {
+  var args = [];
+
+  for (var _i = 0; _i < arguments.length; _i++) {
+    args[_i] = arguments[_i];
+  }
+
+  checkPermissionsAndThrow(1, "sensitivity.getAsync");
+  var commonParameters = parseCommonArgs(args, true, false);
+  checkFeatureEnabledAndThrow(Features.calendarItems, "sensitivity.getAsync");
+  standardInvokeHostMethod(171, commonParameters.asyncContext, commonParameters.callback, undefined, undefined);
+}
+// CONCATENATED MODULE: ./src/api/getSensitivitySurface.ts
+
+
+
+function getSensitivitySurface() {
+  return objectDefine({}, {
+    getAsync: getSensitivity,
+    setAsync: setSensitivity
+  });
+}
 // CONCATENATED MODULE: ./src/api/getAppointmentCompose.ts
+
+
+
+
 
 
 
@@ -12577,7 +13288,11 @@ function getAppointmentCompose() {
     loadCustomPropertiesAsync: loadCustomProperties,
     removeAttachmentAsync: removeAttachment,
     saveAsync: save,
-    setSelectedDataAsync: setSelectedData(29)
+    setSelectedDataAsync: setSelectedData(29),
+    isAllDayEvent: getAllDayEventSurface(),
+    sensitivity: getSensitivitySurface(),
+    isClientSignatureEnabledAsync: isClientSignatureEnabled,
+    disableClientSignatureAsync: disableClientSignature
   });
   return appointmentCompose;
 }
@@ -12863,7 +13578,9 @@ var prepareApiSurface_createMailboxSurface = function createMailboxSurface(targe
     ewsUrl: getInitialDataProp("ewsUrl"),
     restUrl: getInitialDataProp("restUrl"),
     displayAppointmentForm: displayAppointmentForm,
+    displayAppointmentFormAsync: displayAppointmentFormAsync,
     displayMessageForm: displayMessageForm,
+    displayMessageFormAsync: displayMessageFormAsync,
     displayPersonaCardAsync: displayPersonaCardAsync,
     getCallbackTokenAsync: getCallbackToken,
     getUserIdentityTokenAsync: getUserIdentityToken,
@@ -12905,7 +13622,9 @@ var prepareApiSurface_createMailboxSurface = function createMailboxSurface(targe
   if (getHostItemType_getHostItemType() !== HostItemType.MessageCompose && getHostItemType_getHostItemType() !== HostItemType.AppointmentCompose) {
     objectDefine(target, {
       displayNewAppointmentForm: displayNewAppointmentForm,
-      displayNewMessageForm: displayNewMessageForm
+      displayNewMessageForm: displayNewMessageForm,
+      displayNewAppointmentFormAsync: displayNewAppointmentFormAsync,
+      displayNewMessageFormAsync: displayNewMessageFormAsync
     });
   }
 
@@ -12993,6 +13712,9 @@ var whenStringsFinish;
 var getInitialDataProp = function getInitialDataProp(key) {
   return appInstance && appInstance.getInitialDataProp(key);
 };
+var getIsNoItemContextWebExt = function getIsNoItemContextWebExt() {
+  return !appInstance || !appInstance.item;
+};
 var getAppName = function getAppName() {
   return appInstance && appInstance.getAppName();
 };
@@ -13016,7 +13738,7 @@ var OutlookAppOm_OutlookAppOm = function () {
     };
 
     this.initialize = function (data) {
-      if (data === null) {
+      if (data === null || data === undefined) {
         recreateAdditionalGlobalParametersSingleton(true);
         _this.initialData = null;
         _this.item = null;

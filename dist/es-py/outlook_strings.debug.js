@@ -10,6 +10,7 @@ _u.ExtensibilityStrings=function _u_ExtensibilityStrings() {
 }
 if (_u.ExtensibilityStrings.registerClass) _u.ExtensibilityStrings.registerClass('_u.ExtensibilityStrings');
 _u.ExtensibilityStrings.l_APICallFailedDueToItemChange_Text='The selected item has been changed.';
+_u.ExtensibilityStrings.l_API_Not_Supported_By_ExtensionPoint_Error_Text='API not supported for extension point.';
 _u.ExtensibilityStrings.l_ActionsDefinitionMultipleActionsError_Text='Only a single action is currently supported.';
 _u.ExtensibilityStrings.l_ActionsDefinitionWrongNotificationMessageError_Text='Actions can\'t be defined for this notification message type.';
 _u.ExtensibilityStrings.l_AttachmentDeleteGeneralFailure_Text='The attachment cannot be deleted from the item.';
@@ -53,8 +54,10 @@ _u.ExtensibilityStrings.l_InvalidParameterValueError_Text='The value of the \'{0
 _u.ExtensibilityStrings.l_InvalidSelection_Text='The selection is invalid.';
 _u.ExtensibilityStrings.l_InvalidTime_Text='The input doesn\'t resolve to a valid time.';
 _u.ExtensibilityStrings.l_Invalid_Category_Error_Text='Invalid categories were provided.';
+_u.ExtensibilityStrings.l_ItemNotFound_Text='The item does not exist or has not been created.';
 _u.ExtensibilityStrings.l_Item_Not_Saved_Error_Text='The id can\'t be retrieved until the item is saved.';
 _u.ExtensibilityStrings.l_MessageInDifferentStoreError_Text='The EWS ID can\'t be retrieved because the message is saved in a different store.';
+_u.ExtensibilityStrings.l_Missing_Extended_Permissions_For_API='Extended Permission missing for the API call.';
 _u.ExtensibilityStrings.l_NoValidRecipientsProvided_Text='No valid recipients were provided.';
 _u.ExtensibilityStrings.l_NotificationKeyNotFound_Text='There are no notifications with the provided key.';
 _u.ExtensibilityStrings.l_NullOrEmptyParameterError_Text='The parameter \'{0}\' is mandatory and it can\'t be null or empty.';
@@ -73,3 +76,4 @@ _u.ExtensibilityStrings.l_RecurrenceUnsupportedAlternateCalendar_Text='The recur
 _u.ExtensibilityStrings.l_Recurrence_Error_Instance_SetAsync_Text='A recurrence pattern can\'t be set for a single occurrence in a series.';
 _u.ExtensibilityStrings.l_Recurrence_Error_Properties_Invalid_Text='The recurrence pattern isn\'t valid. Please check that the specified recurrence properties align with the recurrence type.';
 _u.ExtensibilityStrings.l_SaveError_Text='Connection error occurred while trying to save the item on the server.';
+_u.ExtensibilityStrings.l_TokenAccessDeniedWithoutItemContext_Text='A REST token is only available with ReadWriteMailbox permission when there is no item context.';

@@ -4,6 +4,7 @@ _u.ExtensibilityStrings = function()
 };
 _u.ExtensibilityStrings.registerClass("_u.ExtensibilityStrings");
 _u.ExtensibilityStrings.l_APICallFailedDueToItemChange_Text = "El elemento seleccionado se modificó.";
+_u.ExtensibilityStrings.l_API_Not_Supported_By_ExtensionPoint_Error_Text = "La API no es compatible con el punto de extensión.";
 _u.ExtensibilityStrings.l_ActionsDefinitionMultipleActionsError_Text = "Actualmente solo se admite una acción.";
 _u.ExtensibilityStrings.l_ActionsDefinitionWrongNotificationMessageError_Text = "No se pueden definir acciones para este tipo de mensaje de notificación.";
 _u.ExtensibilityStrings.l_AttachmentDeleteGeneralFailure_Text = "Los datos adjuntos no se pueden eliminar del elemento.";
@@ -47,8 +48,10 @@ _u.ExtensibilityStrings.l_InvalidParameterValueError_Text = 'El valor del parám
 _u.ExtensibilityStrings.l_InvalidSelection_Text = "La selección no es válida.";
 _u.ExtensibilityStrings.l_InvalidTime_Text = "La entrada no se resuelve en una hora válida.";
 _u.ExtensibilityStrings.l_Invalid_Category_Error_Text = "Se proporcionaron categorías no válidas.";
+_u.ExtensibilityStrings.l_ItemNotFound_Text = "El elemento no existe o no se ha creado.";
 _u.ExtensibilityStrings.l_Item_Not_Saved_Error_Text = "No se puede recuperar el identificador hasta que se guarde el elemento.";
 _u.ExtensibilityStrings.l_MessageInDifferentStoreError_Text = "No se puede recuperar el id. de EWS porque el mensaje está guardado en otro almacén.";
+_u.ExtensibilityStrings.l_Missing_Extended_Permissions_For_API = "Falta el permiso extendido para la llamada a la API.";
 _u.ExtensibilityStrings.l_NoValidRecipientsProvided_Text = "No se proporcionaron destinatarios válidos.";
 _u.ExtensibilityStrings.l_NotificationKeyNotFound_Text = "No existe ninguna notificación con la clave proporcionada.";
 _u.ExtensibilityStrings.l_NullOrEmptyParameterError_Text = 'El parámetro "{0}" es obligatorio y no puede ser nulo ni estar vacío.';
@@ -67,3 +70,4 @@ _u.ExtensibilityStrings.l_RecurrenceUnsupportedAlternateCalendar_Text = "El usua
 _u.ExtensibilityStrings.l_Recurrence_Error_Instance_SetAsync_Text = "No se puede establecer un patrón de periodicidad para una sola aparición de una serie.";
 _u.ExtensibilityStrings.l_Recurrence_Error_Properties_Invalid_Text = "El patrón de periodicidad no es válido. Comprueba que las propiedades de frecuencia especificadas se alineen con el tipo de periodicidad.";
 _u.ExtensibilityStrings.l_SaveError_Text = "Se produjo un error conexión al intentar guardar el elemento en el servidor.";
+_u.ExtensibilityStrings.l_TokenAccessDeniedWithoutItemContext_Text = "Un token de REST solo está disponible con el permiso ReadWriteMailbox cuando no hay ningún contexto de elemento.";

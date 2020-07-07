@@ -4,6 +4,7 @@ _u.ExtensibilityStrings = function()
 };
 _u.ExtensibilityStrings.registerClass("_u.ExtensibilityStrings");
 _u.ExtensibilityStrings.l_APICallFailedDueToItemChange_Text = "L’élément sélectionné a été modifié.";
+_u.ExtensibilityStrings.l_API_Not_Supported_By_ExtensionPoint_Error_Text = "L’API n’est pas prise en charge pour le point d’extension.";
 _u.ExtensibilityStrings.l_ActionsDefinitionMultipleActionsError_Text = "Une seule action est actuellement prise en charge.";
 _u.ExtensibilityStrings.l_ActionsDefinitionWrongNotificationMessageError_Text = "Aucune action ne peut être définie pour ce type de message de notification.";
 _u.ExtensibilityStrings.l_AttachmentDeleteGeneralFailure_Text = "La pièce jointe ne peut pas être supprimée de l’élément.";
@@ -47,8 +48,10 @@ _u.ExtensibilityStrings.l_InvalidParameterValueError_Text = "La valeur du param�
 _u.ExtensibilityStrings.l_InvalidSelection_Text = "La sélection n’est pas valide.";
 _u.ExtensibilityStrings.l_InvalidTime_Text = "L’entrée ne correspond pas à une heure valide.";
 _u.ExtensibilityStrings.l_Invalid_Category_Error_Text = "Des catégories non valides ont été fournies.";
+_u.ExtensibilityStrings.l_ItemNotFound_Text = "L’élément n’existe pas ou n’a pas été créé.";
 _u.ExtensibilityStrings.l_Item_Not_Saved_Error_Text = "L'identifiant ne peut pas être obtenu tant que l'élément n'a pas été enregistré.";
 _u.ExtensibilityStrings.l_MessageInDifferentStoreError_Text = "Nous n’avons pas pu récupérer l’ID EWS, car le message est enregistré dans un autre magasin.";
+_u.ExtensibilityStrings.l_Missing_Extended_Permissions_For_API = "Autorisation étendue manquante pour l’appel d'API.";
 _u.ExtensibilityStrings.l_NoValidRecipientsProvided_Text = "Aucun destinataire valide n’a été indiqué.";
 _u.ExtensibilityStrings.l_NotificationKeyNotFound_Text = "Aucune notification n’est associée à la clé fournie.";
 _u.ExtensibilityStrings.l_NullOrEmptyParameterError_Text = "Le paramètre « {0} » est obligatoire et ne peut pas être nul ou vide.";
@@ -67,3 +70,4 @@ _u.ExtensibilityStrings.l_RecurrenceUnsupportedAlternateCalendar_Text = "La pér
 _u.ExtensibilityStrings.l_Recurrence_Error_Instance_SetAsync_Text = "Nous ne pouvons pas définir une périodicité pour une seule occurrence d’une série.";
 _u.ExtensibilityStrings.l_Recurrence_Error_Properties_Invalid_Text = "La périodicité n’est pas valide. Vérifiez que les propriétés de périodicité spécifiées sont compatibles avec le type de périodicité.";
 _u.ExtensibilityStrings.l_SaveError_Text = "Nous avons rencontré une erreur de connexion lorsque nous avons essayé d’enregistrer l’élément sur le serveur.";
+_u.ExtensibilityStrings.l_TokenAccessDeniedWithoutItemContext_Text = "Un jeton REST est uniquement disponible avec l’autorisation ReadWriteMailbox lorsqu’il n’y a pas de contexte d’élément.";

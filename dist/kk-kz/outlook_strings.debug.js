@@ -4,6 +4,7 @@ _u.ExtensibilityStrings = function()
 };
 _u.ExtensibilityStrings.registerClass("_u.ExtensibilityStrings");
 _u.ExtensibilityStrings.l_APICallFailedDueToItemChange_Text = "Таңдалған элемент өзгертілді.";
+_u.ExtensibilityStrings.l_API_Not_Supported_By_ExtensionPoint_Error_Text = "Кеңейтім нүктесі үшін API параметріне қолдау көрсетілмейді.";
 _u.ExtensibilityStrings.l_ActionsDefinitionMultipleActionsError_Text = "Ағымдағы уақытта тек бір әрекетке қолдау көрсетіледі.";
 _u.ExtensibilityStrings.l_ActionsDefinitionWrongNotificationMessageError_Text = "Бұл хабарландыру хабарының түрі үшін әрекеттерді анықтау мүмкін емес.";
 _u.ExtensibilityStrings.l_AttachmentDeleteGeneralFailure_Text = "Тіркемені элементтен жою мүмкін емес.";
@@ -47,8 +48,10 @@ _u.ExtensibilityStrings.l_InvalidParameterValueError_Text = '"{0}" параме�
 _u.ExtensibilityStrings.l_InvalidSelection_Text = "Таңдау жарамсыз.";
 _u.ExtensibilityStrings.l_InvalidTime_Text = "Енгізілген деректерді жарамды уақытқа айналдыру мүмкін емес.";
 _u.ExtensibilityStrings.l_Invalid_Category_Error_Text = "Жарамсыз санаттар көрсетілді.";
+_u.ExtensibilityStrings.l_ItemNotFound_Text = "Элемент жоқ немесе жасалмады.";
 _u.ExtensibilityStrings.l_Item_Not_Saved_Error_Text = "Идентификаторды алу мүмкін емес. Алдымен элементті сақтау қажет.";
 _u.ExtensibilityStrings.l_MessageInDifferentStoreError_Text = "EWS идентификаторын алу мүмкін емес, себебі хабар басқа сақтау орнында сақталған.";
+_u.ExtensibilityStrings.l_Missing_Extended_Permissions_For_API = "API қоңырауы үшін Кеңейтілген рұқсат жоқ.";
 _u.ExtensibilityStrings.l_NoValidRecipientsProvided_Text = "Жарамды алушылар ұсынылмады.";
 _u.ExtensibilityStrings.l_NotificationKeyNotFound_Text = "Көрсетілген кілті бар хабарландырулар табылмады.";
 _u.ExtensibilityStrings.l_NullOrEmptyParameterError_Text = '"{0}" параметрі міндетті және ол Null мәніне ие болмауы немесе бос болмауы тиіс.';
@@ -67,3 +70,4 @@ _u.ExtensibilityStrings.l_RecurrenceUnsupportedAlternateCalendar_Text = "Пай�
 _u.ExtensibilityStrings.l_Recurrence_Error_Instance_SetAsync_Text = "Қатардағы бір қайталану үшін қайталану үлгісін орнату мүмкін емес.";
 _u.ExtensibilityStrings.l_Recurrence_Error_Properties_Invalid_Text = "Қайталану үлгісі жарамсыз. Көрсетілген қайталану сипаттарының қайталану түрімен үйлесімді екенін тексеріңіз.";
 _u.ExtensibilityStrings.l_SaveError_Text = "Элементті серверге сақтау әрекеті кезінде байланыс қатесі пайда болды.";
+_u.ExtensibilityStrings.l_TokenAccessDeniedWithoutItemContext_Text = "REST таңбалауышы элемент мазмұны болмаған кезде тек ReadWriteMailbox рұқсатымен қол жетімді.";

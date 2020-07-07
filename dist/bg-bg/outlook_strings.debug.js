@@ -4,6 +4,7 @@ _u.ExtensibilityStrings = function()
 };
 _u.ExtensibilityStrings.registerClass("_u.ExtensibilityStrings");
 _u.ExtensibilityStrings.l_APICallFailedDueToItemChange_Text = "Избраният елемент е променен.";
+_u.ExtensibilityStrings.l_API_Not_Supported_By_ExtensionPoint_Error_Text = "API не се поддържа за точка на разширение.";
 _u.ExtensibilityStrings.l_ActionsDefinitionMultipleActionsError_Text = "В момента се поддържа само едно действие.";
 _u.ExtensibilityStrings.l_ActionsDefinitionWrongNotificationMessageError_Text = "Не могат да бъдат дефинирани действия за типа съобщение на това известие.";
 _u.ExtensibilityStrings.l_AttachmentDeleteGeneralFailure_Text = "Прикаченият файл не може да бъде изтрит от елемента.";
@@ -47,8 +48,10 @@ _u.ExtensibilityStrings.l_InvalidParameterValueError_Text = 'Стойностт�
 _u.ExtensibilityStrings.l_InvalidSelection_Text = "Селекцията е невалидна.";
 _u.ExtensibilityStrings.l_InvalidTime_Text = "Въведеното не е валиден час.";
 _u.ExtensibilityStrings.l_Invalid_Category_Error_Text = "Предоставени са невалидни категории.";
+_u.ExtensibilityStrings.l_ItemNotFound_Text = "Елементът не съществува или не е създаден.";
 _u.ExtensibilityStrings.l_Item_Not_Saved_Error_Text = "ИД не може да бъде извлечен, докато елементът не бъде записан.";
 _u.ExtensibilityStrings.l_MessageInDifferentStoreError_Text = "ИД на EWS не може да бъде извлечен, защото съобщението е записано в друго хранилище.";
+_u.ExtensibilityStrings.l_Missing_Extended_Permissions_For_API = "За повикването на API липсва разширено разрешение.";
 _u.ExtensibilityStrings.l_NoValidRecipientsProvided_Text = "Едно или повече от предоставените показвани имена са твърде дълги.";
 _u.ExtensibilityStrings.l_NotificationKeyNotFound_Text = "Няма известия с предоставения ключ.";
 _u.ExtensibilityStrings.l_NullOrEmptyParameterError_Text = 'Параметърът "{0}" е задължителен и не може да бъде null или празен.';
@@ -67,3 +70,4 @@ _u.ExtensibilityStrings.l_RecurrenceUnsupportedAlternateCalendar_Text = "Схе�
 _u.ExtensibilityStrings.l_Recurrence_Error_Instance_SetAsync_Text = "Не може да бъде зададена схема на повторяемост за едно повторение в серия.";
 _u.ExtensibilityStrings.l_Recurrence_Error_Properties_Invalid_Text = "Схемата на повторяемост не е валидна. Проверете дали свойствата на зададената повторяемост съответстват на типа повторяемост.";
 _u.ExtensibilityStrings.l_SaveError_Text = "Възникна грешка при свързване при опит да се запише елементът на сървъра.";
+_u.ExtensibilityStrings.l_TokenAccessDeniedWithoutItemContext_Text = "Маркерът за почивка се предлага само с разрешение ReadWriteMailbox, когато няма контекст на елемент.";

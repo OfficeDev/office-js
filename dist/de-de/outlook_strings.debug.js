@@ -4,6 +4,7 @@ _u.ExtensibilityStrings = function()
 };
 _u.ExtensibilityStrings.registerClass("_u.ExtensibilityStrings");
 _u.ExtensibilityStrings.l_APICallFailedDueToItemChange_Text = "Das ausgewählte Element wurde geändert.";
+_u.ExtensibilityStrings.l_API_Not_Supported_By_ExtensionPoint_Error_Text = "API für den Erweiterungspunkt nicht unterstützt.";
 _u.ExtensibilityStrings.l_ActionsDefinitionMultipleActionsError_Text = "Zurzeit wird nur eine einzelne Aktion unterstützt.";
 _u.ExtensibilityStrings.l_ActionsDefinitionWrongNotificationMessageError_Text = "Aktionen können für diesen Benachrichtigungsnachrichtentyp nicht definiert werden.";
 _u.ExtensibilityStrings.l_AttachmentDeleteGeneralFailure_Text = "Die Anlage kann nicht aus dem Element gelöscht werden.";
@@ -47,8 +48,10 @@ _u.ExtensibilityStrings.l_InvalidParameterValueError_Text = 'Der Wert des Parame
 _u.ExtensibilityStrings.l_InvalidSelection_Text = "Die Auswahl ist ungültig.";
 _u.ExtensibilityStrings.l_InvalidTime_Text = "Die Eingabe kann nicht zu einer gültigen Uhrzeit aufgelöst werden.";
 _u.ExtensibilityStrings.l_Invalid_Category_Error_Text = "Ungültige Kategorien wurden angegeben.";
+_u.ExtensibilityStrings.l_ItemNotFound_Text = "Das Element ist nicht vorhanden oder wurde nicht erstellt.";
 _u.ExtensibilityStrings.l_Item_Not_Saved_Error_Text = "Die ID kann erst abgerufen werden, nachdem das Element gespeichert wurde.";
 _u.ExtensibilityStrings.l_MessageInDifferentStoreError_Text = "Die EWS-ID kann nicht abgerufen werden, weil die Nachricht in einem anderen Informationsspeicher gespeichert ist.";
+_u.ExtensibilityStrings.l_Missing_Extended_Permissions_For_API = "Es fehlt die erweiterte Berechtigung für den API-Aufruf.";
 _u.ExtensibilityStrings.l_NoValidRecipientsProvided_Text = "Es wurden keine gültigen Empfänger angegeben.";
 _u.ExtensibilityStrings.l_NotificationKeyNotFound_Text = "Es gibt keine Benachrichtigungen mit dem angegebenen Schlüssel.";
 _u.ExtensibilityStrings.l_NullOrEmptyParameterError_Text = 'Der Parameter "{0}" ist obligatorisch und kann nicht null oder leer sein.';
@@ -67,3 +70,4 @@ _u.ExtensibilityStrings.l_RecurrenceUnsupportedAlternateCalendar_Text = "Das Ser
 _u.ExtensibilityStrings.l_Recurrence_Error_Instance_SetAsync_Text = "Ein Serienmuster kann nicht für ein einzelnes Element in einer Serie festgelegt werden.";
 _u.ExtensibilityStrings.l_Recurrence_Error_Properties_Invalid_Text = "Das Serienmuster ist ungültig. Überprüfen Sie, ob die angegebenen Serieneigenschaften mit dem Serientyp in Einklang stehen.";
 _u.ExtensibilityStrings.l_SaveError_Text = "Verbindungsfehler beim Speichern des Elements auf dem Server.";
+_u.ExtensibilityStrings.l_TokenAccessDeniedWithoutItemContext_Text = "Ein REST-Token ist nur in Verbindung mit der ReadWriteMailbox-Berechtigung verfügbar, wenn kein Elementkontext vorhanden ist.";

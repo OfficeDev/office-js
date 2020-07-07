@@ -4,6 +4,7 @@ _u.ExtensibilityStrings = function()
 };
 _u.ExtensibilityStrings.registerClass("_u.ExtensibilityStrings");
 _u.ExtensibilityStrings.l_APICallFailedDueToItemChange_Text = "Izabrana stavka je promenjena.";
+_u.ExtensibilityStrings.l_API_Not_Supported_By_ExtensionPoint_Error_Text = "API nije podržan za tačku proširenja.";
 _u.ExtensibilityStrings.l_ActionsDefinitionMultipleActionsError_Text = "Trenutno je podržana samo jedna radnja.";
 _u.ExtensibilityStrings.l_ActionsDefinitionWrongNotificationMessageError_Text = "Nije moguće definisati radnje za ovaj tip poruke sa obaveštenjem.";
 _u.ExtensibilityStrings.l_AttachmentDeleteGeneralFailure_Text = "Nije moguće izbrisati prilog iz stavke.";
@@ -47,8 +48,10 @@ _u.ExtensibilityStrings.l_InvalidParameterValueError_Text = "Vrednost parametra 
 _u.ExtensibilityStrings.l_InvalidSelection_Text = "Izbor je nevažeći.";
 _u.ExtensibilityStrings.l_InvalidTime_Text = "Unos se ne razrešava na važeće vreme.";
 _u.ExtensibilityStrings.l_Invalid_Category_Error_Text = "Obezbeđene su nevažeće kategorije.";
+_u.ExtensibilityStrings.l_ItemNotFound_Text = "Stavka ne postoji ili nije kreirana.";
 _u.ExtensibilityStrings.l_Item_Not_Saved_Error_Text = "Није могуће преузети ID док се ставка не сачува.";
 _u.ExtensibilityStrings.l_MessageInDifferentStoreError_Text = "Nije moguće preuzeti EWS ID zato što je poruka sačuvana u drugom skladištu.";
+_u.ExtensibilityStrings.l_Missing_Extended_Permissions_For_API = "Nedostaje proširena dozvola za API poziv.";
 _u.ExtensibilityStrings.l_NoValidRecipientsProvided_Text = "Nisu dati važeći primaoci.";
 _u.ExtensibilityStrings.l_NotificationKeyNotFound_Text = "Ne postoji nijedno obaveštenje sa obezbeđenim ključem.";
 _u.ExtensibilityStrings.l_NullOrEmptyParameterError_Text = "Parametar „{0}“ je obavezan i ne može da bude bez vrednosti ili prazan.";
@@ -67,3 +70,4 @@ _u.ExtensibilityStrings.l_RecurrenceUnsupportedAlternateCalendar_Text = "Korisni
 _u.ExtensibilityStrings.l_Recurrence_Error_Instance_SetAsync_Text = "Nije moguće postaviti obrazac ponavljanja za jedno pojavljivanje u grupi.";
 _u.ExtensibilityStrings.l_Recurrence_Error_Properties_Invalid_Text = "Obrazac ponavljanja nije važeći. Proverite da li su navedena svojstva ponavljanja poravnata sa tipom ponavljanja.";
 _u.ExtensibilityStrings.l_SaveError_Text = "Došlo je do greške u povezivanju prilikom pokušaja čuvanja stavke na serveru.";
+_u.ExtensibilityStrings.l_TokenAccessDeniedWithoutItemContext_Text = "Token REST dostupan je samo uz ReadWriteMailbox dozvolu kada nema stavke konteksta.";

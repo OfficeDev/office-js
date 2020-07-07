@@ -4,6 +4,7 @@ _u.ExtensibilityStrings = function()
 };
 _u.ExtensibilityStrings.registerClass("_u.ExtensibilityStrings");
 _u.ExtensibilityStrings.l_APICallFailedDueToItemChange_Text = "Aldatu egin da hautatutako elementua.";
+_u.ExtensibilityStrings.l_API_Not_Supported_By_ExtensionPoint_Error_Text = "Luzapen-puntuak ez du onartzen APIa.";
 _u.ExtensibilityStrings.l_ActionsDefinitionMultipleActionsError_Text = "Ekintza bakarra onartzen da.";
 _u.ExtensibilityStrings.l_ActionsDefinitionWrongNotificationMessageError_Text = "Jakinarazpen-mezu mota honetan, ezin dira definitu ekintzak.";
 _u.ExtensibilityStrings.l_AttachmentDeleteGeneralFailure_Text = "Ezin da eranskina elementutik ezabatu.";
@@ -47,8 +48,10 @@ _u.ExtensibilityStrings.l_InvalidParameterValueError_Text = '"{0}" parametroaren
 _u.ExtensibilityStrings.l_InvalidSelection_Text = "Hautapenak ez du balio.";
 _u.ExtensibilityStrings.l_InvalidTime_Text = "Idatzitako datuek ez dute balio ordu bat osatzeko.";
 _u.ExtensibilityStrings.l_Invalid_Category_Error_Text = "Kategoria baliogabeak eman dira.";
+_u.ExtensibilityStrings.l_ItemNotFound_Text = "Elementua ez da existitzen edo ez da sortu.";
 _u.ExtensibilityStrings.l_Item_Not_Saved_Error_Text = "Elementua gorde arte, ezin da eskuratu IDa.";
 _u.ExtensibilityStrings.l_MessageInDifferentStoreError_Text = "Ezin da eskuratu EWS IDa, mezua beste biltegi batean dagoelako gordeta.";
+_u.ExtensibilityStrings.l_Missing_Extended_Permissions_For_API = "API deia egiteko Baimen Zabaldua falta da.";
 _u.ExtensibilityStrings.l_NoValidRecipientsProvided_Text = "Ez da baliozko hartzailerik adierazi.";
 _u.ExtensibilityStrings.l_NotificationKeyNotFound_Text = "Ez dago emandako gakoa duen jakinarazpenik.";
 _u.ExtensibilityStrings.l_NullOrEmptyParameterError_Text = '"{0}" parametroa derrigorrezkoa da eta ezin da izan nulua, ezta hutsik egon ere.';
@@ -67,3 +70,4 @@ _u.ExtensibilityStrings.l_RecurrenceUnsupportedAlternateCalendar_Text = "Errepik
 _u.ExtensibilityStrings.l_Recurrence_Error_Instance_SetAsync_Text = "Errepikatze-maiztasunak ezin dira ezarri serie bateko gertaldi bakarrean.";
 _u.ExtensibilityStrings.l_Recurrence_Error_Properties_Invalid_Text = "Errepikatze-maiztasunak ez du balio. Egiaztatu zehaztutako errepikatzearen propietateak bat datozela errepikatze motarekin.";
 _u.ExtensibilityStrings.l_SaveError_Text = "Konexio-errore bat gertatu da elementua zerbitzarian gordetzean.";
+_u.ExtensibilityStrings.l_TokenAccessDeniedWithoutItemContext_Text = "Token REST bat ReadWriteMailbox baimenarekin bakarrik dago eskuragarri, item testuingururik ez dagoenean.";

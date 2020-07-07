@@ -4,6 +4,7 @@ _u.ExtensibilityStrings = function()
 };
 _u.ExtensibilityStrings.registerClass("_u.ExtensibilityStrings");
 _u.ExtensibilityStrings.l_APICallFailedDueToItemChange_Text = "Valda atriðinu hefur verið breytt.";
+_u.ExtensibilityStrings.l_API_Not_Supported_By_ExtensionPoint_Error_Text = "API er ekki stutt fyrir framlengingarpunkt.";
 _u.ExtensibilityStrings.l_ActionsDefinitionMultipleActionsError_Text = "Aðeins er hægt að framkvæma eina aðgerð.";
 _u.ExtensibilityStrings.l_ActionsDefinitionWrongNotificationMessageError_Text = "Ekki er hægt að skilgreina aðgerðir fyrir þessa gerð tilkynninga.";
 _u.ExtensibilityStrings.l_AttachmentDeleteGeneralFailure_Text = "Ekki var hægt að eyða viðhengi frá hlutnum.";
@@ -47,8 +48,10 @@ _u.ExtensibilityStrings.l_InvalidParameterValueError_Text = "Gildi færibreytunn
 _u.ExtensibilityStrings.l_InvalidSelection_Text = "Valið er ógilt.";
 _u.ExtensibilityStrings.l_InvalidTime_Text = "Inntakið skilaði ekki gildum tíma.";
 _u.ExtensibilityStrings.l_Invalid_Category_Error_Text = "Ógildir flokkar voru gefnir upp.";
+_u.ExtensibilityStrings.l_ItemNotFound_Text = "Atriðið er ekki til eða hefur ekki verið búið til.";
 _u.ExtensibilityStrings.l_Item_Not_Saved_Error_Text = "Ekki er hægt að sækja auðkennið fyrr en atriðið hefur verið vistað.";
 _u.ExtensibilityStrings.l_MessageInDifferentStoreError_Text = "Ekki er hægt að sækja EWS-auðkennið vegna þess að atriðið er vistað í annarri geymslu.";
+_u.ExtensibilityStrings.l_Missing_Extended_Permissions_For_API = "Aukna heimild vantar fyrir API-kallið.";
 _u.ExtensibilityStrings.l_NoValidRecipientsProvided_Text = "Engir gildir viðtakendur voru gefnir upp.";
 _u.ExtensibilityStrings.l_NotificationKeyNotFound_Text = "Engar tilkynningar með þessum lykli eru til staðar.";
 _u.ExtensibilityStrings.l_NullOrEmptyParameterError_Text = "Færibreytan „{0}“ er áskilin og má ekki vera núllgildi eða auð.";
@@ -67,3 +70,4 @@ _u.ExtensibilityStrings.l_RecurrenceUnsupportedAlternateCalendar_Text = "Notandi
 _u.ExtensibilityStrings.l_Recurrence_Error_Instance_SetAsync_Text = "Ekki er hægt að stilla endurtekningamynstur fyrir stakt tilvik í röð.";
 _u.ExtensibilityStrings.l_Recurrence_Error_Properties_Invalid_Text = "Endurtekningarmynstrið er ógilt. Gakktu úr skugga um að eiginleikar sem hafa verið valdir fyrir endurtekninguna séu í samræmi við gerð endurtekningar.";
 _u.ExtensibilityStrings.l_SaveError_Text = "Tengingarvilla kom upp þegar reynt var að vista atriðið á þjóninum.";
+_u.ExtensibilityStrings.l_TokenAccessDeniedWithoutItemContext_Text = "REST-lykill er aðeins fáanlegur með ReadWriteMailbox heimild þegar samhengi atriðis vantar.";

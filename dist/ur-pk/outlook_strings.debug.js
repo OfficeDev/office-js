@@ -4,6 +4,7 @@ _u.ExtensibilityStrings = function()
 };
 _u.ExtensibilityStrings.registerClass("_u.ExtensibilityStrings");
 _u.ExtensibilityStrings.l_APICallFailedDueToItemChange_Text = "منتخب شدہ شے کو تبدیل کردیا گیا۔";
+_u.ExtensibilityStrings.l_API_Not_Supported_By_ExtensionPoint_Error_Text = "توسیع کے نقطہ کے لئے API کی معاونت نہیں۔";
 _u.ExtensibilityStrings.l_ActionsDefinitionMultipleActionsError_Text = "فی الحال ایک واحد عمل معاونت شدہ ہے۔";
 _u.ExtensibilityStrings.l_ActionsDefinitionWrongNotificationMessageError_Text = "اس اطلاع پیغام قسم کے لئے اعمال واضح نہیں ہو سکتے۔";
 _u.ExtensibilityStrings.l_AttachmentDeleteGeneralFailure_Text = "منسلکہ اس آئٹم سے شامل نہیں کیا جاسکتا۔";
@@ -47,8 +48,10 @@ _u.ExtensibilityStrings.l_InvalidParameterValueError_Text = "'{0}' پيرامي�
 _u.ExtensibilityStrings.l_InvalidSelection_Text = "انتخاب بے جواز ہے۔";
 _u.ExtensibilityStrings.l_InvalidTime_Text = "ان پٹ ایک جائز وقت کو حل نہیں کرتا۔";
 _u.ExtensibilityStrings.l_Invalid_Category_Error_Text = "بےجواز زمرے فراہم کیے گئے تھے۔";
+_u.ExtensibilityStrings.l_ItemNotFound_Text = "آئٹم موجود نہیں ہے یا تخلیق نہیں کیا گیا ہے۔";
 _u.ExtensibilityStrings.l_Item_Not_Saved_Error_Text = "شے کے محفوظ ہو جانے تک id بازگیر نہیں ہو سکتی۔";
 _u.ExtensibilityStrings.l_MessageInDifferentStoreError_Text = "EWS ID بازیافت نہیں ہو سکتی کیونکہ پیغام ایک مختلف اسٹور میں محفوظ ہے۔";
+_u.ExtensibilityStrings.l_Missing_Extended_Permissions_For_API = "API کال کے لیے توسیعی اجازت موجود نہیں۔";
 _u.ExtensibilityStrings.l_NoValidRecipientsProvided_Text = "کوئی اچھا وصول کنندگان فراہم نہیں کیا گیا۔";
 _u.ExtensibilityStrings.l_NotificationKeyNotFound_Text = "فراہم کردہ کلید کے ساتھ کوئی اطلاعات موجود نہیں ہیں۔";
 _u.ExtensibilityStrings.l_NullOrEmptyParameterError_Text = "پیرامیٹر '{0}' لازمی ہے اور یہ معدم یا خالی نہیں ہو سکتے۔";
@@ -67,3 +70,4 @@ _u.ExtensibilityStrings.l_RecurrenceUnsupportedAlternateCalendar_Text = "ایک 
 _u.ExtensibilityStrings.l_Recurrence_Error_Instance_SetAsync_Text = "ایک سلسلے میں ایک واحد تکرار کے لئے مکرر نمونہ سیٹ نہیں ہو سکتا۔";
 _u.ExtensibilityStrings.l_Recurrence_Error_Properties_Invalid_Text = "مکرر نمونہ جائز نہیں ہے۔ براہ مہربانی پڑتال کریں کہ مخصوص کردہ مکرر خواص کے ساتھ مکرر قسم سیدھ میں ہے۔";
 _u.ExtensibilityStrings.l_SaveError_Text = "شے کو سرور پر محفوظ کرنے کے دوران ایک کنکشن نقص واقع ہوا ہے۔";
+_u.ExtensibilityStrings.l_TokenAccessDeniedWithoutItemContext_Text = "REST ٹوکن صرف ReadWriteMailbox اجازت کے ساتھ اس وقت دستیاب ہوتا ہے جب کسی شے کا سیاق نہ ہو۔";

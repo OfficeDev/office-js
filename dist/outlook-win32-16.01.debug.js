@@ -1,6 +1,6 @@
 /*! Outlook specific API library */
 /*! Version: 16.0.6807.1000 */
-/*! Update: 3 */
+/*! Update: 5 */
 /*!
 	Copyright (c) Microsoft Corporation.  All rights reserved.
 */
@@ -5335,7 +5335,7 @@ var OSFAriaLogger;
                     this.sendTelemetry(data["Table"],data)
             };
             AriaLogger.EnableSendingTelemetryWithOTel = true;
-            AriaLogger.EnableSendingTelemetryWithLegacyAria = true;
+            AriaLogger.EnableSendingTelemetryWithLegacyAria = false;
             return AriaLogger
         }();
     OSFAriaLogger.AriaLogger = AriaLogger
@@ -5542,7 +5542,7 @@ var OSFAppTelemetry;
                         return"IP127Range_" + hash;
                     return"IPOther_" + hash
                 }
-                return domain
+				return domain.split(".").slice(-2).join(".");
             };
             UrlFilter.httpPrefix = "http://";
             UrlFilter.httpsPrefix = "https://";

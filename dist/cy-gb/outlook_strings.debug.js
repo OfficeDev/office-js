@@ -4,6 +4,7 @@ _u.ExtensibilityStrings = function()
 };
 _u.ExtensibilityStrings.registerClass("_u.ExtensibilityStrings");
 _u.ExtensibilityStrings.l_APICallFailedDueToItemChange_Text = "Mae’r eitem a ddewiswyd wedi cael ei newid.";
+_u.ExtensibilityStrings.l_API_Not_Supported_By_ExtensionPoint_Error_Text = "Does dim modd delio â'r API ar gyfer y pwynt estyniad.";
 _u.ExtensibilityStrings.l_ActionsDefinitionMultipleActionsError_Text = "Dim ond un cam gweithredu mae modd delio ag ef ar hyn o bryd.";
 _u.ExtensibilityStrings.l_ActionsDefinitionWrongNotificationMessageError_Text = "Does dim modd diffinio’r camau gweithredu ar gyfer y math hwn o neges hysbysu.";
 _u.ExtensibilityStrings.l_AttachmentDeleteGeneralFailure_Text = "Does dim modd dileu'r atodiad o'r eitem.";
@@ -47,8 +48,10 @@ _u.ExtensibilityStrings.l_InvalidParameterValueError_Text = "Mae gwerth y parame
 _u.ExtensibilityStrings.l_InvalidSelection_Text = "Mae'r dewis yn annilys.";
 _u.ExtensibilityStrings.l_InvalidTime_Text = "Dydy'r mewnbwn ddim yn cyfateb i amser dilys.";
 _u.ExtensibilityStrings.l_Invalid_Category_Error_Text = "Darparwyd categorïau annilys.";
+_u.ExtensibilityStrings.l_ItemNotFound_Text = "Nid yw'r eitem yn bodoli neu nid yw wedi cael ei chreu.";
 _u.ExtensibilityStrings.l_Item_Not_Saved_Error_Text = "Does dim modd cael gafael ar yr id hwn cyn i chi gadw’r eitem.";
 _u.ExtensibilityStrings.l_MessageInDifferentStoreError_Text = "Does dim modd cael gafael ar ID yr EWS oherwydd bod y neges wedi’i chadw mewn storfa wahanol.";
+_u.ExtensibilityStrings.l_Missing_Extended_Permissions_For_API = "Mae’r caniatâd estynedig ar gyfer yr alwad API ar goll.";
 _u.ExtensibilityStrings.l_NoValidRecipientsProvided_Text = "Doedd dim derbynwyr dilys wedi cael eu rhoi.";
 _u.ExtensibilityStrings.l_NotificationKeyNotFound_Text = "Does dim hysbysiadau gyda’r allwedd a roddwyd.";
 _u.ExtensibilityStrings.l_NullOrEmptyParameterError_Text = "Mae’r paramedr '{0}' yn ofynnol a does dim modd iddo fod yn nwl neu’n wag.";
@@ -67,3 +70,4 @@ _u.ExtensibilityStrings.l_RecurrenceUnsupportedAlternateCalendar_Text = "Cafodd 
 _u.ExtensibilityStrings.l_Recurrence_Error_Instance_SetAsync_Text = "Does dim modd gosod patrwm ailddigwydd ar gyfer un digwyddiad mewn cyfres.";
 _u.ExtensibilityStrings.l_Recurrence_Error_Properties_Invalid_Text = "Dydy’r patrwm ailddigwydd ddim yn ddilys. Gwiriwch fod y priodweddau ailddigwydd a bennwyd yn alinio gyda’r math o ailddigwydd.";
 _u.ExtensibilityStrings.l_SaveError_Text = "Gwall cysylltu wrth geisio cadw’r eitem ar y gweinydd.";
+_u.ExtensibilityStrings.l_TokenAccessDeniedWithoutItemContext_Text = "Mae tocyn REST dim ond ar gael gyda hawliau ReadWriteMailbox pan nad oes cyd-destun eitemau.";

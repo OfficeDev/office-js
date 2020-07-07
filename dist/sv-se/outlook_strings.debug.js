@@ -4,6 +4,7 @@ _u.ExtensibilityStrings = function()
 };
 _u.ExtensibilityStrings.registerClass("_u.ExtensibilityStrings");
 _u.ExtensibilityStrings.l_APICallFailedDueToItemChange_Text = "Det markerade objektet har ändrats.";
+_u.ExtensibilityStrings.l_API_Not_Supported_By_ExtensionPoint_Error_Text = "API stöds inte för anknytningspunkt.";
 _u.ExtensibilityStrings.l_ActionsDefinitionMultipleActionsError_Text = "Bara en enda åtgärd stöds för närvarande.";
 _u.ExtensibilityStrings.l_ActionsDefinitionWrongNotificationMessageError_Text = "Det går inte att ange åtgärder för den här aviseringsmeddelandetypen.";
 _u.ExtensibilityStrings.l_AttachmentDeleteGeneralFailure_Text = "Det går inte att ta bort den bifogade filen från objektet.";
@@ -47,8 +48,10 @@ _u.ExtensibilityStrings.l_InvalidParameterValueError_Text = "Ogiltigt värde fö
 _u.ExtensibilityStrings.l_InvalidSelection_Text = "Markeringen är ogiltig.";
 _u.ExtensibilityStrings.l_InvalidTime_Text = "Indata omvandlas inte till en giltig tid.";
 _u.ExtensibilityStrings.l_Invalid_Category_Error_Text = "Ogiltig kategorier angavs.";
+_u.ExtensibilityStrings.l_ItemNotFound_Text = "Objektet finns inte eller har inte skapats.";
 _u.ExtensibilityStrings.l_Item_Not_Saved_Error_Text = "Det går inte att hämta ID förrän objektet har sparats.";
 _u.ExtensibilityStrings.l_MessageInDifferentStoreError_Text = "EWS-ID kan inte hämtas eftersom meddelandet har sparats i en annan lagring.";
+_u.ExtensibilityStrings.l_Missing_Extended_Permissions_For_API = "Utökad behörighet saknas i API-anropet.";
 _u.ExtensibilityStrings.l_NoValidRecipientsProvided_Text = "Inga giltiga mottagare angavs.";
 _u.ExtensibilityStrings.l_NotificationKeyNotFound_Text = "Det finns inga aviseringar med den angivna nyckeln.";
 _u.ExtensibilityStrings.l_NullOrEmptyParameterError_Text = "Parametern {0} är obligatorisk och kan inte vara null eller tom.";
@@ -67,3 +70,4 @@ _u.ExtensibilityStrings.l_RecurrenceUnsupportedAlternateCalendar_Text = "Upprepn
 _u.ExtensibilityStrings.l_Recurrence_Error_Instance_SetAsync_Text = "Det går inte ange ett upprepningsmönster för en enstaka förekomst i en serie.";
 _u.ExtensibilityStrings.l_Recurrence_Error_Properties_Invalid_Text = "Upprepningsmönstret är inte giltigt. Kontrollera att de angivna upprepningsegenskaperna stämmer överens med upprepningstypen.";
 _u.ExtensibilityStrings.l_SaveError_Text = "Det uppstod fel vid anslutning till spara objektet på servern.";
+_u.ExtensibilityStrings.l_TokenAccessDeniedWithoutItemContext_Text = "Ett REST-token är endast tillgängligt med ReadWriteMailbox-behörighet när det inte finns någon objektkontext.";

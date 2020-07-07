@@ -4,6 +4,7 @@ _u.ExtensibilityStrings = function()
 };
 _u.ExtensibilityStrings.registerClass("_u.ExtensibilityStrings");
 _u.ExtensibilityStrings.l_APICallFailedDueToItemChange_Text = "Valittu kohde on vaihdettu.";
+_u.ExtensibilityStrings.l_API_Not_Supported_By_ExtensionPoint_Error_Text = "Laajennuspisteen ohjelmointirajapintaa ei tueta.";
 _u.ExtensibilityStrings.l_ActionsDefinitionMultipleActionsError_Text = "Tällä hetkellä tuetaan vain yksittäisiä toimintoja.";
 _u.ExtensibilityStrings.l_ActionsDefinitionWrongNotificationMessageError_Text = "Tälle ilmoitusviestityypille ei voi määrittää toimintoja.";
 _u.ExtensibilityStrings.l_AttachmentDeleteGeneralFailure_Text = "Liitettä ei voi poistaa kohteesta.";
@@ -47,8 +48,10 @@ _u.ExtensibilityStrings.l_InvalidParameterValueError_Text = "Parametrin {0} arvo
 _u.ExtensibilityStrings.l_InvalidSelection_Text = "Valinta on virheellinen.";
 _u.ExtensibilityStrings.l_InvalidTime_Text = "Syöte ei tuota kelvollista aikaa.";
 _u.ExtensibilityStrings.l_Invalid_Category_Error_Text = "Virheellisiä luokkia annettiin.";
+_u.ExtensibilityStrings.l_ItemNotFound_Text = "Kohdetta ei ole, tai sitä ei ole luotu.";
 _u.ExtensibilityStrings.l_Item_Not_Saved_Error_Text = "Tunnusta ei voi noutaa, ennen kuin osa on tallennettu.";
 _u.ExtensibilityStrings.l_MessageInDifferentStoreError_Text = "EWS-tunnusta ei voi noutaa, koska viesti on tallennettu toiseen säilöön.";
+_u.ExtensibilityStrings.l_Missing_Extended_Permissions_For_API = "API-kutsusta puuttuu laajennettu käyttöoikeus.";
 _u.ExtensibilityStrings.l_NoValidRecipientsProvided_Text = "Kelvollisia vastaanottajia ei ole määritetty.";
 _u.ExtensibilityStrings.l_NotificationKeyNotFound_Text = "Annetulla avaimella ei löydy ilmoituksia.";
 _u.ExtensibilityStrings.l_NullOrEmptyParameterError_Text = "Parametri {0} on pakollinen eikä se voi olla null-arvoinen tai tyhjä.";
@@ -67,3 +70,4 @@ _u.ExtensibilityStrings.l_RecurrenceUnsupportedAlternateCalendar_Text = "Toistum
 _u.ExtensibilityStrings.l_Recurrence_Error_Instance_SetAsync_Text = "Toistuvuuskaavan määrittäminen sarjan yksittäiselle esiintymiskerralle ei ole mahdollista.";
 _u.ExtensibilityStrings.l_Recurrence_Error_Properties_Invalid_Text = "Toistumiskaava ei kelpaa. Tarkista, että määritetyt toistuvuusominaisuudet ovat yhtenevät toistuvuustyypin kanssa.";
 _u.ExtensibilityStrings.l_SaveError_Text = "Yhteysvirhe yritettäessä tallentaa kohdetta palvelimeen.";
+_u.ExtensibilityStrings.l_TokenAccessDeniedWithoutItemContext_Text = "REST-tunnus on käytettävissä vain ReadWriteMailbox-oikeuksilla, kun kohteen kontekstia ei ole.";

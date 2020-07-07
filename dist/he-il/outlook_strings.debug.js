@@ -4,6 +4,7 @@ _u.ExtensibilityStrings = function()
 };
 _u.ExtensibilityStrings.registerClass("_u.ExtensibilityStrings");
 _u.ExtensibilityStrings.l_APICallFailedDueToItemChange_Text = "הפריט שנבחר השתנה.";
+_u.ExtensibilityStrings.l_API_Not_Supported_By_ExtensionPoint_Error_Text = "ה- API אינו נתמך עבור נקודת הרחבה.";
 _u.ExtensibilityStrings.l_ActionsDefinitionMultipleActionsError_Text = "פעולה אחת בלבד נתמכת כעת.";
 _u.ExtensibilityStrings.l_ActionsDefinitionWrongNotificationMessageError_Text = "אין אפשרות להגדיר פעולות עבור הודעת התראה מסוג זה.";
 _u.ExtensibilityStrings.l_AttachmentDeleteGeneralFailure_Text = "אין אפשרות למחוק את הקובץ המצורף מהפריט.";
@@ -47,8 +48,10 @@ _u.ExtensibilityStrings.l_InvalidParameterValueError_Text = "הערך של הפ�
 _u.ExtensibilityStrings.l_InvalidSelection_Text = "הבחירה אינה חוקית.";
 _u.ExtensibilityStrings.l_InvalidTime_Text = "הקלט אינו מזוהה כשעה חוקית.";
 _u.ExtensibilityStrings.l_Invalid_Category_Error_Text = "סופקו קטגוריות לא חוקיות.";
+_u.ExtensibilityStrings.l_ItemNotFound_Text = "הפריט לא קיים או לא נוצר.";
 _u.ExtensibilityStrings.l_Item_Not_Saved_Error_Text = "לא ניתן לאחזר את המזהה עד לשמירת הפריט.";
 _u.ExtensibilityStrings.l_MessageInDifferentStoreError_Text = "אין אפשרות לאחזר את מזהה EWS מכיוון שההודעה נשמרה במאגר אחר.";
+_u.ExtensibilityStrings.l_Missing_Extended_Permissions_For_API = "הרשאה ממושכת חסרה עבור שיחת API.";
 _u.ExtensibilityStrings.l_NoValidRecipientsProvided_Text = "לא סופקו נמענים חוקיים.";
 _u.ExtensibilityStrings.l_NotificationKeyNotFound_Text = "אין הודעות עם המפתח שסופק.";
 _u.ExtensibilityStrings.l_NullOrEmptyParameterError_Text = "הפרמטר '{0}' הוא הכרחי ואינו יכול להיות Null או ריק.";
@@ -67,3 +70,4 @@ _u.ExtensibilityStrings.l_RecurrenceUnsupportedAlternateCalendar_Text = "תבנ�
 _u.ExtensibilityStrings.l_Recurrence_Error_Instance_SetAsync_Text = "אין אפשרות להגדיר תבנית מופע חוזר עבור מופע בודד בסידרה.";
 _u.ExtensibilityStrings.l_Recurrence_Error_Properties_Invalid_Text = "תבנית המופע החוזר אינה חוקית. בדוק שמאפייני המופע החוזר שצוינו מתאימים לסוג המופע החוזר.";
 _u.ExtensibilityStrings.l_SaveError_Text = "אירעה שגיאת חיבור בעת ניסיון לשמור את הפריט בשרת.";
+_u.ExtensibilityStrings.l_TokenAccessDeniedWithoutItemContext_Text = "אסימון מנוחה זמין רק באמצעות הרשאת ReadWriteMailbox כאשר אין הקשר פריט.";

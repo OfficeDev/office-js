@@ -4,6 +4,7 @@ _u.ExtensibilityStrings = function()
 };
 _u.ExtensibilityStrings.registerClass("_u.ExtensibilityStrings");
 _u.ExtensibilityStrings.l_APICallFailedDueToItemChange_Text = "선택한 항목이 변경되었습니다.";
+_u.ExtensibilityStrings.l_API_Not_Supported_By_ExtensionPoint_Error_Text = "API가 확장 지점에 대해 지원되지 않습니다.";
 _u.ExtensibilityStrings.l_ActionsDefinitionMultipleActionsError_Text = "현재 하나의 작업만 지원됩니다.";
 _u.ExtensibilityStrings.l_ActionsDefinitionWrongNotificationMessageError_Text = "이 알림 메시지 유형에 대해 작업을 정의할 수 없습니다.";
 _u.ExtensibilityStrings.l_AttachmentDeleteGeneralFailure_Text = "항목에서 첨부 파일을 삭제할 수 없습니다.";
@@ -47,8 +48,10 @@ _u.ExtensibilityStrings.l_InvalidParameterValueError_Text = "'{0}' 매개 변수
 _u.ExtensibilityStrings.l_InvalidSelection_Text = "선택이 잘못되었습니다.";
 _u.ExtensibilityStrings.l_InvalidTime_Text = "입력이 유효한 날짜로 확인되지 않습니다.";
 _u.ExtensibilityStrings.l_Invalid_Category_Error_Text = "제공된 카테고리가 잘못되었습니다.";
+_u.ExtensibilityStrings.l_ItemNotFound_Text = "항목이 없거나 만들어지지 않았습니다.";
 _u.ExtensibilityStrings.l_Item_Not_Saved_Error_Text = "항목을 저장 해야 id를 검색할 수 있습니다.";
 _u.ExtensibilityStrings.l_MessageInDifferentStoreError_Text = "메시지가 다른 저장소에 저장되어 EWS ID를 검색할 수 없습니다.";
+_u.ExtensibilityStrings.l_Missing_Extended_Permissions_For_API = "API 호출에 대한 확장된 사용 권한이 누락되었습니다.";
 _u.ExtensibilityStrings.l_NoValidRecipientsProvided_Text = "제공된 받는 사람이 유효하지 않습니다.";
 _u.ExtensibilityStrings.l_NotificationKeyNotFound_Text = "입력한 키를 사용하는 알림이 없습니다.";
 _u.ExtensibilityStrings.l_NullOrEmptyParameterError_Text = "'{0}' 매개 변수는 필수이며 null이거나 비워 둘 수 없습니다.";
@@ -67,3 +70,4 @@ _u.ExtensibilityStrings.l_RecurrenceUnsupportedAlternateCalendar_Text = "이 되
 _u.ExtensibilityStrings.l_Recurrence_Error_Instance_SetAsync_Text = "일련의 단일 항목에 대한 되풀이 방법을 설정할 수 없습니다.";
 _u.ExtensibilityStrings.l_Recurrence_Error_Properties_Invalid_Text = "되풀이 방법이 잘못되었습니다. 지정된 되풀이 속성이 되풀이 유형에 부응하는지 확인하세요.";
 _u.ExtensibilityStrings.l_SaveError_Text = "서버에서 항목을 저장하는 동안 연결 오류가 발생했습니다.";
+_u.ExtensibilityStrings.l_TokenAccessDeniedWithoutItemContext_Text = "REST 토큰은 항목 컨텍스트가 없는 경우 ReadWriteMailbox 권한으로만 사용할 수 있습니다.";

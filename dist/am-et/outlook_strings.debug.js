@@ -4,6 +4,7 @@ _u.ExtensibilityStrings = function()
 };
 _u.ExtensibilityStrings.registerClass("_u.ExtensibilityStrings");
 _u.ExtensibilityStrings.l_APICallFailedDueToItemChange_Text = "የተመረጠው ንጥል ነገር ተለውጧል።";
+_u.ExtensibilityStrings.l_API_Not_Supported_By_ExtensionPoint_Error_Text = "API ለተራዘመ ነጥብ አይደገፍም።";
 _u.ExtensibilityStrings.l_ActionsDefinitionMultipleActionsError_Text = "አሁን የሚደገፈው አንድ ድርጊት ብቻ ነው።";
 _u.ExtensibilityStrings.l_ActionsDefinitionWrongNotificationMessageError_Text = "ድርጊቶች ለዚህ ማሳወቂያ መልዕት ዓይነት መበየን አይችሉም።";
 _u.ExtensibilityStrings.l_AttachmentDeleteGeneralFailure_Text = "አባሪው ከንጥልነገሩ ላይ ሊሰረዝ አይችልም።";
@@ -47,8 +48,10 @@ _u.ExtensibilityStrings.l_InvalidParameterValueError_Text = "የ '{0}' ልኬት
 _u.ExtensibilityStrings.l_InvalidSelection_Text = "የአመራረጥ ሁኔታው ትክክል አይደለም።";
 _u.ExtensibilityStrings.l_InvalidTime_Text = "ግቤቱ ወደ ትክክለኛ ቀን ሊቀየር አልቻም።";
 _u.ExtensibilityStrings.l_Invalid_Category_Error_Text = "ልክ ያልሆኑ ምድቦች ቀርበው ነበር።";
+_u.ExtensibilityStrings.l_ItemNotFound_Text = "እቃው የለም ወይም አልተፈጠረም።";
 _u.ExtensibilityStrings.l_Item_Not_Saved_Error_Text = "ንጥሉ እስኪቀመጥ ድረስ መታወቂያው መገኘት አይችልም።";
 _u.ExtensibilityStrings.l_MessageInDifferentStoreError_Text = "የ EWS ID መገኘት አይችልም ምክንያቱም መልዕክቱ በተለየ ማከማቻ ውስጥ ተቀምጧል።";
+_u.ExtensibilityStrings.l_Missing_Extended_Permissions_For_API = "ለ API ጥሪ የተራዘመ ፈቃድ ማጣት።";
 _u.ExtensibilityStrings.l_NoValidRecipientsProvided_Text = "ምንም ተቀባይነት ያላቸው ተቀባዮች አልቀረቡም።";
 _u.ExtensibilityStrings.l_NotificationKeyNotFound_Text = "በቀረበው ቁልፍ ላይ ምንም ማሳወቂያዎች የሉም።";
 _u.ExtensibilityStrings.l_NullOrEmptyParameterError_Text = "'{0}' ልኬት አስፈላጊ ነው እናም ኢምንት ወይም ባዶ መሆን አይችልም።";
@@ -67,3 +70,4 @@ _u.ExtensibilityStrings.l_RecurrenceUnsupportedAlternateCalendar_Text = "የድ�
 _u.ExtensibilityStrings.l_Recurrence_Error_Instance_SetAsync_Text = "የተደጋጋሚነት ጥለት በተከታታይ ውስጥ ለአንድ ክስተት መዘጋጀት አይችልም።";
 _u.ExtensibilityStrings.l_Recurrence_Error_Properties_Invalid_Text = "የተደጋጋሚነት ጥለት ልክ አይደለም። እባክዎ የተጠቀሱት የተደጋጋሚነት ባህሪዎች ከተደጋጋሚነት አይነቱ ጋር ይሰምራሉ።";
 _u.ExtensibilityStrings.l_SaveError_Text = "በአገልጋዩ ላይ ለማስቀመጥ በመሞከር ላይ የግንኙነት ስህተት ተከስቷል።";
+_u.ExtensibilityStrings.l_TokenAccessDeniedWithoutItemContext_Text = "ቀሪው ምልክት ከማንበብ መፃፍ መልዕክት ሳጥን ፈቃድ ጋር የሚገኘው የዓይነት አገባብ ከሌለ ነው።";

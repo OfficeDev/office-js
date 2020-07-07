@@ -4,6 +4,7 @@ _u.ExtensibilityStrings = function()
 };
 _u.ExtensibilityStrings.registerClass("_u.ExtensibilityStrings");
 _u.ExtensibilityStrings.l_APICallFailedDueToItemChange_Text = "પસંદ કરેલી આઇટમ પરિવર્તિત કરી છે.";
+_u.ExtensibilityStrings.l_API_Not_Supported_By_ExtensionPoint_Error_Text = "એક્સ્ટેંશન પોઇન્ટ માટે API સમર્થિત નથી.";
 _u.ExtensibilityStrings.l_ActionsDefinitionMultipleActionsError_Text = "ફક્ત એક જ ક્રિયા વર્તમાનમાં સમર્થિત છે.";
 _u.ExtensibilityStrings.l_ActionsDefinitionWrongNotificationMessageError_Text = "ક્રિયાઓ આ સૂચના સંદેશ પ્રકાર માટે નિર્ધારિત કરી શકાતી નથી.";
 _u.ExtensibilityStrings.l_AttachmentDeleteGeneralFailure_Text = "જોડાણને આઇટમમાંથી હટાવી શકાતું નથી.";
@@ -47,8 +48,10 @@ _u.ExtensibilityStrings.l_InvalidParameterValueError_Text = "'{0}' પેરા�
 _u.ExtensibilityStrings.l_InvalidSelection_Text = "પસંદગી અમાન્ય છે.";
 _u.ExtensibilityStrings.l_InvalidTime_Text = "એક માન્ય સમયમાં ઇનપુટ ઉકેલતું નથી.";
 _u.ExtensibilityStrings.l_Invalid_Category_Error_Text = "અમાન્ય શ્રેણી પ્રદાન કરવામાં આવી હતી.";
+_u.ExtensibilityStrings.l_ItemNotFound_Text = "આઇટમ હાજર નથી અથવા બનાવવામાં આવી નથી.";
 _u.ExtensibilityStrings.l_Item_Not_Saved_Error_Text = "જ્યાં સુધી આઇટમ સાચવવામાં આવતી નથી ત્યાં સુધી id પુનઃપ્રાપ્ત કરી શકાતી નથી.";
 _u.ExtensibilityStrings.l_MessageInDifferentStoreError_Text = "EWS ID ને પુનઃપ્રાપ્ત કરી શકાતું નથી કારણ કે સંદેશ એક ભિન્ન સ્ટોરમાં સાચવેલો છે.";
+_u.ExtensibilityStrings.l_Missing_Extended_Permissions_For_API = "API કૉલ માટે વિસ્તૃત કરેલ અનુમતિ ખૂટે છે.";
 _u.ExtensibilityStrings.l_NoValidRecipientsProvided_Text = "કોઈ માન્ય પ્રાપ્તકર્તાઓ પ્રદાન કરેલા ન હતાં.";
 _u.ExtensibilityStrings.l_NotificationKeyNotFound_Text = "પ્રદાન કરાયેલ કી સાથેની કોઈ સૂચનાઓ નથી.";
 _u.ExtensibilityStrings.l_NullOrEmptyParameterError_Text = "પેરામીટર '{0}' ફરજિયાત છે અને તે નલ અથવા ખાલી હોઈ શકે નહીં.";
@@ -67,3 +70,4 @@ _u.ExtensibilityStrings.l_RecurrenceUnsupportedAlternateCalendar_Text = "પુ�
 _u.ExtensibilityStrings.l_Recurrence_Error_Instance_SetAsync_Text = "એક શ્રૃંખલામાં એકલ ઉદ્ભવ માટે એક પુનરાવૃત્તિ નમૂનો સેટ કરી શકાતો નથી.";
 _u.ExtensibilityStrings.l_Recurrence_Error_Properties_Invalid_Text = "પુનરાવૃત્તિ નમૂનો માન્ય નથી. કૃપયા તપાસો કે નિર્દિષ્ટ કરેલ પુનરાવૃત્તિ ગુણધર્મો પુનરાવૃત્તિ પ્રકાર સાથે સંરેખિત થાય છે.";
 _u.ExtensibilityStrings.l_SaveError_Text = "સર્વર પર આઇટમને સાચવવાનો પ્રયાસ કરતી વખતે કનેક્શન ભૂલ આવી હતી.";
+_u.ExtensibilityStrings.l_TokenAccessDeniedWithoutItemContext_Text = "જ્યારે કોઈ આઇટમનો સંદર્ભ ન હોય, ત્યારે REST ટોકન ફક્ત ReadWritMailbox અનુમતિ સાથે ઉપલબ્ધ છે.";

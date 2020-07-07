@@ -4,6 +4,7 @@ _u.ExtensibilityStrings = function()
 };
 _u.ExtensibilityStrings.registerClass("_u.ExtensibilityStrings");
 _u.ExtensibilityStrings.l_APICallFailedDueToItemChange_Text = "निवडलेला आयटम बदलण्यात आला आहे.";
+_u.ExtensibilityStrings.l_API_Not_Supported_By_ExtensionPoint_Error_Text = "API एक्‍सटेंशन पॉइंटसाठी समर्थित नाही.";
 _u.ExtensibilityStrings.l_ActionsDefinitionMultipleActionsError_Text = "केवळ एकल क्रिया सध्या समर्थित आहे.";
 _u.ExtensibilityStrings.l_ActionsDefinitionWrongNotificationMessageError_Text = "या सूचना संदेश प्रकारासाठी क्रिया परिभाषित होऊ शकत नाही.";
 _u.ExtensibilityStrings.l_AttachmentDeleteGeneralFailure_Text = "संलग्नक आयटममधून हटविणे शक्य नाही.";
@@ -47,8 +48,10 @@ _u.ExtensibilityStrings.l_InvalidParameterValueError_Text = "'{0}' परिम�
 _u.ExtensibilityStrings.l_InvalidSelection_Text = "निवड अवैध आहे.";
 _u.ExtensibilityStrings.l_InvalidTime_Text = "इनपुटचे वैध तारखेला निराकरण झाले नाही.";
 _u.ExtensibilityStrings.l_Invalid_Category_Error_Text = "अवैध वर्ग प्रदान केले होते.";
+_u.ExtensibilityStrings.l_ItemNotFound_Text = "आयटम अस्तित्वात नाही किंवा तयार केलेला नाही.";
 _u.ExtensibilityStrings.l_Item_Not_Saved_Error_Text = "आयटम सुरक्षित होईपर्यंत id पुनर्प्राप्त होऊ शकत नाही.";
 _u.ExtensibilityStrings.l_MessageInDifferentStoreError_Text = "EWS ID प्राप्त होऊ शकत नाही कारण संदेश भिन्न संग्रहामध्ये सुरक्षित झाला.";
+_u.ExtensibilityStrings.l_Missing_Extended_Permissions_For_API = "Api कॉलसाठी विस्तारीत परवानगी गहाळ आहे.";
 _u.ExtensibilityStrings.l_NoValidRecipientsProvided_Text = "कोणतेही वैध प्राप्तकर्ते प्रदान केलेले नाहीत.";
 _u.ExtensibilityStrings.l_NotificationKeyNotFound_Text = "प्रदान कळसह कोणत्याही सूचना नाहीत.";
 _u.ExtensibilityStrings.l_NullOrEmptyParameterError_Text = "परिमापन '{0}' बंधनकारक आहे आणि ते नल किंवा रिक्त राहू शकत नाही.";
@@ -67,3 +70,4 @@ _u.ExtensibilityStrings.l_RecurrenceUnsupportedAlternateCalendar_Text = "प्�
 _u.ExtensibilityStrings.l_Recurrence_Error_Instance_SetAsync_Text = "श्रृंखलेमधील एकल उपस्थितीसाठी पुनर्घटनेचा नमुना सेट होऊ शकत नाही.";
 _u.ExtensibilityStrings.l_Recurrence_Error_Properties_Invalid_Text = "पुनर्घटनेचा नमुना वैध नाही. कृपया विनिर्दिष्ट आवर्तन गुणधर्म आवर्तन प्रकाराशी संरेखित असल्याचे तपासून घ्या.";
 _u.ExtensibilityStrings.l_SaveError_Text = "आयटम सर्व्हरवर सुरक्षित करण्याचा प्रयत्न करीत असताना कनेक्शन त्रुटी आली.";
+_u.ExtensibilityStrings.l_TokenAccessDeniedWithoutItemContext_Text = "जेव्हा कोणताही आयटम संदर्भ नसतो, तेव्हा REST टोकन केवळ ReadWriteMailbox परवानगीसोबत उपलब्ध असते.";

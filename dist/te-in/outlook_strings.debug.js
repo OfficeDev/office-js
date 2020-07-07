@@ -4,6 +4,7 @@ _u.ExtensibilityStrings = function()
 };
 _u.ExtensibilityStrings.registerClass("_u.ExtensibilityStrings");
 _u.ExtensibilityStrings.l_APICallFailedDueToItemChange_Text = "ఎంచుకోబడిన అంశం మార్చబడింది.";
+_u.ExtensibilityStrings.l_API_Not_Supported_By_ExtensionPoint_Error_Text = "ఎక్స్‌టెన్షన్ పాయింట్‌లో APIకు మద్దతు లేదు.";
 _u.ExtensibilityStrings.l_ActionsDefinitionMultipleActionsError_Text = "ప్రస్తుతం ఒక చర్యకు మాత్రమే మద్దతు ఉంది.";
 _u.ExtensibilityStrings.l_ActionsDefinitionWrongNotificationMessageError_Text = "ఈ నోటిఫికేషన్ సందేశ రకం యొక్క చర్యను నిర్వచించడం సాధ్యం కాదు.";
 _u.ExtensibilityStrings.l_AttachmentDeleteGeneralFailure_Text = "అంశం నుండి జోడింపుని తొలగించలేము.";
@@ -47,8 +48,10 @@ _u.ExtensibilityStrings.l_InvalidParameterValueError_Text = "పరామిత�
 _u.ExtensibilityStrings.l_InvalidSelection_Text = "ఎంపిక చెల్లదు.";
 _u.ExtensibilityStrings.l_InvalidTime_Text = "ఇన్‌పుట్ చెల్లుబాటు అయ్యే తేదీని అందించడం లేదు.";
 _u.ExtensibilityStrings.l_Invalid_Category_Error_Text = "చెల్లని వర్గాలు అందించబడ్డాయి.";
+_u.ExtensibilityStrings.l_ItemNotFound_Text = "ఈ అంశం లేదు లేదా సృష్టించబడి ఉండకపోవచ్చు.";
 _u.ExtensibilityStrings.l_Item_Not_Saved_Error_Text = "అంశాన్ని సేవ్ చేసే వరకు idని తిరిగి పొందడం సాధ్యం కాదు.";
 _u.ExtensibilityStrings.l_MessageInDifferentStoreError_Text = "సందేశం వేరే స్టోర్‌లో సేవ్ చేయబడింది కనుక EWS IDని తిరిగి పొందడం సాధ్యం కాలేదు.";
+_u.ExtensibilityStrings.l_Missing_Extended_Permissions_For_API = "API కాల్ కోసం విస్తరించబడిన అనుమతి లేదు.";
 _u.ExtensibilityStrings.l_NoValidRecipientsProvided_Text = "చెల్లుబాటు అయ్యే గ్రహీతలు అందించబడలేదు.";
 _u.ExtensibilityStrings.l_NotificationKeyNotFound_Text = "అందించిన కీతో నోటిఫికేషన్‌లు ఉన్నాయి.";
 _u.ExtensibilityStrings.l_NullOrEmptyParameterError_Text = "పరామితి '{0}' తప్పనిసరి, ఇది శూన్యం మరియు ఖాళీ కాకూడదు.";
@@ -67,3 +70,4 @@ _u.ExtensibilityStrings.l_RecurrenceUnsupportedAlternateCalendar_Text = "వి�
 _u.ExtensibilityStrings.l_Recurrence_Error_Instance_SetAsync_Text = "శ్రేణిలోని ఒక సంభవం కోసం పునరావృత నమూనాని సెట్ చేయలేరు.";
 _u.ExtensibilityStrings.l_Recurrence_Error_Properties_Invalid_Text = "పునరావృత నమూనా చెల్లదు. దయచేసి పునరావృత రకానికి ఆ పేర్కొనబడిన పునరావృత లక్షణాలు సరిపోతున్నట్లు నిర్ధారించుకోండి.";
 _u.ExtensibilityStrings.l_SaveError_Text = "సర్వర్‌లో అంశాన్ని సేవ్ చేస్తున్నప్పుడు అనుసంధానంలో దోషం ఏర్పడింది.";
+_u.ExtensibilityStrings.l_TokenAccessDeniedWithoutItemContext_Text = "అంశం సందర్భం లేనప్పుడు రీడ్‌రైట్ మెయిల్‌బాక్స్ అనుమతితో మాత్రమే REST టోకెన్ అందుబాటులో ఉంటుంది.";

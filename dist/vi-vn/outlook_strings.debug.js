@@ -4,6 +4,7 @@ _u.ExtensibilityStrings = function()
 };
 _u.ExtensibilityStrings.registerClass("_u.ExtensibilityStrings");
 _u.ExtensibilityStrings.l_APICallFailedDueToItemChange_Text = "Mục được chọn đã bị thay đổi.";
+_u.ExtensibilityStrings.l_API_Not_Supported_By_ExtensionPoint_Error_Text = "API không được hỗ trợ cho điểm mở rộng.";
 _u.ExtensibilityStrings.l_ActionsDefinitionMultipleActionsError_Text = "Hiện chỉ hỗ trợ duy nhất một hành động đơn.";
 _u.ExtensibilityStrings.l_ActionsDefinitionWrongNotificationMessageError_Text = "Không thể xác định hành động cho loại thư thông báo này.";
 _u.ExtensibilityStrings.l_AttachmentDeleteGeneralFailure_Text = "Không thể xóa phần đính kèm ra khỏi mục.";
@@ -47,8 +48,10 @@ _u.ExtensibilityStrings.l_InvalidParameterValueError_Text = "Giá trị của th
 _u.ExtensibilityStrings.l_InvalidSelection_Text = "Lựa chọn không hợp lệ.";
 _u.ExtensibilityStrings.l_InvalidTime_Text = "Đầu vào không tạo thời gian hợp lệ.";
 _u.ExtensibilityStrings.l_Invalid_Category_Error_Text = "Đã cung cấp thể loại không hợp lệ.";
+_u.ExtensibilityStrings.l_ItemNotFound_Text = "Mục không tồn tại hoặc chưa được tạo.";
 _u.ExtensibilityStrings.l_Item_Not_Saved_Error_Text = "Không thể truy xuất ID cho đến khi mục được lưu.";
 _u.ExtensibilityStrings.l_MessageInDifferentStoreError_Text = "Không thể truy xuất ID EWS do thư được lưu trong một kho khác.";
+_u.ExtensibilityStrings.l_Missing_Extended_Permissions_For_API = "Thiếu quyền mở rộng cho cuộc gọi API.";
 _u.ExtensibilityStrings.l_NoValidRecipientsProvided_Text = "Chưa có thông tin về người nhận hợp lệ.";
 _u.ExtensibilityStrings.l_NotificationKeyNotFound_Text = "Không có thông báo nào chứa khóa được cung cấp.";
 _u.ExtensibilityStrings.l_NullOrEmptyParameterError_Text = "Tham số '{0}' là bắt buộc và không thể có dạng null hoặc trống.";
@@ -67,3 +70,4 @@ _u.ExtensibilityStrings.l_RecurrenceUnsupportedAlternateCalendar_Text = "Kiểu 
 _u.ExtensibilityStrings.l_Recurrence_Error_Instance_SetAsync_Text = "Không thể đặt kiểu lặp lại cho một sự kiện duy nhất trong chuỗi.";
 _u.ExtensibilityStrings.l_Recurrence_Error_Properties_Invalid_Text = "Kiểu lặp lại không hợp lệ. Vui lòng kiểm tra để chắc rằng các thuộc tính lặp lại được chỉ định phù hợp với loại lặp lại.";
 _u.ExtensibilityStrings.l_SaveError_Text = "Đã xảy ra lỗi kết nối trong khi tìm cách lưu mục này trên máy chủ.";
+_u.ExtensibilityStrings.l_TokenAccessDeniedWithoutItemContext_Text = "Mã thông báo REST chỉ khả dụng với quyền ReadWriteMailbox khi không có ngữ cảnh của mục.";
