@@ -148,7 +148,10 @@ OSF.XdmFieldName = {
 OSF.FlightNames = {
     UseOriginNotUrl: 0,
     CheckReceiverOrigin: 1,
-    AddinEnforceHttps: 2
+    AddinEnforceHttps: 2,
+    RibbonNativeGroupControl: 3,
+    RibbonTabPosition: 4,
+    RibbonTabAutoFocus: 5
 };
 OSF.Flights = [];
 OSF.WindowNameItemKeys = {
@@ -871,16 +874,16 @@ OSF.OUtil = (function () {
             var e = Function._validateParams(arguments, [{ name: "hostname", type: String, mayBeNull: false }
             ]);
             if (e) {
-                var hostnameSubstrings = hostname.split('.');
-                var len = hostnameSubstrings.length;
-                if (len >= 2) {
-                    return hostnameSubstrings[len - 2] + "." + hostnameSubstrings[len - 1];
-                }
-                else if (len == 1) {
-                    return hostnameSubstrings[0];
-                }
+                return "";
             }
-            return "";
+            var hostnameSubstrings = hostname.split('.');
+            var len = hostnameSubstrings.length;
+            if (len >= 2) {
+                return hostnameSubstrings[len - 2] + "." + hostnameSubstrings[len - 1];
+            }
+            else if (len == 1) {
+                return hostnameSubstrings[0];
+            }
         },
         isiOS: function OSF_Outil$isiOS() {
             return (window.navigator.userAgent.match(/(iPad|iPhone|iPod)/g) ? true : false);
@@ -1248,7 +1251,9 @@ OSF.AgaveHostAction = {
     "DisableTaskPaneHeaderButton": 30,
     "TaskPaneHeaderButtonClicked": 31,
     "RemoveAppCommandsAddin": 32,
-    "RefreshRibbonGallery": 33
+    "RefreshRibbonGallery": 33,
+    "GetOriginalControlId": 34,
+    "OfficeJsReady": 35
 };
 OSF.SharedConstants = {
     "NotificationConversationIdSuffix": '_ntf'
@@ -8680,15 +8685,8 @@ OSF.DDA.WAC.Delegate.openDialog = function OSF_DDA_WAC_Delegate$OpenDialog(args)
                 childIsSubdomain = Microsoft.Office.Common.XdmCommunicationManager.isTargetSubdomainOfSourceLocation(taskpaneUrl, dialogUrl);
             }
         }
-        var logJson = {
-            "openDialog isInline": dialogInfo[OSF.ShowWindowDialogParameterKeys.DisplayInIframe],
-            "taskpaneHostname": taskpaneUrlPortionAllowedToLog,
-            "dialogHostName": dialogUrlPortionAllowedToLog,
-            "isSameDomain": isSameDomain,
-            "parentIsSubdomain": parentIsSubdomain,
-            "childIsSubdomain": childIsSubdomain
-        };
-        OSF.AppTelemetry.logAppCommonMessage(JSON.stringify(logJson));
+        var logJsonAsString = "openDialog isInline: " + dialogInfo[OSF.ShowWindowDialogParameterKeys.DisplayInIframe].toString() + ", " + "taskpaneHostname: " + taskpaneUrlPortionAllowedToLog + ", " + "dialogHostName: " + dialogUrlPortionAllowedToLog + ", " + "isSameDomain: " + isSameDomain.toString() + ", " + "parentIsSubdomain: " + parentIsSubdomain.toString() + ", " + "childIsSubdomain: " + childIsSubdomain.toString();
+        OSF.AppTelemetry.logAppCommonMessage(logJsonAsString);
     }
     if (dialogUrl == null || !(dialogUrl.substr(0, httpsIdentifyString.length) === httpsIdentifyString)) {
         if (dialogUrl.substr(0, httpIdentifyString.length) === httpIdentifyString) {
