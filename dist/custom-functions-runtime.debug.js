@@ -1549,9 +1549,14 @@ OSF._OfficeAppFactory = (function OSF__OfficeAppFactory() {
         }
         return false;
     };
-    var shouldLoadOldMacJs = function _shouldLoadOldMacJs() {
-        var versionToUseNewJS = "15.30.1128.0";
-        var currentHostVersion = window.external.GetContext().GetHostFullVersion();
+    var shouldLoadOldOutlookMacJs = function _shouldLoadOldOutlookMacJs() {
+        try {
+            var versionToUseNewJS = "15.30.1128.0";
+            var currentHostVersion = window.external.GetContext().GetHostFullVersion();
+        }
+        catch (ex) {
+            return false;
+        }
         return !!compareVersions(versionToUseNewJS, currentHostVersion);
     };
     var _retrieveLoggingAllowed = function OSF__OfficeAppFactory$_retrieveLoggingAllowed() {
@@ -1596,7 +1601,7 @@ OSF._OfficeAppFactory = (function OSF__OfficeAppFactory() {
                     _hostInfo.isO15 = true;
                     _hostInfo.isDialog = true;
                 }
-                else if (fallbackHostInfo.toLowerCase().indexOf("mac") !== -1 && fallbackHostInfo.toLowerCase().indexOf("outlook") !== -1 && shouldLoadOldMacJs()) {
+                else if (fallbackHostInfo.toLowerCase().indexOf("mac") !== -1 && fallbackHostInfo.toLowerCase().indexOf("outlook") !== -1 && shouldLoadOldOutlookMacJs()) {
                     _hostInfo.isO15 = true;
                 }
                 else {
@@ -1984,21 +1989,24 @@ OSF._OfficeAppFactory = (function OSF__OfficeAppFactory() {
     }, __webpack_require__.p = "", __webpack_require__(__webpack_require__.s = 3);
 }([ function(module, exports, __webpack_require__) {
     "use strict";
-    var extendStatics, __extends = this && this.__extends || (extendStatics = function(d, b) {
-        return (extendStatics = Object.setPrototypeOf || {
-            __proto__: []
-        } instanceof Array && function(d, b) {
-            d.__proto__ = b;
-        } || function(d, b) {
-            for (var p in b) b.hasOwnProperty(p) && (d[p] = b[p]);
-        })(d, b);
-    }, function(d, b) {
-        function __() {
-            this.constructor = d;
-        }
-        extendStatics(d, b), d.prototype = null === b ? Object.create(b) : (__.prototype = b.prototype, 
-        new __);
-    });
+    var __extends = this && this.__extends || function() {
+        var extendStatics = function(d, b) {
+            return (extendStatics = Object.setPrototypeOf || {
+                __proto__: []
+            } instanceof Array && function(d, b) {
+                d.__proto__ = b;
+            } || function(d, b) {
+                for (var p in b) b.hasOwnProperty(p) && (d[p] = b[p]);
+            })(d, b);
+        };
+        return function(d, b) {
+            function __() {
+                this.constructor = d;
+            }
+            extendStatics(d, b), d.prototype = null === b ? Object.create(b) : (__.prototype = b.prototype, 
+            new __());
+        };
+    }();
     Object.defineProperty(exports, "__esModule", {
         value: !0
     });
@@ -2022,8 +2030,8 @@ OSF._OfficeAppFactory = (function OSF__OfficeAppFactory() {
         return HttpUtility.setCustomSendRequestFunc = function(func) {
             HttpUtility.s_customSendRequestFunc = func;
         }, HttpUtility.xhrSendRequestFunc = function(request) {
-            return CoreUtility.createPromise((function(resolve, reject) {
-                var xhr = new XMLHttpRequest;
+            return CoreUtility.createPromise(function(resolve, reject) {
+                var xhr = new XMLHttpRequest();
                 if (xhr.open(request.method, request.url), xhr.onload = function() {
                     var resp = {
                         statusCode: xhr.status,
@@ -2038,7 +2046,7 @@ OSF._OfficeAppFactory = (function OSF__OfficeAppFactory() {
                     }));
                 }, request.headers) for (var key in request.headers) xhr.setRequestHeader(key, request.headers[key]);
                 xhr.send(CoreUtility._getRequestBodyText(request));
-            }));
+            });
         }, HttpUtility.sendRequest = function(request) {
             HttpUtility.validateAndNormalizeRequest(request);
             var func = HttpUtility.s_customSendRequestFunc;
@@ -2050,8 +2058,8 @@ OSF._OfficeAppFactory = (function OSF__OfficeAppFactory() {
         }, HttpUtility.officeJsSendLocalDocumentRequestFunc = function(request) {
             request = CoreUtility._validateLocalDocumentRequest(request);
             var requestSafeArray = CoreUtility._buildRequestMessageSafeArray(request);
-            return CoreUtility.createPromise((function(resolve, reject) {
-                OSF.DDA.RichApi.executeRichApiRequestAsync(requestSafeArray, (function(asyncResult) {
+            return CoreUtility.createPromise(function(resolve, reject) {
+                OSF.DDA.RichApi.executeRichApiRequestAsync(requestSafeArray, function(asyncResult) {
                     var response;
                     response = "succeeded" == asyncResult.status ? {
                         statusCode: RichApiMessageUtility.getResponseStatusCode(asyncResult),
@@ -2059,8 +2067,8 @@ OSF._OfficeAppFactory = (function OSF__OfficeAppFactory() {
                         body: RichApiMessageUtility.getResponseBody(asyncResult)
                     } : RichApiMessageUtility.buildHttpResponseFromOfficeJsError(asyncResult.error.code, asyncResult.error.message), 
                     CoreUtility.log("Response:"), CoreUtility.log(JSON.stringify(response)), resolve(response);
-                }));
-            }));
+                });
+            });
         }, HttpUtility.validateAndNormalizeRequest = function(request) {
             if (CoreUtility.isNullOrUndefined(request)) throw _Internal.RuntimeError._createInvalidArgError({
                 argumentName: "request"
@@ -2108,7 +2116,7 @@ OSF._OfficeAppFactory = (function OSF__OfficeAppFactory() {
         return HostBridge.init = function(bridge) {
             if ("object" == typeof bridge && bridge) {
                 var instance = new HostBridge(bridge);
-                HostBridge.s_instance = instance, HttpUtility.setCustomSendLocalDocumentRequestFunc((function(request) {
+                HostBridge.s_instance = instance, HttpUtility.setCustomSendLocalDocumentRequestFunc(function(request) {
                     request = CoreUtility._validateLocalDocumentRequest(request);
                     var requestFlags = 0;
                     CoreUtility.isReadonlyRestRequest(request.method) || (requestFlags = 1);
@@ -2123,10 +2131,10 @@ OSF._OfficeAppFactory = (function OSF__OfficeAppFactory() {
                         flags: requestFlags,
                         message: request
                     };
-                    return instance.sendMessageToHostAndExpectResponse(bridgeMessage).then((function(bridgeResponse) {
+                    return instance.sendMessageToHostAndExpectResponse(bridgeMessage).then(function(bridgeResponse) {
                         return bridgeResponse.message;
-                    }));
-                }));
+                    });
+                });
                 for (var i = 0; i < HostBridge.s_onInitedHandlers.length; i++) HostBridge.s_onInitedHandlers[i](instance);
             }
         }, Object.defineProperty(HostBridge, "instance", {
@@ -2138,9 +2146,9 @@ OSF._OfficeAppFactory = (function OSF__OfficeAppFactory() {
         }), HostBridge.prototype.sendMessageToHost = function(message) {
             this.m_bridge.sendMessageToHost(JSON.stringify(message));
         }, HostBridge.prototype.sendMessageToHostAndExpectResponse = function(message) {
-            var _this = this, ret = CoreUtility.createPromise((function(resolve, reject) {
+            var _this = this, ret = CoreUtility.createPromise(function(resolve, reject) {
                 _this.m_promiseResolver[message.id] = resolve;
-            }));
+            });
             return this.m_bridge.sendMessageToHost(JSON.stringify(message)), ret;
         }, HostBridge.prototype.addHostMessageHandler = function(handler) {
             this.m_handlers.push(handler);
@@ -2334,13 +2342,13 @@ OSF._OfficeAppFactory = (function OSF__OfficeAppFactory() {
             } else ret = ret.replace("{0}", arg);
             return ret;
         }, CoreUtility._formatString = function(format, arrArg) {
-            return format.replace(/\{\d\}/g, (function(v) {
+            return format.replace(/\{\d\}/g, function(v) {
                 var position = parseInt(v.substr(1, v.length - 2));
                 if (position < arrArg.length) return arrArg[position];
                 throw _Internal.RuntimeError._createInvalidArgError({
                     argumentName: "format"
                 });
-            }));
+            });
         }, Object.defineProperty(CoreUtility, "Promise", {
             get: function() {
                 return _Internal.getPromiseType();
@@ -2350,19 +2358,19 @@ OSF._OfficeAppFactory = (function OSF__OfficeAppFactory() {
         }), CoreUtility.createPromise = function(executor) {
             return new CoreUtility.Promise(executor);
         }, CoreUtility._createPromiseFromResult = function(value) {
-            return CoreUtility.createPromise((function(resolve, reject) {
+            return CoreUtility.createPromise(function(resolve, reject) {
                 resolve(value);
-            }));
+            });
         }, CoreUtility._createPromiseFromException = function(reason) {
-            return CoreUtility.createPromise((function(resolve, reject) {
+            return CoreUtility.createPromise(function(resolve, reject) {
                 reject(reason);
-            }));
+            });
         }, CoreUtility._createTimeoutPromise = function(timeout) {
-            return CoreUtility.createPromise((function(resolve, reject) {
-                setTimeout((function() {
+            return CoreUtility.createPromise(function(resolve, reject) {
+                setTimeout(function() {
                     resolve(null);
-                }), timeout);
-            }));
+                }, timeout);
+            });
         }, CoreUtility._createInvalidArgError = function(error) {
             return _Internal.RuntimeError._createInvalidArgError(error);
         }, CoreUtility._isLocalDocumentUrl = function(url) {
@@ -2477,21 +2485,24 @@ OSF._OfficeAppFactory = (function OSF__OfficeAppFactory() {
     exports.TestUtility = TestUtility;
 }, function(module, exports, __webpack_require__) {
     "use strict";
-    var extendStatics, __extends = this && this.__extends || (extendStatics = function(d, b) {
-        return (extendStatics = Object.setPrototypeOf || {
-            __proto__: []
-        } instanceof Array && function(d, b) {
-            d.__proto__ = b;
-        } || function(d, b) {
-            for (var p in b) b.hasOwnProperty(p) && (d[p] = b[p]);
-        })(d, b);
-    }, function(d, b) {
-        function __() {
-            this.constructor = d;
-        }
-        extendStatics(d, b), d.prototype = null === b ? Object.create(b) : (__.prototype = b.prototype, 
-        new __);
-    });
+    var __extends = this && this.__extends || function() {
+        var extendStatics = function(d, b) {
+            return (extendStatics = Object.setPrototypeOf || {
+                __proto__: []
+            } instanceof Array && function(d, b) {
+                d.__proto__ = b;
+            } || function(d, b) {
+                for (var p in b) b.hasOwnProperty(p) && (d[p] = b[p]);
+            })(d, b);
+        };
+        return function(d, b) {
+            function __() {
+                this.constructor = d;
+            }
+            extendStatics(d, b), d.prototype = null === b ? Object.create(b) : (__.prototype = b.prototype, 
+            new __());
+        };
+    }();
     Object.defineProperty(exports, "__esModule", {
         value: !0
     });
@@ -2505,8 +2516,7 @@ OSF._OfficeAppFactory = (function OSF__OfficeAppFactory() {
         alwaysPolyfillClientObjectUpdateMethod: !1,
         alwaysPolyfillClientObjectRetrieveMethod: !1,
         enableConcurrentFlag: !0,
-        enableUndoableFlag: !0,
-        appendTypeNameToObjectPathInfo: !1
+        enableUndoableFlag: !0
     }, exports.config = {
         extendedErrorLogging: !1
     };
@@ -2576,9 +2586,9 @@ OSF._OfficeAppFactory = (function OSF__OfficeAppFactory() {
             configurable: !0
         }), ClientObjectBase.prototype._addAction = function(action, resultHandler) {
             var _this = this;
-            return void 0 === resultHandler && (resultHandler = null), Core.CoreUtility.createPromise((function(resolve, reject) {
+            return void 0 === resultHandler && (resultHandler = null), Core.CoreUtility.createPromise(function(resolve, reject) {
                 _this._context._addServiceApiAction(action, resultHandler, resolve, reject);
-            }));
+            });
         }, ClientObjectBase.prototype._retrieve = function(option, resultHandler) {
             var shouldPolyfill = exports._internalConfig.alwaysPolyfillClientObjectRetrieveMethod;
             shouldPolyfill || (shouldPolyfill = !CommonUtility.isSetSupported("RichApiRuntime", "1.1"));
@@ -3078,9 +3088,9 @@ OSF._OfficeAppFactory = (function OSF__OfficeAppFactory() {
                 resultHandler: resultHandler,
                 resolve: resolve,
                 reject: reject
-            }), 1 === this.m_actions.length && setTimeout((function() {
+            }), 1 === this.m_actions.length && setTimeout(function() {
                 return _this.processActions();
-            }), 0);
+            }, 0);
         }, ServiceApiQueue.prototype.processActions = function() {
             var _this = this;
             if (0 !== this.m_actions.length) {
@@ -3097,13 +3107,13 @@ OSF._OfficeAppFactory = (function OSF__OfficeAppFactory() {
                     Headers: null,
                     Body: body
                 };
-                Core.CoreUtility.log("Request:"), Core.CoreUtility.log(JSON.stringify(body)), (new HttpRequestExecutor).executeAsync(this.m_context._customData, flags, requestMessage).then((function(response) {
+                Core.CoreUtility.log("Request:"), Core.CoreUtility.log(JSON.stringify(body)), new HttpRequestExecutor().executeAsync(this.m_context._customData, flags, requestMessage).then(function(response) {
                     _this.processResponse(request, actions, response);
-                })).catch((function(ex) {
+                }).catch(function(ex) {
                     for (var i = 0; i < actions.length; i++) {
                         actions[i].reject(ex);
                     }
-                }));
+                });
             }
         }, ServiceApiQueue.prototype.processResponse = function(request, actions, response) {
             var error = this.getErrorFromResponse(response), actionResults = null;
@@ -3142,7 +3152,7 @@ OSF._OfficeAppFactory = (function OSF__OfficeAppFactory() {
             };
             if (requestInfo.headers[Core.CoreConstants.sourceLibHeader] = HttpRequestExecutor.SourceLibHeaderValue, 
             requestInfo.headers["CONTENT-TYPE"] = "application/json", requestMessage.Headers) for (var key in requestMessage.Headers) requestInfo.headers[key] = requestMessage.Headers[key];
-            return (Core.CoreUtility._isLocalDocumentUrl(requestInfo.url) ? Core.HttpUtility.sendLocalDocumentRequest : Core.HttpUtility.sendRequest)(requestInfo).then((function(responseInfo) {
+            return (Core.CoreUtility._isLocalDocumentUrl(requestInfo.url) ? Core.HttpUtility.sendLocalDocumentRequest : Core.HttpUtility.sendRequest)(requestInfo).then(function(responseInfo) {
                 var response;
                 if (200 === responseInfo.statusCode) response = {
                     ErrorCode: null,
@@ -3160,7 +3170,7 @@ OSF._OfficeAppFactory = (function OSF__OfficeAppFactory() {
                     };
                 }
                 return response;
-            }));
+            });
         }, HttpRequestExecutor.SourceLibHeaderValue = "officejs-rest", HttpRequestExecutor;
     }();
     exports.HttpRequestExecutor = HttpRequestExecutor;
@@ -3250,7 +3260,7 @@ OSF._OfficeAppFactory = (function OSF__OfficeAppFactory() {
             return ret;
         }, CommonUtility.setMethodArguments = function(context, argumentInfo, args) {
             if (Core.CoreUtility.isNullOrUndefined(args)) return null;
-            var referencedObjectPaths = new Array, referencedObjectPathIds = new Array, hasOne = CommonUtility.collectObjectPathInfos(context, args, referencedObjectPaths, referencedObjectPathIds);
+            var referencedObjectPaths = new Array(), referencedObjectPathIds = new Array(), hasOne = CommonUtility.collectObjectPathInfos(context, args, referencedObjectPaths, referencedObjectPathIds);
             return argumentInfo.Arguments = args, hasOne && (argumentInfo.ReferencedObjectPathIds = referencedObjectPathIds), 
             referencedObjectPaths;
         }, CommonUtility.validateContext = function(context, obj) {
@@ -3324,7 +3334,7 @@ OSF._OfficeAppFactory = (function OSF__OfficeAppFactory() {
                 referencedObjectPathIds.push(clientObject._objectPath.objectPathInfo.Id), referencedObjectPaths.push(clientObject._objectPath), 
                 hasOne = !0;
             } else if (Array.isArray(args[i])) {
-                var childArrayObjectPathIds = new Array;
+                var childArrayObjectPathIds = new Array();
                 CommonUtility.collectObjectPathInfos(context, args[i], referencedObjectPaths, childArrayObjectPathIds) ? (referencedObjectPathIds.push(childArrayObjectPathIds), 
                 hasOne = !0) : referencedObjectPathIds.push(0);
             } else Core.CoreUtility.isPlainJsonObject(args[i]) ? (referencedObjectPathIds.push(0), 
@@ -3402,529 +3412,6 @@ OSF._OfficeAppFactory = (function OSF__OfficeAppFactory() {
         }, BatchApiHelper;
     }();
     exports.BatchApiHelper = BatchApiHelper;
-    var LibraryBuilder = function() {
-        function LibraryBuilder(options) {
-            if (this.m_namespaceMap = {}, this.m_namespace = options.metadata.name, this.m_targetNamespaceObject = options.targetNamespaceObject, 
-            this.m_namespaceMap[this.m_namespace] = options.targetNamespaceObject, options.namespaceMap) for (var ns in options.namespaceMap) this.m_namespaceMap[ns] = options.namespaceMap[ns];
-            this.m_defaultApiSetName = options.metadata.defaultApiSetName, this.m_hostName = options.metadata.hostName;
-            var metadata = options.metadata;
-            if (metadata.enumTypes) for (var i = 0; i < metadata.enumTypes.length; i++) this.buildEnumType(metadata.enumTypes[i]);
-            if (metadata.apiSets) {
-                for (i = 0; i < metadata.apiSets.length; i++) {
-                    var elem = metadata.apiSets[i];
-                    Array.isArray(elem) && (metadata.apiSets[i] = {
-                        version: elem[0],
-                        name: elem[1] || this.m_defaultApiSetName
-                    });
-                }
-                this.m_apiSets = metadata.apiSets;
-            }
-            if (this.m_strings = metadata.strings, metadata.clientObjectTypes) for (i = 0; i < metadata.clientObjectTypes.length; i++) {
-                elem = metadata.clientObjectTypes[i];
-                Array.isArray(elem) && (this.ensureArraySize(elem, 11), metadata.clientObjectTypes[i] = {
-                    name: this.getString(elem[0]),
-                    behaviorFlags: elem[1],
-                    collectionPropertyPath: this.getString(elem[6]),
-                    newObjectServerTypeFullName: this.getString(elem[9]),
-                    newObjectApiFlags: elem[10],
-                    childItemTypeFullName: this.getString(elem[7]),
-                    scalarProperties: elem[2],
-                    navigationProperties: elem[3],
-                    scalarMethods: elem[4],
-                    navigationMethods: elem[5],
-                    events: elem[8]
-                }), this.buildClientObjectType(metadata.clientObjectTypes[i], options.fullyInitialize);
-            }
-        }
-        return LibraryBuilder.prototype.ensureArraySize = function(value, size) {
-            for (var count = size - value.length; count > 0; ) value.push(0), count--;
-        }, LibraryBuilder.prototype.getString = function(ordinalOrValue) {
-            return "number" == typeof ordinalOrValue ? ordinalOrValue > 0 ? this.m_strings[ordinalOrValue - 1] : null : ordinalOrValue;
-        }, LibraryBuilder.prototype.buildEnumType = function(elem) {
-            var enumType;
-            if (Array.isArray(elem)) {
-                (enumType = {
-                    name: elem[0],
-                    fields: elem[2]
-                }).fields || (enumType.fields = {});
-                var fieldsWithCamelUpperCaseValue = elem[1];
-                if (Array.isArray(fieldsWithCamelUpperCaseValue)) for (var index = 0; index < fieldsWithCamelUpperCaseValue.length; index++) enumType.fields[fieldsWithCamelUpperCaseValue[index]] = this.toSimpleCamelUpperCase(fieldsWithCamelUpperCaseValue[index]);
-            } else enumType = elem;
-            this.m_targetNamespaceObject[enumType.name] = enumType.fields;
-        }, LibraryBuilder.prototype.buildClientObjectType = function(typeInfo, fullyInitialize) {
-            var thisBuilder = this, type = function(context, objectPath) {
-                batch_runtime_1.ClientObject.apply(this, arguments), thisBuilder.m_targetNamespaceObject[typeInfo.name]._typeInited || (thisBuilder.buildPrototype(thisBuilder.m_targetNamespaceObject[typeInfo.name], typeInfo), 
-                thisBuilder.m_targetNamespaceObject[typeInfo.name]._typeInited = !0), batch_runtime_1._internalConfig.appendTypeNameToObjectPathInfo && this._objectPath && this._objectPath.objectPathInfo && this._className && (this._objectPath.objectPathInfo.T = this._className);
-            };
-            (this.m_targetNamespaceObject[typeInfo.name] = type, this.extendsType(type, batch_runtime_1.ClientObject), 
-            this.buildNewObject(type, typeInfo), 0 != (2 & typeInfo.behaviorFlags) && (type.prototype._KeepReference = function() {
-                BatchApiHelper.invokeMethod(this, "_KeepReference", 1, [], 0, 0);
-            }), 0 != (32 & typeInfo.behaviorFlags)) && this.getFunction(LibraryBuilder.CustomizationCodeNamespace + "." + typeInfo.name + "_StaticCustomize").call(null, type);
-            fullyInitialize && (this.buildPrototype(type, typeInfo), type._typeInited = !0);
-        }, LibraryBuilder.prototype.extendsType = function(d, b) {
-            function __() {
-                this.constructor = d;
-            }
-            d.prototype = null === b ? Object.create(b) : (__.prototype = b.prototype, new __);
-        }, LibraryBuilder.prototype.findObjectUnderPath = function(top, paths, pathStartIndex) {
-            for (var obj = top, i = pathStartIndex; i < paths.length; i++) {
-                if ("object" != typeof obj) throw new core_1.Error("Cannot find " + paths.join("."));
-                obj = obj[paths[i]];
-            }
-            return obj;
-        }, LibraryBuilder.prototype.getFunction = function(fullName) {
-            var ret = this.resolveObjectByFullName(fullName);
-            if ("function" != typeof ret) throw new core_1.Error("Cannot find function or type: " + fullName);
-            return ret;
-        }, LibraryBuilder.prototype.resolveObjectByFullName = function(fullName) {
-            var parts = fullName.split(".");
-            if (1 === parts.length) return this.m_targetNamespaceObject[parts[0]];
-            var rootName = parts[0];
-            return rootName === this.m_namespace ? this.findObjectUnderPath(this.m_targetNamespaceObject, parts, 1) : this.m_namespaceMap[rootName] ? this.findObjectUnderPath(this.m_namespaceMap[rootName], parts, 1) : this.findObjectUnderPath(this.m_targetNamespaceObject, parts, 0);
-        }, LibraryBuilder.prototype.evaluateSimpleExpression = function(expression, thisObj) {
-            if (batch_runtime_1.Utility.isNullOrUndefined(expression)) return null;
-            var paths = expression.split(".");
-            if (3 === paths.length && "OfficeExtension" === paths[0] && "Constants" === paths[1]) return batch_runtime_1.Constants[paths[2]];
-            if ("this" === paths[0]) {
-                for (var obj = thisObj, i = 1; i < paths.length; i++) obj = "toString()" == paths[i] ? obj.toString() : "()" === paths[i].substr(paths[i].length - 2) ? obj[paths[i].substr(0, paths[i].length - 2)]() : obj[paths[i]];
-                return obj;
-            }
-            throw new core_1.Error("Cannot evaluate: " + expression);
-        }, LibraryBuilder.prototype.evaluateEventTargetId = function(targetIdExpression, thisObj) {
-            return batch_runtime_1.Utility.isNullOrEmptyString(targetIdExpression) ? "" : this.evaluateSimpleExpression(targetIdExpression, thisObj);
-        }, LibraryBuilder.prototype.isAllDigits = function(expression) {
-            for (var charZero = "0".charCodeAt(0), charNine = "9".charCodeAt(0), i = 0; i < expression.length; i++) if (expression.charCodeAt(i) < charZero || expression.charCodeAt(i) > charNine) return !1;
-            return !0;
-        }, LibraryBuilder.prototype.evaluateEventType = function(eventTypeExpression) {
-            if (batch_runtime_1.Utility.isNullOrEmptyString(eventTypeExpression)) return 0;
-            if (this.isAllDigits(eventTypeExpression)) return parseInt(eventTypeExpression);
-            var ret = this.resolveObjectByFullName(eventTypeExpression);
-            if ("number" != typeof ret) throw new core_1.Error("Invalid event type: " + eventTypeExpression);
-            return ret;
-        }, LibraryBuilder.prototype.buildPrototype = function(type, typeInfo) {
-            this.buildScalarProperties(type, typeInfo), this.buildNavigationProperties(type, typeInfo), 
-            this.buildScalarMethods(type, typeInfo), this.buildNavigationMethods(type, typeInfo), 
-            this.buildEvents(type, typeInfo), this.buildHandleResult(type, typeInfo), this.buildHandleIdResult(type, typeInfo), 
-            this.buildHandleRetrieveResult(type, typeInfo), this.buildLoad(type, typeInfo), 
-            this.buildRetrieve(type, typeInfo), this.buildSetMockData(type, typeInfo), this.buildEnsureUnchanged(type, typeInfo), 
-            this.buildUpdate(type, typeInfo), this.buildSet(type, typeInfo), this.buildToJSON(type, typeInfo), 
-            this.buildItems(type, typeInfo), this.buildTypeMetadataInfo(type, typeInfo), this.buildTrackUntrack(type, typeInfo), 
-            this.buildMixin(type, typeInfo);
-        }, LibraryBuilder.prototype.toSimpleCamelUpperCase = function(name) {
-            return name.substr(0, 1).toUpperCase() + name.substr(1);
-        }, LibraryBuilder.prototype.ensureOriginalName = function(member) {
-            null === member.originalName && (member.originalName = this.toSimpleCamelUpperCase(member.name));
-        }, LibraryBuilder.prototype.getFieldName = function(member) {
-            return "m_" + member.name;
-        }, LibraryBuilder.prototype.throwIfApiNotSupported = function(typeInfo, member) {
-            if (this.m_apiSets && member.apiSetInfoOrdinal > 0) {
-                var apiSetInfo = this.m_apiSets[member.apiSetInfoOrdinal - 1];
-                apiSetInfo && batch_runtime_1.Utility.throwIfApiNotSupported(typeInfo.name + "." + member.name, apiSetInfo.name, apiSetInfo.version, this.m_hostName);
-            }
-        }, LibraryBuilder.prototype.buildScalarProperties = function(type, typeInfo) {
-            if (Array.isArray(typeInfo.scalarProperties)) for (var i = 0; i < typeInfo.scalarProperties.length; i++) {
-                var elem = typeInfo.scalarProperties[i];
-                Array.isArray(elem) && (this.ensureArraySize(elem, 5), typeInfo.scalarProperties[i] = {
-                    name: this.getString(elem[0]),
-                    behaviorFlags: elem[1],
-                    apiSetInfoOrdinal: elem[2],
-                    originalName: this.getString(elem[3]),
-                    setMethodApiFlags: elem[4]
-                }), this.buildScalarProperty(type, typeInfo, typeInfo.scalarProperties[i]);
-            }
-        }, LibraryBuilder.prototype.buildScalarProperty = function(type, typeInfo, propInfo) {
-            this.ensureOriginalName(propInfo);
-            var thisBuilder = this, fieldName = this.getFieldName(propInfo), descriptor = {
-                get: function() {
-                    return batch_runtime_1.Utility.throwIfNotLoaded(propInfo.name, this[fieldName], typeInfo.name, this._isNull), 
-                    thisBuilder.throwIfApiNotSupported(typeInfo, propInfo), this[fieldName];
-                },
-                enumerable: !0,
-                configurable: !0
-            };
-            0 == (2 & propInfo.behaviorFlags) && (descriptor.set = function(value) {
-                if (4 & propInfo.behaviorFlags && thisBuilder.getFunction(LibraryBuilder.CustomizationCodeNamespace + "." + typeInfo.name + "_" + propInfo.originalName + "_Set").call(this, this, value).handled) return;
-                this[fieldName] = value, BatchApiHelper.invokeSetProperty(this, propInfo.originalName, value, propInfo.setMethodApiFlags);
-            }), Object.defineProperty(type.prototype, propInfo.name, descriptor);
-        }, LibraryBuilder.prototype.buildNavigationProperties = function(type, typeInfo) {
-            if (Array.isArray(typeInfo.navigationProperties)) for (var i = 0; i < typeInfo.navigationProperties.length; i++) {
-                var elem = typeInfo.navigationProperties[i];
-                Array.isArray(elem) && (this.ensureArraySize(elem, 7), typeInfo.navigationProperties[i] = {
-                    name: this.getString(elem[0]),
-                    behaviorFlags: elem[2],
-                    apiSetInfoOrdinal: elem[3],
-                    originalName: this.getString(elem[4]),
-                    getMethodApiFlags: elem[5],
-                    setMethodApiFlags: elem[6],
-                    propertyTypeFullName: this.getString(elem[1])
-                }), this.buildNavigationProperty(type, typeInfo, typeInfo.navigationProperties[i]);
-            }
-        }, LibraryBuilder.prototype.buildNavigationProperty = function(type, typeInfo, propInfo) {
-            this.ensureOriginalName(propInfo);
-            var thisBuilder = this, fieldName = this.getFieldName(propInfo), descriptor = {
-                get: function() {
-                    (this[thisBuilder.getFieldName(propInfo)] || (thisBuilder.throwIfApiNotSupported(typeInfo, propInfo), 
-                    this[fieldName] = BatchApiHelper.createPropertyObject(thisBuilder.getFunction(propInfo.propertyTypeFullName), this, propInfo.originalName, 0 != (16 & propInfo.behaviorFlags), propInfo.getMethodApiFlags)), 
-                    64 & propInfo.behaviorFlags) && thisBuilder.getFunction(LibraryBuilder.CustomizationCodeNamespace + "." + typeInfo.name + "_" + propInfo.originalName + "_Get").call(this, this, this[fieldName]);
-                    return this[fieldName];
-                },
-                enumerable: !0,
-                configurable: !0
-            };
-            0 == (2 & propInfo.behaviorFlags) && (descriptor.set = function(value) {
-                if (4 & propInfo.behaviorFlags && thisBuilder.getFunction(LibraryBuilder.CustomizationCodeNamespace + "." + typeInfo.name + "_" + propInfo.originalName + "_Set").call(this, this, value).handled) return;
-                this[fieldName] = value, BatchApiHelper.invokeSetProperty(this, propInfo.originalName, value, propInfo.setMethodApiFlags);
-            }), Object.defineProperty(type.prototype, propInfo.name, descriptor);
-        }, LibraryBuilder.prototype.buildScalarMethods = function(type, typeInfo) {
-            if (Array.isArray(typeInfo.scalarMethods)) for (var i = 0; i < typeInfo.scalarMethods.length; i++) {
-                var elem = typeInfo.scalarMethods[i];
-                Array.isArray(elem) && (this.ensureArraySize(elem, 6), typeInfo.scalarMethods[i] = {
-                    name: this.getString(elem[0]),
-                    behaviorFlags: elem[2],
-                    apiSetInfoOrdinal: elem[3],
-                    originalName: this.getString(elem[5]),
-                    apiFlags: elem[4],
-                    parameterCount: elem[1]
-                }), this.buildScalarMethod(type, typeInfo, typeInfo.scalarMethods[i]);
-            }
-        }, LibraryBuilder.prototype.buildScalarMethod = function(type, typeInfo, methodInfo) {
-            this.ensureOriginalName(methodInfo);
-            var thisBuilder = this;
-            type.prototype[methodInfo.name] = function() {
-                var args = [];
-                if (64 & methodInfo.behaviorFlags && methodInfo.parameterCount > 0) {
-                    for (var i = 0; i < methodInfo.parameterCount - 1; i++) args.push(arguments[i]);
-                    var rest = [];
-                    for (i = methodInfo.parameterCount - 1; i < arguments.length; i++) rest.push(arguments[i]);
-                    args.push(rest);
-                } else for (i = 0; i < arguments.length; i++) args.push(arguments[i]);
-                if (1 & methodInfo.behaviorFlags) {
-                    var customizationFunc = thisBuilder.getFunction(LibraryBuilder.CustomizationCodeNamespace + "." + typeInfo.name + "_" + methodInfo.originalName), applyArgs = [ this ];
-                    for (i = 0; i < args.length; i++) applyArgs.push(args[i]);
-                    var _a = customizationFunc.apply(this, applyArgs), handled = _a.handled, result = _a.result;
-                    if (handled) return result;
-                }
-                thisBuilder.throwIfApiNotSupported(typeInfo, methodInfo);
-                var resultProcessType = 0;
-                32 & methodInfo.behaviorFlags && (resultProcessType = 1);
-                var operationType = 0;
-                return 2 & methodInfo.behaviorFlags && (operationType = 1), BatchApiHelper.invokeMethod(this, methodInfo.originalName, operationType, args, methodInfo.apiFlags, resultProcessType);
-            };
-        }, LibraryBuilder.prototype.buildNavigationMethods = function(type, typeInfo) {
-            if (Array.isArray(typeInfo.navigationMethods)) for (var i = 0; i < typeInfo.navigationMethods.length; i++) {
-                var elem = typeInfo.navigationMethods[i];
-                Array.isArray(elem) && (this.ensureArraySize(elem, 8), typeInfo.navigationMethods[i] = {
-                    name: this.getString(elem[0]),
-                    behaviorFlags: elem[3],
-                    apiSetInfoOrdinal: elem[4],
-                    originalName: this.getString(elem[6]),
-                    apiFlags: elem[5],
-                    parameterCount: elem[2],
-                    returnTypeFullName: this.getString(elem[1]),
-                    returnObjectGetByIdMethodName: this.getString(elem[7])
-                }), this.buildNavigationMethod(type, typeInfo, typeInfo.navigationMethods[i]);
-            }
-        }, LibraryBuilder.prototype.buildNavigationMethod = function(type, typeInfo, methodInfo) {
-            this.ensureOriginalName(methodInfo);
-            var thisBuilder = this;
-            type.prototype[methodInfo.name] = function() {
-                var args = [];
-                if (64 & methodInfo.behaviorFlags && methodInfo.parameterCount > 0) {
-                    for (var i = 0; i < methodInfo.parameterCount - 1; i++) args.push(arguments[i]);
-                    var rest = [];
-                    for (i = methodInfo.parameterCount - 1; i < arguments.length; i++) rest.push(arguments[i]);
-                    args.push(rest);
-                } else for (i = 0; i < arguments.length; i++) args.push(arguments[i]);
-                if (1 & methodInfo.behaviorFlags) {
-                    var customizationFunc = thisBuilder.getFunction(LibraryBuilder.CustomizationCodeNamespace + "." + typeInfo.name + "_" + methodInfo.originalName), applyArgs = [ this ];
-                    for (i = 0; i < args.length; i++) applyArgs.push(args[i]);
-                    var _a = customizationFunc.apply(this, applyArgs), handled = _a.handled, result = _a.result;
-                    if (handled) return result;
-                }
-                if (thisBuilder.throwIfApiNotSupported(typeInfo, methodInfo), 0 != (16 & methodInfo.behaviorFlags)) return BatchApiHelper.createIndexerObject(thisBuilder.getFunction(methodInfo.returnTypeFullName), this, args);
-                var operationType = 0;
-                return 2 & methodInfo.behaviorFlags && (operationType = 1), BatchApiHelper.createMethodObject(thisBuilder.getFunction(methodInfo.returnTypeFullName), this, methodInfo.originalName, operationType, args, 0 != (4 & methodInfo.behaviorFlags), 0 != (8 & methodInfo.behaviorFlags), methodInfo.returnObjectGetByIdMethodName, methodInfo.apiFlags);
-            };
-        }, LibraryBuilder.prototype.buildHandleResult = function(type, typeInfo) {
-            var thisBuilder = this;
-            type.prototype._handleResult = function(value) {
-                if (batch_runtime_1.ClientObject.prototype._handleResult.call(this, value), !batch_runtime_1.Utility.isNullOrUndefined(value)) {
-                    if (batch_runtime_1.Utility.fixObjectPathIfNecessary(this, value), 8 & typeInfo.behaviorFlags) thisBuilder.getFunction(LibraryBuilder.CustomizationCodeNamespace + "." + typeInfo.name + "_HandleResult").call(this, this, value);
-                    if (typeInfo.scalarProperties) for (var i_1 = 0; i_1 < typeInfo.scalarProperties.length; i_1++) batch_runtime_1.Utility.isUndefined(value[typeInfo.scalarProperties[i_1].originalName]) || (0 != (8 & typeInfo.scalarProperties[i_1].behaviorFlags) ? this[thisBuilder.getFieldName(typeInfo.scalarProperties[i_1])] = batch_runtime_1.Utility.adjustToDateTime(value[typeInfo.scalarProperties[i_1].originalName]) : this[thisBuilder.getFieldName(typeInfo.scalarProperties[i_1])] = value[typeInfo.scalarProperties[i_1].originalName]);
-                    if (typeInfo.navigationProperties) {
-                        for (var propNames = [], i_2 = 0; i_2 < typeInfo.navigationProperties.length; i_2++) propNames.push(typeInfo.navigationProperties[i_2].name), 
-                        propNames.push(typeInfo.navigationProperties[i_2].originalName);
-                        batch_runtime_1.Utility._handleNavigationPropertyResults(this, value, propNames);
-                    }
-                    if (0 != (1 & typeInfo.behaviorFlags)) {
-                        var hasIndexerMethod = thisBuilder.hasIndexMethod(typeInfo);
-                        if (!batch_runtime_1.Utility.isNullOrUndefined(value[batch_runtime_1.Constants.items])) {
-                            this.m__items = [];
-                            for (var _data = value[batch_runtime_1.Constants.items], childItemType = thisBuilder.getFunction(typeInfo.childItemTypeFullName), i = 0; i < _data.length; i++) {
-                                var _item = BatchApiHelper.createChildItemObject(childItemType, hasIndexerMethod, this, _data[i], i);
-                                _item._handleResult(_data[i]), this.m__items.push(_item);
-                            }
-                        }
-                    }
-                }
-            };
-        }, LibraryBuilder.prototype.buildHandleRetrieveResult = function(type, typeInfo) {
-            var thisBuilder = this;
-            type.prototype._handleRetrieveResult = function(value, result) {
-                if (batch_runtime_1.ClientObject.prototype._handleRetrieveResult.call(this, value, result), 
-                !batch_runtime_1.Utility.isNullOrUndefined(value)) {
-                    if (typeInfo.scalarProperties) for (var i = 0; i < typeInfo.scalarProperties.length; i++) 8 & typeInfo.scalarProperties[i].behaviorFlags && (batch_runtime_1.Utility.isNullOrUndefined(value[typeInfo.scalarProperties[i].name]) || (value[typeInfo.scalarProperties[i].name] = batch_runtime_1.Utility.adjustToDateTime(value[typeInfo.scalarProperties[i].name])));
-                    if (1 & typeInfo.behaviorFlags) {
-                        var hasIndexerMethod_1 = thisBuilder.hasIndexMethod(typeInfo), childItemType_1 = thisBuilder.getFunction(typeInfo.childItemTypeFullName), thisObj_1 = this;
-                        batch_runtime_1.Utility.processRetrieveResult(thisObj_1, value, result, (function(childItemData, index) {
-                            return BatchApiHelper.createChildItemObject(childItemType_1, hasIndexerMethod_1, thisObj_1, childItemData, index);
-                        }));
-                    } else batch_runtime_1.Utility.processRetrieveResult(this, value, result);
-                }
-            };
-        }, LibraryBuilder.prototype.buildHandleIdResult = function(type, typeInfo) {
-            var thisBuilder = this;
-            type.prototype._handleIdResult = function(value) {
-                if (batch_runtime_1.ClientObject.prototype._handleIdResult.call(this, value), !batch_runtime_1.Utility.isNullOrUndefined(value)) {
-                    if (16 & typeInfo.behaviorFlags) thisBuilder.getFunction(LibraryBuilder.CustomizationCodeNamespace + "." + typeInfo.name + "_HandleIdResult").call(this, this, value);
-                    if (typeInfo.scalarProperties) for (var i = 0; i < typeInfo.scalarProperties.length; i++) {
-                        var propName = typeInfo.scalarProperties[i].originalName;
-                        "Id" !== propName && "_Id" !== propName && "_ReferenceId" !== propName || batch_runtime_1.Utility.isNullOrUndefined(value[typeInfo.scalarProperties[i].originalName]) || (this[thisBuilder.getFieldName(typeInfo.scalarProperties[i])] = value[typeInfo.scalarProperties[i].originalName]);
-                    }
-                }
-            };
-        }, LibraryBuilder.prototype.buildLoad = function(type, typeInfo) {
-            type.prototype.load = function(options) {
-                return batch_runtime_1.Utility.load(this, options);
-            };
-        }, LibraryBuilder.prototype.buildRetrieve = function(type, typeInfo) {
-            type.prototype.retrieve = function(options) {
-                return batch_runtime_1.Utility.retrieve(this, options);
-            };
-        }, LibraryBuilder.prototype.buildNewObject = function(type, typeInfo) {
-            batch_runtime_1.Utility.isNullOrEmptyString(typeInfo.newObjectServerTypeFullName) || (type.newObject = function(context) {
-                return BatchApiHelper.createTopLevelServiceObject(type, context, typeInfo.newObjectServerTypeFullName, 0 != (1 & typeInfo.behaviorFlags), typeInfo.newObjectApiFlags);
-            });
-        }, LibraryBuilder.prototype.buildSetMockData = function(type, typeInfo) {
-            var thisBuilder = this;
-            if (1 & typeInfo.behaviorFlags) {
-                var hasIndexMethod_1 = thisBuilder.hasIndexMethod(typeInfo);
-                type.prototype.setMockData = function(data) {
-                    var thisObj = this;
-                    batch_runtime_1.Utility.setMockData(thisObj, data, (function(childItemData, index) {
-                        return BatchApiHelper.createChildItemObject(thisBuilder.getFunction(typeInfo.childItemTypeFullName), hasIndexMethod_1, thisObj, childItemData, index);
-                    }), (function(items) {
-                        thisObj.m__items = items;
-                    }));
-                };
-            } else type.prototype.setMockData = function(data) {
-                batch_runtime_1.Utility.setMockData(this, data);
-            };
-        }, LibraryBuilder.prototype.buildEnsureUnchanged = function(type, typeInfo) {
-            type.prototype.ensureUnchanged = function(data) {
-                BatchApiHelper.invokeEnsureUnchanged(this, data);
-            };
-        }, LibraryBuilder.prototype.buildUpdate = function(type, typeInfo) {
-            type.prototype.update = function(properties) {
-                this._recursivelyUpdate(properties);
-            };
-        }, LibraryBuilder.prototype.buildSet = function(type, typeInfo) {
-            if (0 == (1 & typeInfo.behaviorFlags)) {
-                var notAllowedToBeSetPropertyNames = [], allowedScalarPropertyNames = [];
-                if (typeInfo.scalarProperties) for (var i = 0; i < typeInfo.scalarProperties.length; i++) 0 == (2 & typeInfo.scalarProperties[i].behaviorFlags) && 0 != (1 & typeInfo.scalarProperties[i].behaviorFlags) ? allowedScalarPropertyNames.push(typeInfo.scalarProperties[i].name) : notAllowedToBeSetPropertyNames.push(typeInfo.scalarProperties[i].name);
-                var allowedNavigationPropertyNames = [];
-                if (typeInfo.navigationProperties) for (i = 0; i < typeInfo.navigationProperties.length; i++) 0 != (16 & typeInfo.navigationProperties[i].behaviorFlags) || 0 == (1 & typeInfo.navigationProperties[i].behaviorFlags) || 0 == (32 & typeInfo.navigationProperties[i].behaviorFlags) ? notAllowedToBeSetPropertyNames.push(typeInfo.navigationProperties[i].name) : allowedNavigationPropertyNames.push(typeInfo.navigationProperties[i].name);
-                0 === allowedNavigationPropertyNames.length && 0 === allowedScalarPropertyNames.length || (type.prototype.set = function(properties, options) {
-                    this._recursivelySet(properties, options, allowedScalarPropertyNames, allowedNavigationPropertyNames, notAllowedToBeSetPropertyNames);
-                });
-            }
-        }, LibraryBuilder.prototype.buildItems = function(type, typeInfo) {
-            0 != (1 & typeInfo.behaviorFlags) && Object.defineProperty(type.prototype, "items", {
-                get: function() {
-                    return batch_runtime_1.Utility.throwIfNotLoaded("items", this.m__items, typeInfo.name, this._isNull), 
-                    this.m__items;
-                },
-                enumerable: !0,
-                configurable: !0
-            });
-        }, LibraryBuilder.prototype.buildToJSON = function(type, typeInfo) {
-            var thisBuilder = this;
-            0 == (1 & typeInfo.behaviorFlags) ? type.prototype.toJSON = function() {
-                var scalarProperties = {};
-                if (typeInfo.scalarProperties) for (var i = 0; i < typeInfo.scalarProperties.length; i++) 0 != (1 & typeInfo.scalarProperties[i].behaviorFlags) && (scalarProperties[typeInfo.scalarProperties[i].name] = this[thisBuilder.getFieldName(typeInfo.scalarProperties[i])]);
-                var navProperties = {};
-                if (typeInfo.navigationProperties) for (i = 0; i < typeInfo.navigationProperties.length; i++) 0 != (1 & typeInfo.navigationProperties[i].behaviorFlags) && (navProperties[typeInfo.navigationProperties[i].name] = this[thisBuilder.getFieldName(typeInfo.navigationProperties[i])]);
-                return batch_runtime_1.Utility.toJson(this, scalarProperties, navProperties);
-            } : type.prototype.toJSON = function() {
-                return batch_runtime_1.Utility.toJson(this, {}, {}, this.m__items);
-            };
-        }, LibraryBuilder.prototype.buildTypeMetadataInfo = function(type, typeInfo) {
-            Object.defineProperty(type.prototype, "_className", {
-                get: function() {
-                    return typeInfo.name;
-                },
-                enumerable: !0,
-                configurable: !0
-            }), Object.defineProperty(type.prototype, "_isCollection", {
-                get: function() {
-                    return 0 != (1 & typeInfo.behaviorFlags);
-                },
-                enumerable: !0,
-                configurable: !0
-            }), batch_runtime_1.Utility.isNullOrEmptyString(typeInfo.collectionPropertyPath) || Object.defineProperty(type.prototype, "_collectionPropertyPath", {
-                get: function() {
-                    return typeInfo.collectionPropertyPath;
-                },
-                enumerable: !0,
-                configurable: !0
-            }), typeInfo.scalarProperties && typeInfo.scalarProperties.length > 0 && (Object.defineProperty(type.prototype, "_scalarPropertyNames", {
-                get: function() {
-                    return this.m__scalarPropertyNames || (this.m__scalarPropertyNames = typeInfo.scalarProperties.map((function(p) {
-                        return p.name;
-                    }))), this.m__scalarPropertyNames;
-                },
-                enumerable: !0,
-                configurable: !0
-            }), Object.defineProperty(type.prototype, "_scalarPropertyOriginalNames", {
-                get: function() {
-                    return this.m__scalarPropertyOriginalNames || (this.m__scalarPropertyOriginalNames = typeInfo.scalarProperties.map((function(p) {
-                        return p.originalName;
-                    }))), this.m__scalarPropertyOriginalNames;
-                },
-                enumerable: !0,
-                configurable: !0
-            }), Object.defineProperty(type.prototype, "_scalarPropertyUpdateable", {
-                get: function() {
-                    return this.m__scalarPropertyUpdateable || (this.m__scalarPropertyUpdateable = typeInfo.scalarProperties.map((function(p) {
-                        return 0 == (2 & p.behaviorFlags);
-                    }))), this.m__scalarPropertyUpdateable;
-                },
-                enumerable: !0,
-                configurable: !0
-            })), typeInfo.navigationProperties && typeInfo.navigationProperties.length > 0 && Object.defineProperty(type.prototype, "_navigationPropertyNames", {
-                get: function() {
-                    return this.m__navigationPropertyNames || (this.m__navigationPropertyNames = typeInfo.navigationProperties.map((function(p) {
-                        return p.name;
-                    }))), this.m__navigationPropertyNames;
-                },
-                enumerable: !0,
-                configurable: !0
-            });
-        }, LibraryBuilder.prototype.buildTrackUntrack = function(type, typeInfo) {
-            2 & typeInfo.behaviorFlags && (type.prototype.track = function() {
-                return this.context.trackedObjects.add(this), this;
-            }, type.prototype.untrack = function() {
-                return this.context.trackedObjects.remove(this), this;
-            });
-        }, LibraryBuilder.prototype.buildMixin = function(type, typeInfo) {
-            if (4 & typeInfo.behaviorFlags) {
-                var mixinType = this.getFunction(typeInfo.name + "Custom");
-                batch_runtime_1.Utility.applyMixin(type, mixinType);
-            }
-        }, LibraryBuilder.prototype.getOnEventName = function(name) {
-            return "_" === name[0] ? "_on" + name.substr(1) : "on" + name;
-        }, LibraryBuilder.prototype.buildEvents = function(type, typeInfo) {
-            if (typeInfo.events) for (var i = 0; i < typeInfo.events.length; i++) {
-                var elem = typeInfo.events[i];
-                Array.isArray(elem) && (this.ensureArraySize(elem, 7), typeInfo.events[i] = {
-                    name: this.getString(elem[0]),
-                    behaviorFlags: elem[1],
-                    apiSetInfoOrdinal: elem[2],
-                    typeExpression: this.getString(elem[3]),
-                    targetIdExpression: this.getString(elem[4]),
-                    register: this.getString(elem[5]),
-                    unregister: this.getString(elem[6])
-                }), this.buildEvent(type, typeInfo, typeInfo.events[i]);
-            }
-        }, LibraryBuilder.prototype.buildEvent = function(type, typeInfo, evt) {
-            1 & evt.behaviorFlags ? this.buildV0Event(type, typeInfo, evt) : this.buildV2Event(type, typeInfo, evt);
-        }, LibraryBuilder.prototype.buildV2Event = function(type, typeInfo, evt) {
-            var thisBuilder = this, eventName = this.getOnEventName(evt.name), fieldName = this.getFieldName(evt);
-            Object.defineProperty(type.prototype, eventName, {
-                get: function() {
-                    if (!this[fieldName]) {
-                        thisBuilder.throwIfApiNotSupported(typeInfo, evt);
-                        var thisObj = this, registerFunc = null;
-                        "null" !== evt.register && (registerFunc = this[evt.register].bind(this));
-                        var unregisterFunc = null;
-                        "null" !== evt.unregister && (unregisterFunc = this[evt.unregister].bind(this));
-                        var func = null;
-                        2 & evt.behaviorFlags && (func = thisBuilder.getFunction(LibraryBuilder.CustomizationCodeNamespace + "." + typeInfo.name + "_" + evt.name + "_EventArgsTransform"));
-                        var eventType = thisBuilder.evaluateEventType(evt.typeExpression);
-                        this[fieldName] = new batch_runtime_1.GenericEventHandlers(this.context, this, evt.name, {
-                            eventType: eventType,
-                            getTargetIdFunc: function() {
-                                return thisBuilder.evaluateEventTargetId(evt.targetIdExpression, thisObj);
-                            },
-                            registerFunc: registerFunc,
-                            unregisterFunc: unregisterFunc,
-                            eventArgsTransformFunc: function(value) {
-                                return func && (value = func.call(thisObj, thisObj, value)), batch_runtime_1.Utility._createPromiseFromResult(value);
-                            }
-                        });
-                    }
-                    return this[fieldName];
-                },
-                enumerable: !0,
-                configurable: !0
-            });
-        }, LibraryBuilder.prototype.buildV0Event = function(type, typeInfo, evt) {
-            var thisBuilder = this, eventName = this.getOnEventName(evt.name), fieldName = this.getFieldName(evt);
-            Object.defineProperty(type.prototype, eventName, {
-                get: function() {
-                    if (!this[fieldName]) {
-                        thisBuilder.throwIfApiNotSupported(typeInfo, evt);
-                        var thisObj = this, registerFunc = null;
-                        if (batch_runtime_1.Utility.isNullOrEmptyString(evt.register)) {
-                            var eventType_1 = thisBuilder.evaluateEventType(evt.typeExpression);
-                            registerFunc = function(handlerCallback) {
-                                var targetId = thisBuilder.evaluateEventTargetId(evt.targetIdExpression, thisObj);
-                                return thisObj.context.eventRegistration.register(eventType_1, targetId, handlerCallback);
-                            };
-                        } else if ("null" !== evt.register) {
-                            var func_1 = thisBuilder.getFunction(evt.register);
-                            registerFunc = function(handlerCallback) {
-                                return func_1.call(thisObj, thisObj, handlerCallback);
-                            };
-                        }
-                        var unregisterFunc = null;
-                        if (batch_runtime_1.Utility.isNullOrEmptyString(evt.unregister)) {
-                            var eventType_2 = thisBuilder.evaluateEventType(evt.typeExpression);
-                            unregisterFunc = function(handlerCallback) {
-                                var targetId = thisBuilder.evaluateEventTargetId(evt.targetIdExpression, thisObj);
-                                return thisObj.context.eventRegistration.unregister(eventType_2, targetId, handlerCallback);
-                            };
-                        } else if ("null" !== evt.unregister) {
-                            var func_2 = thisBuilder.getFunction(evt.unregister);
-                            unregisterFunc = function(handlerCallback) {
-                                return func_2.call(thisObj, thisObj, handlerCallback);
-                            };
-                        }
-                        var func = null;
-                        2 & evt.behaviorFlags && (func = thisBuilder.getFunction(LibraryBuilder.CustomizationCodeNamespace + "." + typeInfo.name + "_" + evt.name + "_EventArgsTransform"));
-                        this[fieldName] = new batch_runtime_1.EventHandlers(this.context, this, evt.name, {
-                            registerFunc: registerFunc,
-                            unregisterFunc: unregisterFunc,
-                            eventArgsTransformFunc: function(value) {
-                                return func && (value = func.call(thisObj, thisObj, value)), batch_runtime_1.Utility._createPromiseFromResult(value);
-                            }
-                        });
-                    }
-                    return this[fieldName];
-                },
-                enumerable: !0,
-                configurable: !0
-            });
-        }, LibraryBuilder.prototype.hasIndexMethod = function(typeInfo) {
-            var ret = !1;
-            if (typeInfo.navigationMethods) for (var i = 0; i < typeInfo.navigationMethods.length; i++) if (0 != (16 & typeInfo.navigationMethods[i].behaviorFlags)) {
-                ret = !0;
-                break;
-            }
-            return ret;
-        }, LibraryBuilder.CustomizationCodeNamespace = "_CC", LibraryBuilder;
-    }();
-    exports.LibraryBuilder = LibraryBuilder;
 }, function(module, exports, __webpack_require__) {
     "use strict";
     Object.defineProperty(exports, "__esModule", {
@@ -3940,21 +3427,24 @@ OSF._OfficeAppFactory = (function OSF__OfficeAppFactory() {
     }, __webpack_require__(7).default(!0);
 }, function(module, exports, __webpack_require__) {
     "use strict";
-    var extendStatics, __extends = this && this.__extends || (extendStatics = function(d, b) {
-        return (extendStatics = Object.setPrototypeOf || {
-            __proto__: []
-        } instanceof Array && function(d, b) {
-            d.__proto__ = b;
-        } || function(d, b) {
-            for (var p in b) b.hasOwnProperty(p) && (d[p] = b[p]);
-        })(d, b);
-    }, function(d, b) {
-        function __() {
-            this.constructor = d;
-        }
-        extendStatics(d, b), d.prototype = null === b ? Object.create(b) : (__.prototype = b.prototype, 
-        new __);
-    });
+    var __extends = this && this.__extends || function() {
+        var extendStatics = function(d, b) {
+            return (extendStatics = Object.setPrototypeOf || {
+                __proto__: []
+            } instanceof Array && function(d, b) {
+                d.__proto__ = b;
+            } || function(d, b) {
+                for (var p in b) b.hasOwnProperty(p) && (d[p] = b[p]);
+            })(d, b);
+        };
+        return function(d, b) {
+            function __() {
+                this.constructor = d;
+            }
+            extendStatics(d, b), d.prototype = null === b ? Object.create(b) : (__.prototype = b.prototype, 
+            new __());
+        };
+    }();
     Object.defineProperty(exports, "__esModule", {
         value: !0
     });
@@ -4048,9 +3538,8 @@ OSF._OfficeAppFactory = (function OSF__OfficeAppFactory() {
         function ClientObject(context, objectPath) {
             var _this = _super.call(this, context, objectPath) || this;
             return Utility.checkArgumentNull(context, "context"), _this.m_context = context, 
-            _this._objectPath && (!context._processingResult && context._pendingRequest && (ActionFactory.createInstantiateAction(context, _this), 
+            _this._objectPath && !context._processingResult && context._pendingRequest && (ActionFactory.createInstantiateAction(context, _this), 
             context._autoCleanup && _this._KeepReference && context.trackedObjects._autoAdd(_this)), 
-            Common._internalConfig.appendTypeNameToObjectPathInfo && _this._objectPath.objectPathInfo && _this._className && (_this._objectPath.objectPathInfo.T = _this._className)), 
             _this;
         }
         return __extends(ClientObject, _super), Object.defineProperty(ClientObject.prototype, "context", {
@@ -4168,7 +3657,7 @@ OSF._OfficeAppFactory = (function OSF__OfficeAppFactory() {
                 flags: requestFlags,
                 message: httpRequestInfo
             };
-            return Core.CoreUtility.log(JSON.stringify(message)), this.m_session.sendMessageToHost(message).then((function(nativeBridgeResponse) {
+            return Core.CoreUtility.log(JSON.stringify(message)), this.m_session.sendMessageToHost(message).then(function(nativeBridgeResponse) {
                 Core.CoreUtility.log("Received response: " + JSON.stringify(nativeBridgeResponse));
                 var response, responseInfo = nativeBridgeResponse.message;
                 if (200 === responseInfo.statusCode) response = {
@@ -4187,14 +3676,14 @@ OSF._OfficeAppFactory = (function OSF__OfficeAppFactory() {
                     };
                 }
                 return response;
-            }));
+            });
         }, HostBridgeRequestExecutor;
     }(), HostBridgeSession = function(_super) {
         function HostBridgeSession(m_bridge) {
             var _this = _super.call(this) || this;
-            return _this.m_bridge = m_bridge, _this.m_bridge.addHostMessageHandler((function(message) {
+            return _this.m_bridge = m_bridge, _this.m_bridge.addHostMessageHandler(function(message) {
                 3 === message.type && GenericEventRegistration.getGenericEventRegistration()._handleRichApiMessage(message.message);
-            })), _this;
+            }), _this;
         }
         return __extends(HostBridgeSession, _super), HostBridgeSession.getInstanceIfHostBridgeInited = function() {
             return Core.HostBridge.instance ? ((Core.CoreUtility.isNullOrUndefined(HostBridgeSession.s_instance) || HostBridgeSession.s_instance.m_bridge !== Core.HostBridge.instance) && (HostBridgeSession.s_instance = new HostBridgeSession(Core.HostBridge.instance)), 
@@ -4314,8 +3803,8 @@ OSF._OfficeAppFactory = (function OSF__OfficeAppFactory() {
         }, ClientRequestContext.prototype._processOfficeJsErrorResponse = function(officeJsErrorCode, response) {}, 
         ClientRequestContext.prototype.ensureRequestUrlAndHeaderInfo = function() {
             var _this = this;
-            return Utility._createPromiseFromResult(null).then((function() {
-                if (!_this.m_requestUrlAndHeaderInfo) return _this.m_requestUrlAndHeaderInfoResolver._resolveRequestUrlAndHeaderInfo().then((function(value) {
+            return Utility._createPromiseFromResult(null).then(function() {
+                if (!_this.m_requestUrlAndHeaderInfo) return _this.m_requestUrlAndHeaderInfoResolver._resolveRequestUrlAndHeaderInfo().then(function(value) {
                     if (_this.m_requestUrlAndHeaderInfo = value, _this.m_requestUrlAndHeaderInfo || (_this.m_requestUrlAndHeaderInfo = {
                         url: Core.CoreConstants.localDocument,
                         headers: {}
@@ -4325,22 +3814,22 @@ OSF._OfficeAppFactory = (function OSF__OfficeAppFactory() {
                         var executor = _this.m_requestUrlAndHeaderInfoResolver._createRequestExecutorOrNull();
                         executor && (_this._requestExecutor = executor);
                     }
-                }));
-            }));
+                });
+            });
         }, ClientRequestContext.prototype.syncPrivateMain = function() {
             var _this = this;
-            return this.ensureRequestUrlAndHeaderInfo().then((function() {
+            return this.ensureRequestUrlAndHeaderInfo().then(function() {
                 var req = _this._pendingRequest;
-                return _this.m_pendingRequest = null, _this.processPreSyncPromises(req).then((function() {
+                return _this.m_pendingRequest = null, _this.processPreSyncPromises(req).then(function() {
                     return _this.syncPrivate(req);
-                }));
-            }));
+                });
+            });
         }, ClientRequestContext.prototype.syncPrivate = function(req) {
             var _this = this;
             if (Core.TestUtility.isMock()) return Core.CoreUtility._createPromiseFromResult(null);
             if (!req.hasActions) return this.processPendingEventHandlers(req);
             var _a = req.buildRequestMessageBodyAndRequestFlags(), msgBody = _a.body, requestFlags = _a.flags;
-            this._requestFlagModifier && (requestFlags |= this._requestFlagModifier), this._requestExecutor || (Core.CoreUtility._isLocalDocumentUrl(this.m_requestUrlAndHeaderInfo.url) ? this._requestExecutor = new OfficeJsRequestExecutor(this) : this._requestExecutor = new Common.HttpRequestExecutor);
+            this._requestFlagModifier && (requestFlags |= this._requestFlagModifier), this._requestExecutor || (Core.CoreUtility._isLocalDocumentUrl(this.m_requestUrlAndHeaderInfo.url) ? this._requestExecutor = new OfficeJsRequestExecutor(this) : this._requestExecutor = new Common.HttpRequestExecutor());
             var requestExecutor = this._requestExecutor, headers = {};
             Core.CoreUtility._copyHeaders(this.m_requestUrlAndHeaderInfo.headers, headers), 
             Core.CoreUtility._copyHeaders(this.m_customRequestHeaders, headers), delete this.m_customRequestHeaders[Constants.officeScriptEventId];
@@ -4352,14 +3841,14 @@ OSF._OfficeAppFactory = (function OSF__OfficeAppFactory() {
             req.invalidatePendingInvalidObjectPaths();
             var errorFromResponse = null, errorFromProcessEventHandlers = null;
             return this._lastSyncStart = "undefined" == typeof performance ? 0 : performance.now(), 
-            this._lastRequestFlags = requestFlags, requestExecutor.executeAsync(this._customData, requestFlags, requestExecutorRequestMessage).then((function(response) {
+            this._lastRequestFlags = requestFlags, requestExecutor.executeAsync(this._customData, requestFlags, requestExecutorRequestMessage).then(function(response) {
                 return _this._lastSyncEnd = "undefined" == typeof performance ? 0 : performance.now(), 
                 errorFromResponse = _this.processRequestExecutorResponseMessage(req, response), 
-                _this.processPendingEventHandlers(req).catch((function(ex) {
+                _this.processPendingEventHandlers(req).catch(function(ex) {
                     Core.CoreUtility.log("Error in processPendingEventHandlers"), Core.CoreUtility.log(JSON.stringify(ex)), 
                     errorFromProcessEventHandlers = ex;
-                }));
-            })).then((function() {
+                });
+            }).then(function() {
                 if (errorFromResponse) throw Core.CoreUtility.log("Throw error from response: " + JSON.stringify(errorFromResponse)), 
                 errorFromResponse;
                 if (errorFromProcessEventHandlers) {
@@ -4377,7 +3866,7 @@ OSF._OfficeAppFactory = (function OSF__OfficeAppFactory() {
                     }
                     throw transformedError;
                 }
-            }));
+            });
         }, ClientRequestContext.prototype.processRequestExecutorResponseMessage = function(req, response) {
             response.Body && response.Body.TraceIds && req._setResponseTraceIds(response.Body.TraceIds);
             var traceMessages = req._responseTraceMessages, errorStatementInfo = null;
@@ -4442,9 +3931,9 @@ OSF._OfficeAppFactory = (function OSF__OfficeAppFactory() {
                 return p;
             };
         }, ClientRequestContext.prototype.sync = function(passThroughValue) {
-            return Core.TestUtility.isMock() ? Core.CoreUtility._createPromiseFromResult(passThroughValue) : this.syncPrivateMain().then((function() {
+            return Core.TestUtility.isMock() ? Core.CoreUtility._createPromiseFromResult(passThroughValue) : this.syncPrivateMain().then(function() {
                 return passThroughValue;
-            }));
+            });
         }, ClientRequestContext.prototype.batch = function(batchBody) {
             var _this = this;
             if (1 !== this.m_batchMode) return Core.CoreUtility._createPromiseFromException(Utility.createRuntimeError(Core.CoreErrorCodes.generalException, null, null));
@@ -4459,22 +3948,22 @@ OSF._OfficeAppFactory = (function OSF__OfficeAppFactory() {
                 return this.m_explicitBatchInProgress = !1, this.m_pendingRequest = previousRequest, 
                 Core.CoreUtility._createPromiseFromException(ex);
             }
-            return "object" == typeof batchBodyResult && batchBodyResult && "function" == typeof batchBodyResult.then ? batchBodyResultPromise = Utility._createPromiseFromResult(null).then((function() {
+            return "object" == typeof batchBodyResult && batchBodyResult && "function" == typeof batchBodyResult.then ? batchBodyResultPromise = Utility._createPromiseFromResult(null).then(function() {
                 return batchBodyResult;
-            })).then((function(result) {
+            }).then(function(result) {
                 return _this.m_explicitBatchInProgress = !1, request = _this.m_pendingRequest, _this.m_pendingRequest = previousRequest, 
                 result;
-            })).catch((function(ex) {
+            }).catch(function(ex) {
                 return _this.m_explicitBatchInProgress = !1, request = _this.m_pendingRequest, _this.m_pendingRequest = previousRequest, 
                 Core.CoreUtility._createPromiseFromException(ex);
-            })) : (this.m_explicitBatchInProgress = !1, request = this.m_pendingRequest, this.m_pendingRequest = previousRequest, 
-            batchBodyResultPromise = Utility._createPromiseFromResult(batchBodyResult)), batchBodyResultPromise.then((function(result) {
-                return _this.ensureRequestUrlAndHeaderInfo().then((function() {
+            }) : (this.m_explicitBatchInProgress = !1, request = this.m_pendingRequest, this.m_pendingRequest = previousRequest, 
+            batchBodyResultPromise = Utility._createPromiseFromResult(batchBodyResult)), batchBodyResultPromise.then(function(result) {
+                return _this.ensureRequestUrlAndHeaderInfo().then(function() {
                     return _this.syncPrivate(request);
-                })).then((function() {
+                }).then(function() {
                     return result;
-                }));
-            }));
+                });
+            });
         }, ClientRequestContext._run = function(ctxInitializer, runBody, numCleanupAttempts, retryDelay, onCleanupSuccess, onCleanupFailure) {
             return void 0 === numCleanupAttempts && (numCleanupAttempts = 3), void 0 === retryDelay && (retryDelay = 5e3), 
             ClientRequestContext._runCommon("run", null, ctxInitializer, 0, runBody, numCleanupAttempts, retryDelay, null, onCleanupSuccess, onCleanupFailure);
@@ -4527,29 +4016,29 @@ OSF._OfficeAppFactory = (function OSF__OfficeAppFactory() {
             return void 0 === code && (code = Core.CoreResourceStrings.invalidArgument), Core.CoreUtility._createPromiseFromException(Utility.createRuntimeError(code, Core.CoreUtility._getResourceString(code), functionName));
         }, ClientRequestContext._runCommon = function(functionName, requestInfo, ctxRetriever, batchMode, runBody, numCleanupAttempts, retryDelay, onBeforeRun, onCleanupSuccess, onCleanupFailure) {
             Core.SessionBase._overrideSession && (requestInfo = Core.SessionBase._overrideSession);
-            var ctx, resultOrError, previousBatchMode, starterPromise = Core.CoreUtility.createPromise((function(resolve, reject) {
+            var ctx, resultOrError, previousBatchMode, succeeded = !1;
+            return Core.CoreUtility.createPromise(function(resolve, reject) {
                 resolve();
-            })), succeeded = !1;
-            return starterPromise.then((function() {
-                if ((ctx = ctxRetriever(requestInfo))._autoCleanup) return new Promise((function(resolve, reject) {
-                    ctx._onRunFinishedNotifiers.push((function() {
+            }).then(function() {
+                if ((ctx = ctxRetriever(requestInfo))._autoCleanup) return new Promise(function(resolve, reject) {
+                    ctx._onRunFinishedNotifiers.push(function() {
                         ctx._autoCleanup = !0, resolve();
-                    }));
-                }));
+                    });
+                });
                 ctx._autoCleanup = !0;
-            })).then((function() {
+            }).then(function() {
                 return "function" != typeof runBody ? ClientRequestContext.createErrorPromise(functionName) : (previousBatchMode = ctx.m_batchMode, 
                 ctx.m_batchMode = batchMode, onBeforeRun && onBeforeRun(ctx), runBodyResult = runBody(1 == batchMode ? ctx.batch.bind(ctx) : ctx), 
                 (Utility.isNullOrUndefined(runBodyResult) || "function" != typeof runBodyResult.then) && Utility.throwError(ResourceStrings.runMustReturnPromise), 
                 runBodyResult);
                 var runBodyResult;
-            })).then((function(runBodyResult) {
+            }).then(function(runBodyResult) {
                 return 1 === batchMode ? runBodyResult : ctx.sync(runBodyResult);
-            })).then((function(result) {
+            }).then(function(result) {
                 succeeded = !0, resultOrError = result;
-            })).catch((function(error) {
+            }).catch(function(error) {
                 resultOrError = error;
-            })).then((function() {
+            }).then(function() {
                 var itemsToRemove = ctx.trackedObjects._retrieveAndClearAutoCleanupList();
                 for (var key in ctx._autoCleanup = !1, ctx.m_batchMode = previousBatchMode, itemsToRemove) itemsToRemove[key]._objectPath.isValid = !1;
                 var cleanupCounter = 0;
@@ -4563,20 +4052,20 @@ OSF._OfficeAppFactory = (function OSF__OfficeAppFactory() {
                     } finally {
                         ctx.m_batchMode = savedBatchMode, ctx.m_pendingRequest = savedPendingRequest;
                     }
-                    return ctx.syncPrivate(request).then((function() {
+                    return ctx.syncPrivate(request).then(function() {
                         onCleanupSuccess && onCleanupSuccess(cleanupCounter);
-                    })).catch((function() {
-                        onCleanupFailure && onCleanupFailure(cleanupCounter), cleanupCounter < numCleanupAttempts && setTimeout((function() {
+                    }).catch(function() {
+                        onCleanupFailure && onCleanupFailure(cleanupCounter), cleanupCounter < numCleanupAttempts && setTimeout(function() {
                             attemptCleanup();
-                        }), retryDelay);
-                    }));
+                        }, retryDelay);
+                    });
                 }
                 attemptCleanup();
-            })).then((function() {
+            }).then(function() {
                 ctx._onRunFinishedNotifiers && ctx._onRunFinishedNotifiers.length > 0 && ctx._onRunFinishedNotifiers.shift()();
                 if (succeeded) return resultOrError;
                 throw resultOrError;
-            }));
+            });
         }, ClientRequestContext;
     }(Common.ClientRequestContextBase);
     exports.ClientRequestContext = ClientRequestContext;
@@ -4627,7 +4116,7 @@ OSF._OfficeAppFactory = (function OSF__OfficeAppFactory() {
         Constants.eventSourceRemote = "Remote", Constants.proxy = "$proxy", Constants.className = "_className", 
         Constants.isCollection = "_isCollection", Constants.collectionPropertyPath = "_collectionPropertyPath", 
         Constants.objectPathInfoDoNotKeepReferenceFieldName = "D", Constants.officeScriptEventId = "X-OfficeScriptEventId", 
-        Constants.officeScriptFireRecordingEvent = "X-OfficeScriptFireRecordingEvent", Constants;
+        Constants;
     }(Common.CommonConstants);
     exports.Constants = Constants;
     var ClientRequest = function(_super) {
@@ -4683,9 +4172,9 @@ OSF._OfficeAppFactory = (function OSF__OfficeAppFactory() {
             var _this = this;
             this.m_id = context._nextId(), this.m_context = context, this.m_name = name, this.m_handlers = [], 
             this.m_registered = !1, this.m_eventInfo = eventInfo, this.m_callback = function(args) {
-                _this.m_eventInfo.eventArgsTransformFunc(args).then((function(newArgs) {
+                _this.m_eventInfo.eventArgsTransformFunc(args).then(function(newArgs) {
                     return _this.fireEvent(newArgs);
-                }));
+                });
             };
         }
         return Object.defineProperty(EventHandlers.prototype, "_registered", {
@@ -4760,24 +4249,24 @@ OSF._OfficeAppFactory = (function OSF__OfficeAppFactory() {
               case 2:
                 handlersResult = [];
             }
-            return hasChange && (!this.m_registered && handlersResult.length > 0 ? ret = ret.then((function() {
+            return hasChange && (!this.m_registered && handlersResult.length > 0 ? ret = ret.then(function() {
                 return _this.m_eventInfo.registerFunc(_this.m_callback);
-            })).then((function() {
+            }).then(function() {
                 return _this.m_registered = !0;
-            })) : this.m_registered && 0 == handlersResult.length && (ret = ret.then((function() {
+            }) : this.m_registered && 0 == handlersResult.length && (ret = ret.then(function() {
                 return _this.m_eventInfo.unregisterFunc(_this.m_callback);
-            })).catch((function(ex) {
+            }).catch(function(ex) {
                 Core.CoreUtility.log("Error when unregister event: " + JSON.stringify(ex));
-            })).then((function() {
+            }).then(function() {
                 return _this.m_registered = !1;
-            }))), ret = ret.then((function() {
+            })), ret = ret.then(function() {
                 return _this.m_handlers = handlersResult;
-            }))), ret;
+            })), ret;
         }, EventHandlers.prototype.fireEvent = function(args) {
             for (var promises = [], i = 0; i < this.m_handlers.length; i++) {
-                var handler = this.m_handlers[i], p = Core.CoreUtility._createPromiseFromResult(null).then(this.createFireOneEventHandlerFunc(handler, args)).catch((function(ex) {
+                var handler = this.m_handlers[i], p = Core.CoreUtility._createPromiseFromResult(null).then(this.createFireOneEventHandlerFunc(handler, args)).catch(function(ex) {
                     Core.CoreUtility.log("Error when invoke handler: " + JSON.stringify(ex));
-                }));
+                });
                 promises.push(p);
             }
             Core.CoreUtility.Promise.all(promises);
@@ -4809,65 +4298,65 @@ OSF._OfficeAppFactory = (function OSF__OfficeAppFactory() {
             return OfficeJsEventRegistration.prototype.register = function(eventId, targetId, handler) {
                 switch (eventId) {
                   case 4:
-                    return Utility.promisify((function(callback) {
+                    return Utility.promisify(function(callback) {
                         return Office.context.document.bindings.getByIdAsync(targetId, callback);
-                    })).then((function(officeBinding) {
-                        return Utility.promisify((function(callback) {
+                    }).then(function(officeBinding) {
+                        return Utility.promisify(function(callback) {
                             return officeBinding.addHandlerAsync(Office.EventType.BindingDataChanged, handler, callback);
-                        }));
-                    }));
+                        });
+                    });
 
                   case 3:
-                    return Utility.promisify((function(callback) {
+                    return Utility.promisify(function(callback) {
                         return Office.context.document.bindings.getByIdAsync(targetId, callback);
-                    })).then((function(officeBinding) {
-                        return Utility.promisify((function(callback) {
+                    }).then(function(officeBinding) {
+                        return Utility.promisify(function(callback) {
                             return officeBinding.addHandlerAsync(Office.EventType.BindingSelectionChanged, handler, callback);
-                        }));
-                    }));
+                        });
+                    });
 
                   case 2:
-                    return Utility.promisify((function(callback) {
+                    return Utility.promisify(function(callback) {
                         return Office.context.document.addHandlerAsync(Office.EventType.DocumentSelectionChanged, handler, callback);
-                    }));
+                    });
 
                   case 1:
-                    return Utility.promisify((function(callback) {
+                    return Utility.promisify(function(callback) {
                         return Office.context.document.settings.addHandlerAsync(Office.EventType.SettingsChanged, handler, callback);
-                    }));
+                    });
 
                   case 5:
-                    return Utility.promisify((function(callback) {
+                    return Utility.promisify(function(callback) {
                         return OSF.DDA.RichApi.richApiMessageManager.addHandlerAsync("richApiMessage", handler, callback);
-                    }));
+                    });
 
                   case 13:
-                    return Utility.promisify((function(callback) {
+                    return Utility.promisify(function(callback) {
                         return Office.context.document.addHandlerAsync(Office.EventType.ObjectDeleted, handler, {
                             id: targetId
                         }, callback);
-                    }));
+                    });
 
                   case 14:
-                    return Utility.promisify((function(callback) {
+                    return Utility.promisify(function(callback) {
                         return Office.context.document.addHandlerAsync(Office.EventType.ObjectSelectionChanged, handler, {
                             id: targetId
                         }, callback);
-                    }));
+                    });
 
                   case 15:
-                    return Utility.promisify((function(callback) {
+                    return Utility.promisify(function(callback) {
                         return Office.context.document.addHandlerAsync(Office.EventType.ObjectDataChanged, handler, {
                             id: targetId
                         }, callback);
-                    }));
+                    });
 
                   case 16:
-                    return Utility.promisify((function(callback) {
+                    return Utility.promisify(function(callback) {
                         return Office.context.document.addHandlerAsync(Office.EventType.ContentControlAdded, handler, {
                             id: targetId
                         }, callback);
-                    }));
+                    });
 
                   default:
                     throw Core._Internal.RuntimeError._createInvalidArgError({
@@ -4877,79 +4366,79 @@ OSF._OfficeAppFactory = (function OSF__OfficeAppFactory() {
             }, OfficeJsEventRegistration.prototype.unregister = function(eventId, targetId, handler) {
                 switch (eventId) {
                   case 4:
-                    return Utility.promisify((function(callback) {
+                    return Utility.promisify(function(callback) {
                         return Office.context.document.bindings.getByIdAsync(targetId, callback);
-                    })).then((function(officeBinding) {
-                        return Utility.promisify((function(callback) {
+                    }).then(function(officeBinding) {
+                        return Utility.promisify(function(callback) {
                             return officeBinding.removeHandlerAsync(Office.EventType.BindingDataChanged, {
                                 handler: handler
                             }, callback);
-                        }));
-                    }));
+                        });
+                    });
 
                   case 3:
-                    return Utility.promisify((function(callback) {
+                    return Utility.promisify(function(callback) {
                         return Office.context.document.bindings.getByIdAsync(targetId, callback);
-                    })).then((function(officeBinding) {
-                        return Utility.promisify((function(callback) {
+                    }).then(function(officeBinding) {
+                        return Utility.promisify(function(callback) {
                             return officeBinding.removeHandlerAsync(Office.EventType.BindingSelectionChanged, {
                                 handler: handler
                             }, callback);
-                        }));
-                    }));
+                        });
+                    });
 
                   case 2:
-                    return Utility.promisify((function(callback) {
+                    return Utility.promisify(function(callback) {
                         return Office.context.document.removeHandlerAsync(Office.EventType.DocumentSelectionChanged, {
                             handler: handler
                         }, callback);
-                    }));
+                    });
 
                   case 1:
-                    return Utility.promisify((function(callback) {
+                    return Utility.promisify(function(callback) {
                         return Office.context.document.settings.removeHandlerAsync(Office.EventType.SettingsChanged, {
                             handler: handler
                         }, callback);
-                    }));
+                    });
 
                   case 5:
-                    return Utility.promisify((function(callback) {
+                    return Utility.promisify(function(callback) {
                         return OSF.DDA.RichApi.richApiMessageManager.removeHandlerAsync("richApiMessage", {
                             handler: handler
                         }, callback);
-                    }));
+                    });
 
                   case 13:
-                    return Utility.promisify((function(callback) {
+                    return Utility.promisify(function(callback) {
                         return Office.context.document.removeHandlerAsync(Office.EventType.ObjectDeleted, {
                             id: targetId,
                             handler: handler
                         }, callback);
-                    }));
+                    });
 
                   case 14:
-                    return Utility.promisify((function(callback) {
+                    return Utility.promisify(function(callback) {
                         return Office.context.document.removeHandlerAsync(Office.EventType.ObjectSelectionChanged, {
                             id: targetId,
                             handler: handler
                         }, callback);
-                    }));
+                    });
 
                   case 15:
-                    return Utility.promisify((function(callback) {
+                    return Utility.promisify(function(callback) {
                         return Office.context.document.removeHandlerAsync(Office.EventType.ObjectDataChanged, {
                             id: targetId,
                             handler: handler
                         }, callback);
-                    }));
+                    });
 
                   case 16:
-                    return Utility.promisify((function(callback) {
+                    return Utility.promisify(function(callback) {
                         return Office.context.document.removeHandlerAsync(Office.EventType.ContentControlAdded, {
                             id: targetId,
                             handler: handler
                         }, callback);
-                    }));
+                    });
 
                   default:
                     throw Core._Internal.RuntimeError._createInvalidArgError({
@@ -4958,7 +4447,7 @@ OSF._OfficeAppFactory = (function OSF__OfficeAppFactory() {
                 }
             }, OfficeJsEventRegistration;
         }();
-        _Internal.officeJsEventRegistration = new OfficeJsEventRegistration;
+        _Internal.officeJsEventRegistration = new OfficeJsEventRegistration();
     }(_Internal = exports._Internal || (exports._Internal = {}));
     var EventRegistration = function() {
         function EventRegistration(registerEventImpl, unregisterEventImpl) {
@@ -5002,13 +4491,13 @@ OSF._OfficeAppFactory = (function OSF__OfficeAppFactory() {
         }
         return GenericEventRegistration.prototype.ready = function() {
             var _this = this;
-            return this.m_ready || (GenericEventRegistration._testReadyImpl ? this.m_ready = GenericEventRegistration._testReadyImpl().then((function() {
+            return this.m_ready || (GenericEventRegistration._testReadyImpl ? this.m_ready = GenericEventRegistration._testReadyImpl().then(function() {
                 _this.m_isReady = !0;
-            })) : Core.HostBridge.instance ? this.m_ready = Utility._createPromiseFromResult(null).then((function() {
+            }) : Core.HostBridge.instance ? this.m_ready = Utility._createPromiseFromResult(null).then(function() {
                 _this.m_isReady = !0;
-            })) : this.m_ready = _Internal.officeJsEventRegistration.register(5, "", this.m_richApiMessageHandler).then((function() {
+            }) : this.m_ready = _Internal.officeJsEventRegistration.register(5, "", this.m_richApiMessageHandler).then(function() {
                 _this.m_isReady = !0;
-            }))), this.m_ready;
+            })), this.m_ready;
         }, Object.defineProperty(GenericEventRegistration.prototype, "isReady", {
             get: function() {
                 return this.m_isReady;
@@ -5017,14 +4506,14 @@ OSF._OfficeAppFactory = (function OSF__OfficeAppFactory() {
             configurable: !0
         }), GenericEventRegistration.prototype.register = function(eventId, targetId, handler) {
             var _this = this;
-            return this.ready().then((function() {
+            return this.ready().then(function() {
                 return _this.m_eventRegistration.register(eventId, targetId, handler);
-            }));
+            });
         }, GenericEventRegistration.prototype.unregister = function(eventId, targetId, handler) {
             var _this = this;
-            return this.ready().then((function() {
+            return this.ready().then(function() {
                 return _this.m_eventRegistration.unregister(eventId, targetId, handler);
-            }));
+            });
         }, GenericEventRegistration.prototype._registerEventImpl = function(eventId, targetId) {
             return Utility._createPromiseFromResult(null);
         }, GenericEventRegistration.prototype._unregisterEventImpl = function(eventId, targetId) {
@@ -5042,7 +4531,7 @@ OSF._OfficeAppFactory = (function OSF__OfficeAppFactory() {
                 }
             }
         }, GenericEventRegistration.getGenericEventRegistration = function() {
-            return GenericEventRegistration.s_genericEventRegistration || (GenericEventRegistration.s_genericEventRegistration = new GenericEventRegistration), 
+            return GenericEventRegistration.s_genericEventRegistration || (GenericEventRegistration.s_genericEventRegistration = new GenericEventRegistration()), 
             GenericEventRegistration.s_genericEventRegistration;
         }, GenericEventRegistration.richApiMessageEventCategory = 65536, GenericEventRegistration;
     }();
@@ -5060,19 +4549,19 @@ OSF._OfficeAppFactory = (function OSF__OfficeAppFactory() {
             var _this = this;
             return 0 == this._handlers.length && this.m_genericEventInfo.registerFunc && this.m_genericEventInfo.registerFunc(), 
             GenericEventRegistration.getGenericEventRegistration().isReady || this._context._pendingRequest._addPreSyncPromise(GenericEventRegistration.getGenericEventRegistration().ready()), 
-            ActionFactory.createTraceMarkerForCallback(this._context, (function() {
+            ActionFactory.createTraceMarkerForCallback(this._context, function() {
                 _this._handlers.push(handler), 1 == _this._handlers.length && GenericEventRegistration.getGenericEventRegistration().register(_this.m_genericEventInfo.eventType, _this.m_genericEventInfo.getTargetIdFunc(), _this._callback);
-            })), new EventHandlerResult(this._context, this, handler);
+            }), new EventHandlerResult(this._context, this, handler);
         }, GenericEventHandlers.prototype.remove = function(handler) {
             var _this = this;
             1 == this._handlers.length && this.m_genericEventInfo.unregisterFunc && this.m_genericEventInfo.unregisterFunc(), 
-            ActionFactory.createTraceMarkerForCallback(this._context, (function() {
+            ActionFactory.createTraceMarkerForCallback(this._context, function() {
                 for (var handlers = _this._handlers, index = handlers.length - 1; index >= 0; index--) if (handlers[index] === handler) {
                     handlers.splice(index, 1);
                     break;
                 }
                 0 == handlers.length && GenericEventRegistration.getGenericEventRegistration().unregister(_this.m_genericEventInfo.eventType, _this.m_genericEventInfo.getTargetIdFunc(), _this._callback);
-            }));
+            });
         }, GenericEventHandlers.prototype.removeAll = function() {}, GenericEventHandlers;
     }(EventHandlers);
     exports.GenericEventHandlers = GenericEventHandlers;
@@ -5175,14 +4664,14 @@ OSF._OfficeAppFactory = (function OSF__OfficeAppFactory() {
         }
         return OfficeJsRequestExecutor.prototype.executeAsync = function(customData, requestFlags, requestMessage) {
             var _this = this, messageSafearray = Core.RichApiMessageUtility.buildMessageArrayForIRequestExecutor(customData, requestFlags, requestMessage, OfficeJsRequestExecutor.SourceLibHeaderValue);
-            return new Promise((function(resolve, reject) {
-                OSF.DDA.RichApi.executeRichApiRequestAsync(messageSafearray, (function(result) {
+            return new Promise(function(resolve, reject) {
+                OSF.DDA.RichApi.executeRichApiRequestAsync(messageSafearray, function(result) {
                     var response;
                     Core.CoreUtility.log("Response:"), Core.CoreUtility.log(JSON.stringify(result)), 
                     "succeeded" == result.status ? response = Core.RichApiMessageUtility.buildResponseOnSuccess(Core.RichApiMessageUtility.getResponseBody(result), Core.RichApiMessageUtility.getResponseHeaders(result)) : (response = Core.RichApiMessageUtility.buildResponseOnError(result.error.code, result.error.message), 
                     _this.m_context._processOfficeJsErrorResponse(result.error.code, response)), resolve(response);
-                }));
-            }));
+                });
+            });
         }, OfficeJsRequestExecutor.SourceLibHeaderValue = "officejs", OfficeJsRequestExecutor;
     }(), TrackedObjects = function() {
         function TrackedObjects(context) {
@@ -5190,9 +4679,9 @@ OSF._OfficeAppFactory = (function OSF__OfficeAppFactory() {
         }
         return TrackedObjects.prototype.add = function(param) {
             var _this = this;
-            Array.isArray(param) ? param.forEach((function(item) {
+            Array.isArray(param) ? param.forEach(function(item) {
                 return _this._addCommon(item, !0);
-            })) : this._addCommon(param, !0);
+            }) : this._addCommon(param, !0);
         }, TrackedObjects.prototype._autoAdd = function(object) {
             this._addCommon(object, !1), this._autoCleanupList[object._objectPath.objectPathInfo.Id] = object;
         }, TrackedObjects.prototype._autoTrackIfNecessaryWhenHandleObjectResultValue = function(object, resultValue) {
@@ -5208,9 +4697,9 @@ OSF._OfficeAppFactory = (function OSF__OfficeAppFactory() {
             }
         }, TrackedObjects.prototype.remove = function(param) {
             var _this = this;
-            Array.isArray(param) ? param.forEach((function(item) {
+            Array.isArray(param) ? param.forEach(function(item) {
                 return _this._removeCommon(item);
-            })) : this._removeCommon(param);
+            }) : this._removeCommon(param);
         }, TrackedObjects.prototype._removeCommon = function(object) {
             object._objectPath.objectPathInfo[Constants.objectPathInfoDoNotKeepReferenceFieldName] = !0, 
             object.context._pendingRequest._removeKeepReferenceAction(object._objectPath.objectPathInfo.Id);
@@ -5340,9 +4829,9 @@ OSF._OfficeAppFactory = (function OSF__OfficeAppFactory() {
             var _this = this;
             if (this.m_showDispose) {
                 var lastUsedObjectPathIds = action.actionInfo.L;
-                if (lastUsedObjectPathIds && lastUsedObjectPathIds.length > 0) return statement + " // And then dispose {" + lastUsedObjectPathIds.map((function(item) {
+                if (lastUsedObjectPathIds && lastUsedObjectPathIds.length > 0) return statement + " // And then dispose {" + lastUsedObjectPathIds.map(function(item) {
                     return _this.getObjVarName(item);
-                })).join(", ") + "}";
+                }).join(", ") + "}";
             }
             return statement;
         }, RequestPrettyPrinter.prototype.buildQueryExpression = function(action) {
@@ -5472,9 +4961,9 @@ OSF._OfficeAppFactory = (function OSF__OfficeAppFactory() {
         }, Utility.load = function(clientObj, option) {
             return clientObj.context.load(clientObj, option), clientObj;
         }, Utility.loadAndSync = function(clientObj, option) {
-            return clientObj.context.load(clientObj, option), clientObj.context.sync().then((function() {
+            return clientObj.context.load(clientObj, option), clientObj.context.sync().then(function() {
                 return clientObj;
-            }));
+            });
         }, Utility.retrieve = function(clientObj, option) {
             var shouldPolyfill = Common._internalConfig.alwaysPolyfillClientObjectRetrieveMethod;
             shouldPolyfill || (shouldPolyfill = !Utility.isSetSupported("RichApiRuntime", "1.1"));
@@ -5482,9 +4971,9 @@ OSF._OfficeAppFactory = (function OSF__OfficeAppFactory() {
             return clientObj._retrieve(option, result), result;
         }, Utility.retrieveAndSync = function(clientObj, option) {
             var result = Utility.retrieve(clientObj, option);
-            return clientObj.context.sync().then((function() {
+            return clientObj.context.sync().then(function() {
                 return result;
-            }));
+            });
         }, Utility.toJson = function(clientObj, scalarProperties, navigationProperties, collectionItemsIfAny) {
             var result = {};
             for (var prop in scalarProperties) {
@@ -5494,9 +4983,9 @@ OSF._OfficeAppFactory = (function OSF__OfficeAppFactory() {
                 var value;
                 void 0 !== (value = navigationProperties[prop]) && (value[Utility.fieldName_isCollection] && void 0 !== value[Utility.fieldName_m__items] ? result[prop] = value.toJSON().items : result[prop] = value.toJSON());
             }
-            return collectionItemsIfAny && (result.items = collectionItemsIfAny.map((function(item) {
+            return collectionItemsIfAny && (result.items = collectionItemsIfAny.map(function(item) {
                 return item.toJSON();
-            }))), result;
+            })), result;
         }, Utility.throwError = function(resourceId, arg, errorLocation) {
             throw new Core._Internal.RuntimeError({
                 code: resourceId,
@@ -5532,11 +5021,11 @@ OSF._OfficeAppFactory = (function OSF__OfficeAppFactory() {
                 } : void 0
             });
         }, Utility.promisify = function(action) {
-            return new Promise((function(resolve, reject) {
-                action((function(result) {
+            return new Promise(function(resolve, reject) {
+                action(function(result) {
                     "failed" == result.status ? reject(result.error) : resolve(result.value);
-                }));
-            }));
+                });
+            });
         }, Utility._addActionResultHandler = function(clientObj, action, resultHandler) {
             clientObj.context._pendingRequest.addActionResultHandler(action, resultHandler);
         }, Utility._handleNavigationPropertyResults = function(clientObj, objectValue, propertyNames) {
@@ -5618,17 +5107,13 @@ OSF._OfficeAppFactory = (function OSF__OfficeAppFactory() {
                     }
                 }
             }
-        }, Utility.applyMixin = function(derived, base) {
-            Object.getOwnPropertyNames(base.prototype).forEach((function(name) {
-                "constructor" !== name && Object.defineProperty(derived.prototype, name, Object.getOwnPropertyDescriptor(base.prototype, name));
-            }));
         }, Utility.fieldName_m__items = "m__items", Utility.fieldName_isCollection = "_isCollection", 
         Utility._synchronousCleanup = !1, Utility.s_underscoreCharCode = "_".charCodeAt(0), 
         Utility;
     }(Common.CommonUtility);
     exports.Utility = Utility;
 }, function(module, exports) {
-    var wrap, __assign = this && this.__assign || function() {
+    var __assign = this && this.__assign || function() {
         return (__assign = Object.assign || function(t) {
             for (var s, i = 1, n = arguments.length; i < n; i++) for (var p in s = arguments[i]) Object.prototype.hasOwnProperty.call(s, p) && (t[p] = s[p]);
             return t;
@@ -5640,23 +5125,23 @@ OSF._OfficeAppFactory = (function OSF__OfficeAppFactory() {
     function getWrapMethod(property) {
         return function(name) {
             return function(property, method) {
-                return wrapMethod((function(impl) {
+                return wrapMethod(function(impl) {
                     return impl[property][method];
-                }));
+                });
             }(property, name);
         };
     }
     function wrapMethod(methodFetcher) {
         return function() {
             var _this = this, args = arguments;
-            return Office.onReady().then((function(info) {
+            return Office.onReady().then(function(info) {
                 return methodFetcher(getOfficeRuntimeImplementation(info)).apply(_this, args);
-            }));
+            });
         };
     }
-    Office.onReady((function(info) {
+    Office.onReady(function(info) {
         window.OfficeRuntime = __assign({}, window.OfficeRuntime, getOfficeRuntimeImplementation(info));
-    })), window.OfficeRuntime = {
+    }), window.OfficeRuntime = {
         AsyncStorage: function() {
             return {
                 getItem: wrapStorageMethod("getItem"),
@@ -5668,14 +5153,14 @@ OSF._OfficeAppFactory = (function OSF__OfficeAppFactory() {
                 multiGet: wrapStorageMethod("multiGet")
             };
             function wrapStorageMethod(methodName) {
-                return wrapMethod((function(impl) {
+                return wrapMethod(function(impl) {
                     return impl.storage[methodName];
-                }));
+                });
             }
         }(),
-        displayWebDialog: wrapMethod((function(impl) {
+        displayWebDialog: wrapMethod(function(impl) {
             return impl.displayWebDialog;
-        })),
+        }),
         storage: function() {
             return {
                 getItem: wrapStorageMethod("getItem"),
@@ -5687,9 +5172,9 @@ OSF._OfficeAppFactory = (function OSF__OfficeAppFactory() {
                 getItems: wrapStorageMethod("getItems")
             };
             function wrapStorageMethod(methodName) {
-                return wrapMethod((function(impl) {
+                return wrapMethod(function(impl) {
                     return impl.storage[methodName];
-                }));
+                });
             }
         }(),
         experimentation: function() {
@@ -5699,9 +5184,9 @@ OSF._OfficeAppFactory = (function OSF__OfficeAppFactory() {
                 getStringFeatureGateAsync: wrapExperimentationMethod("getStringFeatureGateAsync")
             };
             function wrapExperimentationMethod(methodName) {
-                return wrapMethod((function(impl) {
+                return wrapMethod(function(impl) {
                     return impl.experimentation[methodName];
-                }));
+                });
             }
         }(),
         apiInformation: {
@@ -5709,11 +5194,14 @@ OSF._OfficeAppFactory = (function OSF__OfficeAppFactory() {
                 return Office.context.requirements.isSetSupported(capability, Number(semVer));
             }
         },
-        message: (wrap = getWrapMethod("message"), {
-            on: wrap("on"),
-            off: wrap("off"),
-            emit: wrap("emit")
-        }),
+        message: function() {
+            var wrap = getWrapMethod("message");
+            return {
+                on: wrap("on"),
+                off: wrap("off"),
+                emit: wrap("emit")
+            };
+        }(),
         auth: {
             getAccessToken: getWrapMethod("auth")("getAccessToken")
         },
@@ -5725,14 +5213,20 @@ OSF._OfficeAppFactory = (function OSF__OfficeAppFactory() {
     !function(self) {
         "use strict";
         if (!self.fetch) {
-            var support_searchParams = "URLSearchParams" in self, support_iterable = "Symbol" in self && "iterator" in Symbol, support_blob = "FileReader" in self && "Blob" in self && function() {
-                try {
-                    return new Blob, !0;
-                } catch (e) {
-                    return !1;
-                }
-            }(), support_formData = "FormData" in self, support_arrayBuffer = "ArrayBuffer" in self;
-            if (support_arrayBuffer) var viewClasses = [ "[object Int8Array]", "[object Uint8Array]", "[object Uint8ClampedArray]", "[object Int16Array]", "[object Uint16Array]", "[object Int32Array]", "[object Uint32Array]", "[object Float32Array]", "[object Float64Array]" ], isDataView = function(obj) {
+            var support = {
+                searchParams: "URLSearchParams" in self,
+                iterable: "Symbol" in self && "iterator" in Symbol,
+                blob: "FileReader" in self && "Blob" in self && function() {
+                    try {
+                        return new Blob(), !0;
+                    } catch (e) {
+                        return !1;
+                    }
+                }(),
+                formData: "FormData" in self,
+                arrayBuffer: "ArrayBuffer" in self
+            };
+            if (support.arrayBuffer) var viewClasses = [ "[object Int8Array]", "[object Uint8Array]", "[object Uint8ClampedArray]", "[object Int16Array]", "[object Uint16Array]", "[object Int32Array]", "[object Uint32Array]", "[object Float32Array]", "[object Float64Array]" ], isDataView = function(obj) {
                 return obj && DataView.prototype.isPrototypeOf(obj);
             }, isArrayBufferView = ArrayBuffer.isView || function(obj) {
                 return obj && viewClasses.indexOf(Object.prototype.toString.call(obj)) > -1;
@@ -5753,20 +5247,20 @@ OSF._OfficeAppFactory = (function OSF__OfficeAppFactory() {
                 for (var name in this.map) this.map.hasOwnProperty(name) && callback.call(thisArg, this.map[name], name, this);
             }, Headers.prototype.keys = function() {
                 var items = [];
-                return this.forEach((function(value, name) {
+                return this.forEach(function(value, name) {
                     items.push(name);
-                })), iteratorFor(items);
+                }), iteratorFor(items);
             }, Headers.prototype.values = function() {
                 var items = [];
-                return this.forEach((function(value) {
+                return this.forEach(function(value) {
                     items.push(value);
-                })), iteratorFor(items);
+                }), iteratorFor(items);
             }, Headers.prototype.entries = function() {
                 var items = [];
-                return this.forEach((function(value, name) {
+                return this.forEach(function(value, name) {
                     items.push([ name, value ]);
-                })), iteratorFor(items);
-            }, support_iterable && (Headers.prototype[Symbol.iterator] = Headers.prototype.entries);
+                }), iteratorFor(items);
+            }, support.iterable && (Headers.prototype[Symbol.iterator] = Headers.prototype.entries);
             var methods = [ "DELETE", "GET", "HEAD", "OPTIONS", "POST", "PUT" ];
             Request.prototype.clone = function() {
                 return new Request(this, {
@@ -5796,20 +5290,22 @@ OSF._OfficeAppFactory = (function OSF__OfficeAppFactory() {
                     }
                 });
             }, self.Headers = Headers, self.Request = Request, self.Response = Response, self.fetch = function(input, init) {
-                return new Promise((function(resolve, reject) {
-                    var request = new Request(input, init), xhr = new XMLHttpRequest;
+                return new Promise(function(resolve, reject) {
+                    var request = new Request(input, init), xhr = new XMLHttpRequest();
                     xhr.onload = function() {
-                        var rawHeaders, headers, options = {
+                        var options = {
                             status: xhr.status,
                             statusText: xhr.statusText,
-                            headers: (rawHeaders = xhr.getAllResponseHeaders() || "", headers = new Headers, 
-                            rawHeaders.split(/\r?\n/).forEach((function(line) {
-                                var parts = line.split(":"), key = parts.shift().trim();
-                                if (key) {
-                                    var value = parts.join(":").trim();
-                                    headers.append(key, value);
-                                }
-                            })), headers)
+                            headers: function(rawHeaders) {
+                                var headers = new Headers();
+                                return rawHeaders.split(/\r?\n/).forEach(function(line) {
+                                    var parts = line.split(":"), key = parts.shift().trim();
+                                    if (key) {
+                                        var value = parts.join(":").trim();
+                                        headers.append(key, value);
+                                    }
+                                }), headers;
+                            }(xhr.getAllResponseHeaders() || "")
                         };
                         options.url = "responseURL" in xhr ? xhr.responseURL : options.headers.get("X-Request-URL");
                         var body = "response" in xhr ? xhr.response : xhr.responseText;
@@ -5819,10 +5315,10 @@ OSF._OfficeAppFactory = (function OSF__OfficeAppFactory() {
                     }, xhr.ontimeout = function() {
                         reject(new TypeError("Network request failed"));
                     }, xhr.open(request.method, request.url, !0), "include" === request.credentials && (xhr.withCredentials = !0), 
-                    "responseType" in xhr && support_blob && (xhr.responseType = "blob"), request.headers.forEach((function(value, name) {
+                    "responseType" in xhr && support.blob && (xhr.responseType = "blob"), request.headers.forEach(function(value, name) {
                         xhr.setRequestHeader(name, value);
-                    })), xhr.send(void 0 === request._bodyInit ? null : request._bodyInit);
-                }));
+                    }), xhr.send(void 0 === request._bodyInit ? null : request._bodyInit);
+                });
             }, self.fetch.polyfill = !0;
         }
         function normalizeName(name) {
@@ -5842,34 +5338,34 @@ OSF._OfficeAppFactory = (function OSF__OfficeAppFactory() {
                     };
                 }
             };
-            return support_iterable && (iterator[Symbol.iterator] = function() {
+            return support.iterable && (iterator[Symbol.iterator] = function() {
                 return iterator;
             }), iterator;
         }
         function Headers(headers) {
-            this.map = {}, headers instanceof Headers ? headers.forEach((function(value, name) {
+            this.map = {}, headers instanceof Headers ? headers.forEach(function(value, name) {
                 this.append(name, value);
-            }), this) : Array.isArray(headers) ? headers.forEach((function(header) {
+            }, this) : Array.isArray(headers) ? headers.forEach(function(header) {
                 this.append(header[0], header[1]);
-            }), this) : headers && Object.getOwnPropertyNames(headers).forEach((function(name) {
+            }, this) : headers && Object.getOwnPropertyNames(headers).forEach(function(name) {
                 this.append(name, headers[name]);
-            }), this);
+            }, this);
         }
         function consumed(body) {
             if (body.bodyUsed) return Promise.reject(new TypeError("Already read"));
             body.bodyUsed = !0;
         }
         function fileReaderReady(reader) {
-            return new Promise((function(resolve, reject) {
+            return new Promise(function(resolve, reject) {
                 reader.onload = function() {
                     resolve(reader.result);
                 }, reader.onerror = function() {
                     reject(reader.error);
                 };
-            }));
+            });
         }
         function readBlobAsArrayBuffer(blob) {
-            var reader = new FileReader, promise = fileReaderReady(reader);
+            var reader = new FileReader(), promise = fileReaderReady(reader);
             return reader.readAsArrayBuffer(blob), promise;
         }
         function bufferClone(buf) {
@@ -5879,13 +5375,13 @@ OSF._OfficeAppFactory = (function OSF__OfficeAppFactory() {
         }
         function Body() {
             return this.bodyUsed = !1, this._initBody = function(body) {
-                if (this._bodyInit = body, body) if ("string" == typeof body) this._bodyText = body; else if (support_blob && Blob.prototype.isPrototypeOf(body)) this._bodyBlob = body; else if (support_formData && FormData.prototype.isPrototypeOf(body)) this._bodyFormData = body; else if (support_searchParams && URLSearchParams.prototype.isPrototypeOf(body)) this._bodyText = body.toString(); else if (support_arrayBuffer && support_blob && isDataView(body)) this._bodyArrayBuffer = bufferClone(body.buffer), 
+                if (this._bodyInit = body, body) if ("string" == typeof body) this._bodyText = body; else if (support.blob && Blob.prototype.isPrototypeOf(body)) this._bodyBlob = body; else if (support.formData && FormData.prototype.isPrototypeOf(body)) this._bodyFormData = body; else if (support.searchParams && URLSearchParams.prototype.isPrototypeOf(body)) this._bodyText = body.toString(); else if (support.arrayBuffer && support.blob && isDataView(body)) this._bodyArrayBuffer = bufferClone(body.buffer), 
                 this._bodyInit = new Blob([ this._bodyArrayBuffer ]); else {
-                    if (!support_arrayBuffer || !ArrayBuffer.prototype.isPrototypeOf(body) && !isArrayBufferView(body)) throw new Error("unsupported BodyInit type");
+                    if (!support.arrayBuffer || !ArrayBuffer.prototype.isPrototypeOf(body) && !isArrayBufferView(body)) throw new Error("unsupported BodyInit type");
                     this._bodyArrayBuffer = bufferClone(body);
                 } else this._bodyText = "";
-                this.headers.get("content-type") || ("string" == typeof body ? this.headers.set("content-type", "text/plain;charset=UTF-8") : this._bodyBlob && this._bodyBlob.type ? this.headers.set("content-type", this._bodyBlob.type) : support_searchParams && URLSearchParams.prototype.isPrototypeOf(body) && this.headers.set("content-type", "application/x-www-form-urlencoded;charset=UTF-8"));
-            }, support_blob && (this.blob = function() {
+                this.headers.get("content-type") || ("string" == typeof body ? this.headers.set("content-type", "text/plain;charset=UTF-8") : this._bodyBlob && this._bodyBlob.type ? this.headers.set("content-type", this._bodyBlob.type) : support.searchParams && URLSearchParams.prototype.isPrototypeOf(body) && this.headers.set("content-type", "application/x-www-form-urlencoded;charset=UTF-8"));
+            }, support.blob && (this.blob = function() {
                 var rejected = consumed(this);
                 if (rejected) return rejected;
                 if (this._bodyBlob) return Promise.resolve(this._bodyBlob);
@@ -5895,24 +5391,26 @@ OSF._OfficeAppFactory = (function OSF__OfficeAppFactory() {
             }, this.arrayBuffer = function() {
                 return this._bodyArrayBuffer ? consumed(this) || Promise.resolve(this._bodyArrayBuffer) : this.blob().then(readBlobAsArrayBuffer);
             }), this.text = function() {
-                var blob, reader, promise, rejected = consumed(this);
+                var rejected = consumed(this);
                 if (rejected) return rejected;
-                if (this._bodyBlob) return blob = this._bodyBlob, reader = new FileReader, promise = fileReaderReady(reader), 
-                reader.readAsText(blob), promise;
+                if (this._bodyBlob) return function(blob) {
+                    var reader = new FileReader(), promise = fileReaderReady(reader);
+                    return reader.readAsText(blob), promise;
+                }(this._bodyBlob);
                 if (this._bodyArrayBuffer) return Promise.resolve(function(buf) {
                     for (var view = new Uint8Array(buf), chars = new Array(view.length), i = 0; i < view.length; i++) chars[i] = String.fromCharCode(view[i]);
                     return chars.join("");
                 }(this._bodyArrayBuffer));
                 if (this._bodyFormData) throw new Error("could not read FormData body as text");
                 return Promise.resolve(this._bodyText);
-            }, support_formData && (this.formData = function() {
+            }, support.formData && (this.formData = function() {
                 return this.text().then(decode);
             }), this.json = function() {
                 return this.text().then(JSON.parse);
             }, this;
         }
         function Request(input, options) {
-            var method, upcased, body = (options = options || {}).body;
+            var body = (options = options || {}).body;
             if (input instanceof Request) {
                 if (input.bodyUsed) throw new TypeError("Already read");
                 this.url = input.url, this.credentials = input.credentials, options.headers || (this.headers = new Headers(input.headers)), 
@@ -5920,19 +5418,21 @@ OSF._OfficeAppFactory = (function OSF__OfficeAppFactory() {
                 input.bodyUsed = !0);
             } else this.url = String(input);
             if (this.credentials = options.credentials || this.credentials || "omit", !options.headers && this.headers || (this.headers = new Headers(options.headers)), 
-            this.method = (method = options.method || this.method || "GET", upcased = method.toUpperCase(), 
-            methods.indexOf(upcased) > -1 ? upcased : method), this.mode = options.mode || this.mode || null, 
+            this.method = function(method) {
+                var upcased = method.toUpperCase();
+                return methods.indexOf(upcased) > -1 ? upcased : method;
+            }(options.method || this.method || "GET"), this.mode = options.mode || this.mode || null, 
             this.referrer = null, ("GET" === this.method || "HEAD" === this.method) && body) throw new TypeError("Body not allowed for GET or HEAD requests");
             this._initBody(body);
         }
         function decode(body) {
-            var form = new FormData;
-            return body.trim().split("&").forEach((function(bytes) {
+            var form = new FormData();
+            return body.trim().split("&").forEach(function(bytes) {
                 if (bytes) {
                     var split = bytes.split("="), name = split.shift().replace(/\+/g, " "), value = split.join("=").replace(/\+/g, " ");
                     form.append(decodeURIComponent(name), decodeURIComponent(value));
                 }
-            })), form;
+            }), form;
         }
         function Response(bodyInit, options) {
             options || (options = {}), this.type = "default", this.status = "status" in options ? options.status : 200, 
@@ -5948,11 +5448,11 @@ OSF._OfficeAppFactory = (function OSF__OfficeAppFactory() {
     var CFRuntime = __webpack_require__(8);
     exports.default = function(shouldInitRuntime) {
         function documentReadyCallback() {
-            Office.onReady((function(hostInfo) {
+            Office.onReady(function(hostInfo) {
                 hostInfo.host === Office.HostType.Excel ? function initializeCustomFunctionsOrDelay() {
                     CustomFunctionMappings && CustomFunctionMappings.__delay__ ? setTimeout(initializeCustomFunctionsOrDelay, 50) : CFRuntime.CustomFunctions.initialize();
                 }() : console.warn("Warning: Expected to be loaded inside of an Excel add-in.");
-            }));
+            });
         }
         window.CustomFunctions = window.CustomFunctions || {}, window.CustomFunctions.setCustomFunctionInvoker = CFRuntime.setCustomFunctionInvoker, 
         window.CustomFunctions.Error = CFRuntime.CustomFunctionError, window.CustomFunctions.ErrorCode = CFRuntime.ErrorCode, 
@@ -5960,21 +5460,24 @@ OSF._OfficeAppFactory = (function OSF__OfficeAppFactory() {
     };
 }, function(module, exports, __webpack_require__) {
     "use strict";
-    var extendStatics, __extends = this && this.__extends || (extendStatics = function(d, b) {
-        return (extendStatics = Object.setPrototypeOf || {
-            __proto__: []
-        } instanceof Array && function(d, b) {
-            d.__proto__ = b;
-        } || function(d, b) {
-            for (var p in b) b.hasOwnProperty(p) && (d[p] = b[p]);
-        })(d, b);
-    }, function(d, b) {
-        function __() {
-            this.constructor = d;
-        }
-        extendStatics(d, b), d.prototype = null === b ? Object.create(b) : (__.prototype = b.prototype, 
-        new __);
-    });
+    var __extends = this && this.__extends || function() {
+        var extendStatics = function(d, b) {
+            return (extendStatics = Object.setPrototypeOf || {
+                __proto__: []
+            } instanceof Array && function(d, b) {
+                d.__proto__ = b;
+            } || function(d, b) {
+                for (var p in b) b.hasOwnProperty(p) && (d[p] = b[p]);
+            })(d, b);
+        };
+        return function(d, b) {
+            function __() {
+                this.constructor = d;
+            }
+            extendStatics(d, b), d.prototype = null === b ? Object.create(b) : (__.prototype = b.prototype, 
+            new __());
+        };
+    }();
     Object.defineProperty(exports, "__esModule", {
         value: !0
     });
@@ -6013,8 +5516,9 @@ OSF._OfficeAppFactory = (function OSF__OfficeAppFactory() {
         _CustomFunctionMetadata: {}
     };
     var CustomFunctionLoggingSeverity, InvocationContext = function() {
-        function InvocationContext(functionName, address, setResultHandler, setErrorHandler) {
+        function InvocationContext(functionName, address, parameterAddresses, setResultHandler, setErrorHandler) {
             this._functionName = functionName, _isNullOrUndefined(address) || (this._address = address), 
+            _isNullOrUndefined(parameterAddresses) || (this._parameterAddresses = parameterAddresses), 
             this.setResult = setResultHandler, this.setError = setErrorHandler;
         }
         return Object.defineProperty(InvocationContext.prototype, "onCanceled", {
@@ -6038,15 +5542,23 @@ OSF._OfficeAppFactory = (function OSF__OfficeAppFactory() {
             },
             enumerable: !0,
             configurable: !0
+        }), Object.defineProperty(InvocationContext.prototype, "parameterAddresses", {
+            get: function() {
+                return this._parameterAddresses;
+            },
+            enumerable: !0,
+            configurable: !0
         }), InvocationContext;
     }();
     exports.InvocationContext = InvocationContext, function(CustomFunctionLoggingSeverity) {
         CustomFunctionLoggingSeverity.Info = "Medium", CustomFunctionLoggingSeverity.Error = "Unexpected", 
         CustomFunctionLoggingSeverity.Verbose = "Verbose";
     }(CustomFunctionLoggingSeverity || (CustomFunctionLoggingSeverity = {}));
-    var ErrorCode, CustomFunctionLog = function(Severity, Message) {
-        this.Severity = Severity, this.Message = Message;
-    }, CustomFunctionsLogger = function() {
+    var ErrorCode, CustomFunctionLog = function() {
+        return function(Severity, Message) {
+            this.Severity = Severity, this.Message = Message;
+        };
+    }(), CustomFunctionsLogger = function() {
         function CustomFunctionsLogger() {}
         return CustomFunctionsLogger.logEvent = function(log, data, data2) {
             if (CustomFunctionsLogger.s_shouldLog || OfficeExtension.CoreUtility._logEnabled) {
@@ -6127,11 +5639,11 @@ OSF._OfficeAppFactory = (function OSF__OfficeAppFactory() {
             }
         }, CustomFunctionProxy.prototype.ensureInit = function(context) {
             var _this = this;
-            return this._initSettings(), void 0 === this._whenInit && (this._whenInit = OfficeExtension.Utility._createPromiseFromResult(null).then((function() {
+            return this._initSettings(), void 0 === this._whenInit && (this._whenInit = OfficeExtension.Utility._createPromiseFromResult(null).then(function() {
                 if (!_this._isInit) return context.eventRegistration.register(5, "", _this._handleMessage.bind(_this));
-            })).then((function() {
+            }).then(function() {
                 _this._isInit = !0;
-            }))), this._isInit || context._pendingRequest._addPreSyncPromise(this._whenInit), 
+            })), this._isInit || context._pendingRequest._addPreSyncPromise(this._whenInit), 
             this._whenInit;
         }, CustomFunctionProxy.prototype.setCustomFunctionInvoker = function(invoker) {
             "object" == typeof CustomFunctionMappings && delete CustomFunctionMappings.__delay__, 
@@ -6139,14 +5651,14 @@ OSF._OfficeAppFactory = (function OSF__OfficeAppFactory() {
         }, CustomFunctionProxy.prototype.setCustomFunctionAssociation = function(association) {
             var _this = this;
             this._customFunctionMappingsUpperCase = void 0, this._association = association, 
-            this._association && this._association.onchange((function() {
+            this._association && this._association.onchange(function() {
                 _this._customFunctionMappingsUpperCase = void 0;
-            }));
+            });
         }, CustomFunctionProxy.prototype._initFromHostBridge = function(hostBridge) {
             var _this = this;
-            this._initSettings(), hostBridge.addHostMessageHandler((function(bridgeMessage) {
+            this._initSettings(), hostBridge.addHostMessageHandler(function(bridgeMessage) {
                 3 === bridgeMessage.type ? _this._handleMessage(bridgeMessage.message) : 4 === bridgeMessage.type && _this._handleSettings(bridgeMessage.message);
-            })), this._isInit = !0, this._whenInit = OfficeExtension.CoreUtility.Promise.resolve();
+            }), this._isInit = !0, this._whenInit = OfficeExtension.CoreUtility.Promise.resolve();
         }, CustomFunctionProxy.prototype._handleSettings = function(args) {
             OfficeExtension.Utility.log("CustomFunctionProxy._handleSettings:" + JSON.stringify(args)), 
             args && "object" == typeof args && (CustomFunctionsLogger.s_shouldLog = args[CustomFunctionsLogger.CustomFunctionLoggingFlag]);
@@ -6197,19 +5709,21 @@ OSF._OfficeAppFactory = (function OSF__OfficeAppFactory() {
             }
         }, CustomFunctionProxy.prototype._transferCustomFunctionError = function(entryArray) {
             var _this = this;
-            return entryArray.map((function(value, index) {
-                return null === value ? value : null != value.code && "CustomFunctionError" == value.type ? new CustomFunctionError(value.code) : value instanceof Array ? _this._transferCustomFunctionError(value) : value;
-            }));
+            return entryArray.map(function(value, index) {
+                return null === value ? value : void 0 != value.code && "CustomFunctionError" == value.type ? new CustomFunctionError(value.code) : value instanceof Array ? _this._transferCustomFunctionError(value) : value;
+            });
         }, CustomFunctionProxy.prototype._batchInvocationEntries = function(entryArray) {
             for (var _this = this, batchArray = [], _loop_1 = function(i) {
                 var message, arrayOrObjectMessage = entryArray[i].message;
-                if (message = Array.isArray(arrayOrObjectMessage) ? {
+                if (Array.isArray(arrayOrObjectMessage) ? (message = {
                     invocationId: arrayOrObjectMessage[0],
                     functionName: arrayOrObjectMessage[1],
                     parameterValues: arrayOrObjectMessage[2],
                     address: arrayOrObjectMessage[3],
-                    flags: arrayOrObjectMessage[4]
-                } : arrayOrObjectMessage, _isNullOrUndefined(message)) throw OfficeExtension.Utility.createRuntimeError(CustomFunctionRuntimeErrorCode.generalException, "message", "CustomFunctionProxy._batchInvocationEntries");
+                    flags: arrayOrObjectMessage[4],
+                    parameterAddresses: null
+                }, _isNullOrUndefined(arrayOrObjectMessage[5]) || (message.parameterAddresses = arrayOrObjectMessage[5])) : message = arrayOrObjectMessage, 
+                _isNullOrUndefined(message)) throw OfficeExtension.Utility.createRuntimeError(CustomFunctionRuntimeErrorCode.generalException, "message", "CustomFunctionProxy._batchInvocationEntries");
                 if (_isNullOrUndefined(message.invocationId) || message.invocationId < 0) throw OfficeExtension.Utility.createRuntimeError(CustomFunctionRuntimeErrorCode.generalException, "invocationId", "CustomFunctionProxy._batchInvocationEntries");
                 if (_isNullOrUndefined(message.functionName)) throw OfficeExtension.Utility.createRuntimeError(CustomFunctionRuntimeErrorCode.generalException, "functionName", "CustomFunctionProxy._batchInvocationEntries");
                 var call = null, isCancelable = !1, isStreaming = !1;
@@ -6237,9 +5751,9 @@ OSF._OfficeAppFactory = (function OSF__OfficeAppFactory() {
                         _this._invocationContextMap[message.invocationId] ? _this._setResult(message.invocationId, result) : CustomFunctionsLogger.logEvent(CustomFunctionProxy.CustomFunctionAlreadyCancelled, message.functionName);
                     }, setError = function(error) {
                         _this._invocationContextMap[message.invocationId] ? _this._setError(message.invocationId, error.message, _this._getCustomFunctionResultErrorCodeFromErrorCode(error.code)) : CustomFunctionsLogger.logEvent(CustomFunctionProxy.CustomFunctionAlreadyCancelled, message.functionName);
-                    }), invocationContext = new InvocationContext(message.functionName, message.address, setResult, setError), 
+                    }), invocationContext = new InvocationContext(message.functionName, message.address, message.parameterAddresses, setResult, setError), 
                     this_1._invocationContextMap[message.invocationId] = invocationContext;
-                } else invocationContext = new InvocationContext(message.functionName, message.address);
+                } else invocationContext = new InvocationContext(message.functionName, message.address, message.parameterAddresses);
                 message.parameterValues.push(invocationContext), batchArray.push({
                     call: call,
                     isBatching: !1,
@@ -6265,7 +5779,7 @@ OSF._OfficeAppFactory = (function OSF__OfficeAppFactory() {
                     setResultCalled_1 = !0;
                 };
             }
-            var invocationContext = new InvocationContext(message.functionName, message.address, setResult, setError);
+            var invocationContext = new InvocationContext(message.functionName, message.address, message.parameterAddresses, setResult, setError);
             (isStreaming || isCancelable) && (this._invocationContextMap[invocationId] = invocationContext), 
             this._invoker.invoke(message.functionName, message.parameterValues, invocationContext);
         }, CustomFunctionProxy.prototype._ensureCustomFunctionMappingsUpperCase = function() {
@@ -6324,13 +5838,13 @@ OSF._OfficeAppFactory = (function OSF__OfficeAppFactory() {
             if (batch.isStreaming) ; else if (results.length === batch.parameterValueSets.length) {
                 var _loop_2 = function(i) {
                     _isNullOrUndefined(results[i]) || "object" != typeof results[i] || "function" != typeof results[i].then ? (CustomFunctionsLogger.logEvent(CustomFunctionProxy.CustomFunctionExecutionFinishLog, batch.functionName), 
-                    this_2._setResult(batch.invocationIds[i], results[i])) : results[i].then((function(value) {
+                    this_2._setResult(batch.invocationIds[i], results[i])) : results[i].then(function(value) {
                         CustomFunctionsLogger.logEvent(CustomFunctionProxy.CustomFunctionExecutionFinishLog, batch.functionName), 
                         _this._setResult(batch.invocationIds[i], value);
-                    }), (function(reason) {
+                    }, function(reason) {
                         CustomFunctionsLogger.logEvent(CustomFunctionProxy.CustomFunctionExecutionRejectedPromoseLog, batch.functionName, CustomFunctionProxy.toLogMessage(reason)), 
                         _this._setError(batch.invocationIds[i], reason, 3);
-                    }));
+                    });
                 }, this_2 = this;
                 for (i = 0; i < results.length; i++) _loop_2(i);
             } else {
@@ -6419,17 +5933,17 @@ OSF._OfficeAppFactory = (function OSF__OfficeAppFactory() {
             var useArrayResult = OfficeExtension.Utility.isSetSupported("CustomFunctions", "1.7"), invocationResults = [];
             for (var key in resultEntryBufferCopy) useArrayResult ? invocationResults.push(this._convertCustomFunctionInvocationResultToArray(resultEntryBufferCopy[key].result)) : invocationResults.push(resultEntryBufferCopy[key].result);
             if (0 !== invocationResults.length) {
-                var context = new CustomFunctionRequestContext;
+                var context = new CustomFunctionRequestContext();
                 useArrayResult ? context.customFunctions.setInvocationArrayResults(invocationResults) : context.customFunctions.setInvocationResults(invocationResults);
                 var contextSyncStartTime = Date.now();
                 this._inProgressContextSyncExpectedFinishTime = contextSyncStartTime + this._maxContextSyncExecutionDurationMills, 
-                context.sync().then((function(value) {
+                context.sync().then(function(value) {
                     _this._clearInProgressContextSyncExpectedFinishTimeAfterMinInterval(Date.now() - contextSyncStartTime);
-                }), (function(reason) {
+                }, function(reason) {
                     var timeNow = Date.now();
                     _this._clearInProgressContextSyncExpectedFinishTimeAfterMinInterval(timeNow - contextSyncStartTime), 
                     _this._restoreResultEntries(timeNow, resultEntryBufferCopy), _this._ensureSetResultsTaskIsScheduled(timeNow);
-                }));
+                });
             }
         }, CustomFunctionProxy.prototype._restoreResultEntries = function(timeNow, resultEntryBufferCopy) {
             for (var key in resultEntryBufferCopy) {
@@ -6439,9 +5953,9 @@ OSF._OfficeAppFactory = (function OSF__OfficeAppFactory() {
         }, CustomFunctionProxy.prototype._clearInProgressContextSyncExpectedFinishTimeAfterMinInterval = function(lastContextSyncDurationMills) {
             var _this = this, interval = Math.max(this._minContextSyncIntervalMills, 2 * lastContextSyncDurationMills);
             OfficeExtension.Utility.log("setTimeout(clearInProgressContestSyncExpectedFinishedTime," + interval + ")"), 
-            setTimeout((function() {
+            setTimeout(function() {
                 OfficeExtension.Utility.log("clearInProgressContestSyncExpectedFinishedTime"), _this._inProgressContextSyncExpectedFinishTime = 0;
-            }), interval);
+            }, interval);
         }, CustomFunctionProxy.CustomFunctionExecutionStartLog = new CustomFunctionLog(CustomFunctionLoggingSeverity.Verbose, "CustomFunctions [Execution] [Begin] Function="), 
         CustomFunctionProxy.CustomFunctionExecutionFailureLog = new CustomFunctionLog(CustomFunctionLoggingSeverity.Error, "CustomFunctions [Execution] [End] [Failure] Function="), 
         CustomFunctionProxy.CustomFunctionExecutionRejectedPromoseLog = new CustomFunctionLog(CustomFunctionLoggingSeverity.Error, "CustomFunctions [Execution] [End] [Failure] [RejectedPromise] Function="), 
@@ -6455,12 +5969,12 @@ OSF._OfficeAppFactory = (function OSF__OfficeAppFactory() {
         CustomFunctionProxy.CustomFunctionInvalidArg = new CustomFunctionLog(CustomFunctionLoggingSeverity.Error, "CustomFunctions [InvalidArg] Name="), 
         CustomFunctionProxy;
     }();
-    exports.CustomFunctionProxy = CustomFunctionProxy, exports.customFunctionProxy = new CustomFunctionProxy, 
+    exports.CustomFunctionProxy = CustomFunctionProxy, exports.customFunctionProxy = new CustomFunctionProxy(), 
     exports.setCustomFunctionAssociation = exports.customFunctionProxy.setCustomFunctionAssociation.bind(exports.customFunctionProxy), 
     exports.setCustomFunctionInvoker = exports.customFunctionProxy.setCustomFunctionInvoker.bind(exports.customFunctionProxy), 
-    Core.HostBridge.onInited((function(hostBridge) {
+    Core.HostBridge.onInited(function(hostBridge) {
         exports.customFunctionProxy._initFromHostBridge(hostBridge);
-    }));
+    });
     var CustomFunctions = function(_super) {
         function CustomFunctions() {
             return null !== _super && _super.apply(this, arguments) || this;
@@ -6472,27 +5986,27 @@ OSF._OfficeAppFactory = (function OSF__OfficeAppFactory() {
             enumerable: !0,
             configurable: !0
         }), CustomFunctions.initialize = function() {
-            var context = new CustomFunctionRequestContext;
-            return exports.customFunctionProxy.ensureInit(context).then((function() {
+            var context = new CustomFunctionRequestContext();
+            return exports.customFunctionProxy.ensureInit(context).then(function() {
                 return context.customFunctions._SetOsfControlContainerReadyForCustomFunctions(), 
                 OfficeExtension.Utility.log("OsfControl activation lifecycle: Set OsfControlContainer ready for CustomFunctions"), 
-                context._customData = "SetOsfControlContainerReadyForCustomFunctions", context.sync().catch((function(error) {
+                context._customData = "SetOsfControlContainerReadyForCustomFunctions", context.sync().catch(function(error) {
                     return function(error, rethrowOtherError) {
                         var isCellEditModeError = error instanceof OfficeExtension.Error && error.code === CustomFunctionRuntimeErrorCode.invalidOperationInCellEditMode;
                         if (OfficeExtension.CoreUtility.log("Error on starting custom functions: " + error), 
                         isCellEditModeError) {
                             OfficeExtension.CoreUtility.log("Was in cell-edit mode, will try again");
                             var delay_1 = exports.customFunctionProxy._ensureInitRetryDelayMillis;
-                            return new OfficeExtension.CoreUtility.Promise((function(resolve) {
+                            return new OfficeExtension.CoreUtility.Promise(function(resolve) {
                                 return setTimeout(resolve, delay_1);
-                            })).then((function() {
+                            }).then(function() {
                                 return CustomFunctions.initialize();
-                            }));
+                            });
                         }
                         if (rethrowOtherError) throw error;
                     }(error, !0);
-                }));
-            }));
+                });
+            });
         }, CustomFunctions.prototype.setInvocationArrayResults = function(results) {
             _throwIfApiNotSupported("CustomFunctions.setInvocationArrayResults", "CustomFunctions", "1.4", "Excel"), 
             _invokeMethod(this, "SetInvocationArrayResults", 0, [ results ], 2, 0);
@@ -6953,7 +6467,7 @@ var oteljs = function(modules) {
             var _a, _b;
             this.onSendEvent = new Event.a, this.persistentDataFields = [], this.config = config || {}, 
             parent ? (this.onSendEvent = parent.onSendEvent, (_a = this.persistentDataFields).push.apply(_a, parent.persistentDataFields), 
-            this.config = __assign(__assign({}, parent.getConfig()), this.config)) : this.persistentDataFields.push(Object(DataFieldHelper.e)("OTelJS.Version", "3.1.49")), 
+            this.config = __assign(__assign({}, parent.getConfig()), this.config)) : this.persistentDataFields.push(Object(DataFieldHelper.e)("OTelJS.Version", "3.1.50")), 
             persistentDataFields && (_b = this.persistentDataFields).push.apply(_b, persistentDataFields);
         }
         return SimpleTelemetryLogger.prototype.sendTelemetryEvent = function(event) {

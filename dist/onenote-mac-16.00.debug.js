@@ -17,9 +17,9 @@
 
 // Sources:
 // osfweb: 16.0\13018.10000
-// runtime: 16.0\13018.10000
-// core: 16.0\13018.10000
-// host: 16.0\13018.10000
+// runtime: 16.0\13106.10000
+// core: 16.0\13106.10000
+// host: 16.0\13106.10000
 
 
 
@@ -6334,7 +6334,7 @@ var OSFAppTelemetry;
         }
         appInfo.message = context.get_hostCustomMessage();
         appInfo.officeJSVersion = OSF.ConstantNames.FileVersion;
-        appInfo.hostJSVersion = "16.0.13018.10000";
+        appInfo.hostJSVersion = "16.0.13106.10000";
         if (context._wacHostEnvironment) {
             appInfo.wacHostEnvironment = context._wacHostEnvironment;
         }
@@ -17033,7 +17033,7 @@ var OfficeFirstPartyAuth;
             if (OSF.WebAuth && OSF._OfficeAppFactory.getHostInfo().hostPlatform == "web") {
                 try {
                     if (!Office || !Office.context || !Office.context.webAuth) {
-                        reject({ code: ErrorCode.GetAuthContextAsyncMissing, message: (Strings && Strings.OfficeOM.L_ImplicitGetAuthContextMissing) ? Strings.OfficeOM.L_ImplicitGetAuthContextMissing : "" });
+                        reject({ code: ErrorCode.GetAuthContextAsyncMissing, message: (typeof (Strings) !== 'undefined' && Strings.OfficeOM.L_ImplicitGetAuthContextMissing) ? Strings.OfficeOM.L_ImplicitGetAuthContextMissing : "" });
                     }
                     Office.context.webAuth.getAuthContextAsync(function (result) {
                         if (result.status === "succeeded") {
@@ -17059,7 +17059,7 @@ var OfficeFirstPartyAuth;
                                     succeeded = true;
                                     resolve();
                                 }
-                                reject({ code: ErrorCode.PackageNotLoaded, message: (Strings && Strings.OfficeOM.L_ImplicitNotLoaded) ? Strings.OfficeOM.L_ImplicitNotLoaded : "" });
+                                reject({ code: ErrorCode.PackageNotLoaded, message: (typeof (Strings) !== 'undefined' && Strings.OfficeOM.L_ImplicitNotLoaded) ? Strings.OfficeOM.L_ImplicitNotLoaded : "" });
                             });
                             logLoadEvent(loadResult, succeeded);
                             var finalReplyUrl = (replyUrl) ? replyUrl : window.location.href.split("?")[0];
@@ -17099,43 +17099,57 @@ var OfficeFirstPartyAuth;
     }
     OfficeFirstPartyAuth.load = load;
     function getAccessToken(options, behaviorOption) {
-        if (OSF.WebAuth && OSF._OfficeAppFactory.getHostInfo().hostPlatform == "web") {
-            if (OSF.WebAuth.loaded) {
-                return new OfficeExtension.CoreUtility.Promise(function (resolve, reject) {
-                    if (behaviorOption && behaviorOption.forceRefresh) {
-                        OSF.WebAuth.clearCache();
+        return new OfficeExtension.CoreUtility.Promise(function (resolve, reject) {
+            if (OSF._OfficeAppFactory.getHostInfo().hostPlatform == "web") {
+                Office.context.webAuth.getAuthContextAsync(function (result) {
+                    var supportsAuthToken = false;
+                    if (result.status === "succeeded") {
+                        retrievedAuthContext = true;
+                        var authContext = result.value;
+                        if (authContext.supportsAuthToken) {
+                            supportsAuthToken = true;
+                        }
                     }
-                    var identityType = (OSF.WebAuth.config.idp.toLowerCase() == "msa")
-                        ? OfficeCore.IdentityType.microsoftAccount
-                        : OfficeCore.IdentityType.organizationAccount;
-                    if (OSF.WebAuth.config.appIds[0]) {
-                        OSF.WebAuth.getToken(options.resource, OSF.WebAuth.config.appIds[0], OSF._OfficeAppFactory.getHostInfo().osfControlAppCorrelationId, (behaviorOption && behaviorOption.popup) ? behaviorOption.popup : null).then(function (result) {
-                            logAcquireEvent(result, true, options.resource, (behaviorOption && behaviorOption.popup) ? behaviorOption.popup : null);
-                            resolve({ accessToken: result.Token, tokenIdenityType: identityType });
-                        })["catch"](function (result) {
-                            logAcquireEvent(result, false, options.resource, (behaviorOption && behaviorOption.popup) ? behaviorOption.popup : null, result.ErrorCode);
-                            reject({ code: result.ErrorCode, message: result.ErrorMessage });
+                    if (!supportsAuthToken) {
+                        if (OSF.WebAuth && OSF.WebAuth.loaded) {
+                            if (behaviorOption && behaviorOption.forceRefresh) {
+                                OSF.WebAuth.clearCache();
+                            }
+                            var identityType_1 = (OSF.WebAuth.config.idp.toLowerCase() == "msa")
+                                ? OfficeCore.IdentityType.microsoftAccount
+                                : OfficeCore.IdentityType.organizationAccount;
+                            if (OSF.WebAuth.config.appIds[0]) {
+                                OSF.WebAuth.getToken(options.resource, OSF.WebAuth.config.appIds[0], OSF._OfficeAppFactory.getHostInfo().osfControlAppCorrelationId, (behaviorOption && behaviorOption.popup) ? behaviorOption.popup : null).then(function (result) {
+                                    logAcquireEvent(result, true, options.resource, (behaviorOption && behaviorOption.popup) ? behaviorOption.popup : null);
+                                    resolve({ accessToken: result.Token, tokenIdenityType: identityType_1 });
+                                })["catch"](function (result) {
+                                    logAcquireEvent(result, false, options.resource, (behaviorOption && behaviorOption.popup) ? behaviorOption.popup : null, result.ErrorCode);
+                                    reject({ code: result.ErrorCode, message: result.ErrorMessage });
+                                });
+                            }
+                        }
+                        else {
+                            logUnexpectedAcquireEvent(OSF.WebAuth.loaded, OSF.WebAuth.loadAttempts);
+                        }
+                    }
+                    else {
+                        var context = new OfficeCore.RequestContext();
+                        var auth = OfficeCore.AuthenticationService.newObject(context);
+                        context._customData = "WacPartition";
+                        var result_1 = auth.getAccessToken(options, null);
+                        context.sync().then(function () {
+                            resolve(result_1.value);
                         });
                     }
                 });
             }
             else {
-                logUnexpectedAcquireEvent(OSF.WebAuth.loaded, OSF.WebAuth.loadAttempts);
-            }
-        }
-        var context = new OfficeCore.RequestContext();
-        var auth = OfficeCore.AuthenticationService.newObject(context);
-        context._customData = "WacPartition";
-        if (OSF._OfficeAppFactory.getHostInfo().hostPlatform == "web" && OSF._OfficeAppFactory.getHostInfo().hostType == "word") {
-            var result_1 = auth.getAccessToken(options, null);
-            return context.sync().then(function () { return result_1.value; });
-        }
-        else {
-            return new OfficeExtension.CoreUtility.Promise(function (resolve, reject) {
-                var handler = auth.onTokenReceived.add(function (arg) {
+                var context_1 = new OfficeCore.RequestContext();
+                var auth_1 = OfficeCore.AuthenticationService.newObject(context_1);
+                var handler_1 = auth_1.onTokenReceived.add(function (arg) {
                     if (!OfficeExtension.CoreUtility.isNullOrUndefined(arg)) {
-                        handler.remove();
-                        context.sync()["catch"](function () {
+                        handler_1.remove();
+                        context_1.sync()["catch"](function () {
                         });
                         if (arg.code == 0) {
                             resolve(arg.tokenValue);
@@ -17156,10 +17170,10 @@ var OfficeFirstPartyAuth;
                     }
                     return null;
                 });
-                context.sync()
+                context_1.sync()
                     .then(function () {
-                    var apiResult = auth.getAccessToken(options, auth._targetId);
-                    return context.sync()
+                    var apiResult = auth_1.getAccessToken(options, auth_1._targetId);
+                    return context_1.sync()
                         .then(function () {
                         if (OfficeExtension.CoreUtility.isNullOrUndefined(apiResult.value)) {
                             return null;
@@ -17172,8 +17186,8 @@ var OfficeFirstPartyAuth;
                 })["catch"](function (e) {
                     reject(e);
                 });
-            });
-        }
+            }
+        });
     }
     OfficeFirstPartyAuth.getAccessToken = getAccessToken;
     function getPrimaryIdentityInfo() {
@@ -21458,22 +21472,9 @@ var OfficeCore;
                         registerFunc: function () { return _this._RegisterStateChange(); },
                         unregisterFunc: function () { return _this._UnregisterStateChange(); },
                         getTargetIdFunc: function () { return _this.id; },
-                        eventArgsTransformFunc: function (args) {
-                            if (args) {
-                                var newArgs = {
-                                    feature: args.featureName,
-                                    isEnabled: args.isEnabled,
-                                    tier: args.tierName
-                                };
-                                if (args.tierName) {
-                                    newArgs.tier = args.tierName == 0 ? LicenseFeatureTier.unknown :
-                                        args.tierName == 1 ? LicenseFeatureTier.basic :
-                                            args.tierName == 2 ? LicenseFeatureTier.premium :
-                                                args.tierName;
-                                }
-                                return OfficeExtension.Utility._createPromiseFromResult(newArgs);
-                            }
-                            return OfficeExtension.Utility._createPromiseFromResult(null);
+                        eventArgsTransformFunc: function (value) {
+                            var event = _CC.LicenseFeature_StateChanged_EventArgsTransform(_this, value);
+                            return OfficeExtension.Utility._createPromiseFromResult(event);
                         }
                     });
                 }
@@ -21497,6 +21498,23 @@ var OfficeCore;
         return LicenseFeature;
     }(OfficeExtension.ClientObject));
     OfficeCore.LicenseFeature = LicenseFeature;
+    (function (_CC) {
+        function LicenseFeature_StateChanged_EventArgsTransform(thisObj, args) {
+            var newArgs = {
+                feature: args.featureName,
+                isEnabled: args.isEnabled,
+                tier: args.tierName
+            };
+            if (args.tierName) {
+                newArgs.tier = args.tierName == 0 ? LicenseFeatureTier.unknown :
+                    args.tierName == 1 ? LicenseFeatureTier.basic :
+                        args.tierName == 2 ? LicenseFeatureTier.premium :
+                            args.tierName;
+            }
+            return newArgs;
+        }
+        _CC.LicenseFeature_StateChanged_EventArgsTransform = LicenseFeature_StateChanged_EventArgsTransform;
+    })(_CC = OfficeCore._CC || (OfficeCore._CC = {}));
     var ErrorCodes;
     (function (ErrorCodes) {
         ErrorCodes["apiNotAvailable"] = "ApiNotAvailable";
@@ -21905,20 +21923,34 @@ var Office;
         function notifyActionHandlerReady() {
             var context = new OfficeExtension.ClientRequestContext();
             var addinInternalService = OfficeCore.AddinInternalService.newObject(context);
+            context._customData = 'WacPartition';
             addinInternalService.notifyActionHandlerReady();
             return context.sync();
         }
+        function handlerOnReadyInternal() {
+            Office.onReadyInternal()
+                .then(function () {
+                return init();
+            })
+                .then(function () {
+                if (OSF._OfficeAppFactory.getHostInfo().hostType === "excel") {
+                    return notifyActionHandlerReady();
+                }
+            });
+        }
         function initOnce() {
-            if (typeof (document) !== 'undefined' && document.addEventListener) {
-                document.addEventListener("DOMContentLoaded", function () {
-                    Office.onReadyInternal()
-                        .then(function () {
-                        return init();
-                    })
-                        .then(function () {
-                        return notifyActionHandlerReady();
+            OfficeExtension.Utility.log('ActionProxy.initOnce');
+            if (typeof (document) !== 'undefined') {
+                if (document.readyState && document.readyState !== 'loading') {
+                    OfficeExtension.Utility.log('ActionProxy.initOnce: document.readyState is not loading state');
+                    handlerOnReadyInternal();
+                }
+                else if (document.addEventListener) {
+                    document.addEventListener("DOMContentLoaded", function () {
+                        OfficeExtension.Utility.log('ActionProxy.initOnce: DOMContentLoaded event triggered');
+                        handlerOnReadyInternal();
                     });
-                });
+                }
             }
         }
         initOnce();

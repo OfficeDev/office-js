@@ -1,6 +1,6 @@
 /* Outlook Web specific API library */
 /* osfweb version: 16.0.13004.10000 */
-/* office-js-api version: 20200617.5 */
+/* office-js-api version: 20200702.1 */
 /*
 	Copyright (c) Microsoft Corporation.  All rights reserved.
 */
@@ -8989,7 +8989,35 @@ OSF.DDA.WAC.Delegate.executeAsync = function OSF_DDA_WAC_Delegate$executeAsyncOv
     };
     executeAsyncBase(args);
 };
-;OSF.InitializationHelper.prototype.prepareApiSurface = function OSF_InitializationHelper$prepareApiSurface(appContext)
+;
+
+OSF.InitializationHelper.prototype.isHostOriginTrusted = function OSF_InitializationHelper$isHostOriginTrusted(hostOrigin) {
+    if (!hostOrigin || hostOrigin === "null") {
+        return false;
+    }
+
+    var regexHostNameStringArray = [
+        "^outlook\\.office\\.com$",
+        "^outlook-sdf\\.office\\.com$",
+        "^outlook\\.office\\.com$",
+        "^outlook-sdf\\.office\\.com$",
+        "^outlook\\.live\\.com$",
+        "^outlook-sdf\\.live\\.com$",
+        "^consumer\\.live-int\\.com$",
+        "^outlook-tdf\\.live\\.com$",
+        "^sdfpilot\\.live\\.com$",
+        "^outlook\\.office\\.de$",
+        "^outlook\\.office365\\.us$",
+        "^outlook\\.office365\\.com$",
+        "^partner\\.outlook\\.cn$",
+        "^exchangelabs\\.live-int\\.com$"
+    ];
+
+    var regexHostName = new RegExp(regexHostNameStringArray.join("|"));
+    return regexHostName.test(hostOrigin);
+};  
+
+OSF.InitializationHelper.prototype.prepareApiSurface = function OSF_InitializationHelper$prepareApiSurface(appContext)
 {
     var license = new OSF.DDA.License(appContext.get_eToken());
     if ((appContext.get_appName() == OSF.AppName.OutlookWebApp)) {
@@ -10437,7 +10465,8 @@ var Features = {
   signature: beta,
   replyCallback: beta,
   displayXAsync: beta,
-  propertyGetAll: beta
+  propertyGetAll: beta,
+  state: beta
 };
 function isFeatureEnabled(feature) {
   return feature <= getCurrentLevel();
@@ -14265,7 +14294,61 @@ function disableClientSignature() {
   checkFeatureEnabledAndThrow(Features.signature, "disableClientSignatureAsync");
   standardInvokeHostMethod(176, commonParameters.asyncContext, commonParameters.callback, undefined, undefined);
 }
+// CONCATENATED MODULE: ./src/methods/getState.ts
+
+
+
+
+function getState() {
+  var args = [];
+
+  for (var _i = 0; _i < arguments.length; _i++) {
+    args[_i] = arguments[_i];
+  }
+
+  checkPermissionsAndThrow(2, "state.getAsync");
+  var commonParameters = parseCommonArgs(args, true, false);
+  checkFeatureEnabledAndThrow(Features.state, "state.getAsync");
+  standardInvokeHostMethod(186, commonParameters.asyncContext, commonParameters.callback, undefined, undefined);
+}
+// CONCATENATED MODULE: ./src/methods/setState.ts
+
+
+
+
+
+function setState(data) {
+  var args = [];
+
+  for (var _i = 1; _i < arguments.length; _i++) {
+    args[_i - 1] = arguments[_i];
+  }
+
+  checkPermissionsAndThrow(2, "state.setAsync");
+  var commonParameters = parseCommonArgs(args, false, false);
+  var parameters = {
+    data: data
+  };
+  checkFeatureEnabledAndThrow(Features.state, "state.setAsync");
+  setState_validateParameters(parameters);
+  standardInvokeHostMethod(185, commonParameters.asyncContext, commonParameters.callback, parameters, undefined);
+}
+
+function setState_validateParameters(parameters) {
+  validateStringParam("data", parameters.data);
+}
+// CONCATENATED MODULE: ./src/api/getStateSurface.ts
+
+
+
+function getStateSurface() {
+  return objectDefine({}, {
+    getAsync: getState,
+    setAsync: setState
+  });
+}
 // CONCATENATED MODULE: ./src/api/getMessageCompose.ts
+
 
 
 
@@ -14322,7 +14405,8 @@ function getMessageCompose() {
     delayDeliveryTime: getDelayDeliverySurface(true),
     getComposeTypeAsync: getComposeType,
     isClientSignatureEnabledAsync: isClientSignatureEnabled,
-    disableClientSignatureAsync: disableClientSignature
+    disableClientSignatureAsync: disableClientSignature,
+    state: getStateSurface()
   });
   return messageCompose;
 }
@@ -15126,6 +15210,7 @@ function getSensitivitySurface() {
 
 
 
+
 function getAppointmentCompose() {
   var appointmentCompose = objectDefine({}, {
     body: getBodySurface(true),
@@ -15158,7 +15243,8 @@ function getAppointmentCompose() {
     isAllDayEvent: getAllDayEventSurface(),
     sensitivity: getSensitivitySurface(),
     isClientSignatureEnabledAsync: isClientSignatureEnabled,
-    disableClientSignatureAsync: disableClientSignature
+    disableClientSignatureAsync: disableClientSignature,
+    state: getStateSurface()
   });
   return appointmentCompose;
 }

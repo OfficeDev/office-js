@@ -4801,7 +4801,7 @@ declare namespace Office {
          * 
          * The set method creates a new setting of the specified name if it does not already exist, or sets an existing setting of the specified name 
          * in the in-memory copy of the settings property bag. After you call the Settings.saveAsync method, the value is stored in the document as 
-         * the serialized JSON representation of its data type. A maximum of 2MB is available for the settings of each add-in.
+         * the serialized JSON representation of its data type.
          * 
          * @param settingName The case-sensitive name of the setting to set or create.
          * @param value Specifies the value to be stored.
@@ -12562,7 +12562,7 @@ declare namespace Office {
          */
         displayNewMessageForm(parameters: any): void;
         /**
-         * Gets a string that contains a token used to call REST APIs or Exchange Web Services.
+         * Gets a string that contains a token used to call REST APIs or Exchange Web Services (EWS).
          *
          * The `getCallbackTokenAsync` method makes an asynchronous call to get an opaque token from the Exchange Server that hosts the user's mailbox. 
          * The lifetime of the callback token is 5 minutes.
@@ -12574,9 +12574,12 @@ declare namespace Office {
          * Calling the `getCallbackTokenAsync` method in compose mode requires you to have saved the item.
          * The `saveAsync` method requires a minimum permission level of `ReadWriteItem`.
          *
+         * **Important**: For guidance on delegate or shared scenarios, see the
+         * {@link https://docs.microsoft.com/office/dev/add-ins/outlook/delegate-access | delegate access} article.
+         *
          * *REST Tokens*
          *
-         * When a REST token is requested (`options.isRest` = `true`), the resulting token will not work to authenticate Exchange Web Services calls.
+         * When a REST token is requested (`options.isRest` = `true`), the resulting token will not work to authenticate EWS calls.
          * The token will be limited in scope to read-only access to the current item and its attachments, unless the add-in has specified the
          * `ReadWriteMailbox` permission in its manifest.
          * If the `ReadWriteMailbox` permission is specified, the resulting token will grant read/write access to mail, calendar, and contacts,
@@ -12653,6 +12656,9 @@ declare namespace Office {
          *
          * Calling the `getCallbackTokenAsync` method in compose mode requires you to have saved the item.
          * The `saveAsync` method requires a minimum permission level of `ReadWriteItem`.
+         *
+         * **Important**: For guidance on delegate or shared scenarios, see the
+         * {@link https://docs.microsoft.com/office/dev/add-ins/outlook/delegate-access | delegate access} article.
          *
          * [Api set: All support Read mode; Mailbox 1.3 introduced Compose mode support]
          *
@@ -16563,7 +16569,19 @@ declare namespace OfficeExtension {
 
     class EventHandlers<T> {
         constructor(context: ClientRequestContext, parentObject: ClientObject, name: string, eventInfo: EventInfo<T>);
+        /**
+         * Adds a function to be called when the event is triggered.
+         * @param handler A promise-based function that takes in any relevant event arguments.
+         */
         add(handler: (args: T) => Promise<any>): EventHandlerResult<T>;
+        /**
+         * Removes the specified function from the event handler list so that it will not be called on subsequent events. 
+         * 
+         * **Note**: The same {@link OfficeExtension.ClientRequestContext | RequestContext} object that the handler was added in must be used when removing the handler. 
+         * More information can be found in {@link https://docs.microsoft.com/office/dev/add-ins/develop/common-coding-issues#removing-event-handlers | Coding guidance for common issues and unexpected platform behaviors}. 
+         * 
+         * @param handler A reference to a function previously provided to the `add` method as an event handler. 
+         */
         remove(handler: (args: T) => Promise<any>): void;
     }
 
@@ -17285,19 +17303,64 @@ declare namespace Excel {
         fiveBoxes: FiveBoxesSet;
     }
     var icons: IconCollections;
+    enum SessionOperation {
+        Close = "Session.close",
+        CommitChanges = "Session.commitChanges",
+        Create = "Session.resolveRequestUrlAndHeaderInfo"
+    }
+    interface SessionOptions {
+        persistChanges?: boolean;
+        commitExplicitly?: boolean;
+    }
     /**
      * Provides connection session for a remote workbook.
      */
     class Session {
-        private static WorkbookSessionIdHeaderName;
-        private static WorkbookSessionIdHeaderNameLower;
+        private static readonly WorkbookSessionIdHeaderName;
+        private static readonly WorkbookSessionIdHeaderNameLower;
+        private static readonly EXPONENTIAL_BACKOFF_STATUS_CODES;
+        private static readonly ASYNC_API_GRAPH_VERSION;
+        private static readonly POLL_DELAY;
+        private static readonly MAX_POLL_ATTEMPTS;
+        private static readonly DEFAULT_COMMIT_CHANGES_RETRY_AFTER;
+        private static readonly MAX_COMMIT_CHANGES_RETRY_TIME;
+        private static readonly REQUEST_ID_HEADER;
+        private static readonly RETRY_AFTER_HEADER;
+        private static readonly PREFER_HEADER;
+        private static readonly PREFER_HEADER_VAL;
+        private static readonly CONTENT_TYPE_HEADER;
+        private static readonly CONTENT_TYPE_HEADER_VAL;
+        private static readonly CLOSE_SESSION;
+        private static readonly COMMIT_CHANGES;
+        private static readonly CREATE_SESSION;
+        readonly requestId: string;
         constructor(workbookUrl?: string, requestHeaders?: {
             [name: string]: string;
-        }, persisted?: boolean);
+        }, { persistChanges, commitExplicitly }?: SessionOptions);
         /**
          * Close the session.
          */
         close(): Promise<void>;
+        /**
+         * Needs to be called to save any changes to the session.
+         * On success, one needs to a certain amount of time before submitting another commitChanges() request.
+         * This cooldown is mandated by the Calc China team.
+         * @param retries The amount of retries used. This number is used in calculating the exponential backoff time used to delay subsequent retries.
+         *                XLO will kill the whole session if there are too many consecutive save failures. So we do not have to throw if too many retries were used.
+         * @returns the number of milliseconds one should wait before committing again.
+         */
+        commitChanges(retries?: number): Promise<number>;
+        private createCommitChangesRequestInfo;
+        private createAsyncGraphSessionRequestInfo;
+        private getCorrectGraphVersionUrl;
+        private pollResourceLocation;
+        private delayForFailedOperation;
+        private parseCooldownTime;
+        private formatRequestUrlAndHeaderInfo;
+        private ensureUrlFormatEndWithSlash;
+        private delay;
+        private createErrorFromResponseInfo;
+        private createError;
     }
     /**
      * The RequestContext object facilitates requests to the Excel application. Since the Office add-in and the Excel application run in two different processes, the request context is required to get access to the Excel object model from the add-in.
@@ -24822,14 +24885,14 @@ declare namespace Excel {
          */
         reapplyFilters(): void;
         /**
-         * Sets the style applied to the slicer.
+         * Sets the style applied to the table.
          *
          * [Api set: ExcelApi BETA (PREVIEW ONLY)]
          * @beta
          *
-         * @param style The style to apply to the PivotTable. An `InvalidArgumentException` is thrown if a string is provided that does not match the name of any style.
+         * @param style The style to apply to the table. An `InvalidArgumentException` is thrown if a string is provided that does not match the name of any style.
          */
-        setStyle(style: string | PivotTableStyle | BuiltInTableStyle): void;
+        setStyle(style: string | TableStyle | BuiltInTableStyle): void;
         /**
          * Queues up a command to load the specified properties of the object. You must call `context.sync()` before reading the properties.
          *
@@ -39453,9 +39516,9 @@ declare namespace Excel {
          * [Api set: ExcelApi BETA (PREVIEW ONLY)]
          * @beta
          *
-         * @param style The style to apply to the PivotTable. An `InvalidArgumentException` is thrown if a string is provided that does not match the name of any style.
+         * @param style The style to apply to the slicer. An `InvalidArgumentException` is thrown if a string is provided that does not match the name of any style.
          */
-        setStyle(style: string | PivotTableStyle | BuiltInSlicerStyle): void;
+        setStyle(style: string | SlicerStyle | BuiltInSlicerStyle): void;
         /**
          * Queues up a command to load the specified properties of the object. You must call `context.sync()` before reading the properties.
          *

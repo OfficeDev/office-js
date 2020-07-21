@@ -1,4 +1,4 @@
-/* Version: 16.0.13018.10000 */
+/* Version: 16.0.13104.10000 */
 /*
 	Copyright (c) Microsoft Corporation.  All rights reserved.
 */
@@ -17927,7 +17927,7 @@ var Excel;
 			/// <summary>
 			/// Sets the style applied to the slicer. [Api set: ExcelApi BETA (PREVIEW ONLY)]
 			/// </summary>
-			/// <param name="style" >The style to apply to the PivotTable. An `InvalidArgumentException` is thrown if a string is provided that does not match the name of any style.</param>
+			/// <param name="style" >The style to apply to the slicer. An `InvalidArgumentException` is thrown if a string is provided that does not match the name of any style.</param>
 			/// <returns ></returns>
 		}
 
@@ -18619,9 +18619,9 @@ var Excel;
 		}
 		Table.prototype.setStyle = function(style) {
 			/// <summary>
-			/// Sets the style applied to the slicer. [Api set: ExcelApi BETA (PREVIEW ONLY)]
+			/// Sets the style applied to the table. [Api set: ExcelApi BETA (PREVIEW ONLY)]
 			/// </summary>
-			/// <param name="style" >The style to apply to the PivotTable. An `InvalidArgumentException` is thrown if a string is provided that does not match the name of any style.</param>
+			/// <param name="style" >The style to apply to the table. An `InvalidArgumentException` is thrown if a string is provided that does not match the name of any style.</param>
 			/// <returns ></returns>
 		}
 		Table.prototype.onChanged = {

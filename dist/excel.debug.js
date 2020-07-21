@@ -106,6 +106,8 @@ var OSF;
         AgaveHostAction[AgaveHostAction["TaskPaneHeaderButtonClicked"] = 31] = "TaskPaneHeaderButtonClicked";
         AgaveHostAction[AgaveHostAction["RemoveAppCommandsAddin"] = 32] = "RemoveAppCommandsAddin";
         AgaveHostAction[AgaveHostAction["RefreshRibbonGallery"] = 33] = "RefreshRibbonGallery";
+        AgaveHostAction[AgaveHostAction["GetOriginalControlId"] = 34] = "GetOriginalControlId";
+        AgaveHostAction[AgaveHostAction["OfficeJsReady"] = 35] = "OfficeJsReady";
     })(AgaveHostAction = OSF.AgaveHostAction || (OSF.AgaveHostAction = {}));
 })(OSF || (OSF = {}));
 var OSF;
@@ -1204,6 +1206,7 @@ var OSF;
                     platform: OSF.HostName.Host.getInstance().getPlatform(appNameNumber),
                     addin: addinInfo
                 });
+                notifyHostOfficeReady();
                 onSuccess(officeAppContext);
             };
             var onGetAppContextError = function (e) {
@@ -1337,6 +1340,13 @@ var OSF;
         }
         function isWebkit2Sandbox() {
             return window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.Agave;
+        }
+        function notifyHostOfficeReady() {
+            if (_hostInfo.hostPlatform == OSF.HostInfoPlatform.web) {
+                if (_webAppState.clientEndPoint != null) {
+                    _webAppState.clientEndPoint.invoke("ContextActivationManager_notifyHost", null, [_webAppState.id, OSF.AgaveHostAction.OfficeJsReady, Date.now()]);
+                }
+            }
         }
         function getWindowName() {
             return _windowName;
@@ -5577,33 +5587,6 @@ var OSF;
                 }
                 return clientId;
             };
-            AppStorage.prototype.saveLog = function (logId, log) {
-                var logIdSet = this.getValue(this.logIdSetKey);
-                logIdSet = ((logIdSet && logIdSet.length > 0) ? (logIdSet + ";") : "") + logId;
-                this.setValue(this.logIdSetKey, logIdSet);
-                this.setValue(logId, log);
-            };
-            AppStorage.prototype.enumerateLog = function (callback, clean) {
-                var logIdSet = this.getValue(this.logIdSetKey);
-                if (logIdSet) {
-                    var ids = logIdSet.split(";");
-                    for (var id in ids) {
-                        var logId = ids[id];
-                        var log = this.getValue(logId);
-                        if (log) {
-                            if (callback) {
-                                callback(logId, log);
-                            }
-                            if (clean) {
-                                this.remove(logId);
-                            }
-                        }
-                    }
-                    if (clean) {
-                        this.remove(this.logIdSetKey);
-                    }
-                }
-            };
             AppStorage.prototype.getValue = function (key) {
                 var osfLocalStorage = OSF.OUtil.getLocalStorage();
                 var value = "";
@@ -5616,16 +5599,6 @@ var OSF;
                 var osfLocalStorage = OSF.OUtil.getLocalStorage();
                 if (osfLocalStorage) {
                     osfLocalStorage.setItem(key, value);
-                }
-            };
-            AppStorage.prototype.remove = function (key) {
-                var osfLocalStorage = OSF.OUtil.getLocalStorage();
-                if (osfLocalStorage) {
-                    try {
-                        osfLocalStorage.removeItem(key);
-                    }
-                    catch (ex) {
-                    }
                 }
             };
             return AppStorage;
@@ -5699,9 +5672,7 @@ var OSF;
             })(context.get_eToken(), appInfo);
             appInfo.sessionId = sessionId;
             appInfo.name = context.get_addinName();
-            setTimeout(function () {
-                OTel.OTelLogger.initialize(appInfo);
-            }, 10 * 1000);
+            OTel.OTelLogger.initialize(appInfo);
             AppTelemetry.onAppActivated();
         }
         AppTelemetry.initialize = initialize;
@@ -5764,58 +5735,11 @@ var OSF;
 })(OSF || (OSF = {}));
 var OTel;
 (function (OTel) {
-    var CDN_PATH_OTELJS_AGAVE = 'telemetry/oteljs_agave.js';
-    var CDN_PATH_OTELJS = 'telemetry/oteljs.js';
     var OTelLogger = (function () {
         function OTelLogger() {
         }
         OTelLogger.loaded = function () {
             return !(OTelLogger.logger === undefined);
-        };
-        OTelLogger.getOtelCDNLocation = function () {
-            return (OSF.LoadScriptHelper.getHostBundleJsBasePath() + CDN_PATH_OTELJS);
-        };
-        OTelLogger.getOtelSinkCDNLocation = function () {
-            return (OSF.LoadScriptHelper.getHostBundleJsBasePath() + CDN_PATH_OTELJS_AGAVE);
-        };
-        OTelLogger.getMapName = function (map, name) {
-            if (name !== undefined && map.hasOwnProperty(name)) {
-                return map[name];
-            }
-            return name;
-        };
-        OTelLogger.getHost = function () {
-            var host = OSF._OfficeAppFactory.getHostInfo().hostType;
-            var map = {
-                "excel": "Excel",
-                "onenote": "OneNote",
-                "outlook": "Outlook",
-                "powerpoint": "PowerPoint",
-                "project": "Project",
-                "visio": "Visio",
-                "word": "Word"
-            };
-            var mappedName = OTelLogger.getMapName(map, host);
-            return mappedName;
-        };
-        OTelLogger.getFlavor = function () {
-            var flavor = OSF._OfficeAppFactory.getHostInfo().hostPlatform;
-            var map = {
-                "android": "Android",
-                "ios": "iOS",
-                "mac": "Mac",
-                "universal": "Universal",
-                "web": "Web",
-                "win32": "Win32"
-            };
-            var mappedName = OTelLogger.getMapName(map, flavor);
-            return mappedName;
-        };
-        OTelLogger.ensureValue = function (value, alternative) {
-            if (!value) {
-                return alternative;
-            }
-            return value;
         };
         OTelLogger.create = function (info) {
             var contract = {
@@ -5829,68 +5753,49 @@ var OTel;
                 sessionId: info.sessionId
             };
             var fields = oteljs.Contracts.Office.System.SDX.getFields("SDX", contract);
-            var host = OTelLogger.getHost();
-            var flavor = OTelLogger.getFlavor();
-            var version = (flavor === "Web" && info.hostVersion.slice(0, 2) === "0.") ? "16.0.0.0" : info.hostVersion;
-            var context = {
-                'App.Name': host,
-                'App.Platform': flavor,
-                'App.Version': version,
-                'Session.Id': OTelLogger.ensureValue(info.correlationId, "00000000-0000-0000-0000-000000000000")
-            };
-            var sink = oteljs_agave.AgaveSink.createInstance(context);
+            var flavor = OSF._OfficeAppFactory.getHostInfo().hostPlatform;
+            var sink;
+            if (flavor === "web") {
+                sink = new OTel.SdxWacSink();
+            }
+            else if (Office.context.requirements.isSetSupported('Telemetry', '1.2')) {
+                sink = new OTel.RichApiSink();
+            }
+            else {
+                console.error('Cannot create telemetry sink successfully');
+                return null;
+            }
             var namespace = "Office.Extensibility.OfficeJs";
             var ariaTenantToken = 'db334b301e7b474db5e0f02f07c51a47-a1b5bc36-1bbe-482f-a64a-c2d9cb606706-7439';
             var nexusTenantToken = 1755;
-            var logger = new oteljs.TelemetryLogger(undefined, fields);
+            var logger = new oteljs.SimpleTelemetryLogger(undefined, fields);
             logger.addSink(sink);
             logger.setTenantToken(namespace, ariaTenantToken, nexusTenantToken);
+            oteljs.onNotification().addListener(function (notification) {
+                OSF.Utility.debugLog(notification.message());
+            });
             return logger;
+        };
+        OTelLogger.checkAndResolvePromises = function () {
+            if (OTelLogger.loaded()) {
+                OTelLogger.promises.forEach(function (resolve) {
+                    resolve();
+                });
+                OTelLogger.promises = [];
+            }
         };
         OTelLogger.initialize = function (info) {
             if (!OTelLogger.Enabled) {
                 OTelLogger.promises = [];
                 return;
             }
-            var timeoutScriptLoadMilliseconds = 15000;
-            var afterOnReady = function () {
-                if ((typeof oteljs === "undefined") || (typeof oteljs_agave === "undefined")) {
-                    console.error("oteljs.js or oteljs_agave.js is not loaded");
-                    return;
-                }
+            Office.onReadyInternal().then(function () {
                 if (!OTelLogger.loaded()) {
                     OSF.Utility.debugLog("Creating OTelLogger");
                     OTelLogger.logger = OTelLogger.create(info);
+                    OTelLogger.checkAndResolvePromises();
                 }
-                if (OTelLogger.loaded()) {
-                    OTelLogger.promises.forEach(function (resolve) {
-                        resolve();
-                    });
-                }
-            };
-            var afterLoadOtelSink = function (success) {
-                if (success) {
-                    Office.onReadyInternal().then(function () {
-                        setTimeout(afterOnReady, 0);
-                    });
-                }
-                else {
-                    console.error("Cannot load " + OTelLogger.getOtelSinkCDNLocation());
-                }
-            };
-            if (typeof (window.oteljs) !== 'undefined') {
-                OSF.OUtil.loadScript(OTelLogger.getOtelSinkCDNLocation(), afterLoadOtelSink, timeoutScriptLoadMilliseconds);
-            }
-            else {
-                OSF.OUtil.loadScript(OTelLogger.getOtelCDNLocation(), function (success) {
-                    if (success) {
-                        OSF.OUtil.loadScript(OTelLogger.getOtelSinkCDNLocation(), afterLoadOtelSink, timeoutScriptLoadMilliseconds);
-                    }
-                    else {
-                        console.error("Cannot load " + OTelLogger.getOtelCDNLocation());
-                    }
-                }, timeoutScriptLoadMilliseconds);
-            }
+            });
         };
         OTelLogger.sendTelemetryEvent = function (telemetryEvent) {
             OTelLogger.onTelemetryLoaded(function () {
@@ -5919,6 +5824,116 @@ var OTel;
         return OTelLogger;
     }());
     OTel.OTelLogger = OTelLogger;
+})(OTel || (OTel = {}));
+var OTel;
+(function (OTel) {
+    var DEFAULT_MINIMUM_MILLISECONDS_BETWEEN_CALLS = 1000;
+    var _minimumMillisecondsBeforeFirstCall = DEFAULT_MINIMUM_MILLISECONDS_BETWEEN_CALLS;
+    var _minimumMillisecondsBetweenCalls = DEFAULT_MINIMUM_MILLISECONDS_BETWEEN_CALLS;
+    var RichApiSink = (function () {
+        function RichApiSink() {
+            var _this = this;
+            this._requestIsPending = true;
+            this._telemetryQueue = [];
+            this.pause(_minimumMillisecondsBeforeFirstCall).then(function () {
+                var currentWork = _this._telemetryQueue;
+                _this._telemetryQueue = [];
+                _this._requestIsPending = false;
+                _this.processTelemetryEvents(currentWork);
+            });
+        }
+        RichApiSink.prototype.sendTelemetryEvent = function (telemetryEvent) {
+            this._telemetryQueue.push(telemetryEvent);
+            if (this._requestIsPending) {
+                return;
+            }
+            this.processWorkBacklog();
+        };
+        RichApiSink.prototype.processWorkBacklog = function () {
+            var _this = this;
+            this._requestIsPending = true;
+            var currentWork = this._telemetryQueue;
+            this._telemetryQueue = [];
+            this.processTelemetryEvents(currentWork)
+                .then(this.waitAndProcessMore)
+                .catch(function (error) {
+                oteljs.logError(oteljs.Category.Sink, "RichApiSink Error", error);
+                _this.waitAndProcessMore();
+            });
+        };
+        RichApiSink.prototype.waitAndProcessMore = function () {
+            var _this = this;
+            this.pause(_minimumMillisecondsBetweenCalls)
+                .then(function () {
+                if (_this._telemetryQueue.length > 0) {
+                    setTimeout(function () { return _this.processWorkBacklog(); }, 0);
+                }
+                _this._requestIsPending = false;
+            })
+                .catch(function () { });
+        };
+        RichApiSink.prototype.processTelemetryEvents = function (telemetryEvents) {
+            var _this = this;
+            var ctx = new OfficeCore.RequestContext();
+            telemetryEvents.forEach(function (telemetryEvent) {
+                if (!telemetryEvent.telemetryProperties) {
+                    return;
+                }
+                var dataFields = [];
+                _this.addDataFields(dataFields, telemetryEvent.dataFields);
+                var contractName = !!telemetryEvent.eventContract ? telemetryEvent.eventContract.name : '';
+                if (!!telemetryEvent.eventContract) {
+                    _this.addDataFields(dataFields, telemetryEvent.eventContract.dataFields);
+                }
+                ctx.telemetry.sendTelemetryEvent(telemetryEvent.telemetryProperties, telemetryEvent.eventName, contractName, oteljs.getEffectiveEventFlags(telemetryEvent), dataFields);
+            });
+            return ctx.sync().catch(function () {
+                oteljs.logNotification(oteljs.LogLevel.Info, oteljs.Category.Sink, function () { return 'RichApi telemetry call failed.'; });
+            });
+        };
+        RichApiSink.prototype.addDataFields = function (richApiDataFields, dataFields) {
+            if (dataFields) {
+                dataFields.forEach(function (dataField) {
+                    richApiDataFields.push({
+                        name: dataField.name,
+                        value: dataField.value,
+                        classification: dataField.classification ? dataField.classification : oteljs.DataClassification.SystemMetadata,
+                        type: dataField.dataType
+                    });
+                });
+            }
+        };
+        RichApiSink.prototype.pause = function (ms) {
+            return new Office.Promise(function (resolve) { return setTimeout(resolve, ms); });
+        };
+        return RichApiSink;
+    }());
+    OTel.RichApiSink = RichApiSink;
+})(OTel || (OTel = {}));
+var OTel;
+(function (OTel) {
+    var SdxWacSink = (function () {
+        function SdxWacSink() {
+        }
+        SdxWacSink.prototype.sendTelemetryEvent = function (event, _timestamp) {
+            try {
+                if (event.dataFields &&
+                    event.dataFields.filter(function (dataField) {
+                        return dataField.classification && dataField.classification !== oteljs.DataClassification.SystemMetadata;
+                    }).length > 0) {
+                    return;
+                }
+                var id = OSF._OfficeAppFactory.getId();
+                var SendTelemetryEventId = OSF.AgaveHostAction.SendTelemetryEvent;
+                OSF.getClientEndPoint().invoke('ContextActivationManager_notifyHost', null, [id, SendTelemetryEventId, event]);
+            }
+            catch (error) {
+                oteljs.logError(oteljs.Category.Sink, "AgaveWacSink", error);
+            }
+        };
+        return SdxWacSink;
+    }());
+    OTel.SdxWacSink = SdxWacSink;
 })(OTel || (OTel = {}));
 var OSF;
 (function (OSF) {
@@ -11834,6 +11849,564 @@ var OfficeExtension;
         configurable: true
     });
 })(OfficeExtension || (OfficeExtension = {}));
+var __assign = (this && this.__assign) || function () {
+    __assign = Object.assign || function(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
+var oteljs;
+(function (oteljs) {
+    function addContractField(dataFields, instanceName, contractName) {
+        dataFields.push(oteljs.makeStringDataField("zC." + instanceName, contractName));
+    }
+    oteljs.addContractField = addContractField;
+})(oteljs || (oteljs = {}));
+var oteljs;
+(function (oteljs) {
+    var DataClassification;
+    (function (DataClassification) {
+        DataClassification[DataClassification["EssentialServiceMetadata"] = 1] = "EssentialServiceMetadata";
+        DataClassification[DataClassification["AccountData"] = 2] = "AccountData";
+        DataClassification[DataClassification["SystemMetadata"] = 4] = "SystemMetadata";
+        DataClassification[DataClassification["OrganizationIdentifiableInformation"] = 8] = "OrganizationIdentifiableInformation";
+        DataClassification[DataClassification["EndUserIdentifiableInformation"] = 16] = "EndUserIdentifiableInformation";
+        DataClassification[DataClassification["CustomerContent"] = 32] = "CustomerContent";
+        DataClassification[DataClassification["AccessControl"] = 64] = "AccessControl";
+    })(DataClassification = oteljs.DataClassification || (oteljs.DataClassification = {}));
+})(oteljs || (oteljs = {}));
+var oteljs;
+(function (oteljs) {
+    function makeBooleanDataField(name, value) {
+        return {
+            name: name,
+            dataType: oteljs.DataFieldType.Boolean,
+            value: value,
+            classification: oteljs.DataClassification.SystemMetadata
+        };
+    }
+    oteljs.makeBooleanDataField = makeBooleanDataField;
+    function makeInt64DataField(name, value) {
+        return {
+            name: name,
+            dataType: oteljs.DataFieldType.Int64,
+            value: value,
+            classification: oteljs.DataClassification.SystemMetadata
+        };
+    }
+    oteljs.makeInt64DataField = makeInt64DataField;
+    function makeDoubleDataField(name, value) {
+        return {
+            name: name,
+            dataType: oteljs.DataFieldType.Double,
+            value: value,
+            classification: oteljs.DataClassification.SystemMetadata
+        };
+    }
+    oteljs.makeDoubleDataField = makeDoubleDataField;
+    function makeStringDataField(name, value) {
+        return {
+            name: name,
+            dataType: oteljs.DataFieldType.String,
+            value: value,
+            classification: oteljs.DataClassification.SystemMetadata
+        };
+    }
+    oteljs.makeStringDataField = makeStringDataField;
+    function makeGuidDataField(name, value) {
+        return {
+            name: name,
+            dataType: oteljs.DataFieldType.Guid,
+            value: value,
+            classification: oteljs.DataClassification.SystemMetadata
+        };
+    }
+    oteljs.makeGuidDataField = makeGuidDataField;
+})(oteljs || (oteljs = {}));
+var oteljs;
+(function (oteljs) {
+    var DataFieldType;
+    (function (DataFieldType) {
+        DataFieldType[DataFieldType["String"] = 0] = "String";
+        DataFieldType[DataFieldType["Boolean"] = 1] = "Boolean";
+        DataFieldType[DataFieldType["Int64"] = 2] = "Int64";
+        DataFieldType[DataFieldType["Double"] = 3] = "Double";
+        DataFieldType[DataFieldType["Guid"] = 4] = "Guid";
+    })(DataFieldType = oteljs.DataFieldType || (oteljs.DataFieldType = {}));
+})(oteljs || (oteljs = {}));
+var oteljs;
+(function (oteljs) {
+    var Event = (function () {
+        function Event() {
+            this._listeners = [];
+        }
+        Event.prototype.fireEvent = function (args) {
+            this._listeners.forEach(function (listener) { return listener(args); });
+        };
+        Event.prototype.addListener = function (listener) {
+            if (listener) {
+                this._listeners.push(listener);
+            }
+        };
+        Event.prototype.removeListener = function (listener) {
+            this._listeners = this._listeners.filter(function (h) { return h !== listener; });
+        };
+        Event.prototype.getListenerCount = function () {
+            return this._listeners.length;
+        };
+        return Event;
+    }());
+    oteljs.Event = Event;
+})(oteljs || (oteljs = {}));
+var oteljs;
+(function (oteljs) {
+    function getEffectiveEventFlags(telemetryEvent) {
+        var eventFlags = {
+            costPriority: oteljs.CostPriority.Normal,
+            samplingPolicy: oteljs.SamplingPolicy.Measure,
+            persistencePriority: oteljs.PersistencePriority.Normal,
+            dataCategories: oteljs.DataCategories.NotSet,
+            diagnosticLevel: oteljs.DiagnosticLevel.FullEvent
+        };
+        if (!telemetryEvent.eventFlags || !telemetryEvent.eventFlags.dataCategories) {
+            oteljs.logNotification(oteljs.LogLevel.Error, oteljs.Category.Core, function () { return 'Event is missing DataCategories event flag'; });
+        }
+        if (!telemetryEvent.eventFlags) {
+            return eventFlags;
+        }
+        if (telemetryEvent.eventFlags.costPriority) {
+            eventFlags.costPriority = telemetryEvent.eventFlags.costPriority;
+        }
+        if (telemetryEvent.eventFlags.samplingPolicy) {
+            eventFlags.samplingPolicy = telemetryEvent.eventFlags.samplingPolicy;
+        }
+        if (telemetryEvent.eventFlags.persistencePriority) {
+            eventFlags.persistencePriority = telemetryEvent.eventFlags.persistencePriority;
+        }
+        if (telemetryEvent.eventFlags.dataCategories) {
+            eventFlags.dataCategories = telemetryEvent.eventFlags.dataCategories;
+        }
+        if (telemetryEvent.eventFlags.diagnosticLevel) {
+            eventFlags.diagnosticLevel = telemetryEvent.eventFlags.diagnosticLevel;
+        }
+        return eventFlags;
+    }
+    oteljs.getEffectiveEventFlags = getEffectiveEventFlags;
+})(oteljs || (oteljs = {}));
+var oteljs;
+(function (oteljs) {
+    var SamplingPolicy;
+    (function (SamplingPolicy) {
+        SamplingPolicy[SamplingPolicy["NotSet"] = 0] = "NotSet";
+        SamplingPolicy[SamplingPolicy["Measure"] = 1] = "Measure";
+        SamplingPolicy[SamplingPolicy["Diagnostics"] = 2] = "Diagnostics";
+        SamplingPolicy[SamplingPolicy["CriticalBusinessImpact"] = 191] = "CriticalBusinessImpact";
+        SamplingPolicy[SamplingPolicy["CriticalCensus"] = 192] = "CriticalCensus";
+        SamplingPolicy[SamplingPolicy["CriticalExperimentation"] = 193] = "CriticalExperimentation";
+        SamplingPolicy[SamplingPolicy["CriticalUsage"] = 194] = "CriticalUsage";
+    })(SamplingPolicy = oteljs.SamplingPolicy || (oteljs.SamplingPolicy = {}));
+    var PersistencePriority;
+    (function (PersistencePriority) {
+        PersistencePriority[PersistencePriority["NotSet"] = 0] = "NotSet";
+        PersistencePriority[PersistencePriority["Normal"] = 1] = "Normal";
+        PersistencePriority[PersistencePriority["High"] = 2] = "High";
+    })(PersistencePriority = oteljs.PersistencePriority || (oteljs.PersistencePriority = {}));
+    var CostPriority;
+    (function (CostPriority) {
+        CostPriority[CostPriority["NotSet"] = 0] = "NotSet";
+        CostPriority[CostPriority["Normal"] = 1] = "Normal";
+        CostPriority[CostPriority["High"] = 2] = "High";
+    })(CostPriority = oteljs.CostPriority || (oteljs.CostPriority = {}));
+    var DataCategories;
+    (function (DataCategories) {
+        DataCategories[DataCategories["NotSet"] = 0] = "NotSet";
+        DataCategories[DataCategories["SoftwareSetup"] = 1] = "SoftwareSetup";
+        DataCategories[DataCategories["ProductServiceUsage"] = 2] = "ProductServiceUsage";
+        DataCategories[DataCategories["ProductServicePerformance"] = 4] = "ProductServicePerformance";
+        DataCategories[DataCategories["DeviceConfiguration"] = 8] = "DeviceConfiguration";
+        DataCategories[DataCategories["InkingTypingSpeech"] = 16] = "InkingTypingSpeech";
+    })(DataCategories = oteljs.DataCategories || (oteljs.DataCategories = {}));
+    var DiagnosticLevel;
+    (function (DiagnosticLevel) {
+        DiagnosticLevel[DiagnosticLevel["ReservedDoNotUse"] = 0] = "ReservedDoNotUse";
+        DiagnosticLevel[DiagnosticLevel["BasicEvent"] = 10] = "BasicEvent";
+        DiagnosticLevel[DiagnosticLevel["FullEvent"] = 100] = "FullEvent";
+        DiagnosticLevel[DiagnosticLevel["NecessaryServiceDataEvent"] = 110] = "NecessaryServiceDataEvent";
+        DiagnosticLevel[DiagnosticLevel["AlwaysOnNecessaryServiceDataEvent"] = 120] = "AlwaysOnNecessaryServiceDataEvent";
+    })(DiagnosticLevel = oteljs.DiagnosticLevel || (oteljs.DiagnosticLevel = {}));
+})(oteljs || (oteljs = {}));
+var oteljs;
+(function (oteljs) {
+    var onNotificationEvent = new oteljs.Event();
+    var LogLevel;
+    (function (LogLevel) {
+        LogLevel[LogLevel["Error"] = 0] = "Error";
+        LogLevel[LogLevel["Warning"] = 1] = "Warning";
+        LogLevel[LogLevel["Info"] = 2] = "Info";
+        LogLevel[LogLevel["Verbose"] = 3] = "Verbose";
+    })(LogLevel = oteljs.LogLevel || (oteljs.LogLevel = {}));
+    var Category;
+    (function (Category) {
+        Category[Category["Core"] = 0] = "Core";
+        Category[Category["Sink"] = 1] = "Sink";
+        Category[Category["Transport"] = 2] = "Transport";
+    })(Category = oteljs.Category || (oteljs.Category = {}));
+    function onNotification() {
+        return onNotificationEvent;
+    }
+    oteljs.onNotification = onNotification;
+    function logNotification(level, category, message) {
+        onNotificationEvent.fireEvent({ level: level, category: category, message: message });
+    }
+    oteljs.logNotification = logNotification;
+    function logError(category, message, error) {
+        logNotification(LogLevel.Error, category, function () {
+            var errorMessage = error instanceof Error ? error.message : '';
+            return message + ": " + errorMessage;
+        });
+    }
+    oteljs.logError = logError;
+})(oteljs || (oteljs = {}));
+var oteljs;
+(function (oteljs) {
+    oteljs.SuppressNexus = -1;
+    var SimpleTelemetryLogger = (function () {
+        function SimpleTelemetryLogger(parent, persistentDataFields, config) {
+            var _a, _b;
+            this.onSendEvent = new oteljs.Event();
+            this.persistentDataFields = [];
+            this.config = config || {};
+            if (parent) {
+                this.onSendEvent = parent.onSendEvent;
+                (_a = this.persistentDataFields).push.apply(_a, parent.persistentDataFields);
+                this.config = __assign(__assign({}, parent.getConfig()), this.config);
+            }
+            else {
+                this.persistentDataFields.push(oteljs.makeStringDataField('OTelJS.Version', oteljs.oteljsVersion));
+            }
+            if (persistentDataFields) {
+                (_b = this.persistentDataFields).push.apply(_b, persistentDataFields);
+            }
+        }
+        SimpleTelemetryLogger.prototype.sendTelemetryEvent = function (event) {
+            var localEvent;
+            try {
+                if (this.onSendEvent.getListenerCount() === 0) {
+                    oteljs.logNotification(oteljs.LogLevel.Warning, oteljs.Category.Core, function () { return 'No telemetry sinks are attached.'; });
+                    return;
+                }
+                localEvent = this.cloneEvent(event);
+                this.processTelemetryEvent(localEvent);
+            }
+            catch (error) {
+                oteljs.logError(oteljs.Category.Core, 'SendTelemetryEvent', error);
+                return;
+            }
+            try {
+                this.onSendEvent.fireEvent(localEvent);
+            }
+            catch (_e) {
+            }
+        };
+        SimpleTelemetryLogger.prototype.processTelemetryEvent = function (event) {
+            var _a;
+            if (!event.telemetryProperties) {
+                event.telemetryProperties = oteljs.TenantTokenManager.getTenantTokens(event.eventName);
+            }
+            if (event.dataFields && this.persistentDataFields) {
+                (_a = event.dataFields).unshift.apply(_a, this.persistentDataFields);
+            }
+            if (!this.config.disableValidation) {
+                oteljs.TelemetryEventValidator.validateTelemetryEvent(event);
+            }
+        };
+        SimpleTelemetryLogger.prototype.addSink = function (sink) {
+            this.onSendEvent.addListener(function (event) { return sink.sendTelemetryEvent(event); });
+        };
+        SimpleTelemetryLogger.prototype.setTenantToken = function (namespace, ariaTenantToken, nexusTenantToken) {
+            oteljs.TenantTokenManager.setTenantToken(namespace, ariaTenantToken, nexusTenantToken);
+        };
+        SimpleTelemetryLogger.prototype.setTenantTokens = function (tokenTree) {
+            oteljs.TenantTokenManager.setTenantTokens(tokenTree);
+        };
+        SimpleTelemetryLogger.prototype.cloneEvent = function (event) {
+            var localEvent = { eventName: event.eventName, eventFlags: event.eventFlags };
+            if (!!event.telemetryProperties) {
+                localEvent.telemetryProperties = {
+                    ariaTenantToken: event.telemetryProperties.ariaTenantToken,
+                    nexusTenantToken: event.telemetryProperties.nexusTenantToken
+                };
+            }
+            if (!!event.eventContract) {
+                localEvent.eventContract = { name: event.eventContract.name, dataFields: event.eventContract.dataFields.slice() };
+            }
+            localEvent.dataFields = !!event.dataFields ? event.dataFields.slice() : [];
+            return localEvent;
+        };
+        SimpleTelemetryLogger.prototype.getConfig = function () {
+            return this.config;
+        };
+        return SimpleTelemetryLogger;
+    }());
+    oteljs.SimpleTelemetryLogger = SimpleTelemetryLogger;
+})(oteljs || (oteljs = {}));
+var oteljs;
+(function (oteljs) {
+    var TelemetryEventValidator;
+    (function (TelemetryEventValidator) {
+        var INT64_MIN = -9007199254740991;
+        var INT64_MAX = 9007199254740991;
+        var StartsWithCapitalRegex = /^[A-Z][a-zA-Z0-9]*$/;
+        var AlphanumericRegex = /^[a-zA-Z0-9_\.]*$/;
+        function validateTelemetryEvent(event) {
+            if (!isEventNameValid(event.eventName)) {
+                throw new Error('Invalid eventName');
+            }
+            if (event.eventContract && !isEventContractValid(event.eventContract)) {
+                throw new Error('Invalid eventContract');
+            }
+            if (event.dataFields != null) {
+                for (var i = 0; i < event.dataFields.length; i++) {
+                    validateDataField(event.dataFields[i]);
+                }
+            }
+        }
+        TelemetryEventValidator.validateTelemetryEvent = validateTelemetryEvent;
+        function isNamespaceValid(eventNamePieces) {
+            return !!eventNamePieces && eventNamePieces.length >= 3 && eventNamePieces[0] === 'Office';
+        }
+        function isEventNodeValid(eventNode) {
+            return eventNode !== undefined && StartsWithCapitalRegex.test(eventNode);
+        }
+        function isEventNameValid(eventName) {
+            var maxEventNameLength = 98;
+            if (!eventName || eventName.length > maxEventNameLength) {
+                return false;
+            }
+            var eventNamePieces = eventName.split('.');
+            var eventNodeName = eventNamePieces[eventNamePieces.length - 1];
+            return isNamespaceValid(eventNamePieces) && isEventNodeValid(eventNodeName);
+        }
+        function isEventContractValid(eventContract) {
+            return isNameValid(eventContract.name);
+        }
+        function isDataFieldNameValid(dataFieldName) {
+            var maxDataFieldNameLength = 100;
+            var dataFieldPrefixLength = 5;
+            return !!dataFieldName && isNameValid(dataFieldName) && dataFieldName.length + dataFieldPrefixLength < maxDataFieldNameLength;
+        }
+        function isNameValid(name) {
+            return name !== undefined && AlphanumericRegex.test(name);
+        }
+        function validateDataField(dataField) {
+            if (!isDataFieldNameValid(dataField.name)) {
+                throw new Error('Invalid dataField name');
+            }
+            if (dataField.dataType === oteljs.DataFieldType.Int64) {
+                validateInt(dataField.value);
+            }
+        }
+        function validateInt(value) {
+            if (typeof value !== 'number' || !isFinite(value) || Math.floor(value) !== value || value < INT64_MIN || value > INT64_MAX) {
+                throw new Error("Invalid integer " + JSON.stringify(value));
+            }
+        }
+        TelemetryEventValidator.validateInt = validateInt;
+    })(TelemetryEventValidator = oteljs.TelemetryEventValidator || (oteljs.TelemetryEventValidator = {}));
+})(oteljs || (oteljs = {}));
+var oteljs;
+(function (oteljs) {
+    var TokenType;
+    (function (TokenType) {
+        TokenType[TokenType["Aria"] = 0] = "Aria";
+        TokenType[TokenType["Nexus"] = 1] = "Nexus";
+    })(TokenType || (TokenType = {}));
+    var TenantTokenManager;
+    (function (TenantTokenManager) {
+        var ariaTokenMap = {};
+        var nexusTokenMap = {};
+        var tenantTokens = {};
+        function setTenantToken(namespace, ariaTenantToken, nexusTenantToken) {
+            var parts = namespace.split('.');
+            if (parts.length < 2 || parts[0] !== 'Office') {
+                oteljs.logNotification(oteljs.LogLevel.Error, oteljs.Category.Core, function () {
+                    return "Invalid namespace: " + namespace;
+                });
+                return;
+            }
+            var leaf = Object.create(Object.prototype);
+            if (ariaTenantToken) {
+                leaf['ariaTenantToken'] = ariaTenantToken;
+            }
+            if (nexusTenantToken) {
+                leaf['nexusTenantToken'] = nexusTenantToken;
+            }
+            var node = leaf;
+            var index;
+            for (index = parts.length - 1; index >= 0; --index) {
+                var parentNode = Object.create(Object.prototype);
+                parentNode[parts[index]] = node;
+                node = parentNode;
+            }
+            setTenantTokens(node);
+        }
+        TenantTokenManager.setTenantToken = setTenantToken;
+        function setTenantTokens(tokenTree) {
+            if (typeof tokenTree !== 'object') {
+                throw new Error('tokenTree must be an object');
+            }
+            tenantTokens = mergeTenantTokens(tenantTokens, tokenTree);
+        }
+        TenantTokenManager.setTenantTokens = setTenantTokens;
+        function getTenantTokens(eventName) {
+            var ariaTenantToken = getAriaTenantToken(eventName);
+            var nexusTenantToken = getNexusTenantToken(eventName);
+            if (!nexusTenantToken || !ariaTenantToken) {
+                throw new Error('Could not find tenant token for ' + eventName);
+            }
+            return {
+                ariaTenantToken: ariaTenantToken,
+                nexusTenantToken: nexusTenantToken
+            };
+        }
+        TenantTokenManager.getTenantTokens = getTenantTokens;
+        function getAriaTenantToken(eventName) {
+            if (ariaTokenMap[eventName]) {
+                return ariaTokenMap[eventName];
+            }
+            var ariaToken = getTenantToken(eventName, TokenType.Aria);
+            if (typeof ariaToken === 'string') {
+                ariaTokenMap[eventName] = ariaToken;
+                return ariaToken;
+            }
+            return undefined;
+        }
+        TenantTokenManager.getAriaTenantToken = getAriaTenantToken;
+        function getNexusTenantToken(eventName) {
+            if (nexusTokenMap[eventName]) {
+                return nexusTokenMap[eventName];
+            }
+            var nexusToken = getTenantToken(eventName, TokenType.Nexus);
+            if (typeof nexusToken === 'number') {
+                nexusTokenMap[eventName] = nexusToken;
+                return nexusToken;
+            }
+            return undefined;
+        }
+        TenantTokenManager.getNexusTenantToken = getNexusTenantToken;
+        function getTenantToken(eventName, tokenType) {
+            var pieces = eventName.split('.');
+            var node = tenantTokens;
+            var token = undefined;
+            if (!node) {
+                return undefined;
+            }
+            for (var i = 0; i < pieces.length - 1; i++) {
+                if (node[pieces[i]]) {
+                    node = node[pieces[i]];
+                    if (tokenType === TokenType.Aria && typeof node.ariaTenantToken === 'string') {
+                        token = node.ariaTenantToken;
+                    }
+                    else if (tokenType === TokenType.Nexus && typeof node.nexusTenantToken === 'number') {
+                        token = node.nexusTenantToken;
+                    }
+                }
+            }
+            return token;
+        }
+        function mergeTenantTokens(existingTokenTree, newTokenTree) {
+            if (typeof newTokenTree !== 'object') {
+                return newTokenTree;
+            }
+            for (var _i = 0, _a = Object.keys(newTokenTree); _i < _a.length; _i++) {
+                var key = _a[_i];
+                if (key in existingTokenTree && typeof (existingTokenTree[key] === 'object')) {
+                    existingTokenTree[key] = mergeTenantTokens(existingTokenTree[key], newTokenTree[key]);
+                }
+                else {
+                    existingTokenTree[key] = newTokenTree[key];
+                }
+            }
+            return existingTokenTree;
+        }
+        function clear() {
+            ariaTokenMap = {};
+            nexusTokenMap = {};
+            tenantTokens = {};
+        }
+        TenantTokenManager.clear = clear;
+    })(TenantTokenManager = oteljs.TenantTokenManager || (oteljs.TenantTokenManager = {}));
+})(oteljs || (oteljs = {}));
+var oteljs;
+(function (oteljs) {
+    oteljs.oteljsVersion = '3.1.46';
+})(oteljs || (oteljs = {}));
+var oteljs;
+(function (oteljs) {
+    var Contracts;
+    (function (Contracts) {
+        var Office;
+        (function (Office) {
+            var System;
+            (function (System) {
+                var SDX;
+                (function (SDX) {
+                    var contractName = 'Office.System.SDX';
+                    function getFields(instanceName, contract) {
+                        var dataFields = [];
+                        if (contract.id !== undefined) {
+                            dataFields.push(oteljs.makeStringDataField(instanceName + ".Id", contract.id));
+                        }
+                        if (contract.version !== undefined) {
+                            dataFields.push(oteljs.makeStringDataField(instanceName + ".Version", contract.version));
+                        }
+                        if (contract.instanceId !== undefined) {
+                            dataFields.push(oteljs.makeStringDataField(instanceName + ".InstanceId", contract.instanceId));
+                        }
+                        if (contract.name !== undefined) {
+                            dataFields.push(oteljs.makeStringDataField(instanceName + ".Name", contract.name));
+                        }
+                        if (contract.marketplaceType !== undefined) {
+                            dataFields.push(oteljs.makeStringDataField(instanceName + ".MarketplaceType", contract.marketplaceType));
+                        }
+                        if (contract.sessionId !== undefined) {
+                            dataFields.push(oteljs.makeStringDataField(instanceName + ".SessionId", contract.sessionId));
+                        }
+                        if (contract.browserToken !== undefined) {
+                            dataFields.push(oteljs.makeStringDataField(instanceName + ".BrowserToken", contract.browserToken));
+                        }
+                        if (contract.osfRuntimeVersion !== undefined) {
+                            dataFields.push(oteljs.makeStringDataField(instanceName + ".OsfRuntimeVersion", contract.osfRuntimeVersion));
+                        }
+                        if (contract.officeJsVersion !== undefined) {
+                            dataFields.push(oteljs.makeStringDataField(instanceName + ".OfficeJsVersion", contract.officeJsVersion));
+                        }
+                        if (contract.hostJsVersion !== undefined) {
+                            dataFields.push(oteljs.makeStringDataField(instanceName + ".HostJsVersion", contract.hostJsVersion));
+                        }
+                        if (contract.assetId !== undefined) {
+                            dataFields.push(oteljs.makeStringDataField(instanceName + ".AssetId", contract.assetId));
+                        }
+                        if (contract.providerName !== undefined) {
+                            dataFields.push(oteljs.makeStringDataField(instanceName + ".ProviderName", contract.providerName));
+                        }
+                        if (contract.type !== undefined) {
+                            dataFields.push(oteljs.makeStringDataField(instanceName + ".Type", contract.type));
+                        }
+                        oteljs.addContractField(dataFields, instanceName, contractName);
+                        return dataFields;
+                    }
+                    SDX.getFields = getFields;
+                })(SDX = System.SDX || (System.SDX = {}));
+            })(System = Office.System || (Office.System = {}));
+        })(Office = Contracts.Office || (Contracts.Office = {}));
+    })(Contracts = oteljs.Contracts || (oteljs.Contracts = {}));
+})(oteljs || (oteljs = {}));
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
         extendStatics = Object.setPrototypeOf ||
@@ -12501,7 +13074,7 @@ var OfficeFirstPartyAuth;
             if (OSF.WebAuth && OSF._OfficeAppFactory.getHostInfo().hostPlatform == "web") {
                 try {
                     if (!Office || !Office.context || !Office.context.webAuth) {
-                        reject({ code: ErrorCode.GetAuthContextAsyncMissing, message: (Strings && Strings.OfficeOM.L_ImplicitGetAuthContextMissing) ? Strings.OfficeOM.L_ImplicitGetAuthContextMissing : "" });
+                        reject({ code: ErrorCode.GetAuthContextAsyncMissing, message: (typeof (Strings) !== 'undefined' && Strings.OfficeOM.L_ImplicitGetAuthContextMissing) ? Strings.OfficeOM.L_ImplicitGetAuthContextMissing : "" });
                     }
                     Office.context.webAuth.getAuthContextAsync(function (result) {
                         if (result.status === "succeeded") {
@@ -12527,7 +13100,7 @@ var OfficeFirstPartyAuth;
                                     succeeded = true;
                                     resolve();
                                 }
-                                reject({ code: ErrorCode.PackageNotLoaded, message: (Strings && Strings.OfficeOM.L_ImplicitNotLoaded) ? Strings.OfficeOM.L_ImplicitNotLoaded : "" });
+                                reject({ code: ErrorCode.PackageNotLoaded, message: (typeof (Strings) !== 'undefined' && Strings.OfficeOM.L_ImplicitNotLoaded) ? Strings.OfficeOM.L_ImplicitNotLoaded : "" });
                             });
                             logLoadEvent(loadResult, succeeded);
                             var finalReplyUrl = (replyUrl) ? replyUrl : window.location.href.split("?")[0];
@@ -12567,43 +13140,57 @@ var OfficeFirstPartyAuth;
     }
     OfficeFirstPartyAuth.load = load;
     function getAccessToken(options, behaviorOption) {
-        if (OSF.WebAuth && OSF._OfficeAppFactory.getHostInfo().hostPlatform == "web") {
-            if (OSF.WebAuth.loaded) {
-                return new OfficeExtension.CoreUtility.Promise(function (resolve, reject) {
-                    if (behaviorOption && behaviorOption.forceRefresh) {
-                        OSF.WebAuth.clearCache();
+        return new OfficeExtension.CoreUtility.Promise(function (resolve, reject) {
+            if (OSF._OfficeAppFactory.getHostInfo().hostPlatform == "web") {
+                Office.context.webAuth.getAuthContextAsync(function (result) {
+                    var supportsAuthToken = false;
+                    if (result.status === "succeeded") {
+                        retrievedAuthContext = true;
+                        var authContext = result.value;
+                        if (authContext.supportsAuthToken) {
+                            supportsAuthToken = true;
+                        }
                     }
-                    var identityType = (OSF.WebAuth.config.idp.toLowerCase() == "msa")
-                        ? OfficeCore.IdentityType.microsoftAccount
-                        : OfficeCore.IdentityType.organizationAccount;
-                    if (OSF.WebAuth.config.appIds[0]) {
-                        OSF.WebAuth.getToken(options.resource, OSF.WebAuth.config.appIds[0], OSF._OfficeAppFactory.getHostInfo().osfControlAppCorrelationId, (behaviorOption && behaviorOption.popup) ? behaviorOption.popup : null).then(function (result) {
-                            logAcquireEvent(result, true, options.resource, (behaviorOption && behaviorOption.popup) ? behaviorOption.popup : null);
-                            resolve({ accessToken: result.Token, tokenIdenityType: identityType });
-                        }).catch(function (result) {
-                            logAcquireEvent(result, false, options.resource, (behaviorOption && behaviorOption.popup) ? behaviorOption.popup : null, result.ErrorCode);
-                            reject({ code: result.ErrorCode, message: result.ErrorMessage });
+                    if (!supportsAuthToken) {
+                        if (OSF.WebAuth && OSF.WebAuth.loaded) {
+                            if (behaviorOption && behaviorOption.forceRefresh) {
+                                OSF.WebAuth.clearCache();
+                            }
+                            var identityType_1 = (OSF.WebAuth.config.idp.toLowerCase() == "msa")
+                                ? OfficeCore.IdentityType.microsoftAccount
+                                : OfficeCore.IdentityType.organizationAccount;
+                            if (OSF.WebAuth.config.appIds[0]) {
+                                OSF.WebAuth.getToken(options.resource, OSF.WebAuth.config.appIds[0], OSF._OfficeAppFactory.getHostInfo().osfControlAppCorrelationId, (behaviorOption && behaviorOption.popup) ? behaviorOption.popup : null).then(function (result) {
+                                    logAcquireEvent(result, true, options.resource, (behaviorOption && behaviorOption.popup) ? behaviorOption.popup : null);
+                                    resolve({ accessToken: result.Token, tokenIdenityType: identityType_1 });
+                                }).catch(function (result) {
+                                    logAcquireEvent(result, false, options.resource, (behaviorOption && behaviorOption.popup) ? behaviorOption.popup : null, result.ErrorCode);
+                                    reject({ code: result.ErrorCode, message: result.ErrorMessage });
+                                });
+                            }
+                        }
+                        else {
+                            logUnexpectedAcquireEvent(OSF.WebAuth.loaded, OSF.WebAuth.loadAttempts);
+                        }
+                    }
+                    else {
+                        var context = new OfficeCore.RequestContext();
+                        var auth = OfficeCore.AuthenticationService.newObject(context);
+                        context._customData = "WacPartition";
+                        var result_1 = auth.getAccessToken(options, null);
+                        context.sync().then(function () {
+                            resolve(result_1.value);
                         });
                     }
                 });
             }
             else {
-                logUnexpectedAcquireEvent(OSF.WebAuth.loaded, OSF.WebAuth.loadAttempts);
-            }
-        }
-        var context = new OfficeCore.RequestContext();
-        var auth = OfficeCore.AuthenticationService.newObject(context);
-        context._customData = "WacPartition";
-        if (OSF._OfficeAppFactory.getHostInfo().hostPlatform == "web" && OSF._OfficeAppFactory.getHostInfo().hostType == "word") {
-            var result_1 = auth.getAccessToken(options, null);
-            return context.sync().then(function () { return result_1.value; });
-        }
-        else {
-            return new OfficeExtension.CoreUtility.Promise(function (resolve, reject) {
-                var handler = auth.onTokenReceived.add(function (arg) {
+                var context_1 = new OfficeCore.RequestContext();
+                var auth_1 = OfficeCore.AuthenticationService.newObject(context_1);
+                var handler_1 = auth_1.onTokenReceived.add(function (arg) {
                     if (!OfficeExtension.CoreUtility.isNullOrUndefined(arg)) {
-                        handler.remove();
-                        context.sync().catch(function () {
+                        handler_1.remove();
+                        context_1.sync().catch(function () {
                         });
                         if (arg.code == 0) {
                             resolve(arg.tokenValue);
@@ -12624,10 +13211,10 @@ var OfficeFirstPartyAuth;
                     }
                     return null;
                 });
-                context.sync()
+                context_1.sync()
                     .then(function () {
-                    var apiResult = auth.getAccessToken(options, auth._targetId);
-                    return context.sync()
+                    var apiResult = auth_1.getAccessToken(options, auth_1._targetId);
+                    return context_1.sync()
                         .then(function () {
                         if (OfficeExtension.CoreUtility.isNullOrUndefined(apiResult.value)) {
                             return null;
@@ -12641,8 +13228,8 @@ var OfficeFirstPartyAuth;
                     .catch(function (e) {
                     reject(e);
                 });
-            });
-        }
+            }
+        });
     }
     OfficeFirstPartyAuth.getAccessToken = getAccessToken;
     function getPrimaryIdentityInfo() {
@@ -13158,6 +13745,23 @@ var OfficeCore;
         return PeopleApiContext;
     }());
     OfficeCore.PeopleApiContext = PeopleApiContext;
+    (function (_CC) {
+        function LicenseFeature_StateChanged_EventArgsTransform(thisObj, args) {
+            var newArgs = {
+                feature: args.featureName,
+                isEnabled: args.isEnabled,
+                tier: args.tierName
+            };
+            if (args.tierName) {
+                newArgs.tier = args.tierName == 0 ? LicenseFeatureTier.unknown :
+                    args.tierName == 1 ? LicenseFeatureTier.basic :
+                        args.tierName == 2 ? LicenseFeatureTier.premium :
+                            args.tierName;
+            }
+            return newArgs;
+        }
+        _CC.LicenseFeature_StateChanged_EventArgsTransform = LicenseFeature_StateChanged_EventArgsTransform;
+    })(_CC = OfficeCore._CC || (OfficeCore._CC = {}));
     var ErrorCodes;
     (function (ErrorCodes) {
         ErrorCodes["apiNotAvailable"] = "ApiNotAvailable";
@@ -13192,7 +13796,7 @@ var OfficeCore;
         "defaultApiSetName": "OfficeSharedApi",
         "hostName": "Office",
         "apiSets": [["1.2", "FirstPartyAuthentication"], ["1.3", "FirstPartyAuthentication"], ["1.2", "DynamicRibbon"]],
-        "strings": ["AuthenticationService", "RoamingSetting", "RoamingSettingCollection", "ServiceUrlProvider", "LinkedIn", "NetworkUsage", "DynamicRibbon", "RibbonTab", "RibbonButton", "RibbonButtonCollection", "LocaleApi", "OfficeServicesManagerApi", "Comment", "CommentCollection", "MemberInfoList", "PersonaActions", "PersonaInfoSource", "PersonaInfo", "PersonaUnifiedCommunicationInfo", "PersonaPhotoInfo", "PersonaCollection", "PersonaOrganizationInfo", "UnifiedGroupInfo", "Persona", "PersonaLifetime", "LokiTokenProvider", "LokiTokenProviderFactory", "ServiceContext", "RichapiPcxFeatureChecks", "Tap", "AppRuntimePersistenceService", "AppRuntimeService", "License", "LicenseFeature", "null", "id", "getItem", "getCount", "isWarmedUp", "isWarmingUp", "displayName", "email", "emailAddresses", "sipAddresses", "birthday", "birthdays", "title", "jobInfoDepartment", "companyName", "office", "linkedTitles", "linkedDepartments", "linkedCompanyNames", "linkedOffices", "webSites", "notes", "getImageUri", "setPlaceholderColor", "getPlaceholderUri", "getImageUriWithMetadata", "instanceId", "dispose", "_RegisterPersonaUpdatedEvent", "_UnregisterPersonaUpdatedEvent", "this.instanceId", "_RegisterLokiTokenAvailableEvent", "_UnregisterLokiTokenAvailableEvent", "_RegisterIdentityUniqueIdAvailableEvent", "_UnregisterIdentityUniqueIdAvailableEvent", "_RegisterClientAccessTokenAvailableEvent", "_UnregisterClientAccessTokenAvailableEvent", "getLokiTokenProvider"],
+        "strings": ["AuthenticationService", "RoamingSetting", "RoamingSettingCollection", "ServiceUrlProvider", "LinkedIn", "NetworkUsage", "DynamicRibbon", "RibbonTab", "RibbonButton", "RibbonButtonCollection", "LocaleApi", "OfficeServicesManagerApi", "Comment", "CommentCollection", "MemberInfoList", "PersonaActions", "PersonaInfoSource", "PersonaInfo", "PersonaUnifiedCommunicationInfo", "PersonaPhotoInfo", "PersonaCollection", "PersonaOrganizationInfo", "UnifiedGroupInfo", "Persona", "PersonaLifetime", "LokiTokenProvider", "LokiTokenProviderFactory", "ServiceContext", "RichapiPcxFeatureChecks", "Tap", "AppRuntimePersistenceService", "AppRuntimeService", "License", "LicenseFeature", "null", "id", "getItem", "getCount", "isWarmedUp", "isWarmingUp", "displayName", "email", "emailAddresses", "sipAddresses", "birthday", "birthdays", "title", "jobInfoDepartment", "companyName", "office", "linkedTitles", "linkedDepartments", "linkedCompanyNames", "linkedOffices", "webSites", "notes", "getImageUri", "setPlaceholderColor", "getPlaceholderUri", "getImageUriWithMetadata", "instanceId", "dispose", "_RegisterPersonaUpdatedEvent", "_UnregisterPersonaUpdatedEvent", "this.instanceId", "_RegisterLokiTokenAvailableEvent", "_UnregisterLokiTokenAvailableEvent", "_RegisterIdentityUniqueIdAvailableEvent", "_UnregisterIdentityUniqueIdAvailableEvent", "_RegisterClientAccessTokenAvailableEvent", "_UnregisterClientAccessTokenAvailableEvent", "getLokiTokenProvider", "_RegisterStateChange", "_UnregisterStateChange"],
         "enumTypes": [["IdentityType", ["organizationAccount", "microsoftAccount", "unsupported"]],
             ["ServiceProvider", ["ariaBrowserPipeUrl", "ariaUploadUrl", "ariaVNextUploadUrl"]],
             ["TimeStringFormat", ["shortTime", "longTime", "shortDate", "longDate"]],
@@ -13247,7 +13851,7 @@ var OfficeCore;
             [31, 0, 0, 0, [["setAppRuntimeStartState", 1], ["getAppRuntimeStartState", 0, 2, 0, 4]], 0, 0, 0, 0, "Microsoft.AppRuntime.AppRuntimePersistenceService", 4],
             [32, 0, 0, 0, [["setAppRuntimeState", 1], ["getAppRuntimeState", 0, 2, 0, 4]], 0, 0, 0, [["VisibilityChanged", 0, 0, "65539", "", 35, 35]], "Microsoft.AppRuntime.AppRuntimeService", 4],
             [33, 0, 0, 0, [["isFeatureEnabled", 2, 2, 0, 4], ["getFeatureTier", 2, 2, 0, 4], ["isFreemiumUpsellEnabled", 0, 2, 0, 4], ["launchUpsellExperience", 1, 2, 0, 4], ["_TestFireStateChangedEvent", 1, 0, 0, 1]], [["getLicenseFeature", 34, 1, 2, 0, 4]], 0, 0, 0, "Microsoft.Office.Licensing.License", 4],
-            [34, 0, [[36, 3]], 0, [["_RegisterStateChange", 0, 2, 0, 4], ["_UnregisterStateChange", 0, 2, 0, 4]]]] };
+            [34, 0, [[36, 3]], 0, [[73, 0, 2, 0, 4], [74, 0, 2, 0, 4]], 0, 0, 0, [["StateChanged", 2, 0, "LicenseEventType.featureStateChanged", "this.id", 73, 74]]]] };
     var _builder = new OfficeExtension.LibraryBuilder({ metadata: _libraryMetadataOfficeSharedApi, targetNamespaceObject: OfficeCore });
 })(OfficeCore || (OfficeCore = {}));
 var Office;
@@ -13636,7 +14240,9 @@ var Office;
                 return init();
             })
                 .then(function () {
-                return notifyActionHandlerReady();
+                if (OSF._OfficeAppFactory.getHostInfo().hostType === "excel") {
+                    return notifyActionHandlerReady();
+                }
             });
         }
         function initOnce() {
@@ -13863,102 +14469,287 @@ var Excel;
         }
         return false;
     }
+    var OperationStatus;
+    (function (OperationStatus) {
+        OperationStatus["NotStarted"] = "notStarted";
+        OperationStatus["Running"] = "running";
+        OperationStatus["Succeeded"] = "succeeded";
+        OperationStatus["Failed"] = "failed";
+    })(OperationStatus || (OperationStatus = {}));
+    var HttpStatusCode;
+    (function (HttpStatusCode) {
+        HttpStatusCode[HttpStatusCode["OK"] = 200] = "OK";
+        HttpStatusCode[HttpStatusCode["Created"] = 201] = "Created";
+        HttpStatusCode[HttpStatusCode["Accepted"] = 202] = "Accepted";
+        HttpStatusCode[HttpStatusCode["NoContent"] = 204] = "NoContent";
+        HttpStatusCode[HttpStatusCode["HighestSuccessCode"] = 299] = "HighestSuccessCode";
+        HttpStatusCode[HttpStatusCode["TooManyRequests"] = 429] = "TooManyRequests";
+        HttpStatusCode[HttpStatusCode["InternalServerError"] = 500] = "InternalServerError";
+        HttpStatusCode[HttpStatusCode["ServiceUnavailable"] = 503] = "ServiceUnavailable";
+        HttpStatusCode[HttpStatusCode["GatewayTimeout"] = 504] = "GatewayTimeout";
+    })(HttpStatusCode || (HttpStatusCode = {}));
+    var SessionOperation;
+    (function (SessionOperation) {
+        SessionOperation["Close"] = "Session.close";
+        SessionOperation["CommitChanges"] = "Session.commitChanges";
+        SessionOperation["Create"] = "Session.resolveRequestUrlAndHeaderInfo";
+    })(SessionOperation = Excel.SessionOperation || (Excel.SessionOperation = {}));
     var Session = (function () {
-        function Session(workbookUrl, requestHeaders, persisted) {
-            this.m_workbookUrl = workbookUrl;
-            this.m_requestHeaders = requestHeaders;
-            if (!this.m_requestHeaders) {
-                this.m_requestHeaders = {};
-            }
-            if (OfficeExtension.Utility.isNullOrUndefined(persisted)) {
-                persisted = true;
-            }
-            this.m_persisted = persisted;
+        function Session(workbookUrl, requestHeaders, _a) {
+            var _b = _a === void 0 ? {} : _a, _c = _b.persistChanges, persistChanges = _c === void 0 ? true : _c, _d = _b.commitExplicitly, commitExplicitly = _d === void 0 ? true : _d;
+            this.m_requestId = '';
+            this.m_workbookUrl = !workbookUrl ? '' : this.ensureUrlFormatEndWithSlash(workbookUrl);
+            this.m_requestHeaders = !requestHeaders ? {} : requestHeaders;
+            this.m_persistChanges = persistChanges;
+            this.m_commitExplicitly = commitExplicitly;
         }
+        Object.defineProperty(Session.prototype, "requestId", {
+            get: function () {
+                return this.m_requestId;
+            },
+            enumerable: true,
+            configurable: true
+        });
         Session.prototype.close = function () {
             var _this = this;
             if (this.m_requestUrlAndHeaderInfo &&
                 !OfficeExtension.Utility._isLocalDocumentUrl(this.m_requestUrlAndHeaderInfo.url)) {
-                var url = this.m_requestUrlAndHeaderInfo.url;
-                if (url.charAt(url.length - 1) !== "/") {
-                    url = url + "/";
-                }
-                url = url + "closeSession";
-                var headers = this.m_requestUrlAndHeaderInfo;
-                var req = { method: "POST", url: url, headers: this.m_requestUrlAndHeaderInfo.headers, body: "" };
-                this.m_requestUrlAndHeaderInfo = null;
-                return OfficeExtension.HttpUtility.sendRequest(req)
-                    .then(function (resp) {
-                    if (resp.statusCode !== 204) {
-                        var err = OfficeExtension.Utility._parseErrorResponse(resp);
-                        throw OfficeExtension.Utility.createRuntimeError(err.errorCode, err.errorMessage, "Session.close");
+                var url = this.ensureUrlFormatEndWithSlash(this.m_requestUrlAndHeaderInfo.url) + Session.CLOSE_SESSION;
+                var req = {
+                    method: 'POST',
+                    url: url,
+                    headers: this.m_requestUrlAndHeaderInfo.headers,
+                    body: '',
+                };
+                return OfficeExtension.HttpUtility.sendRequest(req).then(function (resp) {
+                    if (resp.statusCode !== HttpStatusCode.NoContent) {
+                        throw _this.createErrorFromResponseInfo(resp, SessionOperation.Close);
                     }
                     _this.m_requestUrlAndHeaderInfo = null;
-                    var foundSessionKey = null;
                     for (var key in _this.m_requestHeaders) {
                         if (key.toLowerCase() === Session.WorkbookSessionIdHeaderNameLower) {
-                            foundSessionKey = key;
+                            delete _this.m_requestHeaders[key];
                             break;
                         }
                     }
-                    if (foundSessionKey) {
-                        delete _this.m_requestHeaders[foundSessionKey];
-                    }
                 });
             }
-            else {
-                return OfficeExtension.Utility._createPromiseFromResult(null);
-            }
+            return OfficeExtension.Utility._createPromiseFromResult(null);
         };
-        Session.prototype._resolveRequestUrlAndHeaderInfo = function () {
+        Session.prototype.commitChanges = function (retries) {
             var _this = this;
+            if (retries === void 0) { retries = 0; }
+            if (!this.m_commitExplicitly) {
+                throw this.createError(HttpStatusCode.InternalServerError, 'Can not call commitChanges() if commitExplicitly is not set.', SessionOperation.CommitChanges);
+            }
+            if (!this.m_workbookUrl || OfficeExtension.Utility._isLocalDocumentUrl(this.m_workbookUrl)) {
+                throw this.createError(HttpStatusCode.InternalServerError, 'Not supported for local documents.', SessionOperation.CommitChanges);
+            }
+            if (!this.m_requestUrlAndHeaderInfo) {
+                throw this.createError(HttpStatusCode.InternalServerError, 'Need to call this._resolveRequestUrlAndHeaderInfo() to get the session id first.', SessionOperation.CommitChanges);
+            }
+            var commitChangesRequestInfo = this.createCommitChangesRequestInfo();
+            return OfficeExtension.HttpUtility.sendRequest(commitChangesRequestInfo).then(function (commitChangesResponseInfo) {
+                var statusCode = commitChangesResponseInfo.statusCode;
+                if (statusCode === HttpStatusCode.Accepted) {
+                    return _this.delay(Session.POLL_DELAY)
+                        .then(function (_) {
+                        return _this.pollResourceLocation(commitChangesResponseInfo.headers.location, SessionOperation.CommitChanges);
+                    })
+                        .then(function (commitChangesResourceLocationResponseInfo) {
+                        if (JSON.parse(commitChangesResourceLocationResponseInfo.body).status === OperationStatus.Failed) {
+                            return _this.delayForFailedOperation(commitChangesResourceLocationResponseInfo, retries + 1).then(function (succeeded) {
+                                if (succeeded) {
+                                    return _this.commitChanges(++retries);
+                                }
+                                throw _this.createErrorFromResponseInfo(commitChangesResourceLocationResponseInfo, SessionOperation.CommitChanges);
+                            });
+                        }
+                        return _this.parseCooldownTime(commitChangesResourceLocationResponseInfo);
+                    });
+                }
+                if (statusCode >= HttpStatusCode.OK && statusCode <= HttpStatusCode.HighestSuccessCode) {
+                    return _this.parseCooldownTime(commitChangesResponseInfo);
+                }
+                return _this.delayForFailedOperation(commitChangesResponseInfo, retries + 1).then(function (succeeded) {
+                    if (succeeded) {
+                        return _this.commitChanges(++retries);
+                    }
+                    throw _this.createErrorFromResponseInfo(commitChangesResponseInfo, SessionOperation.CommitChanges);
+                });
+            });
+        };
+        Session.prototype._resolveRequestUrlAndHeaderInfo = function (retries) {
+            var _this = this;
+            if (retries === void 0) { retries = 0; }
             if (this.m_requestUrlAndHeaderInfo) {
                 return OfficeExtension.Utility._createPromiseFromResult(this.m_requestUrlAndHeaderInfo);
             }
-            if (OfficeExtension.Utility.isNullOrEmptyString(this.m_workbookUrl) ||
-                OfficeExtension.Utility._isLocalDocumentUrl(this.m_workbookUrl)) {
+            if (!this.m_workbookUrl || OfficeExtension.Utility._isLocalDocumentUrl(this.m_workbookUrl)) {
                 this.m_requestUrlAndHeaderInfo = { url: this.m_workbookUrl, headers: this.m_requestHeaders };
                 return OfficeExtension.Utility._createPromiseFromResult(this.m_requestUrlAndHeaderInfo);
             }
-            var foundSessionId = false;
-            for (var key in this.m_requestHeaders) {
-                if (key.toLowerCase() === Session.WorkbookSessionIdHeaderNameLower) {
-                    foundSessionId = true;
-                    break;
-                }
-            }
-            if (foundSessionId) {
+            if (Object.keys(this.m_requestHeaders).some(function (key) { return key.toLowerCase() === Session.WorkbookSessionIdHeaderNameLower; })) {
                 this.m_requestUrlAndHeaderInfo = { url: this.m_workbookUrl, headers: this.m_requestHeaders };
                 return OfficeExtension.Utility._createPromiseFromResult(this.m_requestUrlAndHeaderInfo);
             }
-            var url = this.m_workbookUrl;
-            if (url.charAt(url.length - 1) !== "/") {
-                url = url + "/";
-            }
-            url = url + "createSession";
-            var headers = {};
-            OfficeExtension.Utility._copyHeaders(this.m_requestHeaders, headers);
-            headers["Content-Type"] = "application/json";
-            var body = {};
-            body.persistChanges = this.m_persisted;
-            var req = { method: "POST", url: url, headers: headers, body: JSON.stringify(body) };
-            return OfficeExtension.HttpUtility.sendRequest(req)
-                .then(function (resp) {
-                if (resp.statusCode !== 201) {
-                    var err = OfficeExtension.Utility._parseErrorResponse(resp);
-                    throw OfficeExtension.Utility.createRuntimeError(err.errorCode, err.errorMessage, "Session.resolveRequestUrlAndHeaderInfo");
+            var sessionRequestInfo = this.createAsyncGraphSessionRequestInfo();
+            return OfficeExtension.HttpUtility.sendRequest(sessionRequestInfo).then(function (sessionResponseInfo) {
+                _this.m_requestId = sessionResponseInfo.headers[Session.REQUEST_ID_HEADER];
+                if (sessionResponseInfo.statusCode !== HttpStatusCode.Accepted &&
+                    sessionResponseInfo.statusCode !== HttpStatusCode.Created) {
+                    throw _this.createErrorFromResponseInfo(sessionResponseInfo, SessionOperation.Create);
                 }
-                var session = JSON.parse(resp.body);
-                var sessionId = session.id;
-                headers = {};
-                OfficeExtension.Utility._copyHeaders(_this.m_requestHeaders, headers);
-                headers[Session.WorkbookSessionIdHeaderName] = sessionId;
-                _this.m_requestUrlAndHeaderInfo = { url: _this.m_workbookUrl, headers: headers };
-                return _this.m_requestUrlAndHeaderInfo;
+                if (sessionResponseInfo.statusCode === HttpStatusCode.Created) {
+                    _this.formatRequestUrlAndHeaderInfo(sessionResponseInfo);
+                    return _this.m_requestUrlAndHeaderInfo;
+                }
+                return _this.delay(Session.POLL_DELAY)
+                    .then(function (_) { return _this.pollResourceLocation(sessionResponseInfo.headers.location, SessionOperation.Create); })
+                    .then(function (operationStatusResponseInfo) {
+                    var operationStatusBody = JSON.parse(operationStatusResponseInfo.body);
+                    if (operationStatusBody.status === OperationStatus.Failed) {
+                        return _this.delayForFailedOperation(operationStatusResponseInfo, retries + 1).then(function (succeeded) {
+                            if (succeeded) {
+                                return _this._resolveRequestUrlAndHeaderInfo(++retries);
+                            }
+                            throw _this.createErrorFromResponseInfo(operationStatusResponseInfo, SessionOperation.CommitChanges);
+                        });
+                    }
+                    var sessionResourceLocationRequestInfo = {
+                        method: 'GET',
+                        url: operationStatusBody.resourceLocation,
+                        headers: { Authorization: _this.m_requestHeaders.Authorization },
+                        body: undefined,
+                    };
+                    return OfficeExtension.HttpUtility.sendRequest(sessionResourceLocationRequestInfo).then(function (sessionResourceLocationResponseInfo) {
+                        _this.formatRequestUrlAndHeaderInfo(sessionResourceLocationResponseInfo);
+                        return _this.m_requestUrlAndHeaderInfo;
+                    });
+                });
             });
         };
-        Session.WorkbookSessionIdHeaderName = "Workbook-Session-Id";
-        Session.WorkbookSessionIdHeaderNameLower = "workbook-session-id";
+        Session.prototype.createCommitChangesRequestInfo = function () {
+            var url = this.getCorrectGraphVersionUrl() + Session.COMMIT_CHANGES;
+            var headers = {};
+            OfficeExtension.Utility._copyHeaders(this.m_requestUrlAndHeaderInfo.headers, headers);
+            headers[Session.PREFER_HEADER] = Session.PREFER_HEADER_VAL;
+            return { url: url, method: 'POST', headers: headers, body: {} };
+        };
+        Session.prototype.createAsyncGraphSessionRequestInfo = function () {
+            var url = this.getCorrectGraphVersionUrl() + Session.CREATE_SESSION;
+            var headers = {};
+            OfficeExtension.Utility._copyHeaders(this.m_requestHeaders, headers);
+            headers[Session.CONTENT_TYPE_HEADER] = Session.CONTENT_TYPE_HEADER_VAL;
+            headers[Session.PREFER_HEADER] = Session.PREFER_HEADER_VAL;
+            return {
+                url: url,
+                method: 'POST',
+                headers: headers,
+                body: { persistChanges: this.m_persistChanges, commitExplicitly: this.m_commitExplicitly },
+            };
+        };
+        Session.prototype.getCorrectGraphVersionUrl = function () {
+            return this.m_workbookUrl.replace(new RegExp('graph\.microsoft\.com\/.*?\/'), "graph.microsoft.com/" + Session.ASYNC_API_GRAPH_VERSION + "/");
+        };
+        Session.prototype.pollResourceLocation = function (resourceLocation, sessionOperation, pollAttempt) {
+            var _this = this;
+            if (pollAttempt === void 0) { pollAttempt = 0; }
+            if (pollAttempt >= Session.MAX_POLL_ATTEMPTS) {
+                throw this.createError(HttpStatusCode.InternalServerError, 'Timout while polling for the resource location.', sessionOperation);
+            }
+            var operationStatusRequestInfo = {
+                method: 'GET',
+                url: resourceLocation,
+                headers: { Authorization: this.m_requestHeaders.Authorization },
+                body: undefined,
+            };
+            return OfficeExtension.HttpUtility.sendRequest(operationStatusRequestInfo).then(function (operationStatusResponseInfo) {
+                if (operationStatusResponseInfo.statusCode !== HttpStatusCode.OK) {
+                    return _this.pollResourceLocation(resourceLocation, sessionOperation, pollAttempt + 1);
+                }
+                var operationStatusBody = JSON.parse(operationStatusResponseInfo.body);
+                switch (operationStatusBody.status) {
+                    case OperationStatus.Succeeded:
+                        return operationStatusResponseInfo;
+                    case OperationStatus.Failed:
+                        return operationStatusResponseInfo;
+                    case OperationStatus.NotStarted:
+                    case OperationStatus.Running:
+                        return _this.delay(Session.POLL_DELAY).then(function (_) {
+                            return _this.pollResourceLocation(resourceLocation, sessionOperation, pollAttempt + 1);
+                        });
+                    default:
+                        throw _this.createErrorFromResponseInfo(operationStatusResponseInfo, sessionOperation);
+                }
+            });
+        };
+        Session.prototype.delayForFailedOperation = function (responseInfo, exponentialBackoffVal) {
+            if (responseInfo.headers[Session.RETRY_AFTER_HEADER]) {
+                return this.delay(parseInt(responseInfo.headers[Session.RETRY_AFTER_HEADER]) * 1000).then(function (_) { return true; });
+            }
+            var responseBody = JSON.parse(responseInfo.body);
+            var statusCode = responseBody.statusCode ? responseBody.statusCode : responseInfo.statusCode;
+            if (Session.EXPONENTIAL_BACKOFF_STATUS_CODES.indexOf(statusCode) !== -1) {
+                var backoffTime = Math.min(Session.MAX_COMMIT_CHANGES_RETRY_TIME, Math.pow(2, exponentialBackoffVal) * 1000);
+                return this.delay(backoffTime).then(function (_) { return true; });
+            }
+            return OfficeExtension.CoreUtility.Promise.resolve(false);
+        };
+        Session.prototype.parseCooldownTime = function (responseInfo) {
+            return !responseInfo.headers[Session.RETRY_AFTER_HEADER]
+                ? Session.DEFAULT_COMMIT_CHANGES_RETRY_AFTER
+                : parseInt(responseInfo.headers[Session.RETRY_AFTER_HEADER]) * 1000;
+        };
+        Session.prototype.formatRequestUrlAndHeaderInfo = function (responseInfo) {
+            if (responseInfo.statusCode !== HttpStatusCode.OK && responseInfo.statusCode !== HttpStatusCode.Created) {
+                throw this.createErrorFromResponseInfo(responseInfo, SessionOperation.Create);
+            }
+            var session = JSON.parse(responseInfo.body);
+            var sessionId = session.id;
+            var headers = {};
+            OfficeExtension.Utility._copyHeaders(this.m_requestHeaders, headers);
+            headers[Session.WorkbookSessionIdHeaderName] = sessionId;
+            this.m_requestUrlAndHeaderInfo = { url: this.getCorrectGraphVersionUrl(), headers: headers };
+        };
+        Session.prototype.ensureUrlFormatEndWithSlash = function (url) {
+            if (url.charAt(url.length - 1) !== '/') {
+                url += '/';
+            }
+            return url;
+        };
+        Session.prototype.delay = function (milliseconds) {
+            return new OfficeExtension.CoreUtility.Promise(function (res, _) { return setTimeout(function () { return res(); }, milliseconds); });
+        };
+        Session.prototype.createErrorFromResponseInfo = function (responseInfo, locationThrown) {
+            var err = OfficeExtension.Utility._parseErrorResponse(responseInfo);
+            return OfficeExtension.Utility.createRuntimeError(err.errorCode, err.errorMessage, locationThrown);
+        };
+        Session.prototype.createError = function (code, message, locationThrown) {
+            return OfficeExtension.Utility.createRuntimeError('' + code, message, locationThrown);
+        };
+        Session.WorkbookSessionIdHeaderName = 'Workbook-Session-Id';
+        Session.WorkbookSessionIdHeaderNameLower = 'workbook-session-id';
+        Session.EXPONENTIAL_BACKOFF_STATUS_CODES = [
+            HttpStatusCode.TooManyRequests,
+            HttpStatusCode.InternalServerError,
+            HttpStatusCode.ServiceUnavailable,
+            HttpStatusCode.GatewayTimeout,
+        ];
+        Session.ASYNC_API_GRAPH_VERSION = 'beta';
+        Session.POLL_DELAY = 10000;
+        Session.MAX_POLL_ATTEMPTS = 10;
+        Session.DEFAULT_COMMIT_CHANGES_RETRY_AFTER = 10000;
+        Session.MAX_COMMIT_CHANGES_RETRY_TIME = 30000;
+        Session.REQUEST_ID_HEADER = 'request-id';
+        Session.RETRY_AFTER_HEADER = 'Retry-After';
+        Session.PREFER_HEADER = 'Prefer';
+        Session.PREFER_HEADER_VAL = 'respond-async';
+        Session.CONTENT_TYPE_HEADER = 'Content-Type';
+        Session.CONTENT_TYPE_HEADER_VAL = 'application/json';
+        Session.CLOSE_SESSION = 'closeSession';
+        Session.COMMIT_CHANGES = 'commitChanges';
+        Session.CREATE_SESSION = 'createSession';
         return Session;
     }());
     Excel.Session = Session;
@@ -14032,6 +14823,9 @@ var Excel;
         }
         else {
             context._requestFlagModifier &= ~64;
+        }
+        if (excelOptions._makerSafe) {
+            context._requestFlagModifier |= 1024;
         }
     }
     function run(arg1, arg2) {

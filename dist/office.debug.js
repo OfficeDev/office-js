@@ -1543,9 +1543,14 @@ OSF._OfficeAppFactory = (function OSF__OfficeAppFactory() {
         }
         return false;
     };
-    var shouldLoadOldMacJs = function _shouldLoadOldMacJs() {
-        var versionToUseNewJS = "15.30.1128.0";
-        var currentHostVersion = window.external.GetContext().GetHostFullVersion();
+    var shouldLoadOldOutlookMacJs = function _shouldLoadOldOutlookMacJs() {
+        try {
+            var versionToUseNewJS = "15.30.1128.0";
+            var currentHostVersion = window.external.GetContext().GetHostFullVersion();
+        }
+        catch (ex) {
+            return false;
+        }
         return !!compareVersions(versionToUseNewJS, currentHostVersion);
     };
     var _retrieveLoggingAllowed = function OSF__OfficeAppFactory$_retrieveLoggingAllowed() {
@@ -1590,7 +1595,7 @@ OSF._OfficeAppFactory = (function OSF__OfficeAppFactory() {
                     _hostInfo.isO15 = true;
                     _hostInfo.isDialog = true;
                 }
-                else if (fallbackHostInfo.toLowerCase().indexOf("mac") !== -1 && fallbackHostInfo.toLowerCase().indexOf("outlook") !== -1 && shouldLoadOldMacJs()) {
+                else if (fallbackHostInfo.toLowerCase().indexOf("mac") !== -1 && fallbackHostInfo.toLowerCase().indexOf("outlook") !== -1 && shouldLoadOldOutlookMacJs()) {
                     _hostInfo.isO15 = true;
                 }
                 else {
@@ -2325,7 +2330,7 @@ var oteljs = function(modules) {
             var _a, _b;
             this.onSendEvent = new Event.a, this.persistentDataFields = [], this.config = config || {}, 
             parent ? (this.onSendEvent = parent.onSendEvent, (_a = this.persistentDataFields).push.apply(_a, parent.persistentDataFields), 
-            this.config = __assign(__assign({}, parent.getConfig()), this.config)) : this.persistentDataFields.push(Object(DataFieldHelper.e)("OTelJS.Version", "3.1.49")), 
+            this.config = __assign(__assign({}, parent.getConfig()), this.config)) : this.persistentDataFields.push(Object(DataFieldHelper.e)("OTelJS.Version", "3.1.50")), 
             persistentDataFields && (_b = this.persistentDataFields).push.apply(_b, persistentDataFields);
         }
         return SimpleTelemetryLogger.prototype.sendTelemetryEvent = function(event) {
