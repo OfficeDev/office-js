@@ -34,11 +34,11 @@ assignees: ''
 
 ## Your Environment
 <!--- Include as many relevant details about the environment you experienced the bug in -->
-* Platform [PC desktop, Mac, iOS, Office Online]: ______
+* Platform [PC desktop, Mac, iOS, Office on the web]: ______
 * Host [Excel, Word, PowerPoint, etc.]: ______
 * Office version number: ______
 * Operating System: ______
-* Browser (if using Office Online): ______
+* Browser (if using Office on the web): ______
 
 ## Useful logs
 <!--- Please include any of the following logs that may help us debugging your issue -->
