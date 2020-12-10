@@ -1,0 +1,482 @@
+html, body {
+    height: 100%;
+    margin: 0px;
+}
+
+div#container {
+    height: 100%;
+}
+
+.moe-infobar-out {
+    padding: 8px;
+}
+
+.moe-infobar-body {
+    background-color:#FCF7B6;
+    border:1px solid #D9D98B;
+    position:relative;
+    max-height:250px;
+    overflow:hidden;
+    white-space: normal;
+    font-family: "Segoe UI","Segoe UI Web",Arial,Verdana,sans-serif;
+    line-height: 1;
+}
+
+.moe-infobar-body:hover {
+    background-color:#FEF294;
+}
+
+.moe-hovered {
+    background-color:#FEF294;
+}
+
+.moe-infobar-infotable {
+    width:100%;
+    height:100%;
+    max-height:110px;
+}
+
+.moe-infobar-top-left-cell {
+    width:30px;
+    min-width:30px;
+    max-width:30px;
+    vertical-align:top;
+    padding:1px; 
+}
+
+.moe-infobar-message-cell {
+    padding:7px 7px 3px 0px;
+    vertical-align:top;
+}
+
+.moe-infobar-top-right-cell {
+    width:20px;
+    min-width:20px;
+    max-width:20px;
+    vertical-align:top;
+}
+
+.moe-infobar-button-cell {
+    padding:0px 10px 6px 0px;
+}
+
+.moe-status-warning-icon{
+    position:absolute;
+    clip:rect(0px  42px 41px 0px);
+    top:0px;
+    left:0px;
+
+}
+
+.moe-status-warning-icon_ie{
+    position:absolute;
+    clip:rect(0px  42px 41px 0px);
+    top:0px;
+    left:0px;
+
+}
+
+.moe-status-warning-icon:hover {
+    cursor:default;
+}
+
+.moe-status-error-icon{
+    position:absolute;
+    clip:rect(42px 42px 83px 0px);
+    top:-42px;
+    left:0px;
+
+}
+
+.moe-status-error-icon_ie{
+    position:absolute;
+    clip:rect(42px 42px 83px 0px);
+    top:-42px;
+    left:0px;
+
+}
+
+.moe-status-error-icon:hover {
+    cursor:default;
+}
+
+.moe-status-info-icon{
+    position:absolute;
+    clip:rect(84px 42px 125px 0px);
+    top:-84px;
+    left:0px;
+
+}
+
+.moe-status-info-icon_ie{
+    position:absolute;
+    clip:rect(84px 42px 125px 0px);
+    top:-84px;
+    left:0px;
+
+}
+
+.moe-status-info-icon:hover{
+    cursor:default;
+}
+
+.moe-status-secinfo-icon{
+    position:absolute;
+    clip:rect(210px 42px 251px 0px);
+    top:-210px;
+    left:0px;
+
+}
+
+.moe-status-secinfo-icon_ie{
+    position:absolute;
+    clip:rect(210px 42px 251px 0px);
+    top:-210px;
+    left:0px;
+
+}
+
+.moe-status-secinfo-icon:hover{
+    cursor:default;
+}
+
+.moe-infobar-warning {
+    position:absolute;
+    clip:rect(0px 75px 23px 50px);
+    top:0px;
+    left:-50px;
+    margin:7px 2px 1px 2px;
+}
+
+.moe-infobar-error {
+    position:absolute;
+    clip:rect(26px 75px 47px 50px);
+    top:-26px;
+    left:-50px;
+    margin:7px 2px 1px 2px;
+}
+
+.moe-infobar-info {
+    position:absolute;
+    clip:rect(52px 75px 75px 50px);
+    top:-52px;
+    left:-50px;
+    margin:7px 2px 1px 2px;
+}
+
+.moe-infobar-secinfo{
+    position:absolute;
+    clip:rect(175px 75px 199px 50px);
+    top:-178px;
+    left:-50px;
+    margin:7px 2px 1px 2px;
+}
+
+.moe-infobar-dismiss {
+    position:absolute;
+    clip:rect(83px 71px 98px 55px);
+    top:-83px;
+    right:0px;
+    margin:2px 1px 1px 2px;
+}
+
+.moe-infobar-dismiss:hover { 
+    cursor:default;
+}
+
+.moe-infobar-dismiss:focus {
+    -webkit-filter: brightness(50%);
+    filter: brightness(50%);
+}
+
+.moe-infobar-message-div {
+    overflow:hidden;
+    height:100%;
+    width:100%;
+    max-height:68px;
+}
+
+.moe-infobar-title {
+    font-style:Normal;
+    font-size:8pt;
+    color:#444444;
+    font-weight:bold;
+    word-wrap:break-word;
+    overflow:hidden;
+}
+
+.moe-infobar-message {
+    font-style:normal;
+    font-size:8pt;
+    color:#444444;
+    margin:7px 10px 0px 6px;
+    text-overflow:ellipsis;
+    overflow:hidden;
+}
+
+.moe-infobar-message-with-url {
+    color:#0000FF;
+}
+
+button.moe-infobar-button {
+    text-transform:uppercase;
+    font-size:8pt;
+    background-color:#FFF19D;
+    border:1px solid #B4A555;
+    color:#444444;
+    text-align:center;
+    vertical-align:middle;
+    margin:3px 3px 3px 0px;
+    padding:3px 15px;
+    display:inline;
+    overflow:visible;
+}
+
+button.moe-infobar-button:hover {
+    background-color:#FEF8D8;
+    border-color:#B4A555;
+    cursor:default;
+}
+
+button.moe-infobar-button:active {
+    background-color:#F3E282;
+    border-color:#B4A555;
+}
+
+.moe-background {
+    height: 100%;
+    width:100%;
+}
+
+.moe-trust-prompt {
+    background-color: #ffffff;
+}
+
+.moe-trust-prompt-collapse {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+}
+.moe-trust-prompt-collapse:hover {
+    cursor: pointer;
+}
+.collapsed .moe-trust-prompt-collapse {
+    transform: rotate(180deg);
+}
+.taskpane-add-in .moe-trust-prompt-collapse {
+    display: none;
+}
+
+.moe-trust-prompt-button {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    box-shadow: none;
+    color: #333;
+    font-size: 14px;
+    font-weight: 400;
+    background-color: #d2d2d2;
+    border: 1px solid #d2d2d2;
+    cursor: pointer;
+    display: inline-block;
+    height: 32px;
+    min-width: 80px;
+    padding: 4px 20px 6px;
+    border-radius: 2px;
+}
+.moe-trust-prompt-button:hover {
+    background-color: #e6e6e6;
+    border-color: #e6e6e6;
+    outline: none;
+}
+.moe-trust-prompt-button:active {
+    background-color: #969696;
+    border-color: #969696;
+}
+.WAC_Word .moe-trust-prompt-button-primary {
+    color: #ffffff;
+    background-color: #2b579a;
+    border-color: #2b579a;
+}
+.WAC_Word .moe-trust-prompt-button-primary:hover {
+    background-color: #4a78b0;
+    border-color: #4a78b0;
+}
+.WAC_Word .moe-trust-prompt-button-primary:active {
+    background-color: #124078;
+    border-color: #124078;
+}
+.WAC_Powerpoint .moe-trust-prompt-button-primary {
+    color: #ffffff;
+    background-color: #b7472a;
+    border-color: #b7472a;
+}
+.WAC_Powerpoint .moe-trust-prompt-button-primary:hover {
+    background-color: #e86e58;
+    border-color: #e86e58;
+}
+.WAC_Powerpoint .moe-trust-prompt-button-primary:active {
+    background-color: #a92b1a;
+    border-color: #a92b1a;
+}
+.WAC_Excel .moe-trust-prompt-button-primary {
+    color: #ffffff;
+    background-color: #217346;
+    border-color: #217346;
+}
+.WAC_Excel .moe-trust-prompt-button-primary:hover {
+    background-color: #4e9668;
+    border-color: #4e9668;
+}
+.WAC_Excel .moe-trust-prompt-button-primary:active {
+    background-color: #0e5c2f;
+    border-color: #0e5c2f;
+}
+
+.moe-trust-prompt-table {
+    width: 100%;
+}
+.moe-trust-prompt-row {}
+.moe-trust-prompt-cell {
+    padding: 0px 15px;
+    margin: 0px;
+}
+.moe-trust-prompt-cell p {
+    margin: 0;
+}
+
+.moe-trust-prompt-header .moe-trust-prompt-cell {
+    max-width: 0px;
+}
+.moe-trust-prompt-header-title {
+    white-space: nowrap; 
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding-right: 0px;
+    font-size: 16pt;
+}
+.WAC_Word .moe-trust-prompt-header-title {
+    color: #2b579a;
+}
+.WAC_Powerpoint .moe-trust-prompt-header-title {
+    color: #b7472a;
+}
+.WAC_Excel .moe-trust-prompt-header-title {
+    color: #217346;
+}
+
+.moe-trust-prompt-preview .moe-trust-prompt-cell {
+    padding-top: 5px;
+    max-width: 0px;
+}
+.moe-trust-prompt-preview-img {
+    width: 48px;
+    height:48px;
+    float: left;
+    background-color: #f4f4f4;
+    border: 1px solid #f4f4f4;
+}
+.moe-trust-prompt-preview-title {
+    padding-left: 15px;
+    font-size: 14px;
+    white-space: nowrap; 
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.moe-trust-prompt-preview-sub {
+    padding-left: 15px;
+    margin-top: 3px;
+    font-size: 12px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.moe-trust-prompt-description .moe-trust-prompt-cell {
+    padding-top: 15px;
+}
+.WAC_Powerpoint .moe-trust-prompt-description .moe-trust-prompt-cell,
+.WAC_Excel .moe-trust-prompt-description .moe-trust-prompt-cell {
+    padding-top: 10px;
+}
+.moe-trust-prompt-description-text {
+    font-size: 12px;
+    white-space: normal;
+    max-width: 450px;
+}
+
+.moe-trust-prompt-footer .moe-trust-prompt-cell {
+    padding-top: 15px;
+}
+.moe-trust-prompt-buttons-action { }
+.moe-trust-prompt-buttons-url {
+    margin-left: 15px;
+}
+
+.taskpane-add-in thead {
+    display: none;
+}
+.content-add-in .moe-trust-prompt-preview {
+    display: none;
+}
+.content-add-in .moe-trust-prompt-header .moe-trust-prompt-cell {
+    padding-top: 15px;
+}
+.content-add-in .moe-trust-prompt-footer .moe-trust-prompt-cell {
+    padding-bottom: 15px;
+}
+.content-add-in .moe-trust-prompt-table thead,
+.moe-trust-prompt-table tbody {
+    transition: visibility 0.1s ease-out,
+                opacity 0.3s ease-out;
+}
+.content-add-in.collapsed .moe-trust-prompt-table thead,
+.collapsed .moe-trust-prompt-table tbody {
+    visibility: collapse;
+    opacity: 0;
+    transition: visibility 0.3s ease-in,
+                opacity 0.1s ease-in;
+}
+.content-add-in .moe-trust-prompt-table thead td,
+.moe-trust-prompt-table tbody td {
+    transition: margin 0.1s ease-out,
+                padding 0.1s ease-out;
+}
+.content-add-in.collapsed .moe-trust-prompt-table thead td,
+.collapsed .moe-trust-prompt-table tbody td {
+    margin: 0;
+    padding: 0;
+    transition: margin 0.3s ease-in,
+                padding 0.3s ease-in;
+}
+.content-add-in .moe-trust-prompt-table thead td > *,
+.moe-trust-prompt-table tbody td > * {
+    transition: height 0.1s ease-out, 
+                opacity 0.3s ease-out;
+}
+.content-add-in.collapsed .moe-trust-prompt-table thead td > *,
+.collapsed .moe-trust-prompt-table tbody td > * {
+    height: 0;
+    opacity: 0;
+    transition: height 0.3s ease-in,
+                opacity 0.1s ease-in;
+}
+.content-add-in .moe-trust-prompt-buttons-url {
+    transition: visibility 0.1s ease-out,
+                height 0.1s ease-out,
+                opacity 0.3s ease-out,
+                margin 0.1s ease-out,
+                padding 0.1s ease-out;
+}
+.content-add-in.collapsed .moe-trust-prompt-buttons-url {
+    visibility: collapse;
+    height: 0;
+    opacity: 0;
+    margin: 0;
+    padding: 0;
+    transition: visibility 0.3s ease-in,
+                height 0.3s ease-in,
+                opacity 0.1s ease-in,
+                margin 0.3s ease-in,
+                padding 0.3s ease-in;
+}
