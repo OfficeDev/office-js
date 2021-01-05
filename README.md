@@ -149,3 +149,4 @@ For more information on Office Add-ins and the Office JavaScript APIs, see:
 
 - [Office Add-ins platform overview](https://docs.microsoft.com/office/dev/add-ins/overview/office-add-ins)
 - [JavaScript API for Office reference](https://docs.microsoft.com/javascript/api/overview/office?view=office-js)
+- [Learn about the Microsoft 365 Developer Program](https://developer.microsoft.com/en-us/microsoft-365/dev-program)
