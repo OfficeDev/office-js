@@ -149,4 +149,13 @@ For more information on Office Add-ins and the Office JavaScript APIs, see:
 
 - [Office Add-ins platform overview](https://docs.microsoft.com/office/dev/add-ins/overview/office-add-ins)
 - [JavaScript API for Office reference](https://docs.microsoft.com/javascript/api/overview/office?view=office-js)
-- [Learn about the Microsoft 365 Developer Program](https://developer.microsoft.com/microsoft-365/dev-program)
+
+
+## Join the Microsoft 365 Developer Program
+Get a free sandbox, tools, and other resources you need to build solutions for the Microsoft 365 platform.
+- [Free developer sandbox](https://developer.microsoft.com/microsoft-365/dev-program#Subscription) Get a free, renewable 90-day Microsoft 365 E5 developer subscription.
+- [Sample data packs](https://developer.microsoft.com/microsoft-365/dev-program#Sample) Automatically configure your sandbox by installing user data and content to help you build your solutions.
+- [Access to experts](https://developer.microsoft.com/microsoft-365/dev-program#Experts) Access community events to learn from Microsoft 365 experts.
+- [Personalized recommendations](https://developer.microsoft.com/microsoft-365/dev-program#Recommendations) Find developer resources quickly from your personalized dashboard.
+
+
