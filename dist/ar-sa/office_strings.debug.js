@@ -153,8 +153,10 @@ Strings.OfficeOM.L_PropertyDoesNotExist = 'لا توجد الخاصية "{0}" ف
 Strings.OfficeOM.L_PropertyNotLoaded = "الخاصية '{0}' غير متاحة. قبل قراءة قيمة الخاصية، قم باستدعاء أسلوب التحميل على العنصر المضمن وقم باستدعاء \"context.sync()‎\" في سياق الطلب المقترن.";
 Strings.OfficeOM.L_ReadSettingsError = "خطأ في إعدادات القراءة";
 Strings.OfficeOM.L_RedundantCallbackSpecification = "لا يمكن تعيين رد الاستدعاء في كل من قائمة الوسائط وفي العنصر الاختياري.";
+Strings.OfficeOM.L_RequestPayloadSizeLimitExceededMessage = 'تجاوز حجم حمولة الطلب الحد المسموح به. الرجاء الرجوع إلى الوثائق: "https://docs.microsoft.com/office/dev/add-ins/concepts/resource-limits-and-performance-optimization#excel-add-ins".';
 Strings.OfficeOM.L_RequestTimeout = "استغرقت المكالمة وقتاً طويلاً وبالتالي يتعذر تنفيذها.";
 Strings.OfficeOM.L_RequestTokenUnavailable = "تم إحباط API هذه لإبطاء تكرار المكالمة.";
+Strings.OfficeOM.L_ResponsePayloadSizeLimitExceededMessage = 'تجاوز حجم حمولة الاستجابة الحد المسموح به. الرجاء الرجوع إلى الوثائق: "https://docs.microsoft.com/office/dev/add-ins/concepts/resource-limits-and-performance-optimization#excel-add-ins".';
 Strings.OfficeOM.L_RowIndexOutOfRange = "إن قيمة فهرس الصف خارج النطاق المسموح به. استخدم قيمة (0 أو أعلى) تكون أصغر من عدد الصفوف.";
 Strings.OfficeOM.L_RunMustReturnPromise = 'لم ترجع الوظيفة الدفعية التي تم تمريرها إلى أسلوب ".run" أي تعهد. يجب أن تُرجع الوظيفة أي تعهد، بحيث يمكن إصدار أي عناصر يتم تعقبها تلقائياً عند اكتمال العملية الدفعية. عادةً، يمكن إرجاع التعهد بإرجاع الاستجابة من"context.sync()".';
 Strings.OfficeOM.L_SSOClientError = "حدث خطأ في طلب المصادقة من Office.";
@@ -198,3 +200,4 @@ Strings.OfficeOM.L_UserClickIgnore = "اختار المستخدم تجاهل م�
 Strings.OfficeOM.L_UserNotSignedIn = "لم يسجل أي مستخدم دخوله إلى Office.";
 Strings.OfficeOM.L_ValueNotLoaded = 'لم يتم تحميل قيمة عنصر النتيجة بعد. قم باستدعاء "context.sync()" في سياق الطلب المقترن قبل قراءة خاصية القيمة.';
 Strings.OfficeOM.L_WorkbookHiddenMessage = "فشل طلب JavaScript API لأنه تم إخفاء المصنف. الرجاء قم بإظهار المصنف، ثم أعد المحاولة.";
+Strings.OfficeOM.L_WriteNotSupportedWhenModalDialogOpen = "عملية الكتابة غير مدعمة لـ Office عند فتح مربع حوار مشروط.";

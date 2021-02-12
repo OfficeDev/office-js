@@ -145,15 +145,41 @@ OSF.XdmFieldName = {
     ConversationUrl: "ConversationUrl",
     AppId: "AppId"
 };
+OSF.TestFlightStart = 1000;
+OSF.TestFlightEnd = 1009;
 OSF.FlightNames = {
     UseOriginNotUrl: 0,
     CheckReceiverOrigin: 1,
     AddinEnforceHttps: 2,
     RibbonNativeGroupControl: 3,
     RibbonTabPosition: 4,
-    RibbonTabAutoFocus: 5
+    RibbonTabAutoFocus: 5,
+    FirstPartyAnonymousProxyReadyCheckTimeout: 6,
+    SdxOnWacCDNIsEnabled: 7,
+    AddinRibbonControlsOverriddenByApi: 8,
+    AddinRibbonIdAllowUnknown: 9,
+    AdvancedUrlParsing: 10,
+    IgnoreWindowName: 11,
+    PostMessageParentOnlyOnce: 12,
+    RemoveOptionNotEnforceAppDomains: 13,
+    DialogPromptCleanDisplay: 14,
+    ManifestParserDevConsoleLog: 15,
+    LegacyRibbonAddinCommandsEnableDisableControls: 16,
+    AddInsInSupportedIrmDocsIsEnabled: 17,
+    AddinActionDefinitionHybridMode: 18,
+    OSFTestFlight1000: OSF.TestFlightStart,
+    OSFTestFlight1001: OSF.TestFlightStart + 1,
+    OSFTestFlight1002: OSF.TestFlightStart + 2,
+    OSFTestFlight1003: OSF.TestFlightStart + 3,
+    OSFTestFlight1004: OSF.TestFlightStart + 4,
+    OSFTestFlight1005: OSF.TestFlightStart + 5,
+    OSFTestFlight1006: OSF.TestFlightStart + 6,
+    OSFTestFlight1007: OSF.TestFlightStart + 7,
+    OSFTestFlight1008: OSF.TestFlightStart + 8,
+    OSFTestFlight1009: OSF.TestFlightEnd
 };
 OSF.Flights = [];
+OSF.Settings = {};
 OSF.WindowNameItemKeys = {
     BaseFrameName: "baseFrameName",
     HostInfo: "hostInfo",
@@ -487,6 +513,15 @@ OSF.OUtil = (function () {
                 return true;
             }
             return false;
+        },
+        getBooleanSetting: function OSF_OUtil$getSetting(settingName) {
+            return OSF.OUtil.getBooleanFromDictionary(OSF.Settings, settingName);
+        },
+        getBooleanFromDictionary: function OSF_OUtil$getBooleanFromDictionary(settings, settingName) {
+            var result = (settings && settingName && settings[settingName] !== undefined && settings[settingName] &&
+                ((typeof (settings[settingName]) === "string" && settings[settingName].toUpperCase() === 'TRUE') ||
+                    (typeof (settings[settingName]) === "boolean" && settings[settingName])));
+            return result !== undefined ? result : false;
         },
         parseFlightsFromWindowName: function OSF_OUtil$parseFlightsFromWindowName(skipSessionStorage, windowName) {
             return OSF.OUtil.parseArrayWithDefault(OSF.OUtil.parseInfoFromWindowName(skipSessionStorage, windowName, OSF.WindowNameItemKeys.Flights));
@@ -900,54 +935,179 @@ OSF.OUtil = (function () {
         isFirefox: function OSF_Outil$isFirefox() {
             return window.navigator.userAgent.indexOf("Firefox") > 0;
         },
+        startsWith: function OSF_Outil$startsWith(originalString, patternToCheck, browserIsIE) {
+            if (browserIsIE) {
+                return originalString.substr(0, patternToCheck.length) === patternToCheck;
+            }
+            else {
+                return originalString.startsWith(patternToCheck);
+            }
+        },
+        containsPort: function OSF_Outil$containsPort(url, protocol, hostname, portNumber) {
+            return this.startsWith(url, protocol + "//" + hostname + ":" + portNumber, true) || this.startsWith(url, hostname + ":" + portNumber, true);
+        },
+        getRedundandPortString: function OSF_Outil$getRedundandPortString(url, parser) {
+            if (!url || !parser)
+                return "";
+            if (parser.protocol == "https:" && this.containsPort(url, "https:", parser.hostname, "443"))
+                return ":443";
+            else if (parser.protocol == "http:" && this.containsPort(url, "http:", parser.hostname, "80"))
+                return ":80";
+            return "";
+        },
+        removeChar: function OSF_Outil$removeChar(url, indexOfCharToRemove) {
+            if (indexOfCharToRemove < url.length - 1)
+                return url.substring(0, indexOfCharToRemove) + url.substring(indexOfCharToRemove + 1);
+            else if (indexOfCharToRemove == url.length - 1)
+                return url.substring(0, url.length - 1);
+            else
+                return url;
+        },
+        cleanUrlOfChar: function OSF_Outil$cleanUrlOfChar(url, charToClean) {
+            var i;
+            for (i = 0; i < url.length; i++) {
+                if (url.charAt(i) === charToClean) {
+                    if (i + 1 >= url.length) {
+                        return this.removeChar(url, i);
+                    }
+                    else if (charToClean === '/') {
+                        if (url.charAt(i + 1) === '?' || url.charAt(i + 1) === '#') {
+                            return this.removeChar(url, i);
+                        }
+                    }
+                    else if (charToClean === '?') {
+                        if (url.charAt(i + 1) === '#') {
+                            return this.removeChar(url, i);
+                        }
+                    }
+                }
+            }
+            return url;
+        },
+        cleanUrl: function OSF_Outil$cleanUrl(url) {
+            url = this.cleanUrlOfChar(url, '/');
+            url = this.cleanUrlOfChar(url, '?');
+            url = this.cleanUrlOfChar(url, '#');
+            if (url.substr(0, 8) == "https://") {
+                var portIndex = url.indexOf(":443");
+                if (portIndex != -1) {
+                    if (portIndex == url.length - 4 || url.charAt(portIndex + 4) == "/" || url.charAt(portIndex + 4) == "?" || url.charAt(portIndex + 4) == "#") {
+                        url = url.substring(0, portIndex) + url.substring(portIndex + 4);
+                    }
+                }
+            }
+            else if (url.substr(0, 7) == "http://") {
+                var portIndex = url.indexOf(":80");
+                if (portIndex != -1) {
+                    if (portIndex == url.length - 3 || url.charAt(portIndex + 3) == "/" || url.charAt(portIndex + 3) == "?" || url.charAt(portIndex + 3) == "#") {
+                        url = url.substring(0, portIndex) + url.substring(portIndex + 3);
+                    }
+                }
+            }
+            return url;
+        },
         parseUrl: function OSF_Outil$parseUrl(url, enforceHttps) {
             if (enforceHttps === void 0) { enforceHttps = false; }
             if (typeof url === "undefined" || !url) {
                 return undefined;
             }
             var notHttpsErrorMessage = "NotHttps";
+            var invalidUrlErrorMessage = "InvalidUrl";
             var isIEBoolean = this.isIE();
             var isEdgeBoolean = this.isEdge();
             var parsedUrlObj = {
                 protocol: undefined,
                 hostname: undefined,
-                port: undefined
+                host: undefined,
+                port: undefined,
+                pathname: undefined,
+                search: undefined,
+                hash: undefined,
+                isPortPartOfUrl: undefined
             };
-            try {
-                if (isIEBoolean)
-                    throw "Browser doesn't support new URL library";
-                else if (isEdgeBoolean)
-                    throw "Browser has inconsistent URL library";
-                var urlObj = new URL(url);
-                if (urlObj) {
-                    parsedUrlObj.protocol = urlObj.protocol;
-                    parsedUrlObj.hostname = urlObj.hostname;
-                    parsedUrlObj.port = urlObj.port;
-                    if (OSF.OUtil.checkFlight(OSF.FlightNames.AddinEnforceHttps)) {
-                        if (enforceHttps && urlObj.protocol != "https:")
-                            throw new Error(notHttpsErrorMessage);
+            if (OSF.OUtil.checkFlight(OSF.FlightNames.AdvancedUrlParsing)) {
+                try {
+                    if (isIEBoolean) {
+                        var parser = document.createElement("a");
+                        parser.href = url;
+                        if (!parser || !parser.protocol || !parser.host || !parser.hostname || !parser.href
+                            || this.cleanUrl(parser.href) !== this.cleanUrl(url)) {
+                            throw invalidUrlErrorMessage;
+                        }
+                        if (OSF.OUtil.checkFlight(OSF.FlightNames.AddinEnforceHttps)) {
+                            if (enforceHttps && parser.protocol != "https:")
+                                throw new Error(notHttpsErrorMessage);
+                        }
+                        var redundandPortString = this.getRedundandPortString(url, parser);
+                        parsedUrlObj.protocol = parser.protocol;
+                        parsedUrlObj.hostname = parser.hostname;
+                        parsedUrlObj.port = (redundandPortString == "") ? parser.port : "";
+                        parsedUrlObj.host = (redundandPortString != "") ? parser.hostname : parser.host;
+                        parsedUrlObj.pathname = (isIEBoolean ? "/" : "") + parser.pathname;
+                        parsedUrlObj.search = parser.search;
+                        parsedUrlObj.hash = parser.hash;
+                        parsedUrlObj.isPortPartOfUrl = this.containsPort(url, parser.protocol, parser.hostname, parser.port);
+                    }
+                    else {
+                        var urlObj = new URL(url);
+                        if (urlObj && urlObj.protocol && urlObj.host && urlObj.hostname) {
+                            if (OSF.OUtil.checkFlight(OSF.FlightNames.AddinEnforceHttps)) {
+                                if (enforceHttps && urlObj.protocol != "https:")
+                                    throw new Error(notHttpsErrorMessage);
+                            }
+                            parsedUrlObj.protocol = urlObj.protocol;
+                            parsedUrlObj.hostname = urlObj.hostname;
+                            parsedUrlObj.port = urlObj.port;
+                            parsedUrlObj.host = urlObj.host;
+                            parsedUrlObj.pathname = urlObj.pathname;
+                            parsedUrlObj.search = urlObj.search;
+                            parsedUrlObj.hash = urlObj.hash;
+                            parsedUrlObj.isPortPartOfUrl = urlObj.host.lastIndexOf(":" + urlObj.port) == (urlObj.host.length - urlObj.port.length - 1);
+                        }
                     }
                 }
+                catch (err) {
+                    if (err.message === notHttpsErrorMessage)
+                        throw err;
+                }
             }
-            catch (err) {
-                if (err.message === notHttpsErrorMessage)
-                    throw err;
-                var parser = document.createElement("a");
-                parser.href = url;
-                if ((parser.pathname == '' || parser.pathname == '/')
-                    && !(url.substring(url.length - 1, url.length) === '/')) {
-                    url += '/';
+            else {
+                try {
+                    if (isIEBoolean)
+                        throw "Browser doesn't support new URL library";
+                    else if (isEdgeBoolean)
+                        throw "Browser has inconsistent URL library";
+                    var urlObj = new URL(url);
+                    if (urlObj) {
+                        parsedUrlObj.protocol = urlObj.protocol;
+                        parsedUrlObj.hostname = urlObj.hostname;
+                        parsedUrlObj.port = urlObj.port;
+                        if (OSF.OUtil.checkFlight(OSF.FlightNames.AddinEnforceHttps)) {
+                            if (enforceHttps && urlObj.protocol != "https:")
+                                throw new Error(notHttpsErrorMessage);
+                        }
+                    }
                 }
-                if (OSF.OUtil.checkFlight(OSF.FlightNames.AddinEnforceHttps)) {
-                    if (enforceHttps && parser.protocol != "https:")
-                        throw new Error(notHttpsErrorMessage);
-                }
-                var parsedUrlWithoutPort = parser.protocol + "//" + parser.hostname + (isIEBoolean ? "/" : "") + parser.pathname + parser.search + parser.hash;
-                var parsedUrlWithPort = parser.protocol + "//" + parser.host + (isIEBoolean ? "/" : "") + parser.pathname + parser.search + parser.hash;
-                if (url == parsedUrlWithoutPort || url == parsedUrlWithPort) {
-                    parsedUrlObj.protocol = parser.protocol;
-                    parsedUrlObj.hostname = parser.hostname;
-                    parsedUrlObj.port = parser.port;
+                catch (err) {
+                    if (err.message === notHttpsErrorMessage)
+                        throw err;
+                    var parser = document.createElement("a");
+                    parser.href = url;
+                    if ((parser.pathname == '' || parser.pathname == '/')
+                        && !(url.substring(url.length - 1, url.length) === '/')) {
+                        url += '/';
+                    }
+                    if (OSF.OUtil.checkFlight(OSF.FlightNames.AddinEnforceHttps)) {
+                        if (enforceHttps && parser.protocol != "https:")
+                            throw new Error(notHttpsErrorMessage);
+                    }
+                    var parsedUrlWithoutPort = parser.protocol + "//" + parser.hostname + (isIEBoolean ? "/" : "") + parser.pathname + parser.search + parser.hash;
+                    var parsedUrlWithPort = parser.protocol + "//" + parser.host + (isIEBoolean ? "/" : "") + parser.pathname + parser.search + parser.hash;
+                    if (url == parsedUrlWithoutPort || url == parsedUrlWithPort) {
+                        parsedUrlObj.protocol = parser.protocol;
+                        parsedUrlObj.hostname = parser.hostname;
+                        parsedUrlObj.port = parser.port;
+                    }
                 }
             }
             return parsedUrlObj;
@@ -1133,6 +1293,26 @@ OSF.OUtil = (function () {
                 }
             }
             return false;
+        },
+        hashCode: function OSF_OUtil$hashCode(str) {
+            var hash = 0;
+            if (!OSF.OUtil.isNullOrUndefined(str)) {
+                var i = 0;
+                var len = str.length;
+                while (i < len) {
+                    hash = (hash << 5) - hash + str.charCodeAt(i++) | 0;
+                }
+            }
+            return hash;
+        },
+        getValue: function OSF_OUtil$getValue(value, defaultValue) {
+            if (OSF.OUtil.isNullOrUndefined(value)) {
+                return defaultValue;
+            }
+            return value;
+        },
+        externalNativeFunctionExists: function OSF_OUtil$externalNativeFunctionExists(type) {
+            return type === 'unknown' || type !== 'undefined';
         }
     };
 })();
@@ -1253,7 +1433,9 @@ OSF.AgaveHostAction = {
     "RemoveAppCommandsAddin": 32,
     "RefreshRibbonGallery": 33,
     "GetOriginalControlId": 34,
-    "OfficeJsReady": 35
+    "OfficeJsReady": 35,
+    "InsertDevManifest": 36,
+    "InsertDevManifestError": 37
 };
 OSF.SharedConstants = {
     "NotificationConversationIdSuffix": '_ntf'
@@ -1639,9 +1821,12 @@ OSF.DDA.ErrorCodeManager = (function () {
             ooeInvalidApiArguments: 5013,
             ooeOperationCancelled: 5014,
             ooeWorkbookHidden: 5015,
+            ooeWriteNotSupportedWhenModalDialogOpen: 5016,
             ooeTooManyIncompleteRequests: 5100,
             ooeRequestTokenUnavailable: 5101,
             ooeActivityLimitReached: 5102,
+            ooeRequestPayloadSizeLimitExceeded: 5103,
+            ooeResponsePayloadSizeLimitExceeded: 5104,
             ooeCustomXmlNodeNotFound: 6000,
             ooeCustomXmlError: 6100,
             ooeCustomXmlExceedQuota: 6101,
@@ -1745,11 +1930,14 @@ OSF.DDA.ErrorCodeManager = (function () {
             _errorMappings[OSF.DDA.ErrorCodeManager.errorCodes.ooeBrowserAPINotSupported] = { name: stringNS.L_APINotSupported, message: stringNS.L_BrowserAPINotSupported };
             _errorMappings[OSF.DDA.ErrorCodeManager.errorCodes.ooeRequestTimeout] = { name: stringNS.L_APICallFailed, message: stringNS.L_RequestTimeout };
             _errorMappings[OSF.DDA.ErrorCodeManager.errorCodes.ooeInvalidOrTimedOutSession] = { name: stringNS.L_InvalidOrTimedOutSession, message: stringNS.L_InvalidOrTimedOutSessionMessage };
+            _errorMappings[OSF.DDA.ErrorCodeManager.errorCodes.ooeInvalidApiArguments] = { name: stringNS.L_APICallFailed, message: stringNS.L_InvalidApiArgumentsMessage };
+            _errorMappings[OSF.DDA.ErrorCodeManager.errorCodes.ooeWorkbookHidden] = { name: stringNS.L_APICallFailed, message: stringNS.L_WorkbookHiddenMessage };
+            _errorMappings[OSF.DDA.ErrorCodeManager.errorCodes.ooeWriteNotSupportedWhenModalDialogOpen] = { name: stringNS.L_APICallFailed, message: stringNS.L_WriteNotSupportedWhenModalDialogOpen };
             _errorMappings[OSF.DDA.ErrorCodeManager.errorCodes.ooeTooManyIncompleteRequests] = { name: stringNS.L_APICallFailed, message: stringNS.L_TooManyIncompleteRequests };
             _errorMappings[OSF.DDA.ErrorCodeManager.errorCodes.ooeRequestTokenUnavailable] = { name: stringNS.L_APICallFailed, message: stringNS.L_RequestTokenUnavailable };
             _errorMappings[OSF.DDA.ErrorCodeManager.errorCodes.ooeActivityLimitReached] = { name: stringNS.L_APICallFailed, message: stringNS.L_ActivityLimitReached };
-            _errorMappings[OSF.DDA.ErrorCodeManager.errorCodes.ooeInvalidApiArguments] = { name: stringNS.L_APICallFailed, message: stringNS.L_InvalidApiArgumentsMessage };
-            _errorMappings[OSF.DDA.ErrorCodeManager.errorCodes.ooeWorkbookHidden] = { name: stringNS.L_APICallFailed, message: stringNS.L_WorkbookHiddenMessage };
+            _errorMappings[OSF.DDA.ErrorCodeManager.errorCodes.ooeRequestPayloadSizeLimitExceeded] = { name: stringNS.L_APICallFailed, message: stringNS.L_RequestPayloadSizeLimitExceededMessage };
+            _errorMappings[OSF.DDA.ErrorCodeManager.errorCodes.ooeResponsePayloadSizeLimitExceeded] = { name: stringNS.L_APICallFailed, message: stringNS.L_ResponsePayloadSizeLimitExceededMessage };
             _errorMappings[OSF.DDA.ErrorCodeManager.errorCodes.ooeCustomXmlNodeNotFound] = { name: stringNS.L_InvalidNode, message: stringNS.L_CustomXmlNodeNotFound };
             _errorMappings[OSF.DDA.ErrorCodeManager.errorCodes.ooeCustomXmlError] = { name: stringNS.L_CustomXmlError, message: stringNS.L_CustomXmlError };
             _errorMappings[OSF.DDA.ErrorCodeManager.errorCodes.ooeCustomXmlExceedQuota] = { name: stringNS.L_CustomXmlExceedQuotaName, message: stringNS.L_CustomXmlExceedQuotaMessage };
@@ -3875,36 +4063,40 @@ var OfficeExt;
             if (typeof url === "undefined" || !url) {
                 return undefined;
             }
-            var host;
+            var host = undefined;
             var httpsProtocol = "https:";
             try {
                 var urlObj = new URL(url);
-                if (urlObj)
+                if (urlObj) {
                     host = urlObj.host;
-                if (urlObj.protocol !== httpsProtocol) {
+                }
+                if (!urlObj.protocol) {
+                    throw "fallback";
+                }
+                else if (urlObj.protocol !== httpsProtocol) {
                     return undefined;
                 }
             }
-            catch (err) {
-                var parser = document.createElement("a");
-                parser.href = url;
-                if (parser.protocol !== httpsProtocol) {
+            catch (ex) {
+                try {
+                    var parser = document.createElement("a");
+                    parser.href = url;
+                    if (parser.protocol !== httpsProtocol) {
+                        return undefined;
+                    }
+                    var match = url.match(new RegExp("^https://[^/?#]+", "i"));
+                    var naiveMatch = (match && match.length == 1) ? match[0].toLowerCase() : "";
+                    var parsedUrlWithoutPort = (parser.protocol + "//" + parser.hostname).toLowerCase();
+                    var parsedUrlWithPort = (parser.protocol + "//" + parser.host).toLowerCase();
+                    if (parsedUrlWithPort === naiveMatch || parsedUrlWithoutPort == naiveMatch) {
+                        host = parser.port == "443" ? parser.hostname : parser.host;
+                    }
+                }
+                catch (ex) {
                     return undefined;
                 }
-                var stringEndsWithSlash = function (str) {
-                    return str.substring(str.length - 1, str.length) === '/';
-                };
-                if ((parser.pathname === '' || parser.pathname === '/')
-                    && !stringEndsWithSlash(url)) {
-                    url += '/';
-                }
-                var parsedUrlWithoutPort = parser.protocol + "//" + parser.hostname + (stringEndsWithSlash(parser.hostname) ? "" : "/") + parser.pathname + parser.search + parser.hash;
-                var parsedUrlWithPort = parser.protocol + "//" + parser.host + (stringEndsWithSlash(parser.host) ? "" : "/") + parser.pathname + parser.search + parser.hash;
-                if (url == parsedUrlWithoutPort || url == parsedUrlWithPort) {
-                    host = parser.port == "443" ? parser.hostname : parser.host;
-                }
             }
-            return host;
+            return host ? host.toLowerCase() : undefined;
         }
         WACUtils.getHostSecure = getHostSecure;
         var CacheConstants = (function () {
@@ -4581,8 +4773,7 @@ Microsoft.Office.Common.ClientEndPoint.prototype = {
                 }
             }
         };
-        if (OSF.OUtil.checkFlight(OSF.FlightNames.CheckReceiverOrigin) &&
-            me._checkReceiverOriginAndRun) {
+        if (me._checkReceiverOriginAndRun) {
             me._checkReceiverOriginAndRun(funcToRun);
         }
         else {
@@ -4827,7 +5018,7 @@ Microsoft.Office.Common.XdmCommunicationManager = (function () {
         if (!hostName || hostName === "null") {
             return false;
         }
-        var regexHostNameStringArray = new Array("^office-int\\.com$", "^officeapps\\.live-int\\.com$", "^.*\\.dod\\.online\\.office365\\.us$", "^.*\\.gov\\.online\\.office365\\.us$", "^.*\\.officeapps\\.live\\.com$", "^.*\\.officeapps\\.live-int\\.com$", "^.*\\.officeapps-df\\.live\\.com$", "^.*\\.online\\.office\\.de$", "^.*\\.partner\\.officewebapps\\.cn$", "^" + document.domain.replace(new RegExp("\\.", "g"), "\\.") + "$");
+        var regexHostNameStringArray = new Array("^office-int\\.com$", "^officeapps\\.live-int\\.com$", "^.*\\.dod\\.online\\.office365\\.us$", "^.*\\.gov\\.online\\.office365\\.us$", "^.*\\.officeapps\\.live\\.com$", "^.*\\.officeapps\\.live-int\\.com$", "^.*\\.officeapps-df\\.live\\.com$", "^.*\\.online\\.office\\.de$", "^.*\\.partner\\.officewebapps\\.cn$", "^.*\\.office\\.net$", "^" + document.domain.replace(new RegExp("\\.", "g"), "\\.") + "$");
         var regexHostName = new RegExp(regexHostNameStringArray.join("|"));
         return regexHostName.test(hostName);
     }
@@ -4964,30 +5155,6 @@ Microsoft.Office.Common.XdmCommunicationManager = (function () {
             }
             else if (messageObject._messageType === Microsoft.Office.Common.MessageType.response) {
                 var clientEndPoint = _lookupClientEndPoint(messageObject._conversationId);
-                if (messageObject._actionName == "ContextActivationManager_getAppContextAsync") {
-                    try {
-                        if (OSF.OUtil.checkFlight(OSF.FlightNames.AddinEnforceHttps)) {
-                            var wachostname = OSF.OUtil.parseUrl(e.origin, true).hostname;
-                            var isOriginValid = _isHostNameValidWacDomain(wachostname);
-                        }
-                        else {
-                            var wacorigin = e.origin;
-                            var parser = document.createElement("a");
-                            parser.href = wacorigin;
-                            var isOriginValid = _isHostNameValidWacDomain(parser.hostname);
-                        }
-                        var isWacKnownHost = isOriginValid ? 1 : 0;
-                        var hostInfo = OSF._OfficeAppFactory.getHostInfo();
-                        OSF.AppTelemetry.onCheckWACHost(isWacKnownHost, messageObject._data._id, hostInfo.hostType, hostInfo.hostPlatform, messageObject._data._correlationId, wacorigin);
-                        if (!isWacKnownHost) {
-                            if (clientEndPoint && clientEndPoint._onSenderOriginNotTrusted) {
-                                clientEndPoint._onSenderOriginNotTrusted();
-                            }
-                        }
-                    }
-                    catch (ex) {
-                    }
-                }
                 if (!clientEndPoint) {
                     return;
                 }
@@ -6483,7 +6650,7 @@ var Logger;
 })(Logger || (Logger = {}));
 var OSFAriaLogger;
 (function (OSFAriaLogger) {
-    var TelemetryEventAppActivated = { name: "AppActivated", enabled: true, basic: true, critical: true, points: [
+    var TelemetryEventAppActivated = { name: "AppActivated", enabled: true, critical: true, points: [
             { name: "Browser", type: "string" },
             { name: "Message", type: "string" },
             { name: "AppURL", type: "string" },
@@ -6492,29 +6659,30 @@ var OSFAriaLogger;
             { name: "AppSizeHeight", type: "int64" },
             { name: "IsFromWacAutomation", type: "string" },
         ] };
-    var TelemetryEventScriptLoad = { name: "ScriptLoad", enabled: true, basic: false, critical: false, points: [
+    var TelemetryEventScriptLoad = { name: "ScriptLoad", enabled: true, critical: false, points: [
             { name: "ScriptId", type: "string" },
             { name: "StartTime", type: "double" },
             { name: "ResponseTime", type: "double" },
         ] };
-    var TelemetryEventApiUsage = { name: "APIUsage", enabled: false, basic: false, critical: false, points: [
+    var enableAPIUsage = shouldAPIUsageBeEnabled();
+    var TelemetryEventApiUsage = { name: "APIUsage", enabled: enableAPIUsage, critical: false, points: [
             { name: "APIType", type: "string" },
             { name: "APIID", type: "int64" },
             { name: "Parameters", type: "string" },
             { name: "ResponseTime", type: "int64" },
             { name: "ErrorType", type: "int64" },
         ] };
-    var TelemetryEventAppInitialization = { name: "AppInitialization", enabled: true, basic: false, critical: false, points: [
+    var TelemetryEventAppInitialization = { name: "AppInitialization", enabled: true, critical: false, points: [
             { name: "SuccessCode", type: "int64" },
             { name: "Message", type: "string" },
         ] };
-    var TelemetryEventAppClosed = { name: "AppClosed", enabled: true, basic: false, critical: false, points: [
+    var TelemetryEventAppClosed = { name: "AppClosed", enabled: true, critical: false, points: [
             { name: "FocusTime", type: "int64" },
             { name: "AppSizeFinalWidth", type: "int64" },
             { name: "AppSizeFinalHeight", type: "int64" },
             { name: "OpenTime", type: "int64" },
         ] };
-    var TelemetryEventCheckWACHost = { name: "CheckWACHost", enabled: true, basic: false, critical: false, points: [
+    var TelemetryEventCheckWACHost = { name: "CheckWACHost", enabled: true, critical: false, points: [
             { name: "isWacKnownHost", type: "int64" },
             { name: "solutionId", type: "string" },
             { name: "hostType", type: "string" },
@@ -6575,6 +6743,12 @@ var OSFAriaLogger;
         }
         return eventDefinition.enabled;
     }
+    function shouldAPIUsageBeEnabled() {
+        return (OSF._OfficeAppFactory &&
+            OSF._OfficeAppFactory.getHostInfo &&
+            OSF._OfficeAppFactory.getHostInfo()["hostType"] === "outlook" &&
+            OSF._OfficeAppFactory.getHostInfo()["hostPlatform"] === "mac");
+    }
     function generateTelemetryEvent(eventName, telemetryData) {
         var eventDefinition = getEventDefinition(eventName);
         if (eventDefinition === undefined) {
@@ -6597,9 +6771,7 @@ var OSFAriaLogger;
         if (eventDefinition.critical) {
             flags.samplingPolicy = oteljs.SamplingPolicy.CriticalBusinessImpact;
         }
-        if (eventDefinition.basic) {
-            flags.diagnosticLevel = oteljs.DiagnosticLevel.BasicEvent;
-        }
+        flags.diagnosticLevel = oteljs.DiagnosticLevel.NecessaryServiceDataEvent;
         var eventNameFull = "Office.Extensibility.OfficeJs." + eventName + "X";
         var event = { eventName: eventNameFull, dataFields: dataFields, eventFlags: flags };
         return event;
@@ -6990,7 +7162,6 @@ var OSFAppTelemetry;
             }
         })(context.get_eToken(), appInfo);
         appInfo.sessionId = sessionId;
-        appInfo.name = context.get_addinName();
         if (typeof OTel !== "undefined") {
             OTel.OTelLogger.initialize(appInfo);
         }
@@ -7083,6 +7254,9 @@ var OSFAppTelemetry;
     OSFAppTelemetry.onScriptDone = onScriptDone;
     function onCallDone(apiType, id, parameters, msResponseTime, errorType) {
         if (!appInfo) {
+            return;
+        }
+        if (!isAllowedHost() || !isAPIUsageEnabledDispId(id, apiType)) {
             return;
         }
         var data = new OSFLog.APIUsageUsageData();
@@ -7180,6 +7354,28 @@ var OSFAppTelemetry;
         doAppInitializationLogging(true, errorMessage);
     }
     OSFAppTelemetry.logAppException = logAppException;
+    function isAllowedHost() {
+        return (OSF._OfficeAppFactory &&
+            OSF._OfficeAppFactory.getHostInfo &&
+            OSF._OfficeAppFactory.getHostInfo()["hostType"] === "outlook" &&
+            OSF._OfficeAppFactory.getHostInfo()["hostPlatform"] === "mac");
+    }
+    function isAPIUsageEnabledDispId(dispId, apiType) {
+        if (apiType === "method") {
+            switch (dispId) {
+                case 3:
+                case 4:
+                case 38:
+                case 37:
+                case 10:
+                case 12:
+                    return true;
+                default:
+                    return false;
+            }
+        }
+        return false;
+    }
     OSF.AppTelemetry = OSFAppTelemetry;
 })(OSFAppTelemetry || (OSFAppTelemetry = {}));
 OSF.InitializationHelper.prototype.loadAppSpecificScriptAndCreateOM = function OSF_InitializationHelper$loadAppSpecificScriptAndCreateOM(appContext, appReady, basePath) {
@@ -7617,11 +7813,36 @@ var OfficeExt;
     var RichApiMessageManager = (function () {
         function RichApiMessageManager() {
             this._eventDispatch = null;
+            this._registerHandlers = [];
             this._eventDispatch = new OSF.EventDispatch([
                 Microsoft.Office.WebExtension.EventType.RichApiMessage,
             ]);
             OSF.DDA.DispIdHost.addEventSupport(this, this._eventDispatch);
         }
+        RichApiMessageManager.prototype.register = function (handler) {
+            var _this = this;
+            if (!this._registerWithHostPromise) {
+                this._registerWithHostPromise = new Office.Promise(function (resolve, reject) {
+                    _this.addHandlerAsync(Microsoft.Office.WebExtension.EventType.RichApiMessage, function (args) {
+                        _this._registerHandlers.forEach(function (value) {
+                            if (value) {
+                                value(args);
+                            }
+                        });
+                    }, function (asyncResult) {
+                        if (asyncResult.status == 'failed') {
+                            reject(asyncResult.error);
+                        }
+                        else {
+                            resolve();
+                        }
+                    });
+                });
+            }
+            return this._registerWithHostPromise.then(function () {
+                _this._registerHandlers.push(handler);
+            });
+        };
         return RichApiMessageManager;
     })();
     OfficeExt.RichApiMessageManager = RichApiMessageManager;
@@ -8063,7 +8284,8 @@ var OfficeExt;
             var registerDialogNotificationShownArgs = {
                 "dispId": OSF.DDA.EventDispId.dispidDialogNotificationShownInAddinEvent,
                 "eventType": OSF.DDA.Marshaling.DialogNotificationShownEventType.DialogNotificationShown,
-                "onComplete": null
+                "onComplete": null,
+                "onCalling": null
             };
             function setHostThemeButtonStyle(args) {
                 var hostThemeButtonStyleArgs = args.input;
@@ -8083,9 +8305,17 @@ var OfficeExt;
             Dialog.removeEventListenersForDialog = removeEventListenersForDialog;
             function handleNewWindowDialog(dialogInfo) {
                 try {
-                    if (dialogInfo[OSF.ShowWindowDialogParameterKeys.EnforceAppDomain] && !checkAppDomain(dialogInfo)) {
-                        showDialogCallback(OSF.DDA.ErrorCodeManager.errorCodes.ooeAppDomains);
-                        return;
+                    if (OSF.OUtil.checkFlight(OSF.FlightNames.RemoveOptionNotEnforceAppDomains)) {
+                        if (!checkAppDomain(dialogInfo)) {
+                            showDialogCallback(OSF.DDA.ErrorCodeManager.errorCodes.ooeAppDomains);
+                            return;
+                        }
+                    }
+                    else {
+                        if (dialogInfo[OSF.ShowWindowDialogParameterKeys.EnforceAppDomain] && !checkAppDomain(dialogInfo)) {
+                            showDialogCallback(OSF.DDA.ErrorCodeManager.errorCodes.ooeAppDomains);
+                            return;
+                        }
                     }
                     if (!dialogInfo[OSF.ShowWindowDialogParameterKeys.PromptBeforeOpen]) {
                         showDialog(dialogInfo);
@@ -8097,7 +8327,14 @@ var OfficeExt;
                     var dialogCssManager = OfficeExt.WacCommonUICssManager.getDialogCssManager(hostInfoObj.hostType);
                     var notificationText = OSF.OUtil.formatString(Strings.OfficeOM.L_ShowWindowDialogNotification, OSF._OfficeAppFactory.getInitializationHelper()._appContext._addinName);
                     overlayElement = createOverlayElement(dialogCssManager);
-                    document.body.insertBefore(overlayElement, document.body.firstChild);
+                    var docBodyChildren = [];
+                    if (OSF.OUtil.checkFlight(OSF.FlightNames.DialogPromptCleanDisplay)) {
+                        docBodyChildren = removeAndStoreAllChildrenFromNode(document.body);
+                        document.body.appendChild(overlayElement);
+                    }
+                    else {
+                        document.body.insertBefore(overlayElement, document.body.firstChild);
+                    }
                     dialogNotificationPanel = createNotificationPanel(dialogCssManager, notificationText);
                     dialogNotificationPanel.id = newWindowNotificationId;
                     var dialogNotificationButtonPanel = createButtonPanel(dialogCssManager);
@@ -8112,17 +8349,44 @@ var OfficeExt;
                         if (!hasCrossZoneNotification) {
                             dismissDialogNotification();
                         }
+                        if (OSF.OUtil.checkFlight(OSF.FlightNames.DialogPromptCleanDisplay)) {
+                            restoreChildrenToNode(document.body, docBodyChildren);
+                            docBodyChildren = [];
+                        }
                         event.preventDefault();
                         event.stopPropagation();
                     };
+                    function removeAndStoreAllChildrenFromNode(node) {
+                        var children = [];
+                        try {
+                            while (node.firstChild && node.firstChild != null) {
+                                children.push(node.firstChild);
+                                node.removeChild(node.firstChild);
+                            }
+                        }
+                        catch (e) { }
+                        return children;
+                    }
+                    function restoreChildrenToNode(node, children) {
+                        try {
+                            for (var i = 0; i < children.length; i++) {
+                                node.appendChild(children[i]);
+                            }
+                        }
+                        catch (e) { }
+                    }
                     function ignoreButtonClickEventHandler(event) {
                         function unregisterDialogNotificationShownEventCallback(status) {
                             removeDialogNotificationElement();
                             setFocusOnFirstElement(status);
                             showDialogCallback(OSF.DDA.ErrorCodeManager.errorCodes.ooeEndUserIgnore);
                         }
-                        registerDialogNotificationShownArgs.onComplete = unregisterDialogNotificationShownEventCallback;
+                        registerDialogNotificationShownArgs.onCalling = unregisterDialogNotificationShownEventCallback;
                         OSF.DDA.WAC.Delegate.unregisterEventAsync(registerDialogNotificationShownArgs);
+                        if (OSF.OUtil.checkFlight(OSF.FlightNames.DialogPromptCleanDisplay)) {
+                            restoreChildrenToNode(document.body, docBodyChildren);
+                            docBodyChildren = [];
+                        }
                         event.preventDefault();
                         event.stopPropagation();
                     }
@@ -8160,7 +8424,7 @@ var OfficeExt;
                     function registerDialogNotificationShownEventCallback(status) {
                         allowButton.focus();
                     }
-                    registerDialogNotificationShownArgs.onComplete = registerDialogNotificationShownEventCallback;
+                    registerDialogNotificationShownArgs.onCalling = registerDialogNotificationShownEventCallback;
                     OSF.DDA.WAC.Delegate.registerEventAsync(registerDialogNotificationShownArgs);
                 }
                 catch (e) {
@@ -8235,19 +8499,43 @@ var OfficeExt;
             Dialog.sendMessage = sendMessage;
             function postDialogMessage(targetWindow, message) {
                 var appDomains = OSF._OfficeAppFactory.getInitializationHelper()._appContext._appDomains;
-                if (appDomains) {
-                    for (var i = 0; i < appDomains.length && appDomains[i].indexOf("://") !== -1; i++) {
-                        targetWindow.postMessage(message, appDomains[i]);
-                    }
-                }
                 var currentOrigin = window.location.origin;
                 if (!currentOrigin) {
                     currentOrigin = window.location.protocol + "//"
                         + window.location.hostname
                         + (window.location.port ? ':' + window.location.port : '');
                 }
-                if (!Microsoft.Office.Common.XdmCommunicationManager.checkUrlWithAppDomains(appDomains, currentOrigin)) {
-                    targetWindow.postMessage(message, currentOrigin);
+                if (OSF.OUtil.checkFlight(OSF.FlightNames.PostMessageParentOnlyOnce)) {
+                    var isMessageParent = windowInstance == null;
+                    if (isMessageParent) {
+                        var parsedParentUrl = OSF.OUtil.parseUrl(document.referrer);
+                        var tagetOrigin = parsedParentUrl.protocol + "//"
+                            + parsedParentUrl.hostname
+                            + (parsedParentUrl.isPortPartOfUrl ? ':' + parsedParentUrl.port : '');
+                        if (Microsoft.Office.Common.XdmCommunicationManager.checkUrlWithAppDomains(appDomains, tagetOrigin)) {
+                            targetWindow.postMessage(message, tagetOrigin);
+                        }
+                    }
+                    else {
+                        if (appDomains) {
+                            for (var i = 0; i < appDomains.length && appDomains[i].indexOf("://") !== -1; i++) {
+                                targetWindow.postMessage(message, appDomains[i]);
+                            }
+                        }
+                        if (!Microsoft.Office.Common.XdmCommunicationManager.checkUrlWithAppDomains(appDomains, currentOrigin)) {
+                            targetWindow.postMessage(message, currentOrigin);
+                        }
+                    }
+                }
+                else {
+                    if (appDomains) {
+                        for (var i = 0; i < appDomains.length && appDomains[i].indexOf("://") !== -1; i++) {
+                            targetWindow.postMessage(message, appDomains[i]);
+                        }
+                    }
+                    if (!Microsoft.Office.Common.XdmCommunicationManager.checkUrlWithAppDomains(appDomains, currentOrigin)) {
+                        targetWindow.postMessage(message, currentOrigin);
+                    }
                 }
             }
             Dialog.postDialogMessage = postDialogMessage;
@@ -8419,7 +8707,7 @@ var OfficeExt;
                     "isDialog",
                     hostInfoObj.disableLogging ? "disableLogging" : ""
                 ];
-                var hostInfo = hostInfoVals.join("|");
+                var hostInfo = hostInfoVals.join("$");
                 var appContext = OSF._OfficeAppFactory.getInitializationHelper()._appContext;
                 var windowUrl = dialogInfo[OSF.ShowWindowDialogParameterKeys.Url];
                 if (!dialogInfo[OSF.ShowWindowDialogParameterKeys.UrlNoHostInfo]) {
@@ -8519,7 +8807,7 @@ var OfficeExt;
                     removeDialogNotificationElement();
                     setFocusOnFirstElement(status);
                 }
-                registerDialogNotificationShownArgs.onComplete = unregisterDialogNotificationShownEventCallback;
+                registerDialogNotificationShownArgs.onCalling = unregisterDialogNotificationShownEventCallback;
                 OSF.DDA.WAC.Delegate.unregisterEventAsync(registerDialogNotificationShownArgs);
             }
             function removeDialogNotificationElement() {
@@ -8667,6 +8955,7 @@ OSF.DDA.WAC.Delegate.openDialog = function OSF_DDA_WAC_Delegate$OpenDialog(args)
         var isSameDomain = false;
         var parentIsSubdomain = false;
         var childIsSubdomain = false;
+        var isAppDomain = false;
         var dialogUrlPortionAllowedToLog = "";
         var taskpaneUrlPortionAllowedToLog = "";
         if (OSF.OUtil) {
@@ -8684,8 +8973,10 @@ OSF.DDA.WAC.Delegate.openDialog = function OSF_DDA_WAC_Delegate$OpenDialog(args)
                 parentIsSubdomain = Microsoft.Office.Common.XdmCommunicationManager.isTargetSubdomainOfSourceLocation(dialogUrl, taskpaneUrl);
                 childIsSubdomain = Microsoft.Office.Common.XdmCommunicationManager.isTargetSubdomainOfSourceLocation(taskpaneUrl, dialogUrl);
             }
+            var appDomains = OSF._OfficeAppFactory.getInitializationHelper()._appContext._appDomains;
+            isAppDomain = Microsoft.Office.Common.XdmCommunicationManager.checkUrlWithAppDomains(appDomains, dialogUrl);
         }
-        var logJsonAsString = "openDialog isInline: " + dialogInfo[OSF.ShowWindowDialogParameterKeys.DisplayInIframe].toString() + ", " + "taskpaneHostname: " + taskpaneUrlPortionAllowedToLog + ", " + "dialogHostName: " + dialogUrlPortionAllowedToLog + ", " + "isSameDomain: " + isSameDomain.toString() + ", " + "parentIsSubdomain: " + parentIsSubdomain.toString() + ", " + "childIsSubdomain: " + childIsSubdomain.toString();
+        var logJsonAsString = "openDialog isInline: " + dialogInfo[OSF.ShowWindowDialogParameterKeys.DisplayInIframe].toString() + ", " + "taskpaneHostname: " + taskpaneUrlPortionAllowedToLog + ", " + "dialogHostName: " + dialogUrlPortionAllowedToLog + ", " + "isSameDomain: " + isSameDomain.toString() + ", " + "parentIsSubdomain: " + parentIsSubdomain.toString() + ", " + "childIsSubdomain: " + childIsSubdomain.toString() + ", " + "isAppDomain: " + isAppDomain.toString();
         OSF.AppTelemetry.logAppCommonMessage(logJsonAsString);
     }
     if (dialogUrl == null || !(dialogUrl.substr(0, httpsIdentifyString.length) === httpsIdentifyString)) {
@@ -8853,7 +9144,7 @@ OSF.InitializationHelper.prototype.prepareApiSurface = function OSF_Initializati
     }), exports.apiInformation = {
         isSetSupported: function(capability, version) {
             try {
-                return !!(Office && Office.context && Office.context.requirements) && Office.context.requirements.isSetSupported(capability, Number(version));
+                return !!(Office && Office.context && Office.context.requirements) && Office.context.requirements.isSetSupported(capability, version);
             } catch (e) {
                 return !1;
             }

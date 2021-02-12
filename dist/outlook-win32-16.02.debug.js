@@ -1,6 +1,6 @@
 /* Outlook Win32 specific API library */
 /* osfweb version: 16.0.13004.10000 */
-/* office-js-api version: 20200608.3 */
+/* office-js-api version: 20200812.2 */
 /*
 	Copyright (c) Microsoft Corporation.  All rights reserved.
 */
@@ -7470,6 +7470,7 @@ function getErrorArgs(detailedErrorCode) {
   return getErrorArgs_OSF.DDA.ErrorCodeManager.getErrorArgs(detailedErrorCode);
 }
 var totalRecipientsLimit = 500;
+var sessionDataLengthLimit = 50000;
 function initialize() {
   addErrorMessage(9000, "AttachmentSizeExceeded", getString("l_AttachmentExceededSize_Text"));
   addErrorMessage(9001, "NumberOfAttachmentsExceeded", getString("l_ExceededMaxNumberOfAttachments_Text"));
@@ -7520,6 +7521,8 @@ function initialize() {
   addErrorMessage(9047, "MissingExtendedPermissionsForAPIError", getString("l_Missing_Extended_Permissions_For_API"));
   addErrorMessage(9048, "TokenAccessDenied", getString("l_TokenAccessDeniedWithoutItemContext_Text"));
   addErrorMessage(9049, "ItemNotFound", getString("l_ItemNotFound_Text"));
+  addErrorMessage(9050, "KeyNotFound", getString("l_KeyNotFound_Text"));
+  addErrorMessage(9051, "SessionObjectMaxLengthExceeded", getString("l_SessionDataObjectMaxLengthExceeded_Text").replace("{0}", sessionDataLengthLimit));
   isInitialized = true;
 }
 function addErrorMessage(code, error, message) {
@@ -8590,11 +8593,12 @@ var getCurrentLevel = function getCurrentLevel() {
 var Features = {
   featureSampleProduction: production,
   featureSampleBeta: beta,
+  displayXAsync: production,
+  propertyGetAll: production,
   calendarItems: beta,
   signature: beta,
   replyCallback: beta,
-  displayXAsync: beta,
-  propertyGetAll: beta
+  sessionData: beta
 };
 function isFeatureEnabled(feature) {
   return feature <= getCurrentLevel();
@@ -8736,6 +8740,10 @@ function validateOptionalStringParameter(value, minLength, maxlength, name) {
     throw createArgumentError(String(name));
   }
 }
+// CONCATENATED MODULE: ./src/utils/isDateObject.ts
+var isDateObject = function isDateObject(objectIn) {
+  return objectIn instanceof Date || Object.prototype.toString.call(objectIn) == "[object Date]";
+};
 // CONCATENATED MODULE: ./src/methods/displayNewAppointmentForm.ts
 var displayNewAppointmentForm_spreadArrays = undefined && undefined.__spreadArrays || function () {
   for (var s = 0, i = 0, il = arguments.length; i < il; i++) {
@@ -8750,6 +8758,7 @@ var displayNewAppointmentForm_spreadArrays = undefined && undefined.__spreadArra
 
   return r;
 };
+
 
 
 
@@ -8817,16 +8826,16 @@ function displayNewAppointmentForm_validateParameters(parameters) {
   }
 
   if (!isNullOrUndefined(parameters.start)) {
-    if (!(parameters.start instanceof Date)) {
+    if (!isDateObject(parameters.start)) {
       throw createArgumentError("start");
     }
 
     if (!isNullOrUndefined(parameters.end)) {
-      if (!(parameters.end instanceof Date)) {
+      if (!isDateObject(parameters.end)) {
         throw createArgumentError("end");
       }
 
-      if (parameters.end < parameters.start) {
+      if (parameters.end && parameters.start && parameters.end < parameters.start) {
         throw createArgumentError("end", getString("l_InvalidEventDates_Text"));
       }
     }
@@ -9499,6 +9508,7 @@ var CustomProperties_spreadArrays = undefined && undefined.__spreadArrays || fun
 
 
 
+
 var CustomProperties_CustomProperties = function () {
   function CustomProperties(deserializedData) {
     if (isNullOrUndefined(deserializedData)) {
@@ -9542,7 +9552,7 @@ var CustomProperties_CustomProperties = function () {
   };
 
   CustomProperties.prototype.set = function (key, value) {
-    if (value instanceof Date) {
+    if (isDateObject(value)) {
       value = DatePrefix + value.getTime() + DatePostfix;
     }
 
@@ -9935,6 +9945,15 @@ function validateStringParam(paramName, paramValue) {
     throw createArgumentTypeError(paramName, typeof paramValue, "string");
   }
 }
+function validateStringParamWithEmptyAllowed(paramName, paramValue) {
+  if (isNullOrUndefined(paramValue)) {
+    throw createNullArgumentError(paramName);
+  }
+
+  if (!(typeof paramValue === "string")) {
+    throw createArgumentTypeError(paramName, typeof paramValue, "string");
+  }
+}
 // CONCATENATED MODULE: ./src/validation/notificationMessagesConstants.ts
 var MaximumKeyLength = 32;
 var MaximumIconLength = 32;
@@ -9986,19 +10005,7 @@ function validateData(data) {
       throw createArgumentError(NotificationsActionsDefinitionParameterName, getString("l_ActionsDefinitionWrongNotificationMessageError_Text"));
     }
   } else if (data.type === MailboxEnums.ItemNotificationMessageType.InsightMessage) {
-    validateStringParam(NotificationsIconParameterName, data.icon);
-
-    if (data.icon.length > MaximumIconLength) {
-      throw createArgumentOutOfRange(NotificationsIconParameterName, data.icon.length);
-    }
-
-    if (!isNullOrUndefined(data.persistent)) {
-      throw createNullArgumentError(NotificationsPersistentParameterName);
-    }
-
-    if (!isNullOrUndefined(data.actions)) {
-      validateActionsDefinitionBlob(data.actions);
-    }
+    validateInsightMessageParameters(data);
   } else {
     if (!isNullOrUndefined(data.icon)) {
       throw createArgumentError(NotificationsIconParameterName);
@@ -10017,6 +10024,24 @@ function validateData(data) {
 
   if (data.message.length > MaximumMessageLength) {
     throw createArgumentOutOfRange(NotificationsMessageParameterName, data.message.length);
+  }
+}
+
+function validateInsightMessageParameters(data) {
+  validateStringParam(NotificationsIconParameterName, data.icon);
+
+  if (data.icon.length > MaximumIconLength) {
+    throw createArgumentOutOfRange(NotificationsIconParameterName, data.icon.length);
+  }
+
+  if (!isNullOrUndefined(data.persistent)) {
+    throw createArgumentError(NotificationsPersistentParameterName);
+  }
+
+  if (isNullOrUndefined(data.actions)) {
+    throw createNullArgumentError(NotificationsActionsDefinitionParameterName);
+  } else {
+    validateActionsDefinitionBlob(data.actions);
   }
 }
 
@@ -10556,6 +10581,7 @@ function getDelayDelivery() {
 
 
 
+
 function setDelayDelivery(dateTime) {
   var args = [];
 
@@ -10576,7 +10602,7 @@ function validateParamerters(dateTime) {
     throw createNullArgumentError("dateTime", "You cannot conduct to a null dateTime");
   }
 
-  if (!(dateTime instanceof Date)) {
+  if (!isDateObject(dateTime)) {
     throw createArgumentTypeError("dateTime", typeof dateTime, typeof Date);
   }
 
@@ -12416,7 +12442,138 @@ function disableClientSignature() {
   checkFeatureEnabledAndThrow(Features.signature, "disableClientSignatureAsync");
   standardInvokeHostMethod(176, commonParameters.asyncContext, commonParameters.callback, undefined, undefined);
 }
+// CONCATENATED MODULE: ./src/methods/getSessionData.ts
+
+
+
+
+
+function getSessionData(name) {
+  var args = [];
+
+  for (var _i = 1; _i < arguments.length; _i++) {
+    args[_i - 1] = arguments[_i];
+  }
+
+  checkPermissionsAndThrow(2, "sessionData.getAsync");
+  var commonParameters = parseCommonArgs(args, true, false);
+  checkFeatureEnabledAndThrow(Features.sessionData, "sessionData.getAsync");
+  var parameters = {
+    name: name
+  };
+  getSessionData_validateParameters(parameters);
+  standardInvokeHostMethod(186, commonParameters.asyncContext, commonParameters.callback, parameters, undefined);
+}
+
+function getSessionData_validateParameters(parameters) {
+  validateStringParam("name", parameters.name);
+}
+// CONCATENATED MODULE: ./src/methods/setSessionData.ts
+
+
+
+
+
+function setSessionData(name, value) {
+  var args = [];
+
+  for (var _i = 2; _i < arguments.length; _i++) {
+    args[_i - 2] = arguments[_i];
+  }
+
+  checkPermissionsAndThrow(2, "sessionData.setAsync");
+  var commonParameters = parseCommonArgs(args, false, false);
+  var parameters = {
+    name: name,
+    value: value
+  };
+  checkFeatureEnabledAndThrow(Features.sessionData, "sessionData.setAsync");
+  setSessionData_validateParameters(parameters);
+  standardInvokeHostMethod(185, commonParameters.asyncContext, commonParameters.callback, parameters, undefined);
+}
+
+function setSessionData_validateParameters(parameters) {
+  validateStringParam("name", parameters.name);
+  validateStringParamWithEmptyAllowed("value", parameters.value);
+}
+// CONCATENATED MODULE: ./src/methods/getAllSessionData.ts
+
+
+
+
+function getAllSessionData() {
+  var args = [];
+
+  for (var _i = 0; _i < arguments.length; _i++) {
+    args[_i] = arguments[_i];
+  }
+
+  checkPermissionsAndThrow(2, "sessionData.getAllAsync");
+  var commonParameters = parseCommonArgs(args, true, false);
+  checkFeatureEnabledAndThrow(Features.sessionData, "sessionData.getAllAsync");
+  standardInvokeHostMethod(187, commonParameters.asyncContext, commonParameters.callback, undefined, undefined);
+}
+// CONCATENATED MODULE: ./src/methods/clearSessionData.ts
+
+
+
+
+function clearSessionData() {
+  var args = [];
+
+  for (var _i = 0; _i < arguments.length; _i++) {
+    args[_i] = arguments[_i];
+  }
+
+  checkPermissionsAndThrow(2, "sessionData.clearAsync");
+  var commonParameters = parseCommonArgs(args, false, false);
+  checkFeatureEnabledAndThrow(Features.sessionData, "sessionData.clearAsync");
+  standardInvokeHostMethod(188, commonParameters.asyncContext, commonParameters.callback, undefined, undefined);
+}
+// CONCATENATED MODULE: ./src/methods/removeSessionData.ts
+
+
+
+
+
+function removeSessionData(name) {
+  var args = [];
+
+  for (var _i = 1; _i < arguments.length; _i++) {
+    args[_i - 1] = arguments[_i];
+  }
+
+  checkPermissionsAndThrow(2, "sessionData.removeAsync");
+  var commonParameters = parseCommonArgs(args, false, false);
+  var parameters = {
+    name: name
+  };
+  checkFeatureEnabledAndThrow(Features.sessionData, "sessionData.removeAsync");
+  removeSessionData_validateParameters(parameters);
+  standardInvokeHostMethod(189, commonParameters.asyncContext, commonParameters.callback, parameters, undefined);
+}
+
+function removeSessionData_validateParameters(parameters) {
+  validateStringParam("name", parameters.name);
+}
+// CONCATENATED MODULE: ./src/api/getSessionDataSurface.ts
+
+
+
+
+
+
+function getSessionDataSurface() {
+  return objectDefine({}, {
+    getAsync: getSessionData,
+    setAsync: setSessionData,
+    getAllAsync: getAllSessionData,
+    clearAsync: clearSessionData,
+    removeAsync: removeSessionData
+  });
+}
 // CONCATENATED MODULE: ./src/api/getMessageCompose.ts
+
 
 
 
@@ -12473,7 +12630,8 @@ function getMessageCompose() {
     delayDeliveryTime: getDelayDeliverySurface(true),
     getComposeTypeAsync: getComposeType,
     isClientSignatureEnabledAsync: isClientSignatureEnabled,
-    disableClientSignatureAsync: disableClientSignature
+    disableClientSignatureAsync: disableClientSignature,
+    sessionData: getSessionDataSurface()
   });
   return messageCompose;
 }
@@ -12705,6 +12863,7 @@ function getTime_format(rawInput) {
 
 
 
+
 var maxTime = 8640000000000000;
 var minTime = -8640000000000000;
 function setTime(namespace) {
@@ -12729,7 +12888,7 @@ function setTime(namespace) {
 }
 
 function setTime_validateParameters(parameters) {
-  if (!(parameters.date instanceof Date)) {
+  if (!isDateObject(parameters.date)) {
     throw createArgumentTypeError("dateTime", typeof parameters.date, typeof Date);
   }
 
@@ -13277,6 +13436,7 @@ function getSensitivitySurface() {
 
 
 
+
 function getAppointmentCompose() {
   var appointmentCompose = objectDefine({}, {
     body: getBodySurface(true),
@@ -13309,7 +13469,8 @@ function getAppointmentCompose() {
     isAllDayEvent: getAllDayEventSurface(),
     sensitivity: getSensitivitySurface(),
     isClientSignatureEnabledAsync: isClientSignatureEnabled,
-    disableClientSignatureAsync: disableClientSignature
+    disableClientSignatureAsync: disableClientSignature,
+    sessionData: getSessionDataSurface()
   });
   return appointmentCompose;
 }
@@ -13466,8 +13627,9 @@ var __assign = undefined && undefined.__assign || function () {
 
 
 
+
 function convertToLocalClientTime(timeValue) {
-  if (!(timeValue instanceof Date)) {
+  if (!isDateObject(timeValue)) {
     throw createArgumentError("timeValue");
   }
 

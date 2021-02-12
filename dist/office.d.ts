@@ -1,6 +1,11 @@
 // Type definitions for Office.js 1.0
 // Project: https://github.com/OfficeDev/office-js
-// Definitions by: OfficeDev <https://github.com/OfficeDev>, Ricky Kirkham <https://github.com/Rick-Kirkham>, Alex Jerabek <https://github.com/AlexJerabek>, Elizabeth Samuel <https://github.com/ElizabethSamuel-MSFT>, Sudhi Ramamurthy <https://github.com/sumurthy>
+// Definitions by: OfficeDev <https://github.com/OfficeDev>,
+//                 Ricky Kirkham <https://github.com/Rick-Kirkham>,
+//                 Alex Jerabek <https://github.com/AlexJerabek>,
+//                 Elizabeth Samuel <https://github.com/ElizabethSamuel-MSFT>,
+//                 Sudhi Ramamurthy <https://github.com/sumurthy>,
+//                 Alison McKay <https://github.com/alison-mk>
 // Definitions: https://github.com/DefinitelyTyped/DefinitelyTyped
 // TypeScript Version: 2.4
 
@@ -325,7 +330,37 @@ declare namespace Office {
      * @param useShortNamespace True to use the shortcut alias; otherwise false to disable it. The default is true.
      */
     function useShortNamespace(useShortNamespace: boolean): void;
+    /**
+     * Represents the add-in.
+     */
+    const addin: Addin;
     // Enumerations
+    /**
+     * Provides options to determine the startup behavior of the add-in upon next start-up.
+     */
+    enum StartupBehavior {
+        /**
+         * The add-in does not load until opened by the user.
+         */
+        none = 'None',
+        /**
+         * Load the add-in but do not show UI.
+         */
+        load = 'Load',
+    }
+    /**
+     * Visibility mode of the add-in.
+     */
+    enum VisibilityMode {
+        /**
+         * UI is Hidden
+         */
+        hidden = 'Hidden',
+        /**
+         * Displayed as taskpane
+         */
+        taskpane = 'Taskpane',
+    }
     /**
      * Specifies the result of an asynchronous call.
      * 
@@ -476,6 +511,123 @@ declare namespace Office {
         */
         value: T;
     }
+	/**
+     * Message used in the `onVisibilityModeChanged` invocation.
+     */
+    interface VisibilityModeChangedMessage {
+        /**
+         * Visibility changed state.
+         */
+        visibilityMode: Office.VisibilityMode;
+    }
+    /**
+     * Function type to turn off the event.
+     */
+    type RemoveEventListener = () => Promise<void>;
+    /**
+     * Represents add-in level functionality for operating or configuring various aspects of the add-in.
+     */
+    interface Addin {
+        /**
+         * Sets the startup behavior for the add-in for when the document is opened next time.
+         * @param behavior - Specifies startup behavior of the add-in.
+         */
+        setStartupBehavior(behavior: Office.StartupBehavior): Promise<void>;
+        /**
+         * Gets the current startup behavior for the add-in.
+         */
+        getStartupBehavior(): Promise<Office.StartupBehavior>;
+        /**
+         * Shows the task pane associated with the add-in.
+         * @returns A promise that is resolved when the UI is shown.
+         */
+        showAsTaskpane(): Promise<void>;
+        /**
+         * Hides the task pane.
+         * @returns A promise that is resolved when the UI is hidden.
+         */
+        hide(): Promise<void>;
+        /**
+         * Adds a listener for the `onVisbilityModeChanged` event.
+         * @param listener - The listener function that is called when the event is emitted. This function takes in a message for the receiving component.
+         * @returns A promise that resolves to a function when the listener is added. The `RemoveEventListener` type is defined with `type RemoveEventListener = () => Promise<void>`. Calling it removes the listener.
+         */
+        onVisibilityModeChanged(
+            listener: (message: VisibilityModeChangedMessage) => void,
+        ): Promise<RemoveEventListener>;
+    }
+    /**
+     * An interface that contains all the functionality provided to manage the state of the Office ribbon.
+	 *
+	 * @remarks
+     *
+     * **Requirement set**: Ribbon 1.1
+     */
+    interface Ribbon {
+        /**
+         * Sends a request to Office to update the ribbon.
+		 *
+		 * @remarks
+         *
+         * **Requirement set**: Ribbon 1.1
+		 *
+         * Note that this API is only to request an update. The actual UI update to the ribbon is controlled by the Office application and hence the exact timing of the ribbon update (or refresh) cannot be determined by the completion of this API.
+		 *
+         * @param input - Represents the updates to be made to the ribbon. Note that only the changes specified in the input parameter are made.
+         */
+        requestUpdate(input: RibbonUpdaterData): Promise<void>;
+    }
+    /**
+     * Specifies changes to the ribbon, such as the enabled or disabled status of a button.
+	 *
+	 * @remarks
+     *
+     * **Requirement set**: Ribbon 1.1
+     */
+    interface RibbonUpdaterData {
+        /**
+         * Collection of tabs whose state is set with the call of `requestUpdate`.
+		 */
+        tabs: Tab[];
+    }
+    /**
+     * Represents an individual tab and the state it should have.
+	 *
+	 * @remarks
+     *
+     * **Requirement set**: Ribbon 1.1
+     */
+    interface Tab {
+        /**
+         * Identifier of the tab as specified in the manifest.
+         */
+        id: string;
+        /**
+         * Specifies the controls in the tab, such as menu items, buttons, etc.
+         */
+        controls: Control[];
+    }
+    /**
+     * Represents an individual control or command and the state it should have.
+	 *
+	 * @remarks
+     *
+     * **Requirement set**: Ribbon 1.1
+     */
+    interface Control {
+        /**
+         * Identifier of the control as specified in the manifest.
+         */
+        id: string;
+        /**
+         * Indicates whether the control should be visible or hidden. The default is true.
+         */
+        visible?: boolean;
+        /**
+         * Indicates whether the control should be enabled or disabled. The default is true.
+         */
+        enabled?: boolean;
+    } 	
     /**
      * Represents the runtime environment of the add-in and provides access to key objects of the API. 
      * The current context exists as a property of Office. It is accessed using `Office.context`.
@@ -738,19 +890,34 @@ declare namespace Office {
      */
     interface UI {
         /**
+         * Adds an event handler to the object using the specified event type.
+         *
+         * @remarks
+         *
+         * **Requirement set**: {@link https://docs.microsoft.com/office/dev/add-ins/reference/requirement-sets/dialog-api-requirement-sets | DialogApi 1.2}
+         *
+         * You can add multiple event handlers for the specified event type as long as the name of each event handler function is unique.
+         *
+         * @param eventType Specifies the type of event to add. This must be `Office.EventType.DialogParentMessageReceived`.
+         * @param handler The event handler function to add, whose only parameter is of type {@link Office.DialogParentMessageReceivedEventArgs}.
+         * @param options Optional. Provides an option for preserving context data of any type, unchanged, for use in a callback.
+         * @param callback Optional. A function that is invoked when the handler registration returns, whose only parameter is of type {@link Office.AsyncResult}.
+         */
+        addHandlerAsync(eventType: Office.EventType, handler: (result: DialogParentMessageReceivedEventArgs) => void, options?: Office.AsyncContextOptions, callback?: (result: AsyncResult<void>) => void): void;
+        /**
         * Displays a dialog to show or collect information from the user or to facilitate Web navigation.
         *
         * @remarks
-        * 
-        * **Hosts**: Word, Excel, Outlook, PowerPoint
-        * 
+        *
+        * **Hosts**: Excel, Outlook, PowerPoint, Word
+        *
         * **Requirement sets**: 
-        * 
+        *
         * - {@link https://docs.microsoft.com/office/dev/add-ins/reference/requirement-sets/dialog-api-requirement-sets | DialogApi}
-        * 
+        *
         * - {@link https://docs.microsoft.com/office/dev/add-ins/reference/requirement-sets/outlook-api-requirement-sets | Mailbox 1.4}
-        * 
-        * This method is available in the DialogApi requirement set for Word, Excel, or PowerPoint add-ins, and in the Mailbox requirement set 1.4 
+        *
+        * This method is available in the DialogApi requirement set for Excel, PowerPoint, or Word add-ins, and in the Mailbox requirement set 1.4
         * for Outlook. For more on how to specify a requirement set in your manifest, see 
         * {@link https://docs.microsoft.com/office/dev/add-ins/develop/specify-office-hosts-and-api-requirements | Specify Office hosts and API requirements}.
         *
@@ -758,7 +925,7 @@ declare namespace Office {
         * other domains.
         *
         * Any page calling `Office.context.ui.messageParent` must also be on the same domain as the parent page.
-        * 
+        *
         * **Design considerations**:
         *
         * The following design considerations apply to dialog boxes:
@@ -851,7 +1018,7 @@ declare namespace Office {
         * 
         * - {@link https://docs.microsoft.com/office/dev/add-ins/reference/requirement-sets/outlook-api-requirement-sets | Mailbox 1.4}
         * 
-        * This method is available in the DialogApi requirement set for Word, Excel, or PowerPoint add-ins, and in the Mailbox requirement set 1.4 
+        * This method is available in the DialogApi requirement set for Excel, PowerPoint, or Word add-ins, and in the Mailbox requirement set 1.4
         * for Outlook. For more on how to specify a requirement set in your manifest, see 
         * {@link https://docs.microsoft.com/office/dev/add-ins/develop/specify-office-hosts-and-api-requirements | Specify Office hosts and API requirements}.
         *
@@ -953,9 +1120,13 @@ declare namespace Office {
          *
          * @remarks
          * 
-         * **Hosts**: Excel, Word, PowerPoint, Outlook (Minimum requirement set: Mailbox 1.5)
+         * **Hosts**: Excel, Outlook (Minimum requirement set: Mailbox 1.5), PowerPoint, Word
          * 
-         * **Requirement set**: {@link https://docs.microsoft.com/office/dev/add-ins/reference/requirement-sets/dialog-api-requirement-sets | DialogApi}
+        * **Requirement sets**:
+        *
+        * - {@link https://docs.microsoft.com/office/dev/add-ins/reference/requirement-sets/dialog-api-requirement-sets | DialogApi}
+        *
+        * - {@link https://docs.microsoft.com/office/dev/add-ins/reference/requirement-sets/outlook-api-requirement-sets | Mailbox 1.5}
          * 
          * The behavior of this method is specified by the following:
          *
@@ -967,6 +1138,16 @@ declare namespace Office {
          * - Called from a module extension: No effect.
          */
         closeContainer(): void;
+        /**
+         * Opens a browser window and loads the specified URL. 
+         * 
+         * @remarks
+         * 
+         * **Requirement set**: {@link https://docs.microsoft.com/office/dev/add-ins/reference/requirement-sets/open-browser-window-api-requirement-sets | OpenBrowserWindowApi 1.1}
+         *  
+         * @param url The full URL to be opened including protocol (e.g., https), and port number, if any.
+         */
+        openBrowserWindow(url: string): void;
     }
 
     /**
@@ -1021,7 +1202,125 @@ declare namespace Office {
          */
         asyncContext?: any
     }
-
+    /**
+     * The Office Auth namespace, `Office.context.auth`, provides a method that allows the Office client application to obtain an access token to the add-in's web application.
+     * Indirectly, this also enables the add-in to access the signed-in user's Microsoft Graph data without requiring the user to sign in a second time.
+     */
+    interface Auth {
+        /**
+         * Calls the Azure Active Directory V 2.0 endpoint to get an access token to your add-in's web application. Enables add-ins to identify users.
+         * Server-side code can use this token to access Microsoft Graph for the add-in's web application by using the
+         * {@link https://docs.microsoft.com/azure/active-directory/develop/active-directory-v2-protocols-oauth-on-behalf-of | "on behalf of" OAuth flow}.
+         *
+         * @deprecated Use Office.auth.getAccessToken instead.
+         * 
+         * **Important**: In Outlook, this API is not supported if the add-in is loaded in an Outlook.com or Gmail mailbox.
+         * 
+         * @remarks
+         *
+         * **Hosts**: Excel, OneNote, Outlook, PowerPoint, Word
+         *
+         * **Requirement set**: {@link https://docs.microsoft.com/office/dev/add-ins/reference/requirement-sets/identity-api-requirement-sets | IdentityAPI}
+         *
+         * This API requires a single sign-on configuration that bridges the add-in to an Azure application. Office users sign in with Organizational
+         * Accounts and Microsoft Accounts. Microsoft Azure returns tokens intended for both user account types to access resources in the Microsoft Graph.
+         *
+         * @param options - Optional. Accepts an `AuthOptions` object to define sign-on behaviors.
+         * @param callback - Optional. Accepts a callback method that can parse the token for the user's ID or use the token in the "on behalf of" flow to get access to Microsoft Graph.
+         *                   If `AsyncResult.status` is "succeeded", then `AsyncResult.value` is the raw AAD v. 2.0-formatted access token.
+         */
+        getAccessTokenAsync(options?: AuthOptions, callback?: (result: AsyncResult<string>) => void): void;
+        /**
+         * Calls the Azure Active Directory V 2.0 endpoint to get an access token to your add-in's web application. Enables add-ins to identify users.
+         * Server-side code can use this token to access Microsoft Graph for the add-in's web application by using the
+         * {@link https://docs.microsoft.com/azure/active-directory/develop/active-directory-v2-protocols-oauth-on-behalf-of | "on behalf of" OAuth flow}.
+         *
+         * @deprecated Use `Office.auth.getAccessToken` instead.
+         * 
+         * **Important**: In Outlook, this API is not supported if the add-in is loaded in an Outlook.com or Gmail mailbox.
+         *
+         * @remarks
+         *
+         * **Hosts**: Excel, OneNote, Outlook, PowerPoint, Word
+         *
+         * **Requirement set**: {@link https://docs.microsoft.com/office/dev/add-ins/reference/requirement-sets/identity-api-requirement-sets | IdentityAPI}
+         *
+         * This API requires a single sign-on configuration that bridges the add-in to an Azure application. Office users sign in with Organizational
+         * Accounts and Microsoft Accounts. Microsoft Azure returns tokens intended for both user account types to access resources in the Microsoft Graph.
+         *
+         * @param callback - Optional. Accepts a callback method that can parse the token for the user's ID or use the token in the "on behalf of" flow to get access to Microsoft Graph.
+         *                   If `AsyncResult.status` is "succeeded", then `AsyncResult.value` is the raw AAD v. 2.0-formatted access token.
+         */
+        getAccessTokenAsync(callback?: (result: AsyncResult<string>) => void): void;
+        /**
+         * Calls the Azure Active Directory V 2.0 endpoint to get an access token to your add-in's web application. Enables add-ins to identify users.
+         * Server-side code can use this token to access Microsoft Graph for the add-in's web application by using the
+         * {@link https://docs.microsoft.com/azure/active-directory/develop/active-directory-v2-protocols-oauth-on-behalf-of | "on behalf of" OAuth flow}. 
+         * This API requires a single sign-on configuration that bridges the add-in to an Azure application. Office users sign in with Organizational
+         * Accounts and Microsoft Accounts. Microsoft Azure returns tokens intended for both user account types to access resources in the Microsoft Graph.
+         *
+         * @remarks
+         *
+         * **Hosts**: Excel, OneNote, Outlook, PowerPoint, Word
+         * 
+         * **Important**: In Outlook, this API is not supported if the add-in is loaded in an Outlook.com or Gmail mailbox. 
+         *
+         * **Requirement set**: {@link https://docs.microsoft.com/office/dev/add-ins/reference/requirement-sets/identity-api-requirement-sets | IdentityAPI}
+         *
+         * @param options - Optional. Accepts an `AuthOptions` object to define sign-on behaviors.
+         * @returns Promise to the access token.
+         */
+        getAccessToken(options?: AuthOptions): Promise<string>;
+    }
+    /**
+     * Provides options for the user experience when Office obtains an access token to the add-in from AAD v. 2.0 with the `getAccessToken` method.
+     */
+    interface AuthOptions {
+        /**
+         * Allows Office to get an access token silently or through interactive consent, if one is required. Default value is `false`.
+         * If set to `false`, Office will silently try to get an access token. If it fails to do so, Office will return a descriptive error.
+         * If set to `true`, Office will show an interactive consent UI after it fails to silently get an access token.
+         * The prompt will only allow consent to the AAD profile scope, not to any Microsoft Graph scopes.
+         */
+        allowConsentPrompt?: boolean;
+        /**
+         * Allows Office to get an access token silently provided consent is present or show interactive UI to sign in the user. Default value is `false`.
+         * If set to `false`, Office will silently try to get an access token. If it fails to do so, Office will return a descriptive error.
+         * If set to `true`, Office will show an interactive sign-in UI after it fails to silently get an access token.
+         */
+        allowSignInPrompt?: boolean;
+        /**
+         * Prompts the user to add their Office account (or to switch to it, if it is already added). Default value is `false`.
+         *
+         * @deprecated Use `allowSignInPrompt` instead.
+         */
+        forceAddAccount?: boolean;
+        /**
+         * Causes Office to display the add-in consent experience. Useful if the add-in's Azure permissions have changed or if the user's consent has
+         * been revoked. Default value is `false`.
+         *
+         * @deprecated Use `allowConsentPrompt` instead.
+         */
+        forceConsent?: boolean;
+        /**
+         * Causes Office to prompt the user to provide the additional factor when the tenancy being targeted by Microsoft Graph requires multifactor
+         * authentication. The string value identifies the type of additional factor that is required. In most cases, you won't know at development
+         * time whether the user's tenant requires an additional factor or what the string should be. So this option would be used in a "second try"
+         * call of `getAccessToken` after Microsoft Graph has sent an error requesting the additional factor and containing the string that should
+         * be used with the `authChallenge` option.
+         */
+        authChallenge?: string;
+        /**
+         * A user-defined item of any type that is returned, unchanged, in the `asyncContext` property of the `AsyncResult` object that is passed to a callback.
+         */
+        asyncContext?: any;
+        /**
+         * Causes Office to return a descriptive error when the add-in wants to access Microsoft Graph and the user/admin has not granted consent to Graph scopes. Default value is `false`.
+         * Office only supports consent to Graph scopes when the add-in has been deployed by a tenant admin. This information will not be available during development.
+         * Setting this option to `true` will cause Office to inform your add-in beforehand (by returning a descriptive error) if Graph access will fail.
+         */
+        forMSGraphAccess?: boolean;
+      }
     /**
      * Provides an option for preserving context data of any type, unchanged, for use in a callback.
      */
@@ -1183,14 +1482,18 @@ declare namespace Office {
          */
          column?: number
     }
+	/**
+	 * Used to strongly type the `handler` property of RemoveHandlerOptions.
+	 */
+	 type BindingEventHandler = (eventArgs?: Office.BindingDataChangedEventArgs | Office.BindingSelectionChangedEventArgs) => any;
     /**
      * Provides options to determine which event handler or handlers are removed.
      */
     interface RemoveHandlerOptions {
         /**
-         * The handler to be removed. If not specified all handlers for the specified event type are removed.
+         * The handler to be removed. If a particular handler is not specified, then all handlers for the specified event type are removed. The `BindingEventHandler` type is defined with `type BindingEventHandler = (eventArgs?: Office.BindingDataChangedEventArgs | Office.BindingSelectionChangedEventArgs) => any`.
          */
-        handler?: string
+        handler?: BindingEventHandler
         /**
          * A user-defined item of any type that is returned, unchanged, in the asyncContext property of the AsyncResult object that is passed to a callback.
          */
@@ -1422,8 +1725,27 @@ declare namespace Office {
          * - DialogMessageReceived. Triggered when the dialog box sends a message to its parent.
          *
          * - DialogEventReceived. Triggered when the dialog box has been closed or otherwise unloaded.
+         * 
+         * @param eventType Must be either DialogMessageReceived or DialogEventReceived.
+         * @param handler A function which accepts either an object with a `message` property, if eventType is DialogMessageReceived, or an object with an `error` property, if eventType is DialogEventReceived.
          */
-        addEventHandler(eventType: Office.EventType, handler: Function): void;
+        addEventHandler(eventType: Office.EventType, handler: (args: {message: string | boolean} | {error: number}) => void): void;
+        /**
+         * Delivers a message from the host page, such as a task pane or a UI-less function file, to a dialog that was opened from the page.
+         *
+         * @remarks
+         *
+         * **Hosts**: Excel, Outlook (Minimum requirement set: Mailbox 1.9), PowerPoint, Word
+         *
+         * **Requirement sets**:
+         *
+         * - {@link https://docs.microsoft.com/office/dev/add-ins/reference/requirement-sets/dialog-api-requirement-sets | DialogApi 1.2}
+         *
+         * - {@link https://docs.microsoft.com/office/dev/add-ins/reference/requirement-sets/outlook-api-requirement-sets | Mailbox 1.9}
+         *
+         * @param message Accepts a message from the host page to deliver to the dialog. Anything that can be serialized to a string, including JSON and XML, can be sent.
+         */
+        messageChild(message: string): void;
         /**
          * FOR INTERNAL USE ONLY. DO NOT CALL IN YOUR CODE.
          */
@@ -1663,6 +1985,10 @@ declare namespace Office {
          * Triggers when a dialog sends a message via `messageParent`.
          */
         DialogMessageReceived,
+        /**
+         * Triggers when a host page sends a message to a child dialog box with `messageChild`.
+         */
+        DialogParentMessageReceived,
         /**
          * Triggers when a document-level selection happens.
          * 
@@ -4837,6 +5163,23 @@ declare namespace Office {
         type: EventType;
     }
     /**
+     * Provides information about the message from the parent page that raised the `DialogParentMessageReceived` event.
+     *
+     * To add an event handler for the `DialogParentMessageReceived` event, use the `addHandlerAsync` method of the
+     * {@link Office.UI} object.
+     *
+     */
+    interface DialogParentMessageReceivedEventArgs {
+        /**
+         * Gets the content of the message sent from the parent page, which can be any string or stringified data.
+         */
+        message: string;
+        /**
+         * Get an {@link Office.EventType} enumeration value that identifies the kind of event that was raised.
+         */
+        type: EventType;
+    }
+    /**
      * Represents a slice of a document file. The Slice object is accessed with the `File.getSliceAsync` method.
      */
     interface Slice {
@@ -7613,17 +7956,14 @@ declare namespace Office {
              * The content of the attachment is returned as a base64-encoded string.
              */
             Base64 = "base64",
-
             /**
              * The content of the attachment is returned as a string representing a URL.
              */
             Url = "url",
-
             /**
              * The content of the attachment is returned as a string representing an .eml formatted file.
              */
             Eml = "eml",
-
             /**
              * The content of the attachment is returned as a string representing an .icalendar formatted file.
              */
@@ -7643,7 +7983,6 @@ declare namespace Office {
              * An attachment was added to the item.
              */
             Added = "added",
-
             /**
              * An attachment was removed from the item.
              */
@@ -8840,6 +9179,8 @@ declare namespace Office {
          * When you use the `Time.setAsync` method to set the end time, you should use the `convertToUtcClientTime` method to convert the local time on 
          * the client to UTC for the server.
          *
+         * **Important**: In the Windows client, you can't use this property to update the end of a recurrence.
+         *
          * @remarks
          *
          * **{@link https://docs.microsoft.com/office/dev/add-ins/outlook/understanding-outlook-add-in-permissions | Minimum permission level}**: `ReadItem`
@@ -8896,14 +9237,11 @@ declare namespace Office {
          */
         notificationMessages: NotificationMessages;
         /**
-         * Provides access to the optional attendees of an event. The type of object and level of access depends on the mode of the current item.
-         * 
-         * The `optionalAttendees` property returns a {@link Office.Recipients | Recipients} object that provides methods to get or update the optional attendees 
-         * for a meeting. By default, the collection is limited to a maximum of 100 members. However, on Windows and Mac, the following limits apply.
-         * 
-         * - Get 500 members maximum.
+         * Provides access to the optional attendees of an event. The type of object and level of access depend on the mode of the current item.
          *
-         * - Set a maximum of 100 members per call, up to 500 members total.
+         * The `optionalAttendees` property returns a `Recipients` object that provides methods to get or update the
+         * optional attendees for a meeting. However, depending on the client/platform (i.e., Windows, Mac, etc.), limits may apply on how many
+         * recipients you can get or update. See the {@link Office.Recipients | Recipients} object for more details.
          *
          * @remarks
          *
@@ -8947,14 +9285,11 @@ declare namespace Office {
          */
         recurrence: Recurrence;
         /**
-         * Provides access to the required attendees of an event. The type of object and level of access depends on the mode of the current item.
+         * Provides access to the required attendees of an event. The type of object and level of access depend on the mode of the current item.
          *
-         * The `requiredAttendees` property returns a {@link Office.Recipients | Recipients} object that provides methods to get or update the required attendees 
-         * for a meeting. By default, the collection is limited to a maximum of 100 members. However, on Windows and Mac, the following limits apply.
-         *
-         * - Get 500 members maximum.
-         *
-         * - Set a maximum of 100 members per call, up to 500 members total.
+         * The `requiredAttendees` property returns a `Recipients` object that provides methods to get or update the
+         * required attendees for a meeting. However, depending on the client/platform (i.e., Windows, Mac, etc.), limits may apply on how many
+         * recipients you can get or update. See the {@link Office.Recipients | Recipients} object for more details.
          *
          * @remarks
          *
@@ -8994,6 +9329,8 @@ declare namespace Office {
          *
          * When you use the `Time.setAsync` method to set the start time, you should use the `convertToUtcClientTime` method to convert the local time on 
          * the client to UTC for the server.
+         *
+         * **Important**: In the Windows client, you can't use this property to update the start of a recurrence.
          *
          * @remarks
          *
@@ -9060,42 +9397,6 @@ declare namespace Office {
         /**
          * Adds a file to a message or appointment as an attachment.
          *
-         * The `addFileAttachmentAsync` method uploads the file at the specified URI and attaches it to the item in the compose form.
-         *
-         * You can subsequently use the identifier with the `removeAttachmentAsync` method to remove the attachment in the same session.
-         *
-         * **Important**: In recent builds of Outlook on Windows, a bug was introduced that incorrectly appends an `Authorization: Bearer` header to
-         * this action (whether using this API or the Outlook UI). To work around this issue, you can try using the `addFileAttachmentFromBase64` API
-         * introduced with requirement set 1.8.
-         *
-         * [Api set: Mailbox 1.1]
-         *
-         * @remarks
-         * 
-         * **{@link https://docs.microsoft.com/office/dev/add-ins/outlook/understanding-outlook-add-in-permissions | Minimum permission level}**: `ReadWriteItem`
-         * 
-         * **{@link https://docs.microsoft.com/office/dev/add-ins/outlook/outlook-add-ins-overview#extension-points | Applicable Outlook mode}**: Appointment Organizer
-         * 
-         * **Errors**:
-         * 
-         * - `AttachmentSizeExceeded`: The attachment is larger than allowed.
-         * 
-         * - `FileTypeNotSupported`: The attachment has an extension that is not allowed.
-         * 
-         * - `NumberOfAttachmentsExceeded`: The message or appointment has too many attachments.
-         *
-         * @param uri - The URI that provides the location of the file to attach to the message or appointment. The maximum length is 2048 characters.
-         * @param attachmentName - The name of the attachment that is shown while the attachment is uploading. The maximum length is 255 characters.
-         * @param callback - Optional. When the method completes, the function passed in the `callback` parameter is called with a single parameter
-         *                             of type `Office.AsyncResult`.
-         *                 On success, the attachment identifier will be provided in the `asyncResult.value` property.
-         *                 If uploading the attachment fails, the `asyncResult` object will contain
-         *                 an `Error` object that provides a description of the error.
-         */
-        addFileAttachmentAsync(uri: string, attachmentName: string, callback?: (asyncResult: Office.AsyncResult<string>) => void): void;
-        /**
-         * Adds a file to a message or appointment as an attachment.
-         *
          * The `addFileAttachmentFromBase64Async` method uploads the file from the base64 encoding and attaches it to the item in the compose form.
          * This method returns the attachment identifier in the `asyncResult.value` object.
          *
@@ -9134,42 +9435,6 @@ declare namespace Office {
          */
         addFileAttachmentFromBase64Async(base64File: string, attachmentName: string, options?: Office.AsyncContextOptions &  { isInline: boolean }, callback?: (asyncResult: Office.AsyncResult<string>) => void): void;
         /**
-         * Adds a file to a message or appointment as an attachment.
-         *
-         * The `addFileAttachmentFromBase64Async` method uploads the file from the base64 encoding and attaches it to the item in the compose form.
-         * This method returns the attachment identifier in the `asyncResult.value` object.
-         *
-         * You can subsequently use the identifier with the `removeAttachmentAsync` method to remove the attachment in the same session.
-         * 
-         * **Note**: If you're using a data URL API (e.g., `readAsDataURL`), you need to strip out the data URL prefix then send the rest of the string to this API.
-         * For example, if the full string is represented by `data:image/svg+xml;base64,<rest of base64 string>`, remove `data:image/svg+xml;base64,`.
-         *
-         * [Api set: Mailbox 1.8]
-         *
-         * @remarks
-         * 
-         * **{@link https://docs.microsoft.com/office/dev/add-ins/outlook/understanding-outlook-add-in-permissions | Minimum permission level}**: `ReadWriteItem`
-         * 
-         * **{@link https://docs.microsoft.com/office/dev/add-ins/outlook/outlook-add-ins-overview#extension-points | Applicable Outlook mode}**: Appointment Organizer
-         * 
-         * **Errors**:
-         * 
-         * - `AttachmentSizeExceeded`: The attachment is larger than allowed.
-         * 
-         * - `FileTypeNotSupported`: The attachment has an extension that is not allowed.
-         * 
-         * - `NumberOfAttachmentsExceeded`: The message or appointment has too many attachments.
-         * 
-         * @param base64File - The base64 encoded content of an image or file to be added to an email or event.
-         * @param attachmentName - The name of the attachment that is shown while the attachment is uploading. The maximum length is 255 characters.
-         * @param callback - Optional. When the method completes, the function passed in the `callback` parameter is called with a single parameter
-         *                             of type `Office.AsyncResult`.
-         *                  On success, the attachment identifier will be provided in the `asyncResult.value` property. 
-         *                  If uploading the attachment fails, the `asyncResult` object will contain
-         *                  an `Error` object that provides a description of the error.
-         */
-        addFileAttachmentFromBase64Async(base64File: string, attachmentName: string, callback?: (asyncResult: Office.AsyncResult<string>) => void): void;
-        /**
          * Adds an event handler for a supported event. **Note**: Events are available only with task pane.
          * 
          * Refer to the Item object model {@link https://docs.microsoft.com/office/dev/add-ins/reference/objectmodel/requirement-set-1.8/office.context.mailbox.item#events | events section} for supported events.
@@ -9191,26 +9456,6 @@ declare namespace Office {
          *                `asyncResult`, which is an `Office.AsyncResult` object.
          */
         addHandlerAsync(eventType: Office.EventType | string, handler: any, options?: Office.AsyncContextOptions, callback?: (asyncResult: Office.AsyncResult<void>) => void): void;
-        /**
-         * Adds an event handler for a supported event. **Note**: Events are available only with task pane.
-         * 
-         * Refer to the Item object model {@link https://docs.microsoft.com/office/dev/add-ins/reference/objectmodel/requirement-set-1.8/office.context.mailbox.item#events | events section} for supported events.
-         * 
-         * [Api set: Mailbox 1.7]
-         *
-         * @remarks
-         *
-         * **{@link https://docs.microsoft.com/office/dev/add-ins/outlook/understanding-outlook-add-in-permissions | Minimum permission level}**: `ReadItem`
-         * 
-         * **{@link https://docs.microsoft.com/office/dev/add-ins/outlook/outlook-add-ins-overview#extension-points | Applicable Outlook mode}**: Appointment Organizer
-         * 
-         * @param eventType - The event that should invoke the handler.
-         * @param handler - The function to handle the event. The function must accept a single parameter, which is an object literal. 
-         *                The type property on the parameter will match the `eventType` parameter passed to `addHandlerAsync`.
-         * @param callback - Optional. When the method completes, the function passed in the `callback` parameter is called with a single parameter, 
-         *                `asyncResult`, which is an `Office.AsyncResult` object.
-         */
-        addHandlerAsync(eventType: Office.EventType | string, handler: any, callback?: (asyncResult: Office.AsyncResult<void>) => void): void;
         /**
          * Adds an Exchange item, such as a message, as an attachment to the message or appointment.
          *
@@ -9247,40 +9492,6 @@ declare namespace Office {
          *                 an `Error` object that provides a description of the error.
          */
         addItemAttachmentAsync(itemId: any, attachmentName: string, options?: Office.AsyncContextOptions, callback?: (asyncResult: Office.AsyncResult<string>) => void): void;
-        /**
-         * Adds an Exchange item, such as a message, as an attachment to the message or appointment.
-         *
-         * The `addItemAttachmentAsync` method attaches the item with the specified Exchange identifier to the item in the compose form. 
-         * If you specify a callback method, the method is called with one parameter, `asyncResult`, which contains either the attachment identifier or 
-         * a code that indicates any error that occurred while attaching the item. 
-         * You can use the `options` parameter to pass state information to the callback method, if needed.
-         *
-         * You can subsequently use the identifier with the `removeAttachmentAsync` method to remove the attachment in the same session.
-         *
-         * If your Office Add-in is running in Outlook on the web, the `addItemAttachmentAsync` method can attach items to items other than the item that 
-         * you are editing; however, this is not supported and is not recommended.
-         *
-         * [Api set: Mailbox 1.1]
-         *
-         * @remarks
-         * 
-         * **{@link https://docs.microsoft.com/office/dev/add-ins/outlook/understanding-outlook-add-in-permissions | Minimum permission level}**: `ReadWriteItem`
-         * 
-         * **{@link https://docs.microsoft.com/office/dev/add-ins/outlook/outlook-add-ins-overview#extension-points | Applicable Outlook mode}**: Appointment Organizer
-         * 
-         * **Errors**:
-         * 
-         * - `NumberOfAttachmentsExceeded`: The message or appointment has too many attachments.
-         *
-         * @param itemId - The Exchange identifier of the item to attach. The maximum length is 100 characters.
-         * @param attachmentName - The name of the attachment that is shown while the attachment is uploading. The maximum length is 255 characters.
-         * @param callback - Optional. When the method completes, the function passed in the `callback` parameter is called with a single parameter
-         *                             of type `Office.AsyncResult`.
-         *                 On success, the attachment identifier will be provided in the `asyncResult.value` property. 
-         *                 If adding the attachment fails, the `asyncResult` object will contain
-         *                 an `Error` object that provides a description of the error.
-         */
-        addItemAttachmentAsync(itemId: any, attachmentName: string, callback?: (asyncResult: Office.AsyncResult<string>) => void): void;
         /**
          * Closes the current item that is being composed
          *
@@ -9334,36 +9545,6 @@ declare namespace Office {
          */
         getAttachmentContentAsync(attachmentId: string, options?: Office.AsyncContextOptions, callback?: (asyncResult: Office.AsyncResult<AttachmentContent>) => void): void;
         /**
-         * Gets an attachment from a message or appointment and returns it as an `AttachmentContent` object.
-         * 
-         * The `getAttachmentContentAsync` method gets the attachment with the specified identifier from the item. As a best practice, you should use 
-         * the identifier to retrieve an attachment in the same session that the attachmentIds were retrieved with the `getAttachmentsAsync` or 
-         * `item.attachments` call. In Outlook on the web and mobile devices, the attachment identifier is valid only within the same session. 
-         * A session is over when the user closes the app, or if the user starts composing an inline form then subsequently pops out the form to 
-         * continue in a separate window.
-         * 
-         * [Api set: Mailbox 1.8]
-         * 
-         * @remarks
-         * 
-         * **{@link https://docs.microsoft.com/office/dev/add-ins/outlook/understanding-outlook-add-in-permissions | Minimum permission level}**: `ReadItem`
-         * 
-         * **{@link https://docs.microsoft.com/office/dev/add-ins/outlook/outlook-add-ins-overview#extension-points | Applicable Outlook mode}**: Appointment Organizer
-         * 
-         * **Errors**:
-         * 
-         * - `AttachmentTypeNotSupported`: The attachment type isn't supported. Unsupported types include embedded images in Rich Text Format,
-         *                               or item attachment types other than email or calendar items (such as a contact or task item).
-         *
-         * - `InvalidAttachmentId`: The attachment identifier does not exist.
-         * 
-         * @param attachmentId - The identifier of the attachment you want to get. 
-         * @param callback - Optional. When the method completes, the function passed in the `callback` parameter is called with a single parameter, 
-         *                `asyncResult`, which is an `Office.AsyncResult` object. If the call fails, the `asyncResult.error` property will contain
-         *                an error code with the reason for the failure.
-         */
-        getAttachmentContentAsync(attachmentId: string, callback?: (asyncResult: Office.AsyncResult<AttachmentContent>) => void): void;
-        /**
          * Gets the item's attachments as an array.
          * 
          * [Api set: Mailbox 1.8]
@@ -9381,22 +9562,6 @@ declare namespace Office {
          *                 the failure.
          */
         getAttachmentsAsync(options?: Office.AsyncContextOptions, callback?: (asyncResult: Office.AsyncResult<AttachmentDetailsCompose[]>) => void): void;
-        /**
-         * Gets the item's attachments as an array.
-         * 
-         * [Api set: Mailbox 1.8]
-         *
-         * @remarks
-         *
-         * **{@link https://docs.microsoft.com/office/dev/add-ins/outlook/understanding-outlook-add-in-permissions | Minimum permission level}**: `ReadItem`
-         * 
-         * **{@link https://docs.microsoft.com/office/dev/add-ins/outlook/outlook-add-ins-overview#extension-points | Applicable Outlook mode}**: Appointment Organizer
-         * 
-         * @param callback - Optional. When the method completes, the function passed in the `callback` parameter is called with a single parameter of
-         *                 type `Office.AsyncResult`. If the call fails, the `asyncResult.error` property will contain an error code with the reason for
-         *                 the failure.
-         */
-        getAttachmentsAsync(callback?: (asyncResult: Office.AsyncResult<AttachmentDetailsCompose[]>) => void): void;
         /**
          * Asynchronously gets the ID of a saved item.
          *
@@ -9506,7 +9671,10 @@ declare namespace Office {
         /**
          * Gets the properties of an appointment or message in a shared folder, calendar, or mailbox.
          *
-         * **Note**: This method is not supported in Outlook on Mac, iOS, or Android.
+         * For more information around using this API, see the
+         * {@link https://docs.microsoft.com/office/dev/add-ins/outlook/delegate-access | delegate access} article.
+         *
+         * **Note**: This method is not supported in Outlook on iOS or Android.
          *
          * [Api set: Mailbox 1.8]
          *
@@ -9526,7 +9694,10 @@ declare namespace Office {
         /**
          * Gets the properties of an appointment or message in a shared folder, calendar, or mailbox.
          *
-         * **Note**: This method is not supported in Outlook on Mac, iOS, or Android.
+         * For more information around using this API, see the
+         * {@link https://docs.microsoft.com/office/dev/add-ins/outlook/delegate-access | delegate access} article.
+         *
+         * **Note**: This method is not supported in Outlook on iOS or Android.
          *
          * [Api set: Mailbox 1.8]
          *
@@ -9594,34 +9765,6 @@ declare namespace Office {
          */
         removeAttachmentAsync(attachmentId: string, options?: Office.AsyncContextOptions, callback?: (asyncResult: Office.AsyncResult<void>) => void): void;
         /**
-         * Removes an attachment from a message or appointment.
-         *
-         * The `removeAttachmentAsync` method removes the attachment with the specified identifier from the item. 
-         * As a best practice, you should use the attachment identifier to remove an attachment only if the same mail app has added that attachment 
-         * in the same session. 
-         * In Outlook on the web and mobile devices, the attachment identifier is valid only within the same session. 
-         * A session is over when the user closes the app, or if the user starts composing an inline form then subsequently pops out the form to 
-         * continue in a separate window.
-         *
-         * [Api set: Mailbox 1.1]
-         *
-         * @remarks
-         *
-         * **{@link https://docs.microsoft.com/office/dev/add-ins/outlook/understanding-outlook-add-in-permissions | Minimum permission level}**: `ReadWriteItem`
-         * 
-         * **{@link https://docs.microsoft.com/office/dev/add-ins/outlook/outlook-add-ins-overview#extension-points | Applicable Outlook mode}**: Appointment Organizer
-         * 
-         * **Errors**:
-         * 
-         * - `InvalidAttachmentId`: The attachment identifier does not exist.
-         *
-         * @param attachmentId - The identifier of the attachment to remove.
-         * @param callback - Optional. When the method completes, the function passed in the `callback` parameter is called with a single parameter of 
-         *                 type `Office.AsyncResult`. 
-         *                 If removing the attachment fails, the `asyncResult.error` property will contain an error code with the reason for the failure.
-         */
-        removeAttachmentAsync(attachmentId: string, callback?: (asyncResult: Office.AsyncResult<void>) => void): void;
-        /**
          * Removes the event handlers for a supported event type. **Note**: Events are available only with task pane.
          * 
          * Refer to the Item object model {@link https://docs.microsoft.com/office/dev/add-ins/reference/objectmodel/requirement-set-1.8/office.context.mailbox.item#events | events section} for supported events.
@@ -9641,24 +9784,6 @@ declare namespace Office {
          *                `asyncResult`, which is an `Office.AsyncResult` object.
          */
         removeHandlerAsync(eventType: Office.EventType | string, options?: Office.AsyncContextOptions, callback?: (asyncResult: Office.AsyncResult<void>) => void): void;
-        /**
-         * Removes the event handlers for a supported event type. **Note**: Events are available only with task pane.
-         * 
-         * Refer to the Item object model {@link https://docs.microsoft.com/office/dev/add-ins/reference/objectmodel/requirement-set-1.8/office.context.mailbox.item#events | events section} for supported events.
-         * 
-         * [Api set: Mailbox 1.7]
-         *
-         * @remarks
-         *
-         * **{@link https://docs.microsoft.com/office/dev/add-ins/outlook/understanding-outlook-add-in-permissions | Minimum permission level}**: `ReadItem`
-         * 
-         * **{@link https://docs.microsoft.com/office/dev/add-ins/outlook/outlook-add-ins-overview#extension-points | Applicable Outlook mode}**: Appointment Organizer
-         * 
-         * @param eventType - The event that should revoke the handler.
-         * @param callback - Optional. When the method completes, the function passed in the `callback` parameter is called with a single parameter, 
-         *                `asyncResult`, which is an `Office.AsyncResult` object.
-         */
-        removeHandlerAsync(eventType: Office.EventType | string, callback?: (asyncResult: Office.AsyncResult<void>) => void): void;
         /**
          * Asynchronously saves an item.
          *
@@ -9764,31 +9889,6 @@ declare namespace Office {
          *                 type `Office.AsyncResult`.
          */
         setSelectedDataAsync(data: string, options?: Office.AsyncContextOptions & CoercionTypeOptions, callback?: (asyncResult: Office.AsyncResult<void>) => void): void;
-        /**
-         * Asynchronously inserts data into the body or subject of a message.
-         *
-         * The `setSelectedDataAsync` method inserts the specified string at the cursor location in the subject or body of the item, or, if text is
-         * selected in the editor, it replaces the selected text. If the cursor is not in the body or subject field, an error is returned.
-         * After insertion, the cursor is placed at the end of the inserted content.
-         *
-         * [Api set: Mailbox 1.2]
-         *
-         * @remarks
-         *
-         * **{@link https://docs.microsoft.com/office/dev/add-ins/outlook/understanding-outlook-add-in-permissions | Minimum permission level}**: `ReadWriteItem`
-         * 
-         * **{@link https://docs.microsoft.com/office/dev/add-ins/outlook/outlook-add-ins-overview#extension-points | Applicable Outlook mode}**: Appointment Organizer
-         * 
-         * **Errors**:
-         * 
-         * - `InvalidAttachmentId`: The attachment identifier does not exist.
-         *
-         * @param data - The data to be inserted. Data is not to exceed 1,000,000 characters. 
-         *             If more than 1,000,000 characters are passed in, an `ArgumentOutOfRange` exception is thrown.
-         * @param callback - Optional. When the method completes, the function passed in the `callback` parameter is called with a single parameter of 
-         *                 type `Office.AsyncResult`.
-         */
-        setSelectedDataAsync(data: string, callback?: (asyncResult: Office.AsyncResult<void>) => void): void;
     }
     /**
      * The `AppointmentForm` object is used to access the currently selected appointment.
@@ -9855,21 +9955,24 @@ declare namespace Office {
         */
        location: Location | string;
        /**
-        * Provides access to the optional attendees of an event. The type of object and level of access depends on the mode of the current item.
+        * Provides access to the optional attendees of an event. The type of object and level of access depend on the mode of the current item.
         *
         * *Read mode*
         *
-        * The `optionalAttendees` property returns an array that contains an `EmailAddressDetails` object for each optional attendee to the meeting.
-        * By default, the collection is limited to a maximum of 100 members. However, on Windows and Mac, you can get 500 members maximum.
+        * The `optionalAttendees` property returns an array that contains an {@link Office.EmailAddressDetails | EmailAddressDetails} object for
+        * each optional attendee to the meeting. Collection size limits:
+        *
+        * - Windows: 500 members
+        *
+        * - Mac: 100 members
+        *
+        * - Other: No limit
         *
         * *Compose mode*
         *
-        * The `optionalAttendees` property returns a `Recipients` object that provides methods to get or update the optional attendees for a meeting.
-        * By default, the collection is limited to a maximum of 100 members. However, on Windows and Mac, the following limits apply.
-        * 
-        * - Get 500 members maximum.
-        *
-        * - Set a maximum of 100 members per call, up to 500 members total.
+        * The `optionalAttendees` property returns a `Recipients` object that provides methods to get or update the
+        * optional attendees for a meeting. However, depending on the client/platform (i.e., Windows, Mac, etc.), limits may apply on how many
+        * recipients you can get or update. See the {@link Office.Recipients | Recipients} object for more details.
         *
         * @remarks
         *
@@ -9889,21 +9992,24 @@ declare namespace Office {
         */
        resources: string[];
         /**
-         * Provides access to the required attendees of an event. The type of object and level of access depends on the mode of the current item.
+         * Provides access to the required attendees of an event. The type of object and level of access depend on the mode of the current item.
          *
          * *Read mode*
          *
-         * The `requiredAttendees` property returns an array that contains an `EmailAddressDetails` object for each required attendee to the meeting.
-         * By default, the collection is limited to a maximum of 100 members. However, on Windows and Mac, you can get 500 members maximum.
+         * The `requiredAttendees` property returns an array that contains an {@link Office.EmailAddressDetails | EmailAddressDetails} object for
+         * each required attendee to the meeting. Collection size limits:
+         *
+         * - Windows: 500 members
+         *
+         * - Mac: 100 members
+         *
+         * - Other: No limit
          *
          * *Compose mode*
          *
-         * The `requiredAttendees` property returns a `Recipients` object that provides methods to get or update the required attendees for a meeting.
-         * By default, the collection is limited to a maximum of 100 members. However, on Windows and Mac, the following limits apply.
-         *
-         * - Get 500 members maximum.
-         *
-         * - Set a maximum of 100 members per call, up to 500 members total.
+         * The `requiredAttendees` property returns a `Recipients` object that provides methods to get or update the
+         * required attendees for a meeting. However, depending on the client/platform (i.e., Windows, Mac, etc.), limits may apply on how many
+         * recipients you can get or update. See the {@link Office.Recipients | Recipients} object for more details.
          *
          * @remarks
          *
@@ -10166,10 +10272,16 @@ declare namespace Office {
          */
         notificationMessages: NotificationMessages;
         /**
-         * Provides access to the optional attendees of an event. The type of object and level of access depends on the mode of the current item.
+         * Provides access to the optional attendees of an event. The type of object and level of access depend on the mode of the current item.
          *
-         * The `optionalAttendees` property returns an array that contains an {@link Office.EmailAddressDetails | EmailAddressDetails} object for each optional attendee to 
-         * the meeting. By default, the collection is limited to a maximum of 100 members. However, on Windows and Mac, you can get 500 members maximum.
+         * The `optionalAttendees` property returns an array that contains an {@link Office.EmailAddressDetails | EmailAddressDetails} object for
+         * each optional attendee to the meeting. Collection size limits:
+         *
+         * - Windows: 500 members
+         *
+         * - Mac: 100 members
+         *
+         * - Other: No limit
          *
          * @remarks
          *
@@ -10209,11 +10321,16 @@ declare namespace Office {
          */
         recurrence: Recurrence;
         /**
-         * Provides access to the required attendees of an event. The type of object and level of access depends on the mode of the current item.
+         * Provides access to the required attendees of an event. The type of object and level of access depend on the mode of the current item.
          *
-         * The `requiredAttendees` property returns an array that contains an {@link Office.EmailAddressDetails | EmailAddressDetails} object
-         * for each required attendee to the meeting. By default, the collection is limited to a maximum of 100 members.
-         * However, on Windows and Mac, you can get 500 members maximum.
+         * The `requiredAttendees` property returns an array that contains an {@link Office.EmailAddressDetails | EmailAddressDetails} object for
+         * each required attendee to the meeting. Collection size limits:
+         *
+         * - Windows: 500 members
+         *
+         * - Mac: 100 members
+         *
+         * - Other: No limit
          *
          * @remarks
          *
@@ -10296,26 +10413,6 @@ declare namespace Office {
          */
         addHandlerAsync(eventType: Office.EventType | string, handler: any, options?: Office.AsyncContextOptions, callback?: (asyncResult: Office.AsyncResult<void>) => void): void;
         /**
-         * Adds an event handler for a supported event. **Note**: Events are available only with task pane.
-         * 
-         * Refer to the Item object model {@link https://docs.microsoft.com/office/dev/add-ins/reference/objectmodel/requirement-set-1.8/office.context.mailbox.item#events | events section} for supported events.
-         * 
-         * [Api set: Mailbox 1.7]
-         *
-         * @remarks
-         *
-         * **{@link https://docs.microsoft.com/office/dev/add-ins/outlook/understanding-outlook-add-in-permissions | Minimum permission level}**: `ReadItem`
-         * 
-         * **{@link https://docs.microsoft.com/office/dev/add-ins/outlook/outlook-add-ins-overview#extension-points | Applicable Outlook mode}**: Appointment Attendee
-         * 
-         * @param eventType - The event that should invoke the handler.
-         * @param handler - The function to handle the event. The function must accept a single parameter, which is an object literal. 
-         *                The type property on the parameter will match the `eventType` parameter passed to `addHandlerAsync`.
-         * @param callback - Optional. When the method completes, the function passed in the `callback` parameter is called with a single parameter, 
-         *                `asyncResult`, which is an `Office.AsyncResult` object.
-         */
-        addHandlerAsync(eventType: Office.EventType | string, handler: any, callback?: (asyncResult: Office.AsyncResult<void>) => void): void;
-        /**
          * Displays a reply form that includes either the sender and all recipients of the selected message or the organizer and all attendees of the
          * selected appointment.
          *
@@ -10339,6 +10436,35 @@ declare namespace Office {
          */
         displayReplyAllForm(formData: string | ReplyFormData): void;
         /**
+         * Displays a reply form that includes either the sender and all recipients of the selected message or the organizer and all attendees of the
+         * selected appointment.
+         *
+         * In Outlook on the web, the reply form is displayed as a pop-out form in the 3-column view and a pop-up form in the 2-column or 1-column view.
+         *
+         * If any of the string parameters exceed their limits, `displayReplyAllFormAsync` throws an exception.
+         *
+         * When attachments are specified in the `formData.attachments` parameter, Outlook attempts to download all attachments and attach them to the
+         * reply form. If any attachments fail to be added, an error is shown in the form UI. If this isn't possible, then no error message is thrown.
+         *
+         * **Note**: This method is not supported in Outlook on iOS or Android.
+         *
+         * [Api set: Mailbox 1.9]
+         *
+         * @remarks
+         *
+         * **{@link https://docs.microsoft.com/office/dev/add-ins/outlook/understanding-outlook-add-in-permissions | Minimum permission level}**: `ReadItem`
+         *
+         * **{@link https://docs.microsoft.com/office/dev/add-ins/outlook/outlook-add-ins-overview#extension-points | Applicable Outlook mode}**: Appointment Attendee
+         *
+         * @param formData - A string that contains text and HTML and that represents the body of the reply form. The string is limited to 32 KB
+         *                   OR a {@link Office.ReplyFormData | ReplyFormData} object that contains body or attachment data and a callback function.
+         * @param options - Optional. An object literal that contains one or more of the following properties.
+         *        `asyncContext`: Developers can provide any object they wish to access in the callback method.
+         * @param callback - Optional. When the method completes, the function passed in the `callback` parameter is called with a single parameter,
+         *                `asyncResult`, which is an `Office.AsyncResult` object.
+         */
+        displayReplyAllFormAsync(formData: string | ReplyFormData, options?: Office.AsyncContextOptions, callback?: (asyncResult: Office.AsyncResult<void>) => void): void;
+        /**
          * Displays a reply form that includes only the sender of the selected message or the organizer of the selected appointment.
          *
          * In Outlook on the web, the reply form is displayed as a pop-out form in the 3-column view and a pop-up form in the 2-column or 1-column view.
@@ -10360,6 +10486,34 @@ declare namespace Office {
          *                   OR a {@link Office.ReplyFormData | ReplyFormData} object that contains body or attachment data and a callback function.
          */
         displayReplyForm(formData: string | ReplyFormData): void;
+        /**
+         * Displays a reply form that includes only the sender of the selected message or the organizer of the selected appointment.
+         *
+         * In Outlook on the web, the reply form is displayed as a pop-out form in the 3-column view and a pop-up form in the 2-column or 1-column view.
+         *
+         * If any of the string parameters exceed their limits, `displayReplyFormAsync` throws an exception.
+         *
+         * When attachments are specified in the `formData.attachments` parameter, Outlook attempts to download all attachments and attach them to the
+         * reply form. If any attachments fail to be added, an error is shown in the form UI. If this isn't possible, then no error message is thrown.
+         *
+         * **Note**: This method is not supported in Outlook on iOS or Android.
+         *
+         * [Api set: Mailbox 1.9]
+         *
+         * @remarks
+         *
+         * **{@link https://docs.microsoft.com/office/dev/add-ins/outlook/understanding-outlook-add-in-permissions | Minimum permission level}**: `ReadItem`
+         *
+         * **{@link https://docs.microsoft.com/office/dev/add-ins/outlook/outlook-add-ins-overview#extension-points | Applicable Outlook mode}**: Appointment Attendee
+         *
+         * @param formData - A string that contains text and HTML and that represents the body of the reply form. The string is limited to 32 KB
+         *                   OR a {@link Office.ReplyFormData | ReplyFormData} object that contains body or attachment data and a callback function.
+         * @param options - Optional. An object literal that contains one or more of the following properties.
+         *        `asyncContext`: Developers can provide any object they wish to access in the callback method.
+         * @param callback - Optional. When the method completes, the function passed in the `callback` parameter is called with a single parameter,
+         *                `asyncResult`, which is an `Office.AsyncResult` object.
+         */
+        displayReplyFormAsync(formData: string | ReplyFormData, options?: Office.AsyncContextOptions, callback?: (asyncResult: Office.AsyncResult<void>) => void): void;
         /**
          * Gets an attachment from a message or appointment and returns it as an `AttachmentContent` object.
          * 
@@ -10392,36 +10546,6 @@ declare namespace Office {
          *                 an error code with the reason for the failure.
          */
         getAttachmentContentAsync(attachmentId: string, options?: Office.AsyncContextOptions, callback?: (asyncResult: Office.AsyncResult<AttachmentContent>) => void): void;
-        /**
-         * Gets an attachment from a message or appointment and returns it as an **AttachmentContent** object.
-         * 
-         * The `getAttachmentContentAsync` method gets the attachment with the specified identifier from the item. As a best practice, you should use 
-         * the identifier to retrieve an attachment in the same session that the attachmentIds were retrieved with the `getAttachmentsAsync` or 
-         * `item.attachments` call. In Outlook on the web and mobile devices, the attachment identifier is valid only within the same session. 
-         * A session is over when the user closes the app, or if the user starts composing an inline form then subsequently pops out the form to 
-         * continue in a separate window.
-         * 
-         * [Api set: Mailbox 1.8]
-         * 
-         * @remarks
-         * 
-         * **{@link https://docs.microsoft.com/office/dev/add-ins/outlook/understanding-outlook-add-in-permissions | Minimum permission level}**: `ReadItem`
-         * 
-         * **{@link https://docs.microsoft.com/office/dev/add-ins/outlook/outlook-add-ins-overview#extension-points | Applicable Outlook mode}**: Appointment Attendee
-         * 
-         * **Errors**:
-         * 
-         * - `AttachmentTypeNotSupported`: The attachment type isn't supported. Unsupported types include embedded images in Rich Text Format,
-         *                               or item attachment types other than email or calendar items (such as a contact or task item).
-         *
-         * - `InvalidAttachmentId`: The attachment identifier does not exist.
-         * 
-         * @param attachmentId - The identifier of the attachment you want to get. 
-         * @param callback - Optional. When the method completes, the function passed in the `callback` parameter is called with a single parameter, 
-         *                `asyncResult`, which is an `Office.AsyncResult` object. If the call fails, the `asyncResult.error` property will contain
-         *                 an error code with the reason for the failure.
-         */
-        getAttachmentContentAsync(attachmentId: string, callback?: (asyncResult: Office.AsyncResult<AttachmentContent>) => void): void;
         /**
          * Gets the entities found in the selected item's body.
          *
@@ -10620,7 +10744,10 @@ declare namespace Office {
         /**
          * Gets the properties of an appointment or message in a shared folder, calendar, or mailbox.
          *
-         * **Note**: This method is not supported in Outlook on Mac, iOS, or Android.
+         * For more information around using this API, see the
+         * {@link https://docs.microsoft.com/office/dev/add-ins/outlook/delegate-access | delegate access} article.
+         *
+         * **Note**: This method is not supported in Outlook on iOS or Android.
          *
          * [Api set: Mailbox 1.8]
          *
@@ -10640,7 +10767,10 @@ declare namespace Office {
         /**
          * Gets the properties of an appointment or message in a shared folder, calendar, or mailbox.
          *
-         * **Note**: This method is not supported in Outlook on Mac, iOS, or Android.
+         * For more information around using this API, see the
+         * {@link https://docs.microsoft.com/office/dev/add-ins/outlook/delegate-access | delegate access} article.
+         *
+         * **Note**: This method is not supported in Outlook on iOS or Android.
          *
          * [Api set: Mailbox 1.8]
          *
@@ -10698,24 +10828,6 @@ declare namespace Office {
          *                `asyncResult`, which is an `Office.AsyncResult` object.
          */
         removeHandlerAsync(eventType: Office.EventType | string, options?: Office.AsyncContextOptions, callback?: (asyncResult: Office.AsyncResult<void>) => void): void;
-        /**
-         * Removes the event handlers for a supported event type. **Note**: Events are available only with task pane.
-         * 
-         * Refer to the Item object model {@link https://docs.microsoft.com/office/dev/add-ins/reference/objectmodel/requirement-set-1.8/office.context.mailbox.item#events | events section} for supported events.
-         * 
-         * [Api set: Mailbox 1.7]
-         *
-         * @remarks
-         *
-         * **{@link https://docs.microsoft.com/office/dev/add-ins/outlook/understanding-outlook-add-in-permissions | Minimum permission level}**: `ReadItem`
-         * 
-         * **{@link https://docs.microsoft.com/office/dev/add-ins/outlook/outlook-add-ins-overview#extension-points | Applicable Outlook mode}**: Appointment Attendee
-         * 
-         * @param eventType - The event that should revoke the handler.
-         * @param callback - Optional. When the method completes, the function passed in the callback parameter is called with a single parameter,
-         *                `asyncResult`, which is an `Office.AsyncResult` object.
-         */
-        removeHandlerAsync(eventType: Office.EventType | string, callback?: (asyncResult: Office.AsyncResult<void>) => void): void; 
     }
     /**
      * Provides the current dates and times of the appointment that raised the `Office.EventType.AppointmentTimeChanged` event. 
@@ -10900,6 +11012,42 @@ declare namespace Office {
      */
     interface Body {
         /**
+         * Appends on send the specified content to the end of the item body, after any signature.
+         *
+         * If the user is running add-ins that implement the
+         * {@link https://docs.microsoft.com/office/dev/add-ins/outlook/outlook-on-send-addins?tabs=windows | on-send feature using `ItemSend` in the manifest},
+         * append-on-send runs before on-send functionality.
+         *
+         * **Important**: If your add-in implements the on-send feature and calls `appendOnSendAsync` in the `ItemSend` handler,
+         * the `appendOnSendAsync` call returns an error as this scenario is not supported.
+         *
+         * **Important**: To use `appendOnSendAsync`, the `ExtendedPermissions` manifest node must include the `AppendOnSend` extended permission.
+         *
+         * **Note**: To clear data from a previous `appendOnSendAsync` call, you can call it again with the `data` parameter set to `null`.
+         *
+         * [Api set: Mailbox 1.9]
+         *
+         * @remarks
+         *
+         * **{@link https://docs.microsoft.com/office/dev/add-ins/outlook/understanding-outlook-add-in-permissions | Minimum permission level}**: `ReadWriteItem`
+         *
+         * **{@link https://docs.microsoft.com/office/dev/add-ins/outlook/outlook-add-ins-overview#extension-points | Applicable Outlook mode}**: Compose
+         *
+         * **Errors**:
+         *
+         * - `DataExceedsMaximumSize`: The `data` parameter is longer than 5,000 characters.
+         *
+         * - `InvalidFormatError`: The `options.coercionType` parameter is set to `Office.CoercionType.Html` but the message body is in plain text.
+         *
+         * @param data - The string to be added to the end of the body. The string is limited to 5,000 characters.
+         * @param options - Optional. An object literal that contains one or more of the following properties.
+         *        `asyncContext`: Developers can provide any object they wish to access in the callback method.
+         *        `coercionType`: The desired format for the data to be appended. The string in the `data` parameter will be converted to this format.
+         * @param callback - Optional. When the method completes, the function passed in the `callback` parameter is called with a single parameter
+         *                             of type `Office.AsyncResult`. Any errors encountered will be provided in the `asyncResult.error` property.
+         */
+        appendOnSendAsync(data: string, options?: Office.AsyncContextOptions & CoercionTypeOptions, callback?: (asyncResult: Office.AsyncResult<void>) => void): void;
+        /**
          * Returns the current body in a specified format.
          *
          * This method returns the entire current body in the format specified by `coercionType`.
@@ -10924,28 +11072,6 @@ declare namespace Office {
          */
         getAsync(coercionType: Office.CoercionType | string, options?: Office.AsyncContextOptions, callback?: (asyncResult: Office.AsyncResult<string>) => void): void;
         /**
-         * Returns the current body in a specified format.
-         *
-         * This method returns the entire current body in the format specified by `coercionType`.
-         *
-         * When working with HTML-formatted bodies, it is important to note that the `Body.getAsync` and `Body.setAsync` methods are not idempotent.
-         * The value returned from the `getAsync` method will not necessarily be exactly the same as the value that was passed in the `setAsync` method previously.
-         * The client may modify the value passed to `setAsync` in order to make it render efficiently with its rendering engine.
-         *
-         * [Api set: Mailbox 1.3]
-         *
-         * @remarks
-         * 
-         * **{@link https://docs.microsoft.com/office/dev/add-ins/outlook/understanding-outlook-add-in-permissions | Minimum permission level}**: `ReadItem`
-         * 
-         * **{@link https://docs.microsoft.com/office/dev/add-ins/outlook/outlook-add-ins-overview#extension-points | Applicable Outlook mode}**: Compose or Read
-         *
-         * @param coercionType - The format for the returned body.
-         * @param callback - Optional. When the method completes, the function passed in the `callback` parameter is called with a single parameter
-         *                             of type Office.AsyncResult. The body is provided in the requested format in the `asyncResult.value` property.
-         */
-        getAsync(coercionType: Office.CoercionType | string, callback?: (asyncResult: Office.AsyncResult<string>) => void): void;
-        /**
          * Gets a value that indicates whether the content is in HTML or text format.
          *
          * [Api set: Mailbox 1.1]
@@ -10964,26 +11090,14 @@ declare namespace Office {
          */
         getTypeAsync(options?: Office.AsyncContextOptions, callback?: (asyncResult: Office.AsyncResult<Office.CoercionType>) => void): void;
         /**
-         * Gets a value that indicates whether the content is in HTML or text format.
-         *
-         * [Api set: Mailbox 1.1]
-         *
-         * @remarks
-         * 
-         * **{@link https://docs.microsoft.com/office/dev/add-ins/outlook/understanding-outlook-add-in-permissions | Minimum permission level}**: `ReadItem`
-         * 
-         * **{@link https://docs.microsoft.com/office/dev/add-ins/outlook/outlook-add-ins-overview#extension-points | Applicable Outlook mode}**: Compose
-         *
-         * @param callback - Optional. When the method completes, the function passed in the `callback` parameter is called with a single parameter
-         *                             of type `Office.AsyncResult`.
-         *                  The content type is returned as one of the `CoercionType` values in the `asyncResult.value` property.
-         */
-        getTypeAsync(callback?: (asyncResult: Office.AsyncResult<Office.CoercionType>) => void): void;
-        /**
          * Adds the specified content to the beginning of the item body.
          *
          * The `prependAsync` method inserts the specified string at the beginning of the item body.
          * After insertion, the cursor is returned to its original place, relative to the inserted content.
+         *
+         * When working with HTML-formatted bodies, it's important to note that the client may modify the value passed to `prependAsync` in order to
+         * make it render efficiently with its rendering engine. This means that the value returned from a subsequent call to `Body.getAsync` method
+         * will not necessarily exactly contain the value that was passed in the `prependAsync` method previously.
          *
          * When including links in HTML markup, you can disable online link preview by setting the `id` attribute on the anchor (\<a\>) to "LPNoLP"
          * (see the **Examples** section for a sample).
@@ -11008,32 +11122,6 @@ declare namespace Office {
          *                             of type `Office.AsyncResult`. Any errors encountered will be provided in the `asyncResult.error` property.
          */
         prependAsync(data: string, options?: Office.AsyncContextOptions & CoercionTypeOptions, callback?: (asyncResult: Office.AsyncResult<void>) => void): void;
-        /**
-         * Adds the specified content to the beginning of the item body.
-         *
-         * The `prependAsync` method inserts the specified string at the beginning of the item body.
-         * After insertion, the cursor is returned to its original place, relative to the inserted content.
-         *
-         * When including links in HTML markup, you can disable online link preview by setting the `id` attribute on the anchor (\<a\>) to "LPNoLP"
-         * (see the **Examples** section for a sample).
-         *
-         * [Api set: Mailbox 1.1]
-         *
-         * @remarks
-         * 
-         * **{@link https://docs.microsoft.com/office/dev/add-ins/outlook/understanding-outlook-add-in-permissions | Minimum permission level}**: `ReadWriteItem`
-         * 
-         * **{@link https://docs.microsoft.com/office/dev/add-ins/outlook/outlook-add-ins-overview#extension-points | Applicable Outlook mode}**: Compose
-         * 
-         * **Errors**:
-         * 
-         * - `DataExceedsMaximumSize`: The data parameter is longer than 1,000,000 characters.
-         * 
-         * @param data - The string to be inserted at the beginning of the body. The string is limited to 1,000,000 characters.
-         * @param callback - Optional. When the method completes, the function passed in the `callback` parameter is called with a single parameter
-         *                             of type `Office.AsyncResult`. Any errors encountered will be provided in the `asyncResult.error` property.
-         */
-        prependAsync(data: string, callback?: (asyncResult: Office.AsyncResult<void>) => void): void;
         /**
          * Replaces the entire body with the specified text.
          *
@@ -11067,35 +11155,6 @@ declare namespace Office {
          */
         setAsync(data: string, options?: Office.AsyncContextOptions & CoercionTypeOptions, callback?: (asyncResult: Office.AsyncResult<void>) => void): void;
         /**
-         * Replaces the entire body with the specified text.
-         *
-         * When working with HTML-formatted bodies, it is important to note that the `Body.getAsync` and `Body.setAsync` methods are not idempotent.
-         * The value returned from the `getAsync` method will not necessarily be exactly the same as the value that was passed in the `setAsync` method
-         * previously. The client may modify the value passed to `setAsync` in order to make it render efficiently with its rendering engine.
-         *
-         * When including links in HTML markup, you can disable online link preview by setting the id attribute on the anchor (\<a\>) to "LPNoLP"
-         * (see the **Examples** section for a sample).
-         *
-         * [Api set: Mailbox 1.3]
-         *
-         * @remarks
-         * 
-         * **{@link https://docs.microsoft.com/office/dev/add-ins/outlook/understanding-outlook-add-in-permissions | Minimum permission level}**: `ReadWriteItem`
-         * 
-         * **{@link https://docs.microsoft.com/office/dev/add-ins/outlook/outlook-add-ins-overview#extension-points | Applicable Outlook mode}**: Compose
-         * 
-         * **Errors**:
-         * 
-         * - `DataExceedsMaximumSize`: The `data` parameter is longer than 1,000,000 characters.
-         * 
-         * - `InvalidFormatError`: The `options.coercionType` parameter is set to `Office.CoercionType.Html` and the message body is in plain text.
-         *
-         * @param data - The string that will replace the existing body. The string is limited to 1,000,000 characters.
-         * @param callback - Optional. When the method completes, the function passed in the `callback` parameter is called with a single parameter
-         *                             of type `Office.AsyncResult`. Any errors encountered will be provided in the `asyncResult.error` property.
-         */
-        setAsync(data: string, callback?: (asyncResult: Office.AsyncResult<void>) => void): void;
-        /**
          * Replaces the selection in the body with the specified text.
          *
          * The `setSelectedDataAsync` method inserts the specified string at the cursor location in the body of the item, or, if text is selected in
@@ -11127,35 +11186,6 @@ declare namespace Office {
          *                             of type `Office.AsyncResult`. Any errors encountered will be provided in the `asyncResult.error` property.
          */
         setSelectedDataAsync(data: string, options?: Office.AsyncContextOptions & CoercionTypeOptions, callback?: (asyncResult: Office.AsyncResult<void>) => void): void;
-        /**
-         * Replaces the selection in the body with the specified text.
-         *
-         * The `setSelectedDataAsync` method inserts the specified string at the cursor location in the body of the item, or, if text is selected in
-         * the editor, it replaces the selected text. If the cursor was never in the body of the item, or if the body of the item lost focus in the
-         * UI, the string will be inserted at the top of the body content. After insertion, the cursor is placed at the end of the inserted content.
-         *
-         * When including links in HTML markup, you can disable online link preview by setting the `id` attribute on the anchor (\<a\>) to "LPNoLP" 
-         * (see the **Examples** section for a sample).
-         *
-         * [Api set: Mailbox 1.1]
-         *
-         * @remarks
-         * 
-         * **{@link https://docs.microsoft.com/office/dev/add-ins/outlook/understanding-outlook-add-in-permissions | Minimum permission level}**: `ReadWriteItem`
-         * 
-         * **{@link https://docs.microsoft.com/office/dev/add-ins/outlook/outlook-add-ins-overview#extension-points | Applicable Outlook mode}**: Compose
-         * 
-         * **Errors**:
-         * 
-         * - `DataExceedsMaximumSize`: The `data` parameter is longer than 1,000,000 characters.
-         * 
-         * - `InvalidFormatError`: The `options.coercionType` parameter is set to `Office.CoercionType.Html` and the message body is in plain text.
-         *
-         * @param data - The string that will replace the existing body. The string is limited to 1,000,000 characters.
-         * @param callback - Optional. When the method completes, the function passed in the `callback` parameter is called with a single parameter
-         *                             of type `Office.AsyncResult`. Any errors encountered will be provided in the `asyncResult.error` property.
-         */
-        setSelectedDataAsync(data: string, callback?: (asyncResult: Office.AsyncResult<void>) => void): void;
     }
     /**
      * Represents the categories on an item.
@@ -11199,35 +11229,17 @@ declare namespace Office {
          */
         addAsync(categories: string[], options?: Office.AsyncContextOptions, callback?: (asyncResult: Office.AsyncResult<void>) => void): void;
         /**
-         * Adds categories to an item. Each category must be in the categories master list on that mailbox and so must have a unique name
-         * but multiple categories can use the same color.
+         * Gets an item's categories.
+         *
+         * **Important**: If there are no categories on the item, `null` or an empty array will be returned depending on the Outlook version
+         * so make sure to handle both cases.
          *
          * [Api set: Mailbox 1.8]
-         *
-         * @remarks
-         * 
-         * **{@link https://docs.microsoft.com/office/dev/add-ins/outlook/understanding-outlook-add-in-permissions | Minimum permission level}**: `ReadWriteItem`
-         * 
-         * **{@link https://docs.microsoft.com/office/dev/add-ins/outlook/outlook-add-ins-overview#extension-points | Applicable Outlook mode}**: Compose or Read
-         * 
-         * **Errors**:
-         * 
-         * - `InvalidCategory`: Invalid categories were provided.
-         *
-         * @param categories - The categories to be added to the item.
-         * @param callback - When the method completes, the function passed in the `callback` parameter is called with a single parameter of
-         *                 type `Office.AsyncResult`. If adding categories fails, the `asyncResult.error` property will contain an error code.
-         */
-        addAsync(categories: string[], callback: (asyncResult: Office.AsyncResult<void>) => void): void;
-        /**
-         * Gets an item's categories.
          *
          * @param options - An object literal that contains one or more of the following properties.
          *        `asyncContext`: Developers can provide any object they wish to access in the callback method.
          * @param callback - When the method completes, the function passed in the `callback` parameter is called with a single parameter of
-         *                 type `Office.AsyncResult`. If adding categories fails, the `asyncResult.error` property will contain an error code.
-         *
-         * [Api set: Mailbox 1.8]
+         *                 type `Office.AsyncResult`. If getting categories fails, the `asyncResult.error` property will contain an error code.
          *
          * @remarks
          * 
@@ -11239,6 +11251,9 @@ declare namespace Office {
         /**
          * Gets an item's categories.
          *
+         * **Important**: If there are no categories on the item, `null` or an empty array will be returned depending on the Outlook version
+         * so make sure to handle both cases.
+         *
          * [Api set: Mailbox 1.8]
          *
          * @remarks
@@ -11248,7 +11263,7 @@ declare namespace Office {
          * **{@link https://docs.microsoft.com/office/dev/add-ins/outlook/outlook-add-ins-overview#extension-points | Applicable Outlook mode}**: Compose or Read
          *
          * @param callback - When the method completes, the function passed in the `callback` parameter is called with a single parameter of
-         *                 type `Office.AsyncResult`.
+         *                 type `Office.AsyncResult`. If getting categories fails, the `asyncResult.error` property will contain an error code.
          */
         getAsync(callback: (asyncResult: Office.AsyncResult<CategoryDetails[]>) => void): void;
         /**
@@ -11269,22 +11284,6 @@ declare namespace Office {
          *                 type `Office.AsyncResult`. If removing categories fails, the `asyncResult.error` property will contain an error code.
          */
         removeAsync(categories: string[], options?: Office.AsyncContextOptions, callback?: (asyncResult: Office.AsyncResult<void>) => void): void;
-        /**
-         * Removes categories from an item.
-         *
-         * [Api set: Mailbox 1.8]
-         *
-         * @remarks
-         * 
-         * **{@link https://docs.microsoft.com/office/dev/add-ins/outlook/understanding-outlook-add-in-permissions | Minimum permission level}**: `ReadWriteItem`
-         * 
-         * **{@link https://docs.microsoft.com/office/dev/add-ins/outlook/outlook-add-ins-overview#extension-points | Applicable Outlook mode}**: Compose or Read
-         *
-         * @param categories - The categories to be removed from the item.
-         * @param callback - When the method completes, the function passed in the `callback` parameter is called with a single parameter of
-         *                 type `Office.AsyncResult`. If removing categories fails, the `asyncResult.error` property will contain an error code.
-         */
-        removeAsync(categories: string[], callback: (asyncResult: Office.AsyncResult<void>) => void): void;
     }
     /**
      * Represents a category's details like name and associated color.
@@ -11374,6 +11373,26 @@ declare namespace Office {
          * @param name - The name of the custom property to be returned.
          */
         get(name: string): any;
+        /**
+         * Returns an object with all custom properties in a collection of name/value pairs. The following are equivalent.
+         *
+         * `customProps.get("name")`
+         *
+         * `var dictionary = customProps.getAll(); dictionary["name"]`
+         *
+         * You can iterate through the dictionary object to discover all `names` and `values`.
+         *
+         * [Api set: Mailbox 1.9]
+         *
+         * @returns An object with all custom properties in a collection of name/value pairs.
+         *
+         * @remarks
+         *
+         * **{@link https://docs.microsoft.com/office/dev/add-ins/outlook/understanding-outlook-add-in-permissions | Minimum permission level}**: `ReadItem`
+         *
+         * **{@link https://docs.microsoft.com/office/dev/add-ins/outlook/outlook-add-ins-overview#extension-points | Applicable Outlook mode}**: Compose or Read
+         */
+        getAll(): any;
         /**
          * Removes the specified property from the custom property collection.
          *
@@ -11576,26 +11595,6 @@ declare namespace Office {
          */
         addAsync(locationIdentifiers: LocationIdentifier[], options?: Office.AsyncContextOptions, callback?: (asyncResult: Office.AsyncResult<void>) => void): void;
         /**
-         * Adds to the set of locations associated with the appointment.
-         * 
-         * [Api set: Mailbox 1.8]
-         * 
-         * @remarks
-         * 
-         * **{@link https://docs.microsoft.com/office/dev/add-ins/outlook/understanding-outlook-add-in-permissions | Minimum permission level}**: `ReadWriteItem`
-         * 
-         * **{@link https://docs.microsoft.com/office/dev/add-ins/outlook/outlook-add-ins-overview#extension-points | Applicable Outlook mode}**: Compose
-         * 
-         * **Errors**:
-         * 
-         * - `InvalidFormatError`: The format of the specified data object is not valid.
-         * 
-         * @param locationIdentifiers The locations to be added to the current list of locations.
-         * @param callback Optional. When the method completes, the function passed in the `callback` parameter is called with a single parameter, 
-         *                `asyncResult`, which is an `Office.AsyncResult` object. Check the `status` property of `asyncResult` to determine if the call succeeded.
-         */
-        addAsync(locationIdentifiers: LocationIdentifier[], callback?: (asyncResult: Office.AsyncResult<void>) => void): void;
-        /**
          * Gets the set of locations associated with the appointment.
          * 
          * [Api set: Mailbox 1.8]
@@ -11612,21 +11611,6 @@ declare namespace Office {
          *                `asyncResult`, which is an `Office.AsyncResult` object.
          */
         getAsync(options?: Office.AsyncContextOptions, callback?: (asyncResult: Office.AsyncResult<LocationDetails[]>) => void): void;
-        /**
-         * Gets the set of locations associated with the appointment.
-         * 
-         * [Api set: Mailbox 1.8]
-         * 
-         * @remarks
-         * 
-         * **{@link https://docs.microsoft.com/office/dev/add-ins/outlook/understanding-outlook-add-in-permissions | Minimum permission level}**: `ReadItem`
-         * 
-         * **{@link https://docs.microsoft.com/office/dev/add-ins/outlook/outlook-add-ins-overview#extension-points | Applicable Outlook mode}**: Compose or Read
-         * 
-         * @param callback Optional. When the method completes, the function passed in the `callback` parameter is called with a single parameter,
-         *                `asyncResult`, which is an `Office.AsyncResult` object.
-         */
-        getAsync(callback?: (asyncResult: Office.AsyncResult<LocationDetails[]>) => void): void;
         /**
          * Removes the set of locations associated with the appointment.
          * 
@@ -11647,24 +11631,6 @@ declare namespace Office {
          *                `asyncResult`, which is an `Office.AsyncResult` object. Check the `status` property of `asyncResult` to determine if the call succeeded.
          */
         removeAsync(locationIdentifiers: LocationIdentifier[], options?: Office.AsyncContextOptions, callback?: (asyncResult: Office.AsyncResult<void>) => void): void;
-        /**
-         * Removes the set of locations associated with the appointment.
-         * 
-         * If there are multiple locations with the same name, all matching locations will be removed even if only one was specified in `locationIdentifiers`.
-         * 
-         * [Api set: Mailbox 1.8]
-         * 
-         * @remarks
-         * 
-         * **{@link https://docs.microsoft.com/office/dev/add-ins/outlook/understanding-outlook-add-in-permissions | Minimum permission level}**: `ReadWriteItem`
-         * 
-         * **{@link https://docs.microsoft.com/office/dev/add-ins/outlook/outlook-add-ins-overview#extension-points | Applicable Outlook mode}**: Compose
-         * 
-         * @param locationIdentifiers The locations to be removed from the current list of locations.
-         * @param callback Optional. When the method completes, the function passed in the `callback` parameter is called with a single parameter, 
-         *                `asyncResult`, which is an `Office.AsyncResult` object. Check the `status` property of `asyncResult` to determine if the call succeeded.
-         */
-        removeAsync(locationIdentifiers: LocationIdentifier[], callback?: (asyncResult: Office.AsyncResult<void>) => void): void;
     }
     /**
      * Provides the current enhanced locations when the `Office.EventType.EnhancedLocationsChanged` event is raised.
@@ -11777,27 +11743,7 @@ declare namespace Office {
          *                             `asyncResult`, which is an `Office.AsyncResult` object.
          *                  The `value` property of the result is the item's from value, as an `EmailAddressDetails` object.
          */
-        getAsync(options: Office.AsyncContextOptions, callback?: (asyncResult: Office.AsyncResult<EmailAddressDetails>) => void): void;
-        /**
-         * Gets the from value of a message.
-         * 
-         * The `getAsync` method starts an asynchronous call to the Exchange server to get the from value of a message.
-         * 
-         * The from value of the item is provided as an {@link Office.EmailAddressDetails | EmailAddressDetails} in the `asyncResult.value` property.
-         * 
-         * [Api set: Mailbox 1.7]
-         * 
-         * @remarks
-         * 
-         * **{@link https://docs.microsoft.com/office/dev/add-ins/outlook/understanding-outlook-add-in-permissions | Minimum permission level}**: `ReadItem`
-         * 
-         * **{@link https://docs.microsoft.com/office/dev/add-ins/outlook/outlook-add-ins-overview#extension-points | Applicable Outlook mode}**: Compose
-         * 
-         * @param callback - Optional. When the method completes, the function passed in the callback parameter is called with a single parameter,
-         *                             `asyncResult`, which is an `Office.AsyncResult` object.
-         *                  The `value` property of the result is the item's from value, as an `EmailAddressDetails` object.
-         */
-        getAsync(callback?: (asyncResult: Office.AsyncResult<EmailAddressDetails>) => void): void;
+        getAsync(options?: Office.AsyncContextOptions, callback?: (asyncResult: Office.AsyncResult<EmailAddressDetails>) => void): void;
     }
     /**
      * The `InternetHeaders` object represents custom internet headers that are preserved after the message item leaves Exchange
@@ -11850,25 +11796,6 @@ declare namespace Office {
          */
         getAsync(names: string[], options?: Office.AsyncContextOptions, callback?: (asyncResult: Office.AsyncResult<InternetHeaders>) => void): void;
         /**
-         * Given an array of internet header names, this method returns a dictionary containing those internet headers and their values. 
-         * If the add-in requests an x-header that is not available, that x-header will not be returned in the results.
-         * 
-         * **Note**: This method is intended to return the values of the custom headers you set using the `setAsync` method.
-         *
-         * [Api set: Mailbox 1.8]
-         *
-         * @remarks
-         * 
-         * **{@link https://docs.microsoft.com/office/dev/add-ins/outlook/understanding-outlook-add-in-permissions | Minimum permission level}**: `ReadItem`
-         * 
-         * **{@link https://docs.microsoft.com/office/dev/add-ins/outlook/outlook-add-ins-overview#extension-points | Applicable Outlook mode}**: Compose
-         * 
-         * @param names - The names of the internet headers to be returned.
-         * @param callback - Optional. When the method completes, the function passed in the `callback` parameter is called with a single parameter, 
-         *                `asyncResult`, which is an `Office.AsyncResult` object.
-         */
-        getAsync(names: string[], callback?: (asyncResult: Office.AsyncResult<InternetHeaders>) => void): void;
-        /**
          * Given an array of internet header names, this method removes the specified headers from the internet header collection.
          * 
          * **Note**: This method is intended to remove the custom headers you set using the `setAsync` method.
@@ -11888,24 +11815,6 @@ declare namespace Office {
          *                `asyncResult`, which is an `Office.AsyncResult` object.
          */
         removeAsync(names: string[], options?: Office.AsyncContextOptions, callback?: (asyncResult: Office.AsyncResult<InternetHeaders>) => void): void;
-        /**
-         * Given an array of internet header names, this method removes the specified headers from the internet header collection.
-         *
-         * **Note**: This method is intended to remove your custom headers you set using the `setAsync` method.
-         *
-         * [Api set: Mailbox 1.8]
-         *
-         * @remarks
-         * 
-         * **{@link https://docs.microsoft.com/office/dev/add-ins/outlook/understanding-outlook-add-in-permissions | Minimum permission level}**: `ReadWriteItem`
-         * 
-         * **{@link https://docs.microsoft.com/office/dev/add-ins/outlook/outlook-add-ins-overview#extension-points | Applicable Outlook mode}**: Compose
-         * 
-         * @param names - The names of the internet headers to be removed.
-         * @param callback - Optional. When the method completes, the function passed in the `callback` parameter is called with a single parameter,
-         *                `asyncResult`, which is an `Office.AsyncResult` object.
-         */
-        removeAsync(names: string[], callback?: (asyncResult: Office.AsyncResult<InternetHeaders>) => void): void;
         /**
          * Sets the specified internet headers to the specified values.
          * 
@@ -11930,28 +11839,6 @@ declare namespace Office {
          *                             of type Office.AsyncResult. Any errors encountered will be provided in the `asyncResult.error` property.
          */
         setAsync(headers: Object, options?: Office.AsyncContextOptions, callback?: (asyncResult: Office.AsyncResult<void>) => void): void;
-        /**
-         * Sets the specified internet headers to the specified values.
-         * 
-         * The `setAsync` method creates a new header if the specified header doesn't already exist; otherwise, the existing value is replaced with 
-         * the new value.
-         *
-         * **Note**: This method is intended to set the values of your custom headers.
-         *
-         * [Api set: Mailbox 1.8]
-         *
-         * @remarks
-         * 
-         * **{@link https://docs.microsoft.com/office/dev/add-ins/outlook/understanding-outlook-add-in-permissions | Minimum permission level}**: `ReadWriteItem`
-         * 
-         * **{@link https://docs.microsoft.com/office/dev/add-ins/outlook/outlook-add-ins-overview#extension-points | Applicable Outlook mode}**: Compose
-         *
-         * @param headers - The names and corresponding values of the headers to be set. Should be a dictionary object with keys being the names of the 
-         *                internet headers and values being the values of the internet headers.
-         * @param callback - Optional. When the method completes, the function passed in the `callback` parameter is called with a single parameter
-         *                             of type Office.AsyncResult. Any errors encountered will be provided in the `asyncResult.error` property.
-         */
-        setAsync(headers: Object, callback?: (asyncResult: Office.AsyncResult<void>) => void): void;
     }
     /**
      * The item namespace is used to access the currently selected message, meeting request, or appointment. 
@@ -12126,29 +12013,6 @@ declare namespace Office {
          *                 type `Office.AsyncResult`. If setting the location fails, the `asyncResult.error` property will contain an error code.
          */
         setAsync(location: string, options?: Office.AsyncContextOptions, callback?: (asyncResult: Office.AsyncResult<void>) => void): void;
-        /**
-         * Sets the location of an appointment.
-         *
-         * The `setAsync` method starts an asynchronous call to the Exchange server to set the location of an appointment. 
-         * Setting the location of an appointment overwrites the current location.
-         *
-         * [Api set: Mailbox 1.1]
-         *
-         * @remarks
-         * 
-         * **{@link https://docs.microsoft.com/office/dev/add-ins/outlook/understanding-outlook-add-in-permissions | Minimum permission level}**: `ReadItem`
-         * 
-         * **{@link https://docs.microsoft.com/office/dev/add-ins/outlook/outlook-add-ins-overview#extension-points | Applicable Outlook mode}**: Compose
-         * 
-         * **Errors**:
-         * 
-         * - `DataExceedsMaximumSize`: The location parameter is longer than 255 characters.
-         *
-         * @param location - The location of the appointment. The string is limited to 255 characters.
-         * @param callback - Optional. When the method completes, the function passed in the `callback` parameter is called with a single parameter of 
-         *                 type `Office.AsyncResult`. If setting the location fails, the `asyncResult.error` property will contain an error code.
-         */
-        setAsync(location: string, callback?: (asyncResult: Office.AsyncResult<void>) => void): void;
     }
     /**
      * Represents a location. Read only.
@@ -12338,26 +12202,6 @@ declare namespace Office {
          */
         addHandlerAsync(eventType: Office.EventType | string, handler: (type: Office.EventType) => void, options?: Office.AsyncContextOptions, callback?: (asyncResult: Office.AsyncResult<void>) => void): void;
         /**
-         * Adds an event handler for a supported event. **Note**: Events are available only with task pane.
-         *
-         * Refer to the Mailbox object model {@link https://docs.microsoft.com/office/dev/add-ins/reference/objectmodel/requirement-set-1.8/office.context.mailbox#events | events section} for supported events.
-         *
-         * [Api set: Mailbox 1.5]
-         *
-         * @remarks
-         *
-         * **{@link https://docs.microsoft.com/office/dev/add-ins/outlook/understanding-outlook-add-in-permissions | Minimum permission level}**: `ReadItem`
-         * 
-         * **{@link https://docs.microsoft.com/office/dev/add-ins/outlook/outlook-add-ins-overview#extension-points | Applicable Outlook mode}**: Compose or Read
-         *
-         * @param eventType - The event that should invoke the handler.
-         * @param handler - The function to handle the event. The function must accept a single parameter, which is an object literal.
-         *                The type property on the parameter will match the `eventType` parameter passed to `addHandlerAsync`.
-         * @param callback - Optional. When the method completes, the function passed in the `callback` parameter is called with a single parameter of
-         *                 type `Office.AsyncResult`.
-         */
-        addHandlerAsync(eventType: Office.EventType | string, handler: (type: Office.EventType) => void, callback?: (asyncResult: Office.AsyncResult<void>) => void): void;
-        /**
          * Converts an item ID formatted for REST into EWS format.
          *
          * Item IDs retrieved via a REST API (such as the Outlook Mail API or the Microsoft Graph) use a different format than the format used by
@@ -12465,6 +12309,38 @@ declare namespace Office {
          */
         displayAppointmentForm(itemId: string): void;
         /**
+         * Displays an existing calendar appointment.
+         *
+         * The `displayAppointmentFormAsync` method opens an existing calendar appointment in a new window on the desktop or in a dialog box on
+         * mobile devices.
+         *
+         * In Outlook on Mac, you can use this method to display a single appointment that is not part of a recurring series, or the master appointment
+         * of a recurring series. However, you can't display an instance of the series because you can't access the properties
+         * (including the item ID) of instances of a recurring series.
+         *
+         * In Outlook on the web, this method opens the specified form only if the body of the form is less than or equal to 32K characters.
+         *
+         * If the specified item identifier does not identify an existing appointment, a blank pane opens on the client computer or device, and
+         * no error message is returned.
+         *
+         * **Note**: This method is not supported in Outlook on iOS or Android.
+         *
+         * [Api set: Mailbox 1.9]
+         *
+         * @remarks
+         *
+         * **{@link https://docs.microsoft.com/office/dev/add-ins/outlook/understanding-outlook-add-in-permissions | Minimum permission level}**: `ReadItem`
+         *
+         * **{@link https://docs.microsoft.com/office/dev/add-ins/outlook/outlook-add-ins-overview#extension-points | Applicable Outlook mode}**: Compose or Read
+         *
+         * @param itemId - The Exchange Web Services (EWS) identifier for an existing calendar appointment.
+         * @param options - Optional. An object literal that contains one or more of the following properties.
+         *        `asyncContext`: Developers can provide any object they wish to access in the callback method.
+         * @param callback - Optional. When the method completes, the function passed in the `callback` parameter is called with a single parameter,
+         *                `asyncResult`, which is an `Office.AsyncResult` object.
+         */
+        displayAppointmentFormAsync(itemId: string, options?: Office.AsyncContextOptions, callback?: (asyncResult: Office.AsyncResult<void>) => void): void;
+        /**
          * Displays an existing message.
          *
          * The `displayMessageForm` method opens an existing message in a new window on the desktop or in a dialog box on mobile devices.
@@ -12488,6 +12364,37 @@ declare namespace Office {
          * @param itemId - The Exchange Web Services (EWS) identifier for an existing message.
          */
         displayMessageForm(itemId: string): void;
+        /**
+         * Displays an existing message.
+         *
+         * The `displayMessageFormAsync` method opens an existing message in a new window on the desktop or in a dialog box on mobile devices.
+         *
+         * In Outlook on the web, this method opens the specified form only if the body of the form is less than or equal to 32K characters.
+         *
+         * If the specified item identifier does not identify an existing message, no message will be displayed on the client computer, and
+         * no error message is returned.
+         *
+         * Do not use the `displayMessageForm` or `displayMessageFormAsync` method with an itemId that represents an appointment.
+         * Use the `displayAppointmentForm` or `displayAppointmentFormAsync` method to display an existing appointment,
+         * and `displayNewAppointmentForm` or `displayNewAppointmentFormAsync` to display a form to create a new appointment.
+         *
+         * **Note**: This method is not supported in Outlook on iOS or Android.
+         *
+         * [Api set: Mailbox 1.9]
+         *
+         * @remarks
+         *
+         * **{@link https://docs.microsoft.com/office/dev/add-ins/outlook/understanding-outlook-add-in-permissions | Minimum permission level}**: `ReadItem`
+         *
+         * **{@link https://docs.microsoft.com/office/dev/add-ins/outlook/outlook-add-ins-overview#extension-points | Applicable Outlook mode}**: Compose or Read
+         *
+         * @param itemId - The Exchange Web Services (EWS) identifier for an existing message.
+         * @param options - Optional. An object literal that contains one or more of the following properties.
+         *        `asyncContext`: Developers can provide any object they wish to access in the callback method.
+         * @param callback - Optional. When the method completes, the function passed in the `callback` parameter is called with a single parameter,
+         *                `asyncResult`, which is an `Office.AsyncResult` object.
+         */
+        displayMessageFormAsync(itemId: string, options?: Office.AsyncContextOptions, callback?: (asyncResult: Office.AsyncResult<void>) => void): void;
         /**
          * Displays a form for creating a new calendar appointment.
          *
@@ -12516,6 +12423,39 @@ declare namespace Office {
          */
         displayNewAppointmentForm(parameters: AppointmentForm): void;
         /**
+         * Displays a form for creating a new calendar appointment.
+         *
+         * The `displayNewAppointmentFormAsync` method opens a form that enables the user to create a new appointment or meeting.
+         * If parameters are specified, the appointment form fields are automatically populated with the contents of the parameters.
+         *
+         * In Outlook on the web, this method always displays a form with an attendees field.
+         * If you do not specify any attendees as input arguments, the method displays a form with a **Save** button.
+         * If you have specified attendees, the form would include the attendees and a **Send** button.
+         *
+         * In the Outlook rich client and Outlook RT, if you specify any attendees or resources in the `requiredAttendees`, `optionalAttendees`, or
+         * `resources` parameter, this method displays a meeting form with a **Send** button.
+         * If you don't specify any recipients, this method displays an appointment form with a **Save & Close** button.
+         *
+         * If any of the parameters exceed the specified size limits, or if an unknown parameter name is specified, an exception is thrown.
+         *
+         * **Note**: This method is not supported in Outlook on iOS or Android.
+         *
+         * [Api set: Mailbox 1.9]
+         *
+         * @remarks
+         *
+         * **{@link https://docs.microsoft.com/office/dev/add-ins/outlook/understanding-outlook-add-in-permissions | Minimum permission level}**: `ReadItem`
+         *
+         * **{@link https://docs.microsoft.com/office/dev/add-ins/outlook/outlook-add-ins-overview#extension-points | Applicable Outlook mode}**: Read
+         *
+         * @param parameters - An `AppointmentForm` describing the new appointment. All properties are optional.
+         * @param options - Optional. An object literal that contains one or more of the following properties.
+         *        `asyncContext`: Developers can provide any object they wish to access in the callback method.
+         * @param callback - Optional. When the method completes, the function passed in the `callback` parameter is called with a single parameter,
+         *                `asyncResult`, which is an `Office.AsyncResult` object.
+         */
+        displayNewAppointmentFormAsync(parameters: AppointmentForm, options?: Office.AsyncContextOptions, callback?: (asyncResult: Office.AsyncResult<void>) => void): void;
+        /**
          * Displays a form for creating a new message.
          *
          * The `displayNewMessageForm` method opens a form that enables the user to create a new message. If parameters are specified, the message form 
@@ -12534,13 +12474,13 @@ declare namespace Office {
          * @param parameters - A dictionary containing all values to be filled in for the user in the new form. All parameters are optional.
          * 
          *        `toRecipients`: An array of strings containing the email addresses or an array containing an {@link Office.EmailAddressDetails | EmailAddressDetails} object 
-         *        for each of the recipients on the To line. The array is limited to a maximum of 100 entries.
+         *        for each of the recipients on the **To** line. The array is limited to a maximum of 100 entries.
          * 
          *        `ccRecipients`: An array of strings containing the email addresses or an array containing an {@link Office.EmailAddressDetails | EmailAddressDetails} object 
-         *        for each of the recipients on the Cc line. The array is limited to a maximum of 100 entries.
+         *        for each of the recipients on the **Cc** line. The array is limited to a maximum of 100 entries.
          * 
          *        `bccRecipients`: An array of strings containing the email addresses or an array containing an {@link Office.EmailAddressDetails | EmailAddressDetails} object 
-         *        for each of the recipients on the Bcc line. The array is limited to a maximum of 100 entries.
+         *        for each of the recipients on the **Bcc** line. The array is limited to a maximum of 100 entries.
          * 
          *        `subject`: A string containing the subject of the message. The string is limited to a maximum of 255 characters.
          * 
@@ -12561,6 +12501,56 @@ declare namespace Office {
          *        This is a string up to 100 characters.
          */
         displayNewMessageForm(parameters: any): void;
+        /**
+         * Displays a form for creating a new message.
+         *
+         * The `displayNewMessageFormAsync` method opens a form that enables the user to create a new message.
+         * If parameters are specified, the message form fields are automatically populated with the contents of the parameters.
+         *
+         * If any of the parameters exceed the specified size limits, or if an unknown parameter name is specified, an exception is thrown.
+         *
+         * [Api set: Mailbox 1.9]
+         *
+         * @remarks
+         *
+         * **{@link https://docs.microsoft.com/office/dev/add-ins/outlook/understanding-outlook-add-in-permissions | Minimum permission level}**: `ReadItem`
+         *
+         * **{@link https://docs.microsoft.com/office/dev/add-ins/outlook/outlook-add-ins-overview#extension-points | Applicable Outlook mode}**: Read
+         *
+         * @param parameters - A dictionary containing all values to be filled in for the user in the new form. All parameters are optional.
+         *
+         *        `toRecipients`: An array of strings containing the email addresses or an array containing an {@link Office.EmailAddressDetails | EmailAddressDetails} object
+         *        for each of the recipients on the **To** line. The array is limited to a maximum of 100 entries.
+         *
+         *        `ccRecipients`: An array of strings containing the email addresses or an array containing an {@link Office.EmailAddressDetails | EmailAddressDetails} object
+         *        for each of the recipients on the **Cc** line. The array is limited to a maximum of 100 entries.
+         *
+         *        `bccRecipients`: An array of strings containing the email addresses or an array containing an {@link Office.EmailAddressDetails | EmailAddressDetails} object
+         *        for each of the recipients on the **Bcc** line. The array is limited to a maximum of 100 entries.
+         *
+         *        `subject`: A string containing the subject of the message. The string is limited to a maximum of 255 characters.
+         *
+         *        `htmlBody`: The HTML body of the message. The body content is limited to a maximum size of 32 KB.
+         *
+         *        `attachments`: An array of JSON objects that are either file or item attachments.
+         *
+         *        `attachments.type`: Indicates the type of attachment. Must be file for a file attachment or item for an item attachment.
+         *
+         *        `attachments.name`: A string that contains the name of the attachment, up to 255 characters in length.
+         *
+         *        `attachments.url`: Only used if type is set to file. The URI of the location for the file.
+         *
+         *        `attachments.isInline`: Only used if type is set to file. If true, indicates that the attachment will be shown inline in the
+         *        message body, and should not be displayed in the attachment list.
+         *
+         *        `attachments.itemId`: Only used if type is set to item. The EWS item id of the existing e-mail you want to attach to the new message.
+         *        This is a string up to 100 characters.
+         * @param options - Optional. An object literal that contains one or more of the following properties.
+         *        `asyncContext`: Developers can provide any object they wish to access in the callback method.
+         * @param callback - Optional. When the method completes, the function passed in the `callback` parameter is called with a single parameter,
+         *                `asyncResult`, which is an `Office.AsyncResult` object.
+         */
+        displayNewMessageFormAsync(parameters: any, options?: Office.AsyncContextOptions, callback?: (asyncResult: Office.AsyncResult<void>) => void): void;
         /**
          * Gets a string that contains a token used to call REST APIs or Exchange Web Services (EWS).
          *
@@ -12782,24 +12772,6 @@ declare namespace Office {
          *                 type `Office.AsyncResult`.
          */
         removeHandlerAsync(eventType: Office.EventType | string, options?: Office.AsyncContextOptions, callback?: (asyncResult: Office.AsyncResult<void>) => void): void;
-        /**
-         * Removes the event handlers for a supported event type. **Note**: Events are available only with task pane.
-         *
-         * Refer to the Mailbox object model {@link https://docs.microsoft.com/office/dev/add-ins/reference/objectmodel/requirement-set-1.8/office.context.mailbox#events | events section} for supported events.
-         *
-         * [Api set: Mailbox 1.5]
-         *
-         * @remarks
-         *
-         * **{@link https://docs.microsoft.com/office/dev/add-ins/outlook/understanding-outlook-add-in-permissions | Minimum permission level}**: `ReadItem`
-         * 
-         * **{@link https://docs.microsoft.com/office/dev/add-ins/outlook/outlook-add-ins-overview#extension-points | Applicable Outlook mode}**: Compose or Read
-         *
-         * @param eventType - The event that should revoke the handler.
-         * @param callback - Optional. When the method completes, the function passed in the `callback` parameter is called with a single parameter of
-         *                 type `Office.AsyncResult`.
-         */
-        removeHandlerAsync(eventType: Office.EventType | string, callback?: (asyncResult: Office.AsyncResult<void>) => void): void;
     }
     /**
      * Represents the categories master list on the mailbox.
@@ -12842,28 +12814,6 @@ declare namespace Office {
          *                 type `Office.AsyncResult`.
          */
         addAsync(categories: CategoryDetails[], options?: Office.AsyncContextOptions, callback?: (asyncResult: Office.AsyncResult<void>) => void): void;
-        /**
-         * Adds categories to the master list on a mailbox. Each category must have a unique name but multiple categories can use the same color.
-         *
-         * [Api set: Mailbox 1.8]
-         *
-         * @remarks
-         * 
-         * **{@link https://docs.microsoft.com/office/dev/add-ins/outlook/understanding-outlook-add-in-permissions | Minimum permission level}**: `ReadWriteMailbox`
-         * 
-         * **{@link https://docs.microsoft.com/office/dev/add-ins/outlook/outlook-add-ins-overview#extension-points | Applicable Outlook mode}**: Compose or Read
-         * 
-         * **Errors**:
-         * 
-         * - `DuplicateCategory`: One of the categories provided is already in the master category list.
-         * 
-         * - `PermissionDenied`: The user does not have permission to perform this action.
-         *
-         * @param categories - The categories to be added to the master list on the mailbox.
-         * @param callback - When the method completes, the function passed in the `callback` parameter is called with a single parameter of 
-         *                 type `Office.AsyncResult`. If adding categories fails, the `asyncResult.error` property will contain an error code.
-         */
-        addAsync(categories: CategoryDetails[], callback: (asyncResult: Office.AsyncResult<void>) => void): void;
         /**
          * Gets the master list of categories on a mailbox.
          *
@@ -12918,26 +12868,6 @@ declare namespace Office {
          *                 type `Office.AsyncResult`. If removing categories fails, the `asyncResult.error` property will contain an error code.
          */
         removeAsync(categories: string[], options?: Office.AsyncContextOptions, callback?: (asyncResult: Office.AsyncResult<void>) => void): void;
-        /**
-         * Removes categories from the master list on a mailbox.
-         *
-         * [Api set: Mailbox 1.8]
-         *
-         * @remarks
-         * 
-         * **{@link https://docs.microsoft.com/office/dev/add-ins/outlook/understanding-outlook-add-in-permissions | Minimum permission level}**: `ReadWriteMailbox`
-         * 
-         * **{@link https://docs.microsoft.com/office/dev/add-ins/outlook/outlook-add-ins-overview#extension-points | Applicable Outlook mode}**: Compose or Read
-         * 
-         * **Errors**:
-         * 
-         * - `PermissionDenied`: The user does not have permission to perform this action.
-         *
-         * @param categories - The categories to be removed from the master list on the mailbox.
-         * @param callback - When the method completes, the function passed in the `callback` parameter is called with a single parameter of 
-         *                 type `Office.AsyncResult`. If removing categories fails, the `asyncResult.error` property will contain an error code.
-         */
-        removeAsync(categories: string[], callback: (asyncResult: Office.AsyncResult<void>) => void): void;
     }
     /**
      * Represents a suggested meeting found in an item. Read mode only.
@@ -13010,14 +12940,10 @@ declare namespace Office {
      */
     interface MessageCompose extends Message, ItemCompose {
         /**
-         * Gets an object that provides methods to get or update the recipients on the Bcc (blind carbon copy) line of a message.
+         * Gets an object that provides methods to get or update the recipients on the **Bcc** (blind carbon copy) line of a message.
          *
-         * By default, the collection is limited to a maximum of 100 members. However, in Outlook on the web, Windows, and Mac,
-         * the following limits apply.
-         *
-         * - Get 500 members maximum.
-         *
-         * - Set a maximum of 100 members per call, up to 500 members total.
+         * Depending on the client/platform (i.e., Windows, Mac, etc.), limits may apply on how many recipients you can get or update.
+         * See the {@link Office.Recipients | Recipients} object for more details.
          *
          * [Api set: Mailbox 1.1]
          *
@@ -13055,16 +12981,12 @@ declare namespace Office {
          */
         categories: Categories;
         /**
-         * Provides access to the Cc (carbon copy) recipients of a message. The type of object and level of access depends on the mode of the 
+         * Provides access to the Cc (carbon copy) recipients of a message. The type of object and level of access depend on the mode of the 
          * current item.
          *
-         * The `cc` property returns a {@link Office.Recipients | Recipients} object that provides methods to get or update the recipients on the
-         * **Cc** line of the message. By default, the collection is limited to a maximum of 100 members. However, in Outlook on the web, Windows,
-         * and Mac, the following limits apply.
-         * 
-         * - Get 500 members maximum.
-         *
-         * - Set a maximum of 100 members per call, up to 500 members total.
+         * The `cc` property returns a `Recipients` object that provides methods to get or update the recipients on the
+         * **Cc** line of the message. However, depending on the client/platform (i.e., Windows, Mac, etc.), limits may apply on how many recipients
+         * you can get or update. See the {@link Office.Recipients | Recipients} object for more details.
          *
          * @remarks
          *
@@ -13092,9 +13014,6 @@ declare namespace Office {
         conversationId: string;
         /**
          * Gets the email address of the sender of a message.
-         *
-         * The `from` and `sender` properties represent the same person unless the message is sent by a delegate.
-         * In that case, the `from` property represents the owner, and the `sender` property represents the delegate.
          *
          * The `from` property returns a `From` object that provides a method to get the from value.
          * 
@@ -13184,16 +13103,12 @@ declare namespace Office {
          */
         subject: Subject;
         /**
-         * Provides access to the recipients on the To line of a message. The type of object and level of access depends on the mode of the
+         * Provides access to the recipients on the **To** line of a message. The type of object and level of access depend on the mode of the
          * current item.
          *
-         * The `to` property returns a {@link Office.Recipients | Recipients} object that provides methods to get or update the recipients on the
-         * **To** line of the message. By default, the collection is limited to a maximum of 100 members. However, in Outlook on the web, Windows,
-         * and Mac, the following limits apply.
-         * 
-         * - Get 500 members maximum.
-         *
-         * - Set a maximum of 100 members per call, up to 500 members total.
+         * The `to` property returns a `Recipients` object that provides methods to get or update the recipients on the
+         * **To** line of the message. However, depending on the client/platform (i.e., Windows, Mac, etc.), limits may apply on how many recipients
+         * you can get or update. See the {@link Office.Recipients | Recipients} object for more details.
          *
          * @remarks
          *
@@ -13245,41 +13160,6 @@ declare namespace Office {
         /**
          * Adds a file to a message or appointment as an attachment.
          *
-         * The `addFileAttachmentAsync` method uploads the file at the specified URI and attaches it to the item in the compose form.
-         *
-         * You can subsequently use the identifier with the `removeAttachmentAsync` method to remove the attachment in the same session.
-         *
-         * **Important**: In recent builds of Outlook on Windows, a bug was introduced that incorrectly appends an `Authorization: Bearer` header to
-         * this action (whether using this API or the Outlook UI). To work around this issue, you can try using the `addFileAttachmentFromBase64` API
-         * introduced with requirement set 1.8.
-         *
-         * [Api set: Mailbox 1.1]
-         *
-         * @remarks
-         * 
-         * **{@link https://docs.microsoft.com/office/dev/add-ins/outlook/understanding-outlook-add-in-permissions | Minimum permission level}**: `ReadWriteItem`
-         * 
-         * **{@link https://docs.microsoft.com/office/dev/add-ins/outlook/outlook-add-ins-overview#extension-points | Applicable Outlook mode}**: Message Compose
-         * 
-         * **Errors**:
-         * 
-         * - `AttachmentSizeExceeded`: The attachment is larger than allowed.
-         * 
-         * - `FileTypeNotSupported`: The attachment has an extension that is not allowed.
-         * 
-         * - `NumberOfAttachmentsExceeded`: The message or appointment has too many attachments.
-         *
-         * @param uri - The URI that provides the location of the file to attach to the message or appointment. The maximum length is 2048 characters.
-         * @param attachmentName - The name of the attachment that is shown while the attachment is uploading. The maximum length is 255 characters.
-         * @param callback - Optional. When the method completes, the function passed in the callback parameter is called with a single parameter of
-         *                 type `Office.AsyncResult`. On success, the attachment identifier will be provided in the `asyncResult.value` property.
-         *                 If uploading the attachment fails, the `asyncResult` object will contain an `Error` object that provides a description of
-         *                 the error.
-         */
-        addFileAttachmentAsync(uri: string, attachmentName: string, callback?: (asyncResult: Office.AsyncResult<string>) => void): void;
-        /**
-         * Adds a file to a message or appointment as an attachment.
-         *
          * The `addFileAttachmentFromBase64Async` method uploads the file from the base64 encoding and attaches it to the item in the compose form.
          * This method returns the attachment identifier in the `asyncResult.value` object.
          *
@@ -13315,40 +13195,6 @@ declare namespace Office {
          */
         addFileAttachmentFromBase64Async(base64File: string, attachmentName: string, options?: Office.AsyncContextOptions & { isInline: boolean }, callback?: (asyncResult: Office.AsyncResult<string>) => void): void;
         /**
-         * Adds a file to a message or appointment as an attachment.
-         *
-         * The `addFileAttachmentFromBase64Async` method uploads the file from the base64 encoding and attaches it to the item in the compose form.
-         * This method returns the attachment identifier in the `asyncResult.value` object.
-         *
-         * You can subsequently use the identifier with the `removeAttachmentAsync` method to remove the attachment in the same session.
-         * 
-         * **Note**: If you're using a data URL API (e.g., `readAsDataURL`), you need to strip out the data URL prefix then send the rest of the string to this API.
-         * For example, if the full string is represented by `data:image/svg+xml;base64,<rest of base64 string>`, remove `data:image/svg+xml;base64,`.
-         *
-         * [Api set: Mailbox 1.8]
-         *
-         * @remarks
-         * 
-         * **{@link https://docs.microsoft.com/office/dev/add-ins/outlook/understanding-outlook-add-in-permissions | Minimum permission level}**: `ReadWriteItem`
-         * 
-         * **{@link https://docs.microsoft.com/office/dev/add-ins/outlook/outlook-add-ins-overview#extension-points | Applicable Outlook mode}**: Message Compose
-         * 
-         * **Errors**:
-         * 
-         * - `AttachmentSizeExceeded`: The attachment is larger than allowed.
-         * 
-         * - `FileTypeNotSupported`: The attachment has an extension that is not allowed.
-         * 
-         * - `NumberOfAttachmentsExceeded`: The message or appointment has too many attachments.
-         * 
-         * @param base64File - The base64-encoded content of an image or file to be added to an email or event.
-         * @param attachmentName - The name of the attachment that is shown while the attachment is uploading. The maximum length is 255 characters.
-         * @param callback - Optional. When the method completes, the function passed in the `callback` parameter is called with a single parameter of
-         *                             type Office.AsyncResult. On success, the attachment identifier will be provided in the `asyncResult.value` property. 
-         *                  If uploading the attachment fails, the `asyncResult` object will contain an `Error` object that provides a description of the error.
-         */
-        addFileAttachmentFromBase64Async(base64File: string, attachmentName: string, callback?: (asyncResult: Office.AsyncResult<string>) => void): void;
-        /**
          * Adds an event handler for a supported event. **Note**: Events are available only with task pane.
          * 
          * Refer to the Item object model {@link https://docs.microsoft.com/office/dev/add-ins/reference/objectmodel/requirement-set-1.8/office.context.mailbox.item#events | events section} for supported events.
@@ -13370,26 +13216,6 @@ declare namespace Office {
          *                `asyncResult`, which is an `Office.AsyncResult` object.
          */
         addHandlerAsync(eventType: Office.EventType | string, handler: any, options?: Office.AsyncContextOptions, callback?: (asyncResult: Office.AsyncResult<void>) => void): void;
-        /**
-         * Adds an event handler for a supported event. **Note**: Events are available only with task pane.
-         * 
-         * Refer to the Item object model {@link https://docs.microsoft.com/office/dev/add-ins/reference/objectmodel/requirement-set-1.8/office.context.mailbox.item#events | events section} for supported events.
-         * 
-         * [Api set: Mailbox 1.7]
-         *
-         * @remarks
-         *
-         * **{@link https://docs.microsoft.com/office/dev/add-ins/outlook/understanding-outlook-add-in-permissions | Minimum permission level}**: `ReadItem`
-         * 
-         * **{@link https://docs.microsoft.com/office/dev/add-ins/outlook/outlook-add-ins-overview#extension-points | Applicable Outlook mode}**: Message Compose
-         * 
-         * @param eventType - The event that should invoke the handler.
-         * @param handler - The function to handle the event. The function must accept a single parameter, which is an object literal.
-         *                The type property on the parameter will match the `eventType` parameter passed to `addHandlerAsync`.
-         * @param callback - Optional. When the method completes, the function passed in the `callback` parameter is called with a single parameter,
-         *                `asyncResult`, which is an `Office.AsyncResult` object.
-         */
-        addHandlerAsync(eventType: Office.EventType | string, handler: any, callback?: (asyncResult: Office.AsyncResult<void>) => void): void;
         /**
          * Adds an Exchange item, such as a message, as an attachment to the message or appointment.
          *
@@ -13425,39 +13251,6 @@ declare namespace Office {
          *                 the error.
          */
         addItemAttachmentAsync(itemId: any, attachmentName: string, options?: Office.AsyncContextOptions, callback?: (asyncResult: Office.AsyncResult<string>) => void): void;
-        /**
-         * Adds an Exchange item, such as a message, as an attachment to the message or appointment.
-         *
-         * The `addItemAttachmentAsync` method attaches the item with the specified Exchange identifier to the item in the compose form.
-         * If you specify a callback method, the method is called with one parameter, `asyncResult`, which contains either the attachment identifier or
-         * a code that indicates any error that occurred while attaching the item.
-         * You can use the options parameter to pass state information to the callback method, if needed.
-         *
-         * You can subsequently use the identifier with the `removeAttachmentAsync` method to remove the attachment in the same session.
-         *
-         * If your Office Add-in is running in Outlook on the web, the `addItemAttachmentAsync` method can attach items to items other than the item that 
-         * you are editing; however, this is not supported and is not recommended.
-         *
-         * [Api set: Mailbox 1.1]
-         *
-         * @remarks
-         * 
-         * **{@link https://docs.microsoft.com/office/dev/add-ins/outlook/understanding-outlook-add-in-permissions | Minimum permission level}**: `ReadWriteItem`
-         * 
-         * **{@link https://docs.microsoft.com/office/dev/add-ins/outlook/outlook-add-ins-overview#extension-points | Applicable Outlook mode}**: Message Compose
-         * 
-         * **Errors**:
-         * 
-         * - `NumberOfAttachmentsExceeded`: The message or appointment has too many attachments.
-         *
-         * @param itemId - The Exchange identifier of the item to attach. The maximum length is 100 characters.
-         * @param attachmentName - The name of the attachment that is shown while the attachment is uploading. The maximum length is 255 characters.
-         * @param callback - Optional. When the method completes, the function passed in the `callback` parameter is called with a single parameter of 
-         *                 type `Office.AsyncResult`. On success, the attachment identifier will be provided in the `asyncResult.value` property. 
-         *                 If adding the attachment fails, the `asyncResult` object will contain an `Error` object that provides a description of 
-         *                 the error.
-         */
-        addItemAttachmentAsync(itemId: any, attachmentName: string, callback?: (asyncResult: Office.AsyncResult<string>) => void): void;
         /**
          * Closes the current item that is being composed
          *
@@ -13511,36 +13304,6 @@ declare namespace Office {
          */
         getAttachmentContentAsync(attachmentId: string, options?: Office.AsyncContextOptions, callback?: (asyncResult: Office.AsyncResult<AttachmentContent>) => void): void;
         /**
-         * Gets an attachment from a message or appointment and returns it as an `AttachmentContent` object.
-         * 
-         * The `getAttachmentContentAsync` method gets the attachment with the specified identifier from the item. As a best practice, you should use
-         * the identifier to retrieve an attachment in the same session that the attachment IDs were retrieved with the `getAttachmentsAsync` or
-         * `item.attachments` call. In Outlook on the web and mobile devices, the attachment identifier is valid only within the same session.
-         * A session is over when the user closes the app, or if the user starts composing an inline form then subsequently pops out the form to
-         * continue in a separate window.
-         * 
-         * [Api set: Mailbox 1.8]
-         * 
-         * @remarks
-         * 
-         * **{@link https://docs.microsoft.com/office/dev/add-ins/outlook/understanding-outlook-add-in-permissions | Minimum permission level}**: `ReadItem`
-         * 
-         * **{@link https://docs.microsoft.com/office/dev/add-ins/outlook/outlook-add-ins-overview#extension-points | Applicable Outlook mode}**: Message Compose
-         * 
-         * **Errors**:
-         * 
-         * - `AttachmentTypeNotSupported`: The attachment type isn't supported. Unsupported types include embedded images in Rich Text Format,
-         *                               or item attachment types other than email or calendar items (such as a contact or task item).
-         *
-         * - `InvalidAttachmentId`: The attachment identifier does not exist.
-         * 
-         * @param attachmentId - The identifier of the attachment you want to get. 
-         * @param callback - Optional. When the method completes, the function passed in the `callback` parameter is called with a single parameter,
-         *                `asyncResult`, which is an `Office.AsyncResult` object. If the call fails, the `asyncResult.error` property will contain
-         *                an error code with the reason for the failure.
-         */
-        getAttachmentContentAsync(attachmentId: string, callback?: (asyncResult: Office.AsyncResult<AttachmentContent>) => void): void;
-        /**
          * Gets the item's attachments as an array.
          * 
          * [Api set: Mailbox 1.8]
@@ -13558,22 +13321,6 @@ declare namespace Office {
          *                 the failure.
          */
         getAttachmentsAsync(options?: Office.AsyncContextOptions, callback?: (asyncResult: Office.AsyncResult<AttachmentDetailsCompose[]>) => void): void;
-        /**
-         * Gets the item's attachments as an array.
-         * 
-         * [Api set: Mailbox 1.8]
-         *
-         * @remarks
-         *
-         * **{@link https://docs.microsoft.com/office/dev/add-ins/outlook/understanding-outlook-add-in-permissions | Minimum permission level}**: `ReadItem`
-         * 
-         * **{@link https://docs.microsoft.com/office/dev/add-ins/outlook/outlook-add-ins-overview#extension-points | Applicable Outlook mode}**: Message Compose
-         * 
-         * @param callback - Optional. When the method completes, the function passed in the callback parameter is called with a single parameter of
-         *                 type `Office.AsyncResult`. If the call fails, the `asyncResult.error` property will contain an error code with the reason for
-         *                 the failure.
-         */
-        getAttachmentsAsync(callback?: (asyncResult: Office.AsyncResult<AttachmentDetailsCompose[]>) => void): void;
         /**
          * Asynchronously gets the ID of a saved item.
          *
@@ -13683,7 +13430,18 @@ declare namespace Office {
         /**
          * Gets the properties of an appointment or message in a shared folder, calendar, or mailbox.
          *
-         * **Note**: This method is not supported in Outlook on Mac, iOS, or Android.
+         * **Important**: In Message Compose mode, this API is not supported in Outlook on the web or Windows unless the following conditions are met.
+         *
+         * 1. The owner shares at least one mailbox folder with the delegate.
+         *
+         * 2. The delegate drafts a message in the shared folder.
+         *
+         * After the message has been sent, it's usually found in the delegate's **Sent Items** folder.
+         *
+         * For more information around using this API, see the
+         * {@link https://docs.microsoft.com/office/dev/add-ins/outlook/delegate-access | delegate access} article.
+         *
+         * **Note**: This method is not supported in Outlook on iOS or Android.
          *
          * [Api set: Mailbox 1.8]
          *
@@ -13702,7 +13460,18 @@ declare namespace Office {
         /**
          * Gets the properties of an appointment or message in a shared folder, calendar, or mailbox.
          *
-         * **Note**: This method is not supported in Outlook on Mac, iOS, or Android.
+         * **Important**: In Message Compose mode, this API is not supported in Outlook on the web or Windows unless the following conditions are met.
+         *
+         * 1. The owner shares at least one mailbox folder with the delegate.
+         *
+         * 2. The delegate drafts a message in the shared folder.
+         *
+         * After the message has been sent, it's usually found in the delegate's **Sent Items** folder.
+         *
+         * For more information around using this API, see the
+         * {@link https://docs.microsoft.com/office/dev/add-ins/outlook/delegate-access | delegate access} article.
+         *
+         * **Note**: This method is not supported in Outlook on iOS or Android.
          *
          * [Api set: Mailbox 1.8]
          *
@@ -13769,33 +13538,6 @@ declare namespace Office {
          */
         removeAttachmentAsync(attachmentId: string, options?: Office.AsyncContextOptions, callback?: (asyncResult: Office.AsyncResult<void>) => void): void;
         /**
-         * Removes an attachment from a message or appointment.
-         *
-         * The `removeAttachmentAsync` method removes the attachment with the specified identifier from the item. 
-         * As a best practice, you should use the attachment identifier to remove an attachment only if the same mail app has added that attachment 
-         * in the same session. In Outlook on the web and mobile devices, the attachment identifier is valid only within the same session. 
-         * A session is over when the user closes the app, or if the user starts composing an inline form then subsequently pops out the form to 
-         * continue in a separate window.
-         *
-         * [Api set: Mailbox 1.1]
-         *
-         * @remarks
-         *
-         * **{@link https://docs.microsoft.com/office/dev/add-ins/outlook/understanding-outlook-add-in-permissions | Minimum permission level}**: `ReadWriteItem`
-         * 
-         * **{@link https://docs.microsoft.com/office/dev/add-ins/outlook/outlook-add-ins-overview#extension-points | Applicable Outlook mode}**: Message Compose
-         * 
-         * **Errors**:
-         * 
-         * - `InvalidAttachmentId`: The attachment identifier does not exist.
-         *
-         * @param attachmentId - The identifier of the attachment to remove.
-         * @param callback - Optional. When the method completes, the function passed in the `callback` parameter is called with a single parameter of
-         *                 type `Office.AsyncResult`. If removing the attachment fails, the `asyncResult.error` property will contain an error code
-         *                 with the reason for the failure.
-         */
-        removeAttachmentAsync(attachmentId: string, callback?: (asyncResult: Office.AsyncResult<void>) => void): void;
-        /**
          * Removes the event handlers for a supported event type. **Note**: Events are available only with task pane.
          * 
          * Refer to the Item object model {@link https://docs.microsoft.com/office/dev/add-ins/reference/objectmodel/requirement-set-1.8/office.context.mailbox.item#events | events section} for supported events.
@@ -13815,24 +13557,6 @@ declare namespace Office {
          *                `asyncResult`, which is an `Office.AsyncResult` object.
          */
         removeHandlerAsync(eventType: Office.EventType | string, options?: Office.AsyncContextOptions, callback?: (asyncResult: Office.AsyncResult<void>) => void): void;
-        /**
-         * Removes the event handlers for a supported event type. **Note**: Events are available only with task pane.
-         * 
-         * Refer to the Item object model {@link https://docs.microsoft.com/office/dev/add-ins/reference/objectmodel/requirement-set-1.8/office.context.mailbox.item#events | events section} for supported events.
-         * 
-         * [Api set: Mailbox 1.7]
-         *
-         * @remarks
-         *
-         * **{@link https://docs.microsoft.com/office/dev/add-ins/outlook/understanding-outlook-add-in-permissions | Minimum permission level}**: `ReadItem`
-         * 
-         * **{@link https://docs.microsoft.com/office/dev/add-ins/outlook/outlook-add-ins-overview#extension-points | Applicable Outlook mode}**: Message Compose
-         * 
-         * @param eventType - The event that should revoke the handler.
-         * @param callback - Optional. When the method completes, the function passed in the `callback` parameter is called with a single parameter,
-         *                `asyncResult`, which is an `Office.AsyncResult` object.
-         */
-        removeHandlerAsync(eventType: Office.EventType | string, callback?: (asyncResult: Office.AsyncResult<void>) => void): void;
         /**
          * Asynchronously saves an item.
          *
@@ -13930,31 +13654,6 @@ declare namespace Office {
          *                 type `Office.AsyncResult`.
          */
         setSelectedDataAsync(data: string, options?: Office.AsyncContextOptions & CoercionTypeOptions, callback?: (asyncResult: Office.AsyncResult<void>) => void): void;
-        /**
-         * Asynchronously inserts data into the body or subject of a message.
-         *
-         * The `setSelectedDataAsync` method inserts the specified string at the cursor location in the subject or body of the item, or, if text is
-         * selected in the editor, it replaces the selected text. If the cursor is not in the body or subject field, an error is returned.
-         * After insertion, the cursor is placed at the end of the inserted content.
-         *
-         * [Api set: Mailbox 1.2]
-         *
-         * @remarks
-         *
-         * **{@link https://docs.microsoft.com/office/dev/add-ins/outlook/understanding-outlook-add-in-permissions | Minimum permission level}**: `ReadWriteItem`
-         * 
-         * **{@link https://docs.microsoft.com/office/dev/add-ins/outlook/outlook-add-ins-overview#extension-points | Applicable Outlook mode}**: Message Compose
-         * 
-         * **Errors**:
-         * 
-         * - `InvalidAttachmentId`: The attachment identifier does not exist.
-         *
-         * @param data - The data to be inserted. Data is not to exceed 1,000,000 characters. 
-         *             If more than 1,000,000 characters are passed in, an `ArgumentOutOfRange` exception is thrown.
-         * @param callback - Optional. When the method completes, the function passed in the `callback` parameter is called with a single parameter of
-         *                 type `Office.AsyncResult`.
-         */
-        setSelectedDataAsync(data: string, callback?: (asyncResult: Office.AsyncResult<void>) => void): void;
     }
     /**
      * The message read mode of {@link Office.Item | Office.context.mailbox.item}.
@@ -14010,12 +13709,19 @@ declare namespace Office {
          */
         categories: Categories;
         /**
-         * Provides access to the Cc (carbon copy) recipients of a message. The type of object and level of access depends on the mode of the 
+         * Provides access to the Cc (carbon copy) recipients of a message. The type of object and level of access depend on the mode of the 
          * current item.
          *
-         * The `cc` property returns an array that contains an `EmailAddressDetails` object for each recipient listed on the Cc line of the message. 
-         * By default, the collection is limited to a maximum of 100 members. However, in Outlook on the web, you can get 20 members maximum, while
-         * on Windows and Mac, you can get 500 members maximum.
+         * The `cc` property returns an array that contains an {@link Office.EmailAddressDetails | EmailAddressDetails} object for
+         * each recipient listed on the **Cc** line of the message. Collection size limits:
+         *
+         * - Windows: 500 members
+         *
+         * - Mac: 100 members
+         *
+         * - Web browser: 20 members
+         *
+         * - Other: No limit
          *
          * @remarks
          *
@@ -14098,6 +13804,10 @@ declare namespace Office {
         from: EmailAddressDetails;
         /**
          * Gets the internet message identifier for an email message.
+         *
+         * **Important**: In the **Sent Items** folder, the `internetMessageId` may not be available yet on recently sent items. In that case,
+         * consider using {@link https://docs.microsoft.com/office/dev/add-ins/outlook/web-services | Exchange Web Services} to get this
+         * {@link https://docs.microsoft.com/exchange/client-developer/web-service-reference/internetmessageid | property from the server}.
          *
          * @remarks
          *
@@ -14300,12 +14010,19 @@ declare namespace Office {
          */
         subject: string;
         /**
-         * Provides access to the recipients on the To line of a message. The type of object and level of access depends on the mode of the
+         * Provides access to the recipients on the **To** line of a message. The type of object and level of access depend on the mode of the
          * current item.
          *
-         * The `to` property returns an array that contains an `EmailAddressDetails` object for each recipient listed on the To line of the message.
-         * By default, the collection is limited to a maximum of 100 members. However, in Outlook on the web, you can get 20 members maximum, while
-         * on Windows and Mac, you can get 500 members maximum.
+         * The `to` property returns an array that contains an {@link Office.EmailAddressDetails | EmailAddressDetails} object for
+         * each recipient listed on the **To** line of the message. Collection size limits:
+         *
+         * - Windows: 500 members
+         *
+         * - Mac: 100 members
+         *
+         * - Web browser: 20 members
+         *
+         * - Other: No limit
          *
          * @remarks
          *
@@ -14338,26 +14055,6 @@ declare namespace Office {
          */
         addHandlerAsync(eventType: Office.EventType | string, handler: any, options?: Office.AsyncContextOptions, callback?: (asyncResult: Office.AsyncResult<void>) => void): void;
         /**
-         * Adds an event handler for a supported event. **Note**: Events are available only with task pane.
-         * 
-         * Refer to the Item object model {@link https://docs.microsoft.com/office/dev/add-ins/reference/objectmodel/requirement-set-1.8/office.context.mailbox.item#events | events section} for supported events.
-         * 
-         * [Api set: Mailbox 1.7]
-         *
-         * @remarks
-         *
-         * **{@link https://docs.microsoft.com/office/dev/add-ins/outlook/understanding-outlook-add-in-permissions | Minimum permission level}**: `ReadItem`
-         * 
-         * **{@link https://docs.microsoft.com/office/dev/add-ins/outlook/outlook-add-ins-overview#extension-points | Applicable Outlook mode}**: Message Read
-         * 
-         * @param eventType - The event that should invoke the handler.
-         * @param handler - The function to handle the event. The function must accept a single parameter, which is an object literal.
-         *                The type property on the parameter will match the `eventType` parameter passed to `addHandlerAsync`.
-         * @param callback - Optional. When the method completes, the function passed in the `callback` parameter is called with a single parameter, 
-         *                `asyncResult`, which is an `Office.AsyncResult` object.
-         */
-        addHandlerAsync(eventType: Office.EventType | string, handler: any, callback?: (asyncResult: Office.AsyncResult<void>) => void): void;
-        /**
          * Displays a reply form that includes either the sender and all recipients of the selected message or the organizer and all attendees of the
          * selected appointment.
          *
@@ -14381,6 +14078,35 @@ declare namespace Office {
          */
         displayReplyAllForm(formData: string | ReplyFormData): void;
         /**
+         * Displays a reply form that includes either the sender and all recipients of the selected message or the organizer and all attendees of the
+         * selected appointment.
+         *
+         * In Outlook on the web, the reply form is displayed as a pop-out form in the 3-column view and a pop-up form in the 2-column or 1-column view.
+         *
+         * If any of the string parameters exceed their limits, `displayReplyAllFormAsync` throws an exception.
+         *
+         * When attachments are specified in the `formData.attachments` parameter, Outlook attempts to download all attachments and attach them to the
+         * reply form. If any attachments fail to be added, an error is shown in the form UI. If this isn't possible, then no error message is thrown.
+         *
+         * **Note**: This method is not supported in Outlook on iOS or Android.
+         *
+         * [Api set: Mailbox 1.9]
+         *
+         * @remarks
+         *
+         * **{@link https://docs.microsoft.com/office/dev/add-ins/outlook/understanding-outlook-add-in-permissions | Minimum permission level}**: `ReadItem`
+         *
+         * **{@link https://docs.microsoft.com/office/dev/add-ins/outlook/outlook-add-ins-overview#extension-points | Applicable Outlook mode}**: Message Read
+         *
+         * @param formData - A string that contains text and HTML and that represents the body of the reply form. The string is limited to 32 KB
+         *                   OR a {@link Office.ReplyFormData | ReplyFormData} object that contains body or attachment data and a callback function.
+         * @param options - Optional. An object literal that contains one or more of the following properties.
+         *        `asyncContext`: Developers can provide any object they wish to access in the callback method.
+         * @param callback - Optional. When the method completes, the function passed in the `callback` parameter is called with a single parameter,
+         *                `asyncResult`, which is an `Office.AsyncResult` object.
+         */
+        displayReplyAllFormAsync(formData: string | ReplyFormData, options?: Office.AsyncContextOptions, callback?: (asyncResult: Office.AsyncResult<void>) => void): void;
+        /**
          * Displays a reply form that includes only the sender of the selected message or the organizer of the selected appointment.
          *
          * In Outlook on the web, the reply form is displayed as a pop-out form in the 3-column view and a pop-up form in the 2-column or 1-column view.
@@ -14403,6 +14129,34 @@ declare namespace Office {
          */
         displayReplyForm(formData: string | ReplyFormData): void;
         /**
+         * Displays a reply form that includes only the sender of the selected message or the organizer of the selected appointment.
+         *
+         * In Outlook on the web, the reply form is displayed as a pop-out form in the 3-column view and a pop-up form in the 2-column or 1-column view.
+         *
+         * If any of the string parameters exceed their limits, `displayReplyFormAsync` throws an exception.
+         *
+         * When attachments are specified in the `formData.attachments` parameter, Outlook attempts to download all attachments and attach them to the
+         * reply form. If any attachments fail to be added, an error is shown in the form UI. If this isn't possible, then no error message is thrown.
+         *
+         * **Note**: This method is not supported in Outlook on iOS or Android.
+         *
+         * [Api set: Mailbox 1.9]
+         *
+         * @remarks
+         *
+         * **{@link https://docs.microsoft.com/office/dev/add-ins/outlook/understanding-outlook-add-in-permissions | Minimum permission level}**: `ReadItem`
+         *
+         * **{@link https://docs.microsoft.com/office/dev/add-ins/outlook/outlook-add-ins-overview#extension-points | Applicable Outlook mode}**: Message Read
+         *
+         * @param formData - A string that contains text and HTML and that represents the body of the reply form. The string is limited to 32 KB
+         *                   OR a {@link Office.ReplyFormData | ReplyFormData} object that contains body or attachment data and a callback function.
+         * @param options - Optional. An object literal that contains one or more of the following properties.
+         *        `asyncContext`: Developers can provide any object they wish to access in the callback method.
+         * @param callback - Optional. When the method completes, the function passed in the `callback` parameter is called with a single parameter,
+         *                `asyncResult`, which is an `Office.AsyncResult` object.
+         */
+        displayReplyFormAsync(formData: string | ReplyFormData, options?: Office.AsyncContextOptions, callback?: (asyncResult: Office.AsyncResult<void>) => void): void;
+        /**
          * Gets all the internet headers for the message as a string.
          * 
          * [Api set: Mailbox 1.8]
@@ -14422,24 +14176,6 @@ declare namespace Office {
          *                If the call fails, the `asyncResult.error` property will contain an error code with the reason for the failure.
          */
         getAllInternetHeadersAsync(options?: Office.AsyncContextOptions, callback?: (asyncResult: Office.AsyncResult<string>) => void): void;
-        /**
-         * Gets all the internet headers for the message as a string.
-         * 
-         * [Api set: Mailbox 1.8]
-         *
-         * @remarks
-         *
-         * **{@link https://docs.microsoft.com/office/dev/add-ins/outlook/understanding-outlook-add-in-permissions | Minimum permission level}**: `ReadItem`
-         * 
-         * **{@link https://docs.microsoft.com/office/dev/add-ins/outlook/outlook-add-ins-overview#extension-points | Applicable Outlook mode}**: Message Read
-         * 
-         * @param callback - Optional. When the method completes, the function passed in the `callback` parameter is called with a single parameter, 
-         *                `asyncResult`, which is an `Office.AsyncResult` object.
-         *                On success, the internet headers data is provided in the asyncResult.value property as a string. 
-         *                Refer to {@link https://tools.ietf.org/html/rfc2183 | RFC 2183} for the formatting information of the returned string value. 
-         *                If the call fails, the `asyncResult.error` property will contain an error code with the reason for the failure.
-         */
-        getAllInternetHeadersAsync(callback?: (asyncResult: Office.AsyncResult<string>) => void): void;
         /**
          * Gets an attachment from a message or appointment and returns it as an `AttachmentContent` object.
          * 
@@ -14472,36 +14208,6 @@ declare namespace Office {
          *                an error code with the reason for the failure.
          */
         getAttachmentContentAsync(attachmentId: string, options?: Office.AsyncContextOptions, callback?: (asyncResult: Office.AsyncResult<AttachmentContent>) => void): void;
-        /**
-         * Gets an attachment from a message or appointment and returns it as an `AttachmentContent` object.
-         * 
-         * The `getAttachmentContentAsync` method gets the attachment with the specified identifier from the item. As a best practice, you should use 
-         * the identifier to retrieve an attachment in the same session that the attachmentIds were retrieved with the `getAttachmentsAsync` or 
-         * `item.attachments` call. In Outlook on the web and mobile devices, the attachment identifier is valid only within the same session. 
-         * A session is over when the user closes the app, or if the user starts composing an inline form then subsequently pops out the form to 
-         * continue in a separate window.
-         * 
-         * [Api set: Mailbox 1.8]
-         * 
-         * @remarks
-         * 
-         * **{@link https://docs.microsoft.com/office/dev/add-ins/outlook/understanding-outlook-add-in-permissions | Minimum permission level}**: `ReadItem`
-         * 
-         * **{@link https://docs.microsoft.com/office/dev/add-ins/outlook/outlook-add-ins-overview#extension-points | Applicable Outlook mode}**: Message Read
-         * 
-         * **Errors**:
-         * 
-         * - `AttachmentTypeNotSupported`: The attachment type isn't supported. Unsupported types include embedded images in Rich Text Format,
-         *                               or item attachment types other than email or calendar items (such as a contact or task item).
-         *
-         * - `InvalidAttachmentId`: The attachment identifier does not exist.
-         * 
-         * @param attachmentId - The identifier of the attachment you want to get.
-         * @param callback - Optional. When the method completes, the function passed in the `callback` parameter is called with a single parameter,
-         *                `asyncResult`, which is an `Office.AsyncResult` object. If the call fails, the `asyncResult.error` property will contain
-         *                an error code with the reason for the failure.
-         */
-        getAttachmentContentAsync(attachmentId: string, callback?: (asyncResult: Office.AsyncResult<AttachmentContent>) => void): void;
         /**
          * Gets the entities found in the selected item's body.
          *
@@ -14701,7 +14407,10 @@ declare namespace Office {
         /**
          * Gets the properties of an appointment or message in a shared folder, calendar, or mailbox.
          *
-         * **Note**: This method is not supported in Outlook on Mac, iOS, or Android.
+         * For more information around using this API, see the
+         * {@link https://docs.microsoft.com/office/dev/add-ins/outlook/delegate-access | delegate access} article.
+         *
+         * **Note**: This method is not supported in Outlook on iOS or Android.
          *
          * [Api set: Mailbox 1.8]
          *
@@ -14720,7 +14429,10 @@ declare namespace Office {
         /**
          * Gets the properties of an appointment or message in a shared folder, calendar, or mailbox.
          *
-         * **Note**: This method is not supported in Outlook on Mac, iOS, or Android.
+         * For more information around using this API, see the
+         * {@link https://docs.microsoft.com/office/dev/add-ins/outlook/delegate-access | delegate access} article.
+         *
+         * **Note**: This method is not supported in Outlook on iOS or Android.
          *
          * [Api set: Mailbox 1.8]
          *
@@ -14776,24 +14488,6 @@ declare namespace Office {
          *                `asyncResult`, which is an `Office.AsyncResult` object.
          */
         removeHandlerAsync(eventType: Office.EventType | string, options?: Office.AsyncContextOptions, callback?: (asyncResult: Office.AsyncResult<void>) => void): void;
-        /**
-         * Removes the event handlers for a supported event type. **Note**: Events are available only with task pane.
-         * 
-         * Refer to the Item object model {@link https://docs.microsoft.com/office/dev/add-ins/reference/objectmodel/requirement-set-1.8/office.context.mailbox.item#events | events section} for supported events.
-         * 
-         * [Api set: Mailbox 1.7]
-         *
-         * @remarks
-         *
-         * **{@link https://docs.microsoft.com/office/dev/add-ins/outlook/understanding-outlook-add-in-permissions | Minimum permission level}**: `ReadItem`
-         * 
-         * **{@link https://docs.microsoft.com/office/dev/add-ins/outlook/outlook-add-ins-overview#extension-points | Applicable Outlook mode}**: Message Read
-         * 
-         * @param eventType - The event that should revoke the handler.
-         * @param callback - Optional. When the method completes, the function passed in the `callback` parameter is called with a single parameter,
-         *                `asyncResult`, which is an `Office.AsyncResult` object.
-         */
-        removeHandlerAsync(eventType: Office.EventType | string, callback?: (asyncResult: Office.AsyncResult<void>) => void): void;
     }
     /**
      * An array of `NotificationMessageDetails` objects are returned by the `NotificationMessages.getAllAsync` method.
@@ -14812,9 +14506,12 @@ declare namespace Office {
          */
         key?: string;
         /**
-         * Specifies the `ItemNotificationMessageType` of message. If type is `ProgressIndicator` or `ErrorMessage`, an icon is automatically supplied
+         * Specifies the `ItemNotificationMessageType` of message.
+         *
+         * If type is `ProgressIndicator` or `ErrorMessage`, an icon is automatically supplied
          * and the message is not persistent. Therefore the icon and persistent properties are not valid for these types of messages.
          * Including them will result in an `ArgumentException`.
+         *
          * If type is `ProgressIndicator`, the developer should remove or replace the progress indicator when the action is complete.
          */
         type: MailboxEnums.ItemNotificationMessageType | string;
@@ -14831,7 +14528,8 @@ declare namespace Office {
          */
         message: string;
         /**
-         * Only applicable when type is `InformationalMessage`. If true, the message remains until removed by this add-in or dismissed by the user.
+         * Specifies if the message should be persistent. Only applicable when type is `InformationalMessage`.
+         * If true, the message remains until removed by this add-in or dismissed by the user.
          * If false, it is removed when the user navigates to a different item.
          * For error notifications, the message persists until the user sees it once.
          * Specifying this parameter for an unsupported type throws an exception.
@@ -14874,27 +14572,6 @@ declare namespace Office {
          */
         addAsync(key: string, JSONmessage: NotificationMessageDetails, options?: Office.AsyncContextOptions, callback?: (asyncResult: Office.AsyncResult<void>) => void): void;
         /**
-         * Adds a notification to an item.
-         *
-         * There are a maximum of 5 notifications per message. Setting more will return a `NumberOfNotificationMessagesExceeded` error.
-         *
-         * [Api set: Mailbox 1.3]
-         *
-         * @remarks
-         * 
-         * **{@link https://docs.microsoft.com/office/dev/add-ins/outlook/understanding-outlook-add-in-permissions | Minimum permission level}**: `ReadItem`
-         * 
-         * **{@link https://docs.microsoft.com/office/dev/add-ins/outlook/outlook-add-ins-overview#extension-points | Applicable Outlook mode}**: Compose or Read
-         *
-         * @param key - A developer-specified key used to reference this notification message. Developers can use it to modify this message later. 
-         *             It can't be longer than 32 characters.
-         * @param JSONmessage - A JSON object that contains the notification message to be added to the item. 
-         *                    It contains a `NotificationMessageDetails` object.
-         * @param callback - Optional. When the method completes, the function passed in the `callback` parameter is called with a single parameter
-         *                 of type `Office.AsyncResult`.
-         */
-        addAsync(key: string, JSONmessage: NotificationMessageDetails, callback?: (asyncResult: Office.AsyncResult<void>) => void): void;
-        /**
          * Returns all keys and messages for an item.
          *
          * [Api set: Mailbox 1.3]
@@ -14911,21 +14588,6 @@ declare namespace Office {
          *                 of type `Office.AsyncResult`. The `value` property of the result is an array of `NotificationMessageDetails` objects.
          */
         getAllAsync(options?: Office.AsyncContextOptions, callback?: (asyncResult: Office.AsyncResult<NotificationMessageDetails[]>) => void): void;
-        /**
-         * Returns all keys and messages for an item.
-         *
-         * [Api set: Mailbox 1.3]
-         *
-         * @remarks
-         * 
-         * **{@link https://docs.microsoft.com/office/dev/add-ins/outlook/understanding-outlook-add-in-permissions | Minimum permission level}**: `ReadItem`
-         * 
-         * **{@link https://docs.microsoft.com/office/dev/add-ins/outlook/outlook-add-ins-overview#extension-points | Applicable Outlook mode}**: Compose or Read
-         *
-         * @param callback - Optional. When the method completes, the function passed in the `callback` parameter is called with a single parameter
-         *                  of type `Office.AsyncResult`. The `value` property of the result is an array of `NotificationMessageDetails` objects.
-         */
-        getAllAsync(callback?: (asyncResult: Office.AsyncResult<NotificationMessageDetails[]>) => void): void;
         /**
          * Removes a notification message for an item.
          *
@@ -14944,22 +14606,6 @@ declare namespace Office {
          *                 of type `Office.AsyncResult`.
          */
         removeAsync(key: string, options?: Office.AsyncContextOptions, callback?: (asyncResult: Office.AsyncResult<void>) => void): void;
-        /**
-         * Removes a notification message for an item.
-         *
-         * [Api set: Mailbox 1.3]
-         *
-         * @remarks
-         * 
-         * **{@link https://docs.microsoft.com/office/dev/add-ins/outlook/understanding-outlook-add-in-permissions | Minimum permission level}**: `ReadItem`
-         * 
-         * **{@link https://docs.microsoft.com/office/dev/add-ins/outlook/outlook-add-ins-overview#extension-points | Applicable Outlook mode}**: Compose or Read
-         *
-         * @param key - The key for the notification message to remove.
-         * @param callback - Optional. When the method completes, the function passed in the `callback` parameter is called with a single parameter
-         *                 of type `Office.AsyncResult`.
-         */
-        removeAsync(key: string, callback?: (asyncResult: Office.AsyncResult<void>) => void): void;
         /**
          * Replaces a notification message that has a given key with another message.
          *
@@ -14982,26 +14628,6 @@ declare namespace Office {
          *                 of type `Office.AsyncResult`.
          */
         replaceAsync(key: string, JSONmessage: NotificationMessageDetails, options?: Office.AsyncContextOptions, callback?: (asyncResult: Office.AsyncResult<void>) => void): void;
-        /**
-         * Replaces a notification message that has a given key with another message.
-         *
-         * If a notification message with the specified key doesn't exist, `replaceAsync` will add the notification.
-         *
-         * [Api set: Mailbox 1.3]
-         *
-         * @remarks
-         * 
-         * **{@link https://docs.microsoft.com/office/dev/add-ins/outlook/understanding-outlook-add-in-permissions | Minimum permission level}**: `ReadItem`
-         * 
-         * **{@link https://docs.microsoft.com/office/dev/add-ins/outlook/outlook-add-ins-overview#extension-points | Applicable Outlook mode}**: Compose or Read
-         *
-         * @param key - The key for the notification message to replace. It can't be longer than 32 characters.
-         * @param JSONmessage - A JSON object that contains the new notification message to replace the existing message. 
-         *                    It contains a `NotificationMessageDetails` object.
-         * @param callback - Optional. When the method completes, the function passed in the `callback` parameter is called with a single parameter
-         *                 of type `Office.AsyncResult`.
-         */
-        replaceAsync(key: string, JSONmessage: NotificationMessageDetails, callback?: (asyncResult: Office.AsyncResult<void>) => void): void;
     }
     /**
      * Represents the appointment organizer, even if an alias or a delegate was used to create the appointment. 
@@ -15028,29 +14654,13 @@ declare namespace Office {
          * 
          * **{@link https://docs.microsoft.com/office/dev/add-ins/outlook/outlook-add-ins-overview#extension-points | Applicable Outlook mode}**: Compose
          * 
-         * @param options - An object literal that contains one or more of the following properties.
+         * @param options - Optional. An object literal that contains one or more of the following properties.
          *        `asyncContext`: Developers can provide any object they wish to access in the callback method.
-         * @param callback - When the method completes, the function passed in the `callback` parameter is called with a single parameter,
+         * @param callback - Optional. When the method completes, the function passed in the `callback` parameter is called with a single parameter,
          *                  `asyncResult`, which is an `AsyncResult` object. The `value` property of the result is the appointment's organizer value,
          *                  as an `EmailAddressDetails` object.
          */
-        getAsync(options: Office.AsyncContextOptions, callback: (asyncResult: Office.AsyncResult<EmailAddressDetails>) => void): void;
-        /**
-         * Gets the organizer value of an appointment as an {@link Office.EmailAddressDetails | EmailAddressDetails} object in the asyncResult.value property.
-         * 
-         * [Api set: Mailbox 1.7]
-         * 
-         * @remarks
-         * 
-         * **{@link https://docs.microsoft.com/office/dev/add-ins/outlook/understanding-outlook-add-in-permissions | Minimum permission level}**: `ReadItem`
-         * 
-         * **{@link https://docs.microsoft.com/office/dev/add-ins/outlook/outlook-add-ins-overview#extension-points | Applicable Outlook mode}**: Compose
-         * 
-         * @param callback - When the method completes, the function passed in the `callback` parameter is called with a single parameter,
-         *                  `asyncResult`, which is an `AsyncResult` object. The `value` property of the result is the appointment's organizer value,
-         *                  as an `EmailAddressDetails` object.
-         */
-        getAsync(callback?: (asyncResult: Office.AsyncResult<EmailAddressDetails>) => void): void;
+        getAsync(options?: Office.AsyncContextOptions, callback?: (asyncResult: Office.AsyncResult<EmailAddressDetails>) => void): void;
     }
     /**
      * Represents a phone number identified in an item. Read mode only.
@@ -15102,6 +14712,15 @@ declare namespace Office {
          *
          * - {@link Office.EmailAddressDetails | EmailAddressDetails} objects
          *
+         * Maximum number that can be added:
+         *
+         * - Windows: 100 recipients.
+         * **Note**: Can call API repeatedly but the maximum number of recipients in the target field on the item is 500 recipients.
+         *
+         * - Mac, web browser: 100 recipients
+         *
+         * - Other: No limit
+         *
          * [Api set: Mailbox 1.1]
          *
          * @remarks
@@ -15122,38 +14741,14 @@ declare namespace Office {
          */
         addAsync(recipients: (string | EmailUser | EmailAddressDetails)[], options?: Office.AsyncContextOptions, callback?: (asyncResult: Office.AsyncResult<void>) => void): void;
         /**
-         * Adds a recipient list to the existing recipients for an appointment or message.
-         *
-         * The recipients parameter can be an array of one of the following:
-         *
-         * - Strings containing SMTP email addresses
-         *
-         * - {@link Office.EmailUser | EmailUser} objects
-         *
-         * - {@link Office.EmailAddressDetails | EmailAddressDetails} objects
-         *
-         * [Api set: Mailbox 1.1]
-         *
-         * @remarks
-         * 
-         * **{@link https://docs.microsoft.com/office/dev/add-ins/outlook/understanding-outlook-add-in-permissions | Minimum permission level}**: `ReadWriteItem`
-         * 
-         * **{@link https://docs.microsoft.com/office/dev/add-ins/outlook/outlook-add-ins-overview#extension-points | Applicable Outlook mode}**: Compose
-         * 
-         * **Errors**:
-         * 
-         * - `NumberOfRecipientsExceeded`: The number of recipients exceeded 100 entries.
-         *
-         * @param recipients - The recipients to add to the recipients list.
-         * @param callback - Optional. When the method completes, the function passed in the `callback` parameter is called with a single parameter
-         *                 of type `Office.AsyncResult`. If adding the recipients fails, the `asyncResult.error` property will contain an error code.
-         */
-        addAsync(recipients: (string | EmailUser | EmailAddressDetails)[], callback?: (asyncResult: Office.AsyncResult<void>) => void): void;
-        /**
          * Gets a recipient list for an appointment or message.
          *
-         * When the call completes, the `asyncResult.value` property will contain
-         * an array of {@link Office.EmailAddressDetails | EmailAddressDetails} objects.
+         * When the call completes, the `asyncResult.value` property will contain an array of {@link Office.EmailAddressDetails | EmailAddressDetails}
+         * objects. Collection size limits:
+         *
+         * - Windows, Mac, web browser: 500 members
+         *
+         * - Other: No limit
          *
          * [Api set: Mailbox 1.1]
          *
@@ -15172,8 +14767,12 @@ declare namespace Office {
         /**
          * Gets a recipient list for an appointment or message.
          *
-         * When the call completes, the `asyncResult.value` property will contain
-         * an array of {@link Office.EmailAddressDetails | EmailAddressDetails} objects.
+         * When the call completes, the `asyncResult.value` property will contain an array of {@link Office.EmailAddressDetails | EmailAddressDetails}
+         * objects. Collection size limits:
+         *
+         * - Windows, Mac, web browser: 500 members
+         *
+         * - Other: No limit
          *
          * [Api set: Mailbox 1.1]
          *
@@ -15199,6 +14798,12 @@ declare namespace Office {
          * - {@link Office.EmailUser | EmailUser} objects
          *
          * - {@link Office.EmailAddressDetails | EmailAddressDetails} objects
+         *
+         * Maximum number that can be set:
+         *
+         * - Windows, Mac, web browser: 100 recipients
+         *
+         * - Other: No limit
          *
          * [Api set: Mailbox 1.1]
          *
@@ -15232,6 +14837,12 @@ declare namespace Office {
          * - {@link Office.EmailUser | EmailUser} objects
          *
          * - {@link Office.EmailAddressDetails | EmailAddressDetails} objects
+         *
+         * Maximum number that can be set:
+         *
+         * - Windows, Mac, web browser: 100 recipients
+         *
+         * - Other: No limit
          *
          * [Api set: Mailbox 1.1]
          *
@@ -15439,23 +15050,6 @@ declare namespace Office {
          */
         getAsync(options?: Office.AsyncContextOptions, callback?: (asyncResult: Office.AsyncResult<Recurrence>) => void): void;
         /**
-         * Returns the current recurrence object of an appointment series.
-         * 
-         * This method returns the entire `Recurrence` object for the appointment series.
-         * 
-         * [Api set: Mailbox 1.7]
-         * 
-         * @remarks
-         * 
-         * **{@link https://docs.microsoft.com/office/dev/add-ins/outlook/understanding-outlook-add-in-permissions | Minimum permission level}**: `ReadItem`
-         * 
-         * **{@link https://docs.microsoft.com/office/dev/add-ins/outlook/outlook-add-ins-overview#extension-points | Applicable Outlook mode}**: Compose or Read
-         * 
-         * @param callback - Optional. When the method completes, the function passed in the `callback` parameter is called with a single parameter,
-         *                `asyncResult`, which is an `Office.AsyncResult` object. The `value` property of the result is a `Recurrence` object.
-         */
-        getAsync(callback?: (asyncResult: Office.AsyncResult<Recurrence>) => void): void;
-        /**
          * Sets the recurrence pattern of an appointment series.
          * 
          * **Note**: `setAsync` should only be available for series items and not instance items.
@@ -15479,28 +15073,6 @@ declare namespace Office {
          *                `asyncResult`, which is an `Office.AsyncResult` object.
          */
         setAsync(recurrencePattern: Recurrence, options?: Office.AsyncContextOptions, callback?: (asyncResult: Office.AsyncResult<void>) => void): void;
-        /**
-         * Sets the recurrence pattern of an appointment series.
-         * 
-         * **Note**: `setAsync` should only be available for series items and not instance items.
-         * 
-         * [Api set: Mailbox 1.7]
-         * 
-         * @remarks
-         * 
-         * **{@link https://docs.microsoft.com/office/dev/add-ins/outlook/understanding-outlook-add-in-permissions | Minimum permission level}**: `ReadWriteItem`
-         * 
-         * **{@link https://docs.microsoft.com/office/dev/add-ins/outlook/outlook-add-ins-overview#extension-points | Applicable Outlook mode}**: Compose
-         * 
-         * **Errors**:
-         * 
-         * - `InvalidEndTime`: The appointment end time is before its start time.
-         * 
-         * @param recurrencePattern - A recurrence object.
-         * @param callback - Optional. When the method completes, the function passed in the `callback` parameter is called with a single parameter,
-         *                `asyncResult`, which is an `Office.AsyncResult` object.
-         */
-        setAsync(recurrencePattern: Recurrence, callback?: (asyncResult: Office.AsyncResult<void>) => void): void;
     }
     /**
      * Provides updated recurrence object that raised the `Office.EventType.RecurrenceChanged` event. 
@@ -15930,14 +15502,17 @@ declare namespace Office {
         owner: string;
         /**
          * The REST API's base URL (currently https://outlook.office.com/api).
-         * Use with `targetMailbox` to construct REST operation's URL.
-         * 
+         *
+         * Use with `targetMailbox` to construct the REST operation's URL.
+         *
          * Example usage: `targetRestUrl + "/{api_version}/users/" + targetMailbox + "/{REST_operation}"`
          */
         targetRestUrl: string;
         /**
-         * The target/owner's mailbox. Use with `targetRestUrl` to construct REST operation's URL.
-         * 
+         * The location of the owner's mailbox for the delegate's access. This location may differ based on the Outlook client.
+         *
+         * Use with `targetRestUrl` to construct the REST operation's URL.
+         *
          * Example usage: `targetRestUrl + "/{api_version}/users/" + targetMailbox + "/{REST_operation}"`
          */
         targetMailbox: string;
@@ -16019,29 +15594,6 @@ declare namespace Office {
          *                 of type `Office.AsyncResult`. If setting the subject fails, the `asyncResult.error` property will contain an error code.
          */
         setAsync(subject: string, options?: Office.AsyncContextOptions, callback?: (asyncResult: Office.AsyncResult<void>) => void): void;
-        /**
-         * Sets the subject of an appointment or message.
-         *
-         * The `setAsync` method starts an asynchronous call to the Exchange server to set the subject of an appointment or message.
-         * Setting the subject overwrites the current subject, but leaves any prefixes, such as "Fwd:" or "Re:" in place.
-         *
-         * [Api set: Mailbox 1.1]
-         *
-         * @remarks
-         * 
-         * **{@link https://docs.microsoft.com/office/dev/add-ins/outlook/understanding-outlook-add-in-permissions | Minimum permission level}**: `ReadItem`
-         * 
-         * **{@link https://docs.microsoft.com/office/dev/add-ins/outlook/outlook-add-ins-overview#extension-points | Applicable Outlook mode}**: Compose
-         * 
-         * **Errors**:
-         * 
-         * - `DataExceedsMaximumSize`: The subject parameter is longer than 255 characters.
-         *
-         * @param subject - The subject of the appointment or message. The string is limited to 255 characters.
-         * @param callback - Optional. When the method completes, the function passed in the `callback` parameter is called with a single parameter
-         *                 of type `Office.AsyncResult`. If setting the subject fails, the `asyncResult.error` property will contain an error code.
-         */
-        setAsync(data: string, callback?: (asyncResult: Office.AsyncResult<void>) => void): void;
     }
     /**
      * Represents a suggested task identified in an item. Read mode only.
@@ -16123,6 +15675,8 @@ declare namespace Office {
          *
          * The time must be in UTC; you can get the correct UTC time by using the `convertToUtcClientTime` method.
          *
+         * **Important**: In the Windows client, you can't use this function to update the start or end of a recurrence.
+         *
          * [Api set: Mailbox 1.1]
          *
          * @remarks
@@ -16142,31 +15696,6 @@ declare namespace Office {
          *               type `Office.AsyncResult`. If setting the date and time fails, the `asyncResult.error` property will contain an error code.
          */
         setAsync(dateTime: Date, options?: Office.AsyncContextOptions, callback?: (asyncResult: Office.AsyncResult<void>) => void): void;
-        /**
-         * Sets the start or end time of an appointment.
-         *
-         * If the `setAsync` method is called on the start property, the `end` property will be adjusted to maintain the duration of the appointment as
-         * previously set. If the `setAsync` method is called on the `end` property, the duration of the appointment will be extended to the new end time.
-         *
-         * The time must be in UTC; you can get the correct UTC time by using the `convertToUtcClientTime` method.
-         *
-         * [Api set: Mailbox 1.1]
-         *
-         * @remarks
-         * 
-         * **{@link https://docs.microsoft.com/office/dev/add-ins/outlook/understanding-outlook-add-in-permissions | Minimum permission level}**: `ReadWriteItem`
-         * 
-         * **{@link https://docs.microsoft.com/office/dev/add-ins/outlook/outlook-add-ins-overview#extension-points | Applicable Outlook mode}**: Compose
-         * 
-         * **Errors**:
-         * 
-         * - `InvalidEndTime`: The appointment end time is before the appointment start time.
-         *
-         * @param dateTime - A date-time object in Coordinated Universal Time (UTC).
-         * @param callback - Optional. When the method completes, the function passed in the `callback` parameter is called with a single parameter of
-         *               type `Office.AsyncResult`. If setting the date and time fails, the `asyncResult.error` property will contain an error code.
-         */
-        setAsync(dateTime: Date, callback?: (asyncResult: Office.AsyncResult<void>) => void): void;
     }
     /**
      * Information about the user associated with the mailbox. This includes their account type, display name, email address, and time zone.
@@ -16578,7 +16107,7 @@ declare namespace OfficeExtension {
          * Removes the specified function from the event handler list so that it will not be called on subsequent events. 
          * 
          * **Note**: The same {@link OfficeExtension.ClientRequestContext | RequestContext} object that the handler was added in must be used when removing the handler. 
-         * More information can be found in {@link https://docs.microsoft.com/office/dev/add-ins/develop/common-coding-issues#removing-event-handlers | Coding guidance for common issues and unexpected platform behaviors}. 
+         * More information can be found in {@link https://docs.microsoft.com/office/dev/add-ins/excel/excel-add-ins-events#remove-an-event-handler | Remove an event handler}. 
          * 
          * @param handler A reference to a function previously provided to the `add` method as an event handler. 
          */
@@ -16627,10 +16156,13 @@ declare namespace OfficeExtension {
 
 declare namespace OfficeCore {
     class RequestContext extends OfficeExtension.ClientRequestContext {
-        constructor(url?: string | OfficeExtension.RequestUrlAndHeaderInfo | any);
+        constructor(url?: string | OfficeExtension.RequestUrlAndHeaderInfo | any)
     }
 }
 
+interface Session {}
+
+        
 
 ////////////////////////////////////////////////////////////////
 //////////////////////// End OfficeCore ////////////////////////
@@ -17303,64 +16835,7 @@ declare namespace Excel {
         fiveBoxes: FiveBoxesSet;
     }
     var icons: IconCollections;
-    enum SessionOperation {
-        Close = "Session.close",
-        CommitChanges = "Session.commitChanges",
-        Create = "Session.resolveRequestUrlAndHeaderInfo"
-    }
-    interface SessionOptions {
-        persistChanges?: boolean;
-        commitExplicitly?: boolean;
-    }
-    /**
-     * Provides connection session for a remote workbook.
-     */
-    class Session {
-        private static readonly WorkbookSessionIdHeaderName;
-        private static readonly WorkbookSessionIdHeaderNameLower;
-        private static readonly EXPONENTIAL_BACKOFF_STATUS_CODES;
-        private static readonly ASYNC_API_GRAPH_VERSION;
-        private static readonly POLL_DELAY;
-        private static readonly MAX_POLL_ATTEMPTS;
-        private static readonly DEFAULT_COMMIT_CHANGES_RETRY_AFTER;
-        private static readonly MAX_COMMIT_CHANGES_RETRY_TIME;
-        private static readonly REQUEST_ID_HEADER;
-        private static readonly RETRY_AFTER_HEADER;
-        private static readonly PREFER_HEADER;
-        private static readonly PREFER_HEADER_VAL;
-        private static readonly CONTENT_TYPE_HEADER;
-        private static readonly CONTENT_TYPE_HEADER_VAL;
-        private static readonly CLOSE_SESSION;
-        private static readonly COMMIT_CHANGES;
-        private static readonly CREATE_SESSION;
-        readonly requestId: string;
-        constructor(workbookUrl?: string, requestHeaders?: {
-            [name: string]: string;
-        }, { persistChanges, commitExplicitly }?: SessionOptions);
-        /**
-         * Close the session.
-         */
-        close(): Promise<void>;
-        /**
-         * Needs to be called to save any changes to the session.
-         * On success, one needs to a certain amount of time before submitting another commitChanges() request.
-         * This cooldown is mandated by the Calc China team.
-         * @param retries The amount of retries used. This number is used in calculating the exponential backoff time used to delay subsequent retries.
-         *                XLO will kill the whole session if there are too many consecutive save failures. So we do not have to throw if too many retries were used.
-         * @returns the number of milliseconds one should wait before committing again.
-         */
-        commitChanges(retries?: number): Promise<number>;
-        private createCommitChangesRequestInfo;
-        private createAsyncGraphSessionRequestInfo;
-        private getCorrectGraphVersionUrl;
-        private pollResourceLocation;
-        private delayForFailedOperation;
-        private parseCooldownTime;
-        private formatRequestUrlAndHeaderInfo;
-        private ensureUrlFormatEndWithSlash;
-        private delay;
-        private createErrorFromResponseInfo;
-        private createError;
+    interface Session {
     }
     /**
      * The RequestContext object facilitates requests to the Excel application. Since the Office add-in and the Excel application run in two different processes, the request context is required to get access to the Excel object model from the add-in.
@@ -17417,6 +16892,698 @@ declare namespace Excel {
     function getDataCommonPostprocess(response: any, callArgs: any): any;
     /**
      *
+     * Enum representing all accepted conditions by which a date filter can be applied.
+                Used to configure the type of PivotFilter that is applied to the field.
+     *
+     * [Api set: ExcelApi 1.12]
+     */
+    enum DateFilterCondition {
+        /**
+         * DateFilterCondition is unknown or unsupported.
+         *
+         */
+        unknown = "Unknown",
+        /**
+         * Equals comparator criterion.
+                    
+                    Required Criteria: {`comparator`}.
+                    Optional Criteria: {`wholeDays`, `exclusive`}.
+         *
+         */
+        equals = "Equals",
+        /**
+         * Date is before comparator date.
+                    
+                    Required Criteria: {`comparator`}.
+                    Optional Criteria: {`wholeDays`}.
+         *
+         */
+        before = "Before",
+        /**
+         * Date is before or equal to comparator date.
+                    
+                    Required Criteria: {`comparator`}.
+                    Optional Criteria: {`wholeDays`}.
+         *
+         */
+        beforeOrEqualTo = "BeforeOrEqualTo",
+        /**
+         * Date is after comparator date.
+                    
+                    Required Criteria: {`comparator`}.
+                    Optional Criteria: {`wholeDays`}.
+         *
+         */
+        after = "After",
+        /**
+         * Date is after or equal to comparator date.
+                    
+                    Required Criteria: {`comparator`}.
+                    Optional Criteria: {`wholeDays`}.
+         *
+         */
+        afterOrEqualTo = "AfterOrEqualTo",
+        /**
+         * Between `lowerBound` and `upperBound` dates.
+                    
+                    Required Criteria: {`lowerBound`, `upperBound`}.
+                    Optional Criteria: {`wholeDays`, `exclusive`}.
+         *
+         */
+        between = "Between",
+        /**
+         * Date is tomorrow.
+         *
+         */
+        tomorrow = "Tomorrow",
+        /**
+         * Date is today.
+         *
+         */
+        today = "Today",
+        /**
+         * Date is yesterday.
+         *
+         */
+        yesterday = "Yesterday",
+        /**
+         * Date is next week.
+         *
+         */
+        nextWeek = "NextWeek",
+        /**
+         * Date is this week.
+         *
+         */
+        thisWeek = "ThisWeek",
+        /**
+         * Date is last week.
+         *
+         */
+        lastWeek = "LastWeek",
+        /**
+         * Date is next month.
+         *
+         */
+        nextMonth = "NextMonth",
+        /**
+         * Date is this month.
+         *
+         */
+        thisMonth = "ThisMonth",
+        /**
+         * Date is last month.
+         *
+         */
+        lastMonth = "LastMonth",
+        /**
+         * Date is next quarter.
+         *
+         */
+        nextQuarter = "NextQuarter",
+        /**
+         * Date is this quarter.
+         *
+         */
+        thisQuarter = "ThisQuarter",
+        /**
+         * Date is last quarter.
+         *
+         */
+        lastQuarter = "LastQuarter",
+        /**
+         * Date is next year.
+         *
+         */
+        nextYear = "NextYear",
+        /**
+         * Date is this year.
+         *
+         */
+        thisYear = "ThisYear",
+        /**
+         * Date is last year.
+         *
+         */
+        lastYear = "LastYear",
+        /**
+         * Date is in the same year to date.
+         *
+         */
+        yearToDate = "YearToDate",
+        /**
+         * Date is in Quarter 1.
+         *
+         */
+        allDatesInPeriodQuarter1 = "AllDatesInPeriodQuarter1",
+        /**
+         * Date is in Quarter 2.
+         *
+         */
+        allDatesInPeriodQuarter2 = "AllDatesInPeriodQuarter2",
+        /**
+         * Date is in Quarter 3.
+         *
+         */
+        allDatesInPeriodQuarter3 = "AllDatesInPeriodQuarter3",
+        /**
+         * Date is in Quarter 4.
+         *
+         */
+        allDatesInPeriodQuarter4 = "AllDatesInPeriodQuarter4",
+        /**
+         * Date is in January.
+         *
+         */
+        allDatesInPeriodJanuary = "AllDatesInPeriodJanuary",
+        /**
+         * Date is in February.
+         *
+         */
+        allDatesInPeriodFebruary = "AllDatesInPeriodFebruary",
+        /**
+         * Date is in March.
+         *
+         */
+        allDatesInPeriodMarch = "AllDatesInPeriodMarch",
+        /**
+         * Date is in April.
+         *
+         */
+        allDatesInPeriodApril = "AllDatesInPeriodApril",
+        /**
+         * Date is in May.
+         *
+         */
+        allDatesInPeriodMay = "AllDatesInPeriodMay",
+        /**
+         * Date is in June.
+         *
+         */
+        allDatesInPeriodJune = "AllDatesInPeriodJune",
+        /**
+         * Date is in July.
+         *
+         */
+        allDatesInPeriodJuly = "AllDatesInPeriodJuly",
+        /**
+         * Date is in August.
+         *
+         */
+        allDatesInPeriodAugust = "AllDatesInPeriodAugust",
+        /**
+         * Date is in September.
+         *
+         */
+        allDatesInPeriodSeptember = "AllDatesInPeriodSeptember",
+        /**
+         * Date is in October.
+         *
+         */
+        allDatesInPeriodOctober = "AllDatesInPeriodOctober",
+        /**
+         * Date is in November.
+         *
+         */
+        allDatesInPeriodNovember = "AllDatesInPeriodNovember",
+        /**
+         * Date is in December.
+         *
+         */
+        allDatesInPeriodDecember = "AllDatesInPeriodDecember"
+    }
+    /**
+     *
+     * Enum representing all accepted conditions by which a label filter can be applied.
+                Used to configure the type of PivotFilter that is applied to the field.
+                `PivotFilter.criteria.exclusive` can be set to true to invert many of these conditions.
+     *
+     * [Api set: ExcelApi 1.12]
+     */
+    enum LabelFilterCondition {
+        /**
+         * LabelFilterCondition is unknown or unsupported.
+         *
+         */
+        unknown = "Unknown",
+        /**
+         * Equals comparator criterion.
+                    
+                    Required Criteria: {`comparator`}.
+                    Optional Criteria: {`exclusive`}.
+         *
+         */
+        equals = "Equals",
+        /**
+         * Label begins with substring criterion.
+                    
+                    Required Criteria: {`substring`}.
+                    Optional Criteria: {`exclusive`}.
+         *
+         */
+        beginsWith = "BeginsWith",
+        /**
+         * Label ends with substring criterion.
+                    
+                    Required Criteria: {`substring`}.
+                    Optional Criteria: {`exclusive`}.
+         *
+         */
+        endsWith = "EndsWith",
+        /**
+         * Label contains substring criterion.
+                    
+                    Required Criteria: {`substring`}.
+                    Optional Criteria: {`exclusive`}.
+         *
+         */
+        contains = "Contains",
+        /**
+         * Greater than comparator criterion.
+                    
+                    Required Criteria: {`comparator`}.
+         *
+         */
+        greaterThan = "GreaterThan",
+        /**
+         * Greater than or equal to comparator criterion.
+                    
+                    Required Criteria: {`comparator`}.
+         *
+         */
+        greaterThanOrEqualTo = "GreaterThanOrEqualTo",
+        /**
+         * Less than comparator criterion.
+                    
+                    Required Criteria: {`comparator`}.
+         *
+         */
+        lessThan = "LessThan",
+        /**
+         * Less than or equal to comparator criterion.
+                    
+                    Required Criteria: {`comparator`}.
+         *
+         */
+        lessThanOrEqualTo = "LessThanOrEqualTo",
+        /**
+         * Between `lowerBound` and `upperBound` criteria.
+                    
+                    Required Criteria: {`lowerBound`, `upperBound`}.
+                    Optional Criteria: {`exclusive`}.
+         *
+         */
+        between = "Between"
+    }
+    /**
+     *
+     * Configurable template for a date filter to apply to a PivotField.
+                The `condition` defines what criteria need to be set in order for the filter to operate.
+     *
+     * [Api set: ExcelApi 1.12]
+     */
+    interface PivotDateFilter {
+        /**
+         *
+         * The comparator is the static value to which other values are compared. The type of comparison is defined by the condition.
+         *
+         * [Api set: ExcelApi 1.12]
+         */
+        comparator?: Excel.FilterDatetime;
+        /**
+         *
+         * Specifies the condition for the filter, which defines the necessary filtering criteria.
+         *
+         * [Api set: ExcelApi 1.12]
+         */
+        condition: Excel.DateFilterCondition | "Unknown" | "Equals" | "Before" | "BeforeOrEqualTo" | "After" | "AfterOrEqualTo" | "Between" | "Tomorrow" | "Today" | "Yesterday" | "NextWeek" | "ThisWeek" | "LastWeek" | "NextMonth" | "ThisMonth" | "LastMonth" | "NextQuarter" | "ThisQuarter" | "LastQuarter" | "NextYear" | "ThisYear" | "LastYear" | "YearToDate" | "AllDatesInPeriodQuarter1" | "AllDatesInPeriodQuarter2" | "AllDatesInPeriodQuarter3" | "AllDatesInPeriodQuarter4" | "AllDatesInPeriodJanuary" | "AllDatesInPeriodFebruary" | "AllDatesInPeriodMarch" | "AllDatesInPeriodApril" | "AllDatesInPeriodMay" | "AllDatesInPeriodJune" | "AllDatesInPeriodJuly" | "AllDatesInPeriodAugust" | "AllDatesInPeriodSeptember" | "AllDatesInPeriodOctober" | "AllDatesInPeriodNovember" | "AllDatesInPeriodDecember";
+        /**
+         *
+         * If true, filter *excludes* items that meet criteria. The default is false (filter to include items that meet criteria).
+         *
+         * [Api set: ExcelApi 1.12]
+         */
+        exclusive?: boolean;
+        /**
+         *
+         * The lower-bound of the range for the `Between` filter condition.
+         *
+         * [Api set: ExcelApi 1.12]
+         */
+        lowerBound?: Excel.FilterDatetime;
+        /**
+         *
+         * The upper-bound of the range for the `Between` filter condition.
+         *
+         * [Api set: ExcelApi 1.12]
+         */
+        upperBound?: Excel.FilterDatetime;
+        /**
+         *
+         * For `Equals`, `Before`, `After`, and `Between` filter conditions, indicates if comparisons should be made as whole days.
+         *
+         * [Api set: ExcelApi 1.12]
+         */
+        wholeDays?: boolean;
+    }
+    /**
+     *
+     * A simple enum that represents a type of filter for a PivotField.
+     *
+     * [Api set: ExcelApi 1.12]
+     */
+    enum PivotFilterType {
+        /**
+         * PivotFilterType is unknown or unsupported.
+         *
+         */
+        unknown = "Unknown",
+        /**
+         * Filters based on the value of a PivotItem with respect to a DataPivotHierarchy.
+         *
+         */
+        value = "Value",
+        /**
+         * Filters specific manually selected PivotItems from the PivotTable.
+         *
+         */
+        manual = "Manual",
+        /**
+         * Filters PivotItems based on their labels.
+                    Note: A PivotField cannot simultaneously have a label filter and a date filter applied.
+         *
+         */
+        label = "Label",
+        /**
+         * Filters PivotItems with a date in place of a label.
+                    Note: A PivotField cannot simultaneously have a label filter and a date filter applied.
+         *
+         */
+        date = "Date"
+    }
+    /**
+     *
+     * An interface representing all PivotFilters currently applied to a given PivotField.
+     *
+     * [Api set: ExcelApi 1.12]
+     */
+    interface PivotFilters {
+        /**
+         *
+         * The PivotField's currently applied date filter. Null if none is applied.
+         *
+         * [Api set: ExcelApi 1.12]
+         */
+        dateFilter?: Excel.PivotDateFilter;
+        /**
+         *
+         * The PivotField's currently applied label filter. Null if none is applied.
+         *
+         * [Api set: ExcelApi 1.12]
+         */
+        labelFilter?: Excel.PivotLabelFilter;
+        /**
+         *
+         * The PivotField's currently applied manual filter. Null if none is applied.
+         *
+         * [Api set: ExcelApi 1.12]
+         */
+        manualFilter?: Excel.PivotManualFilter;
+        /**
+         *
+         * The PivotField's currently applied value filter. Null if none is applied.
+         *
+         * [Api set: ExcelApi 1.12]
+         */
+        valueFilter?: Excel.PivotValueFilter;
+    }
+    /**
+     *
+     * Configurable template for a label filter to apply to a PivotField.
+                The `condition` defines what criteria need to be set in order for the filter to operate.
+     *
+     * [Api set: ExcelApi 1.12]
+     */
+    interface PivotLabelFilter {
+        /**
+         *
+         * The comparator is the static value to which other values are compared. The type of comparison is defined by the condition.
+                    Note: A numeric string is treated as a number when being compared against other numeric strings.
+         *
+         * [Api set: ExcelApi 1.12]
+         */
+        comparator?: string;
+        /**
+         *
+         * Specifies the condition for the filter, which defines the necessary filtering criteria.
+         *
+         * [Api set: ExcelApi 1.12]
+         */
+        condition: Excel.LabelFilterCondition | "Unknown" | "Equals" | "BeginsWith" | "EndsWith" | "Contains" | "GreaterThan" | "GreaterThanOrEqualTo" | "LessThan" | "LessThanOrEqualTo" | "Between";
+        /**
+         *
+         * If true, filter *excludes* items that meet criteria. The default is false (filter to include items that meet criteria).
+         *
+         * [Api set: ExcelApi 1.12]
+         */
+        exclusive?: boolean;
+        /**
+         *
+         * The lower-bound of the range for the Between filter condition.
+                    Note: A numeric string is treated as a number when being compared against other numeric strings.
+         *
+         * [Api set: ExcelApi 1.12]
+         */
+        lowerBound?: string;
+        /**
+         *
+         * The substring used for `BeginsWith`, `EndsWith`, and `Contains` filter conditions.
+         *
+         * [Api set: ExcelApi 1.12]
+         */
+        substring?: string;
+        /**
+         *
+         * The upper-bound of the range for the Between filter condition.
+                    Note: A numeric string is treated as a number when being compared against other numeric strings.
+         *
+         * [Api set: ExcelApi 1.12]
+         */
+        upperBound?: string;
+    }
+    /**
+     *
+     * Configurable template for a manual filter to apply to a PivotField.
+                The `condition` defines what criteria need to be set in order for the filter to operate.
+     *
+     * [Api set: ExcelApi 1.12]
+     */
+    interface PivotManualFilter {
+        /**
+         *
+         * A list of selected items to manually filter. These must be existing and valid items from the chosen field.
+         *
+         * [Api set: ExcelApi 1.12]
+         */
+        selectedItems?: (string | PivotItem)[];
+    }
+    /**
+     *
+     * Configurable template for a value filter to apply to a PivotField.
+                The `condition` defines what criteria need to be set in order for the filter to operate.
+     *
+     * [Api set: ExcelApi 1.12]
+     */
+    interface PivotValueFilter {
+        /**
+         *
+         * The comparator is the static value to which other values are compared. The type of comparison is defined by the condition.
+                    For example, if comparator is "50" and condition is "GreaterThan", all item values that are not greater than 50 will be removed by the filter.
+         *
+         * [Api set: ExcelApi 1.12]
+         */
+        comparator?: number;
+        /**
+         *
+         * Specifies the condition for the filter, which defines the necessary filtering criteria.
+         *
+         * [Api set: ExcelApi 1.12]
+         */
+        condition: Excel.ValueFilterCondition | "Unknown" | "Equals" | "GreaterThan" | "GreaterThanOrEqualTo" | "LessThan" | "LessThanOrEqualTo" | "Between" | "TopN" | "BottomN";
+        /**
+         *
+         * If true, filter *excludes* items that meet criteria. The default is false (filter to include items that meet criteria).
+         *
+         * [Api set: ExcelApi 1.12]
+         */
+        exclusive?: boolean;
+        /**
+         *
+         * The lower-bound of the range for the `Between` filter condition.
+         *
+         * [Api set: ExcelApi 1.12]
+         */
+        lowerBound?: number;
+        /**
+         *
+         * Specifies if the filter is for the top/bottom N items, top/bottom N percent, or top/bottom N sum.
+         *
+         * [Api set: ExcelApi 1.12]
+         */
+        selectionType?: Excel.TopBottomSelectionType | "Items" | "Percent" | "Sum";
+        /**
+         *
+         * The "N" threshold number of items, percent, or sum to be filtered for a Top/Bottom filter condition.
+         *
+         * [Api set: ExcelApi 1.12]
+         */
+        threshold?: number;
+        /**
+         *
+         * The upper-bound of the range for the `Between` filter condition.
+         *
+         * [Api set: ExcelApi 1.12]
+         */
+        upperBound?: number;
+        /**
+         *
+         * Name of the chosen "value" in the field by which to filter.
+         *
+         * [Api set: ExcelApi 1.12]
+         */
+        value: string;
+    }
+    /**
+     *
+     * A simple enum for Top/Bottom filters to select whether to filter by the top N or bottom N percent, number, or sum of values.
+     *
+     * [Api set: ExcelApi 1.12]
+     */
+    enum TopBottomSelectionType {
+        /**
+         * Filter the top/bottom N number of items as measured by the chosen value.
+         *
+         */
+        items = "Items",
+        /**
+         * Filter the top/bottom N percent of items as measured by the chosen value.
+         *
+         */
+        percent = "Percent",
+        /**
+         * Filter the top/bottom N sum as measured by the chosen value.
+         *
+         */
+        sum = "Sum"
+    }
+    /**
+     *
+     * Enum representing all accepted conditions by which a value filter can be applied.
+                Used to configure the type of PivotFilter that is applied to the field.
+                `PivotFilter.exclusive` can be set to true to invert many of these conditions.
+     *
+     * [Api set: ExcelApi 1.12]
+     */
+    enum ValueFilterCondition {
+        /**
+         * ValueFilterCondition is unknown or unsupported.
+         *
+         */
+        unknown = "Unknown",
+        /**
+         * Equals comparator criterion.
+                    
+                    Required Criteria: {`value`, `comparator`}.
+                    Optional Criteria: {`exclusive`}.
+         *
+         */
+        equals = "Equals",
+        /**
+         * Greater than comparator criterion.
+                    
+                    Required Criteria: {`value`, `comparator`}.
+         *
+         */
+        greaterThan = "GreaterThan",
+        /**
+         * Greater than or equal to comparator criterion.
+                    
+                    Required Criteria: {`value`, `comparator`}.
+         *
+         */
+        greaterThanOrEqualTo = "GreaterThanOrEqualTo",
+        /**
+         * Less than comparator criterion.
+                    
+                    Required Criteria: {`value`, `comparator`}.
+         *
+         */
+        lessThan = "LessThan",
+        /**
+         * Less than or equal to comparator criterion.
+                    
+                    Required Criteria: {`value`, `comparator`}.
+         *
+         */
+        lessThanOrEqualTo = "LessThanOrEqualTo",
+        /**
+         * Between `lowerBound` and `upperBound` criteria.
+                    
+                    Required Criteria: {`value`, `lowerBound`, `upperBound`}.
+                    Optional Criteria: {`exclusive`}.
+         *
+         */
+        between = "Between",
+        /**
+         * In top N (`threshold`) [items, percent, sum] of value category.
+                    
+                    Required Criteria: {`value`, `threshold`, `selectionType`}.
+         *
+         */
+        topN = "TopN",
+        /**
+         * In bottom N (`threshold`) [items, percent, sum] of value category.
+                    
+                    Required Criteria: {`value`, `threshold`, `selectionType`}.
+         *
+         */
+        bottomN = "BottomN"
+    }
+    /**
+     *
+     * Represents the dimensions when getting values from chart series.
+     *
+     * [Api set: ExcelApi 1.12]
+     */
+    enum ChartSeriesDimension {
+        /**
+         * The chart series axis for the categories.
+         *
+         */
+        categories = "Categories",
+        /**
+         * The chart series axis for the values.
+         *
+         */
+        values = "Values",
+        /**
+         * The chart series axis for the x-axis values in scatter and bubble charts.
+         *
+         */
+        xvalues = "XValues",
+        /**
+         * The chart series axis for the y-axis values in scatter and bubble charts.
+         *
+         */
+        yvalues = "YValues",
+        /**
+         * The chart series axis for the bubble sizes in bubble charts.
+         *
+         */
+        bubbleSizes = "BubbleSizes"
+    }
+    /**
+     *
      * Provides information about the selection that raised the "SelectionChanged" event.
                 
                  **Note**: If multiple, discontiguous cells are selected, `Binding.onSelectionChanged` only reports row and column information for one selection. Use `Worksheet.onSelectionChanged` for multiple selected ranges.
@@ -17426,7 +17593,7 @@ declare namespace Excel {
     interface BindingSelectionChangedEventArgs {
         /**
          *
-         * Gets the Binding object that represents the binding that raised the SelectionChanged event.
+         * Gets a temporary `Binding` object that contains the ID of the `Binding` object that raised the event. Use that ID with `BindingCollection.getItem(id)` to get the binding.
          *
          * [Api set: ExcelApi 1.2]
          */
@@ -17469,7 +17636,7 @@ declare namespace Excel {
     interface BindingDataChangedEventArgs {
         /**
          *
-         * Gets the Binding object that represents the binding that raised the DataChanged event.
+         * Gets a temporary `Binding` object that contains the ID of the `Binding` object that raised the event. Use that ID with `BindingCollection.getItem(id)` to get the binding.
          *
          * [Api set: ExcelApi 1.2]
          */
@@ -18314,6 +18481,143 @@ declare namespace Excel {
     }
     /**
      *
+     * Provides information about the comments that raised the "CommentAdded" event.
+     *
+     * [Api set: ExcelApi 1.12]
+     */
+    interface CommentAddedEventArgs {
+        /**
+         *
+         * Gets the `CommentDetail` array that contains the comment ID and IDs of its related replies.
+         *
+         * [Api set: ExcelApi 1.12]
+         */
+        commentDetails: Excel.CommentDetail[];
+        /**
+         *
+         * Specifies the source of the event. See `Excel.EventSource` for details.
+         *
+         * [Api set: ExcelApi 1.12]
+         */
+        source: Excel.EventSource | "Local" | "Remote";
+        /**
+         *
+         * Gets the type of the event. See `Excel.EventType` for details.
+         *
+         * [Api set: ExcelApi 1.12]
+         */
+        type: "CommentAdded";
+        /**
+         *
+         * Gets the Id of the worksheet in which the event happened.
+         *
+         * [Api set: ExcelApi 1.12]
+         */
+        worksheetId: string;
+    }
+    /**
+     *
+     * Provides information about the comments that raised the "CommentDeleted" event.
+     *
+     * [Api set: ExcelApi 1.12]
+     */
+    interface CommentDeletedEventArgs {
+        /**
+         *
+         * Gets the `CommentDetail` array that contains the comment ID and IDs of its related replies.
+         *
+         * [Api set: ExcelApi 1.12]
+         */
+        commentDetails: Excel.CommentDetail[];
+        /**
+         *
+         * Specifies the source of the event. See `Excel.EventSource` for details.
+         *
+         * [Api set: ExcelApi 1.12]
+         */
+        source: Excel.EventSource | "Local" | "Remote";
+        /**
+         *
+         * Gets the type of the event. See `Excel.EventType` for details.
+         *
+         * [Api set: ExcelApi 1.12]
+         */
+        type: "CommentDeleted";
+        /**
+         *
+         * Gets the Id of the worksheet in which the event happened.
+         *
+         * [Api set: ExcelApi 1.12]
+         */
+        worksheetId: string;
+    }
+    /**
+     *
+     * Occurs when existing comments are changed.
+     *
+     * [Api set: ExcelApi 1.12]
+     */
+    interface CommentChangedEventArgs {
+        /**
+         *
+         * Gets the change type that represents how the changed event is triggered.
+         *
+         * [Api set: ExcelApi 1.12]
+         */
+        changeType: Excel.CommentChangeType | "CommentEdited" | "CommentResolved" | "CommentReopened" | "ReplyAdded" | "ReplyDeleted" | "ReplyEdited";
+        /**
+         *
+         * Get the CommentDetail array which contains the comment Id and Ids of its related replies.
+         *
+         * [Api set: ExcelApi 1.12]
+         */
+        commentDetails: Excel.CommentDetail[];
+        /**
+         *
+         * Specifies the source of the event. See Excel.EventSource for details.
+         *
+         * [Api set: ExcelApi 1.12]
+         */
+        source: Excel.EventSource | "Local" | "Remote";
+        /**
+         *
+         * Gets the type of the event. See Excel.EventType for details.
+         *
+         * [Api set: ExcelApi 1.12]
+         */
+        type: "CommentChanged";
+        /**
+         *
+         * Gets the Id of the worksheet in which the event happened.
+         *
+         * [Api set: ExcelApi 1.12]
+         */
+        worksheetId: string;
+    }
+    /**
+     *
+     * A structure for the comment Id and Ids of its related replies.
+     *
+     * [Api set: ExcelApi 1.12]
+     */
+    interface CommentDetail {
+        /**
+         *
+         * Represents the ids of the related replies belong to comment.
+         *
+         * [Api set: ExcelApi 1.12]
+         */
+        replyIds: string[];
+        /**
+         *
+         * Represents the id of comment.
+         *
+         * [Api set: ExcelApi 1.12]
+         */
+        commentId: string;
+    }
+    /**
+     *
      * Provides information about the shape that raised the Activated event.
      *
      * [Api set: ExcelApi 1.9]
@@ -19101,6 +19405,13 @@ declare namespace Excel {
         readonly comments: Excel.CommentCollection;
         /**
          *
+         * Gets a collection of worksheet-level custom properties.
+         *
+         * [Api set: ExcelApi 1.12]
+         */
+        readonly customProperties: Excel.WorksheetCustomPropertyCollection;
+        /**
+         *
          * Gets an object that can be used to manipulate frozen panes on the worksheet.
          *
          * [Api set: ExcelApi 1.7]
@@ -19466,7 +19777,7 @@ declare namespace Excel {
         readonly onCalculated: OfficeExtension.EventHandlers<Excel.WorksheetCalculatedEventArgs>;
         /**
          *
-         * Occurs when data changed on a specific worksheet.
+         * Occurs when data changes in a specific worksheet.
          *
          * [Api set: ExcelApi 1.7]
          *
@@ -19934,7 +20245,7 @@ declare namespace Excel {
          */
         freezeAt(frozenRange: Range | string): void;
         /**
-         * Freeze the first column(s) of the worksheet in place.
+         * Freeze the first column or columns of the worksheet in place.
          *
          * [Api set: ExcelApi 1.7]
          *
@@ -19942,7 +20253,7 @@ declare namespace Excel {
          */
         freezeColumns(count?: number): void;
         /**
-         * Freeze the top row(s) of the worksheet in place.
+         * Freeze the top row or rows of the worksheet in place.
          *
          * [Api set: ExcelApi 1.7]
          *
@@ -20068,25 +20379,34 @@ declare namespace Excel {
         readonly columnIndex: number;
         /**
          *
-         * Represents the formula in A1-style notation.
+         * Represents the formula in A1-style notation. If a cell has no formula, its value is returned instead.
          *
          * [Api set: ExcelApi 1.1]
          */
         formulas: any[][];
         /**
          *
-         * Represents the formula in A1-style notation, in the user's language and number-formatting locale.  For example, the English "=SUM(A1, 1.5)" formula would become "=SUMME(A1; 1,5)" in German.
+         * Represents the formula in A1-style notation, in the user's language and number-formatting locale. For example, the English "=SUM(A1, 1.5)" formula would become "=SUMME(A1; 1,5)" in German. If a cell has no formula, its value is returned instead.
          *
          * [Api set: ExcelApi 1.1]
          */
         formulasLocal: any[][];
         /**
          *
-         * Represents the formula in R1C1-style notation.
+         * Represents the formula in R1C1-style notation. If a cell has no formula, its value is returned instead.
          *
          * [Api set: ExcelApi 1.2]
          */
         formulasR1C1: any[][];
+        /**
+         *
+         * Represents if all cells have a spill border.
+                    Returns true if all cells have a spill border, or false if all cells do not have a spill border.
+                    Returns null if there are cells both with and without spill borders within the range.
+         *
+         * [Api set: ExcelApi 1.12]
+         */
+        readonly hasSpill: boolean;
         /**
          *
          * Returns the distance in points, for 100% zoom, from top edge of the range to bottom edge of the range.
@@ -20145,6 +20465,13 @@ declare namespace Excel {
         numberFormat: any[][];
         /**
          *
+         * Represents the category of number format of each cell.
+         *
+         * [Api set: ExcelApi 1.12]
+         */
+        readonly numberFormatCategories: Excel.NumberFormatCategory[][];
+        /**
+         *
          * Represents Excel's number format code for the given range, based on the language settings of the user.​
                     Excel does not perform any language or format coercion when getting or setting the `numberFormatLocal` property.
                     Any returned text uses the locally-formatted strings based on the language specified in the system settings.
@@ -20173,6 +20500,15 @@ declare namespace Excel {
          * [Api set: ExcelApi 1.1]
          */
         readonly rowIndex: number;
+        /**
+         *
+         * Represents if ALL the cells would be saved as an array formula.
+                    Returns true if ALL cells would be saved as an array formula, or false if ALL cells would NOT be saved as an array formula.
+                    Returns null if some cells would be saved as an array formula and some would not be.
+         *
+         * [Api set: ExcelApi 1.12]
+         */
+        readonly savedAsArray: boolean;
         /**
          *
          * Represents the style of the current range.
@@ -20432,6 +20768,12 @@ declare namespace Excel {
          */
         getColumnsBefore(count?: number): Excel.Range;
         /**
+         * Returns a WorkbookRangeAreas object that represents the range containing all the direct precedents of a cell in same worksheet or in multiple worksheets.
+         *
+         * [Api set: ExcelApi 1.12]
+         */
+        getDirectPrecedents(): Excel.WorkbookRangeAreas;
+        /**
          * Gets an object that represents the entire column of the range (for example, if the current range represents cells "B4:E11", its `getEntireColumn` is a range that represents columns "B:E").
          *
          * [Api set: ExcelApi 1.1]
@@ -20445,6 +20787,7 @@ declare namespace Excel {
         getEntireRow(): Excel.Range;
         /**
          * Renders the range as a base64-encoded png image.
+                    **Important**: This API is currently unsupported in Excel for Mac. Visit [OfficeDev/office-js Issue #235](https://github.com/OfficeDev/office-js/issues/235) for the current status.
          *
          * [Api set: ExcelApi 1.7]
          */
@@ -20484,6 +20827,12 @@ declare namespace Excel {
          */
         getLastRow(): Excel.Range;
         /**
+         * Returns a RangeAreas object that represents the merged areas in this range. Note that if the merged areas count in this range is more than 512, the API will fail to return the result.
+         *
+         * [Api set: ExcelApiOnline 1.1]
+         */
+        getMergedAreas(): Excel.RangeAreas;
+        /**
          * Gets an object which represents a range that's offset from the specified range. The dimension of the returned range will match this range. If the resulting range is forced outside the bounds of the worksheet grid, an error will be thrown.
          *
          * [Api set: ExcelApi 1.1]
@@ -20495,7 +20844,7 @@ declare namespace Excel {
         /**
          * Gets a scoped collection of PivotTables that overlap with the range.
          *
-         * [Api set: ExcelApiOnline 1.1]
+         * [Api set: ExcelApi 1.12]
          *
          * @param fullyContained If true, returns only PivotTables that are fully contained within the range bounds. The default value is false.
          * @returns
@@ -20583,6 +20932,32 @@ declare namespace Excel {
          * @param cellValueType If cellType is either Constants or Formulas, this argument is used to determine which types of cells to include in the result. These values can be combined together to return more than one type. The default is to select all constants or formulas, no matter what the type.
          */
         getSpecialCellsOrNullObject(cellType: "ConditionalFormats" | "DataValidations" | "Blanks" | "Constants" | "Formulas" | "SameConditionalFormat" | "SameDataValidation" | "Visible", cellValueType?: "All" | "Errors" | "ErrorsLogical" | "ErrorsNumbers" | "ErrorsText" | "ErrorsLogicalNumber" | "ErrorsLogicalText" | "ErrorsNumberText" | "Logical" | "LogicalNumbers" | "LogicalText" | "LogicalNumbersText" | "Numbers" | "NumbersText" | "Text"): Excel.RangeAreas;
+        /**
+         * Gets the range object containing the anchor cell for a cell getting spilled into. Fails if applied to a range with more than one cell.
+         *
+         * [Api set: ExcelApi 1.12]
+         */
+        getSpillParent(): Excel.Range;
+        /**
+         * Gets the range object containing the anchor cell for a cell getting spilled into.
+                    If it is not a spill cell or more than once cells are give, a null object will be returned.
+         *
+         * [Api set: ExcelApi 1.12]
+         */
+        getSpillParentOrNullObject(): Excel.Range;
+        /**
+         * Gets the range object containing the spill range when called on an anchor cell. Fails if applied to a range with more than one cell.
+         *
+         * [Api set: ExcelApi 1.12]
+         */
+        getSpillingToRange(): Excel.Range;
+        /**
+         * Gets the range object containing the spill range when called on an anchor cell.
+                    If the range is not an anchor cell or spill range can't be found, a null object will be returned.
+         *
+         * [Api set: ExcelApi 1.12]
+         */
+        getSpillingToRangeOrNullObject(): Excel.Range;
         /**
          * Returns a Range object that represents the surrounding region for the top-left cell in this range. A surrounding region is a range bounded by any combination of blank rows and blank columns relative to this range.
          *
@@ -21191,6 +21566,87 @@ declare namespace Excel {
         * Whereas the original Excel.RangeAreas object is an API object, the `toJSON` method returns a plain JavaScript object (typed as `Excel.Interfaces.RangeAreasData`) that contains shallow copies of any loaded child properties from the original object.
         */
         toJSON(): Excel.Interfaces.RangeAreasData;
+    }
+    /**
+     *
+     * Represents a collection of one or more rectangular ranges in multiple worksheets.
+     *
+     * [Api set: ExcelApi 1.12]
+     */
+    class WorkbookRangeAreas extends OfficeExtension.ClientObject {
+        /** The request context associated with the object. This connects the add-in's process to the Office host application's process. */
+        context: RequestContext;
+        /**
+         *
+         * Returns the RangeAreasCollection object, each RangeAreas in the collection represent one or more rectangle ranges in one worksheet.
+         *
+         * [Api set: ExcelApi 1.12]
+         */
+        readonly areas: Excel.RangeAreasCollection;
+        /**
+         *
+         * Returns ranges that comprise this object in a RangeCollection object.
+         *
+         * [Api set: ExcelApi 1.12]
+         */
+        readonly ranges: Excel.RangeCollection;
+        /**
+         *
+         * Returns an array of address in A1-style. Address value will contain the worksheet name for each rectangular block of cells (e.g., "Sheet1!A1:B4, Sheet1!D1:D4"). Read-only.
+         *
+         * [Api set: ExcelApi 1.12]
+         */
+        readonly addresses: string[];
+        /**
+         * Returns the RangeAreas object based on worksheet id or name in the collection.
+         *
+         * [Api set: ExcelApi 1.12]
+         *
+         * @param key The name or id of the worksheet.
+         */
+        getRangeAreasBySheet(key: string): Excel.RangeAreas;
+        /**
+         * Returns the RangeAreas object based on worksheet name or id in the collection. If the worksheet does not exist, will return a null object.
+         *
+         * [Api set: ExcelApi 1.12]
+         *
+         * @param key The name or id of the worksheet.
+         */
+        getRangeAreasOrNullObjectBySheet(key: string): Excel.RangeAreas;
+        /**
+         * Queues up a command to load the specified properties of the object. You must call `context.sync()` before reading the properties.
+         *
+         * @param options Provides options for which properties of the object to load.
+         */
+        load(options?: Excel.Interfaces.WorkbookRangeAreasLoadOptions): Excel.WorkbookRangeAreas;
+        /**
+         * Queues up a command to load the specified properties of the object. You must call `context.sync()` before reading the properties.
+         *
+         * @param propertyNames A comma-delimited string or an array of strings that specify the properties to load.
+         */
+        load(propertyNames?: string | string[]): Excel.WorkbookRangeAreas;
+        /**
+         * Queues up a command to load the specified properties of the object. You must call `context.sync()` before reading the properties.
+         *
+         * @param propertyNamesAndPaths `propertyNamesAndPaths.select` is a comma-delimited string that specifies the properties to load, and `propertyNamesAndPaths.expand` is a comma-delimited string that specifies the navigation properties to load.
+         */
+        load(propertyNamesAndPaths?: {
+            select?: string;
+            expand?: string;
+        }): Excel.WorkbookRangeAreas;
+        /**
+         * Track the object for automatic adjustment based on surrounding changes in the document. This call is a shorthand for `context.trackedObjects.add(thisObject)`. If you are using this object across `.sync` calls and outside the sequential execution of a ".run" batch, and get an "InvalidObjectPath" error when setting a property or invoking a method on the object, you needed to have added the object to the tracked object collection when the object was first created.
+         */
+        track(): Excel.WorkbookRangeAreas;
+        /**
+         * Release the memory associated with this object, if it has previously been tracked. This call is shorthand for `context.trackedObjects.remove(thisObject)`. Having many tracked objects slows down the host application, so please remember to free any objects you add, once you're done using them. You will need to call `context.sync()` before the memory release takes effect.
+         */
+        untrack(): Excel.WorkbookRangeAreas;
+        /**
+        * Overrides the JavaScript `toJSON()` method in order to provide more useful output when an API object is passed to `JSON.stringify()`. (`JSON.stringify`, in turn, calls the `toJSON` method of the object that is passed to it.)
+        * Whereas the original Excel.WorkbookRangeAreas object is an API object, the `toJSON` method returns a plain JavaScript object (typed as `Excel.Interfaces.WorkbookRangeAreasData`) that contains shallow copies of any loaded child properties from the original object.
+        */
+        toJSON(): Excel.Interfaces.WorkbookRangeAreasData;
     }
     /**
      *
@@ -23943,7 +24399,7 @@ declare namespace Excel {
         patternTintAndShade: number;
         /**
          *
-         * Specifies a double that lightens or darkens a color for Range Fill, the value is between -1 (darkest) and 1 (brightest), with 0 for the original color.
+         * Specifies a double that lightens or darkens a color for Range Fill. The value is between -1 (darkest) and 1 (brightest), with 0 for the original color.
                     If the tintAndShades are not uniform, null will be returned.
          *
          * [Api set: ExcelApi 1.9]
@@ -24188,7 +24644,7 @@ declare namespace Excel {
         italic: boolean;
         /**
          *
-         * Font name (e.g., "Calibri")
+         * Font name (e.g., "Calibri"). The name's length should not be greater than 31 characters.
          *
          * [Api set: ExcelApi 1.1]
          */
@@ -25197,7 +25653,7 @@ declare namespace Excel {
         markerStyle: Excel.ChartMarkerStyle | "Invalid" | "Automatic" | "None" | "Square" | "Diamond" | "Triangle" | "X" | "Star" | "Dot" | "Dash" | "Circle" | "Plus" | "Picture";
         /**
          *
-         * Specifies the name of a series in a chart.
+         * Specifies the name of a series in a chart. The name's length should not be greater than 255 characters.
          *
          * [Api set: ExcelApi 1.1]
          */
@@ -25299,6 +25755,22 @@ declare namespace Excel {
          * [Api set: ExcelApi 1.7]
          */
         delete(): void;
+        /**
+         * Gets the values from a single dimension of the chart series. These could be either category values or data values, depending on the dimension specified and how the data is mapped for the chart series.
+         *
+         * [Api set: ExcelApi 1.12]
+         *
+         * @param dimension the dimension of axis where the data from
+         */
+        getDimensionValues(dimension: Excel.ChartSeriesDimension): OfficeExtension.ClientResult<string[]>;
+        /**
+         * Gets the values from a single dimension of the chart series. These could be either category values or data values, depending on the dimension specified and how the data is mapped for the chart series.
+         *
+         * [Api set: ExcelApi 1.12]
+         *
+         * @param dimension the dimension of axis where the data from
+         */
+        getDimensionValues(dimension: "Categories" | "Values" | "XValues" | "YValues" | "BubbleSizes"): OfficeExtension.ClientResult<string[]>;
         /**
          * Sets the bubble sizes for a chart series. Only works for bubble charts.
          *
@@ -26174,7 +26646,7 @@ declare namespace Excel {
          *
          * Specifies the angle to which the text is oriented for the chart axis title. The value should either be an integer from -90 to 90 or the integer 180 for vertically-oriented text.
          *
-         * [Api set: ExcelApiOnline 1.1]
+         * [Api set: ExcelApi 1.12]
          */
         textOrientation: number;
         /**
@@ -29355,6 +29827,13 @@ declare namespace Excel {
         context: RequestContext;
         /**
          *
+         * Defines the culturally appropriate format of displaying date and time. This is based on current system culture settings.
+         *
+         * [Api set: ExcelApi 1.12]
+         */
+        readonly datetimeFormat: Excel.DatetimeFormatInfo;
+        /**
+         *
          * Defines the culturally appropriate format of displaying numbers. This is based on current system culture settings.
          *
          * [Api set: ExcelApi 1.11]
@@ -29443,6 +29922,77 @@ declare namespace Excel {
         * Whereas the original Excel.NumberFormatInfo object is an API object, the `toJSON` method returns a plain JavaScript object (typed as `Excel.Interfaces.NumberFormatInfoData`) that contains shallow copies of any loaded child properties from the original object.
         */
         toJSON(): Excel.Interfaces.NumberFormatInfoData;
+    }
+    /**
+     *
+     * Defines the culturally appropriate format of displaying numbers. This is based on current system culture settings.
+     *
+     * [Api set: ExcelApi 1.12]
+     */
+    class DatetimeFormatInfo extends OfficeExtension.ClientObject {
+        /** The request context associated with the object. This connects the add-in's process to the Office host application's process. */
+        context: RequestContext;
+        /**
+         *
+         * Gets the string used as the date separator. This is based on current system settings.
+         *
+         * [Api set: ExcelApi 1.12]
+         */
+        readonly dateSeparator: string;
+        /**
+         *
+         * Gets the format string for a long date value. This is based on current system settings.
+         *
+         * [Api set: ExcelApi 1.12]
+         */
+        readonly longDatePattern: string;
+        /**
+         *
+         * Gets the format string for a long time value. This is based on current system settings.
+         *
+         * [Api set: ExcelApi 1.12]
+         */
+        readonly longTimePattern: string;
+        /**
+         *
+         * Gets the format string for a short date value. This is based on current system settings.
+         *
+         * [Api set: ExcelApi 1.12]
+         */
+        readonly shortDatePattern: string;
+        /**
+         *
+         * Gets the string used as the time separator. This is based on current system settings.
+         *
+         * [Api set: ExcelApi 1.12]
+         */
+        readonly timeSeparator: string;
+        /**
+         * Queues up a command to load the specified properties of the object. You must call `context.sync()` before reading the properties.
+         *
+         * @param options Provides options for which properties of the object to load.
+         */
+        load(options?: Excel.Interfaces.DatetimeFormatInfoLoadOptions): Excel.DatetimeFormatInfo;
+        /**
+         * Queues up a command to load the specified properties of the object. You must call `context.sync()` before reading the properties.
+         *
+         * @param propertyNames A comma-delimited string or an array of strings that specify the properties to load.
+         */
+        load(propertyNames?: string | string[]): Excel.DatetimeFormatInfo;
+        /**
+         * Queues up a command to load the specified properties of the object. You must call `context.sync()` before reading the properties.
+         *
+         * @param propertyNamesAndPaths `propertyNamesAndPaths.select` is a comma-delimited string that specifies the properties to load, and `propertyNamesAndPaths.expand` is a comma-delimited string that specifies the navigation properties to load.
+         */
+        load(propertyNamesAndPaths?: {
+            select?: string;
+            expand?: string;
+        }): Excel.DatetimeFormatInfo;
+        /**
+        * Overrides the JavaScript `toJSON()` method in order to provide more useful output when an API object is passed to `JSON.stringify()`. (`JSON.stringify`, in turn, calls the `toJSON` method of the object that is passed to it.)
+        * Whereas the original Excel.DatetimeFormatInfo object is an API object, the `toJSON` method returns a plain JavaScript object (typed as `Excel.Interfaces.DatetimeFormatInfoData`) that contains shallow copies of any loaded child properties from the original object.
+        */
+        toJSON(): Excel.Interfaces.DatetimeFormatInfoData;
     }
     /**
      *
@@ -29688,7 +30238,7 @@ declare namespace Excel {
      *
      * Represents a scoped collection of PivotTables. The PivotTables are sorted based on the location of the PivotTable's top-left corner. They are ordered top to bottom and then left to right.
      *
-     * [Api set: ExcelApiOnline 1.1]
+     * [Api set: ExcelApi 1.12]
      */
     class PivotTableScopedCollection extends OfficeExtension.ClientObject {
         /** The request context associated with the object. This connects the add-in's process to the Office host application's process. */
@@ -29698,19 +30248,19 @@ declare namespace Excel {
         /**
          * Gets the number of PivotTables in the collection.
          *
-         * [Api set: ExcelApiOnline 1.1]
+         * [Api set: ExcelApi 1.12]
          */
         getCount(): OfficeExtension.ClientResult<number>;
         /**
          * Gets the first PivotTable in the collection. The PivotTables in the collection are sorted top to bottom and left to right, such that top-left table is the first PivotTable in the collection.
          *
-         * [Api set: ExcelApiOnline 1.1]
+         * [Api set: ExcelApi 1.12]
          */
         getFirst(): Excel.PivotTable;
         /**
          * Gets a PivotTable by name.
          *
-         * [Api set: ExcelApiOnline 1.1]
+         * [Api set: ExcelApi 1.12]
          *
          * @param key Name of the PivotTable to be retrieved.
          */
@@ -29718,7 +30268,7 @@ declare namespace Excel {
         /**
          * Gets a PivotTable by name. If the PivotTable does not exist, will return a null object.
          *
-         * [Api set: ExcelApiOnline 1.1]
+         * [Api set: ExcelApi 1.12]
          *
          * @param name Name of the PivotTable to be retrieved.
          */
@@ -29880,6 +30430,13 @@ declare namespace Excel {
          * [Api set: ExcelApi 1.3]
          */
         readonly worksheet: Excel.Worksheet;
+        /**
+         *
+         * Specifies if the PivotTable allows the application of multiple PivotFilters on a given PivotField in the table.
+         *
+         * [Api set: ExcelApi 1.12]
+         */
+        allowMultipleFiltersPerField: boolean;
         /**
          *
          * Specifies if the PivotTable allows values in the data body to be edited by the user.
@@ -30067,9 +30624,9 @@ declare namespace Excel {
          *
          * @param axis The axis from which to get the PivotItems. Must be either "row" or "column."
          * @param cell A single cell within the PivotTable's data body.
-         * @returns A collection of PivotItems that are used to calculate the values in the specified row.
+         * @returns A PivotItemCollection of the PivotItems that are used to calculate the values in the specified row.
          */
-        getPivotItems(axis: Excel.PivotAxis, cell: Range | string): OfficeExtension.ClientResult<Excel.PivotItem[]>;
+        getPivotItems(axis: Excel.PivotAxis, cell: Range | string): Excel.PivotItemCollection;
         /**
          * Gets the PivotItems from an axis that make up the value in a specified range within the PivotTable.
          *
@@ -30077,9 +30634,9 @@ declare namespace Excel {
          *
          * @param axis The axis from which to get the PivotItems. Must be either "row" or "column."
          * @param cell A single cell within the PivotTable's data body.
-         * @returns A collection of PivotItems that are used to calculate the values in the specified row.
+         * @returns A PivotItemCollection of the PivotItems that are used to calculate the values in the specified row.
          */
-        getPivotItems(axis: "Unknown" | "Row" | "Column" | "Data" | "Filter", cell: Range | string): OfficeExtension.ClientResult<Excel.PivotItem[]>;
+        getPivotItems(axis: "Unknown" | "Row" | "Column" | "Data" | "Filter", cell: Range | string): Excel.PivotItemCollection;
         /**
          * Returns the range the PivotTable exists on, excluding the filter area.
          *
@@ -30896,6 +31453,62 @@ declare namespace Excel {
         /** Sets multiple properties on the object at the same time, based on an existing loaded object. */
         set(properties: Excel.PivotField): void;
         /**
+         * Sets one or more of the field's current PivotFilters and applies them to the field.
+                    If the provided filters are invalid or cannot be applied, an exception is thrown.
+         *
+         * [Api set: ExcelApi 1.12]
+         *
+         * @param filter A configured specific PivotFilter or a PivotFilters interface containing multiple configured filters.
+         */
+        applyFilter(filter: Excel.PivotFilters): void;
+        /**
+         * Clears all criteria from all of the field's filters. This removes any active filtering on the field.
+         *
+         * [Api set: ExcelApi 1.12]
+         */
+        clearAllFilters(): void;
+        /**
+         * Clears all existing criteria from the field's filter of the given type (if one is currently applied).
+         *
+         * [Api set: ExcelApi 1.12]
+         *
+         * @param filterType The type of filter on the field of which to clear all criteria.
+         */
+        clearFilter(filterType: Excel.PivotFilterType): void;
+        /**
+         * Clears all existing criteria from the field's filter of the given type (if one is currently applied).
+         *
+         * [Api set: ExcelApi 1.12]
+         *
+         * @param filterType The type of filter on the field of which to clear all criteria.
+         */
+        clearFilter(filterType: "Unknown" | "Value" | "Manual" | "Label" | "Date"): void;
+        /**
+         * Gets all filters currently applied on the field.
+         *
+         * [Api set: ExcelApi 1.12]
+         * @returns A PivotFilters interface with all active filters.
+         */
+        getFilters(): OfficeExtension.ClientResult<Excel.PivotFilters>;
+        /**
+         * Checks if there are any applied filters on the field.
+         *
+         * [Api set: ExcelApi 1.12]
+         *
+         * @param filterType The filter type to check. If no type is provided, this method will check if any filter is applied.
+         * @returns True if the field has a filter of type `filterType` applied. If filterType is not specified, true is returned if the field has any applied filters.
+         */
+        isFiltered(filterType?: Excel.PivotFilterType): OfficeExtension.ClientResult<boolean>;
+        /**
+         * Checks if there are any applied filters on the field.
+         *
+         * [Api set: ExcelApi 1.12]
+         *
+         * @param filterType The filter type to check. If no type is provided, this method will check if any filter is applied.
+         * @returns True if the field has a filter of type `filterType` applied. If filterType is not specified, true is returned if the field has any applied filters.
+         */
+        isFiltered(filterType?: "Unknown" | "Value" | "Manual" | "Label" | "Date"): OfficeExtension.ClientResult<boolean>;
+        /**
          * Sorts the PivotField. If a DataPivotHierarchy is specified, then sort will be applied based on it, if not sort will be based on the PivotField itself.
          *
          * [Api set: ExcelApi 1.8]
@@ -31346,6 +31959,142 @@ declare namespace Excel {
          *
          */
         filter = "Filter"
+    }
+    /**
+     *
+     * Represents a worksheet-level custom property.
+     *
+     * [Api set: ExcelApi 1.12]
+     */
+    class WorksheetCustomProperty extends OfficeExtension.ClientObject {
+        /** The request context associated with the object. This connects the add-in's process to the Office host application's process. */
+        context: RequestContext;
+        /**
+         *
+         * Gets the key of the custom property. Custom property keys are case-insensitive. The key is limited to 255 characters (larger values will cause an "InvalidArgument" error to be thrown.)
+         *
+         * [Api set: ExcelApi 1.12]
+         */
+        readonly key: string;
+        /**
+         *
+         * Gets or sets the value of the custom property.
+         *
+         * [Api set: ExcelApi 1.12]
+         */
+        value: string;
+        /** Sets multiple properties of an object at the same time. You can pass either a plain object with the appropriate properties, or another API object of the same type.
+         *
+         * @remarks
+         *
+         * This method has the following additional signature:
+         *
+         * `set(properties: Excel.WorksheetCustomProperty): void`
+         *
+         * @param properties A JavaScript object with properties that are structured isomorphically to the properties of the object on which the method is called.
+         * @param options Provides an option to suppress errors if the properties object tries to set any read-only properties.
+         */
+        set(properties: Interfaces.WorksheetCustomPropertyUpdateData, options?: OfficeExtension.UpdateOptions): void;
+        /** Sets multiple properties on the object at the same time, based on an existing loaded object. */
+        set(properties: Excel.WorksheetCustomProperty): void;
+        /**
+         * Deletes the custom property.
+         *
+         * [Api set: ExcelApi 1.12]
+         */
+        delete(): void;
+        /**
+         * Queues up a command to load the specified properties of the object. You must call `context.sync()` before reading the properties.
+         *
+         * @param options Provides options for which properties of the object to load.
+         */
+        load(options?: Excel.Interfaces.WorksheetCustomPropertyLoadOptions): Excel.WorksheetCustomProperty;
+        /**
+         * Queues up a command to load the specified properties of the object. You must call `context.sync()` before reading the properties.
+         *
+         * @param propertyNames A comma-delimited string or an array of strings that specify the properties to load.
+         */
+        load(propertyNames?: string | string[]): Excel.WorksheetCustomProperty;
+        /**
+         * Queues up a command to load the specified properties of the object. You must call `context.sync()` before reading the properties.
+         *
+         * @param propertyNamesAndPaths `propertyNamesAndPaths.select` is a comma-delimited string that specifies the properties to load, and `propertyNamesAndPaths.expand` is a comma-delimited string that specifies the navigation properties to load.
+         */
+        load(propertyNamesAndPaths?: {
+            select?: string;
+            expand?: string;
+        }): Excel.WorksheetCustomProperty;
+        /**
+        * Overrides the JavaScript `toJSON()` method in order to provide more useful output when an API object is passed to `JSON.stringify()`. (`JSON.stringify`, in turn, calls the `toJSON` method of the object that is passed to it.)
+        * Whereas the original Excel.WorksheetCustomProperty object is an API object, the `toJSON` method returns a plain JavaScript object (typed as `Excel.Interfaces.WorksheetCustomPropertyData`) that contains shallow copies of any loaded child properties from the original object.
+        */
+        toJSON(): Excel.Interfaces.WorksheetCustomPropertyData;
+    }
+    /**
+     *
+     * Contains the collection of worksheet-level custom property.
+     *
+     * [Api set: ExcelApi 1.12]
+     */
+    class WorksheetCustomPropertyCollection extends OfficeExtension.ClientObject {
+        /** The request context associated with the object. This connects the add-in's process to the Office host application's process. */
+        context: RequestContext;
+        /** Gets the loaded child items in this collection. */
+        readonly items: Excel.WorksheetCustomProperty[];
+        /**
+         * Adds a new custom property that maps to the provided key. This overwrites existing custom properties with that key.
+         *
+         * [Api set: ExcelApi 1.12]
+         *
+         * @param key The key that identifies the custom property object. It is case-insensitive.The key is limited to 255 characters (larger values will cause an "InvalidArgument" error to be thrown.)
+         * @param value The value of this custom property.
+         */
+        add(key: string, value: string): Excel.WorksheetCustomProperty;
+        /**
+         * Gets the number of custom properties on this worksheet.
+         *
+         * [Api set: ExcelApi 1.12]
+         */
+        getCount(): OfficeExtension.ClientResult<number>;
+        /**
+         * Gets a custom property object by its key, which is case-insensitive. Throws if the custom property does not exist.
+         *
+         * [Api set: ExcelApi 1.12]
+         *
+         * @param key The key that identifies the custom property object. It is case-insensitive.
+         */
+        getItem(key: string): Excel.WorksheetCustomProperty;
+        /**
+         * Gets a custom property object by its key, which is case-insensitive. Returns a null object if the custom property does not exist.
+         *
+         * [Api set: ExcelApi 1.12]
+         *
+         * @param key The key that identifies the custom property object. It is case-insensitive.
+         */
+        getItemOrNullObject(key: string): Excel.WorksheetCustomProperty;
+        /**
+         * Queues up a command to load the specified properties of the object. You must call `context.sync()` before reading the properties.
+         *
+         * @param options Provides options for which properties of the object to load.
+         */
+        load(options?: Excel.Interfaces.WorksheetCustomPropertyCollectionLoadOptions & Excel.Interfaces.CollectionLoadOptions): Excel.WorksheetCustomPropertyCollection;
+        /**
+         * Queues up a command to load the specified properties of the object. You must call `context.sync()` before reading the properties.
+         *
+         * @param propertyNames A comma-delimited string or an array of strings that specify the properties to load.
+         */
+        load(propertyNames?: string | string[]): Excel.WorksheetCustomPropertyCollection;
+        /**
+         * Queues up a command to load the specified properties of the object. You must call `context.sync()` before reading the properties.
+         *
+         * @param propertyNamesAndPaths `propertyNamesAndPaths.select` is a comma-delimited string that specifies the properties to load, and `propertyNamesAndPaths.expand` is a comma-delimited string that specifies the navigation properties to load.
+         */
+        load(propertyNamesAndPaths?: OfficeExtension.LoadOption): Excel.WorksheetCustomPropertyCollection;
+        /**
+        * Overrides the JavaScript `toJSON()` method in order to provide more useful output when an API object is passed to `JSON.stringify()`. (`JSON.stringify`, in turn, calls the `toJSON` method of the object that is passed to it.)
+        * Whereas the original `Excel.WorksheetCustomPropertyCollection` object is an API object, the `toJSON` method returns a plain JavaScript object (typed as `Excel.Interfaces.WorksheetCustomPropertyCollectionData`) that contains an "items" array with shallow copies of any loaded properties from the collection's items.
+        */
+        toJSON(): Excel.Interfaces.WorksheetCustomPropertyCollectionData;
     }
     /**
      *
@@ -32600,7 +33349,7 @@ declare namespace Excel {
         context: RequestContext;
         /**
          *
-         * Returns a format object, encapsulating the conditional formats font, fill, borders, and other properties.
+         * Returns a format object, encapsulating the conditional format's font, fill, borders, and other properties.
          *
          * [Api set: ExcelApi 1.6]
          */
@@ -32765,7 +33514,7 @@ declare namespace Excel {
         context: RequestContext;
         /**
          *
-         * Returns a format object, encapsulating the conditional formats font, fill, borders, and other properties.
+         * Returns a format object, encapsulating the conditional format's font, fill, borders, and other properties.
          *
          * [Api set: ExcelApi 1.6]
          */
@@ -34986,6 +35735,55 @@ declare namespace Excel {
     }
     /**
      *
+     * Contains the collection of cross-worksheets level Ranges.
+     *
+     * [Api set: ExcelApi 1.12]
+     */
+    class RangeAreasCollection extends OfficeExtension.ClientObject {
+        /** The request context associated with the object. This connects the add-in's process to the Office host application's process. */
+        context: RequestContext;
+        /** Gets the loaded child items in this collection. */
+        readonly items: Excel.RangeAreas[];
+        /**
+         * Gets the number of RangeAreas objects in this collection.
+         *
+         * [Api set: ExcelApi 1.12]
+         */
+        getCount(): OfficeExtension.ClientResult<number>;
+        /**
+         * Returns the RangeAreas object based on position in the collection.
+         *
+         * [Api set: ExcelApi 1.12]
+         *
+         * @param index Index value of the range object to be retrieved. Zero-indexed.
+         */
+        getItemAt(index: number): Excel.RangeAreas;
+        /**
+         * Queues up a command to load the specified properties of the object. You must call `context.sync()` before reading the properties.
+         *
+         * @param options Provides options for which properties of the object to load.
+         */
+        load(options?: Excel.Interfaces.RangeAreasCollectionLoadOptions & Excel.Interfaces.CollectionLoadOptions): Excel.RangeAreasCollection;
+        /**
+         * Queues up a command to load the specified properties of the object. You must call `context.sync()` before reading the properties.
+         *
+         * @param propertyNames A comma-delimited string or an array of strings that specify the properties to load.
+         */
+        load(propertyNames?: string | string[]): Excel.RangeAreasCollection;
+        /**
+         * Queues up a command to load the specified properties of the object. You must call `context.sync()` before reading the properties.
+         *
+         * @param propertyNamesAndPaths `propertyNamesAndPaths.select` is a comma-delimited string that specifies the properties to load, and `propertyNamesAndPaths.expand` is a comma-delimited string that specifies the navigation properties to load.
+         */
+        load(propertyNamesAndPaths?: OfficeExtension.LoadOption): Excel.RangeAreasCollection;
+        /**
+        * Overrides the JavaScript `toJSON()` method in order to provide more useful output when an API object is passed to `JSON.stringify()`. (`JSON.stringify`, in turn, calls the `toJSON` method of the object that is passed to it.)
+        * Whereas the original `Excel.RangeAreasCollection` object is an API object, the `toJSON` method returns a plain JavaScript object (typed as `Excel.Interfaces.RangeAreasCollectionData`) that contains an "items" array with shallow copies of any loaded properties from the collection's items.
+        */
+        toJSON(): Excel.Interfaces.RangeAreasCollectionData;
+    }
+    /**
+     *
      * Represents the entity that is mentioned in comments.
      *
      * [Api set: ExcelApi 1.11]
@@ -35123,6 +35921,33 @@ declare namespace Excel {
          */
         load(propertyNamesAndPaths?: OfficeExtension.LoadOption): Excel.CommentCollection;
         /**
+         *
+         * Occurs when the comments are added.
+         *
+         * [Api set: ExcelApi 1.12]
+         *
+         * @eventproperty
+         */
+        readonly onAdded: OfficeExtension.EventHandlers<Excel.CommentAddedEventArgs>;
+        /**
+         *
+         * Occurs when comments or replies in a comment collection are changed, including when replies are deleted.
+         *
+         * [Api set: ExcelApi 1.12]
+         *
+         * @eventproperty
+         */
+        readonly onChanged: OfficeExtension.EventHandlers<Excel.CommentChangedEventArgs>;
+        /**
+         *
+         * Occurs when comments are deleted in the comment collection.
+         *
+         * [Api set: ExcelApi 1.12]
+         *
+         * @eventproperty
+         */
+        readonly onDeleted: OfficeExtension.EventHandlers<Excel.CommentDeletedEventArgs>;
+        /**
         * Overrides the JavaScript `toJSON()` method in order to provide more useful output when an API object is passed to `JSON.stringify()`. (`JSON.stringify`, in turn, calls the `toJSON` method of the object that is passed to it.)
         * Whereas the original `Excel.CommentCollection` object is an API object, the `toJSON` method returns a plain JavaScript object (typed as `Excel.Interfaces.CommentCollectionData`) that contains an "items" array with shallow copies of any loaded properties from the collection's items.
         */
@@ -35169,6 +35994,13 @@ declare namespace Excel {
          * [Api set: ExcelApi 1.10]
          */
         content: string;
+        /**
+         *
+         * Gets the content type of the comment.
+         *
+         * [Api set: ExcelApi 1.12]
+         */
+        readonly contentType: Excel.ContentType | "Plain" | "Mention";
         /**
          *
          * Gets the creation time of the comment. Returns null if the comment was converted from a note, since the comment does not have a creation date.
@@ -35370,6 +36202,13 @@ declare namespace Excel {
          * [Api set: ExcelApi 1.10]
          */
         content: string;
+        /**
+         *
+         * The content type of the reply.
+         *
+         * [Api set: ExcelApi 1.12]
+         */
+        readonly contentType: Excel.ContentType | "Plain" | "Mention";
         /**
          *
          * Gets the creation time of the comment reply.
@@ -38779,6 +39618,44 @@ declare namespace Excel {
         hidden = "Hidden"
     }
     /**
+     *
+     * Represents how the comments in the event were changed.
+     *
+     * [Api set: ExcelApi 1.12]
+     */
+    enum CommentChangeType {
+        /**
+         * Comments were edited.
+         *
+         */
+        commentEdited = "CommentEdited",
+        /**
+         * Comments were resolved.
+         *
+         */
+        commentResolved = "CommentResolved",
+        /**
+         * Comments were reopened.
+         *
+         */
+        commentReopened = "CommentReopened",
+        /**
+         * Replies were added.
+         *
+         */
+        replyAdded = "ReplyAdded",
+        /**
+         * Replies were deleted.
+         *
+         */
+        replyDeleted = "ReplyDeleted",
+        /**
+         * Replies were edited.
+         *
+         */
+        replyEdited = "ReplyEdited"
+    }
+    /**
      * [Api set: ExcelApi 1.7]
      */
     enum EventType {
@@ -38962,7 +39839,12 @@ declare namespace Excel {
          * LinkedDataTypeAdded represents the type of event registered on LinkedDataType, and occurs when a new linked data type is added to the workbook.
          *
          */
-        linkedDataTypeLinkedDataTypeAdded = "LinkedDataTypeLinkedDataTypeAdded"
+        linkedDataTypeLinkedDataTypeAdded = "LinkedDataTypeLinkedDataTypeAdded",
+        /**
+         * WorksheetFormulaChanged represents the type of event registered on worksheet, and occurs when formula is changed.
+         *
+         */
+        worksheetFormulaChanged = "WorksheetFormulaChanged"
     }
     /**
      * [Api set: ExcelApi 1.7]
@@ -39284,12 +40166,12 @@ declare namespace Excel {
      */
     enum AutoFillType {
         /**
-         * Populates the adjacent cells with data the selected data.
+         * Populates the adjacent cells based on the surrounding data (the standard AutoFill behavior).
          *
          */
         fillDefault = "FillDefault",
         /**
-         * Populates the adjacent cells with data the selected data.
+         * Populates the adjacent cells with data based on the selected data.
          *
          */
         fillCopy = "FillCopy",
@@ -39951,6 +40833,74 @@ declare namespace Excel {
         developer = "Developer",
         addIns = "AddIns",
         help = "Help"
+    }
+    /**
+     *
+     * Represents a category of number formats.
+     *
+     * [Api set: ExcelApi 1.12]
+     */
+    enum NumberFormatCategory {
+        /**
+         * General format cells have no specific number format.
+         *
+         */
+        general = "General",
+        /**
+         * Number is used for general display of numbers. Currency and Accounting offer specialized formatting for monetary value.
+         *
+         */
+        number = "Number",
+        /**
+         * Currency formats are used for general monetary values. Use Accounting formats to align decimal points in a column.
+         *
+         */
+        currency = "Currency",
+        /**
+         * Accounting formats line up the currency symbols and decimal points in a column.
+         *
+         */
+        accounting = "Accounting",
+        /**
+         * Date formats display date and time serial numbers as date values.  Date formats that begin with an asterisk (*) respond to changes in regional date and time settings that are specified for the operating system. Formats without an asterisk are not affected by operating system settings.
+         *
+         */
+        date = "Date",
+        /**
+         * Time formats display date and time serial numbers as date values.  Time formats that begin with an asterisk (*) respond to changes in regional date and time settings that are specified for the operating system. Formats without an asterisk are not affected by operating system settings.
+         *
+         */
+        time = "Time",
+        /**
+         * Percentage formats multiply the cell value by 100 and displays the result with a percent symbol.
+         *
+         */
+        percentage = "Percentage",
+        /**
+         * Fraction formats display the cell value as a whole number with the remainder rounded to the nearest fraction value.
+         *
+         */
+        fraction = "Fraction",
+        /**
+         * Scientific formats display the cell value as a number between 1 and 10 multiplied by a power of 10.
+         *
+         */
+        scientific = "Scientific",
+        /**
+         * Text format cells are treated as text even when a number is in the cell. The cell is displayed exactly as entered.
+         *
+         */
+        text = "Text",
+        /**
+         * Special formats are useful for tracking list and database values.
+         *
+         */
+        special = "Special",
+        /**
+         * A custom format that is not a part of any category.
+         *
+         */
+        custom = "Custom"
     }
     /**
      *
@@ -43393,7 +44343,9 @@ declare namespace Excel {
         accessDenied = "AccessDenied",
         apiNotFound = "ApiNotFound",
         conflict = "Conflict",
+        filteredRangeConflict = "FilteredRangeConflict",
         generalException = "GeneralException",
+        inactiveWorkbook = "InactiveWorkbook",
         insertDeleteConflict = "InsertDeleteConflict",
         invalidArgument = "InvalidArgument",
         invalidBinding = "InvalidBinding",
@@ -43404,6 +44356,7 @@ declare namespace Excel {
         itemNotFound = "ItemNotFound",
         nonBlankCellOffSheet = "NonBlankCellOffSheet",
         notImplemented = "NotImplemented",
+        pivotTableRangeConflict = "PivotTableRangeConflict",
         rangeExceedsLimit = "RangeExceedsLimit",
         requestAborted = "RequestAborted",
         unsupportedOperation = "UnsupportedOperation",
@@ -43610,21 +44563,21 @@ declare namespace Excel {
             columnHidden?: boolean;
             /**
              *
-             * Represents the formula in A1-style notation.
+             * Represents the formula in A1-style notation. If a cell has no formula, its value is returned instead.
              *
              * [Api set: ExcelApi 1.1]
              */
             formulas?: any[][];
             /**
              *
-             * Represents the formula in A1-style notation, in the user's language and number-formatting locale.  For example, the English "=SUM(A1, 1.5)" formula would become "=SUMME(A1; 1,5)" in German.
+             * Represents the formula in A1-style notation, in the user's language and number-formatting locale. For example, the English "=SUM(A1, 1.5)" formula would become "=SUMME(A1; 1,5)" in German. If a cell has no formula, its value is returned instead.
              *
              * [Api set: ExcelApi 1.1]
              */
             formulasLocal?: any[][];
             /**
              *
-             * Represents the formula in R1C1-style notation.
+             * Represents the formula in R1C1-style notation. If a cell has no formula, its value is returned instead.
              *
              * [Api set: ExcelApi 1.2]
              */
@@ -44106,7 +45059,7 @@ declare namespace Excel {
             patternTintAndShade?: number;
             /**
              *
-             * Specifies a double that lightens or darkens a color for Range Fill, the value is between -1 (darkest) and 1 (brightest), with 0 for the original color.
+             * Specifies a double that lightens or darkens a color for Range Fill. The value is between -1 (darkest) and 1 (brightest), with 0 for the original color.
                         If the tintAndShades are not uniform, null will be returned.
              *
              * [Api set: ExcelApi 1.9]
@@ -44182,7 +45135,7 @@ declare namespace Excel {
             italic?: boolean;
             /**
              *
-             * Font name (e.g., "Calibri")
+             * Font name (e.g., "Calibri"). The name's length should not be greater than 31 characters.
              *
              * [Api set: ExcelApi 1.1]
              */
@@ -44691,7 +45644,7 @@ declare namespace Excel {
             markerStyle?: Excel.ChartMarkerStyle | "Invalid" | "Automatic" | "None" | "Square" | "Diamond" | "Triangle" | "X" | "Star" | "Dot" | "Dash" | "Circle" | "Plus" | "Picture";
             /**
              *
-             * Specifies the name of a series in a chart.
+             * Specifies the name of a series in a chart. The name's length should not be greater than 255 characters.
              *
              * [Api set: ExcelApi 1.1]
              */
@@ -45131,7 +46084,7 @@ declare namespace Excel {
              *
              * Specifies the angle to which the text is oriented for the chart axis title. The value should either be an integer from -90 to 90 or the integer 180 for vertically-oriented text.
              *
-             * [Api set: ExcelApiOnline 1.1]
+             * [Api set: ExcelApi 1.12]
              */
             textOrientation?: number;
             /**
@@ -46206,6 +47159,13 @@ declare namespace Excel {
         interface PivotTableUpdateData {
             /**
              *
+             * Specifies if the PivotTable allows the application of multiple PivotFilters on a given PivotField in the table.
+             *
+             * [Api set: ExcelApi 1.12]
+             */
+            allowMultipleFiltersPerField?: boolean;
+            /**
+             *
              * Specifies if the PivotTable allows values in the data body to be edited by the user.
              *
              * [Api set: ExcelApi 1.9]
@@ -46445,6 +47405,20 @@ declare namespace Excel {
              * [Api set: ExcelApi 1.8]
              */
             visible?: boolean;
+        }
+        /** An interface for updating data on the WorksheetCustomProperty object, for use in `worksheetCustomProperty.set({ ... })`. */
+        interface WorksheetCustomPropertyUpdateData {
+            /**
+             *
+             * Gets or sets the value of the custom property.
+             *
+             * [Api set: ExcelApi 1.12]
+             */
+            value?: string;
+        }
+        /** An interface for updating data on the WorksheetCustomPropertyCollection object, for use in `worksheetCustomPropertyCollection.set({ ... })`. */
+        interface WorksheetCustomPropertyCollectionUpdateData {
+            items?: Excel.Interfaces.WorksheetCustomPropertyData[];
         }
         /** An interface for updating data on the DocumentProperties object, for use in `documentProperties.set({ ... })`. */
         interface DocumentPropertiesUpdateData {
@@ -46875,7 +47849,7 @@ declare namespace Excel {
         interface TopBottomConditionalFormatUpdateData {
             /**
             *
-            * Returns a format object, encapsulating the conditional formats font, fill, borders, and other properties.
+            * Returns a format object, encapsulating the conditional format's font, fill, borders, and other properties.
             *
             * [Api set: ExcelApi 1.6]
             */
@@ -46909,7 +47883,7 @@ declare namespace Excel {
         interface TextConditionalFormatUpdateData {
             /**
             *
-            * Returns a format object, encapsulating the conditional formats font, fill, borders, and other properties.
+            * Returns a format object, encapsulating the conditional format's font, fill, borders, and other properties.
             *
             * [Api set: ExcelApi 1.6]
             */
@@ -47531,6 +48505,10 @@ declare namespace Excel {
         /** An interface for updating data on the RangeCollection object, for use in `rangeCollection.set({ ... })`. */
         interface RangeCollectionUpdateData {
             items?: Excel.Interfaces.RangeData[];
+        }
+        /** An interface for updating data on the RangeAreasCollection object, for use in `rangeAreasCollection.set({ ... })`. */
+        interface RangeAreasCollectionUpdateData {
+            items?: Excel.Interfaces.RangeAreasData[];
         }
         /** An interface for updating data on the CommentCollection object, for use in `commentCollection.set({ ... })`. */
         interface CommentCollectionUpdateData {
@@ -48334,6 +49312,13 @@ declare namespace Excel {
             comments?: Excel.Interfaces.CommentData[];
             /**
             *
+            * Gets a collection of worksheet-level custom properties.
+            *
+            * [Api set: ExcelApi 1.12]
+            */
+            customProperties?: Excel.Interfaces.WorksheetCustomPropertyData[];
+            /**
+            *
             * Gets the horizontal page break collection for the worksheet. This collection only contains manual page breaks.
             *
             * [Api set: ExcelApi 1.9]
@@ -48558,25 +49543,34 @@ declare namespace Excel {
             columnIndex?: number;
             /**
              *
-             * Represents the formula in A1-style notation.
+             * Represents the formula in A1-style notation. If a cell has no formula, its value is returned instead.
              *
              * [Api set: ExcelApi 1.1]
              */
             formulas?: any[][];
             /**
              *
-             * Represents the formula in A1-style notation, in the user's language and number-formatting locale.  For example, the English "=SUM(A1, 1.5)" formula would become "=SUMME(A1; 1,5)" in German.
+             * Represents the formula in A1-style notation, in the user's language and number-formatting locale. For example, the English "=SUM(A1, 1.5)" formula would become "=SUMME(A1; 1,5)" in German. If a cell has no formula, its value is returned instead.
              *
              * [Api set: ExcelApi 1.1]
              */
             formulasLocal?: any[][];
             /**
              *
-             * Represents the formula in R1C1-style notation.
+             * Represents the formula in R1C1-style notation. If a cell has no formula, its value is returned instead.
              *
              * [Api set: ExcelApi 1.2]
              */
             formulasR1C1?: any[][];
+            /**
+             *
+             * Represents if all cells have a spill border.
+                        Returns true if all cells have a spill border, or false if all cells do not have a spill border.
+                        Returns null if there are cells both with and without spill borders within the range.
+             *
+             * [Api set: ExcelApi 1.12]
+             */
+            hasSpill?: boolean;
             /**
              *
              * Returns the distance in points, for 100% zoom, from top edge of the range to bottom edge of the range.
@@ -48635,6 +49629,13 @@ declare namespace Excel {
             numberFormat?: any[][];
             /**
              *
+             * Represents the category of number format of each cell.
+             *
+             * [Api set: ExcelApi 1.12]
+             */
+            numberFormatCategories?: Excel.NumberFormatCategory[][];
+            /**
+             *
              * Represents Excel's number format code for the given range, based on the language settings of the user.​
                         Excel does not perform any language or format coercion when getting or setting the `numberFormatLocal` property.
                         Any returned text uses the locally-formatted strings based on the language specified in the system settings.
@@ -48663,6 +49664,15 @@ declare namespace Excel {
              * [Api set: ExcelApi 1.1]
              */
             rowIndex?: number;
+            /**
+             *
+             * Represents if ALL the cells would be saved as an array formula.
+                        Returns true if ALL cells would be saved as an array formula, or false if ALL cells would NOT be saved as an array formula.
+                        Returns null if some cells would be saved as an array formula and some would not be.
+             *
+             * [Api set: ExcelApi 1.12]
+             */
+            savedAsArray?: boolean;
             /**
              *
              * Represents the style of the current range.
@@ -48789,6 +49799,30 @@ declare namespace Excel {
              * [Api set: ExcelApi 1.9]
              */
             style?: string;
+        }
+        /** An interface describing the data returned by calling `workbookRangeAreas.toJSON()`. */
+        interface WorkbookRangeAreasData {
+            /**
+            *
+            * Returns the RangeAreasCollection object, each RangeAreas in the collection represent one or more rectangle ranges in one worksheet.
+            *
+            * [Api set: ExcelApi 1.12]
+            */
+            areas?: Excel.Interfaces.RangeAreasData[];
+            /**
+            *
+            * Returns ranges that comprise this object in a RangeCollection object.
+            *
+            * [Api set: ExcelApi 1.12]
+            */
+            ranges?: Excel.Interfaces.RangeData[];
+            /**
+             *
+             * Returns an array of address in A1-style. Address value will contain the worksheet name for each rectangular block of cells (e.g., "Sheet1!A1:B4, Sheet1!D1:D4"). Read-only.
+             *
+             * [Api set: ExcelApi 1.12]
+             */
+            addresses?: string[];
         }
         /** An interface describing the data returned by calling `rangeView.toJSON()`. */
         interface RangeViewData {
@@ -49422,7 +50456,7 @@ declare namespace Excel {
             patternTintAndShade?: number;
             /**
              *
-             * Specifies a double that lightens or darkens a color for Range Fill, the value is between -1 (darkest) and 1 (brightest), with 0 for the original color.
+             * Specifies a double that lightens or darkens a color for Range Fill. The value is between -1 (darkest) and 1 (brightest), with 0 for the original color.
                         If the tintAndShades are not uniform, null will be returned.
              *
              * [Api set: ExcelApi 1.9]
@@ -49497,7 +50531,7 @@ declare namespace Excel {
             italic?: boolean;
             /**
              *
-             * Font name (e.g., "Calibri")
+             * Font name (e.g., "Calibri"). The name's length should not be greater than 31 characters.
              *
              * [Api set: ExcelApi 1.1]
              */
@@ -50034,7 +51068,7 @@ declare namespace Excel {
             markerStyle?: Excel.ChartMarkerStyle | "Invalid" | "Automatic" | "None" | "Square" | "Diamond" | "Triangle" | "X" | "Star" | "Dot" | "Dash" | "Circle" | "Plus" | "Picture";
             /**
              *
-             * Specifies the name of a series in a chart.
+             * Specifies the name of a series in a chart. The name's length should not be greater than 255 characters.
              *
              * [Api set: ExcelApi 1.1]
              */
@@ -50537,7 +51571,7 @@ declare namespace Excel {
              *
              * Specifies the angle to which the text is oriented for the chart axis title. The value should either be an integer from -90 to 90 or the integer 180 for vertically-oriented text.
              *
-             * [Api set: ExcelApiOnline 1.1]
+             * [Api set: ExcelApi 1.12]
              */
             textOrientation?: number;
             /**
@@ -51738,6 +52772,13 @@ declare namespace Excel {
         interface CultureInfoData {
             /**
             *
+            * Defines the culturally appropriate format of displaying date and time. This is based on current system culture settings.
+            *
+            * [Api set: ExcelApi 1.12]
+            */
+            datetimeFormat?: Excel.Interfaces.DatetimeFormatInfoData;
+            /**
+            *
             * Defines the culturally appropriate format of displaying numbers. This is based on current system culture settings.
             *
             * [Api set: ExcelApi 1.11]
@@ -51767,6 +52808,44 @@ declare namespace Excel {
              * [Api set: ExcelApi 1.11]
              */
             numberGroupSeparator?: string;
+        }
+        /** An interface describing the data returned by calling `datetimeFormatInfo.toJSON()`. */
+        interface DatetimeFormatInfoData {
+            /**
+             *
+             * Gets the string used as the date separator. This is based on current system settings.
+             *
+             * [Api set: ExcelApi 1.12]
+             */
+            dateSeparator?: string;
+            /**
+             *
+             * Gets the format string for a long date value. This is based on current system settings.
+             *
+             * [Api set: ExcelApi 1.12]
+             */
+            longDatePattern?: string;
+            /**
+             *
+             * Gets the format string for a long time value. This is based on current system settings.
+             *
+             * [Api set: ExcelApi 1.12]
+             */
+            longTimePattern?: string;
+            /**
+             *
+             * Gets the format string for a short date value. This is based on current system settings.
+             *
+             * [Api set: ExcelApi 1.12]
+             */
+            shortDatePattern?: string;
+            /**
+             *
+             * Gets the string used as the time separator. This is based on current system settings.
+             *
+             * [Api set: ExcelApi 1.12]
+             */
+            timeSeparator?: string;
         }
         /** An interface describing the data returned by calling `customXmlPartScopedCollection.toJSON()`. */
         interface CustomXmlPartScopedCollectionData {
@@ -51838,6 +52917,13 @@ declare namespace Excel {
             * [Api set: ExcelApi 1.8]
             */
             rowHierarchies?: Excel.Interfaces.RowColumnPivotHierarchyData[];
+            /**
+             *
+             * Specifies if the PivotTable allows the application of multiple PivotFilters on a given PivotField in the table.
+             *
+             * [Api set: ExcelApi 1.12]
+             */
+            allowMultipleFiltersPerField?: boolean;
             /**
              *
              * Specifies if the PivotTable allows values in the data body to be edited by the user.
@@ -52156,6 +53242,27 @@ declare namespace Excel {
              * [Api set: ExcelApi 1.8]
              */
             visible?: boolean;
+        }
+        /** An interface describing the data returned by calling `worksheetCustomProperty.toJSON()`. */
+        interface WorksheetCustomPropertyData {
+            /**
+             *
+             * Gets the key of the custom property. Custom property keys are case-insensitive. The key is limited to 255 characters (larger values will cause an "InvalidArgument" error to be thrown.)
+             *
+             * [Api set: ExcelApi 1.12]
+             */
+            key?: string;
+            /**
+             *
+             * Gets or sets the value of the custom property.
+             *
+             * [Api set: ExcelApi 1.12]
+             */
+            value?: string;
+        }
+        /** An interface describing the data returned by calling `worksheetCustomPropertyCollection.toJSON()`. */
+        interface WorksheetCustomPropertyCollectionData {
+            items?: Excel.Interfaces.WorksheetCustomPropertyData[];
         }
         /** An interface describing the data returned by calling `documentProperties.toJSON()`. */
         interface DocumentPropertiesData {
@@ -52642,7 +53749,7 @@ declare namespace Excel {
         interface TopBottomConditionalFormatData {
             /**
             *
-            * Returns a format object, encapsulating the conditional formats font, fill, borders, and other properties.
+            * Returns a format object, encapsulating the conditional format's font, fill, borders, and other properties.
             *
             * [Api set: ExcelApi 1.6]
             */
@@ -52676,7 +53783,7 @@ declare namespace Excel {
         interface TextConditionalFormatData {
             /**
             *
-            * Returns a format object, encapsulating the conditional formats font, fill, borders, and other properties.
+            * Returns a format object, encapsulating the conditional format's font, fill, borders, and other properties.
             *
             * [Api set: ExcelApi 1.6]
             */
@@ -53337,6 +54444,10 @@ declare namespace Excel {
         interface RangeCollectionData {
             items?: Excel.Interfaces.RangeData[];
         }
+        /** An interface describing the data returned by calling `rangeAreasCollection.toJSON()`. */
+        interface RangeAreasCollectionData {
+            items?: Excel.Interfaces.RangeAreasData[];
+        }
         /** An interface describing the data returned by calling `commentCollection.toJSON()`. */
         interface CommentCollectionData {
             items?: Excel.Interfaces.CommentData[];
@@ -53371,6 +54482,13 @@ declare namespace Excel {
              * [Api set: ExcelApi 1.10]
              */
             content?: string;
+            /**
+             *
+             * Gets the content type of the comment.
+             *
+             * [Api set: ExcelApi 1.12]
+             */
+            contentType?: Excel.ContentType | "Plain" | "Mention";
             /**
              *
              * Gets the creation time of the comment. Returns null if the comment was converted from a note, since the comment does not have a creation date.
@@ -53434,6 +54552,13 @@ declare namespace Excel {
              * [Api set: ExcelApi 1.10]
              */
             content?: string;
+            /**
+             *
+             * The content type of the reply.
+             *
+             * [Api set: ExcelApi 1.12]
+             */
+            contentType?: Excel.ContentType | "Plain" | "Mention";
             /**
              *
              * Gets the creation time of the comment reply.
@@ -54712,25 +55837,34 @@ declare namespace Excel {
             columnIndex?: boolean;
             /**
              *
-             * Represents the formula in A1-style notation.
+             * Represents the formula in A1-style notation. If a cell has no formula, its value is returned instead.
              *
              * [Api set: ExcelApi 1.1]
              */
             formulas?: boolean;
             /**
              *
-             * Represents the formula in A1-style notation, in the user's language and number-formatting locale.  For example, the English "=SUM(A1, 1.5)" formula would become "=SUMME(A1; 1,5)" in German.
+             * Represents the formula in A1-style notation, in the user's language and number-formatting locale. For example, the English "=SUM(A1, 1.5)" formula would become "=SUMME(A1; 1,5)" in German. If a cell has no formula, its value is returned instead.
              *
              * [Api set: ExcelApi 1.1]
              */
             formulasLocal?: boolean;
             /**
              *
-             * Represents the formula in R1C1-style notation.
+             * Represents the formula in R1C1-style notation. If a cell has no formula, its value is returned instead.
              *
              * [Api set: ExcelApi 1.2]
              */
             formulasR1C1?: boolean;
+            /**
+             *
+             * Represents if all cells have a spill border.
+                        Returns true if all cells have a spill border, or false if all cells do not have a spill border.
+                        Returns null if there are cells both with and without spill borders within the range.
+             *
+             * [Api set: ExcelApi 1.12]
+             */
+            hasSpill?: boolean;
             /**
              *
              * Returns the distance in points, for 100% zoom, from top edge of the range to bottom edge of the range.
@@ -54789,6 +55923,13 @@ declare namespace Excel {
             numberFormat?: boolean;
             /**
              *
+             * Represents the category of number format of each cell.
+             *
+             * [Api set: ExcelApi 1.12]
+             */
+            numberFormatCategories?: boolean;
+            /**
+             *
              * Represents Excel's number format code for the given range, based on the language settings of the user.​
                         Excel does not perform any language or format coercion when getting or setting the `numberFormatLocal` property.
                         Any returned text uses the locally-formatted strings based on the language specified in the system settings.
@@ -54817,6 +55958,15 @@ declare namespace Excel {
              * [Api set: ExcelApi 1.1]
              */
             rowIndex?: boolean;
+            /**
+             *
+             * Represents if ALL the cells would be saved as an array formula.
+                        Returns true if ALL cells would be saved as an array formula, or false if ALL cells would NOT be saved as an array formula.
+                        Returns null if some cells would be saved as an array formula and some would not be.
+             *
+             * [Api set: ExcelApi 1.12]
+             */
+            savedAsArray?: boolean;
             /**
              *
              * Represents the style of the current range.
@@ -54946,6 +56096,25 @@ declare namespace Excel {
              * [Api set: ExcelApi 1.9]
              */
             style?: boolean;
+        }
+        /**
+         *
+         * Represents a collection of one or more rectangular ranges in multiple worksheets.
+         *
+         * [Api set: ExcelApi 1.12]
+         */
+        interface WorkbookRangeAreasLoadOptions {
+            /**
+              Specifying `$all` for the LoadOptions loads all the scalar properties (e.g.: `Range.address`) but not the navigational properties (e.g.: `Range.format.fill.color`).
+             */
+            $all?: boolean;
+            /**
+             *
+             * Returns an array of address in A1-style. Address value will contain the worksheet name for each rectangular block of cells (e.g., "Sheet1!A1:B4, Sheet1!D1:D4"). Read-only.
+             *
+             * [Api set: ExcelApi 1.12]
+             */
+            addresses?: boolean;
         }
         /**
          *
@@ -56238,7 +57407,7 @@ declare namespace Excel {
             patternTintAndShade?: boolean;
             /**
              *
-             * Specifies a double that lightens or darkens a color for Range Fill, the value is between -1 (darkest) and 1 (brightest), with 0 for the original color.
+             * Specifies a double that lightens or darkens a color for Range Fill. The value is between -1 (darkest) and 1 (brightest), with 0 for the original color.
                         If the tintAndShades are not uniform, null will be returned.
              *
              * [Api set: ExcelApi 1.9]
@@ -56375,7 +57544,7 @@ declare namespace Excel {
             italic?: boolean;
             /**
              *
-             * Font name (e.g., "Calibri")
+             * Font name (e.g., "Calibri"). The name's length should not be greater than 31 characters.
              *
              * [Api set: ExcelApi 1.1]
              */
@@ -57125,7 +58294,7 @@ declare namespace Excel {
             markerStyle?: boolean;
             /**
              *
-             * For EACH ITEM in the collection: Specifies the name of a series in a chart.
+             * For EACH ITEM in the collection: Specifies the name of a series in a chart. The name's length should not be greater than 255 characters.
              *
              * [Api set: ExcelApi 1.1]
              */
@@ -57454,7 +58623,7 @@ declare namespace Excel {
             markerStyle?: boolean;
             /**
              *
-             * Specifies the name of a series in a chart.
+             * Specifies the name of a series in a chart. The name's length should not be greater than 255 characters.
              *
              * [Api set: ExcelApi 1.1]
              */
@@ -58098,7 +59267,7 @@ declare namespace Excel {
              *
              * Specifies the angle to which the text is oriented for the chart axis title. The value should either be an integer from -90 to 90 or the integer 180 for vertically-oriented text.
              *
-             * [Api set: ExcelApiOnline 1.1]
+             * [Api set: ExcelApi 1.12]
              */
             textOrientation?: boolean;
             /**
@@ -59698,6 +60867,13 @@ declare namespace Excel {
             $all?: boolean;
             /**
             *
+            * Defines the culturally appropriate format of displaying date and time. This is based on current system culture settings.
+            *
+            * [Api set: ExcelApi 1.12]
+            */
+            datetimeFormat?: Excel.Interfaces.DatetimeFormatInfoLoadOptions;
+            /**
+            *
             * Defines the culturally appropriate format of displaying numbers. This is based on current system culture settings.
             *
             * [Api set: ExcelApi 1.11]
@@ -59736,6 +60912,53 @@ declare namespace Excel {
              * [Api set: ExcelApi 1.11]
              */
             numberGroupSeparator?: boolean;
+        }
+        /**
+         *
+         * Defines the culturally appropriate format of displaying numbers. This is based on current system culture settings.
+         *
+         * [Api set: ExcelApi 1.12]
+         */
+        interface DatetimeFormatInfoLoadOptions {
+            /**
+              Specifying `$all` for the LoadOptions loads all the scalar properties (e.g.: `Range.address`) but not the navigational properties (e.g.: `Range.format.fill.color`).
+             */
+            $all?: boolean;
+            /**
+             *
+             * Gets the string used as the date separator. This is based on current system settings.
+             *
+             * [Api set: ExcelApi 1.12]
+             */
+            dateSeparator?: boolean;
+            /**
+             *
+             * Gets the format string for a long date value. This is based on current system settings.
+             *
+             * [Api set: ExcelApi 1.12]
+             */
+            longDatePattern?: boolean;
+            /**
+             *
+             * Gets the format string for a long time value. This is based on current system settings.
+             *
+             * [Api set: ExcelApi 1.12]
+             */
+            longTimePattern?: boolean;
+            /**
+             *
+             * Gets the format string for a short date value. This is based on current system settings.
+             *
+             * [Api set: ExcelApi 1.12]
+             */
+            shortDatePattern?: boolean;
+            /**
+             *
+             * Gets the string used as the time separator. This is based on current system settings.
+             *
+             * [Api set: ExcelApi 1.12]
+             */
+            timeSeparator?: boolean;
         }
         /**
          *
@@ -59821,7 +61044,7 @@ declare namespace Excel {
          *
          * Represents a scoped collection of PivotTables. The PivotTables are sorted based on the location of the PivotTable's top-left corner. They are ordered top to bottom and then left to right.
          *
-         * [Api set: ExcelApiOnline 1.1]
+         * [Api set: ExcelApi 1.12]
          */
         interface PivotTableScopedCollectionLoadOptions {
             /**
@@ -59842,6 +61065,13 @@ declare namespace Excel {
             * [Api set: ExcelApi 1.3]
             */
             worksheet?: Excel.Interfaces.WorksheetLoadOptions;
+            /**
+             *
+             * For EACH ITEM in the collection: Specifies if the PivotTable allows the application of multiple PivotFilters on a given PivotField in the table.
+             *
+             * [Api set: ExcelApi 1.12]
+             */
+            allowMultipleFiltersPerField?: boolean;
             /**
              *
              * For EACH ITEM in the collection: Specifies if the PivotTable allows values in the data body to be edited by the user.
@@ -59898,6 +61128,13 @@ declare namespace Excel {
             worksheet?: Excel.Interfaces.WorksheetLoadOptions;
             /**
              *
+             * For EACH ITEM in the collection: Specifies if the PivotTable allows the application of multiple PivotFilters on a given PivotField in the table.
+             *
+             * [Api set: ExcelApi 1.12]
+             */
+            allowMultipleFiltersPerField?: boolean;
+            /**
+             *
              * For EACH ITEM in the collection: Specifies if the PivotTable allows values in the data body to be edited by the user.
              *
              * [Api set: ExcelApi 1.9]
@@ -59951,6 +61188,13 @@ declare namespace Excel {
             * [Api set: ExcelApi 1.3]
             */
             worksheet?: Excel.Interfaces.WorksheetLoadOptions;
+            /**
+             *
+             * Specifies if the PivotTable allows the application of multiple PivotFilters on a given PivotField in the table.
+             *
+             * [Api set: ExcelApi 1.12]
+             */
+            allowMultipleFiltersPerField?: boolean;
             /**
              *
              * Specifies if the PivotTable allows values in the data body to be edited by the user.
@@ -60520,6 +61764,58 @@ declare namespace Excel {
              * [Api set: ExcelApi 1.8]
              */
             visible?: boolean;
+        }
+        /**
+         *
+         * Represents a worksheet-level custom property.
+         *
+         * [Api set: ExcelApi 1.12]
+         */
+        interface WorksheetCustomPropertyLoadOptions {
+            /**
+              Specifying `$all` for the LoadOptions loads all the scalar properties (e.g.: `Range.address`) but not the navigational properties (e.g.: `Range.format.fill.color`).
+             */
+            $all?: boolean;
+            /**
+             *
+             * Gets the key of the custom property. Custom property keys are case-insensitive. The key is limited to 255 characters (larger values will cause an "InvalidArgument" error to be thrown.)
+             *
+             * [Api set: ExcelApi 1.12]
+             */
+            key?: boolean;
+            /**
+             *
+             * Gets or sets the value of the custom property.
+             *
+             * [Api set: ExcelApi 1.12]
+             */
+            value?: boolean;
+        }
+        /**
+         *
+         * Contains the collection of worksheet-level custom property.
+         *
+         * [Api set: ExcelApi 1.12]
+         */
+        interface WorksheetCustomPropertyCollectionLoadOptions {
+            /**
+              Specifying `$all` for the LoadOptions loads all the scalar properties (e.g.: `Range.address`) but not the navigational properties (e.g.: `Range.format.fill.color`).
+             */
+            $all?: boolean;
+            /**
+             *
+             * For EACH ITEM in the collection: Gets the key of the custom property. Custom property keys are case-insensitive. The key is limited to 255 characters (larger values will cause an "InvalidArgument" error to be thrown.)
+             *
+             * [Api set: ExcelApi 1.12]
+             */
+            key?: boolean;
+            /**
+             *
+             * For EACH ITEM in the collection: Gets or sets the value of the custom property.
+             *
+             * [Api set: ExcelApi 1.12]
+             */
+            value?: boolean;
         }
         /**
          *
@@ -61287,7 +62583,7 @@ declare namespace Excel {
             $all?: boolean;
             /**
             *
-            * Returns a format object, encapsulating the conditional formats font, fill, borders, and other properties.
+            * Returns a format object, encapsulating the conditional format's font, fill, borders, and other properties.
             *
             * [Api set: ExcelApi 1.6]
             */
@@ -61339,7 +62635,7 @@ declare namespace Excel {
             $all?: boolean;
             /**
             *
-            * Returns a format object, encapsulating the conditional formats font, fill, borders, and other properties.
+            * Returns a format object, encapsulating the conditional format's font, fill, borders, and other properties.
             *
             * [Api set: ExcelApi 1.6]
             */
@@ -62491,25 +63787,34 @@ declare namespace Excel {
             columnIndex?: boolean;
             /**
              *
-             * For EACH ITEM in the collection: Represents the formula in A1-style notation.
+             * For EACH ITEM in the collection: Represents the formula in A1-style notation. If a cell has no formula, its value is returned instead.
              *
              * [Api set: ExcelApi 1.1]
              */
             formulas?: boolean;
             /**
              *
-             * For EACH ITEM in the collection: Represents the formula in A1-style notation, in the user's language and number-formatting locale.  For example, the English "=SUM(A1, 1.5)" formula would become "=SUMME(A1; 1,5)" in German.
+             * For EACH ITEM in the collection: Represents the formula in A1-style notation, in the user's language and number-formatting locale. For example, the English "=SUM(A1, 1.5)" formula would become "=SUMME(A1; 1,5)" in German. If a cell has no formula, its value is returned instead.
              *
              * [Api set: ExcelApi 1.1]
              */
             formulasLocal?: boolean;
             /**
              *
-             * For EACH ITEM in the collection: Represents the formula in R1C1-style notation.
+             * For EACH ITEM in the collection: Represents the formula in R1C1-style notation. If a cell has no formula, its value is returned instead.
              *
              * [Api set: ExcelApi 1.2]
              */
             formulasR1C1?: boolean;
+            /**
+             *
+             * For EACH ITEM in the collection: Represents if all cells have a spill border.
+                        Returns true if all cells have a spill border, or false if all cells do not have a spill border.
+                        Returns null if there are cells both with and without spill borders within the range.
+             *
+             * [Api set: ExcelApi 1.12]
+             */
+            hasSpill?: boolean;
             /**
              *
              * For EACH ITEM in the collection: Returns the distance in points, for 100% zoom, from top edge of the range to bottom edge of the range.
@@ -62568,6 +63873,13 @@ declare namespace Excel {
             numberFormat?: boolean;
             /**
              *
+             * For EACH ITEM in the collection: Represents the category of number format of each cell.
+             *
+             * [Api set: ExcelApi 1.12]
+             */
+            numberFormatCategories?: boolean;
+            /**
+             *
              * For EACH ITEM in the collection: Represents Excel's number format code for the given range, based on the language settings of the user.​
                         Excel does not perform any language or format coercion when getting or setting the `numberFormatLocal` property.
                         Any returned text uses the locally-formatted strings based on the language specified in the system settings.
@@ -62596,6 +63908,15 @@ declare namespace Excel {
              * [Api set: ExcelApi 1.1]
              */
             rowIndex?: boolean;
+            /**
+             *
+             * For EACH ITEM in the collection: Represents if ALL the cells would be saved as an array formula.
+                        Returns true if ALL cells would be saved as an array formula, or false if ALL cells would NOT be saved as an array formula.
+                        Returns null if some cells would be saved as an array formula and some would not be.
+             *
+             * [Api set: ExcelApi 1.12]
+             */
+            savedAsArray?: boolean;
             /**
              *
              * For EACH ITEM in the collection: Represents the style of the current range.
@@ -62643,6 +63964,90 @@ declare namespace Excel {
         }
         /**
          *
+         * Contains the collection of cross-worksheets level Ranges.
+         *
+         * [Api set: ExcelApi 1.12]
+         */
+        interface RangeAreasCollectionLoadOptions {
+            /**
+              Specifying `$all` for the LoadOptions loads all the scalar properties (e.g.: `Range.address`) but not the navigational properties (e.g.: `Range.format.fill.color`).
+             */
+            $all?: boolean;
+            /**
+            *
+            * For EACH ITEM in the collection: Returns a dataValidation object for all ranges in the RangeAreas.
+            *
+            * [Api set: ExcelApi 1.9]
+            */
+            dataValidation?: Excel.Interfaces.DataValidationLoadOptions;
+            /**
+            *
+            * For EACH ITEM in the collection: Returns a RangeFormat object, encapsulating the the font, fill, borders, alignment, and other properties for all ranges in the RangeAreas object.
+            *
+            * [Api set: ExcelApi 1.9]
+            */
+            format?: Excel.Interfaces.RangeFormatLoadOptions;
+            /**
+            *
+            * For EACH ITEM in the collection: Returns the worksheet for the current RangeAreas.
+            *
+            * [Api set: ExcelApi 1.9]
+            */
+            worksheet?: Excel.Interfaces.WorksheetLoadOptions;
+            /**
+             *
+             * For EACH ITEM in the collection: Returns the RangeAreas reference in A1-style. Address value will contain the worksheet name for each rectangular block of cells (e.g., "Sheet1!A1:B4, Sheet1!D1:D4").
+             *
+             * [Api set: ExcelApi 1.9]
+             */
+            address?: boolean;
+            /**
+             *
+             * For EACH ITEM in the collection: Returns the RangeAreas reference in the user locale.
+             *
+             * [Api set: ExcelApi 1.9]
+             */
+            addressLocal?: boolean;
+            /**
+             *
+             * For EACH ITEM in the collection: Returns the number of rectangular ranges that comprise this RangeAreas object.
+             *
+             * [Api set: ExcelApi 1.9]
+             */
+            areaCount?: boolean;
+            /**
+             *
+             * For EACH ITEM in the collection: Returns the number of cells in the RangeAreas object, summing up the cell counts of all of the individual rectangular ranges. Returns -1 if the cell count exceeds 2^31-1 (2,147,483,647).
+             *
+             * [Api set: ExcelApi 1.9]
+             */
+            cellCount?: boolean;
+            /**
+             *
+             * For EACH ITEM in the collection: Specifies if all the ranges on this RangeAreas object represent entire columns (e.g., "A:C, Q:Z").
+             *
+             * [Api set: ExcelApi 1.9]
+             */
+            isEntireColumn?: boolean;
+            /**
+             *
+             * For EACH ITEM in the collection: Specifies if all the ranges on this RangeAreas object represent entire rows (e.g., "1:3, 5:7").
+             *
+             * [Api set: ExcelApi 1.9]
+             */
+            isEntireRow?: boolean;
+            /**
+             *
+             * For EACH ITEM in the collection: Represents the style for all ranges in this RangeAreas object.
+                        If the styles of the cells are inconsistent, null will be returned.
+                        For custom styles, the style name will be returned. For built-in styles, a string representing a value in the BuiltInStyle enum will be returned.
+             *
+             * [Api set: ExcelApi 1.9]
+             */
+            style?: boolean;
+        }
+        /**
+         *
          * Represents a collection of comment objects that are part of the workbook.
          *
          * [Api set: ExcelApi 1.10]
@@ -62673,6 +64078,13 @@ declare namespace Excel {
              * [Api set: ExcelApi 1.10]
              */
             content?: boolean;
+            /**
+             *
+             * For EACH ITEM in the collection: Gets the content type of the comment.
+             *
+             * [Api set: ExcelApi 1.12]
+             */
+            contentType?: boolean;
             /**
              *
              * For EACH ITEM in the collection: Gets the creation time of the comment. Returns null if the comment was converted from a note, since the comment does not have a creation date.
@@ -62743,6 +64155,13 @@ declare namespace Excel {
             content?: boolean;
             /**
              *
+             * Gets the content type of the comment.
+             *
+             * [Api set: ExcelApi 1.12]
+             */
+            contentType?: boolean;
+            /**
+             *
              * Gets the creation time of the comment. Returns null if the comment was converted from a note, since the comment does not have a creation date.
              *
              * [Api set: ExcelApi 1.10]
@@ -62811,6 +64230,13 @@ declare namespace Excel {
             content?: boolean;
             /**
              *
+             * For EACH ITEM in the collection: The content type of the reply.
+             *
+             * [Api set: ExcelApi 1.12]
+             */
+            contentType?: boolean;
+            /**
+             *
              * For EACH ITEM in the collection: Gets the creation time of the comment reply.
              *
              * [Api set: ExcelApi 1.10]
@@ -62877,6 +64303,13 @@ declare namespace Excel {
              * [Api set: ExcelApi 1.10]
              */
             content?: boolean;
+            /**
+             *
+             * The content type of the reply.
+             *
+             * [Api set: ExcelApi 1.12]
+             */
+            contentType?: boolean;
             /**
              *
              * Gets the creation time of the comment reply.
@@ -69815,11 +71248,26 @@ declare namespace Word {
         tableCell = "TableCell",
     }
     /**
+     *
+     * This enum sets where the cursor (insertion point) in the document is after a selection.
+     *
      * [Api set: WordApi]
      */
     enum SelectionMode {
+        /**
+         * The entire range is selected.
+         *
+         */
         select = "Select",
+        /**
+         * The cursor is at the beginning of the selection (just before the start of the selected range).
+         *
+         */
         start = "Start",
+        /**
+         * The cursor is at the end of the selection (just after the end of the selected range).
+         *
+         */
         end = "End",
     }
     /**
@@ -74974,21 +76422,6 @@ declare namespace OneNote {
     }
     /**
      *
-     * Provides information about the binding that raised the StickyNotesContextMenuExecuted event
-     *
-     * [Api set: OneNoteApi 1.5]
-     */
-    interface StickyNotesContextMenuExecutedEventArgs {
-        /**
-         *
-         * Gets the type of the event. See EventType for details.
-         *
-         * [Api set: OneNoteApi 1.5]
-         */
-        type: "StickyNotesContextMenuExecuted";
-    }
-    /**
-     *
      * Provides information about the binding that raised the section selection changed event
      *
      * [Api set: OneNoteApi 1.5]
@@ -75048,81 +76481,71 @@ declare namespace OneNote {
          */
         readonly notebooks: OneNote.NotebookCollection;
         /**
-         *
          * Gets the active notebook if one exists. If no notebook is active, throws ItemNotFound.
-            [Deprecated] use await OneNoteNavigation.getActiveNotebook instead. see OneNoteNavigation.ts
+                    [Deprecated] use await OneNoteNavigation.getActiveNotebook instead. see OneNoteNavigation.ts
          *
          * [Api set: OneNoteApi 1.1]
          */
         getActiveNotebook(): OneNote.Notebook;
         /**
-         *
          * Gets the active notebook if one exists. If no notebook is active, returns null.
-            [Deprecated] use await OneNoteNavigation.getActiveNotebook instead. see OneNoteNavigation.ts
+                    [Deprecated] use await OneNoteNavigation.getActiveNotebook instead. see OneNoteNavigation.ts
          *
          * [Api set: OneNoteApi 1.1]
          */
         getActiveNotebookOrNull(): OneNote.Notebook;
         /**
-         *
          * Gets the active outline if one exists, If no outline is active, throws ItemNotFound.
-            [Deprecated] use await OneNoteNavigation.getActiveOutline instead. see OneNoteNavigation.ts
+                    [Deprecated] use await OneNoteNavigation.getActiveOutline instead. see OneNoteNavigation.ts
          *
          * [Api set: OneNoteApi 1.1]
          */
         getActiveOutline(): OneNote.Outline;
         /**
-         *
          * Gets the active outline if one exists, otherwise returns null.
-            [Deprecated] use await OneNoteNavigation.getActiveOutline instead. see OneNoteNavigation.ts
+                    [Deprecated] use await OneNoteNavigation.getActiveOutline instead. see OneNoteNavigation.ts
          *
          * [Api set: OneNoteApi 1.1]
          */
         getActiveOutlineOrNull(): OneNote.Outline;
         /**
-         *
          * Gets the active page if one exists. If no page is active, throws ItemNotFound.
-            [Deprecated] use await OneNoteNavigation.getActivePage instead. see OneNoteNavigation.ts
+                    [Deprecated] use await OneNoteNavigation.getActivePage instead. see OneNoteNavigation.ts
          *
          * [Api set: OneNoteApi 1.1]
          */
         getActivePage(): OneNote.Page;
         /**
-         *
          * Gets the active page if one exists. If no page is active, returns null.
-            [Deprecated] use await OneNoteNavigation.getActivePage instead. see OneNoteNavigation.ts
+                    [Deprecated] use await OneNoteNavigation.getActivePage instead. see OneNoteNavigation.ts
          *
          * [Api set: OneNoteApi 1.1]
          */
         getActivePageOrNull(): OneNote.Page;
         /**
-         *
          * Gets the active Paragraph if one exists, If no Paragraph is active, throws ItemNotFound.
-            [Deprecated] use await OneNoteNavigation.getActiveParagraph instead. see OneNoteNavigation.ts
+                    [Deprecated] use await OneNoteNavigation.getActiveParagraph instead. see OneNoteNavigation.ts
          *
          * [Api set: OneNoteApi 1.1]
          */
         getActiveParagraph(): OneNote.Paragraph;
         /**
-         *
          * Gets the active Paragraph if one exists, otherwise returns null.
-            [Deprecated] use await OneNoteNavigation.getActiveParagraph instead. see OneNoteNavigation.ts
+                    [Deprecated] use await OneNoteNavigation.getActiveParagraph instead. see OneNoteNavigation.ts
          *
          * [Api set: OneNoteApi 1.1]
          */
         getActiveParagraphOrNull(): OneNote.Paragraph;
         /**
-         *
          * Gets the active section if one exists. If no section is active, throws ItemNotFound.
-            [Deprecated] use await OneNoteNavigation.getActiveSection instead. see OneNoteNavigation.ts
+                    [Deprecated] use await OneNoteNavigation.getActiveSection instead. see OneNoteNavigation.ts
          *
          * [Api set: OneNoteApi 1.1]
          */
         getActiveSection(): OneNote.Section;
         /**
-         *
          * Gets the active section if one exists. If no section is active, returns null.
-            [Deprecated] use await OneNoteNavigation.getActiveSection instead. see OneNoteNavigation.ts
+                    [Deprecated] use await OneNoteNavigation.getActiveSection instead. see OneNoteNavigation.ts
          *
          * [Api set: OneNoteApi 1.1]
          */
@@ -75131,9 +76554,8 @@ declare namespace OneNote {
         insertHtmlAtCurrentPosition(html: string): void;
         isViewingDeletedNotes(): OfficeExtension.ClientResult<boolean>;
         /**
-         *
          * Opens the specified page in the application instance.
-            [Deprecated] use await OneNoteNavigation.navigateToPage instead. see OneNoteNavigation.ts
+                    [Deprecated] use await OneNoteNavigation.navigateToPage instead. see OneNoteNavigation.ts
          *
          * [Api set: OneNoteApi 1.1]
          *
@@ -75141,10 +76563,9 @@ declare namespace OneNote {
          */
         navigateToPage(page: OneNote.Page): void;
         /**
-         *
          * Gets the specified page, and opens it in the application instance.
-            Navigation may still not be carried out when no fails. Caller should validate the returned page if so desired.
-            [Deprecated] use await OneNoteNavigation.navigateToPageWithClientUrl instead. see OneNoteNavigation.ts
+                    Navigation may still not be carried out when no fails. Caller should validate the returned page if so desired.
+                    [Deprecated] use await OneNoteNavigation.navigateToPageWithClientUrl instead. see OneNoteNavigation.ts
          *
          * [Api set: OneNoteApi 1.1]
          *
@@ -75152,61 +76573,41 @@ declare namespace OneNote {
          */
         navigateToPageWithClientUrl(url: string): OneNote.Page;
         /**
-         *
          * Register NotebookChanged event
          *
          * [Api set: OneNoteApi 1.3]
          */
         _RegisterNotebookChangedEvent(): void;
         /**
-         *
          * Register PageSelectionChanged event
          *
          * [Api set: OneNoteApi 1.5]
          */
         _RegisterPageSelectionChangedEvent(): void;
         /**
-         *
          * Register SectionSelectionChanged event
          *
          * [Api set: OneNoteApi 1.5]
          */
         _RegisterSectionSelectionChangedEvent(): void;
         /**
-         *
-         * Register StickyNotesContextMenuExecuted event
-         *
-         * [Api set: OneNoteApi 1.5]
-         */
-        _RegisterStickyNotesContextMenuExecutedEvent(): void;
-        /**
-         *
          * Unregister NotebookChanged event
          *
          * [Api set: OneNoteApi 1.3]
          */
         _UnregisterNotebookChangedEvent(): void;
         /**
-         *
          * Unregister PageSelectionChanged event
          *
          * [Api set: OneNoteApi 1.5]
          */
         _UnregisterPageSelectionChangedEvent(): void;
         /**
-         *
          * Unregister SectionSelectionChanged event
          *
          * [Api set: OneNoteApi 1.5]
          */
         _UnregisterSectionSelectionChangedEvent(): void;
-        /**
-         *
-         * Unregister StickyNotesContextMenuExecuted event
-         *
-         * [Api set: OneNoteApi 1.5]
-         */
-        _UnregisterStickyNotesContextMenuExecutedEvent(): void;
         /**
          * Queues up a command to load the specified properties of the object. You must call `context.sync()` before reading the properties.
          *
@@ -75255,15 +76656,6 @@ declare namespace OneNote {
          * @eventproperty
          */
         readonly onSectionSelectionChanged: OfficeExtension.EventHandlers<OneNote.SectionSelectionChangedEventArgs>;
-        /**
-         *
-         * Occurs when the host sends a command to the add-ins.
-         *
-         * [Api set: OneNoteApi 1.5]
-         *
-         * @eventproperty
-         */
-        readonly onStickyNotesContextMenuExecutedEvent: OfficeExtension.EventHandlers<OneNote.StickyNotesContextMenuExecutedEventArgs>;
         /**
         * Overrides the JavaScript `toJSON()` method in order to provide more useful output when an API object is passed to `JSON.stringify()`. (`JSON.stringify`, in turn, calls the `toJSON` method of the object that is passed to it.)
         * Whereas the original OneNote.Application object is an API object, the `toJSON` method returns a plain JavaScript object (typed as `OneNote.Interfaces.ApplicationData`) that contains shallow copies of any loaded child properties from the original object.
@@ -75440,7 +76832,6 @@ declare namespace OneNote {
          */
         readonly count: number;
         /**
-         *
          * Gets a InkAnalysisParagraph object by ID or by its index in the collection. Read-only.
          *
          * [Api set: OneNoteApi 1.1]
@@ -75449,7 +76840,6 @@ declare namespace OneNote {
          */
         getItem(index: number | string): OneNote.InkAnalysisParagraph;
         /**
-         *
          * Gets a InkAnalysisParagraph on its position in the collection.
          *
          * [Api set: OneNoteApi 1.1]
@@ -75587,7 +76977,6 @@ declare namespace OneNote {
          */
         readonly count: number;
         /**
-         *
          * Gets a InkAnalysisLine object by ID or by its index in the collection. Read-only.
          *
          * [Api set: OneNoteApi 1.1]
@@ -75596,7 +76985,6 @@ declare namespace OneNote {
          */
         getItem(index: number | string): OneNote.InkAnalysisLine;
         /**
-         *
          * Gets a InkAnalysisLine on its position in the collection.
          *
          * [Api set: OneNoteApi 1.1]
@@ -75748,7 +77136,6 @@ declare namespace OneNote {
          */
         readonly count: number;
         /**
-         *
          * Gets a InkAnalysisWord object by ID or by its index in the collection. Read-only.
          *
          * [Api set: OneNoteApi 1.1]
@@ -75757,7 +77144,6 @@ declare namespace OneNote {
          */
         getItem(index: number | string): OneNote.InkAnalysisWord;
         /**
-         *
          * Gets a InkAnalysisWord on its position in the collection.
          *
          * [Api set: OneNoteApi 1.1]
@@ -75939,7 +77325,6 @@ declare namespace OneNote {
          */
         readonly count: number;
         /**
-         *
          * Gets a InkStroke object by ID or by its index in the collection. Read-only.
          *
          * [Api set: OneNoteApi 1.1]
@@ -75948,7 +77333,6 @@ declare namespace OneNote {
          */
         getItem(index: number | string): OneNote.InkStroke;
         /**
-         *
          * Gets a InkStroke on its position in the collection.
          *
          * [Api set: OneNoteApi 1.1]
@@ -76079,7 +77463,6 @@ declare namespace OneNote {
          */
         readonly count: number;
         /**
-         *
          * Gets a InkWord object by ID or by its index in the collection. Read-only.
          *
          * [Api set: OneNoteApi 1.1]
@@ -76088,7 +77471,6 @@ declare namespace OneNote {
          */
         getItem(index: number | string): OneNote.InkWord;
         /**
-         *
          * Gets a InkWord on its position in the collection.
          *
          * [Api set: OneNoteApi 1.1]
@@ -76187,7 +77569,6 @@ declare namespace OneNote {
          */
         readonly name: string;
         /**
-         *
          * Adds a new section to the end of the notebook.
          *
          * [Api set: OneNoteApi 1.1]
@@ -76196,7 +77577,6 @@ declare namespace OneNote {
          */
         addSection(name: string): OneNote.Section;
         /**
-         *
          * Adds a new section group to the end of the notebook.
          *
          * [Api set: OneNoteApi 1.1]
@@ -76205,7 +77585,6 @@ declare namespace OneNote {
          */
         addSectionGroup(name: string): OneNote.SectionGroup;
         /**
-         *
          * Gets the REST API ID.
          *
          * [Api set: OneNoteApi 1.1]
@@ -76265,7 +77644,6 @@ declare namespace OneNote {
          */
         readonly count: number;
         /**
-         *
          * Gets the collection of notebooks with the specified name that are open in the application instance.
          *
          * [Api set: OneNoteApi 1.1]
@@ -76274,7 +77652,6 @@ declare namespace OneNote {
          */
         getByName(name: string): OneNote.NotebookCollection;
         /**
-         *
          * Gets a notebook by ID or by its index in the collection. Read-only.
          *
          * [Api set: OneNoteApi 1.1]
@@ -76283,7 +77660,6 @@ declare namespace OneNote {
          */
         getItem(index: number | string): OneNote.Notebook;
         /**
-         *
          * Gets a notebook on its position in the collection.
          *
          * [Api set: OneNoteApi 1.1]
@@ -76389,7 +77765,6 @@ declare namespace OneNote {
          */
         readonly name: string;
         /**
-         *
          * Adds a new section to the end of the section group.
          *
          * [Api set: OneNoteApi 1.1]
@@ -76398,7 +77773,6 @@ declare namespace OneNote {
          */
         addSection(title: string): OneNote.Section;
         /**
-         *
          * Adds a new section group to the end of this sectionGroup.
          *
          * [Api set: OneNoteApi 1.1]
@@ -76407,7 +77781,6 @@ declare namespace OneNote {
          */
         addSectionGroup(name: string): OneNote.SectionGroup;
         /**
-         *
          * Gets the REST API ID.
          *
          * [Api set: OneNoteApi 1.1]
@@ -76467,7 +77840,6 @@ declare namespace OneNote {
          */
         readonly count: number;
         /**
-         *
          * Gets the collection of section groups with the specified name.
          *
          * [Api set: OneNoteApi 1.1]
@@ -76476,7 +77848,6 @@ declare namespace OneNote {
          */
         getByName(name: string): OneNote.SectionGroupCollection;
         /**
-         *
          * Gets a section group by ID or by its index in the collection. Read-only.
          *
          * [Api set: OneNoteApi 1.1]
@@ -76485,7 +77856,6 @@ declare namespace OneNote {
          */
         getItem(index: number | string): OneNote.SectionGroup;
         /**
-         *
          * Gets a section group on its position in the collection.
          *
          * [Api set: OneNoteApi 1.1]
@@ -76605,7 +77975,6 @@ declare namespace OneNote {
          */
         readonly webUrl: string;
         /**
-         *
          * Adds a new page to the end of the section.
          *
          * [Api set: OneNoteApi 1.1]
@@ -76614,7 +77983,6 @@ declare namespace OneNote {
          */
         addPage(title: string): OneNote.Page;
         /**
-         *
          * Copies this section to specified notebook.
          *
          * [Api set: OneNoteApi 1.1]
@@ -76623,7 +77991,6 @@ declare namespace OneNote {
          */
         copyToNotebook(destinationNotebook: OneNote.Notebook): OneNote.Section;
         /**
-         *
          * Copies this section to specified section group.
          *
          * [Api set: OneNoteApi 1.1]
@@ -76632,14 +77999,12 @@ declare namespace OneNote {
          */
         copyToSectionGroup(destinationSectionGroup: OneNote.SectionGroup): OneNote.Section;
         /**
-         *
          * Gets the REST API ID.
          *
          * [Api set: OneNoteApi 1.1]
          */
         getRestApiId(): OfficeExtension.ClientResult<string>;
         /**
-         *
          * Inserts a new section before or after the current section.
          *
          * [Api set: OneNoteApi 1.1]
@@ -76649,7 +78014,6 @@ declare namespace OneNote {
          */
         insertSectionAsSibling(location: OneNote.InsertLocation, title: string): OneNote.Section;
         /**
-         *
          * Inserts a new section before or after the current section.
          *
          * [Api set: OneNoteApi 1.1]
@@ -76712,7 +78076,6 @@ declare namespace OneNote {
          */
         readonly count: number;
         /**
-         *
          * Gets the collection of sections with the specified name.
          *
          * [Api set: OneNoteApi 1.1]
@@ -76721,7 +78084,6 @@ declare namespace OneNote {
          */
         getByName(name: string): OneNote.SectionCollection;
         /**
-         *
          * Gets a section by ID or by its index in the collection. Read-only.
          *
          * [Api set: OneNoteApi 1.1]
@@ -76730,7 +78092,6 @@ declare namespace OneNote {
          */
         getItem(index: number | string): OneNote.Section;
         /**
-         *
          * Gets a section on its position in the collection.
          *
          * [Api set: OneNoteApi 1.1]
@@ -76857,7 +78218,6 @@ declare namespace OneNote {
         /** Sets multiple properties on the object at the same time, based on an existing loaded object. */
         set(properties: OneNote.Page): void;
         /**
-         *
          * Adds an Outline to the page at the specified position.
          *
          * [Api set: OneNoteApi 1.1]
@@ -76868,14 +78228,12 @@ declare namespace OneNote {
          */
         addOutline(left: number, top: number, html: string): OneNote.Outline;
         /**
-         *
          * Return a json string with node id and content in html format.
          *
          * [Api set: OneNoteApi 1.1]
          */
         analyzePage(): OfficeExtension.ClientResult<string>;
         /**
-         *
          * Inserts a new page with translated content.
          *
          * [Api set: OneNoteApi 1.1]
@@ -76884,7 +78242,6 @@ declare namespace OneNote {
          */
         applyTranslation(translatedContent: string): void;
         /**
-         *
          * Copies this page to specified section.
          *
          * [Api set: OneNoteApi 1.1]
@@ -76893,28 +78250,24 @@ declare namespace OneNote {
          */
         copyToSection(destinationSection: OneNote.Section): OneNote.Page;
         /**
-         *
          * Copies this page to specified section and sets ClassNotebookPageSource.
          *
          * [Api set: OneNoteApi 1.1]
          */
         copyToSectionAndSetClassNotebookPageSource(destinationSection: OneNote.Section): OneNote.Page;
         /**
-         *
          * Gets the REST API ID.
          *
          * [Api set: OneNoteApi 1.1]
          */
         getRestApiId(): OfficeExtension.ClientResult<string>;
         /**
-         *
          * Does the page has content title.
          *
          * [Api set: OneNoteApi 1.1]
          */
         hasTitleContent(): OfficeExtension.ClientResult<boolean>;
         /**
-         *
          * Inserts a new page before or after the current page.
          *
          * [Api set: OneNoteApi 1.1]
@@ -76924,7 +78277,6 @@ declare namespace OneNote {
          */
         insertPageAsSibling(location: OneNote.InsertLocation, title: string): OneNote.Page;
         /**
-         *
          * Inserts a new page before or after the current page.
          *
          * [Api set: OneNoteApi 1.1]
@@ -76987,7 +78339,6 @@ declare namespace OneNote {
          */
         readonly count: number;
         /**
-         *
          * Gets the collection of pages with the specified title.
          *
          * [Api set: OneNoteApi 1.1]
@@ -76996,7 +78347,6 @@ declare namespace OneNote {
          */
         getByTitle(title: string): OneNote.PageCollection;
         /**
-         *
          * Gets a page by ID or by its index in the collection. Read-only.
          *
          * [Api set: OneNoteApi 1.1]
@@ -77005,7 +78355,6 @@ declare namespace OneNote {
          */
         getItem(index: number | string): OneNote.Page;
         /**
-         *
          * Gets a page on its position in the collection.
          *
          * [Api set: OneNoteApi 1.1]
@@ -77125,7 +78474,6 @@ declare namespace OneNote {
         /** Sets multiple properties on the object at the same time, based on an existing loaded object. */
         set(properties: OneNote.PageContent): void;
         /**
-         *
          * Deletes the PageContent object.
          *
          * [Api set: OneNoteApi 1.1]
@@ -77185,7 +78533,6 @@ declare namespace OneNote {
          */
         readonly count: number;
         /**
-         *
          * Gets a PageContent object by ID or by its index in the collection. Read-only.
          *
          * [Api set: OneNoteApi 1.1]
@@ -77194,7 +78541,6 @@ declare namespace OneNote {
          */
         getItem(index: number | string): OneNote.PageContent;
         /**
-         *
          * Gets a page content on its position in the collection.
          *
          * [Api set: OneNoteApi 1.1]
@@ -77265,7 +78611,6 @@ declare namespace OneNote {
          */
         readonly id: string;
         /**
-         *
          * Adds the specified HTML to the bottom of the Outline.
          *
          * [Api set: OneNoteApi 1.1]
@@ -77274,7 +78619,6 @@ declare namespace OneNote {
          */
         appendHtml(html: string): void;
         /**
-         *
          * Adds the specified image to the bottom of the Outline.
          *
          * [Api set: OneNoteApi 1.1]
@@ -77285,7 +78629,6 @@ declare namespace OneNote {
          */
         appendImage(base64EncodedImage: string, width: number, height: number): OneNote.Image;
         /**
-         *
          * Adds the specified text to the bottom of the Outline.
          *
          * [Api set: OneNoteApi 1.1]
@@ -77294,7 +78637,6 @@ declare namespace OneNote {
          */
         appendRichText(paragraphText: string): OneNote.RichText;
         /**
-         *
          * Adds a table with the specified number of rows and columns to the bottom of the outline.
          *
          * [Api set: OneNoteApi 1.1]
@@ -77305,7 +78647,6 @@ declare namespace OneNote {
          */
         appendTable(rowCount: number, columnCount: number, values?: string[][]): OneNote.Table;
         /**
-         *
          * Check if the outline is title outline.
          *
          * [Api set: OneNoteApi 1.1]
@@ -77454,7 +78795,6 @@ declare namespace OneNote {
         /** Sets multiple properties on the object at the same time, based on an existing loaded object. */
         set(properties: OneNote.Paragraph): void;
         /**
-         *
          * Add NoteTag to the paragraph.
          *
          * [Api set: OneNoteApi 1.1]
@@ -77464,7 +78804,6 @@ declare namespace OneNote {
          */
         addNoteTag(type: OneNote.NoteTagType, status: OneNote.NoteTagStatus): OneNote.NoteTag;
         /**
-         *
          * Add NoteTag to the paragraph.
          *
          * [Api set: OneNoteApi 1.1]
@@ -77474,21 +78813,18 @@ declare namespace OneNote {
          */
         addNoteTag(type: "Unknown" | "ToDo" | "Important" | "Question" | "Contact" | "Address" | "PhoneNumber" | "Website" | "Idea" | "Critical" | "ToDoPriority1" | "ToDoPriority2", status: "Unknown" | "Normal" | "Completed" | "Disabled" | "OutlookTask" | "TaskNotSyncedYet" | "TaskRemoved"): OneNote.NoteTag;
         /**
-         *
          * Deletes the paragraph
          *
          * [Api set: OneNoteApi 1.1]
          */
         delete(): void;
         /**
-         *
          * Get list information of paragraph
          *
          * [Api set: OneNoteApi 1.1]
          */
         getParagraphInfo(): OfficeExtension.ClientResult<OneNote.ParagraphInfo>;
         /**
-         *
          * Inserts the specified HTML content
          *
          * [Api set: OneNoteApi 1.1]
@@ -77498,7 +78834,6 @@ declare namespace OneNote {
          */
         insertHtmlAsSibling(insertLocation: OneNote.InsertLocation, html: string): void;
         /**
-         *
          * Inserts the specified HTML content
          *
          * [Api set: OneNoteApi 1.1]
@@ -77508,7 +78843,6 @@ declare namespace OneNote {
          */
         insertHtmlAsSibling(insertLocation: "Before" | "After", html: string): void;
         /**
-         *
          * Inserts the image at the specified insert location..
          *
          * [Api set: OneNoteApi 1.1]
@@ -77520,7 +78854,6 @@ declare namespace OneNote {
          */
         insertImageAsSibling(insertLocation: OneNote.InsertLocation, base64EncodedImage: string, width: number, height: number): OneNote.Image;
         /**
-         *
          * Inserts the image at the specified insert location..
          *
          * [Api set: OneNoteApi 1.1]
@@ -77532,7 +78865,6 @@ declare namespace OneNote {
          */
         insertImageAsSibling(insertLocation: "Before" | "After", base64EncodedImage: string, width: number, height: number): OneNote.Image;
         /**
-         *
          * Inserts the paragraph text at the specifiec insert location.
          *
          * [Api set: OneNoteApi 1.1]
@@ -77542,7 +78874,6 @@ declare namespace OneNote {
          */
         insertRichTextAsSibling(insertLocation: OneNote.InsertLocation, paragraphText: string): OneNote.RichText;
         /**
-         *
          * Inserts the paragraph text at the specifiec insert location.
          *
          * [Api set: OneNoteApi 1.1]
@@ -77552,7 +78883,6 @@ declare namespace OneNote {
          */
         insertRichTextAsSibling(insertLocation: "Before" | "After", paragraphText: string): OneNote.RichText;
         /**
-         *
          * Adds a table with the specified number of rows and columns before or after the current paragraph.
          *
          * [Api set: OneNoteApi 1.1]
@@ -77564,7 +78894,6 @@ declare namespace OneNote {
          */
         insertTableAsSibling(insertLocation: OneNote.InsertLocation, rowCount: number, columnCount: number, values?: string[][]): OneNote.Table;
         /**
-         *
          * Adds a table with the specified number of rows and columns before or after the current paragraph.
          *
          * [Api set: OneNoteApi 1.1]
@@ -77629,7 +78958,6 @@ declare namespace OneNote {
          */
         readonly count: number;
         /**
-         *
          * Gets a Paragraph object by ID or by its index in the collection. Read-only.
          *
          * [Api set: OneNoteApi 1.1]
@@ -77638,7 +78966,6 @@ declare namespace OneNote {
          */
         getItem(index: number | string): OneNote.Paragraph;
         /**
-         *
          * Gets a paragraph on its position in the collection.
          *
          * [Api set: OneNoteApi 1.1]
@@ -77788,7 +79115,6 @@ declare namespace OneNote {
          */
         readonly text: string;
         /**
-         *
          * Get the HTML of the rich text
          *
          * [Api set: OneNoteApi 1.1]
@@ -77910,9 +79236,8 @@ declare namespace OneNote {
         /** Sets multiple properties on the object at the same time, based on an existing loaded object. */
         set(properties: OneNote.Image): void;
         /**
-         *
          * Gets the base64-encoded binary representation of the Image.
-            Example: data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIA...
+                    Example: data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIA...
          *
          * [Api set: OneNoteApi 1.1]
          */
@@ -78018,7 +79343,6 @@ declare namespace OneNote {
         /** Sets multiple properties on the object at the same time, based on an existing loaded object. */
         set(properties: OneNote.Table): void;
         /**
-         *
          * Adds a column to the end of the table. Values, if specified, are set in the new column. Otherwise the column is empty.
          *
          * [Api set: OneNoteApi 1.1]
@@ -78027,7 +79351,6 @@ declare namespace OneNote {
          */
         appendColumn(values?: string[]): void;
         /**
-         *
          * Adds a row to the end of the table. Values, if specified, are set in the new row. Otherwise the row is empty.
          *
          * [Api set: OneNoteApi 1.1]
@@ -78036,14 +79359,12 @@ declare namespace OneNote {
          */
         appendRow(values?: string[]): OneNote.TableRow;
         /**
-         *
          * Clears the contents of the table.
          *
          * [Api set: OneNoteApi 1.1]
          */
         clear(): void;
         /**
-         *
          * Gets the table cell at a specified row and column.
          *
          * [Api set: OneNoteApi 1.1]
@@ -78053,7 +79374,6 @@ declare namespace OneNote {
          */
         getCell(rowIndex: number, cellIndex: number): OneNote.TableCell;
         /**
-         *
          * Inserts a column at the given index in the table. Values, if specified, are set in the new column. Otherwise the column is empty.
          *
          * [Api set: OneNoteApi 1.1]
@@ -78063,7 +79383,6 @@ declare namespace OneNote {
          */
         insertColumn(index: number, values?: string[]): void;
         /**
-         *
          * Inserts a row at the given index in the table. Values, if specified, are set in the new row. Otherwise the row is empty.
          *
          * [Api set: OneNoteApi 1.1]
@@ -78073,9 +79392,8 @@ declare namespace OneNote {
          */
         insertRow(index: number, values?: string[]): OneNote.TableRow;
         /**
-         *
          * Sets the shading color of all cells in the table.
-            The color code to set the cells to.
+                    The color code to set the cells to.
          *
          * [Api set: OneNoteApi 1.1]
          */
@@ -78160,14 +79478,12 @@ declare namespace OneNote {
          */
         readonly rowIndex: number;
         /**
-         *
          * Clears the contents of the row.
          *
          * [Api set: OneNoteApi 1.1]
          */
         clear(): void;
         /**
-         *
          * Inserts a row before or after the current row.
          *
          * [Api set: OneNoteApi 1.1]
@@ -78177,7 +79493,6 @@ declare namespace OneNote {
          */
         insertRowAsSibling(insertLocation: OneNote.InsertLocation, values?: string[]): OneNote.TableRow;
         /**
-         *
          * Inserts a row before or after the current row.
          *
          * [Api set: OneNoteApi 1.1]
@@ -78187,9 +79502,8 @@ declare namespace OneNote {
          */
         insertRowAsSibling(insertLocation: "Before" | "After", values?: string[]): OneNote.TableRow;
         /**
-         *
          * Sets the shading color of all cells in the row.
-            The color code to set the cells to.
+                    The color code to set the cells to.
          *
          * [Api set: OneNoteApi 1.1]
          */
@@ -78248,7 +79562,6 @@ declare namespace OneNote {
          */
         readonly count: number;
         /**
-         *
          * Gets a table row object by ID or by its index in the collection. Read-only.
          *
          * [Api set: OneNoteApi 1.1]
@@ -78257,7 +79570,6 @@ declare namespace OneNote {
          */
         getItem(index: number | string): OneNote.TableRow;
         /**
-         *
          * Gets a table row at its position in the collection.
          *
          * [Api set: OneNoteApi 1.1]
@@ -78363,7 +79675,6 @@ declare namespace OneNote {
         /** Sets multiple properties on the object at the same time, based on an existing loaded object. */
         set(properties: OneNote.TableCell): void;
         /**
-         *
          * Adds the specified HTML to the bottom of the TableCell.
          *
          * [Api set: OneNoteApi 1.1]
@@ -78372,7 +79683,6 @@ declare namespace OneNote {
          */
         appendHtml(html: string): void;
         /**
-         *
          * Adds the specified image to table cell.
          *
          * [Api set: OneNoteApi 1.1]
@@ -78383,7 +79693,6 @@ declare namespace OneNote {
          */
         appendImage(base64EncodedImage: string, width: number, height: number): OneNote.Image;
         /**
-         *
          * Adds the specified text to table cell.
          *
          * [Api set: OneNoteApi 1.1]
@@ -78392,7 +79701,6 @@ declare namespace OneNote {
          */
         appendRichText(paragraphText: string): OneNote.RichText;
         /**
-         *
          * Adds a table with the specified number of rows and columns to table cell.
          *
          * [Api set: OneNoteApi 1.1]
@@ -78403,7 +79711,6 @@ declare namespace OneNote {
          */
         appendTable(rowCount: number, columnCount: number, values?: string[][]): OneNote.Table;
         /**
-         *
          * Clears the contents of the cell.
          *
          * [Api set: OneNoteApi 1.1]
@@ -78463,7 +79770,6 @@ declare namespace OneNote {
          */
         readonly count: number;
         /**
-         *
          * Gets a table cell object by ID or by its index in the collection. Read-only.
          *
          * [Api set: OneNoteApi 1.1]
@@ -78472,7 +79778,6 @@ declare namespace OneNote {
          */
         getItem(index: number | string): OneNote.TableCell;
         /**
-         *
          * Gets a tablecell at its position in the collection.
          *
          * [Api set: OneNoteApi 1.1]
@@ -78566,7 +79871,7 @@ declare namespace OneNote {
         /**
          *
          * //
-            Bullet list type of paragraph
+                    Bullet list type of paragraph
          *
          * [Api set: OneNoteApi 1.1]
          */
@@ -78574,7 +79879,7 @@ declare namespace OneNote {
         /**
          *
          * //
-            Level of indentation of the paragraph
+                    Level of indentation of the paragraph
          *
          * [Api set: OneNoteApi 1.8]
          */
@@ -78582,7 +79887,7 @@ declare namespace OneNote {
         /**
          *
          * //
-            Index of paragraph in a list
+                    Index of paragraph in a list
          *
          * [Api set: OneNoteApi 1.1]
          */
@@ -78590,7 +79895,7 @@ declare namespace OneNote {
         /**
          *
          * //
-            Type of list in paragraph
+                    Type of list in paragraph
          *
          * [Api set: OneNoteApi 1.1]
          */
@@ -78598,7 +79903,7 @@ declare namespace OneNote {
         /**
          *
          * //
-            Numbered list type of paragraph
+                    Numbered list type of paragraph
          *
          * [Api set: OneNoteApi 1.1]
          */
@@ -78739,7 +80044,6 @@ declare namespace OneNote {
      */
     enum EventType {
         notebookChanged = "NotebookChanged",
-        stickyNotesContextMenuExecuted = "StickyNotesContextMenuExecuted",
         sectionSelectionChanged = "SectionSelectionChanged",
         pageSelectionChanged = "PageSelectionChanged",
     }
@@ -83728,9 +85032,368 @@ declare namespace Visio {
 
 
 ////////////////////////////////////////////////////////////////
-///////////////////// Begin PowerPoint APIs ////////////////////
+//////////////////// Begin PowerPoint APIs /////////////////////
 ////////////////////////////////////////////////////////////////
 
+declare namespace PowerPoint {
+    /**
+     * [Api set: PowerPointApi 1.0]
+     */
+    class Application extends OfficeExtension.ClientObject {
+        /** The request context associated with the object. This connects the add-in's process to the Office host application's process. */
+        context: RequestContext;
+        /**
+         * Create a new instance of PowerPoint.Application object
+         */
+        static newObject(context: OfficeExtension.ClientRequestContext): PowerPoint.Application;
+        /**
+        * Overrides the JavaScript `toJSON()` method in order to provide more useful output when an API object is passed to `JSON.stringify()`. (`JSON.stringify`, in turn, calls the `toJSON` method of the object that is passed to it.)
+        * Whereas the original PowerPoint.Application object is an API object, the `toJSON` method returns a plain JavaScript object (typed as `PowerPoint.Interfaces.ApplicationData`) that contains shallow copies of any loaded child properties from the original object.
+        */
+        toJSON(): {
+            [key: string]: string;
+        };
+    }
+    /**
+     * [Api set: PowerPointApi 1.0]
+     */
+    class Presentation extends OfficeExtension.ClientObject {
+        /** The request context associated with the object. This connects the add-in's process to the Office host application's process. */
+        context: RequestContext;
+        /**
+         *
+         * Returns an ordered collection of slides in the presentation.
+         *
+         * [Api set: PowerPointApi 1.2]
+         */
+        readonly slides: PowerPoint.SlideCollection;
+        readonly title: string;
+        /**
+         * Inserts the specified slides from a presentation into the current presentation.
+         *
+         * [Api set: PowerPointApi 1.2]
+         *
+         * @param base64File The base64-encoded string representing the source presentation file.
+         * @param options The options that define which slides will be inserted, where the new slides will go, and which presentation's formatting will be used.
+         */
+        insertSlidesFromBase64(base64File: string, options?: PowerPoint.InsertSlideOptions): void;
+        /**
+         * Queues up a command to load the specified properties of the object. You must call `context.sync()` before reading the properties.
+         *
+         * @param options Provides options for which properties of the object to load.
+         */
+        load(options?: PowerPoint.Interfaces.PresentationLoadOptions): PowerPoint.Presentation;
+        /**
+         * Queues up a command to load the specified properties of the object. You must call `context.sync()` before reading the properties.
+         *
+         * @param propertyNames A comma-delimited string or an array of strings that specify the properties to load.
+         */
+        load(propertyNames?: string | string[]): PowerPoint.Presentation;
+        /**
+         * Queues up a command to load the specified properties of the object. You must call `context.sync()` before reading the properties.
+         *
+         * @param propertyNamesAndPaths `propertyNamesAndPaths.select` is a comma-delimited string that specifies the properties to load, and `propertyNamesAndPaths.expand` is a comma-delimited string that specifies the navigation properties to load.
+         */
+        load(propertyNamesAndPaths?: {
+            select?: string;
+            expand?: string;
+        }): PowerPoint.Presentation;
+        /**
+        * Overrides the JavaScript `toJSON()` method in order to provide more useful output when an API object is passed to `JSON.stringify()`. (`JSON.stringify`, in turn, calls the `toJSON` method of the object that is passed to it.)
+        * Whereas the original PowerPoint.Presentation object is an API object, the `toJSON` method returns a plain JavaScript object (typed as `PowerPoint.Interfaces.PresentationData`) that contains shallow copies of any loaded child properties from the original object.
+        */
+        toJSON(): PowerPoint.Interfaces.PresentationData;
+    }
+    /**
+     *
+     * Specifies the formatting options for when slides are inserted.
+     *
+     * [Api set: PowerPointApi 1.2]
+     */
+    enum InsertSlideFormatting {
+        /**
+         * Copy the source theme into the target presentation and use that theme.
+         *
+         */
+        keepSourceFormatting = "KeepSourceFormatting",
+        /**
+         * Use the existing theme in the target presentation.
+         *
+         */
+        useDestinationTheme = "UseDestinationTheme",
+    }
+    /**
+     *
+     * Represents the available options when inserting slides.
+     *
+     * [Api set: PowerPointApi 1.2]
+     */
+    interface InsertSlideOptions {
+        /**
+         *
+         * Specifies which formatting to use during slide insertion.
+                    The default option is to use "KeepSourceFormatting".
+         *
+         * [Api set: PowerPointApi 1.2]
+         */
+        formatting?: PowerPoint.InsertSlideFormatting | "KeepSourceFormatting" | "UseDestinationTheme";
+        /**
+         *
+         * Specifies the slides from the source presentation that will be inserted into the current presentation. These slides are represented by their IDs which can be retrieved from a `Slide` object.
+                    The order of these slides is preserved during the insertion.
+                    If any of the source slides are not found, or if the IDs are invalid, the operation throws a `SlideNotFound` exception and no slides will be inserted.
+                    All of the source slides will be inserted when `sourceSlideIds` is not provided (this is the default behavior).
+         *
+         * [Api set: PowerPointApi 1.2]
+         */
+        sourceSlideIds?: string[];
+        /**
+         *
+         * Specifies where in the presentation the new slides will be inserted. The new slides will be inserted after the slide with the given slide ID.
+                    If `targetSlideId` is not provided, the slides will be inserted at the beginning of the presentation.
+                    If `targetSlideId` is invalid or if it is pointing to a non-existing slide, the operation throws a `SlideNotFound` exception and no slides will be inserted.
+         *
+         * [Api set: PowerPointApi 1.2]
+         */
+        targetSlideId?: string;
+    }
+    /**
+     *
+     * Represents a single slide of a presentation.
+     *
+     * [Api set: PowerPointApi 1.2]
+     */
+    class Slide extends OfficeExtension.ClientObject {
+        /** The request context associated with the object. This connects the add-in's process to the Office host application's process. */
+        context: RequestContext;
+        /**
+         *
+         * Gets the unique ID of the slide.
+         *
+         * [Api set: PowerPointApi 1.2]
+         */
+        readonly id: string;
+        /**
+         * Deletes the slide from the presentation. Does nothing if the slide does not exist.
+         *
+         * [Api set: PowerPointApi 1.2]
+         */
+        delete(): void;
+        /**
+         * Queues up a command to load the specified properties of the object. You must call `context.sync()` before reading the properties.
+         *
+         * @param options Provides options for which properties of the object to load.
+         */
+        load(options?: PowerPoint.Interfaces.SlideLoadOptions): PowerPoint.Slide;
+        /**
+         * Queues up a command to load the specified properties of the object. You must call `context.sync()` before reading the properties.
+         *
+         * @param propertyNames A comma-delimited string or an array of strings that specify the properties to load.
+         */
+        load(propertyNames?: string | string[]): PowerPoint.Slide;
+        /**
+         * Queues up a command to load the specified properties of the object. You must call `context.sync()` before reading the properties.
+         *
+         * @param propertyNamesAndPaths `propertyNamesAndPaths.select` is a comma-delimited string that specifies the properties to load, and `propertyNamesAndPaths.expand` is a comma-delimited string that specifies the navigation properties to load.
+         */
+        load(propertyNamesAndPaths?: {
+            select?: string;
+            expand?: string;
+        }): PowerPoint.Slide;
+        /**
+        * Overrides the JavaScript `toJSON()` method in order to provide more useful output when an API object is passed to `JSON.stringify()`. (`JSON.stringify`, in turn, calls the `toJSON` method of the object that is passed to it.)
+        * Whereas the original PowerPoint.Slide object is an API object, the `toJSON` method returns a plain JavaScript object (typed as `PowerPoint.Interfaces.SlideData`) that contains shallow copies of any loaded child properties from the original object.
+        */
+        toJSON(): PowerPoint.Interfaces.SlideData;
+    }
+    /**
+     *
+     * Represents the collection of slides in the presentation.
+     *
+     * [Api set: PowerPointApi 1.2]
+     */
+    class SlideCollection extends OfficeExtension.ClientObject {
+        /** The request context associated with the object. This connects the add-in's process to the Office host application's process. */
+        context: RequestContext;
+        /** Gets the loaded child items in this collection. */
+        readonly items: PowerPoint.Slide[];
+        /**
+         * Gets the number of slides in the collection.
+         *
+         * [Api set: PowerPointApi 1.2]
+         * @returns The number of slides in the collection.
+         */
+        getCount(): OfficeExtension.ClientResult<number>;
+        /**
+         * Gets a slide using its unique ID.
+         *
+         * [Api set: PowerPointApi 1.2]
+         *
+         * @param key The ID of the slide.
+         * @returns The slide with the unique ID. If such a slide does not exist, an error is thrown.
+         */
+        getItem(key: string): PowerPoint.Slide;
+        /**
+         * Gets a slide using its zero-based index in the collection. Slides are stored in the same order as they
+                    are shown in the presentation.
+         *
+         * [Api set: PowerPointApi 1.2]
+         *
+         * @param index The index of the slide in the collection.
+         * @returns The slide at the given index. An error is thrown if index is out of range.
+         */
+        getItemAt(index: number): PowerPoint.Slide;
+        /**
+         * Gets a slide using its unique ID. If such a slide does not exist, an object with an `isNullObject` property set to true is returned. For further information,
+                    see {@link https://docs.microsoft.com/office/dev/add-ins/develop/application-specific-api-model#ornullobject-methods-and-properties | *OrNullObject methods
+                    and properties}.
+         *
+         * [Api set: PowerPointApi 1.2]
+         *
+         * @param id The ID of the slide.
+         * @returns The slide with the unique ID.
+         */
+        getItemOrNullObject(id: string): PowerPoint.Slide;
+        /**
+         * Queues up a command to load the specified properties of the object. You must call `context.sync()` before reading the properties.
+         *
+         * @param options Provides options for which properties of the object to load.
+         */
+        load(options?: PowerPoint.Interfaces.SlideCollectionLoadOptions & PowerPoint.Interfaces.CollectionLoadOptions): PowerPoint.SlideCollection;
+        /**
+         * Queues up a command to load the specified properties of the object. You must call `context.sync()` before reading the properties.
+         *
+         * @param propertyNames A comma-delimited string or an array of strings that specify the properties to load.
+         */
+        load(propertyNames?: string | string[]): PowerPoint.SlideCollection;
+        /**
+         * Queues up a command to load the specified properties of the object. You must call `context.sync()` before reading the properties.
+         *
+         * @param propertyNamesAndPaths `propertyNamesAndPaths.select` is a comma-delimited string that specifies the properties to load, and `propertyNamesAndPaths.expand` is a comma-delimited string that specifies the navigation properties to load.
+         */
+        load(propertyNamesAndPaths?: OfficeExtension.LoadOption): PowerPoint.SlideCollection;
+        /**
+        * Overrides the JavaScript `toJSON()` method in order to provide more useful output when an API object is passed to `JSON.stringify()`. (`JSON.stringify`, in turn, calls the `toJSON` method of the object that is passed to it.)
+        * Whereas the original `PowerPoint.SlideCollection` object is an API object, the `toJSON` method returns a plain JavaScript object (typed as `PowerPoint.Interfaces.SlideCollectionData`) that contains an "items" array with shallow copies of any loaded properties from the collection's items.
+        */
+        toJSON(): PowerPoint.Interfaces.SlideCollectionData;
+    }
+    enum ErrorCodes {
+        generalException = "GeneralException",
+    }
+    module Interfaces {
+        /**
+        * Provides ways to load properties of only a subset of members of a collection.
+        */
+        interface CollectionLoadOptions {
+            /**
+            * Specify the number of items in the queried collection to be included in the result.
+            */
+            $top?: number;
+            /**
+            * Specify the number of items in the collection that are to be skipped and not included in the result. If top is specified, the selection of result will start after skipping the specified number of items.
+            */
+            $skip?: number;
+        }
+        /** An interface for updating data on the SlideCollection object, for use in `slideCollection.set({ ... })`. */
+        interface SlideCollectionUpdateData {
+            items?: PowerPoint.Interfaces.SlideData[];
+        }
+        /** An interface describing the data returned by calling `presentation.toJSON()`. */
+        interface PresentationData {
+            title?: string;
+        }
+        /** An interface describing the data returned by calling `slide.toJSON()`. */
+        interface SlideData {
+            /**
+             *
+             * Gets the unique ID of the slide.
+             *
+             * [Api set: PowerPointApi 1.2]
+             */
+            id?: string;
+        }
+        /** An interface describing the data returned by calling `slideCollection.toJSON()`. */
+        interface SlideCollectionData {
+            items?: PowerPoint.Interfaces.SlideData[];
+        }
+        /**
+         * [Api set: PowerPointApi 1.0]
+         */
+        interface PresentationLoadOptions {
+            /**
+              Specifying `$all` for the LoadOptions loads all the scalar properties (e.g.: `Range.address`) but not the navigational properties (e.g.: `Range.format.fill.color`).
+             */
+            $all?: boolean;
+            title?: boolean;
+        }
+        /**
+         *
+         * Represents a single slide of a presentation.
+         *
+         * [Api set: PowerPointApi 1.2]
+         */
+        interface SlideLoadOptions {
+            /**
+              Specifying `$all` for the LoadOptions loads all the scalar properties (e.g.: `Range.address`) but not the navigational properties (e.g.: `Range.format.fill.color`).
+             */
+            $all?: boolean;
+            /**
+             *
+             * Gets the unique ID of the slide.
+             *
+             * [Api set: PowerPointApi 1.2]
+             */
+            id?: boolean;
+        }
+        /**
+         *
+         * Represents the collection of slides in the presentation.
+         *
+         * [Api set: PowerPointApi 1.2]
+         */
+        interface SlideCollectionLoadOptions {
+            /**
+              Specifying `$all` for the LoadOptions loads all the scalar properties (e.g.: `Range.address`) but not the navigational properties (e.g.: `Range.format.fill.color`).
+             */
+            $all?: boolean;
+            /**
+             *
+             * For EACH ITEM in the collection: Gets the unique ID of the slide.
+             *
+             * [Api set: PowerPointApi 1.2]
+             */
+            id?: boolean;
+        }
+    }
+}
+declare namespace PowerPoint {
+    /**
+     * The RequestContext object facilitates requests to the PowerPoint application. Since the Office add-in and the PowerPoint application run in two different processes, the request context is required to get access to the PowerPoint object model from the add-in.
+     */
+    class RequestContext extends OfficeCore.RequestContext {
+        constructor(url?: string);
+        readonly presentation: Presentation;
+        readonly application: Application;
+    }
+    /**
+     * Executes a batch script that performs actions on the PowerPoint object model, using a new RequestContext. When the promise is resolved, any tracked objects that were automatically allocated during execution will be released.
+     * @param batch - A function that takes in a RequestContext and returns a promise (typically, just the result of "context.sync()"). The context parameter facilitates requests to the PowerPoint application. Since the Office add-in and the PowerPoint application run in two different processes, the RequestContext is required to get access to the PowerPoint object model from the add-in.
+     */
+    function run<T>(batch: (context: PowerPoint.RequestContext) => OfficeExtension.IPromise<T>): OfficeExtension.IPromise<T>;
+    /**
+     * Executes a batch script that performs actions on the PowerPoint object model, using the RequestContext of a previously-created API object. When the promise is resolved, any tracked objects that were automatically allocated during execution will be released.
+     * @param object - A previously-created API object. The batch will use the same RequestContext as the passed-in object, which means that any changes applied to the object will be picked up by "context.sync()".
+     * @param batch - A function that takes in a RequestContext and returns a promise (typically, just the result of "context.sync()"). The context parameter facilitates requests to the PowerPoint application. Since the Office add-in and the PowerPoint application run in two different processes, the RequestContext is required to get access to the PowerPoint object model from the add-in.
+     */
+    function run<T>(object: OfficeExtension.ClientObject, batch: (context: PowerPoint.RequestContext) => OfficeExtension.IPromise<T>): OfficeExtension.IPromise<T>;
+    /**
+     * Executes a batch script that performs actions on the PowerPoint object model, using the RequestContext of previously-created API objects.
+     * @param objects - An array of previously-created API objects. The array will be validated to make sure that all of the objects share the same context. The batch will use this shared RequestContext, which means that any changes applied to these objects will be picked up by "context.sync()".
+     * @param batch - A function that takes in a RequestContext and returns a promise (typically, just the result of "context.sync()"). The context parameter facilitates requests to the PowerPoint application. Since the Office add-in and the PowerPoint application run in two different processes, the RequestContext is required to get access to the PowerPoint object model from the add-in.
+     */
+    function run<T>(objects: OfficeExtension.ClientObject[], batch: (context: PowerPoint.RequestContext) => OfficeExtension.IPromise<T>): OfficeExtension.IPromise<T>;
+}
 declare namespace PowerPoint {
     /**
      * Creates and opens a new presentation. Optionally, the presentation can be pre-populated with a base64-encoded .pptx file.
@@ -83742,6 +85405,7 @@ declare namespace PowerPoint {
     function createPresentation(base64File?: string): Promise<void>;
 }
 
+
 ////////////////////////////////////////////////////////////////
-////////////////////// End PowerPoint APIs /////////////////////
+///////////////////// End PowerPoint APIs //////////////////////
 ////////////////////////////////////////////////////////////////

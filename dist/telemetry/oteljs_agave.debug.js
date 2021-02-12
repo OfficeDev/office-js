@@ -1832,12 +1832,13 @@ var oteljs_agave = function(modules) {
             var _a;
             event.dataFields = event.dataFields || [], (_a = event.dataFields).push.apply(_a, this._contextDataFields);
         }, OutlookSink;
-    }(), MAX_SUPPORTED_WIN32_VERSION = [ 16, 0, 11599 ], MIN_SUPPORTED_WIN32_VERSION = [ 16, 0, 4266 ], MAX_SUPPORTED_MAC_VERSION = [ 16, 26 ], MAX_SUPPORTED_IOS_WXP_VERSION = [ 2, 29 ], MAX_SUPPORTED_WEB_OUTLOOK_VERSION = [ 16, 0, 99999 ], _sendEventEnabled = !1;
+    }(), MAX_SUPPORTED_WIN32_VERSION = [ 16, 0, 11599 ], MIN_SUPPORTED_WIN32_VERSION = [ 16, 0, 4266 ], MAX_SUPPORTED_MAC_VERSION = [ 16, 26 ], MAX_SUPPORTED_IOS_WXP_VERSION = [ 2, 29 ], MAX_SUPPORTED_WEB_OUTLOOK_VERSION = [ 16, 0, 99999 ], ALLOWED_APPS = [ "Excel", "Outlook", "PowerPoint", "Project", "Word" ], _sendEventEnabled = !1;
     function canSendToAria() {
         if (!_sendEventEnabled) return !1;
         var platform = TelemetryContext_TelemetryContext.getAppPlatform();
         return function(version, platform, appName) {
             if (!version) return !0;
+            if (!appName || ALLOWED_APPS.indexOf(appName) < 0) return !1;
             var maxVersion, minVersion = [];
             if ("Win32" === platform) maxVersion = MAX_SUPPORTED_WIN32_VERSION, minVersion = MIN_SUPPORTED_WIN32_VERSION; else if ("Mac" === platform) maxVersion = MAX_SUPPORTED_MAC_VERSION; else if ("iOS" === platform) {
                 if ("Outlook" === appName) return !0;

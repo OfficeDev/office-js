@@ -145,15 +145,41 @@ OSF.XdmFieldName = {
     ConversationUrl: "ConversationUrl",
     AppId: "AppId"
 };
+OSF.TestFlightStart = 1000;
+OSF.TestFlightEnd = 1009;
 OSF.FlightNames = {
     UseOriginNotUrl: 0,
     CheckReceiverOrigin: 1,
     AddinEnforceHttps: 2,
     RibbonNativeGroupControl: 3,
     RibbonTabPosition: 4,
-    RibbonTabAutoFocus: 5
+    RibbonTabAutoFocus: 5,
+    FirstPartyAnonymousProxyReadyCheckTimeout: 6,
+    SdxOnWacCDNIsEnabled: 7,
+    AddinRibbonControlsOverriddenByApi: 8,
+    AddinRibbonIdAllowUnknown: 9,
+    AdvancedUrlParsing: 10,
+    IgnoreWindowName: 11,
+    PostMessageParentOnlyOnce: 12,
+    RemoveOptionNotEnforceAppDomains: 13,
+    DialogPromptCleanDisplay: 14,
+    ManifestParserDevConsoleLog: 15,
+    LegacyRibbonAddinCommandsEnableDisableControls: 16,
+    AddInsInSupportedIrmDocsIsEnabled: 17,
+    AddinActionDefinitionHybridMode: 18,
+    OSFTestFlight1000: OSF.TestFlightStart,
+    OSFTestFlight1001: OSF.TestFlightStart + 1,
+    OSFTestFlight1002: OSF.TestFlightStart + 2,
+    OSFTestFlight1003: OSF.TestFlightStart + 3,
+    OSFTestFlight1004: OSF.TestFlightStart + 4,
+    OSFTestFlight1005: OSF.TestFlightStart + 5,
+    OSFTestFlight1006: OSF.TestFlightStart + 6,
+    OSFTestFlight1007: OSF.TestFlightStart + 7,
+    OSFTestFlight1008: OSF.TestFlightStart + 8,
+    OSFTestFlight1009: OSF.TestFlightEnd
 };
 OSF.Flights = [];
+OSF.Settings = {};
 OSF.WindowNameItemKeys = {
     BaseFrameName: "baseFrameName",
     HostInfo: "hostInfo",
@@ -487,6 +513,15 @@ OSF.OUtil = (function () {
                 return true;
             }
             return false;
+        },
+        getBooleanSetting: function OSF_OUtil$getSetting(settingName) {
+            return OSF.OUtil.getBooleanFromDictionary(OSF.Settings, settingName);
+        },
+        getBooleanFromDictionary: function OSF_OUtil$getBooleanFromDictionary(settings, settingName) {
+            var result = (settings && settingName && settings[settingName] !== undefined && settings[settingName] &&
+                ((typeof (settings[settingName]) === "string" && settings[settingName].toUpperCase() === 'TRUE') ||
+                    (typeof (settings[settingName]) === "boolean" && settings[settingName])));
+            return result !== undefined ? result : false;
         },
         parseFlightsFromWindowName: function OSF_OUtil$parseFlightsFromWindowName(skipSessionStorage, windowName) {
             return OSF.OUtil.parseArrayWithDefault(OSF.OUtil.parseInfoFromWindowName(skipSessionStorage, windowName, OSF.WindowNameItemKeys.Flights));
@@ -900,54 +935,179 @@ OSF.OUtil = (function () {
         isFirefox: function OSF_Outil$isFirefox() {
             return window.navigator.userAgent.indexOf("Firefox") > 0;
         },
+        startsWith: function OSF_Outil$startsWith(originalString, patternToCheck, browserIsIE) {
+            if (browserIsIE) {
+                return originalString.substr(0, patternToCheck.length) === patternToCheck;
+            }
+            else {
+                return originalString.startsWith(patternToCheck);
+            }
+        },
+        containsPort: function OSF_Outil$containsPort(url, protocol, hostname, portNumber) {
+            return this.startsWith(url, protocol + "//" + hostname + ":" + portNumber, true) || this.startsWith(url, hostname + ":" + portNumber, true);
+        },
+        getRedundandPortString: function OSF_Outil$getRedundandPortString(url, parser) {
+            if (!url || !parser)
+                return "";
+            if (parser.protocol == "https:" && this.containsPort(url, "https:", parser.hostname, "443"))
+                return ":443";
+            else if (parser.protocol == "http:" && this.containsPort(url, "http:", parser.hostname, "80"))
+                return ":80";
+            return "";
+        },
+        removeChar: function OSF_Outil$removeChar(url, indexOfCharToRemove) {
+            if (indexOfCharToRemove < url.length - 1)
+                return url.substring(0, indexOfCharToRemove) + url.substring(indexOfCharToRemove + 1);
+            else if (indexOfCharToRemove == url.length - 1)
+                return url.substring(0, url.length - 1);
+            else
+                return url;
+        },
+        cleanUrlOfChar: function OSF_Outil$cleanUrlOfChar(url, charToClean) {
+            var i;
+            for (i = 0; i < url.length; i++) {
+                if (url.charAt(i) === charToClean) {
+                    if (i + 1 >= url.length) {
+                        return this.removeChar(url, i);
+                    }
+                    else if (charToClean === '/') {
+                        if (url.charAt(i + 1) === '?' || url.charAt(i + 1) === '#') {
+                            return this.removeChar(url, i);
+                        }
+                    }
+                    else if (charToClean === '?') {
+                        if (url.charAt(i + 1) === '#') {
+                            return this.removeChar(url, i);
+                        }
+                    }
+                }
+            }
+            return url;
+        },
+        cleanUrl: function OSF_Outil$cleanUrl(url) {
+            url = this.cleanUrlOfChar(url, '/');
+            url = this.cleanUrlOfChar(url, '?');
+            url = this.cleanUrlOfChar(url, '#');
+            if (url.substr(0, 8) == "https://") {
+                var portIndex = url.indexOf(":443");
+                if (portIndex != -1) {
+                    if (portIndex == url.length - 4 || url.charAt(portIndex + 4) == "/" || url.charAt(portIndex + 4) == "?" || url.charAt(portIndex + 4) == "#") {
+                        url = url.substring(0, portIndex) + url.substring(portIndex + 4);
+                    }
+                }
+            }
+            else if (url.substr(0, 7) == "http://") {
+                var portIndex = url.indexOf(":80");
+                if (portIndex != -1) {
+                    if (portIndex == url.length - 3 || url.charAt(portIndex + 3) == "/" || url.charAt(portIndex + 3) == "?" || url.charAt(portIndex + 3) == "#") {
+                        url = url.substring(0, portIndex) + url.substring(portIndex + 3);
+                    }
+                }
+            }
+            return url;
+        },
         parseUrl: function OSF_Outil$parseUrl(url, enforceHttps) {
             if (enforceHttps === void 0) { enforceHttps = false; }
             if (typeof url === "undefined" || !url) {
                 return undefined;
             }
             var notHttpsErrorMessage = "NotHttps";
+            var invalidUrlErrorMessage = "InvalidUrl";
             var isIEBoolean = this.isIE();
             var isEdgeBoolean = this.isEdge();
             var parsedUrlObj = {
                 protocol: undefined,
                 hostname: undefined,
-                port: undefined
+                host: undefined,
+                port: undefined,
+                pathname: undefined,
+                search: undefined,
+                hash: undefined,
+                isPortPartOfUrl: undefined
             };
-            try {
-                if (isIEBoolean)
-                    throw "Browser doesn't support new URL library";
-                else if (isEdgeBoolean)
-                    throw "Browser has inconsistent URL library";
-                var urlObj = new URL(url);
-                if (urlObj) {
-                    parsedUrlObj.protocol = urlObj.protocol;
-                    parsedUrlObj.hostname = urlObj.hostname;
-                    parsedUrlObj.port = urlObj.port;
-                    if (OSF.OUtil.checkFlight(OSF.FlightNames.AddinEnforceHttps)) {
-                        if (enforceHttps && urlObj.protocol != "https:")
-                            throw new Error(notHttpsErrorMessage);
+            if (OSF.OUtil.checkFlight(OSF.FlightNames.AdvancedUrlParsing)) {
+                try {
+                    if (isIEBoolean) {
+                        var parser = document.createElement("a");
+                        parser.href = url;
+                        if (!parser || !parser.protocol || !parser.host || !parser.hostname || !parser.href
+                            || this.cleanUrl(parser.href) !== this.cleanUrl(url)) {
+                            throw invalidUrlErrorMessage;
+                        }
+                        if (OSF.OUtil.checkFlight(OSF.FlightNames.AddinEnforceHttps)) {
+                            if (enforceHttps && parser.protocol != "https:")
+                                throw new Error(notHttpsErrorMessage);
+                        }
+                        var redundandPortString = this.getRedundandPortString(url, parser);
+                        parsedUrlObj.protocol = parser.protocol;
+                        parsedUrlObj.hostname = parser.hostname;
+                        parsedUrlObj.port = (redundandPortString == "") ? parser.port : "";
+                        parsedUrlObj.host = (redundandPortString != "") ? parser.hostname : parser.host;
+                        parsedUrlObj.pathname = (isIEBoolean ? "/" : "") + parser.pathname;
+                        parsedUrlObj.search = parser.search;
+                        parsedUrlObj.hash = parser.hash;
+                        parsedUrlObj.isPortPartOfUrl = this.containsPort(url, parser.protocol, parser.hostname, parser.port);
+                    }
+                    else {
+                        var urlObj = new URL(url);
+                        if (urlObj && urlObj.protocol && urlObj.host && urlObj.hostname) {
+                            if (OSF.OUtil.checkFlight(OSF.FlightNames.AddinEnforceHttps)) {
+                                if (enforceHttps && urlObj.protocol != "https:")
+                                    throw new Error(notHttpsErrorMessage);
+                            }
+                            parsedUrlObj.protocol = urlObj.protocol;
+                            parsedUrlObj.hostname = urlObj.hostname;
+                            parsedUrlObj.port = urlObj.port;
+                            parsedUrlObj.host = urlObj.host;
+                            parsedUrlObj.pathname = urlObj.pathname;
+                            parsedUrlObj.search = urlObj.search;
+                            parsedUrlObj.hash = urlObj.hash;
+                            parsedUrlObj.isPortPartOfUrl = urlObj.host.lastIndexOf(":" + urlObj.port) == (urlObj.host.length - urlObj.port.length - 1);
+                        }
                     }
                 }
+                catch (err) {
+                    if (err.message === notHttpsErrorMessage)
+                        throw err;
+                }
             }
-            catch (err) {
-                if (err.message === notHttpsErrorMessage)
-                    throw err;
-                var parser = document.createElement("a");
-                parser.href = url;
-                if ((parser.pathname == '' || parser.pathname == '/')
-                    && !(url.substring(url.length - 1, url.length) === '/')) {
-                    url += '/';
+            else {
+                try {
+                    if (isIEBoolean)
+                        throw "Browser doesn't support new URL library";
+                    else if (isEdgeBoolean)
+                        throw "Browser has inconsistent URL library";
+                    var urlObj = new URL(url);
+                    if (urlObj) {
+                        parsedUrlObj.protocol = urlObj.protocol;
+                        parsedUrlObj.hostname = urlObj.hostname;
+                        parsedUrlObj.port = urlObj.port;
+                        if (OSF.OUtil.checkFlight(OSF.FlightNames.AddinEnforceHttps)) {
+                            if (enforceHttps && urlObj.protocol != "https:")
+                                throw new Error(notHttpsErrorMessage);
+                        }
+                    }
                 }
-                if (OSF.OUtil.checkFlight(OSF.FlightNames.AddinEnforceHttps)) {
-                    if (enforceHttps && parser.protocol != "https:")
-                        throw new Error(notHttpsErrorMessage);
-                }
-                var parsedUrlWithoutPort = parser.protocol + "//" + parser.hostname + (isIEBoolean ? "/" : "") + parser.pathname + parser.search + parser.hash;
-                var parsedUrlWithPort = parser.protocol + "//" + parser.host + (isIEBoolean ? "/" : "") + parser.pathname + parser.search + parser.hash;
-                if (url == parsedUrlWithoutPort || url == parsedUrlWithPort) {
-                    parsedUrlObj.protocol = parser.protocol;
-                    parsedUrlObj.hostname = parser.hostname;
-                    parsedUrlObj.port = parser.port;
+                catch (err) {
+                    if (err.message === notHttpsErrorMessage)
+                        throw err;
+                    var parser = document.createElement("a");
+                    parser.href = url;
+                    if ((parser.pathname == '' || parser.pathname == '/')
+                        && !(url.substring(url.length - 1, url.length) === '/')) {
+                        url += '/';
+                    }
+                    if (OSF.OUtil.checkFlight(OSF.FlightNames.AddinEnforceHttps)) {
+                        if (enforceHttps && parser.protocol != "https:")
+                            throw new Error(notHttpsErrorMessage);
+                    }
+                    var parsedUrlWithoutPort = parser.protocol + "//" + parser.hostname + (isIEBoolean ? "/" : "") + parser.pathname + parser.search + parser.hash;
+                    var parsedUrlWithPort = parser.protocol + "//" + parser.host + (isIEBoolean ? "/" : "") + parser.pathname + parser.search + parser.hash;
+                    if (url == parsedUrlWithoutPort || url == parsedUrlWithPort) {
+                        parsedUrlObj.protocol = parser.protocol;
+                        parsedUrlObj.hostname = parser.hostname;
+                        parsedUrlObj.port = parser.port;
+                    }
                 }
             }
             return parsedUrlObj;
@@ -1133,6 +1293,26 @@ OSF.OUtil = (function () {
                 }
             }
             return false;
+        },
+        hashCode: function OSF_OUtil$hashCode(str) {
+            var hash = 0;
+            if (!OSF.OUtil.isNullOrUndefined(str)) {
+                var i = 0;
+                var len = str.length;
+                while (i < len) {
+                    hash = (hash << 5) - hash + str.charCodeAt(i++) | 0;
+                }
+            }
+            return hash;
+        },
+        getValue: function OSF_OUtil$getValue(value, defaultValue) {
+            if (OSF.OUtil.isNullOrUndefined(value)) {
+                return defaultValue;
+            }
+            return value;
+        },
+        externalNativeFunctionExists: function OSF_OUtil$externalNativeFunctionExists(type) {
+            return type === 'unknown' || type !== 'undefined';
         }
     };
 })();
@@ -1253,7 +1433,9 @@ OSF.AgaveHostAction = {
     "RemoveAppCommandsAddin": 32,
     "RefreshRibbonGallery": 33,
     "GetOriginalControlId": 34,
-    "OfficeJsReady": 35
+    "OfficeJsReady": 35,
+    "InsertDevManifest": 36,
+    "InsertDevManifestError": 37
 };
 OSF.SharedConstants = {
     "NotificationConversationIdSuffix": '_ntf'
@@ -1639,9 +1821,12 @@ OSF.DDA.ErrorCodeManager = (function () {
             ooeInvalidApiArguments: 5013,
             ooeOperationCancelled: 5014,
             ooeWorkbookHidden: 5015,
+            ooeWriteNotSupportedWhenModalDialogOpen: 5016,
             ooeTooManyIncompleteRequests: 5100,
             ooeRequestTokenUnavailable: 5101,
             ooeActivityLimitReached: 5102,
+            ooeRequestPayloadSizeLimitExceeded: 5103,
+            ooeResponsePayloadSizeLimitExceeded: 5104,
             ooeCustomXmlNodeNotFound: 6000,
             ooeCustomXmlError: 6100,
             ooeCustomXmlExceedQuota: 6101,
@@ -1745,11 +1930,14 @@ OSF.DDA.ErrorCodeManager = (function () {
             _errorMappings[OSF.DDA.ErrorCodeManager.errorCodes.ooeBrowserAPINotSupported] = { name: stringNS.L_APINotSupported, message: stringNS.L_BrowserAPINotSupported };
             _errorMappings[OSF.DDA.ErrorCodeManager.errorCodes.ooeRequestTimeout] = { name: stringNS.L_APICallFailed, message: stringNS.L_RequestTimeout };
             _errorMappings[OSF.DDA.ErrorCodeManager.errorCodes.ooeInvalidOrTimedOutSession] = { name: stringNS.L_InvalidOrTimedOutSession, message: stringNS.L_InvalidOrTimedOutSessionMessage };
+            _errorMappings[OSF.DDA.ErrorCodeManager.errorCodes.ooeInvalidApiArguments] = { name: stringNS.L_APICallFailed, message: stringNS.L_InvalidApiArgumentsMessage };
+            _errorMappings[OSF.DDA.ErrorCodeManager.errorCodes.ooeWorkbookHidden] = { name: stringNS.L_APICallFailed, message: stringNS.L_WorkbookHiddenMessage };
+            _errorMappings[OSF.DDA.ErrorCodeManager.errorCodes.ooeWriteNotSupportedWhenModalDialogOpen] = { name: stringNS.L_APICallFailed, message: stringNS.L_WriteNotSupportedWhenModalDialogOpen };
             _errorMappings[OSF.DDA.ErrorCodeManager.errorCodes.ooeTooManyIncompleteRequests] = { name: stringNS.L_APICallFailed, message: stringNS.L_TooManyIncompleteRequests };
             _errorMappings[OSF.DDA.ErrorCodeManager.errorCodes.ooeRequestTokenUnavailable] = { name: stringNS.L_APICallFailed, message: stringNS.L_RequestTokenUnavailable };
             _errorMappings[OSF.DDA.ErrorCodeManager.errorCodes.ooeActivityLimitReached] = { name: stringNS.L_APICallFailed, message: stringNS.L_ActivityLimitReached };
-            _errorMappings[OSF.DDA.ErrorCodeManager.errorCodes.ooeInvalidApiArguments] = { name: stringNS.L_APICallFailed, message: stringNS.L_InvalidApiArgumentsMessage };
-            _errorMappings[OSF.DDA.ErrorCodeManager.errorCodes.ooeWorkbookHidden] = { name: stringNS.L_APICallFailed, message: stringNS.L_WorkbookHiddenMessage };
+            _errorMappings[OSF.DDA.ErrorCodeManager.errorCodes.ooeRequestPayloadSizeLimitExceeded] = { name: stringNS.L_APICallFailed, message: stringNS.L_RequestPayloadSizeLimitExceededMessage };
+            _errorMappings[OSF.DDA.ErrorCodeManager.errorCodes.ooeResponsePayloadSizeLimitExceeded] = { name: stringNS.L_APICallFailed, message: stringNS.L_ResponsePayloadSizeLimitExceededMessage };
             _errorMappings[OSF.DDA.ErrorCodeManager.errorCodes.ooeCustomXmlNodeNotFound] = { name: stringNS.L_InvalidNode, message: stringNS.L_CustomXmlNodeNotFound };
             _errorMappings[OSF.DDA.ErrorCodeManager.errorCodes.ooeCustomXmlError] = { name: stringNS.L_CustomXmlError, message: stringNS.L_CustomXmlError };
             _errorMappings[OSF.DDA.ErrorCodeManager.errorCodes.ooeCustomXmlExceedQuota] = { name: stringNS.L_CustomXmlExceedQuotaName, message: stringNS.L_CustomXmlExceedQuotaMessage };
@@ -4694,7 +4882,7 @@ OSF.initializeRichCommon = function OSF_initializeRichCommon() {
         var context;
         var warningText = "Warning: Office.js is loaded outside of Office client";
         try {
-            if (window.external && typeof window.external.GetContext !== 'undefined') {
+            if (window.external && OSF.OUtil.externalNativeFunctionExists(typeof window.external.GetContext)) {
                 context = OSF.DDA._OsfControlContext = window.external.GetContext();
             }
             else {
@@ -4724,39 +4912,39 @@ OSF.initializeRichCommon = function OSF_initializeRichCommon() {
         catch (ex) {
         }
         var correlationId;
-        if (typeof context.GetCorrelationId !== "undefined") {
+        if (OSF.OUtil.externalNativeFunctionExists(typeof context.GetCorrelationId)) {
             correlationId = context.GetCorrelationId();
         }
         var appInstanceId;
-        if (typeof context.GetInstanceId !== "undefined") {
+        if (OSF.OUtil.externalNativeFunctionExists(typeof context.GetInstanceId)) {
             appInstanceId = context.GetInstanceId();
         }
         var touchEnabled;
-        if (typeof context.GetTouchEnabled !== "undefined") {
+        if (OSF.OUtil.externalNativeFunctionExists(typeof context.GetTouchEnabled)) {
             touchEnabled = context.GetTouchEnabled();
         }
         var commerceAllowed;
-        if (typeof context.GetCommerceAllowed !== "undefined") {
+        if (OSF.OUtil.externalNativeFunctionExists(typeof context.GetCommerceAllowed)) {
             commerceAllowed = context.GetCommerceAllowed();
         }
         var requirementMatrix;
-        if (typeof context.GetSupportedMatrix !== "undefined") {
+        if (OSF.OUtil.externalNativeFunctionExists(typeof context.GetSupportedMatrix)) {
             requirementMatrix = context.GetSupportedMatrix();
         }
         var hostCustomMessage;
-        if (typeof context.GetHostCustomMessage !== "undefined") {
+        if (OSF.OUtil.externalNativeFunctionExists(typeof context.GetHostCustomMessage)) {
             hostCustomMessage = context.GetHostCustomMessage();
         }
         var hostFullVersion;
-        if (typeof context.GetHostFullVersion !== "undefined") {
+        if (OSF.OUtil.externalNativeFunctionExists(typeof context.GetHostFullVersion)) {
             hostFullVersion = context.GetHostFullVersion();
         }
         var dialogRequirementMatrix;
-        if (typeof context.GetDialogRequirementMatrix != "undefined") {
+        if (OSF.OUtil.externalNativeFunctionExists(typeof context.GetDialogRequirementMatrix)) {
             dialogRequirementMatrix = context.GetDialogRequirementMatrix();
         }
         var sdxFeatureGates;
-        if (typeof context.GetFeaturesForSolution != "undefined") {
+        if (OSF.OUtil.externalNativeFunctionExists(typeof context.GetFeaturesForSolution)) {
             try {
                 var sdxFeatureGatesJson = context.GetFeaturesForSolution();
                 if (sdxFeatureGatesJson) {
@@ -4768,7 +4956,7 @@ OSF.initializeRichCommon = function OSF_initializeRichCommon() {
             }
         }
         var initialDisplayMode = 0;
-        if (typeof context.GetInitialDisplayMode != "undefined") {
+        if (OSF.OUtil.externalNativeFunctionExists(typeof context.GetInitialDisplayMode)) {
             initialDisplayMode = context.GetInitialDisplayMode();
         }
         eToken = eToken ? eToken.toString() : "";
@@ -5252,7 +5440,7 @@ var Logger;
 })(Logger || (Logger = {}));
 var OSFAriaLogger;
 (function (OSFAriaLogger) {
-    var TelemetryEventAppActivated = { name: "AppActivated", enabled: true, basic: true, critical: true, points: [
+    var TelemetryEventAppActivated = { name: "AppActivated", enabled: true, critical: true, points: [
             { name: "Browser", type: "string" },
             { name: "Message", type: "string" },
             { name: "AppURL", type: "string" },
@@ -5261,29 +5449,30 @@ var OSFAriaLogger;
             { name: "AppSizeHeight", type: "int64" },
             { name: "IsFromWacAutomation", type: "string" },
         ] };
-    var TelemetryEventScriptLoad = { name: "ScriptLoad", enabled: true, basic: false, critical: false, points: [
+    var TelemetryEventScriptLoad = { name: "ScriptLoad", enabled: true, critical: false, points: [
             { name: "ScriptId", type: "string" },
             { name: "StartTime", type: "double" },
             { name: "ResponseTime", type: "double" },
         ] };
-    var TelemetryEventApiUsage = { name: "APIUsage", enabled: false, basic: false, critical: false, points: [
+    var enableAPIUsage = shouldAPIUsageBeEnabled();
+    var TelemetryEventApiUsage = { name: "APIUsage", enabled: enableAPIUsage, critical: false, points: [
             { name: "APIType", type: "string" },
             { name: "APIID", type: "int64" },
             { name: "Parameters", type: "string" },
             { name: "ResponseTime", type: "int64" },
             { name: "ErrorType", type: "int64" },
         ] };
-    var TelemetryEventAppInitialization = { name: "AppInitialization", enabled: true, basic: false, critical: false, points: [
+    var TelemetryEventAppInitialization = { name: "AppInitialization", enabled: true, critical: false, points: [
             { name: "SuccessCode", type: "int64" },
             { name: "Message", type: "string" },
         ] };
-    var TelemetryEventAppClosed = { name: "AppClosed", enabled: true, basic: false, critical: false, points: [
+    var TelemetryEventAppClosed = { name: "AppClosed", enabled: true, critical: false, points: [
             { name: "FocusTime", type: "int64" },
             { name: "AppSizeFinalWidth", type: "int64" },
             { name: "AppSizeFinalHeight", type: "int64" },
             { name: "OpenTime", type: "int64" },
         ] };
-    var TelemetryEventCheckWACHost = { name: "CheckWACHost", enabled: true, basic: false, critical: false, points: [
+    var TelemetryEventCheckWACHost = { name: "CheckWACHost", enabled: true, critical: false, points: [
             { name: "isWacKnownHost", type: "int64" },
             { name: "solutionId", type: "string" },
             { name: "hostType", type: "string" },
@@ -5344,6 +5533,12 @@ var OSFAriaLogger;
         }
         return eventDefinition.enabled;
     }
+    function shouldAPIUsageBeEnabled() {
+        return (OSF._OfficeAppFactory &&
+            OSF._OfficeAppFactory.getHostInfo &&
+            OSF._OfficeAppFactory.getHostInfo()["hostType"] === "outlook" &&
+            OSF._OfficeAppFactory.getHostInfo()["hostPlatform"] === "mac");
+    }
     function generateTelemetryEvent(eventName, telemetryData) {
         var eventDefinition = getEventDefinition(eventName);
         if (eventDefinition === undefined) {
@@ -5366,9 +5561,7 @@ var OSFAriaLogger;
         if (eventDefinition.critical) {
             flags.samplingPolicy = oteljs.SamplingPolicy.CriticalBusinessImpact;
         }
-        if (eventDefinition.basic) {
-            flags.diagnosticLevel = oteljs.DiagnosticLevel.BasicEvent;
-        }
+        flags.diagnosticLevel = oteljs.DiagnosticLevel.NecessaryServiceDataEvent;
         var eventNameFull = "Office.Extensibility.OfficeJs." + eventName + "X";
         var event = { eventName: eventNameFull, dataFields: dataFields, eventFlags: flags };
         return event;
@@ -5759,7 +5952,6 @@ var OSFAppTelemetry;
             }
         })(context.get_eToken(), appInfo);
         appInfo.sessionId = sessionId;
-        appInfo.name = context.get_addinName();
         if (typeof OTel !== "undefined") {
             OTel.OTelLogger.initialize(appInfo);
         }
@@ -5852,6 +6044,9 @@ var OSFAppTelemetry;
     OSFAppTelemetry.onScriptDone = onScriptDone;
     function onCallDone(apiType, id, parameters, msResponseTime, errorType) {
         if (!appInfo) {
+            return;
+        }
+        if (!isAllowedHost() || !isAPIUsageEnabledDispId(id, apiType)) {
             return;
         }
         var data = new OSFLog.APIUsageUsageData();
@@ -5949,6 +6144,28 @@ var OSFAppTelemetry;
         doAppInitializationLogging(true, errorMessage);
     }
     OSFAppTelemetry.logAppException = logAppException;
+    function isAllowedHost() {
+        return (OSF._OfficeAppFactory &&
+            OSF._OfficeAppFactory.getHostInfo &&
+            OSF._OfficeAppFactory.getHostInfo()["hostType"] === "outlook" &&
+            OSF._OfficeAppFactory.getHostInfo()["hostPlatform"] === "mac");
+    }
+    function isAPIUsageEnabledDispId(dispId, apiType) {
+        if (apiType === "method") {
+            switch (dispId) {
+                case 3:
+                case 4:
+                case 38:
+                case 37:
+                case 10:
+                case 12:
+                    return true;
+                default:
+                    return false;
+            }
+        }
+        return false;
+    }
     OSF.AppTelemetry = OSFAppTelemetry;
 })(OSFAppTelemetry || (OSFAppTelemetry = {}));
 OSF.InitializationHelper.prototype.loadAppSpecificScriptAndCreateOM = function OSF_InitializationHelper$loadAppSpecificScriptAndCreateOM(appContext, appReady, basePath) {
@@ -6386,11 +6603,36 @@ var OfficeExt;
     var RichApiMessageManager = (function () {
         function RichApiMessageManager() {
             this._eventDispatch = null;
+            this._registerHandlers = [];
             this._eventDispatch = new OSF.EventDispatch([
                 Microsoft.Office.WebExtension.EventType.RichApiMessage,
             ]);
             OSF.DDA.DispIdHost.addEventSupport(this, this._eventDispatch);
         }
+        RichApiMessageManager.prototype.register = function (handler) {
+            var _this = this;
+            if (!this._registerWithHostPromise) {
+                this._registerWithHostPromise = new Office.Promise(function (resolve, reject) {
+                    _this.addHandlerAsync(Microsoft.Office.WebExtension.EventType.RichApiMessage, function (args) {
+                        _this._registerHandlers.forEach(function (value) {
+                            if (value) {
+                                value(args);
+                            }
+                        });
+                    }, function (asyncResult) {
+                        if (asyncResult.status == 'failed') {
+                            reject(asyncResult.error);
+                        }
+                        else {
+                            resolve();
+                        }
+                    });
+                });
+            }
+            return this._registerWithHostPromise.then(function () {
+                _this._registerHandlers.push(handler);
+            });
+        };
         return RichApiMessageManager;
     })();
     OfficeExt.RichApiMessageManager = RichApiMessageManager;
@@ -6464,11 +6706,13 @@ OSF.DDA.SafeArray.Delegate.ParameterMap.define({
     Object.defineProperty(exports, "__esModule", {
         value: !0
     });
-    var ApiInformationApi = __webpack_require__(2), DialogApi = __webpack_require__(4), StorageApi = __webpack_require__(5), Experimentation = __webpack_require__(6), officeruntime_message_1 = __webpack_require__(7), DynamicRibbon = __webpack_require__(10), officeruntime_auth_1 = __webpack_require__(11);
+    var AsyncStorage, Storage, ApiInformationApi = __webpack_require__(2), DialogApi = __webpack_require__(4), StorageApi = __webpack_require__(5), AsyncStorageWeb = __webpack_require__(6), StorageWeb = __webpack_require__(7), Experimentation = __webpack_require__(8), officeruntime_message_1 = __webpack_require__(9), DynamicRibbon = __webpack_require__(12), officeruntime_auth_1 = __webpack_require__(13);
+    "undefined" != typeof OSF && OSF._OfficeAppFactory && OSF._OfficeAppFactory.getHostInfo && 0 != (1 & OSF._OfficeAppFactory.getHostInfo().flags) ? (AsyncStorage = AsyncStorageWeb, 
+    Storage = StorageWeb.storage) : (AsyncStorage = StorageApi.AsyncStorage, Storage = StorageApi.storage), 
     window._OfficeRuntimeNative = __assign({}, window.OfficeRuntime, {
         displayWebDialog: DialogApi.displayWebDialog,
-        AsyncStorage: StorageApi.AsyncStorage,
-        storage: StorageApi.storage,
+        AsyncStorage: AsyncStorage,
+        storage: Storage,
         experimentation: Experimentation.experimentation,
         apiInformation: ApiInformationApi.apiInformation,
         message: officeruntime_message_1.Message.instance,
@@ -6996,6 +7240,202 @@ OSF.DDA.SafeArray.Delegate.ParameterMap.define({
     }(exports.ErrorCodes || (exports.ErrorCodes = {}));
 }, function(module, exports, __webpack_require__) {
     "use strict";
+    Object.defineProperty(exports, "__esModule", {
+        value: !0
+    });
+    var prefix = "_Office_AsyncStorage_";
+    function ensureFreshLocalStorage() {
+        window.localStorage.setItem("_Office_AsyncStorage_|_unusedKey_", null), window.localStorage.removeItem("_Office_AsyncStorage_|_unusedKey_");
+    }
+    function performAction(action, callback) {
+        return void 0 === callback && (callback = function() {}), new Promise((function(resolve, reject) {
+            try {
+                ensureFreshLocalStorage(), action(), callback(null), resolve();
+            } catch (e) {
+                callback(e), reject(e);
+            }
+        }));
+    }
+    function performActionAndReturnResult(action, callback) {
+        return void 0 === callback && (callback = function() {}), new Promise((function(resolve, reject) {
+            try {
+                ensureFreshLocalStorage();
+                var result = action();
+                callback(null, result), resolve(result);
+            } catch (e) {
+                callback(e, null), reject(e);
+            }
+        }));
+    }
+    function performMultiAction(collection, action, callback) {
+        return void 0 === callback && (callback = function() {}), new Promise((function(resolve, reject) {
+            var errors = [];
+            try {
+                ensureFreshLocalStorage();
+            } catch (e) {
+                errors.push(e);
+            }
+            collection.forEach((function(item) {
+                try {
+                    action(item);
+                } catch (e) {
+                    errors.push(e);
+                }
+            })), callback(errors), errors.length > 0 ? reject(errors) : resolve();
+        }));
+    }
+    exports.getItem = function(key, callback) {
+        return performActionAndReturnResult((function() {
+            return window.localStorage.getItem(prefix + key);
+        }), callback);
+    }, exports.setItem = function(key, value, callback) {
+        return performAction((function() {
+            return window.localStorage.setItem(prefix + key, value);
+        }), callback);
+    }, exports.removeItem = function(key, callback) {
+        return performAction((function() {
+            return window.localStorage.removeItem(prefix + key);
+        }), callback);
+    }, exports.clear = function(callback) {
+        return performAction((function() {
+            Object.keys(window.localStorage).filter((function(fullKey) {
+                return 0 === fullKey.indexOf(prefix);
+            })).forEach((function(fullKey) {
+                return window.localStorage.removeItem(fullKey);
+            }));
+        }), callback);
+    }, exports.getAllKeys = function(callback) {
+        return performActionAndReturnResult((function() {
+            return Object.keys(window.localStorage).filter((function(fullKey) {
+                return 0 === fullKey.indexOf(prefix);
+            })).map((function(fullKey) {
+                return fullKey.substr(prefix.length);
+            }));
+        }), callback);
+    }, exports.multiSet = function(keyValuePairs, callback) {
+        return performMultiAction(keyValuePairs, (function(_a) {
+            var key = _a[0], value = _a[1];
+            return window.localStorage.setItem(prefix + key, value);
+        }), callback);
+    }, exports.multiRemove = function(keys, callback) {
+        return performMultiAction(keys, (function(key) {
+            return window.localStorage.removeItem(prefix + key);
+        }), callback);
+    }, exports.multiGet = function(keys, callback) {
+        return new Promise((function(resolve, reject) {
+            callback || (callback = function() {});
+            var errors = [], results = keys.map((function(key) {
+                try {
+                    return [ key, window.localStorage.getItem(prefix + key) ];
+                } catch (e) {
+                    errors.push(e);
+                }
+            })).filter((function(pair) {
+                return pair;
+            }));
+            errors.length > 0 ? (callback(errors, results), reject(errors)) : (callback(null, results), 
+            resolve(results));
+        }));
+    };
+}, function(module, exports, __webpack_require__) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", {
+        value: !0
+    });
+    var prefix = "_OfficeRuntime_Storage_";
+    function ensureFreshLocalStorage() {
+        window.localStorage.setItem("_OfficeRuntime_Storage_|_unusedKey_", null), window.localStorage.removeItem("_OfficeRuntime_Storage_|_unusedKey_");
+    }
+    function performAction(action) {
+        return new Promise((function(resolve, reject) {
+            try {
+                ensureFreshLocalStorage(), action(), resolve();
+            } catch (e) {
+                reject(e);
+            }
+        }));
+    }
+    function performActionAndReturnResult(action) {
+        return new Promise((function(resolve, reject) {
+            try {
+                ensureFreshLocalStorage(), resolve(action());
+            } catch (e) {
+                reject(e);
+            }
+        }));
+    }
+    function performMultiAction(collection, action) {
+        return new Promise((function(resolve, reject) {
+            var errors = [];
+            try {
+                ensureFreshLocalStorage();
+            } catch (e) {
+                errors.push(e);
+            }
+            for (var key in collection) if (collection.hasOwnProperty(key) || Array.isArray(collection)) try {
+                Array.isArray(collection) ? action(collection[key]) : action(key);
+            } catch (e) {
+                errors.push(e);
+            }
+            errors.length > 0 ? reject(new Error("Unknown error.")) : resolve();
+        }));
+    }
+    exports.storage = {
+        getItem: function(key) {
+            return performActionAndReturnResult((function() {
+                return window.localStorage.getItem(prefix + key);
+            }));
+        },
+        setItem: function(key, value) {
+            return performAction((function() {
+                return window.localStorage.setItem(prefix + key, value);
+            }));
+        },
+        removeItem: function(key) {
+            return performAction((function() {
+                return window.localStorage.removeItem(prefix + key);
+            }));
+        },
+        getItems: function(keys) {
+            return new Promise((function(resolve, reject) {
+                var result = {}, errors = [];
+                try {
+                    ensureFreshLocalStorage();
+                } catch (e) {
+                    reject(e);
+                }
+                keys.forEach((function(key) {
+                    try {
+                        var value = window.localStorage.getItem(prefix + key);
+                        result[key] = value || null;
+                    } catch (e) {
+                        errors.push(e);
+                    }
+                })), errors.length > 0 ? reject(new Error("Unknown error.")) : resolve(result);
+            }));
+        },
+        setItems: function(keyValues) {
+            return performMultiAction(keyValues, (function(key) {
+                return window.localStorage.setItem(prefix + key, keyValues[key]);
+            }));
+        },
+        removeItems: function(keys) {
+            return performMultiAction(keys, (function(key) {
+                window.localStorage.removeItem(prefix + key);
+            }));
+        },
+        getKeys: function() {
+            return performActionAndReturnResult((function() {
+                return Object.keys(window.localStorage).filter((function(fullKey) {
+                    return 0 === fullKey.indexOf(prefix);
+                })).map((function(fullKey) {
+                    return fullKey.substr(prefix.length);
+                }));
+            }));
+        }
+    };
+}, function(module, exports, __webpack_require__) {
+    "use strict";
     var __awaiter = this && this.__awaiter || function(thisArg, _arguments, P, generator) {
         return new (P || (P = Promise))((function(resolve, reject) {
             function fulfilled(value) {
@@ -7219,14 +7659,14 @@ OSF.DDA.SafeArray.Delegate.ParameterMap.define({
     Object.defineProperty(exports, "__esModule", {
         value: !0
     });
-    var Message_1 = __webpack_require__(8);
+    var Message_1 = __webpack_require__(10);
     exports.Message = Message_1.Message;
 }, function(module, exports, __webpack_require__) {
     "use strict";
     Object.defineProperty(exports, "__esModule", {
         value: !0
     });
-    var ListenerManager_1 = __webpack_require__(9), Message = function() {
+    var ListenerManager_1 = __webpack_require__(11), Message = function() {
         function Message() {
             this.listeners = {};
         }

@@ -1,5 +1,5 @@
 /* Excel specific API library */
-/* Version: 15.0.5233.3000 */
+/* Version: 15.0.5287.1000 */
 /*
 	Copyright (c) Microsoft Corporation.  All rights reserved.
 */
@@ -356,6 +356,59 @@ OSF.OUtil=(function () {
 				}
 			}
 			return osfLocalStorage;
+		},
+		isEdge: function OSF_Outil$isEdge() {
+			return window.navigator.userAgent.indexOf("Edge") > 0;
+		},
+		isIE: function OSF_Outil$isIE() {
+			return window.navigator.userAgent.indexOf("Trident") > 0;
+		},
+		parseUrl: function OSF_Outil$parseUrl(url, enforceHttps) {
+			if (typeof url==="undefined" || !url) {
+				return undefined;
+			}
+			enforceHttps=(typeof enforceHttps !=='undefined') ?  enforceHttps : false;
+			var notHttpsErrorMessage="NotHttps";
+			var isIEBoolean=this.isIE();
+			var isEdgeBoolean=this.isEdge();
+			var parsedUrlObj={
+				protocol: undefined,
+				hostname: undefined,
+				port: undefined
+			};
+			try {
+				if (isIEBoolean) throw "Browser doesn't support new URL library";
+				else if (isEdgeBoolean) throw "Browser has inconsistent URL library";
+				var urlObj=new URL(url);
+				if (urlObj) {
+					parsedUrlObj.protocol=urlObj.protocol;
+					parsedUrlObj.hostname=urlObj.hostname;
+					parsedUrlObj.port=urlObj.port;
+					if (enforceHttps && urlObj.protocol !="https:") {
+						throw new Error(notHttpsErrorMessage);
+					}
+				}
+			}
+			catch (err) {
+				if (err.message===notHttpsErrorMessage) throw err;
+				var parser=document.createElement("a");
+				parser.href=url;
+				if ((parser.pathname=='' || parser.pathname=='/')
+					&& !(url.substring(url.length - 1, url.length)==='/')) {
+						url+='/';
+				}
+				if (enforceHttps && parser.protocol !="https:") {
+					throw new Error(notHttpsErrorMessage);
+				}
+				var parsedUrlWithoutPort=parser.protocol+"//"+parser.hostname+(isIEBoolean ? "/" : "")+parser.pathname+parser.search+parser.hash;
+				var parsedUrlWithPort=parser.protocol+"//"+parser.host+(isIEBoolean ? "/" : "")+parser.pathname+parser.search+parser.hash;
+				if (url==parsedUrlWithoutPort || url==parsedUrlWithPort) {
+					parsedUrlObj.protocol=parser.protocol;
+					parsedUrlObj.hostname=parser.hostname;
+					parsedUrlObj.port=parser.port;
+				}
+			}
+			return parsedUrlObj;
 		},
 		splitStringToList: function OSF_Outil$splitStringToList(input, spliter) {
 			var backslash=false;
@@ -1416,6 +1469,11 @@ Microsoft.Office.Common.ActionType={ "invoke": 0,
 Microsoft.Office.Common.ResponseType={ "forCalling": 0,
 										 "forEventing": 1
 									  };
+Microsoft.Office.Common.HostTrustStatus={ "unknown": 0,
+											"untrusted": 1,
+											"nothttps": 2,
+											"trusted": 3
+										  };
 Microsoft.Office.Common.MethodObject=function Microsoft_Office_Common_MethodObject(method, invokeType, blockingOthers) {
 	this._method=method;
 	this._invokeType=invokeType;
@@ -1567,6 +1625,8 @@ Microsoft.Office.Common.ClientEndPoint=function Microsoft_Office_Common_ClientEn
 	this._callingIndex=0;
 	this._callbackList={};
 	this._eventHandlerList={};
+	this._checkReceiverOriginAndRun=null;
+	this._hostTrustCheckStatus=Microsoft.Office.Common.HostTrustStatus.unknown;
 };
 Microsoft.Office.Common.ClientEndPoint.prototype={
 	invoke: function Microsoft_Office_Common_ClientEndPoint$invoke(targetMethodName, callback, param) {
@@ -1576,32 +1636,47 @@ Microsoft.Office.Common.ClientEndPoint.prototype={
 			{ name: "param", mayBeNull: true }
 		]);
 		if (e) throw e;
-		var correlationId=this._callingIndex++;
-		var now=new Date();
-		var callbackEntry={"callback" : callback, "createdOn": now.getTime() };
-		if(param && typeof param==="object" && typeof param.__timeout__==="number") {
-			callbackEntry.timeout=param.__timeout__;
-			delete param.__timeout__;
-		}
-		this._callbackList[correlationId]=callbackEntry;
-		try {
-			var callRequest=new Microsoft.Office.Common.Request(targetMethodName,
-																  Microsoft.Office.Common.ActionType.invoke,
-																  this._conversationId,
-																  correlationId,
-																  param);
-			var msg=Microsoft.Office.Common.MessagePackager.envelope(callRequest);
-			this._targetWindow.postMessage(msg, this._targetUrl);
-			Microsoft.Office.Common.XdmCommunicationManager._startMethodTimeoutTimer();
-		}
-		catch (ex) {
+		var me=this;
+		var funcToRun=function () {
+			var correlationId=me._callingIndex++;
+			var now=new Date();
+			var callbackEntry={"callback" : callback, "createdOn": now.getTime() };
+			if(param && typeof param==="object" && typeof param.__timeout__==="number") {
+				callbackEntry.timeout=param.__timeout__;
+				delete param.__timeout__;
+			}
+			me._callbackList[correlationId]=callbackEntry;
 			try {
-				if (callback !==null)
-					callback(Microsoft.Office.Common.InvokeResultCode.errorInRequest, ex);
+				if (me._hostTrustCheckStatus !==Microsoft.Office.Common.HostTrustStatus.trusted) {
+					if (targetMethodName !=="ContextActivationManager_getAppContextAsync") {
+						throw "Access Denied";
+					}
+				}
+				var callRequest=new Microsoft.Office.Common.Request(targetMethodName,
+																	  Microsoft.Office.Common.ActionType.invoke,
+																	  me._conversationId,
+																	  correlationId,
+																	  param);
+				var msg=Microsoft.Office.Common.MessagePackager.envelope(callRequest);
+				me._targetWindow.postMessage(msg, me._targetUrl);
+				Microsoft.Office.Common.XdmCommunicationManager._startMethodTimeoutTimer();
 			}
-			finally {
-				delete this._callbackList[correlationId];
+			catch (ex) {
+				try {
+					if (callback !==null)
+						callback(Microsoft.Office.Common.InvokeResultCode.errorInRequest, ex);
+				}
+				finally {
+					delete me._callbackList[correlationId];
+				}
 			}
+		};
+		if (me._checkReceiverOriginAndRun) {
+			me._checkReceiverOriginAndRun(funcToRun);
+		}
+		else {
+			me._hostTrustCheckStatus=Microsoft.Office.Common.HostTrustStatus.trusted;
+			funcToRun();
 		}
 	},
 	registerForEvent: function Microsoft_Office_Common_ClientEndPoint$registerForEvent(targetEventName, eventHandler, callback, data) {
@@ -1797,6 +1872,24 @@ Microsoft.Office.Common.XdmCommunicationManager=(function () {
 		delete url_parser, org_parser;
 		return res;
 	}
+	function _isHostNameValidWacDomain(hostName) {
+		if(!hostName || hostName==="null") {
+			return false;
+		}
+		var regexHostNameStringArray=new Array(
+			"^office-int\\.com$",
+			"^officeapps\\.live-int\\.com$",
+			"^.*\\.dod\\.online\\.office365\\.us$",
+			"^.*\\.gov\\.online\\.office365\\.us$",
+			"^.*\\.officeapps\\.live\\.com$",
+			"^.*\\.officeapps\\.live-int\\.com$",
+			"^.*\\.officeapps-df\\.live\\.com$",
+			"^.*\\.online\\.office\\.de$",
+			"^.*\\.partner\\.officewebapps\\.cn$",
+			"^"+document.domain.replace(new RegExp("\\.", "g"), "\\.")+"$");
+		var regexHostName=new RegExp(regexHostNameStringArray.join("|"));
+		return regexHostName.test(hostName);
+	}
 	function _receive(e) {
 		if (e.data !='') {
 			var messageObject;
@@ -1935,6 +2028,9 @@ Microsoft.Office.Common.XdmCommunicationManager=(function () {
 			if (!_methodTimeoutTimer) {
 				_methodTimeoutTimer=setInterval(_checkMethodTimeout, _methodTimeoutProcessInterval);
 			}
+		},
+		isHostNameValidWacDomain: function Microsoft_Office_Common_XdmCommunicationManager$_isHostNameValidWacDomain(hostName) {
+			return _isHostNameValidWacDomain(hostName);
 		}
 	};
 })();
@@ -6120,6 +6216,59 @@ OSF.OUtil=(function () {
 			}
 			return osfLocalStorage;
 		},
+		isEdge: function OSF_Outil$isEdge() {
+			return window.navigator.userAgent.indexOf("Edge") > 0;
+		},
+		isIE: function OSF_Outil$isIE() {
+			return window.navigator.userAgent.indexOf("Trident") > 0;
+		},
+		parseUrl: function OSF_Outil$parseUrl(url, enforceHttps) {
+			if (typeof url==="undefined" || !url) {
+				return undefined;
+			}
+			enforceHttps=(typeof enforceHttps !=='undefined') ?  enforceHttps : false;
+			var notHttpsErrorMessage="NotHttps";
+			var isIEBoolean=this.isIE();
+			var isEdgeBoolean=this.isEdge();
+			var parsedUrlObj={
+				protocol: undefined,
+				hostname: undefined,
+				port: undefined
+			};
+			try {
+				if (isIEBoolean) throw "Browser doesn't support new URL library";
+				else if (isEdgeBoolean) throw "Browser has inconsistent URL library";
+				var urlObj=new URL(url);
+				if (urlObj) {
+					parsedUrlObj.protocol=urlObj.protocol;
+					parsedUrlObj.hostname=urlObj.hostname;
+					parsedUrlObj.port=urlObj.port;
+					if (enforceHttps && urlObj.protocol !="https:") {
+						throw new Error(notHttpsErrorMessage);
+					}
+				}
+			}
+			catch (err) {
+				if (err.message===notHttpsErrorMessage) throw err;
+				var parser=document.createElement("a");
+				parser.href=url;
+				if ((parser.pathname=='' || parser.pathname=='/')
+					&& !(url.substring(url.length - 1, url.length)==='/')) {
+						url+='/';
+				}
+				if (enforceHttps && parser.protocol !="https:") {
+					throw new Error(notHttpsErrorMessage);
+				}
+				var parsedUrlWithoutPort=parser.protocol+"//"+parser.hostname+(isIEBoolean ? "/" : "")+parser.pathname+parser.search+parser.hash;
+				var parsedUrlWithPort=parser.protocol+"//"+parser.host+(isIEBoolean ? "/" : "")+parser.pathname+parser.search+parser.hash;
+				if (url==parsedUrlWithoutPort || url==parsedUrlWithPort) {
+					parsedUrlObj.protocol=parser.protocol;
+					parsedUrlObj.hostname=parser.hostname;
+					parsedUrlObj.port=parser.port;
+				}
+			}
+			return parsedUrlObj;
+		},
 		splitStringToList: function OSF_Outil$splitStringToList(input, spliter) {
 			var backslash=false;
 			var index=-1;
@@ -7527,6 +7676,91 @@ OSF.InitializationHelper.prototype.getAppContext=function OSF_InitializationHelp
 			this._webAppState.clientEndPoint.invoke("ContextActivationManager_getAppContextAsync", getInvocationCallbackWebApp, this._webAppState.id);
 	}
 };
+OSF.InitializationHelper.prototype.checkReceiverOriginAndRun=function OSF_InitializationHelper$checkReceiverOriginAndRun(funcToRun) {
+	var me=this;
+	var parsedHostname=OSF.OUtil.parseUrl(me._webAppState.clientEndPoint._targetUrl,  false);
+	var isHttps=parsedHostname.protocol=="https:";
+	var notHttpsErrorMessage="NotHttps";
+	if (me._webAppState.clientEndPoint._hostTrustCheckStatus===Microsoft.Office.Common.HostTrustStatus.unknown) {
+		if (!isHttps)
+			me._webAppState.clientEndPoint._hostTrustCheckStatus=Microsoft.Office.Common.HostTrustStatus.nothttps;
+		if (me._webAppState.clientEndPoint._hostTrustCheckStatus !=Microsoft.Office.Common.HostTrustStatus.nothttps) {
+			if (Microsoft.Office.Common.XdmCommunicationManager.isHostNameValidWacDomain(parsedHostname.hostname))
+				me._webAppState.clientEndPoint._hostTrustCheckStatus=Microsoft.Office.Common.HostTrustStatus.trusted;
+		}
+	}
+	if (me._webAppState.clientEndPoint._hostTrustCheckStatus !=Microsoft.Office.Common.HostTrustStatus.trusted) {
+		var loadAgaveErrorUX=function () {
+			var officejsCDNHost=OSF._OfficeAppFactory.getLoadScriptHelper().getOfficeJsBasePath().match(/^https?:\/\/[^:/?#]*(?::([0-9]+))?/);
+			if (officejsCDNHost && officejsCDNHost[0]) {
+				var agaveErrorUXPath=OSF._OfficeAppFactory.getLoadScriptHelper().getOfficeJsBasePath()+'AgaveErrorUX/index.html#';
+				var hashObj={
+					error: "NotTrustedWAC",
+					locale: OSF.getSupportedLocale(me._hostInfo.hostLocale, OSF.ConstantNames.DefaultLocale),
+					hostname: parsedHostname.hostname,
+					noHttps: !isHttps,
+					validate: false
+				}
+				var hostUserTrustIframe=document.createElement("iframe");
+				hostUserTrustIframe.style.visibility="hidden";
+				hostUserTrustIframe.style.height="0";
+				hostUserTrustIframe.style.width="0";
+				function hostUserTrustCallback(event) {
+					if ((event.source==hostUserTrustIframe.contentWindow) &&
+						(event.origin==officejsCDNHost[0])) {
+						try {
+							var receivedObj=JSON.parse(event.data);
+							var e=Function._validateParams(receivedObj, [
+								{ name: "hostUserTrusted", type: Boolean, mayBeNull: false }
+							]);
+							if (receivedObj.hostUserTrusted===true) {
+								me._webAppState.clientEndPoint._hostTrustCheckStatus=Microsoft.Office.Common.HostTrustStatus.trusted;
+								OSF.OUtil.removeEventListener(window, "message", hostUserTrustCallback);
+								document.body.removeChild(hostUserTrustIframe);
+							}
+							else {
+								hashObj.validate=false;
+								window.location.replace(agaveErrorUXPath+encodeURIComponent(JSON.stringify(hashObj)));
+							}
+							funcToRun();
+						}
+						catch (e) {
+							document.body.innerHTML=Strings.OfficeOM.L_NotTrustedWAC;
+						}
+					}
+				};
+				OSF.OUtil.addEventListener(window, "message", hostUserTrustCallback);
+				hashObj.validate=true;
+				hostUserTrustIframe.setAttribute('src', agaveErrorUXPath+encodeURIComponent(JSON.stringify(hashObj)));
+				hostUserTrustIframe.onload=function () {
+					var postingObj={
+						hostname: parsedHostname.hostname,
+						noHttps: !isHttps
+					};
+					hostUserTrustIframe.contentWindow.postMessage(JSON.stringify(postingObj), officejsCDNHost[0]);
+				};
+				document.body.appendChild(hostUserTrustIframe);
+			} else {
+				document.body.innerHTML=Strings.OfficeOM.L_NotTrustedWAC;
+			}
+		}
+		if (document.body) {
+			loadAgaveErrorUX();
+		}
+		else {
+			var checkDone=false;
+			document.addEventListener('DOMContentLoaded', function () {
+				if (!checkDone) {
+					checkDone=true;
+					loadAgaveErrorUX();
+				}
+			});
+		}
+	}
+	else {
+		funcToRun();
+	}
+};
 OSF.InitializationHelper.prototype.setAgaveHostCommunication=function OSF_InitializationHelper$setAgaveHostCommunication() {
 	var me=this;
 	var xdmInfoValue=OSF.OUtil.parseXdmInfo();
@@ -7547,6 +7781,9 @@ OSF.InitializationHelper.prototype.setAgaveHostCommunication=function OSF_Initia
 	if (!me._hostInfo.isRichClient) {
 		me._webAppState.clientEndPoint=Microsoft.Office.Common.XdmCommunicationManager.connect(me._webAppState.conversationID, me._webAppState.wnd, me._webAppState.webAppUrl);
 		me._webAppState.serviceEndPoint=Microsoft.Office.Common.XdmCommunicationManager.createServiceEndPoint(me._webAppState.id);
+		me._webAppState.clientEndPoint._checkReceiverOriginAndRun=function (funcToRun) {
+			me.checkReceiverOriginAndRun(funcToRun);
+		};
 		var notificationConversationId=me._webAppState.conversationID+OSF.SharedConstants.NotificationConversationIdSuffix;
 		me._webAppState.serviceEndPoint.registerConversation(notificationConversationId);
 		var notifyAgave=function OSF_InitializationHelper_setAgaveHostCommunication$notifyAgave(actionId) {

@@ -1,6 +1,6 @@
 /* Outlook Web specific API library */
-/* osfweb version: 16.0.13004.10000 */
-/* office-js-api version: 20200702.1 */
+/* osfweb version: 16.0.13330.10000 */
+/* office-js-api version: 20200930.3 */
 /*
 	Copyright (c) Microsoft Corporation.  All rights reserved.
 */
@@ -15,7 +15,7 @@
         * @version   2.3.0
 */
 /* Outlook OWA specific API library */
-/* Version: 16.0.13004.10000 */
+/* Version: 16.0.13330.10000 */
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
@@ -149,9 +149,23 @@ OSF.XdmFieldName = {
 OSF.FlightNames = {
     UseOriginNotUrl: 0,
     CheckReceiverOrigin: 1,
-    AddinEnforceHttps: 2
+    AddinEnforceHttps: 2,
+    RibbonNativeGroupControl: 3,
+    RibbonTabPosition: 4,
+    RibbonTabAutoFocus: 5,
+    FirstPartyAnonymousProxyReadyCheckTimeout: 6,
+    SdxOnWacCDNIsEnabled: 7,
+    AddinRibbonControlsOverriddenByApi: 8,
+    AddinRibbonIdAllowUnknown: 9,
+    AdvancedUrlParsing: 10,
+    IgnoreWindowName: 11,
+    PostMessageParentOnlyOnce: 12,
+    RemoveOptionNotEnforceAppDomains: 13,
+    DialogPromptCleanDisplay: 14,
+    ManifestParserDevConsoleLog: 15
 };
 OSF.Flights = [];
+OSF.Settings = {};
 OSF.WindowNameItemKeys = {
     BaseFrameName: "baseFrameName",
     HostInfo: "hostInfo",
@@ -485,6 +499,15 @@ OSF.OUtil = (function () {
                 return true;
             }
             return false;
+        },
+        getBooleanSetting: function OSF_OUtil$getSetting(settingName) {
+            return OSF.OUtil.getBooleanFromDictionary(OSF.Settings, settingName);
+        },
+        getBooleanFromDictionary: function OSF_OUtil$getBooleanFromDictionary(settings, settingName) {
+            var result = (settings && settingName && settings[settingName] !== undefined && settings[settingName] &&
+                ((typeof (settings[settingName]) === "string" && settings[settingName].toUpperCase() === 'TRUE') ||
+                    (typeof (settings[settingName]) === "boolean" && settings[settingName])));
+            return result !== undefined ? result : false;
         },
         parseFlightsFromWindowName: function OSF_OUtil$parseFlightsFromWindowName(skipSessionStorage, windowName) {
             return OSF.OUtil.parseArrayWithDefault(OSF.OUtil.parseInfoFromWindowName(skipSessionStorage, windowName, OSF.WindowNameItemKeys.Flights));
@@ -872,16 +895,16 @@ OSF.OUtil = (function () {
             var e = Function._validateParams(arguments, [{ name: "hostname", type: String, mayBeNull: false }
             ]);
             if (e) {
-                var hostnameSubstrings = hostname.split('.');
-                var len = hostnameSubstrings.length;
-                if (len >= 2) {
-                    return hostnameSubstrings[len - 2] + "." + hostnameSubstrings[len - 1];
-                }
-                else if (len == 1) {
-                    return hostnameSubstrings[0];
-                }
+                return "";
             }
-            return "";
+            var hostnameSubstrings = hostname.split('.');
+            var len = hostnameSubstrings.length;
+            if (len >= 2) {
+                return hostnameSubstrings[len - 2] + "." + hostnameSubstrings[len - 1];
+            }
+            else if (len == 1) {
+                return hostnameSubstrings[0];
+            }
         },
         isiOS: function OSF_Outil$isiOS() {
             return (window.navigator.userAgent.match(/(iPad|iPhone|iPod)/g) ? true : false);
@@ -898,54 +921,179 @@ OSF.OUtil = (function () {
         isFirefox: function OSF_Outil$isFirefox() {
             return window.navigator.userAgent.indexOf("Firefox") > 0;
         },
+        startsWith: function OSF_Outil$startsWith(originalString, patternToCheck, browserIsIE) {
+            if (browserIsIE) {
+                return originalString.substr(0, patternToCheck.length) === patternToCheck;
+            }
+            else {
+                return originalString.startsWith(patternToCheck);
+            }
+        },
+        containsPort: function OSF_Outil$containsPort(url, protocol, hostname, portNumber) {
+            return this.startsWith(url, protocol + "//" + hostname + ":" + portNumber, true) || this.startsWith(url, hostname + ":" + portNumber, true);
+        },
+        getRedundandPortString: function OSF_Outil$getRedundandPortString(url, parser) {
+            if (!url || !parser)
+                return "";
+            if (parser.protocol == "https:" && this.containsPort(url, "https:", parser.hostname, "443"))
+                return ":443";
+            else if (parser.protocol == "http:" && this.containsPort(url, "http:", parser.hostname, "80"))
+                return ":80";
+            return "";
+        },
+        removeChar: function OSF_Outil$removeChar(url, indexOfCharToRemove) {
+            if (indexOfCharToRemove < url.length - 1)
+                return url.substring(0, indexOfCharToRemove) + url.substring(indexOfCharToRemove + 1);
+            else if (indexOfCharToRemove == url.length - 1)
+                return url.substring(0, url.length - 1);
+            else
+                return url;
+        },
+        cleanUrlOfChar: function OSF_Outil$cleanUrlOfChar(url, charToClean) {
+            var i;
+            for (i = 0; i < url.length; i++) {
+                if (url.charAt(i) === charToClean) {
+                    if (i + 1 >= url.length) {
+                        return this.removeChar(url, i);
+                    }
+                    else if (charToClean === '/') {
+                        if (url.charAt(i + 1) === '?' || url.charAt(i + 1) === '#') {
+                            return this.removeChar(url, i);
+                        }
+                    }
+                    else if (charToClean === '?') {
+                        if (url.charAt(i + 1) === '#') {
+                            return this.removeChar(url, i);
+                        }
+                    }
+                }
+            }
+            return url;
+        },
+        cleanUrl: function OSF_Outil$cleanUrl(url) {
+            url = this.cleanUrlOfChar(url, '/');
+            url = this.cleanUrlOfChar(url, '?');
+            url = this.cleanUrlOfChar(url, '#');
+            if (url.substr(0, 8) == "https://") {
+                var portIndex = url.indexOf(":443");
+                if (portIndex != -1) {
+                    if (portIndex == url.length - 4 || url.charAt(portIndex + 4) == "/" || url.charAt(portIndex + 4) == "?" || url.charAt(portIndex + 4) == "#") {
+                        url = url.substring(0, portIndex) + url.substring(portIndex + 4);
+                    }
+                }
+            }
+            else if (url.substr(0, 7) == "http://") {
+                var portIndex = url.indexOf(":80");
+                if (portIndex != -1) {
+                    if (portIndex == url.length - 3 || url.charAt(portIndex + 3) == "/" || url.charAt(portIndex + 3) == "?" || url.charAt(portIndex + 3) == "#") {
+                        url = url.substring(0, portIndex) + url.substring(portIndex + 3);
+                    }
+                }
+            }
+            return url;
+        },
         parseUrl: function OSF_Outil$parseUrl(url, enforceHttps) {
             if (enforceHttps === void 0) { enforceHttps = false; }
             if (typeof url === "undefined" || !url) {
                 return undefined;
             }
             var notHttpsErrorMessage = "NotHttps";
+            var invalidUrlErrorMessage = "InvalidUrl";
             var isIEBoolean = this.isIE();
             var isEdgeBoolean = this.isEdge();
             var parsedUrlObj = {
                 protocol: undefined,
                 hostname: undefined,
-                port: undefined
+                host: undefined,
+                port: undefined,
+                pathname: undefined,
+                search: undefined,
+                hash: undefined,
+                isPortPartOfUrl: undefined
             };
-            try {
-                if (isIEBoolean)
-                    throw "Browser doesn't support new URL library";
-                else if (isEdgeBoolean)
-                    throw "Browser has inconsistent URL library";
-                var urlObj = new URL(url);
-                if (urlObj) {
-                    parsedUrlObj.protocol = urlObj.protocol;
-                    parsedUrlObj.hostname = urlObj.hostname;
-                    parsedUrlObj.port = urlObj.port;
-                    if (OSF.OUtil.checkFlight(OSF.FlightNames.AddinEnforceHttps)) {
-                        if (enforceHttps && urlObj.protocol != "https:")
-                            throw new Error(notHttpsErrorMessage);
+            if (OSF.OUtil.checkFlight(OSF.FlightNames.AdvancedUrlParsing)) {
+                try {
+                    if (isIEBoolean) {
+                        var parser = document.createElement("a");
+                        parser.href = url;
+                        if (!parser || !parser.protocol || !parser.host || !parser.hostname || !parser.href
+                            || this.cleanUrl(parser.href) !== this.cleanUrl(url)) {
+                            throw invalidUrlErrorMessage;
+                        }
+                        if (OSF.OUtil.checkFlight(OSF.FlightNames.AddinEnforceHttps)) {
+                            if (enforceHttps && parser.protocol != "https:")
+                                throw new Error(notHttpsErrorMessage);
+                        }
+                        var redundandPortString = this.getRedundandPortString(url, parser);
+                        parsedUrlObj.protocol = parser.protocol;
+                        parsedUrlObj.hostname = parser.hostname;
+                        parsedUrlObj.port = (redundandPortString == "") ? parser.port : "";
+                        parsedUrlObj.host = (redundandPortString != "") ? parser.hostname : parser.host;
+                        parsedUrlObj.pathname = (isIEBoolean ? "/" : "") + parser.pathname;
+                        parsedUrlObj.search = parser.search;
+                        parsedUrlObj.hash = parser.hash;
+                        parsedUrlObj.isPortPartOfUrl = this.containsPort(url, parser.protocol, parser.hostname, parser.port);
+                    }
+                    else {
+                        var urlObj = new URL(url);
+                        if (urlObj && urlObj.protocol && urlObj.host && urlObj.hostname) {
+                            if (OSF.OUtil.checkFlight(OSF.FlightNames.AddinEnforceHttps)) {
+                                if (enforceHttps && urlObj.protocol != "https:")
+                                    throw new Error(notHttpsErrorMessage);
+                            }
+                            parsedUrlObj.protocol = urlObj.protocol;
+                            parsedUrlObj.hostname = urlObj.hostname;
+                            parsedUrlObj.port = urlObj.port;
+                            parsedUrlObj.host = urlObj.host;
+                            parsedUrlObj.pathname = urlObj.pathname;
+                            parsedUrlObj.search = urlObj.search;
+                            parsedUrlObj.hash = urlObj.hash;
+                            parsedUrlObj.isPortPartOfUrl = urlObj.host.lastIndexOf(":" + urlObj.port) == (urlObj.host.length - urlObj.port.length - 1);
+                        }
                     }
                 }
+                catch (err) {
+                    if (err.message === notHttpsErrorMessage)
+                        throw err;
+                }
             }
-            catch (err) {
-                if (err.message === notHttpsErrorMessage)
-                    throw err;
-                var parser = document.createElement("a");
-                parser.href = url;
-                if ((parser.pathname == '' || parser.pathname == '/')
-                    && !(url.substring(url.length - 1, url.length) === '/')) {
-                    url += '/';
+            else {
+                try {
+                    if (isIEBoolean)
+                        throw "Browser doesn't support new URL library";
+                    else if (isEdgeBoolean)
+                        throw "Browser has inconsistent URL library";
+                    var urlObj = new URL(url);
+                    if (urlObj) {
+                        parsedUrlObj.protocol = urlObj.protocol;
+                        parsedUrlObj.hostname = urlObj.hostname;
+                        parsedUrlObj.port = urlObj.port;
+                        if (OSF.OUtil.checkFlight(OSF.FlightNames.AddinEnforceHttps)) {
+                            if (enforceHttps && urlObj.protocol != "https:")
+                                throw new Error(notHttpsErrorMessage);
+                        }
+                    }
                 }
-                if (OSF.OUtil.checkFlight(OSF.FlightNames.AddinEnforceHttps)) {
-                    if (enforceHttps && parser.protocol != "https:")
-                        throw new Error(notHttpsErrorMessage);
-                }
-                var parsedUrlWithoutPort = parser.protocol + "//" + parser.hostname + (isIEBoolean ? "/" : "") + parser.pathname + parser.search + parser.hash;
-                var parsedUrlWithPort = parser.protocol + "//" + parser.host + (isIEBoolean ? "/" : "") + parser.pathname + parser.search + parser.hash;
-                if (url == parsedUrlWithoutPort || url == parsedUrlWithPort) {
-                    parsedUrlObj.protocol = parser.protocol;
-                    parsedUrlObj.hostname = parser.hostname;
-                    parsedUrlObj.port = parser.port;
+                catch (err) {
+                    if (err.message === notHttpsErrorMessage)
+                        throw err;
+                    var parser = document.createElement("a");
+                    parser.href = url;
+                    if ((parser.pathname == '' || parser.pathname == '/')
+                        && !(url.substring(url.length - 1, url.length) === '/')) {
+                        url += '/';
+                    }
+                    if (OSF.OUtil.checkFlight(OSF.FlightNames.AddinEnforceHttps)) {
+                        if (enforceHttps && parser.protocol != "https:")
+                            throw new Error(notHttpsErrorMessage);
+                    }
+                    var parsedUrlWithoutPort = parser.protocol + "//" + parser.hostname + (isIEBoolean ? "/" : "") + parser.pathname + parser.search + parser.hash;
+                    var parsedUrlWithPort = parser.protocol + "//" + parser.host + (isIEBoolean ? "/" : "") + parser.pathname + parser.search + parser.hash;
+                    if (url == parsedUrlWithoutPort || url == parsedUrlWithPort) {
+                        parsedUrlObj.protocol = parser.protocol;
+                        parsedUrlObj.hostname = parser.hostname;
+                        parsedUrlObj.port = parser.port;
+                    }
                 }
             }
             return parsedUrlObj;
@@ -1131,6 +1279,26 @@ OSF.OUtil = (function () {
                 }
             }
             return false;
+        },
+        hashCode: function OSF_OUtil$hashCode(str) {
+            var hash = 0;
+            if (!OSF.OUtil.isNullOrUndefined(str)) {
+                var i = 0;
+                var len = str.length;
+                while (i < len) {
+                    hash = (hash << 5) - hash + str.charCodeAt(i++) | 0;
+                }
+            }
+            return hash;
+        },
+        getValue: function OSF_OUtil$getValue(value, defaultValue) {
+            if (OSF.OUtil.isNullOrUndefined(value)) {
+                return defaultValue;
+            }
+            return value;
+        },
+        externalNativeFunctionExists: function OSF_OUtil$externalNativeFunctionExists(type) {
+            return type === 'unknown' || type !== 'undefined';
         }
     };
 })();
@@ -1249,7 +1417,10 @@ OSF.AgaveHostAction = {
     "DisableTaskPaneHeaderButton": 30,
     "TaskPaneHeaderButtonClicked": 31,
     "RemoveAppCommandsAddin": 32,
-    "RefreshRibbonGallery": 33
+    "RefreshRibbonGallery": 33,
+    "GetOriginalControlId": 34,
+    "OfficeJsReady": 35,
+    "InsertDevManifest": 36
 };
 OSF.SharedConstants = {
     "NotificationConversationIdSuffix": '_ntf'
@@ -1635,9 +1806,11 @@ OSF.DDA.ErrorCodeManager = (function () {
             ooeInvalidApiArguments: 5013,
             ooeOperationCancelled: 5014,
             ooeWorkbookHidden: 5015,
+            ooeWriteNotSupportedWhenModalDialogOpen: 5016,
             ooeTooManyIncompleteRequests: 5100,
             ooeRequestTokenUnavailable: 5101,
             ooeActivityLimitReached: 5102,
+            ooeRequestPayloadSizeLimitExceeded: 5103,
             ooeCustomXmlNodeNotFound: 6000,
             ooeCustomXmlError: 6100,
             ooeCustomXmlExceedQuota: 6101,
@@ -1741,11 +1914,13 @@ OSF.DDA.ErrorCodeManager = (function () {
             _errorMappings[OSF.DDA.ErrorCodeManager.errorCodes.ooeBrowserAPINotSupported] = { name: stringNS.L_APINotSupported, message: stringNS.L_BrowserAPINotSupported };
             _errorMappings[OSF.DDA.ErrorCodeManager.errorCodes.ooeRequestTimeout] = { name: stringNS.L_APICallFailed, message: stringNS.L_RequestTimeout };
             _errorMappings[OSF.DDA.ErrorCodeManager.errorCodes.ooeInvalidOrTimedOutSession] = { name: stringNS.L_InvalidOrTimedOutSession, message: stringNS.L_InvalidOrTimedOutSessionMessage };
+            _errorMappings[OSF.DDA.ErrorCodeManager.errorCodes.ooeInvalidApiArguments] = { name: stringNS.L_APICallFailed, message: stringNS.L_InvalidApiArgumentsMessage };
+            _errorMappings[OSF.DDA.ErrorCodeManager.errorCodes.ooeWorkbookHidden] = { name: stringNS.L_APICallFailed, message: stringNS.L_WorkbookHiddenMessage };
+            _errorMappings[OSF.DDA.ErrorCodeManager.errorCodes.ooeWriteNotSupportedWhenModalDialogOpen] = { name: stringNS.L_APICallFailed, message: stringNS.L_WriteNotSupportedWhenModalDialogOpen };
             _errorMappings[OSF.DDA.ErrorCodeManager.errorCodes.ooeTooManyIncompleteRequests] = { name: stringNS.L_APICallFailed, message: stringNS.L_TooManyIncompleteRequests };
             _errorMappings[OSF.DDA.ErrorCodeManager.errorCodes.ooeRequestTokenUnavailable] = { name: stringNS.L_APICallFailed, message: stringNS.L_RequestTokenUnavailable };
             _errorMappings[OSF.DDA.ErrorCodeManager.errorCodes.ooeActivityLimitReached] = { name: stringNS.L_APICallFailed, message: stringNS.L_ActivityLimitReached };
-            _errorMappings[OSF.DDA.ErrorCodeManager.errorCodes.ooeInvalidApiArguments] = { name: stringNS.L_APICallFailed, message: stringNS.L_InvalidApiArgumentsMessage };
-            _errorMappings[OSF.DDA.ErrorCodeManager.errorCodes.ooeWorkbookHidden] = { name: stringNS.L_APICallFailed, message: stringNS.L_WorkbookHiddenMessage };
+            _errorMappings[OSF.DDA.ErrorCodeManager.errorCodes.ooeRequestPayloadSizeLimitExceeded] = { name: stringNS.L_APICallFailed, message: stringNS.L_RequestPayloadSizeLimitExceededMessage };
             _errorMappings[OSF.DDA.ErrorCodeManager.errorCodes.ooeCustomXmlNodeNotFound] = { name: stringNS.L_InvalidNode, message: stringNS.L_CustomXmlNodeNotFound };
             _errorMappings[OSF.DDA.ErrorCodeManager.errorCodes.ooeCustomXmlError] = { name: stringNS.L_CustomXmlError, message: stringNS.L_CustomXmlError };
             _errorMappings[OSF.DDA.ErrorCodeManager.errorCodes.ooeCustomXmlExceedQuota] = { name: stringNS.L_CustomXmlExceedQuotaName, message: stringNS.L_CustomXmlExceedQuotaMessage };
@@ -3871,36 +4046,40 @@ var OfficeExt;
             if (typeof url === "undefined" || !url) {
                 return undefined;
             }
-            var host;
+            var host = undefined;
             var httpsProtocol = "https:";
             try {
                 var urlObj = new URL(url);
-                if (urlObj)
+                if (urlObj) {
                     host = urlObj.host;
-                if (urlObj.protocol !== httpsProtocol) {
+                }
+                if (!urlObj.protocol) {
+                    throw "fallback";
+                }
+                else if (urlObj.protocol !== httpsProtocol) {
                     return undefined;
                 }
             }
-            catch (err) {
-                var parser = document.createElement("a");
-                parser.href = url;
-                if (parser.protocol !== httpsProtocol) {
+            catch (ex) {
+                try {
+                    var parser = document.createElement("a");
+                    parser.href = url;
+                    if (parser.protocol !== httpsProtocol) {
+                        return undefined;
+                    }
+                    var match = url.match(new RegExp("^https://[^/?#]+", "i"));
+                    var naiveMatch = (match && match.length == 1) ? match[0].toLowerCase() : "";
+                    var parsedUrlWithoutPort = (parser.protocol + "//" + parser.hostname).toLowerCase();
+                    var parsedUrlWithPort = (parser.protocol + "//" + parser.host).toLowerCase();
+                    if (parsedUrlWithPort === naiveMatch || parsedUrlWithoutPort == naiveMatch) {
+                        host = parser.port == "443" ? parser.hostname : parser.host;
+                    }
+                }
+                catch (ex) {
                     return undefined;
                 }
-                var stringEndsWithSlash = function (str) {
-                    return str.substring(str.length - 1, str.length) === '/';
-                };
-                if ((parser.pathname === '' || parser.pathname === '/')
-                    && !stringEndsWithSlash(url)) {
-                    url += '/';
-                }
-                var parsedUrlWithoutPort = parser.protocol + "//" + parser.hostname + (stringEndsWithSlash(parser.hostname) ? "" : "/") + parser.pathname + parser.search + parser.hash;
-                var parsedUrlWithPort = parser.protocol + "//" + parser.host + (stringEndsWithSlash(parser.host) ? "" : "/") + parser.pathname + parser.search + parser.hash;
-                if (url == parsedUrlWithoutPort || url == parsedUrlWithPort) {
-                    host = parser.port == "443" ? parser.hostname : parser.host;
-                }
             }
-            return host;
+            return host ? host.toLowerCase() : undefined;
         }
         WACUtils.getHostSecure = getHostSecure;
         var CacheConstants = (function () {
@@ -4200,8 +4379,7 @@ Microsoft.Office.Common.ClientEndPoint.prototype = {
                 }
             }
         };
-        if (OSF.OUtil.checkFlight(OSF.FlightNames.CheckReceiverOrigin) &&
-            me._checkReceiverOriginAndRun) {
+        if (me._checkReceiverOriginAndRun) {
             me._checkReceiverOriginAndRun(funcToRun);
         }
         else {
@@ -4446,7 +4624,7 @@ Microsoft.Office.Common.XdmCommunicationManager = (function () {
         if (!hostName || hostName === "null") {
             return false;
         }
-        var regexHostNameStringArray = new Array("^office-int\\.com$", "^officeapps\\.live-int\\.com$", "^.*\\.dod\\.online\\.office365\\.us$", "^.*\\.gov\\.online\\.office365\\.us$", "^.*\\.officeapps\\.live\\.com$", "^.*\\.officeapps\\.live-int\\.com$", "^.*\\.officeapps-df\\.live\\.com$", "^.*\\.online\\.office\\.de$", "^.*\\.partner\\.officewebapps\\.cn$", "^" + document.domain.replace(new RegExp("\\.", "g"), "\\.") + "$");
+        var regexHostNameStringArray = new Array("^office-int\\.com$", "^officeapps\\.live-int\\.com$", "^.*\\.dod\\.online\\.office365\\.us$", "^.*\\.gov\\.online\\.office365\\.us$", "^.*\\.officeapps\\.live\\.com$", "^.*\\.officeapps\\.live-int\\.com$", "^.*\\.officeapps-df\\.live\\.com$", "^.*\\.online\\.office\\.de$", "^.*\\.partner\\.officewebapps\\.cn$", "^.*\\.office\\.net$", "^" + document.domain.replace(new RegExp("\\.", "g"), "\\.") + "$");
         var regexHostName = new RegExp(regexHostNameStringArray.join("|"));
         return regexHostName.test(hostName);
     }
@@ -4583,30 +4761,6 @@ Microsoft.Office.Common.XdmCommunicationManager = (function () {
             }
             else if (messageObject._messageType === Microsoft.Office.Common.MessageType.response) {
                 var clientEndPoint = _lookupClientEndPoint(messageObject._conversationId);
-                if (messageObject._actionName == "ContextActivationManager_getAppContextAsync") {
-                    try {
-                        if (OSF.OUtil.checkFlight(OSF.FlightNames.AddinEnforceHttps)) {
-                            var wachostname = OSF.OUtil.parseUrl(e.origin, true).hostname;
-                            var isOriginValid = _isHostNameValidWacDomain(wachostname);
-                        }
-                        else {
-                            var wacorigin = e.origin;
-                            var parser = document.createElement("a");
-                            parser.href = wacorigin;
-                            var isOriginValid = _isHostNameValidWacDomain(parser.hostname);
-                        }
-                        var isWacKnownHost = isOriginValid ? 1 : 0;
-                        var hostInfo = OSF._OfficeAppFactory.getHostInfo();
-                        OSF.AppTelemetry.onCheckWACHost(isWacKnownHost, messageObject._data._id, hostInfo.hostType, hostInfo.hostPlatform, messageObject._data._correlationId, wacorigin);
-                        if (!isWacKnownHost) {
-                            if (clientEndPoint && clientEndPoint._onSenderOriginNotTrusted) {
-                                clientEndPoint._onSenderOriginNotTrusted();
-                            }
-                        }
-                    }
-                    catch (ex) {
-                    }
-                }
                 if (!clientEndPoint) {
                     return;
                 }
@@ -6148,7 +6302,7 @@ var Logger;
 })(Logger || (Logger = {}));
 var OSFAriaLogger;
 (function (OSFAriaLogger) {
-    var TelemetryEventAppActivated = { name: "AppActivated", enabled: true, basic: true, critical: true, points: [
+    var TelemetryEventAppActivated = { name: "AppActivated", enabled: true, critical: true, points: [
             { name: "Browser", type: "string" },
             { name: "Message", type: "string" },
             { name: "AppURL", type: "string" },
@@ -6157,29 +6311,29 @@ var OSFAriaLogger;
             { name: "AppSizeHeight", type: "int64" },
             { name: "IsFromWacAutomation", type: "string" },
         ] };
-    var TelemetryEventScriptLoad = { name: "ScriptLoad", enabled: true, basic: false, critical: false, points: [
+    var TelemetryEventScriptLoad = { name: "ScriptLoad", enabled: true, critical: false, points: [
             { name: "ScriptId", type: "string" },
             { name: "StartTime", type: "double" },
             { name: "ResponseTime", type: "double" },
         ] };
-    var TelemetryEventApiUsage = { name: "APIUsage", enabled: false, basic: false, critical: false, points: [
+    var TelemetryEventApiUsage = { name: "APIUsage", enabled: false, critical: false, points: [
             { name: "APIType", type: "string" },
             { name: "APIID", type: "int64" },
             { name: "Parameters", type: "string" },
             { name: "ResponseTime", type: "int64" },
             { name: "ErrorType", type: "int64" },
         ] };
-    var TelemetryEventAppInitialization = { name: "AppInitialization", enabled: true, basic: false, critical: false, points: [
+    var TelemetryEventAppInitialization = { name: "AppInitialization", enabled: true, critical: false, points: [
             { name: "SuccessCode", type: "int64" },
             { name: "Message", type: "string" },
         ] };
-    var TelemetryEventAppClosed = { name: "AppClosed", enabled: true, basic: false, critical: false, points: [
+    var TelemetryEventAppClosed = { name: "AppClosed", enabled: true, critical: false, points: [
             { name: "FocusTime", type: "int64" },
             { name: "AppSizeFinalWidth", type: "int64" },
             { name: "AppSizeFinalHeight", type: "int64" },
             { name: "OpenTime", type: "int64" },
         ] };
-    var TelemetryEventCheckWACHost = { name: "CheckWACHost", enabled: true, basic: false, critical: false, points: [
+    var TelemetryEventCheckWACHost = { name: "CheckWACHost", enabled: true, critical: false, points: [
             { name: "isWacKnownHost", type: "int64" },
             { name: "solutionId", type: "string" },
             { name: "hostType", type: "string" },
@@ -6262,9 +6416,7 @@ var OSFAriaLogger;
         if (eventDefinition.critical) {
             flags.samplingPolicy = oteljs.SamplingPolicy.CriticalBusinessImpact;
         }
-        if (eventDefinition.basic) {
-            flags.diagnosticLevel = oteljs.DiagnosticLevel.BasicEvent;
-        }
+        flags.diagnosticLevel = oteljs.DiagnosticLevel.NecessaryServiceDataEvent;
         var eventNameFull = "Office.Extensibility.OfficeJs." + eventName + "X";
         var event = { eventName: eventNameFull, dataFields: dataFields, eventFlags: flags };
         return event;
@@ -6612,7 +6764,7 @@ var OSFAppTelemetry;
         }
         appInfo.message = context.get_hostCustomMessage();
         appInfo.officeJSVersion = OSF.ConstantNames.FileVersion;
-        appInfo.hostJSVersion = "16.0.13004.10000";
+        appInfo.hostJSVersion = "16.0.13330.10000";
         if (context._wacHostEnvironment) {
             appInfo.wacHostEnvironment = context._wacHostEnvironment;
         }
@@ -7477,6 +7629,18 @@ var OfficeExt;
         AppCommand.registerDdaFacade = registerDdaFacade;
     })(AppCommand = OfficeExt.AppCommand || (OfficeExt.AppCommand = {}));
 })(OfficeExt || (OfficeExt = {}));
+OSF.OUtil.augmentList(OSF.DDA.EventDescriptors, {
+    DialogParentMessageReceivedEvent: "DialogParentMessageReceivedEvent"
+});
+OSF.OUtil.augmentList(Microsoft.Office.WebExtension.EventType, {
+    DialogParentMessageReceived: "dialogParentMessageReceived",
+    DialogParentEventReceived: "dialogParentEventReceived"
+});
+OSF.DialogParentMessageEventDispatch = new OSF.EventDispatch([
+    Microsoft.Office.WebExtension.EventType.DialogParentMessageReceived,
+    Microsoft.Office.WebExtension.EventType.DialogParentEventReceived
+]);
+OSF.DDA.UI.EnableMessageChildDialogAPI = true;
 OSF.DialogShownStatus = { hasDialogShown: false, isWindowDialog: false };
 OSF.OUtil.augmentList(OSF.DDA.EventDescriptors, {
     DialogMessageReceivedEvent: "DialogMessageReceivedEvent"
@@ -7905,7 +8069,8 @@ var OfficeExt;
             var registerDialogNotificationShownArgs = {
                 "dispId": OSF.DDA.EventDispId.dispidDialogNotificationShownInAddinEvent,
                 "eventType": OSF.DDA.Marshaling.DialogNotificationShownEventType.DialogNotificationShown,
-                "onComplete": null
+                "onComplete": null,
+                "onCalling": null
             };
             function setHostThemeButtonStyle(args) {
                 var hostThemeButtonStyleArgs = args.input;
@@ -7925,9 +8090,17 @@ var OfficeExt;
             Dialog.removeEventListenersForDialog = removeEventListenersForDialog;
             function handleNewWindowDialog(dialogInfo) {
                 try {
-                    if (dialogInfo[OSF.ShowWindowDialogParameterKeys.EnforceAppDomain] && !checkAppDomain(dialogInfo)) {
-                        showDialogCallback(OSF.DDA.ErrorCodeManager.errorCodes.ooeAppDomains);
-                        return;
+                    if (OSF.OUtil.checkFlight(OSF.FlightNames.RemoveOptionNotEnforceAppDomains)) {
+                        if (!checkAppDomain(dialogInfo)) {
+                            showDialogCallback(OSF.DDA.ErrorCodeManager.errorCodes.ooeAppDomains);
+                            return;
+                        }
+                    }
+                    else {
+                        if (dialogInfo[OSF.ShowWindowDialogParameterKeys.EnforceAppDomain] && !checkAppDomain(dialogInfo)) {
+                            showDialogCallback(OSF.DDA.ErrorCodeManager.errorCodes.ooeAppDomains);
+                            return;
+                        }
                     }
                     if (!dialogInfo[OSF.ShowWindowDialogParameterKeys.PromptBeforeOpen]) {
                         showDialog(dialogInfo);
@@ -7939,7 +8112,14 @@ var OfficeExt;
                     var dialogCssManager = OfficeExt.WacCommonUICssManager.getDialogCssManager(hostInfoObj.hostType);
                     var notificationText = OSF.OUtil.formatString(Strings.OfficeOM.L_ShowWindowDialogNotification, OSF._OfficeAppFactory.getInitializationHelper()._appContext._addinName);
                     overlayElement = createOverlayElement(dialogCssManager);
-                    document.body.insertBefore(overlayElement, document.body.firstChild);
+                    var docBodyChildren = [];
+                    if (OSF.OUtil.checkFlight(OSF.FlightNames.DialogPromptCleanDisplay)) {
+                        docBodyChildren = removeAndStoreAllChildrenFromNode(document.body);
+                        document.body.appendChild(overlayElement);
+                    }
+                    else {
+                        document.body.insertBefore(overlayElement, document.body.firstChild);
+                    }
                     dialogNotificationPanel = createNotificationPanel(dialogCssManager, notificationText);
                     dialogNotificationPanel.id = newWindowNotificationId;
                     var dialogNotificationButtonPanel = createButtonPanel(dialogCssManager);
@@ -7954,17 +8134,44 @@ var OfficeExt;
                         if (!hasCrossZoneNotification) {
                             dismissDialogNotification();
                         }
+                        if (OSF.OUtil.checkFlight(OSF.FlightNames.DialogPromptCleanDisplay)) {
+                            restoreChildrenToNode(document.body, docBodyChildren);
+                            docBodyChildren = [];
+                        }
                         event.preventDefault();
                         event.stopPropagation();
                     };
+                    function removeAndStoreAllChildrenFromNode(node) {
+                        var children = [];
+                        try {
+                            while (node.firstChild && node.firstChild != null) {
+                                children.push(node.firstChild);
+                                node.removeChild(node.firstChild);
+                            }
+                        }
+                        catch (e) { }
+                        return children;
+                    }
+                    function restoreChildrenToNode(node, children) {
+                        try {
+                            for (var i = 0; i < children.length; i++) {
+                                node.appendChild(children[i]);
+                            }
+                        }
+                        catch (e) { }
+                    }
                     function ignoreButtonClickEventHandler(event) {
                         function unregisterDialogNotificationShownEventCallback(status) {
                             removeDialogNotificationElement();
                             setFocusOnFirstElement(status);
                             showDialogCallback(OSF.DDA.ErrorCodeManager.errorCodes.ooeEndUserIgnore);
                         }
-                        registerDialogNotificationShownArgs.onComplete = unregisterDialogNotificationShownEventCallback;
+                        registerDialogNotificationShownArgs.onCalling = unregisterDialogNotificationShownEventCallback;
                         OSF.DDA.WAC.Delegate.unregisterEventAsync(registerDialogNotificationShownArgs);
+                        if (OSF.OUtil.checkFlight(OSF.FlightNames.DialogPromptCleanDisplay)) {
+                            restoreChildrenToNode(document.body, docBodyChildren);
+                            docBodyChildren = [];
+                        }
                         event.preventDefault();
                         event.stopPropagation();
                     }
@@ -8002,7 +8209,7 @@ var OfficeExt;
                     function registerDialogNotificationShownEventCallback(status) {
                         allowButton.focus();
                     }
-                    registerDialogNotificationShownArgs.onComplete = registerDialogNotificationShownEventCallback;
+                    registerDialogNotificationShownArgs.onCalling = registerDialogNotificationShownEventCallback;
                     OSF.DDA.WAC.Delegate.registerEventAsync(registerDialogNotificationShownArgs);
                 }
                 catch (e) {
@@ -8077,19 +8284,43 @@ var OfficeExt;
             Dialog.sendMessage = sendMessage;
             function postDialogMessage(targetWindow, message) {
                 var appDomains = OSF._OfficeAppFactory.getInitializationHelper()._appContext._appDomains;
-                if (appDomains) {
-                    for (var i = 0; i < appDomains.length && appDomains[i].indexOf("://") !== -1; i++) {
-                        targetWindow.postMessage(message, appDomains[i]);
-                    }
-                }
                 var currentOrigin = window.location.origin;
                 if (!currentOrigin) {
                     currentOrigin = window.location.protocol + "//"
                         + window.location.hostname
                         + (window.location.port ? ':' + window.location.port : '');
                 }
-                if (!Microsoft.Office.Common.XdmCommunicationManager.checkUrlWithAppDomains(appDomains, currentOrigin)) {
-                    targetWindow.postMessage(message, currentOrigin);
+                if (OSF.OUtil.checkFlight(OSF.FlightNames.PostMessageParentOnlyOnce)) {
+                    var isMessageParent = windowInstance == null;
+                    if (isMessageParent) {
+                        var parsedParentUrl = OSF.OUtil.parseUrl(document.referrer);
+                        var tagetOrigin = parsedParentUrl.protocol + "//"
+                            + parsedParentUrl.protocol.hostname
+                            + (parsedParentUrl.isPortPartOfUrl ? ':' + parsedParentUrl.port : '');
+                        if (Microsoft.Office.Common.XdmCommunicationManager.checkUrlWithAppDomains(appDomains, tagetOrigin)) {
+                            targetWindow.postMessage(message, tagetOrigin);
+                        }
+                    }
+                    else {
+                        if (appDomains) {
+                            for (var i = 0; i < appDomains.length && appDomains[i].indexOf("://") !== -1; i++) {
+                                targetWindow.postMessage(message, appDomains[i]);
+                            }
+                        }
+                        if (!Microsoft.Office.Common.XdmCommunicationManager.checkUrlWithAppDomains(appDomains, currentOrigin)) {
+                            targetWindow.postMessage(message, currentOrigin);
+                        }
+                    }
+                }
+                else {
+                    if (appDomains) {
+                        for (var i = 0; i < appDomains.length && appDomains[i].indexOf("://") !== -1; i++) {
+                            targetWindow.postMessage(message, appDomains[i]);
+                        }
+                    }
+                    if (!Microsoft.Office.Common.XdmCommunicationManager.checkUrlWithAppDomains(appDomains, currentOrigin)) {
+                        targetWindow.postMessage(message, currentOrigin);
+                    }
                 }
             }
             Dialog.postDialogMessage = postDialogMessage;
@@ -8261,7 +8492,7 @@ var OfficeExt;
                     "isDialog",
                     hostInfoObj.disableLogging ? "disableLogging" : ""
                 ];
-                var hostInfo = hostInfoVals.join("|");
+                var hostInfo = hostInfoVals.join("$");
                 var appContext = OSF._OfficeAppFactory.getInitializationHelper()._appContext;
                 var windowUrl = dialogInfo[OSF.ShowWindowDialogParameterKeys.Url];
                 if (!dialogInfo[OSF.ShowWindowDialogParameterKeys.UrlNoHostInfo]) {
@@ -8361,7 +8592,7 @@ var OfficeExt;
                     removeDialogNotificationElement();
                     setFocusOnFirstElement(status);
                 }
-                registerDialogNotificationShownArgs.onComplete = unregisterDialogNotificationShownEventCallback;
+                registerDialogNotificationShownArgs.onCalling = unregisterDialogNotificationShownEventCallback;
                 OSF.DDA.WAC.Delegate.unregisterEventAsync(registerDialogNotificationShownArgs);
             }
             function removeDialogNotificationElement() {
@@ -8509,6 +8740,7 @@ OSF.DDA.WAC.Delegate.openDialog = function OSF_DDA_WAC_Delegate$OpenDialog(args)
         var isSameDomain = false;
         var parentIsSubdomain = false;
         var childIsSubdomain = false;
+        var isAppDomain = false;
         var dialogUrlPortionAllowedToLog = "";
         var taskpaneUrlPortionAllowedToLog = "";
         if (OSF.OUtil) {
@@ -8526,16 +8758,11 @@ OSF.DDA.WAC.Delegate.openDialog = function OSF_DDA_WAC_Delegate$OpenDialog(args)
                 parentIsSubdomain = Microsoft.Office.Common.XdmCommunicationManager.isTargetSubdomainOfSourceLocation(dialogUrl, taskpaneUrl);
                 childIsSubdomain = Microsoft.Office.Common.XdmCommunicationManager.isTargetSubdomainOfSourceLocation(taskpaneUrl, dialogUrl);
             }
+            var appDomains = OSF._OfficeAppFactory.getInitializationHelper()._appContext._appDomains;
+            isAppDomain = Microsoft.Office.Common.XdmCommunicationManager.checkUrlWithAppDomains(appDomains, dialogUrl);
         }
-        var logJson = {
-            "openDialog isInline": dialogInfo[OSF.ShowWindowDialogParameterKeys.DisplayInIframe],
-            "taskpaneHostname": taskpaneUrlPortionAllowedToLog,
-            "dialogHostName": dialogUrlPortionAllowedToLog,
-            "isSameDomain": isSameDomain,
-            "parentIsSubdomain": parentIsSubdomain,
-            "childIsSubdomain": childIsSubdomain
-        };
-        OSF.AppTelemetry.logAppCommonMessage(JSON.stringify(logJson));
+        var logJsonAsString = "openDialog isInline: " + dialogInfo[OSF.ShowWindowDialogParameterKeys.DisplayInIframe].toString() + ", " + "taskpaneHostname: " + taskpaneUrlPortionAllowedToLog + ", " + "dialogHostName: " + dialogUrlPortionAllowedToLog + ", " + "isSameDomain: " + isSameDomain.toString() + ", " + "parentIsSubdomain: " + parentIsSubdomain.toString() + ", " + "childIsSubdomain: " + childIsSubdomain.toString() + ", " + "isAppDomain: " + isAppDomain.toString();
+        OSF.AppTelemetry.logAppCommonMessage(logJsonAsString);
     }
     if (dialogUrl == null || !(dialogUrl.substr(0, httpsIdentifyString.length) === httpsIdentifyString)) {
         if (dialogUrl.substr(0, httpIdentifyString.length) === httpIdentifyString) {
@@ -9168,7 +9395,7 @@ var Outlook = typeof Outlook === "object" ? Outlook : {}; Outlook["OutlookAppOm"
 /******/
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 2);
+/******/ 	return __webpack_require__(__webpack_require__.s = 6);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -9179,12 +9406,988 @@ module.exports = OSF;
 
 /***/ }),
 /* 1 */
+/***/ (function(module, exports, __webpack_require__) {
+
+/* WEBPACK VAR INJECTION */(function(process) {// Copyright Joyent, Inc. and other Node contributors.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a
+// copy of this software and associated documentation files (the
+// "Software"), to deal in the Software without restriction, including
+// without limitation the rights to use, copy, modify, merge, publish,
+// distribute, sublicense, and/or sell copies of the Software, and to permit
+// persons to whom the Software is furnished to do so, subject to the
+// following conditions:
+//
+// The above copyright notice and this permission notice shall be included
+// in all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
+// NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
+// USE OR OTHER DEALINGS IN THE SOFTWARE.
+var getOwnPropertyDescriptors = Object.getOwnPropertyDescriptors || function getOwnPropertyDescriptors(obj) {
+  var keys = Object.keys(obj);
+  var descriptors = {};
+
+  for (var i = 0; i < keys.length; i++) {
+    descriptors[keys[i]] = Object.getOwnPropertyDescriptor(obj, keys[i]);
+  }
+
+  return descriptors;
+};
+
+var formatRegExp = /%[sdj%]/g;
+
+exports.format = function (f) {
+  if (!isString(f)) {
+    var objects = [];
+
+    for (var i = 0; i < arguments.length; i++) {
+      objects.push(inspect(arguments[i]));
+    }
+
+    return objects.join(' ');
+  }
+
+  var i = 1;
+  var args = arguments;
+  var len = args.length;
+  var str = String(f).replace(formatRegExp, function (x) {
+    if (x === '%%') return '%';
+    if (i >= len) return x;
+
+    switch (x) {
+      case '%s':
+        return String(args[i++]);
+
+      case '%d':
+        return Number(args[i++]);
+
+      case '%j':
+        try {
+          return JSON.stringify(args[i++]);
+        } catch (_) {
+          return '[Circular]';
+        }
+
+      default:
+        return x;
+    }
+  });
+
+  for (var x = args[i]; i < len; x = args[++i]) {
+    if (isNull(x) || !isObject(x)) {
+      str += ' ' + x;
+    } else {
+      str += ' ' + inspect(x);
+    }
+  }
+
+  return str;
+}; // Mark that a method should not be used.
+// Returns a modified function which warns once by default.
+// If --no-deprecation is set, then it is a no-op.
+
+
+exports.deprecate = function (fn, msg) {
+  if (typeof process !== 'undefined' && process.noDeprecation === true) {
+    return fn;
+  } // Allow for deprecating things in the process of starting up.
+
+
+  if (typeof process === 'undefined') {
+    return function () {
+      return exports.deprecate(fn, msg).apply(this, arguments);
+    };
+  }
+
+  var warned = false;
+
+  function deprecated() {
+    if (!warned) {
+      if (process.throwDeprecation) {
+        throw new Error(msg);
+      } else if (process.traceDeprecation) {
+        console.trace(msg);
+      } else {
+        console.error(msg);
+      }
+
+      warned = true;
+    }
+
+    return fn.apply(this, arguments);
+  }
+
+  return deprecated;
+};
+
+var debugs = {};
+var debugEnviron;
+
+exports.debuglog = function (set) {
+  if (isUndefined(debugEnviron)) debugEnviron = Object({"NODE_ENV":"production","PUBLIC_URL":""}).NODE_DEBUG || '';
+  set = set.toUpperCase();
+
+  if (!debugs[set]) {
+    if (new RegExp('\\b' + set + '\\b', 'i').test(debugEnviron)) {
+      var pid = process.pid;
+
+      debugs[set] = function () {
+        var msg = exports.format.apply(exports, arguments);
+        console.error('%s %d: %s', set, pid, msg);
+      };
+    } else {
+      debugs[set] = function () {};
+    }
+  }
+
+  return debugs[set];
+};
+/**
+ * Echos the value of a value. Trys to print the value out
+ * in the best way possible given the different types.
+ *
+ * @param {Object} obj The object to print out.
+ * @param {Object} opts Optional options object that alters the output.
+ */
+
+/* legacy: obj, showHidden, depth, colors*/
+
+
+function inspect(obj, opts) {
+  // default options
+  var ctx = {
+    seen: [],
+    stylize: stylizeNoColor
+  }; // legacy...
+
+  if (arguments.length >= 3) ctx.depth = arguments[2];
+  if (arguments.length >= 4) ctx.colors = arguments[3];
+
+  if (isBoolean(opts)) {
+    // legacy...
+    ctx.showHidden = opts;
+  } else if (opts) {
+    // got an "options" object
+    exports._extend(ctx, opts);
+  } // set default options
+
+
+  if (isUndefined(ctx.showHidden)) ctx.showHidden = false;
+  if (isUndefined(ctx.depth)) ctx.depth = 2;
+  if (isUndefined(ctx.colors)) ctx.colors = false;
+  if (isUndefined(ctx.customInspect)) ctx.customInspect = true;
+  if (ctx.colors) ctx.stylize = stylizeWithColor;
+  return formatValue(ctx, obj, ctx.depth);
+}
+
+exports.inspect = inspect; // http://en.wikipedia.org/wiki/ANSI_escape_code#graphics
+
+inspect.colors = {
+  'bold': [1, 22],
+  'italic': [3, 23],
+  'underline': [4, 24],
+  'inverse': [7, 27],
+  'white': [37, 39],
+  'grey': [90, 39],
+  'black': [30, 39],
+  'blue': [34, 39],
+  'cyan': [36, 39],
+  'green': [32, 39],
+  'magenta': [35, 39],
+  'red': [31, 39],
+  'yellow': [33, 39]
+}; // Don't use 'blue' not visible on cmd.exe
+
+inspect.styles = {
+  'special': 'cyan',
+  'number': 'yellow',
+  'boolean': 'yellow',
+  'undefined': 'grey',
+  'null': 'bold',
+  'string': 'green',
+  'date': 'magenta',
+  // "name": intentionally not styling
+  'regexp': 'red'
+};
+
+function stylizeWithColor(str, styleType) {
+  var style = inspect.styles[styleType];
+
+  if (style) {
+    return "\x1B[" + inspect.colors[style][0] + 'm' + str + "\x1B[" + inspect.colors[style][1] + 'm';
+  } else {
+    return str;
+  }
+}
+
+function stylizeNoColor(str, styleType) {
+  return str;
+}
+
+function arrayToHash(array) {
+  var hash = {};
+  array.forEach(function (val, idx) {
+    hash[val] = true;
+  });
+  return hash;
+}
+
+function formatValue(ctx, value, recurseTimes) {
+  // Provide a hook for user-specified inspect functions.
+  // Check that value is an object with an inspect function on it
+  if (ctx.customInspect && value && isFunction(value.inspect) && // Filter out the util module, it's inspect function is special
+  value.inspect !== exports.inspect && // Also filter out any prototype objects using the circular check.
+  !(value.constructor && value.constructor.prototype === value)) {
+    var ret = value.inspect(recurseTimes, ctx);
+
+    if (!isString(ret)) {
+      ret = formatValue(ctx, ret, recurseTimes);
+    }
+
+    return ret;
+  } // Primitive types cannot have properties
+
+
+  var primitive = formatPrimitive(ctx, value);
+
+  if (primitive) {
+    return primitive;
+  } // Look up the keys of the object.
+
+
+  var keys = Object.keys(value);
+  var visibleKeys = arrayToHash(keys);
+
+  if (ctx.showHidden) {
+    keys = Object.getOwnPropertyNames(value);
+  } // IE doesn't make error fields non-enumerable
+  // http://msdn.microsoft.com/en-us/library/ie/dww52sbt(v=vs.94).aspx
+
+
+  if (isError(value) && (keys.indexOf('message') >= 0 || keys.indexOf('description') >= 0)) {
+    return formatError(value);
+  } // Some type of object without properties can be shortcutted.
+
+
+  if (keys.length === 0) {
+    if (isFunction(value)) {
+      var name = value.name ? ': ' + value.name : '';
+      return ctx.stylize('[Function' + name + ']', 'special');
+    }
+
+    if (isRegExp(value)) {
+      return ctx.stylize(RegExp.prototype.toString.call(value), 'regexp');
+    }
+
+    if (isDate(value)) {
+      return ctx.stylize(Date.prototype.toString.call(value), 'date');
+    }
+
+    if (isError(value)) {
+      return formatError(value);
+    }
+  }
+
+  var base = '',
+      array = false,
+      braces = ['{', '}']; // Make Array say that they are Array
+
+  if (isArray(value)) {
+    array = true;
+    braces = ['[', ']'];
+  } // Make functions say that they are functions
+
+
+  if (isFunction(value)) {
+    var n = value.name ? ': ' + value.name : '';
+    base = ' [Function' + n + ']';
+  } // Make RegExps say that they are RegExps
+
+
+  if (isRegExp(value)) {
+    base = ' ' + RegExp.prototype.toString.call(value);
+  } // Make dates with properties first say the date
+
+
+  if (isDate(value)) {
+    base = ' ' + Date.prototype.toUTCString.call(value);
+  } // Make error with message first say the error
+
+
+  if (isError(value)) {
+    base = ' ' + formatError(value);
+  }
+
+  if (keys.length === 0 && (!array || value.length == 0)) {
+    return braces[0] + base + braces[1];
+  }
+
+  if (recurseTimes < 0) {
+    if (isRegExp(value)) {
+      return ctx.stylize(RegExp.prototype.toString.call(value), 'regexp');
+    } else {
+      return ctx.stylize('[Object]', 'special');
+    }
+  }
+
+  ctx.seen.push(value);
+  var output;
+
+  if (array) {
+    output = formatArray(ctx, value, recurseTimes, visibleKeys, keys);
+  } else {
+    output = keys.map(function (key) {
+      return formatProperty(ctx, value, recurseTimes, visibleKeys, key, array);
+    });
+  }
+
+  ctx.seen.pop();
+  return reduceToSingleString(output, base, braces);
+}
+
+function formatPrimitive(ctx, value) {
+  if (isUndefined(value)) return ctx.stylize('undefined', 'undefined');
+
+  if (isString(value)) {
+    var simple = '\'' + JSON.stringify(value).replace(/^"|"$/g, '').replace(/'/g, "\\'").replace(/\\"/g, '"') + '\'';
+    return ctx.stylize(simple, 'string');
+  }
+
+  if (isNumber(value)) return ctx.stylize('' + value, 'number');
+  if (isBoolean(value)) return ctx.stylize('' + value, 'boolean'); // For some reason typeof null is "object", so special case here.
+
+  if (isNull(value)) return ctx.stylize('null', 'null');
+}
+
+function formatError(value) {
+  return '[' + Error.prototype.toString.call(value) + ']';
+}
+
+function formatArray(ctx, value, recurseTimes, visibleKeys, keys) {
+  var output = [];
+
+  for (var i = 0, l = value.length; i < l; ++i) {
+    if (hasOwnProperty(value, String(i))) {
+      output.push(formatProperty(ctx, value, recurseTimes, visibleKeys, String(i), true));
+    } else {
+      output.push('');
+    }
+  }
+
+  keys.forEach(function (key) {
+    if (!key.match(/^\d+$/)) {
+      output.push(formatProperty(ctx, value, recurseTimes, visibleKeys, key, true));
+    }
+  });
+  return output;
+}
+
+function formatProperty(ctx, value, recurseTimes, visibleKeys, key, array) {
+  var name, str, desc;
+  desc = Object.getOwnPropertyDescriptor(value, key) || {
+    value: value[key]
+  };
+
+  if (desc.get) {
+    if (desc.set) {
+      str = ctx.stylize('[Getter/Setter]', 'special');
+    } else {
+      str = ctx.stylize('[Getter]', 'special');
+    }
+  } else {
+    if (desc.set) {
+      str = ctx.stylize('[Setter]', 'special');
+    }
+  }
+
+  if (!hasOwnProperty(visibleKeys, key)) {
+    name = '[' + key + ']';
+  }
+
+  if (!str) {
+    if (ctx.seen.indexOf(desc.value) < 0) {
+      if (isNull(recurseTimes)) {
+        str = formatValue(ctx, desc.value, null);
+      } else {
+        str = formatValue(ctx, desc.value, recurseTimes - 1);
+      }
+
+      if (str.indexOf('\n') > -1) {
+        if (array) {
+          str = str.split('\n').map(function (line) {
+            return '  ' + line;
+          }).join('\n').substr(2);
+        } else {
+          str = '\n' + str.split('\n').map(function (line) {
+            return '   ' + line;
+          }).join('\n');
+        }
+      }
+    } else {
+      str = ctx.stylize('[Circular]', 'special');
+    }
+  }
+
+  if (isUndefined(name)) {
+    if (array && key.match(/^\d+$/)) {
+      return str;
+    }
+
+    name = JSON.stringify('' + key);
+
+    if (name.match(/^"([a-zA-Z_][a-zA-Z_0-9]*)"$/)) {
+      name = name.substr(1, name.length - 2);
+      name = ctx.stylize(name, 'name');
+    } else {
+      name = name.replace(/'/g, "\\'").replace(/\\"/g, '"').replace(/(^"|"$)/g, "'");
+      name = ctx.stylize(name, 'string');
+    }
+  }
+
+  return name + ': ' + str;
+}
+
+function reduceToSingleString(output, base, braces) {
+  var numLinesEst = 0;
+  var length = output.reduce(function (prev, cur) {
+    numLinesEst++;
+    if (cur.indexOf('\n') >= 0) numLinesEst++;
+    return prev + cur.replace(/\u001b\[\d\d?m/g, '').length + 1;
+  }, 0);
+
+  if (length > 60) {
+    return braces[0] + (base === '' ? '' : base + '\n ') + ' ' + output.join(',\n  ') + ' ' + braces[1];
+  }
+
+  return braces[0] + base + ' ' + output.join(', ') + ' ' + braces[1];
+} // NOTE: These type checking functions intentionally don't use `instanceof`
+// because it is fragile and can be easily faked with `Object.create()`.
+
+
+function isArray(ar) {
+  return Array.isArray(ar);
+}
+
+exports.isArray = isArray;
+
+function isBoolean(arg) {
+  return typeof arg === 'boolean';
+}
+
+exports.isBoolean = isBoolean;
+
+function isNull(arg) {
+  return arg === null;
+}
+
+exports.isNull = isNull;
+
+function isNullOrUndefined(arg) {
+  return arg == null;
+}
+
+exports.isNullOrUndefined = isNullOrUndefined;
+
+function isNumber(arg) {
+  return typeof arg === 'number';
+}
+
+exports.isNumber = isNumber;
+
+function isString(arg) {
+  return typeof arg === 'string';
+}
+
+exports.isString = isString;
+
+function isSymbol(arg) {
+  return typeof arg === 'symbol';
+}
+
+exports.isSymbol = isSymbol;
+
+function isUndefined(arg) {
+  return arg === void 0;
+}
+
+exports.isUndefined = isUndefined;
+
+function isRegExp(re) {
+  return isObject(re) && objectToString(re) === '[object RegExp]';
+}
+
+exports.isRegExp = isRegExp;
+
+function isObject(arg) {
+  return typeof arg === 'object' && arg !== null;
+}
+
+exports.isObject = isObject;
+
+function isDate(d) {
+  return isObject(d) && objectToString(d) === '[object Date]';
+}
+
+exports.isDate = isDate;
+
+function isError(e) {
+  return isObject(e) && (objectToString(e) === '[object Error]' || e instanceof Error);
+}
+
+exports.isError = isError;
+
+function isFunction(arg) {
+  return typeof arg === 'function';
+}
+
+exports.isFunction = isFunction;
+
+function isPrimitive(arg) {
+  return arg === null || typeof arg === 'boolean' || typeof arg === 'number' || typeof arg === 'string' || typeof arg === 'symbol' || // ES6 symbol
+  typeof arg === 'undefined';
+}
+
+exports.isPrimitive = isPrimitive;
+exports.isBuffer = __webpack_require__(3);
+
+function objectToString(o) {
+  return Object.prototype.toString.call(o);
+}
+
+function pad(n) {
+  return n < 10 ? '0' + n.toString(10) : n.toString(10);
+}
+
+var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']; // 26 Feb 16:19:34
+
+function timestamp() {
+  var d = new Date();
+  var time = [pad(d.getHours()), pad(d.getMinutes()), pad(d.getSeconds())].join(':');
+  return [d.getDate(), months[d.getMonth()], time].join(' ');
+} // log is just a thin wrapper to console.log that prepends a timestamp
+
+
+exports.log = function () {
+  console.log('%s - %s', timestamp(), exports.format.apply(exports, arguments));
+};
+/**
+ * Inherit the prototype methods from one constructor into another.
+ *
+ * The Function.prototype.inherits from lang.js rewritten as a standalone
+ * function (not on Function.prototype). NOTE: If this file is to be loaded
+ * during bootstrapping this function needs to be rewritten using some native
+ * functions as prototype setup using normal JavaScript does not work as
+ * expected during bootstrapping (see mirror.js in r114903).
+ *
+ * @param {function} ctor Constructor function which needs to inherit the
+ *     prototype.
+ * @param {function} superCtor Constructor function to inherit prototype from.
+ */
+
+
+exports.inherits = __webpack_require__(4);
+
+exports._extend = function (origin, add) {
+  // Don't do anything if add isn't an object
+  if (!add || !isObject(add)) return origin;
+  var keys = Object.keys(add);
+  var i = keys.length;
+
+  while (i--) {
+    origin[keys[i]] = add[keys[i]];
+  }
+
+  return origin;
+};
+
+function hasOwnProperty(obj, prop) {
+  return Object.prototype.hasOwnProperty.call(obj, prop);
+}
+
+var kCustomPromisifiedSymbol = typeof Symbol !== 'undefined' ? Symbol('util.promisify.custom') : undefined;
+
+exports.promisify = function promisify(original) {
+  if (typeof original !== 'function') throw new TypeError('The "original" argument must be of type Function');
+
+  if (kCustomPromisifiedSymbol && original[kCustomPromisifiedSymbol]) {
+    var fn = original[kCustomPromisifiedSymbol];
+
+    if (typeof fn !== 'function') {
+      throw new TypeError('The "util.promisify.custom" argument must be of type Function');
+    }
+
+    Object.defineProperty(fn, kCustomPromisifiedSymbol, {
+      value: fn,
+      enumerable: false,
+      writable: false,
+      configurable: true
+    });
+    return fn;
+  }
+
+  function fn() {
+    var promiseResolve, promiseReject;
+    var promise = new Promise(function (resolve, reject) {
+      promiseResolve = resolve;
+      promiseReject = reject;
+    });
+    var args = [];
+
+    for (var i = 0; i < arguments.length; i++) {
+      args.push(arguments[i]);
+    }
+
+    args.push(function (err, value) {
+      if (err) {
+        promiseReject(err);
+      } else {
+        promiseResolve(value);
+      }
+    });
+
+    try {
+      original.apply(this, args);
+    } catch (err) {
+      promiseReject(err);
+    }
+
+    return promise;
+  }
+
+  Object.setPrototypeOf(fn, Object.getPrototypeOf(original));
+  if (kCustomPromisifiedSymbol) Object.defineProperty(fn, kCustomPromisifiedSymbol, {
+    value: fn,
+    enumerable: false,
+    writable: false,
+    configurable: true
+  });
+  return Object.defineProperties(fn, getOwnPropertyDescriptors(original));
+};
+
+exports.promisify.custom = kCustomPromisifiedSymbol;
+
+function callbackifyOnRejected(reason, cb) {
+  // `!reason` guard inspired by bluebird (Ref: https://goo.gl/t5IS6M).
+  // Because `null` is a special error value in callbacks which means "no error
+  // occurred", we error-wrap so the callback consumer can distinguish between
+  // "the promise rejected with null" or "the promise fulfilled with undefined".
+  if (!reason) {
+    var newReason = new Error('Promise was rejected with a falsy value');
+    newReason.reason = reason;
+    reason = newReason;
+  }
+
+  return cb(reason);
+}
+
+function callbackify(original) {
+  if (typeof original !== 'function') {
+    throw new TypeError('The "original" argument must be of type Function');
+  } // We DO NOT return the promise as it gives the user a false sense that
+  // the promise is actually somehow related to the callback's execution
+  // and that the callback throwing will reject the promise.
+
+
+  function callbackified() {
+    var args = [];
+
+    for (var i = 0; i < arguments.length; i++) {
+      args.push(arguments[i]);
+    }
+
+    var maybeCb = args.pop();
+
+    if (typeof maybeCb !== 'function') {
+      throw new TypeError('The last argument must be of type Function');
+    }
+
+    var self = this;
+
+    var cb = function cb() {
+      return maybeCb.apply(self, arguments);
+    }; // In true node style we process the callback on `nextTick` with all the
+    // implications (stack, `uncaughtException`, `async_hooks`)
+
+
+    original.apply(this, args).then(function (ret) {
+      process.nextTick(cb, null, ret);
+    }, function (rej) {
+      process.nextTick(callbackifyOnRejected, rej, cb);
+    });
+  }
+
+  Object.setPrototypeOf(callbackified, Object.getPrototypeOf(original));
+  Object.defineProperties(callbackified, getOwnPropertyDescriptors(original));
+  return callbackified;
+}
+
+exports.callbackify = callbackify;
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(2)))
+
+/***/ }),
+/* 2 */
+/***/ (function(module, exports) {
+
+// shim for using process in browser
+var process = module.exports = {}; // cached from whatever global is present so that test runners that stub it
+// don't break things.  But we need to wrap it in a try catch in case it is
+// wrapped in strict mode code which doesn't define any globals.  It's inside a
+// function because try/catches deoptimize in certain engines.
+
+var cachedSetTimeout;
+var cachedClearTimeout;
+
+function defaultSetTimout() {
+  throw new Error('setTimeout has not been defined');
+}
+
+function defaultClearTimeout() {
+  throw new Error('clearTimeout has not been defined');
+}
+
+(function () {
+  try {
+    if (typeof setTimeout === 'function') {
+      cachedSetTimeout = setTimeout;
+    } else {
+      cachedSetTimeout = defaultSetTimout;
+    }
+  } catch (e) {
+    cachedSetTimeout = defaultSetTimout;
+  }
+
+  try {
+    if (typeof clearTimeout === 'function') {
+      cachedClearTimeout = clearTimeout;
+    } else {
+      cachedClearTimeout = defaultClearTimeout;
+    }
+  } catch (e) {
+    cachedClearTimeout = defaultClearTimeout;
+  }
+})();
+
+function runTimeout(fun) {
+  if (cachedSetTimeout === setTimeout) {
+    //normal enviroments in sane situations
+    return setTimeout(fun, 0);
+  } // if setTimeout wasn't available but was latter defined
+
+
+  if ((cachedSetTimeout === defaultSetTimout || !cachedSetTimeout) && setTimeout) {
+    cachedSetTimeout = setTimeout;
+    return setTimeout(fun, 0);
+  }
+
+  try {
+    // when when somebody has screwed with setTimeout but no I.E. maddness
+    return cachedSetTimeout(fun, 0);
+  } catch (e) {
+    try {
+      // When we are in I.E. but the script has been evaled so I.E. doesn't trust the global object when called normally
+      return cachedSetTimeout.call(null, fun, 0);
+    } catch (e) {
+      // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error
+      return cachedSetTimeout.call(this, fun, 0);
+    }
+  }
+}
+
+function runClearTimeout(marker) {
+  if (cachedClearTimeout === clearTimeout) {
+    //normal enviroments in sane situations
+    return clearTimeout(marker);
+  } // if clearTimeout wasn't available but was latter defined
+
+
+  if ((cachedClearTimeout === defaultClearTimeout || !cachedClearTimeout) && clearTimeout) {
+    cachedClearTimeout = clearTimeout;
+    return clearTimeout(marker);
+  }
+
+  try {
+    // when when somebody has screwed with setTimeout but no I.E. maddness
+    return cachedClearTimeout(marker);
+  } catch (e) {
+    try {
+      // When we are in I.E. but the script has been evaled so I.E. doesn't  trust the global object when called normally
+      return cachedClearTimeout.call(null, marker);
+    } catch (e) {
+      // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error.
+      // Some versions of I.E. have different rules for clearTimeout vs setTimeout
+      return cachedClearTimeout.call(this, marker);
+    }
+  }
+}
+
+var queue = [];
+var draining = false;
+var currentQueue;
+var queueIndex = -1;
+
+function cleanUpNextTick() {
+  if (!draining || !currentQueue) {
+    return;
+  }
+
+  draining = false;
+
+  if (currentQueue.length) {
+    queue = currentQueue.concat(queue);
+  } else {
+    queueIndex = -1;
+  }
+
+  if (queue.length) {
+    drainQueue();
+  }
+}
+
+function drainQueue() {
+  if (draining) {
+    return;
+  }
+
+  var timeout = runTimeout(cleanUpNextTick);
+  draining = true;
+  var len = queue.length;
+
+  while (len) {
+    currentQueue = queue;
+    queue = [];
+
+    while (++queueIndex < len) {
+      if (currentQueue) {
+        currentQueue[queueIndex].run();
+      }
+    }
+
+    queueIndex = -1;
+    len = queue.length;
+  }
+
+  currentQueue = null;
+  draining = false;
+  runClearTimeout(timeout);
+}
+
+process.nextTick = function (fun) {
+  var args = new Array(arguments.length - 1);
+
+  if (arguments.length > 1) {
+    for (var i = 1; i < arguments.length; i++) {
+      args[i - 1] = arguments[i];
+    }
+  }
+
+  queue.push(new Item(fun, args));
+
+  if (queue.length === 1 && !draining) {
+    runTimeout(drainQueue);
+  }
+}; // v8 likes predictible objects
+
+
+function Item(fun, array) {
+  this.fun = fun;
+  this.array = array;
+}
+
+Item.prototype.run = function () {
+  this.fun.apply(null, this.array);
+};
+
+process.title = 'browser';
+process.browser = true;
+process.env = {};
+process.argv = [];
+process.version = ''; // empty string to avoid regexp issues
+
+process.versions = {};
+
+function noop() {}
+
+process.on = noop;
+process.addListener = noop;
+process.once = noop;
+process.off = noop;
+process.removeListener = noop;
+process.removeAllListeners = noop;
+process.emit = noop;
+process.prependListener = noop;
+process.prependOnceListener = noop;
+
+process.listeners = function (name) {
+  return [];
+};
+
+process.binding = function (name) {
+  throw new Error('process.binding is not supported');
+};
+
+process.cwd = function () {
+  return '/';
+};
+
+process.chdir = function (dir) {
+  throw new Error('process.chdir is not supported');
+};
+
+process.umask = function () {
+  return 0;
+};
+
+/***/ }),
+/* 3 */
+/***/ (function(module, exports) {
+
+module.exports = function isBuffer(arg) {
+  return arg && typeof arg === 'object' && typeof arg.copy === 'function' && typeof arg.fill === 'function' && typeof arg.readUInt8 === 'function';
+};
+
+/***/ }),
+/* 4 */
+/***/ (function(module, exports) {
+
+if (typeof Object.create === 'function') {
+  // implementation from standard node.js 'util' module
+  module.exports = function inherits(ctor, superCtor) {
+    ctor.super_ = superCtor;
+    ctor.prototype = Object.create(superCtor.prototype, {
+      constructor: {
+        value: ctor,
+        enumerable: false,
+        writable: true,
+        configurable: true
+      }
+    });
+  };
+} else {
+  // old school shim for old browsers
+  module.exports = function inherits(ctor, superCtor) {
+    ctor.super_ = superCtor;
+
+    var TempCtor = function TempCtor() {};
+
+    TempCtor.prototype = superCtor.prototype;
+    ctor.prototype = new TempCtor();
+    ctor.prototype.constructor = ctor;
+  };
+}
+
+/***/ }),
+/* 5 */
 /***/ (function(module, exports) {
 
 module.exports = Microsoft;
 
 /***/ }),
-/* 2 */
+/* 6 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -9341,6 +10544,7 @@ function getErrorArgs(detailedErrorCode) {
   return getErrorArgs_OSF.DDA.ErrorCodeManager.getErrorArgs(detailedErrorCode);
 }
 var totalRecipientsLimit = 500;
+var sessionDataLengthLimit = 50000;
 function initialize() {
   addErrorMessage(9000, "AttachmentSizeExceeded", getString("l_AttachmentExceededSize_Text"));
   addErrorMessage(9001, "NumberOfAttachmentsExceeded", getString("l_ExceededMaxNumberOfAttachments_Text"));
@@ -9391,6 +10595,12 @@ function initialize() {
   addErrorMessage(9047, "MissingExtendedPermissionsForAPIError", getString("l_Missing_Extended_Permissions_For_API"));
   addErrorMessage(9048, "TokenAccessDenied", getString("l_TokenAccessDeniedWithoutItemContext_Text"));
   addErrorMessage(9049, "ItemNotFound", getString("l_ItemNotFound_Text"));
+  addErrorMessage(9050, "KeyNotFound", getString("l_KeyNotFound_Text"));
+  addErrorMessage(9051, "SessionObjectMaxLengthExceeded", getString("l_SessionDataObjectMaxLengthExceeded_Text").replace("{0}", sessionDataLengthLimit));
+  addErrorMessage(9052, "AttachmentResourceNotFound", getString("l_Attachment_Resource_Not_Found"));
+  addErrorMessage(9053, "AttachmentResourceUnAuthorizedAccess", getString("l_Attachment_Resource_UnAuthorizedAccess"));
+  addErrorMessage(9054, "AttachmentDownloadFailed", getString("l_Attachment_Download_Failed_Generic_Error"));
+  addErrorMessage(9055, "APINotSupportedForSharedFolders", getString("l_API_Not_Supported_For_Shared_Folders_Error"));
   isInitialized = true;
 }
 function addErrorMessage(code, error, message) {
@@ -9493,8 +10703,15 @@ var callOutlookNativeDispatcher_callOutlookNativeDispatcher = function callOutlo
 
     if (responseData.length > 0) {
       var itemNumberFromOutlookResponse = getItemNumberFromOutlookResponse(responseData);
-      var isValidItemNumber = itemNumberFromOutlookResponse > 0;
-      var itemChanged = isValidItemNumber && itemNumberFromOutlookResponse > getAdditionalGlobalParametersSingleton().itemNumber;
+      var isValidItemNumberFromOutlookResponse = itemNumberFromOutlookResponse > 0;
+      var itemNumberInternal = 0;
+
+      if (getAdditionalGlobalParametersSingleton()) {
+        itemNumberInternal = getAdditionalGlobalParametersSingleton().itemNumber;
+      }
+
+      var isValidItemNumberInternal = itemNumberInternal > 0;
+      var itemChanged = isValidItemNumberFromOutlookResponse && isValidItemNumberInternal && itemNumberFromOutlookResponse > itemNumberInternal;
       deserializedData = createDeserializedData(responseData, itemChanged);
     }
 
@@ -9758,6 +10975,11 @@ function standardInvokeHostMethod(dispid, userContext, callback, data, format, c
           asyncResult = createAsyncResult(undefined, standardInvokeHostMethod_OSF.DDA.AsyncResultEnum.ErrorCode.Failed, standardInvokeHostMethod_OSF.DDA.ErrorCodeManager.errorCodes.ooeOperationNotSupported, userContext);
         }
 
+        if (!asyncResult && !customResponse && !response.errorCode && wasSuccessful === true) {
+          var formattedData = format ? format(response.data) : response.data;
+          asyncResult = createAsyncResult(formattedData, standardInvokeHostMethod_OSF.DDA.AsyncResultEnum.ErrorCode.Success, 0, userContext);
+        }
+
         callback(asyncResult);
       }
     }
@@ -9814,10 +11036,20 @@ var standardInvokeHostMethod_invokeHostMethod = function invokeHostMethod(dispid
     responseCallback(InvokeResultCode.errorHandlingRequest, null);
   }
 };
+// EXTERNAL MODULE: ./node_modules/util/util.js
+var util = __webpack_require__(1);
+
 // CONCATENATED MODULE: ./src/utils/getPermissionLevel.ts
 
+
 var getPermissionLevel_getPermissionLevel = function getPermissionLevel() {
-  return getInitialDataProp("permissionLevel");
+  var permissionLevel = getInitialDataProp("permissionLevel");
+
+  if (Object(util["isNullOrUndefined"])(permissionLevel)) {
+    return -1;
+  }
+
+  return permissionLevel;
 };
 // CONCATENATED MODULE: ./src/utils/createError.ts
 function createError(message, errorInfo) {
@@ -9857,6 +11089,11 @@ function createArgumentError(paramName, message) {
     name: "Sys.ArgumentException",
     paramName: paramName
   });
+  return err;
+}
+function createNullItemError(namespace) {
+  var displayMessage = "Invalid operation ({0}) when Office.context.mailbox.item is null.".replace("{0}", namespace);
+  var err = createError(displayMessage);
   return err;
 }
 function createNullArgumentError(paramName, message) {
@@ -9918,6 +11155,10 @@ function createArgumentTypeError(paramName, actualType, expectedType, message) {
 
 
 function checkPermissionsAndThrow(permissions, namespace) {
+  if (getPermissionLevel_getPermissionLevel() == -1) {
+    throw createNullItemError(namespace);
+  }
+
   if (getPermissionLevel_getPermissionLevel() < permissions) {
     throw createError(getString("l_ElevatedPermissionNeededForMethod_Text").replace("{0}", namespace));
   }
@@ -10461,12 +11702,12 @@ var getCurrentLevel = function getCurrentLevel() {
 var Features = {
   featureSampleProduction: production,
   featureSampleBeta: beta,
+  displayXAsync: production,
+  propertyGetAll: production,
   calendarItems: beta,
   signature: beta,
   replyCallback: beta,
-  displayXAsync: beta,
-  propertyGetAll: beta,
-  state: beta
+  sessionData: beta
 };
 function isFeatureEnabled(feature) {
   return feature <= getCurrentLevel();
@@ -10608,6 +11849,10 @@ function validateOptionalStringParameter(value, minLength, maxlength, name) {
     throw createArgumentError(String(name));
   }
 }
+// CONCATENATED MODULE: ./src/utils/isDateObject.ts
+var isDateObject = function isDateObject(objectIn) {
+  return objectIn instanceof Date || Object.prototype.toString.call(objectIn) == "[object Date]";
+};
 // CONCATENATED MODULE: ./src/methods/displayNewAppointmentForm.ts
 var displayNewAppointmentForm_spreadArrays = undefined && undefined.__spreadArrays || function () {
   for (var s = 0, i = 0, il = arguments.length; i < il; i++) {
@@ -10622,6 +11867,7 @@ var displayNewAppointmentForm_spreadArrays = undefined && undefined.__spreadArra
 
   return r;
 };
+
 
 
 
@@ -10689,16 +11935,16 @@ function displayNewAppointmentForm_validateParameters(parameters) {
   }
 
   if (!isNullOrUndefined(parameters.start)) {
-    if (!(parameters.start instanceof Date)) {
+    if (!isDateObject(parameters.start)) {
       throw createArgumentError("start");
     }
 
     if (!isNullOrUndefined(parameters.end)) {
-      if (!(parameters.end instanceof Date)) {
+      if (!isDateObject(parameters.end)) {
         throw createArgumentError("end");
       }
 
-      if (parameters.end < parameters.start) {
+      if (parameters.end && parameters.start && parameters.end < parameters.start) {
         throw createArgumentError("end", getString("l_InvalidEventDates_Text"));
       }
     }
@@ -11371,6 +12617,7 @@ var CustomProperties_spreadArrays = undefined && undefined.__spreadArrays || fun
 
 
 
+
 var CustomProperties_CustomProperties = function () {
   function CustomProperties(deserializedData) {
     if (isNullOrUndefined(deserializedData)) {
@@ -11414,7 +12661,7 @@ var CustomProperties_CustomProperties = function () {
   };
 
   CustomProperties.prototype.set = function (key, value) {
-    if (value instanceof Date) {
+    if (isDateObject(value)) {
       value = DatePrefix + value.getTime() + DatePostfix;
     }
 
@@ -11800,6 +13047,15 @@ var ItemNotificationMessageType;
 
 function validateStringParam(paramName, paramValue) {
   if (isNullOrUndefined(paramValue) || paramValue === "") {
+    throw createNullArgumentError(paramName);
+  }
+
+  if (!(typeof paramValue === "string")) {
+    throw createArgumentTypeError(paramName, typeof paramValue, "string");
+  }
+}
+function validateStringParamWithEmptyAllowed(paramName, paramValue) {
+  if (isNullOrUndefined(paramValue)) {
     throw createNullArgumentError(paramName);
   }
 
@@ -12434,6 +13690,7 @@ function getDelayDelivery() {
 
 
 
+
 function setDelayDelivery(dateTime) {
   var args = [];
 
@@ -12454,7 +13711,7 @@ function validateParamerters(dateTime) {
     throw createNullArgumentError("dateTime", "You cannot conduct to a null dateTime");
   }
 
-  if (!(dateTime instanceof Date)) {
+  if (!isDateObject(dateTime)) {
     throw createArgumentTypeError("dateTime", typeof dateTime, typeof Date);
   }
 
@@ -12581,7 +13838,7 @@ function resolveDate(input, sentTime) {
       }
     }
 
-    if (Number.isNaN(date.getTime())) {
+    if (isNaN(date.getTime())) {
       return sentTime;
     }
 
@@ -13102,8 +14359,8 @@ var createEntities_createMeetingSuggestions = function createMeetingSuggestions(
 
   var meetings = data || [];
   meetings = meetings.map(function (meeting) {
-    var start = getDate(meeting.StartTime);
-    var end = getDate(meeting.EndTime);
+    var start = meeting.StartTime !== "" ? getDate(meeting.StartTime) : undefined;
+    var end = meeting.EndTime !== "" ? getDate(meeting.EndTime) : undefined;
     return {
       meetingString: meeting.MeetingString,
       attendees: (meeting.Attendees || []).map(createEmailAddressDetailsForEntity),
@@ -14294,57 +15551,134 @@ function disableClientSignature() {
   checkFeatureEnabledAndThrow(Features.signature, "disableClientSignatureAsync");
   standardInvokeHostMethod(176, commonParameters.asyncContext, commonParameters.callback, undefined, undefined);
 }
-// CONCATENATED MODULE: ./src/methods/getState.ts
-
-
-
-
-function getState() {
-  var args = [];
-
-  for (var _i = 0; _i < arguments.length; _i++) {
-    args[_i] = arguments[_i];
-  }
-
-  checkPermissionsAndThrow(2, "state.getAsync");
-  var commonParameters = parseCommonArgs(args, true, false);
-  checkFeatureEnabledAndThrow(Features.state, "state.getAsync");
-  standardInvokeHostMethod(186, commonParameters.asyncContext, commonParameters.callback, undefined, undefined);
-}
-// CONCATENATED MODULE: ./src/methods/setState.ts
+// CONCATENATED MODULE: ./src/methods/getSessionData.ts
 
 
 
 
 
-function setState(data) {
+function getSessionData(name) {
   var args = [];
 
   for (var _i = 1; _i < arguments.length; _i++) {
     args[_i - 1] = arguments[_i];
   }
 
-  checkPermissionsAndThrow(2, "state.setAsync");
+  checkPermissionsAndThrow(2, "sessionData.getAsync");
+  var commonParameters = parseCommonArgs(args, true, false);
+  checkFeatureEnabledAndThrow(Features.sessionData, "sessionData.getAsync");
+  var parameters = {
+    name: name
+  };
+  getSessionData_validateParameters(parameters);
+  standardInvokeHostMethod(186, commonParameters.asyncContext, commonParameters.callback, parameters, undefined);
+}
+
+function getSessionData_validateParameters(parameters) {
+  validateStringParam("name", parameters.name);
+}
+// CONCATENATED MODULE: ./src/methods/setSessionData.ts
+
+
+
+
+
+function setSessionData(name, value) {
+  var args = [];
+
+  for (var _i = 2; _i < arguments.length; _i++) {
+    args[_i - 2] = arguments[_i];
+  }
+
+  checkPermissionsAndThrow(2, "sessionData.setAsync");
   var commonParameters = parseCommonArgs(args, false, false);
   var parameters = {
-    data: data
+    name: name,
+    value: value
   };
-  checkFeatureEnabledAndThrow(Features.state, "state.setAsync");
-  setState_validateParameters(parameters);
+  checkFeatureEnabledAndThrow(Features.sessionData, "sessionData.setAsync");
+  setSessionData_validateParameters(parameters);
   standardInvokeHostMethod(185, commonParameters.asyncContext, commonParameters.callback, parameters, undefined);
 }
 
-function setState_validateParameters(parameters) {
-  validateStringParam("data", parameters.data);
+function setSessionData_validateParameters(parameters) {
+  validateStringParam("name", parameters.name);
+  validateStringParamWithEmptyAllowed("value", parameters.value);
 }
-// CONCATENATED MODULE: ./src/api/getStateSurface.ts
+// CONCATENATED MODULE: ./src/methods/getAllSessionData.ts
 
 
 
-function getStateSurface() {
+
+function getAllSessionData() {
+  var args = [];
+
+  for (var _i = 0; _i < arguments.length; _i++) {
+    args[_i] = arguments[_i];
+  }
+
+  checkPermissionsAndThrow(2, "sessionData.getAllAsync");
+  var commonParameters = parseCommonArgs(args, true, false);
+  checkFeatureEnabledAndThrow(Features.sessionData, "sessionData.getAllAsync");
+  standardInvokeHostMethod(187, commonParameters.asyncContext, commonParameters.callback, undefined, undefined);
+}
+// CONCATENATED MODULE: ./src/methods/clearSessionData.ts
+
+
+
+
+function clearSessionData() {
+  var args = [];
+
+  for (var _i = 0; _i < arguments.length; _i++) {
+    args[_i] = arguments[_i];
+  }
+
+  checkPermissionsAndThrow(2, "sessionData.clearAsync");
+  var commonParameters = parseCommonArgs(args, false, false);
+  checkFeatureEnabledAndThrow(Features.sessionData, "sessionData.clearAsync");
+  standardInvokeHostMethod(188, commonParameters.asyncContext, commonParameters.callback, undefined, undefined);
+}
+// CONCATENATED MODULE: ./src/methods/removeSessionData.ts
+
+
+
+
+
+function removeSessionData(name) {
+  var args = [];
+
+  for (var _i = 1; _i < arguments.length; _i++) {
+    args[_i - 1] = arguments[_i];
+  }
+
+  checkPermissionsAndThrow(2, "sessionData.removeAsync");
+  var commonParameters = parseCommonArgs(args, false, false);
+  var parameters = {
+    name: name
+  };
+  checkFeatureEnabledAndThrow(Features.sessionData, "sessionData.removeAsync");
+  removeSessionData_validateParameters(parameters);
+  standardInvokeHostMethod(189, commonParameters.asyncContext, commonParameters.callback, parameters, undefined);
+}
+
+function removeSessionData_validateParameters(parameters) {
+  validateStringParam("name", parameters.name);
+}
+// CONCATENATED MODULE: ./src/api/getSessionDataSurface.ts
+
+
+
+
+
+
+function getSessionDataSurface() {
   return objectDefine({}, {
-    getAsync: getState,
-    setAsync: setState
+    getAsync: getSessionData,
+    setAsync: setSessionData,
+    getAllAsync: getAllSessionData,
+    clearAsync: clearSessionData,
+    removeAsync: removeSessionData
   });
 }
 // CONCATENATED MODULE: ./src/api/getMessageCompose.ts
@@ -14406,7 +15740,7 @@ function getMessageCompose() {
     getComposeTypeAsync: getComposeType,
     isClientSignatureEnabledAsync: isClientSignatureEnabled,
     disableClientSignatureAsync: disableClientSignature,
-    state: getStateSurface()
+    sessionData: getSessionDataSurface()
   });
   return messageCompose;
 }
@@ -14638,6 +15972,7 @@ function getTime_format(rawInput) {
 
 
 
+
 var maxTime = 8640000000000000;
 var minTime = -8640000000000000;
 function setTime(namespace) {
@@ -14662,7 +15997,7 @@ function setTime(namespace) {
 }
 
 function setTime_validateParameters(parameters) {
-  if (!(parameters.date instanceof Date)) {
+  if (!isDateObject(parameters.date)) {
     throw createArgumentTypeError("dateTime", typeof parameters.date, typeof Date);
   }
 
@@ -15244,14 +16579,14 @@ function getAppointmentCompose() {
     sensitivity: getSensitivitySurface(),
     isClientSignatureEnabledAsync: isClientSignatureEnabled,
     disableClientSignatureAsync: disableClientSignature,
-    state: getStateSurface()
+    sessionData: getSessionDataSurface()
   });
   return appointmentCompose;
 }
 // CONCATENATED MODULE: ./src/utils/addEventSupport.ts
 var addEventSupport_OSF = __webpack_require__(0);
 
-var addEventSupport_Microsoft = __webpack_require__(1);
+var addEventSupport_Microsoft = __webpack_require__(5);
 
 var addEventSupport = function addEventSupport(target) {
   addEventSupport_OSF.DDA.DispIdHost.addEventSupport(target, new addEventSupport_OSF.EventDispatch([addEventSupport_Microsoft.Office.WebExtension.EventType.RecipientsChanged, addEventSupport_Microsoft.Office.WebExtension.EventType.AppointmentTimeChanged, addEventSupport_Microsoft.Office.WebExtension.EventType.AttachmentsChanged, addEventSupport_Microsoft.Office.WebExtension.EventType.EnhancedLocationsChanged, addEventSupport_Microsoft.Office.WebExtension.EventType.InfobarClicked, addEventSupport_Microsoft.Office.WebExtension.EventType.RecurrenceChanged]));
@@ -15401,8 +16736,9 @@ var __assign = undefined && undefined.__assign || function () {
 
 
 
+
 function convertToLocalClientTime(timeValue) {
-  if (!(timeValue instanceof Date)) {
+  if (!isDateObject(timeValue)) {
     throw createArgumentError("timeValue");
   }
 

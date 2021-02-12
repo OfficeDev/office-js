@@ -50,6 +50,7 @@ _u.ExtensibilityStrings.l_InvalidTime_Text = "ورودی به زمان معتب�
 _u.ExtensibilityStrings.l_Invalid_Category_Error_Text = "رده‌های نامعتبری ارائه شد.";
 _u.ExtensibilityStrings.l_ItemNotFound_Text = "مورد وجود ندارد یا ایجاد نشده است.";
 _u.ExtensibilityStrings.l_Item_Not_Saved_Error_Text = "تا زمانی که آیتم ذخیره نشده باشد، امکان بازیابی شناسه وجود ندارد.";
+_u.ExtensibilityStrings.l_KeyNotFound_Text = "کلید مشخص شده یافت نشد.";
 _u.ExtensibilityStrings.l_MessageInDifferentStoreError_Text = "شناسه EWS قابل بازیابی نیست زیرا پیام در حافظه ذخیره‌سازی دیگری دخیره شده است.";
 _u.ExtensibilityStrings.l_Missing_Extended_Permissions_For_API = "مجوز تمدیدشده برای فراخوانی API موجود نیست.";
 _u.ExtensibilityStrings.l_NoValidRecipientsProvided_Text = "گیرنده معتبری ارائه نشده است.";
@@ -70,4 +71,5 @@ _u.ExtensibilityStrings.l_RecurrenceUnsupportedAlternateCalendar_Text = "الگ�
 _u.ExtensibilityStrings.l_Recurrence_Error_Instance_SetAsync_Text = "امکان تنظیم الگوی تکرار برای رویدادی خاص در یک مجموعه وجود ندارد.";
 _u.ExtensibilityStrings.l_Recurrence_Error_Properties_Invalid_Text = "الگوی تکرار معتبر نیست. لطفاً بررسی کنید که خصوصیات ویژه تکرار با نوع تکرار همخوانی داشته باشد.";
 _u.ExtensibilityStrings.l_SaveError_Text = "هنگام تلاش برای ذخیره این مورد در سرور، خطایی در اتصال رخ داد.";
+_u.ExtensibilityStrings.l_SessionDataObjectMaxLengthExceeded_Text = "شی sessionData ' از حداکثر طول خود ' {0}' کاراکتر پیشی گرفت.";
 _u.ExtensibilityStrings.l_TokenAccessDeniedWithoutItemContext_Text = "یک رمز REST فقط با مجوز ReadWriteMailbox در دسترس است، زمانی که هیچ زمینه موردی وجود ندارد.";

@@ -153,8 +153,10 @@ Strings.OfficeOM.L_PropertyDoesNotExist = "خاصیت '{0}' آبجیکٹ پر م
 Strings.OfficeOM.L_PropertyNotLoaded = "خاصیت '{0}' دستیاب نہیں ہے۔ خاصیت کی قدر کا مطالعہ کرنے سے قبل، مشتمل آبجیکٹ پر لوڈ طریقے کو کال کریں اور درخواست کے وابستہ سیاق پر \"context.sync()\" کو کال کریں۔";
 Strings.OfficeOM.L_ReadSettingsError = "سیٹنگیں نقص کا مطالعہ";
 Strings.OfficeOM.L_RedundantCallbackSpecification = "واپس کال کو اختیاری آبجیکٹ اور بحث فہرست میں مخصوص نہیں کیا جاسکتا۔";
+Strings.OfficeOM.L_RequestPayloadSizeLimitExceededMessage = 'درخواست کے پے لوڈ کا سائز حد سے تجاوز کر گیا ہے۔ براہ کرم میں دستاویزات ملاحظہ کريں: "https://docs.microsoft.com/office/dev/add-ins/concepts/resource-limits-and-performance-optimization#excel-add-ins"۔';
 Strings.OfficeOM.L_RequestTimeout = "کال نفاذ کرنے میں بہت دیر کر دی ہے۔";
 Strings.OfficeOM.L_RequestTokenUnavailable = "اس API کو فریکوئنسی آہستہ کرنے کے لیے تھروٹلاد کیا گیا ہے۔";
+Strings.OfficeOM.L_ResponsePayloadSizeLimitExceededMessage = 'جواب کے پے لوڈ کا سائز حد سے تجاوز کر گیا ہے۔ براہ کرم میں دستاویزات ملاحظہ کريں: "https://docs.microsoft.com/office/dev/add-ins/concepts/resource-limits-and-performance-optimization#excel-add-ins"۔';
 Strings.OfficeOM.L_RowIndexOutOfRange = "قدر کا اشاریہ کالم اجازت یافتہ حد اطلاق سے باہر ہے۔ (0 یا اعلی) قدر جو صفوں کی تعداد کے مقابلہ میں کم ہو اسے استعمال کریں۔";
 Strings.OfficeOM.L_RunMustReturnPromise = '".run" طریقے پر دیے گئے بیچ فعل نے کوئی وعدہ نہیں لوٹایا ہے۔ فعل کو لازمی وعدہ لوٹانا چاہئے، تاکہ خود کار طور پر سراغ یافتہ کوئی بھی اشیاء بیچ کی تکمیل پر جاری کئے جاسکتے ہیں۔ عام طور پر، آپ "context.sync()" سے جواب لوٹا کر ایک وعدہ لوٹاتے ہیں۔';
 Strings.OfficeOM.L_SSOClientError = "Office کی طرف سے توثیق کاری کی درخواست میں نقص واقع ہوگیا ہے۔";
@@ -198,3 +200,4 @@ Strings.OfficeOM.L_UserClickIgnore = "صارف نے مکالمہ خانہ کو �
 Strings.OfficeOM.L_UserNotSignedIn = "Office میں کوئی صارف دستخط شدہ نہیں۔";
 Strings.OfficeOM.L_ValueNotLoaded = 'نتیجہ آبجیکٹ کی قدر ابھی تک لوڈ نہیں کی گئی ہے۔ خاصیت کی قدر پڑھنے سے پہلے وابستہ متن پر "context.sync()" کو کال کریں۔';
 Strings.OfficeOM.L_WorkbookHiddenMessage = "کتاب کار پوشیدہ ہونے کی وجہ سے JavaScript API کی درخواست ناکام ہو گئی ہے۔ برائے مہربانی کتاب کار کو عیاں کریں اور دوبارہ کوشش کریں۔";
+Strings.OfficeOM.L_WriteNotSupportedWhenModalDialogOpen = "جب موڈل ڈائیلاگ کھلا ہوا ہو تو Office کے لئے تحریری کارروائی کی سہولت معاونت شدہ نہیں ہوتی ہے۔";

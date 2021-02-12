@@ -1,4 +1,4 @@
-/* Version: 16.0.13104.10000 */
+/* Version: 16.0.13509.10000 */
 /*
 	Copyright (c) Microsoft Corporation.  All rights reserved.
 */
@@ -3656,7 +3656,7 @@ var Excel;
 		var BindingDataChangedEventArgs = (function() {
 			function BindingDataChangedEventArgs() {
 				/// <summary> Provides information about the binding that raised the DataChanged event. [Api set: ExcelApi 1.2] </summary>
-				/// <field name="binding" type="Excel.Binding">Gets the Binding object that represents the binding that raised the DataChanged event. [Api set: ExcelApi 1.2]</field>
+				/// <field name="binding" type="Excel.Binding">Gets a temporary `Binding` object that contains the ID of the `Binding` object that raised the event. Use that ID with `BindingCollection.getItem(id)` to get the binding. [Api set: ExcelApi 1.2]</field>
 			}
 			return BindingDataChangedEventArgs;
 		})();
@@ -3672,7 +3672,7 @@ var Excel;
 		var BindingSelectionChangedEventArgs = (function() {
 			function BindingSelectionChangedEventArgs() {
 				/// <summary> Provides information about the selection that raised the &quot;SelectionChanged&quot; event.                             **Note**: If multiple, discontiguous cells are selected, `Binding.onSelectionChanged` only reports row and column information for one selection. Use `Worksheet.onSelectionChanged` for multiple selected ranges. [Api set: ExcelApi 1.2] </summary>
-				/// <field name="binding" type="Excel.Binding">Gets the Binding object that represents the binding that raised the SelectionChanged event. [Api set: ExcelApi 1.2]</field>
+				/// <field name="binding" type="Excel.Binding">Gets a temporary `Binding` object that contains the ID of the `Binding` object that raised the event. Use that ID with `BindingCollection.getItem(id)` to get the binding. [Api set: ExcelApi 1.2]</field>
 				/// <field name="columnCount" type="Number">Gets the number of columns selected. [Api set: ExcelApi 1.2]</field>
 				/// <field name="rowCount" type="Number">Gets the number of rows selected. [Api set: ExcelApi 1.2]</field>
 				/// <field name="startColumn" type="Number">Gets the index of the first column of the selection (zero-based). [Api set: ExcelApi 1.2]</field>
@@ -4584,7 +4584,7 @@ var Excel;
 			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
 			/// <field name="format" type="Excel.ChartAxisTitleFormat">Specifies the formatting of chart axis title. [Api set: ExcelApi 1.1]</field>
 			/// <field name="text" type="String">Specifies the axis title. [Api set: ExcelApi 1.1]</field>
-			/// <field name="textOrientation" type="Number">Specifies the angle to which the text is oriented for the chart axis title. The value should either be an integer from -90 to 90 or the integer 180 for vertically-oriented text. [Api set: ExcelApiOnline 1.1]</field>
+			/// <field name="textOrientation" type="Number">Specifies the angle to which the text is oriented for the chart axis title. The value should either be an integer from -90 to 90 or the integer 180 for vertically-oriented text. [Api set: ExcelApi 1.12]</field>
 			/// <field name="visible" type="Boolean">Specifies if the axis title is visibile. [Api set: ExcelApi 1.1]</field>
 		}
 
@@ -6232,7 +6232,7 @@ var Excel;
 			/// <field name="markerForegroundColor" type="String">Specifies the markers foreground color of a chart series. [Api set: ExcelApi 1.7]</field>
 			/// <field name="markerSize" type="Number">Specifies the marker size of a chart series. [Api set: ExcelApi 1.7]</field>
 			/// <field name="markerStyle" type="String">Specifies the marker style of a chart series. See Excel.ChartMarkerStyle for details. [Api set: ExcelApi 1.7]</field>
-			/// <field name="name" type="String">Specifies the name of a series in a chart. [Api set: ExcelApi 1.1]</field>
+			/// <field name="name" type="String">Specifies the name of a series in a chart. The name&apos;s length should not be greater than 255 characters. [Api set: ExcelApi 1.1]</field>
 			/// <field name="overlap" type="Number">Specifies how bars and columns are positioned. Can be a value between –100 and 100. Applies only to 2-D bar and 2-D column charts. [Api set: ExcelApi 1.8]</field>
 			/// <field name="parentLabelStrategy" type="String">Specifies the series parent label strategy area for a treemap chart. [Api set: ExcelApi 1.9]</field>
 			/// <field name="plotOrder" type="Number">Specifies the plot order of a chart series within the chart group. [Api set: ExcelApi 1.7]</field>
@@ -6277,6 +6277,17 @@ var Excel;
 			/// Deletes the chart series. [Api set: ExcelApi 1.7]
 			/// </summary>
 			/// <returns ></returns>
+		}
+		ChartSeries.prototype.getDimensionValues = function(dimension) {
+			/// <summary>
+			/// Gets the values from a single dimension of the chart series. These could be either category values or data values, depending on the dimension specified and how the data is mapped for the chart series. [Api set: ExcelApi 1.12]
+			/// </summary>
+			/// <param name="dimension" type="String">the dimension of axis where the data from</param>
+			/// <returns type="OfficeExtension.ClientResult&lt;string[]&gt;"></returns>
+			var result = new OfficeExtension.ClientResult();
+			result.__proto__ = null;
+			result.value = [];
+			return result;
 		}
 		ChartSeries.prototype.setBubbleSizes = function(sourceData) {
 			/// <summary>
@@ -6365,6 +6376,20 @@ var Excel;
 		return ChartSeriesCollection;
 	})(OfficeExtension.ClientObject);
 	Excel.ChartSeriesCollection = ChartSeriesCollection;
+})(Excel || (Excel = {__proto__: null}));
+
+var Excel;
+(function (Excel) {
+	/// <summary> Represents the dimensions when getting values from chart series. [Api set: ExcelApi 1.12] </summary>
+	var ChartSeriesDimension = {
+		__proto__: null,
+		"categories": "categories",
+		"values": "values",
+		"xvalues": "xvalues",
+		"yvalues": "yvalues",
+		"bubbleSizes": "bubbleSizes",
+	}
+	Excel.ChartSeriesDimension = ChartSeriesDimension;
 })(Excel || (Excel = {__proto__: null}));
 
 var Excel;
@@ -7008,6 +7033,7 @@ var Excel;
 			/// <field name="authorEmail" type="String">Gets the email of the comment&apos;s author. [Api set: ExcelApi 1.10]</field>
 			/// <field name="authorName" type="String">Gets the name of the comment&apos;s author. [Api set: ExcelApi 1.10]</field>
 			/// <field name="content" type="String">The comment&apos;s content. The string is plain text. [Api set: ExcelApi 1.10]</field>
+			/// <field name="contentType" type="String">Gets the content type of the comment. [Api set: ExcelApi 1.12]</field>
 			/// <field name="creationDate" type="Date">Gets the creation time of the comment. Returns null if the comment was converted from a note, since the comment does not have a creation date. [Api set: ExcelApi 1.10]</field>
 			/// <field name="id" type="String">Specifies the comment identifier. [Api set: ExcelApi 1.10]</field>
 			/// <field name="mentions" type="Array" elementType="Excel.Interfaces.CommentMention">Gets the entities (e.g., people) that are mentioned in comments. [Api set: ExcelApi 1.11]</field>
@@ -7065,12 +7091,69 @@ var Excel;
 
 var Excel;
 (function (Excel) {
+	var Interfaces;
+	(function (Interfaces) {
+		var CommentAddedEventArgs = (function() {
+			function CommentAddedEventArgs() {
+				/// <summary> Provides information about the comments that raised the &quot;CommentAdded&quot; event. [Api set: ExcelApi 1.12] </summary>
+				/// <field name="commentDetails" type="Array" elementType="Excel.Interfaces.CommentDetail">Gets the `CommentDetail` array that contains the comment ID and IDs of its related replies. [Api set: ExcelApi 1.12]</field>
+				/// <field name="source" type="String">Specifies the source of the event. See `Excel.EventSource` for details. [Api set: ExcelApi 1.12]</field>
+				/// <field name="type" type="String">Gets the type of the event. See `Excel.EventType` for details. [Api set: ExcelApi 1.12]</field>
+				/// <field name="worksheetId" type="String">Gets the Id of the worksheet in which the event happened. [Api set: ExcelApi 1.12]</field>
+			}
+			return CommentAddedEventArgs;
+		})();
+		Interfaces.CommentAddedEventArgs.__proto__ = null;
+		Interfaces.CommentAddedEventArgs = CommentAddedEventArgs;
+	})(Interfaces = Excel.Interfaces || (Excel.Interfaces = { __proto__: null}));
+})(Excel || (Excel = {__proto__: null}));
+
+var Excel;
+(function (Excel) {
+	var Interfaces;
+	(function (Interfaces) {
+		var CommentChangedEventArgs = (function() {
+			function CommentChangedEventArgs() {
+				/// <summary> Occurs when existing comments are changed. [Api set: ExcelApi 1.12] </summary>
+				/// <field name="changeType" type="String">Gets the change type that represents how the changed event is triggered. [Api set: ExcelApi 1.12]</field>
+				/// <field name="commentDetails" type="Array" elementType="Excel.Interfaces.CommentDetail">Get the CommentDetail array which contains the comment Id and Ids of its related replies. [Api set: ExcelApi 1.12]</field>
+				/// <field name="source" type="String">Specifies the source of the event. See Excel.EventSource for details. [Api set: ExcelApi 1.12]</field>
+				/// <field name="type" type="String">Gets the type of the event. See Excel.EventType for details. [Api set: ExcelApi 1.12]</field>
+				/// <field name="worksheetId" type="String">Gets the Id of the worksheet in which the event happened. [Api set: ExcelApi 1.12]</field>
+			}
+			return CommentChangedEventArgs;
+		})();
+		Interfaces.CommentChangedEventArgs.__proto__ = null;
+		Interfaces.CommentChangedEventArgs = CommentChangedEventArgs;
+	})(Interfaces = Excel.Interfaces || (Excel.Interfaces = { __proto__: null}));
+})(Excel || (Excel = {__proto__: null}));
+
+var Excel;
+(function (Excel) {
+	/// <summary> Represents how the comments in the event were changed. [Api set: ExcelApi 1.12] </summary>
+	var CommentChangeType = {
+		__proto__: null,
+		"commentEdited": "commentEdited",
+		"commentResolved": "commentResolved",
+		"commentReopened": "commentReopened",
+		"replyAdded": "replyAdded",
+		"replyDeleted": "replyDeleted",
+		"replyEdited": "replyEdited",
+	}
+	Excel.CommentChangeType = CommentChangeType;
+})(Excel || (Excel = {__proto__: null}));
+
+var Excel;
+(function (Excel) {
 	var CommentCollection = (function(_super) {
 		__extends(CommentCollection, _super);
 		function CommentCollection() {
 			/// <summary> Represents a collection of comment objects that are part of the workbook. [Api set: ExcelApi 1.10] </summary>
 			/// <field name="context" type="Excel.RequestContext">The request context associated with this object.</field>
 			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
+			/// <field name="onAdded" type="OfficeExtension.EventHandlers">Occurs when the comments are added. [Api set: ExcelApi 1.12]</field>
+			/// <field name="onChanged" type="OfficeExtension.EventHandlers">Occurs when comments or replies in a comment collection are changed, including when replies are deleted. [Api set: ExcelApi 1.12]</field>
+			/// <field name="onDeleted" type="OfficeExtension.EventHandlers">Occurs when comments are deleted in the comment collection. [Api set: ExcelApi 1.12]</field>
 			/// <field name="items" type="Array" elementType="Excel.Comment">Gets the loaded child items in this collection.</field>
 		}
 
@@ -7128,10 +7211,88 @@ var Excel;
 			/// <param name="replyId" type="String">The identifier of comment reply.</param>
 			/// <returns type="Excel.Comment"></returns>
 		}
+		CommentCollection.prototype.onAdded = {
+			__proto__: null,
+			add: function (handler) {
+				/// <param name="handler" type="function(eventArgs: Excel.Interfaces.CommentAddedEventArgs)">Handler for the event. EventArgs: Provides information about the comments that raised the &quot;CommentAdded&quot; event. </param>
+				/// <returns type="OfficeExtension.EventHandlerResult"></returns>
+				var eventInfo = new Excel.Interfaces.CommentAddedEventArgs();
+				eventInfo.__proto__ = null;
+				handler(eventInfo);
+			},
+			remove: function (handler) {
+				/// <param name="handler" type="function(eventArgs: Excel.Interfaces.CommentAddedEventArgs)">Handler for the event.</param>
+				return;
+			}
+		};
+		CommentCollection.prototype.onChanged = {
+			__proto__: null,
+			add: function (handler) {
+				/// <param name="handler" type="function(eventArgs: Excel.Interfaces.CommentChangedEventArgs)">Handler for the event. EventArgs: Occurs when existing comments are changed. </param>
+				/// <returns type="OfficeExtension.EventHandlerResult"></returns>
+				var eventInfo = new Excel.Interfaces.CommentChangedEventArgs();
+				eventInfo.__proto__ = null;
+				handler(eventInfo);
+			},
+			remove: function (handler) {
+				/// <param name="handler" type="function(eventArgs: Excel.Interfaces.CommentChangedEventArgs)">Handler for the event.</param>
+				return;
+			}
+		};
+		CommentCollection.prototype.onDeleted = {
+			__proto__: null,
+			add: function (handler) {
+				/// <param name="handler" type="function(eventArgs: Excel.Interfaces.CommentDeletedEventArgs)">Handler for the event. EventArgs: Provides information about the comments that raised the &quot;CommentDeleted&quot; event. </param>
+				/// <returns type="OfficeExtension.EventHandlerResult"></returns>
+				var eventInfo = new Excel.Interfaces.CommentDeletedEventArgs();
+				eventInfo.__proto__ = null;
+				handler(eventInfo);
+			},
+			remove: function (handler) {
+				/// <param name="handler" type="function(eventArgs: Excel.Interfaces.CommentDeletedEventArgs)">Handler for the event.</param>
+				return;
+			}
+		};
 
 		return CommentCollection;
 	})(OfficeExtension.ClientObject);
 	Excel.CommentCollection = CommentCollection;
+})(Excel || (Excel = {__proto__: null}));
+
+var Excel;
+(function (Excel) {
+	var Interfaces;
+	(function (Interfaces) {
+		var CommentDeletedEventArgs = (function() {
+			function CommentDeletedEventArgs() {
+				/// <summary> Provides information about the comments that raised the &quot;CommentDeleted&quot; event. [Api set: ExcelApi 1.12] </summary>
+				/// <field name="commentDetails" type="Array" elementType="Excel.Interfaces.CommentDetail">Gets the `CommentDetail` array that contains the comment ID and IDs of its related replies. [Api set: ExcelApi 1.12]</field>
+				/// <field name="source" type="String">Specifies the source of the event. See `Excel.EventSource` for details. [Api set: ExcelApi 1.12]</field>
+				/// <field name="type" type="String">Gets the type of the event. See `Excel.EventType` for details. [Api set: ExcelApi 1.12]</field>
+				/// <field name="worksheetId" type="String">Gets the Id of the worksheet in which the event happened. [Api set: ExcelApi 1.12]</field>
+			}
+			return CommentDeletedEventArgs;
+		})();
+		Interfaces.CommentDeletedEventArgs.__proto__ = null;
+		Interfaces.CommentDeletedEventArgs = CommentDeletedEventArgs;
+	})(Interfaces = Excel.Interfaces || (Excel.Interfaces = { __proto__: null}));
+})(Excel || (Excel = {__proto__: null}));
+
+var Excel;
+(function (Excel) {
+	var Interfaces;
+	(function (Interfaces) {
+		var CommentDetail = (function() {
+			function CommentDetail() {
+				/// <summary> A structure for the comment Id and Ids of its related replies. [Api set: ExcelApi 1.12] </summary>
+				/// <field name="replyIds" type="Array" elementType="String">Represents the ids of the related replies belong to comment. [Api set: ExcelApi 1.12]</field>
+				/// <field name="commentId" type="String">Represents the id of comment. [Api set: ExcelApi 1.12]</field>
+			}
+			return CommentDetail;
+		})();
+		Interfaces.CommentDetail.__proto__ = null;
+		Interfaces.CommentDetail = CommentDetail;
+	})(Interfaces = Excel.Interfaces || (Excel.Interfaces = { __proto__: null}));
 })(Excel || (Excel = {__proto__: null}));
 
 var Excel;
@@ -7163,6 +7324,7 @@ var Excel;
 			/// <field name="authorEmail" type="String">Gets the email of the comment reply&apos;s author. [Api set: ExcelApi 1.10]</field>
 			/// <field name="authorName" type="String">Gets the name of the comment reply&apos;s author. [Api set: ExcelApi 1.10]</field>
 			/// <field name="content" type="String">The comment reply&apos;s content. The string is plain text. [Api set: ExcelApi 1.10]</field>
+			/// <field name="contentType" type="String">The content type of the reply. [Api set: ExcelApi 1.12]</field>
 			/// <field name="creationDate" type="Date">Gets the creation time of the comment reply. [Api set: ExcelApi 1.10]</field>
 			/// <field name="id" type="String">Specifies the comment reply identifier. [Api set: ExcelApi 1.10]</field>
 			/// <field name="mentions" type="Array" elementType="Excel.Interfaces.CommentMention">The entities (e.g., people) that are mentioned in comments. [Api set: ExcelApi 1.11]</field>
@@ -8202,6 +8364,7 @@ var Excel;
 			/// <summary> Provides information based on current system culture settings. This includes the culture names, number formatting, and other culturally dependent settings. [Api set: ExcelApi 1.11] </summary>
 			/// <field name="context" type="Excel.RequestContext">The request context associated with this object.</field>
 			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
+			/// <field name="datetimeFormat" type="Excel.DatetimeFormatInfo">Defines the culturally appropriate format of displaying date and time. This is based on current system culture settings. [Api set: ExcelApi 1.12]</field>
 			/// <field name="name" type="String">Gets the culture name in the format languagecode2-country/regioncode2 (e.g., &quot;zh-cn&quot; or &quot;en-us&quot;). This is based on current system settings. [Api set: ExcelApi 1.11]</field>
 			/// <field name="numberFormat" type="Excel.NumberFormatInfo">Defines the culturally appropriate format of displaying numbers. This is based on current system culture settings. [Api set: ExcelApi 1.11]</field>
 		}
@@ -8928,6 +9091,54 @@ var Excel;
 
 var Excel;
 (function (Excel) {
+	/// <summary> Enum representing all accepted conditions by which a date filter can be applied.               Used to configure the type of PivotFilter that is applied to the field. [Api set: ExcelApi 1.12] </summary>
+	var DateFilterCondition = {
+		__proto__: null,
+		"unknown": "unknown",
+		"equals": "equals",
+		"before": "before",
+		"beforeOrEqualTo": "beforeOrEqualTo",
+		"after": "after",
+		"afterOrEqualTo": "afterOrEqualTo",
+		"between": "between",
+		"tomorrow": "tomorrow",
+		"today": "today",
+		"yesterday": "yesterday",
+		"nextWeek": "nextWeek",
+		"thisWeek": "thisWeek",
+		"lastWeek": "lastWeek",
+		"nextMonth": "nextMonth",
+		"thisMonth": "thisMonth",
+		"lastMonth": "lastMonth",
+		"nextQuarter": "nextQuarter",
+		"thisQuarter": "thisQuarter",
+		"lastQuarter": "lastQuarter",
+		"nextYear": "nextYear",
+		"thisYear": "thisYear",
+		"lastYear": "lastYear",
+		"yearToDate": "yearToDate",
+		"allDatesInPeriodQuarter1": "allDatesInPeriodQuarter1",
+		"allDatesInPeriodQuarter2": "allDatesInPeriodQuarter2",
+		"allDatesInPeriodQuarter3": "allDatesInPeriodQuarter3",
+		"allDatesInPeriodQuarter4": "allDatesInPeriodQuarter4",
+		"allDatesInPeriodJanuary": "allDatesInPeriodJanuary",
+		"allDatesInPeriodFebruary": "allDatesInPeriodFebruary",
+		"allDatesInPeriodMarch": "allDatesInPeriodMarch",
+		"allDatesInPeriodApril": "allDatesInPeriodApril",
+		"allDatesInPeriodMay": "allDatesInPeriodMay",
+		"allDatesInPeriodJune": "allDatesInPeriodJune",
+		"allDatesInPeriodJuly": "allDatesInPeriodJuly",
+		"allDatesInPeriodAugust": "allDatesInPeriodAugust",
+		"allDatesInPeriodSeptember": "allDatesInPeriodSeptember",
+		"allDatesInPeriodOctober": "allDatesInPeriodOctober",
+		"allDatesInPeriodNovember": "allDatesInPeriodNovember",
+		"allDatesInPeriodDecember": "allDatesInPeriodDecember",
+	}
+	Excel.DateFilterCondition = DateFilterCondition;
+})(Excel || (Excel = {__proto__: null}));
+
+var Excel;
+(function (Excel) {
 	var Interfaces;
 	(function (Interfaces) {
 		var DateTimeDataValidation = (function() {
@@ -8942,6 +9153,34 @@ var Excel;
 		Interfaces.DateTimeDataValidation.__proto__ = null;
 		Interfaces.DateTimeDataValidation = DateTimeDataValidation;
 	})(Interfaces = Excel.Interfaces || (Excel.Interfaces = { __proto__: null}));
+})(Excel || (Excel = {__proto__: null}));
+
+var Excel;
+(function (Excel) {
+	var DatetimeFormatInfo = (function(_super) {
+		__extends(DatetimeFormatInfo, _super);
+		function DatetimeFormatInfo() {
+			/// <summary> Defines the culturally appropriate format of displaying numbers. This is based on current system culture settings. [Api set: ExcelApi 1.12] </summary>
+			/// <field name="context" type="Excel.RequestContext">The request context associated with this object.</field>
+			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
+			/// <field name="dateSeparator" type="String">Gets the string used as the date separator. This is based on current system settings. [Api set: ExcelApi 1.12]</field>
+			/// <field name="longDatePattern" type="String">Gets the format string for a long date value. This is based on current system settings. [Api set: ExcelApi 1.12]</field>
+			/// <field name="longTimePattern" type="String">Gets the format string for a long time value. This is based on current system settings. [Api set: ExcelApi 1.12]</field>
+			/// <field name="shortDatePattern" type="String">Gets the format string for a short date value. This is based on current system settings. [Api set: ExcelApi 1.12]</field>
+			/// <field name="timeSeparator" type="String">Gets the string used as the time separator. This is based on current system settings. [Api set: ExcelApi 1.12]</field>
+		}
+
+		DatetimeFormatInfo.prototype.load = function(option) {
+			/// <summary>
+			/// Queues up a command to load the specified properties of the object. You must call "context.sync()" before reading the properties.
+			/// </summary>
+			/// <param name="option" type="string | string[] | OfficeExtension.LoadOption"/>
+			/// <returns type="Excel.DatetimeFormatInfo"/>
+		}
+
+		return DatetimeFormatInfo;
+	})(OfficeExtension.ClientObject);
+	Excel.DatetimeFormatInfo = DatetimeFormatInfo;
 })(Excel || (Excel = {__proto__: null}));
 
 var Excel;
@@ -9141,6 +9380,7 @@ var Excel;
 		"linkedDataTypeRefreshRequestCompleted": "linkedDataTypeRefreshRequestCompleted",
 		"linkedDataTypeRefreshModeChanged": "linkedDataTypeRefreshModeChanged",
 		"linkedDataTypeLinkedDataTypeAdded": "linkedDataTypeLinkedDataTypeAdded",
+		"worksheetFormulaChanged": "worksheetFormulaChanged",
 	}
 	Excel.EventType = EventType;
 })(Excel || (Excel = {__proto__: null}));
@@ -13148,6 +13388,25 @@ var Excel;
 
 var Excel;
 (function (Excel) {
+	/// <summary> Enum representing all accepted conditions by which a label filter can be applied.               Used to configure the type of PivotFilter that is applied to the field.               `PivotFilter.criteria.exclusive` can be set to true to invert many of these conditions. [Api set: ExcelApi 1.12] </summary>
+	var LabelFilterCondition = {
+		__proto__: null,
+		"unknown": "unknown",
+		"equals": "equals",
+		"beginsWith": "beginsWith",
+		"endsWith": "endsWith",
+		"contains": "contains",
+		"greaterThan": "greaterThan",
+		"greaterThanOrEqualTo": "greaterThanOrEqualTo",
+		"lessThan": "lessThan",
+		"lessThanOrEqualTo": "lessThanOrEqualTo",
+		"between": "between",
+	}
+	Excel.LabelFilterCondition = LabelFilterCondition;
+})(Excel || (Excel = {__proto__: null}));
+
+var Excel;
+(function (Excel) {
 	var Line = (function(_super) {
 		__extends(Line, _super);
 		function Line() {
@@ -13440,6 +13699,27 @@ var Excel;
 		"array": "array",
 	}
 	Excel.NamedItemType = NamedItemType;
+})(Excel || (Excel = {__proto__: null}));
+
+var Excel;
+(function (Excel) {
+	/// <summary> Represents a category of number formats. [Api set: ExcelApi 1.12] </summary>
+	var NumberFormatCategory = {
+		__proto__: null,
+		"general": "general",
+		"number": "number",
+		"currency": "currency",
+		"accounting": "accounting",
+		"date": "date",
+		"time": "time",
+		"percentage": "percentage",
+		"fraction": "fraction",
+		"scientific": "scientific",
+		"text": "text",
+		"special": "special",
+		"custom": "custom",
+	}
+	Excel.NumberFormatCategory = NumberFormatCategory;
 })(Excel || (Excel = {__proto__: null}));
 
 var Excel;
@@ -13812,6 +14092,27 @@ var Excel;
 
 var Excel;
 (function (Excel) {
+	var Interfaces;
+	(function (Interfaces) {
+		var PivotDateFilter = (function() {
+			function PivotDateFilter() {
+				/// <summary> Configurable template for a date filter to apply to a PivotField.              The `condition` defines what criteria need to be set in order for the filter to operate. [Api set: ExcelApi 1.12] </summary>
+				/// <field name="comparator" type="Excel.Interfaces.FilterDatetime">The comparator is the static value to which other values are compared. The type of comparison is defined by the condition. [Api set: ExcelApi 1.12]</field>
+				/// <field name="condition" type="String">Specifies the condition for the filter, which defines the necessary filtering criteria. [Api set: ExcelApi 1.12]</field>
+				/// <field name="exclusive" type="Boolean">If true, filter *excludes* items that meet criteria. The default is false (filter to include items that meet criteria). [Api set: ExcelApi 1.12]</field>
+				/// <field name="lowerBound" type="Excel.Interfaces.FilterDatetime">The lower-bound of the range for the `Between` filter condition. [Api set: ExcelApi 1.12]</field>
+				/// <field name="upperBound" type="Excel.Interfaces.FilterDatetime">The upper-bound of the range for the `Between` filter condition. [Api set: ExcelApi 1.12]</field>
+				/// <field name="wholeDays" type="Boolean">For `Equals`, `Before`, `After`, and `Between` filter conditions, indicates if comparisons should be made as whole days. [Api set: ExcelApi 1.12]</field>
+			}
+			return PivotDateFilter;
+		})();
+		Interfaces.PivotDateFilter.__proto__ = null;
+		Interfaces.PivotDateFilter = PivotDateFilter;
+	})(Interfaces = Excel.Interfaces || (Excel.Interfaces = { __proto__: null}));
+})(Excel || (Excel = {__proto__: null}));
+
+var Excel;
+(function (Excel) {
 	var PivotField = (function(_super) {
 		__extends(PivotField, _super);
 		function PivotField() {
@@ -13846,6 +14147,47 @@ var Excel;
 			/// <summary>Sets multiple properties on the object at the same time, based on an existing loaded object.</summary>
 			/// <param name="properties" type="PivotField">An existing PivotField object, with properties that have already been loaded and synced.</param>
 			/// </signature>
+		}
+		PivotField.prototype.applyFilter = function(filter) {
+			/// <summary>
+			/// Sets one or more of the field&apos;s current PivotFilters and applies them to the field.               If the provided filters are invalid or cannot be applied, an exception is thrown. [Api set: ExcelApi 1.12]
+			/// </summary>
+			/// <param name="filter" type="Excel.Interfaces.PivotFilters">A configured specific PivotFilter or a PivotFilters interface containing multiple configured filters.</param>
+			/// <returns ></returns>
+		}
+		PivotField.prototype.clearAllFilters = function() {
+			/// <summary>
+			/// Clears all criteria from all of the field&apos;s filters. This removes any active filtering on the field. [Api set: ExcelApi 1.12]
+			/// </summary>
+			/// <returns ></returns>
+		}
+		PivotField.prototype.clearFilter = function(filterType) {
+			/// <summary>
+			/// Clears all existing criteria from the field&apos;s filter of the given type (if one is currently applied). [Api set: ExcelApi 1.12]
+			/// </summary>
+			/// <param name="filterType" type="String">The type of filter on the field of which to clear all criteria.</param>
+			/// <returns ></returns>
+		}
+		PivotField.prototype.getFilters = function() {
+			/// <summary>
+			/// Gets all filters currently applied on the field. [Api set: ExcelApi 1.12]
+			/// </summary>
+			/// <returns type="OfficeExtension.ClientResult&lt;Excel.PivotFilters&gt;">A PivotFilters interface with all active filters.</returns>
+			var result = new OfficeExtension.ClientResult();
+			result.__proto__ = null;
+			result.value = {};
+			return result;
+		}
+		PivotField.prototype.isFiltered = function(filterType) {
+			/// <summary>
+			/// Checks if there are any applied filters on the field. [Api set: ExcelApi 1.12]
+			/// </summary>
+			/// <param name="filterType" type="String" optional="true">The filter type to check. If no type is provided, this method will check if any filter is applied.</param>
+			/// <returns type="OfficeExtension.ClientResult&lt;boolean&gt;">True if the field has a filter of type `filterType` applied. If filterType is not specified, true is returned if the field has any applied filters.</returns>
+			var result = new OfficeExtension.ClientResult();
+			result.__proto__ = null;
+			result.value = false;
+			return result;
 		}
 		PivotField.prototype.sortByLabels = function(sortBy) {
 			/// <summary>
@@ -13919,6 +14261,25 @@ var Excel;
 
 var Excel;
 (function (Excel) {
+	var Interfaces;
+	(function (Interfaces) {
+		var PivotFilters = (function() {
+			function PivotFilters() {
+				/// <summary> An interface representing all PivotFilters currently applied to a given PivotField. [Api set: ExcelApi 1.12] </summary>
+				/// <field name="dateFilter" type="Excel.Interfaces.PivotDateFilter">The PivotField&apos;s currently applied date filter. Null if none is applied. [Api set: ExcelApi 1.12]</field>
+				/// <field name="labelFilter" type="Excel.Interfaces.PivotLabelFilter">The PivotField&apos;s currently applied label filter. Null if none is applied. [Api set: ExcelApi 1.12]</field>
+				/// <field name="manualFilter" type="Excel.Interfaces.PivotManualFilter">The PivotField&apos;s currently applied manual filter. Null if none is applied. [Api set: ExcelApi 1.12]</field>
+				/// <field name="valueFilter" type="Excel.Interfaces.PivotValueFilter">The PivotField&apos;s currently applied value filter. Null if none is applied. [Api set: ExcelApi 1.12]</field>
+			}
+			return PivotFilters;
+		})();
+		Interfaces.PivotFilters.__proto__ = null;
+		Interfaces.PivotFilters = PivotFilters;
+	})(Interfaces = Excel.Interfaces || (Excel.Interfaces = { __proto__: null}));
+})(Excel || (Excel = {__proto__: null}));
+
+var Excel;
+(function (Excel) {
 	/// <summary> Represents the criteria for the top/bottom values filter. [Api set: ExcelApi 1.9] </summary>
 	var PivotFilterTopBottomCriterion = {
 		__proto__: null,
@@ -13931,6 +14292,20 @@ var Excel;
 		"bottomSum": "bottomSum",
 	}
 	Excel.PivotFilterTopBottomCriterion = PivotFilterTopBottomCriterion;
+})(Excel || (Excel = {__proto__: null}));
+
+var Excel;
+(function (Excel) {
+	/// <summary> A simple enum that represents a type of filter for a PivotField. [Api set: ExcelApi 1.12] </summary>
+	var PivotFilterType = {
+		__proto__: null,
+		"unknown": "unknown",
+		"value": "value",
+		"manual": "manual",
+		"label": "label",
+		"date": "date",
+	}
+	Excel.PivotFilterType = PivotFilterType;
 })(Excel || (Excel = {__proto__: null}));
 
 var Excel;
@@ -14114,6 +14489,27 @@ var Excel;
 
 var Excel;
 (function (Excel) {
+	var Interfaces;
+	(function (Interfaces) {
+		var PivotLabelFilter = (function() {
+			function PivotLabelFilter() {
+				/// <summary> Configurable template for a label filter to apply to a PivotField.              The `condition` defines what criteria need to be set in order for the filter to operate. [Api set: ExcelApi 1.12] </summary>
+				/// <field name="comparator" type="String">The comparator is the static value to which other values are compared. The type of comparison is defined by the condition.               Note: A numeric string is treated as a number when being compared against other numeric strings. [Api set: ExcelApi 1.12]</field>
+				/// <field name="condition" type="String">Specifies the condition for the filter, which defines the necessary filtering criteria. [Api set: ExcelApi 1.12]</field>
+				/// <field name="exclusive" type="Boolean">If true, filter *excludes* items that meet criteria. The default is false (filter to include items that meet criteria). [Api set: ExcelApi 1.12]</field>
+				/// <field name="lowerBound" type="String">The lower-bound of the range for the Between filter condition.               Note: A numeric string is treated as a number when being compared against other numeric strings. [Api set: ExcelApi 1.12]</field>
+				/// <field name="substring" type="String">The substring used for `BeginsWith`, `EndsWith`, and `Contains` filter conditions. [Api set: ExcelApi 1.12]</field>
+				/// <field name="upperBound" type="String">The upper-bound of the range for the Between filter condition.              Note: A numeric string is treated as a number when being compared against other numeric strings. [Api set: ExcelApi 1.12]</field>
+			}
+			return PivotLabelFilter;
+		})();
+		Interfaces.PivotLabelFilter.__proto__ = null;
+		Interfaces.PivotLabelFilter = PivotLabelFilter;
+	})(Interfaces = Excel.Interfaces || (Excel.Interfaces = { __proto__: null}));
+})(Excel || (Excel = {__proto__: null}));
+
+var Excel;
+(function (Excel) {
 	var PivotLayout = (function(_super) {
 		__extends(PivotLayout, _super);
 		function PivotLayout() {
@@ -14182,11 +14578,7 @@ var Excel;
 			/// </summary>
 			/// <param name="axis" type="String">The axis from which to get the PivotItems. Must be either &quot;row&quot; or &quot;column.&quot;</param>
 			/// <param name="cell" >A single cell within the PivotTable&apos;s data body.</param>
-			/// <returns type="OfficeExtension.ClientResult&lt;Excel.PivotItem[]&gt;">A collection of PivotItems that are used to calculate the values in the specified row.</returns>
-			var result = new OfficeExtension.ClientResult();
-			result.__proto__ = null;
-			result.value = [];
-			return result;
+			/// <returns type="Excel.PivotItemCollection">A PivotItemCollection of the PivotItems that are used to calculate the values in the specified row.</returns>
 		}
 		PivotLayout.prototype.getRange = function() {
 			/// <summary>
@@ -14228,12 +14620,29 @@ var Excel;
 
 var Excel;
 (function (Excel) {
+	var Interfaces;
+	(function (Interfaces) {
+		var PivotManualFilter = (function() {
+			function PivotManualFilter() {
+				/// <summary> Configurable template for a manual filter to apply to a PivotField.              The `condition` defines what criteria need to be set in order for the filter to operate. [Api set: ExcelApi 1.12] </summary>
+				/// <field name="selectedItems" type="Array" >A list of selected items to manually filter. These must be existing and valid items from the chosen field. [Api set: ExcelApi 1.12]</field>
+			}
+			return PivotManualFilter;
+		})();
+		Interfaces.PivotManualFilter.__proto__ = null;
+		Interfaces.PivotManualFilter = PivotManualFilter;
+	})(Interfaces = Excel.Interfaces || (Excel.Interfaces = { __proto__: null}));
+})(Excel || (Excel = {__proto__: null}));
+
+var Excel;
+(function (Excel) {
 	var PivotTable = (function(_super) {
 		__extends(PivotTable, _super);
 		function PivotTable() {
 			/// <summary> Represents an Excel PivotTable.              To learn more about the PivotTable object model, read {@link https://docs.microsoft.com/office/dev/add-ins/excel/excel-add-ins-pivottables | Work with PivotTables using the Excel JavaScript API}. [Api set: ExcelApi 1.3] </summary>
 			/// <field name="context" type="Excel.RequestContext">The request context associated with this object.</field>
 			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
+			/// <field name="allowMultipleFiltersPerField" type="Boolean">Specifies if the PivotTable allows the application of multiple PivotFilters on a given PivotField in the table. [Api set: ExcelApi 1.12]</field>
 			/// <field name="columnHierarchies" type="Excel.RowColumnPivotHierarchyCollection">The Column Pivot Hierarchies of the PivotTable. [Api set: ExcelApi 1.8]</field>
 			/// <field name="dataHierarchies" type="Excel.DataPivotHierarchyCollection">The Data Pivot Hierarchies of the PivotTable. [Api set: ExcelApi 1.8]</field>
 			/// <field name="enableDataValueEditing" type="Boolean">Specifies if the PivotTable allows values in the data body to be edited by the user. [Api set: ExcelApi 1.9]</field>
@@ -14355,7 +14764,7 @@ var Excel;
 	var PivotTableScopedCollection = (function(_super) {
 		__extends(PivotTableScopedCollection, _super);
 		function PivotTableScopedCollection() {
-			/// <summary> Represents a scoped collection of PivotTables. The PivotTables are sorted based on the location of the PivotTable&apos;s top-left corner. They are ordered top to bottom and then left to right. [Api set: ExcelApiOnline 1.1] </summary>
+			/// <summary> Represents a scoped collection of PivotTables. The PivotTables are sorted based on the location of the PivotTable&apos;s top-left corner. They are ordered top to bottom and then left to right. [Api set: ExcelApi 1.12] </summary>
 			/// <field name="context" type="Excel.RequestContext">The request context associated with this object.</field>
 			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
 			/// <field name="items" type="Array" elementType="Excel.PivotTable">Gets the loaded child items in this collection.</field>
@@ -14370,7 +14779,7 @@ var Excel;
 		}
 		PivotTableScopedCollection.prototype.getCount = function() {
 			/// <summary>
-			/// Gets the number of PivotTables in the collection. [Api set: ExcelApiOnline 1.1]
+			/// Gets the number of PivotTables in the collection. [Api set: ExcelApi 1.12]
 			/// </summary>
 			/// <returns type="OfficeExtension.ClientResult&lt;number&gt;"></returns>
 			var result = new OfficeExtension.ClientResult();
@@ -14380,20 +14789,20 @@ var Excel;
 		}
 		PivotTableScopedCollection.prototype.getFirst = function() {
 			/// <summary>
-			/// Gets the first PivotTable in the collection. The PivotTables in the collection are sorted top to bottom and left to right, such that top-left table is the first PivotTable in the collection. [Api set: ExcelApiOnline 1.1]
+			/// Gets the first PivotTable in the collection. The PivotTables in the collection are sorted top to bottom and left to right, such that top-left table is the first PivotTable in the collection. [Api set: ExcelApi 1.12]
 			/// </summary>
 			/// <returns type="Excel.PivotTable"></returns>
 		}
 		PivotTableScopedCollection.prototype.getItem = function(key) {
 			/// <summary>
-			/// Gets a PivotTable by name. [Api set: ExcelApiOnline 1.1]
+			/// Gets a PivotTable by name. [Api set: ExcelApi 1.12]
 			/// </summary>
 			/// <param name="key" type="String">Name of the PivotTable to be retrieved.</param>
 			/// <returns type="Excel.PivotTable"></returns>
 		}
 		PivotTableScopedCollection.prototype.getItemOrNullObject = function(name) {
 			/// <summary>
-			/// Gets a PivotTable by name. If the PivotTable does not exist, will return a null object. [Api set: ExcelApiOnline 1.1]
+			/// Gets a PivotTable by name. If the PivotTable does not exist, will return a null object. [Api set: ExcelApi 1.12]
 			/// </summary>
 			/// <param name="name" type="String">Name of the PivotTable to be retrieved.</param>
 			/// <returns type="Excel.PivotTable"></returns>
@@ -14527,6 +14936,29 @@ var Excel;
 
 var Excel;
 (function (Excel) {
+	var Interfaces;
+	(function (Interfaces) {
+		var PivotValueFilter = (function() {
+			function PivotValueFilter() {
+				/// <summary> Configurable template for a value filter to apply to a PivotField.              The `condition` defines what criteria need to be set in order for the filter to operate. [Api set: ExcelApi 1.12] </summary>
+				/// <field name="comparator" type="Number">The comparator is the static value to which other values are compared. The type of comparison is defined by the condition.               For example, if comparator is &quot;50&quot; and condition is &quot;GreaterThan&quot;, all item values that are not greater than 50 will be removed by the filter. [Api set: ExcelApi 1.12]</field>
+				/// <field name="condition" type="String">Specifies the condition for the filter, which defines the necessary filtering criteria. [Api set: ExcelApi 1.12]</field>
+				/// <field name="exclusive" type="Boolean">If true, filter *excludes* items that meet criteria. The default is false (filter to include items that meet criteria). [Api set: ExcelApi 1.12]</field>
+				/// <field name="lowerBound" type="Number">The lower-bound of the range for the `Between` filter condition. [Api set: ExcelApi 1.12]</field>
+				/// <field name="selectionType" type="String">Specifies if the filter is for the top/bottom N items, top/bottom N percent, or top/bottom N sum. [Api set: ExcelApi 1.12]</field>
+				/// <field name="threshold" type="Number">The &quot;N&quot; threshold number of items, percent, or sum to be filtered for a Top/Bottom filter condition. [Api set: ExcelApi 1.12]</field>
+				/// <field name="upperBound" type="Number">The upper-bound of the range for the `Between` filter condition. [Api set: ExcelApi 1.12]</field>
+				/// <field name="value" type="String">Name of the chosen &quot;value&quot; in the field by which to filter. [Api set: ExcelApi 1.12]</field>
+			}
+			return PivotValueFilter;
+		})();
+		Interfaces.PivotValueFilter.__proto__ = null;
+		Interfaces.PivotValueFilter = PivotValueFilter;
+	})(Interfaces = Excel.Interfaces || (Excel.Interfaces = { __proto__: null}));
+})(Excel || (Excel = {__proto__: null}));
+
+var Excel;
+(function (Excel) {
 	/// <summary> Specifies the way that an object is attached to its underlying cells. [Api set: ExcelApi 1.9] </summary>
 	var Placement = {
 		__proto__: null,
@@ -14654,9 +15086,10 @@ var Excel;
 			/// <field name="conditionalFormats" type="Excel.ConditionalFormatCollection">The collection of ConditionalFormats that intersect the range. [Api set: ExcelApi 1.6]</field>
 			/// <field name="dataValidation" type="Excel.DataValidation">Returns a data validation object. [Api set: ExcelApi 1.8]</field>
 			/// <field name="format" type="Excel.RangeFormat">Returns a format object, encapsulating the range&apos;s font, fill, borders, alignment, and other properties. [Api set: ExcelApi 1.1]</field>
-			/// <field name="formulas" type="Array" elementType="Array">Represents the formula in A1-style notation. [Api set: ExcelApi 1.1]</field>
-			/// <field name="formulasLocal" type="Array" elementType="Array">Represents the formula in A1-style notation, in the user&apos;s language and number-formatting locale.  For example, the English &quot;=SUM(A1, 1.5)&quot; formula would become &quot;=SUMME(A1; 1,5)&quot; in German. [Api set: ExcelApi 1.1]</field>
-			/// <field name="formulasR1C1" type="Array" elementType="Array">Represents the formula in R1C1-style notation. [Api set: ExcelApi 1.2]</field>
+			/// <field name="formulas" type="Array" elementType="Array">Represents the formula in A1-style notation. If a cell has no formula, its value is returned instead. [Api set: ExcelApi 1.1]</field>
+			/// <field name="formulasLocal" type="Array" elementType="Array">Represents the formula in A1-style notation, in the user&apos;s language and number-formatting locale. For example, the English &quot;=SUM(A1, 1.5)&quot; formula would become &quot;=SUMME(A1; 1,5)&quot; in German. If a cell has no formula, its value is returned instead. [Api set: ExcelApi 1.1]</field>
+			/// <field name="formulasR1C1" type="Array" elementType="Array">Represents the formula in R1C1-style notation. If a cell has no formula, its value is returned instead. [Api set: ExcelApi 1.2]</field>
+			/// <field name="hasSpill" type="Boolean">Represents if all cells have a spill border.              Returns true if all cells have a spill border, or false if all cells do not have a spill border.              Returns null if there are cells both with and without spill borders within the range. [Api set: ExcelApi 1.12]</field>
 			/// <field name="height" type="Number">Returns the distance in points, for 100% zoom, from top edge of the range to bottom edge of the range. [Api set: ExcelApi 1.10]</field>
 			/// <field name="hidden" type="Boolean">Represents if all cells of the current range are hidden. [Api set: ExcelApi 1.2]</field>
 			/// <field name="hyperlink" type="Excel.Interfaces.RangeHyperlink">Represents the hyperlink for the current range. [Api set: ExcelApi 1.7]</field>
@@ -14665,10 +15098,12 @@ var Excel;
 			/// <field name="left" type="Number">Returns the distance in points, for 100% zoom, from left edge of the worksheet to left edge of the range. [Api set: ExcelApi 1.10]</field>
 			/// <field name="linkedDataTypeState" type="Array" elementType="Array">Represents the data type state of each cell. [Api set: ExcelApi 1.9]</field>
 			/// <field name="numberFormat" type="Array" elementType="Array">Represents Excel&apos;s number format code for the given range. [Api set: ExcelApi 1.1]</field>
+			/// <field name="numberFormatCategories" type="Array" elementType="Array">Represents the category of number format of each cell. [Api set: ExcelApi 1.12]</field>
 			/// <field name="numberFormatLocal" type="Array" elementType="Array">Represents Excel&apos;s number format code for the given range, based on the language settings of the user.​               Excel does not perform any language or format coercion when getting or setting the `numberFormatLocal` property.               Any returned text uses the locally-formatted strings based on the language specified in the system settings. [Api set: ExcelApi 1.7]</field>
 			/// <field name="rowCount" type="Number">Returns the total number of rows in the range. [Api set: ExcelApi 1.1]</field>
 			/// <field name="rowHidden" type="Boolean">Represents if all rows of the current range are hidden. [Api set: ExcelApi 1.2]</field>
 			/// <field name="rowIndex" type="Number">Returns the row number of the first cell in the range. Zero-indexed. [Api set: ExcelApi 1.1]</field>
+			/// <field name="savedAsArray" type="Boolean">Represents if ALL the cells would be saved as an array formula.              Returns true if ALL cells would be saved as an array formula, or false if ALL cells would NOT be saved as an array formula.              Returns null if some cells would be saved as an array formula and some would not be. [Api set: ExcelApi 1.12]</field>
 			/// <field name="sort" type="Excel.RangeSort">Represents the range sort of the current range. [Api set: ExcelApi 1.2]</field>
 			/// <field name="style" type="String">Represents the style of the current range.              If the styles of the cells are inconsistent, null will be returned.              For custom styles, the style name will be returned. For built-in styles, a string representing a value in the BuiltInStyle enum will be returned. [Api set: ExcelApi 1.7]</field>
 			/// <field name="text" type="Array" elementType="Array">Text values of the specified range. The Text value will not depend on the cell width. The # sign substitution that happens in Excel UI will not affect the text value returned by the API. [Api set: ExcelApi 1.1]</field>
@@ -14841,6 +15276,12 @@ var Excel;
 			/// <param name="count" type="Number" optional="true">Optional. The number of columns to include in the resulting range. In general, use a positive number to create a range outside the current range. You can also use a negative number to create a range within the current range. The default value is 1.</param>
 			/// <returns type="Excel.Range"></returns>
 		}
+		Range.prototype.getDirectPrecedents = function() {
+			/// <summary>
+			/// Returns a WorkbookRangeAreas object that represents the range containing all the direct precedents of a cell in same worksheet or in multiple worksheets. [Api set: ExcelApi 1.12]
+			/// </summary>
+			/// <returns type="Excel.WorkbookRangeAreas"></returns>
+		}
 		Range.prototype.getEntireColumn = function() {
 			/// <summary>
 			/// Gets an object that represents the entire column of the range (for example, if the current range represents cells &quot;B4:E11&quot;, its `getEntireColumn` is a range that represents columns &quot;B:E&quot;). [Api set: ExcelApi 1.1]
@@ -14855,7 +15296,7 @@ var Excel;
 		}
 		Range.prototype.getImage = function() {
 			/// <summary>
-			/// Renders the range as a base64-encoded png image. [Api set: ExcelApi 1.7]
+			/// Renders the range as a base64-encoded png image.              **Important**: This API is currently unsupported in Excel for Mac. Visit [OfficeDev/office-js Issue #235](https://github.com/OfficeDev/office-js/issues/235) for the current status. [Api set: ExcelApi 1.7]
 			/// </summary>
 			/// <returns type="OfficeExtension.ClientResult&lt;string&gt;"></returns>
 			var result = new OfficeExtension.ClientResult();
@@ -14895,6 +15336,12 @@ var Excel;
 			/// </summary>
 			/// <returns type="Excel.Range"></returns>
 		}
+		Range.prototype.getMergedAreas = function() {
+			/// <summary>
+			/// Returns a RangeAreas object that represents the merged areas in this range. Note that if the merged areas count in this range is more than 512, the API will fail to return the result. [Api set: ExcelApiOnline 1.1]
+			/// </summary>
+			/// <returns type="Excel.RangeAreas"></returns>
+		}
 		Range.prototype.getOffsetRange = function(rowOffset, columnOffset) {
 			/// <summary>
 			/// Gets an object which represents a range that&apos;s offset from the specified range. The dimension of the returned range will match this range. If the resulting range is forced outside the bounds of the worksheet grid, an error will be thrown. [Api set: ExcelApi 1.1]
@@ -14905,7 +15352,7 @@ var Excel;
 		}
 		Range.prototype.getPivotTables = function(fullyContained) {
 			/// <summary>
-			/// Gets a scoped collection of PivotTables that overlap with the range. [Api set: ExcelApiOnline 1.1]
+			/// Gets a scoped collection of PivotTables that overlap with the range. [Api set: ExcelApi 1.12]
 			/// </summary>
 			/// <param name="fullyContained" type="Boolean" optional="true">If true, returns only PivotTables that are fully contained within the range bounds. The default value is false.</param>
 			/// <returns type="Excel.PivotTableScopedCollection"></returns>
@@ -14965,6 +15412,30 @@ var Excel;
 			/// <param name="cellType" type="String">The type of cells to include.</param>
 			/// <param name="cellValueType" type="String" optional="true">If cellType is either Constants or Formulas, this argument is used to determine which types of cells to include in the result. These values can be combined together to return more than one type. The default is to select all constants or formulas, no matter what the type.</param>
 			/// <returns type="Excel.RangeAreas"></returns>
+		}
+		Range.prototype.getSpillParent = function() {
+			/// <summary>
+			/// Gets the range object containing the anchor cell for a cell getting spilled into. Fails if applied to a range with more than one cell. [Api set: ExcelApi 1.12]
+			/// </summary>
+			/// <returns type="Excel.Range"></returns>
+		}
+		Range.prototype.getSpillParentOrNullObject = function() {
+			/// <summary>
+			/// Gets the range object containing the anchor cell for a cell getting spilled into.              If it is not a spill cell or more than once cells are give, a null object will be returned. [Api set: ExcelApi 1.12]
+			/// </summary>
+			/// <returns type="Excel.Range"></returns>
+		}
+		Range.prototype.getSpillingToRange = function() {
+			/// <summary>
+			/// Gets the range object containing the spill range when called on an anchor cell. Fails if applied to a range with more than one cell. [Api set: ExcelApi 1.12]
+			/// </summary>
+			/// <returns type="Excel.Range"></returns>
+		}
+		Range.prototype.getSpillingToRangeOrNullObject = function() {
+			/// <summary>
+			/// Gets the range object containing the spill range when called on an anchor cell.              If the range is not an anchor cell or spill range can&apos;t be found, a null object will be returned. [Api set: ExcelApi 1.12]
+			/// </summary>
+			/// <returns type="Excel.Range"></returns>
 		}
 		Range.prototype.getSurroundingRegion = function() {
 			/// <summary>
@@ -15314,6 +15785,47 @@ var Excel;
 
 var Excel;
 (function (Excel) {
+	var RangeAreasCollection = (function(_super) {
+		__extends(RangeAreasCollection, _super);
+		function RangeAreasCollection() {
+			/// <summary> Contains the collection of cross-worksheets level Ranges. [Api set: ExcelApi 1.12] </summary>
+			/// <field name="context" type="Excel.RequestContext">The request context associated with this object.</field>
+			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
+			/// <field name="items" type="Array" elementType="Excel.RangeAreas">Gets the loaded child items in this collection.</field>
+		}
+
+		RangeAreasCollection.prototype.load = function(option) {
+			/// <summary>
+			/// Queues up a command to load the specified properties of the object. You must call "context.sync()" before reading the properties.
+			/// </summary>
+			/// <param name="option" type="string | string[] | OfficeExtension.LoadOption"/>
+			/// <returns type="Excel.RangeAreasCollection"/>
+		}
+		RangeAreasCollection.prototype.getCount = function() {
+			/// <summary>
+			/// Gets the number of RangeAreas objects in this collection. [Api set: ExcelApi 1.12]
+			/// </summary>
+			/// <returns type="OfficeExtension.ClientResult&lt;number&gt;"></returns>
+			var result = new OfficeExtension.ClientResult();
+			result.__proto__ = null;
+			result.value = 0;
+			return result;
+		}
+		RangeAreasCollection.prototype.getItemAt = function(index) {
+			/// <summary>
+			/// Returns the RangeAreas object based on position in the collection. [Api set: ExcelApi 1.12]
+			/// </summary>
+			/// <param name="index" type="Number">Index value of the range object to be retrieved. Zero-indexed.</param>
+			/// <returns type="Excel.RangeAreas"></returns>
+		}
+
+		return RangeAreasCollection;
+	})(OfficeExtension.ClientObject);
+	Excel.RangeAreasCollection = RangeAreasCollection;
+})(Excel || (Excel = {__proto__: null}));
+
+var Excel;
+(function (Excel) {
 	var RangeBorder = (function(_super) {
 		__extends(RangeBorder, _super);
 		function RangeBorder() {
@@ -15476,7 +15988,7 @@ var Excel;
 			/// <field name="pattern" type="String">The pattern of a range. See Excel.FillPattern for details. LinearGradient and RectangularGradient are not supported.              A null value indicates that the entire range doesn&apos;t have uniform pattern setting. [Api set: ExcelApi 1.9]</field>
 			/// <field name="patternColor" type="String">The HTML color code representing the color of the range pattern, of the form #RRGGBB (e.g., &quot;FFA500&quot;) or as a named HTML color (e.g., &quot;orange&quot;). [Api set: ExcelApi 1.9]</field>
 			/// <field name="patternTintAndShade" type="Number">Specifies a double that lightens or darkens a pattern color for Range Fill, the value is between -1 (darkest) and 1 (brightest), with 0 for the original color.              If the pattern tintAndShades are not uniform, null will be returned. [Api set: ExcelApi 1.9]</field>
-			/// <field name="tintAndShade" type="Number">Specifies a double that lightens or darkens a color for Range Fill, the value is between -1 (darkest) and 1 (brightest), with 0 for the original color.              If the tintAndShades are not uniform, null will be returned. [Api set: ExcelApi 1.9]</field>
+			/// <field name="tintAndShade" type="Number">Specifies a double that lightens or darkens a color for Range Fill. The value is between -1 (darkest) and 1 (brightest), with 0 for the original color.               If the tintAndShades are not uniform, null will be returned. [Api set: ExcelApi 1.9]</field>
 		}
 
 		RangeFill.prototype.load = function(option) {
@@ -15524,7 +16036,7 @@ var Excel;
 			/// <field name="bold" type="Boolean">Represents the bold status of font. [Api set: ExcelApi 1.1]</field>
 			/// <field name="color" type="String">HTML color code representation of the text color (e.g., #FF0000 represents Red). [Api set: ExcelApi 1.1]</field>
 			/// <field name="italic" type="Boolean">Specifies the italic status of the font. [Api set: ExcelApi 1.1]</field>
-			/// <field name="name" type="String">Font name (e.g., &quot;Calibri&quot;) [Api set: ExcelApi 1.1]</field>
+			/// <field name="name" type="String">Font name (e.g., &quot;Calibri&quot;). The name&apos;s length should not be greater than 31 characters. [Api set: ExcelApi 1.1]</field>
 			/// <field name="size" type="Number">Font size. [Api set: ExcelApi 1.1]</field>
 			/// <field name="strikethrough" type="Boolean">Specifies the strikethrough status of font. A null value indicates that the entire range doesn&apos;t have uniform Strikethrough setting. [Api set: ExcelApi 1.9]</field>
 			/// <field name="subscript" type="Boolean">Specifies the Subscript status of font.              Returns True if all the fonts of the range are Subscript.              Returns False if all the fonts of the range are Superscript or normal (neither Superscript, nor Subscript).              Returns Null otherwise. [Api set: ExcelApi 1.9]</field>
@@ -18426,7 +18938,7 @@ var Excel;
 			/// <summary> Represents a specific text conditional format. [Api set: ExcelApi 1.6] </summary>
 			/// <field name="context" type="Excel.RequestContext">The request context associated with this object.</field>
 			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
-			/// <field name="format" type="Excel.ConditionalRangeFormat">Returns a format object, encapsulating the conditional formats font, fill, borders, and other properties. [Api set: ExcelApi 1.6]</field>
+			/// <field name="format" type="Excel.ConditionalRangeFormat">Returns a format object, encapsulating the conditional format&apos;s font, fill, borders, and other properties. [Api set: ExcelApi 1.6]</field>
 			/// <field name="rule" type="Excel.Interfaces.ConditionalTextComparisonRule">The rule of the conditional format. [Api set: ExcelApi 1.6]</field>
 		}
 
@@ -18692,7 +19204,7 @@ var Excel;
 			/// <summary> Represents a Top/Bottom conditional format. [Api set: ExcelApi 1.6] </summary>
 			/// <field name="context" type="Excel.RequestContext">The request context associated with this object.</field>
 			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
-			/// <field name="format" type="Excel.ConditionalRangeFormat">Returns a format object, encapsulating the conditional formats font, fill, borders, and other properties. [Api set: ExcelApi 1.6]</field>
+			/// <field name="format" type="Excel.ConditionalRangeFormat">Returns a format object, encapsulating the conditional format&apos;s font, fill, borders, and other properties. [Api set: ExcelApi 1.6]</field>
 			/// <field name="rule" type="Excel.Interfaces.ConditionalTopBottomRule">The criteria of the Top/Bottom conditional format. [Api set: ExcelApi 1.6]</field>
 		}
 
@@ -18726,6 +19238,18 @@ var Excel;
 
 var Excel;
 (function (Excel) {
+	/// <summary> A simple enum for Top/Bottom filters to select whether to filter by the top N or bottom N percent, number, or sum of values. [Api set: ExcelApi 1.12] </summary>
+	var TopBottomSelectionType = {
+		__proto__: null,
+		"items": "items",
+		"percent": "percent",
+		"sum": "sum",
+	}
+	Excel.TopBottomSelectionType = TopBottomSelectionType;
+})(Excel || (Excel = {__proto__: null}));
+
+var Excel;
+(function (Excel) {
 	/// <summary> [Api set: ExcelApi 1.3] </summary>
 	var V1CoercionType = {
 		__proto__: null,
@@ -18748,6 +19272,24 @@ var Excel;
 		"headers": "headers",
 	}
 	Excel.V1TableEnum = V1TableEnum;
+})(Excel || (Excel = {__proto__: null}));
+
+var Excel;
+(function (Excel) {
+	/// <summary> Enum representing all accepted conditions by which a value filter can be applied.               Used to configure the type of PivotFilter that is applied to the field.               `PivotFilter.exclusive` can be set to true to invert many of these conditions. [Api set: ExcelApi 1.12] </summary>
+	var ValueFilterCondition = {
+		__proto__: null,
+		"unknown": "unknown",
+		"equals": "equals",
+		"greaterThan": "greaterThan",
+		"greaterThanOrEqualTo": "greaterThanOrEqualTo",
+		"lessThan": "lessThan",
+		"lessThanOrEqualTo": "lessThanOrEqualTo",
+		"between": "between",
+		"topN": "topN",
+		"bottomN": "bottomN",
+	}
+	Excel.ValueFilterCondition = ValueFilterCondition;
 })(Excel || (Excel = {__proto__: null}));
 
 var Excel;
@@ -19004,6 +19546,60 @@ var Excel;
 
 var Excel;
 (function (Excel) {
+	var WorkbookRangeAreas = (function(_super) {
+		__extends(WorkbookRangeAreas, _super);
+		function WorkbookRangeAreas() {
+			/// <summary> Represents a collection of one or more rectangular ranges in multiple worksheets. [Api set: ExcelApi 1.12] </summary>
+			/// <field name="context" type="Excel.RequestContext">The request context associated with this object.</field>
+			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
+			/// <field name="addresses" type="Array" elementType="String">Returns an array of address in A1-style. Address value will contain the worksheet name for each rectangular block of cells (e.g., &quot;Sheet1!A1:B4, Sheet1!D1:D4&quot;). Read-only. [Api set: ExcelApi 1.12]</field>
+			/// <field name="areas" type="Excel.RangeAreasCollection">Returns the RangeAreasCollection object, each RangeAreas in the collection represent one or more rectangle ranges in one worksheet. [Api set: ExcelApi 1.12]</field>
+			/// <field name="ranges" type="Excel.RangeCollection">Returns ranges that comprise this object in a RangeCollection object. [Api set: ExcelApi 1.12]</field>
+		}
+
+		WorkbookRangeAreas.prototype.load = function(option) {
+			/// <summary>
+			/// Queues up a command to load the specified properties of the object. You must call "context.sync()" before reading the properties.
+			/// </summary>
+			/// <param name="option" type="string | string[] | OfficeExtension.LoadOption"/>
+			/// <returns type="Excel.WorkbookRangeAreas"/>
+		}
+		WorkbookRangeAreas.prototype.getRangeAreasBySheet = function(key) {
+			/// <summary>
+			/// Returns the RangeAreas object based on worksheet id or name in the collection. [Api set: ExcelApi 1.12]
+			/// </summary>
+			/// <param name="key" type="String">The name or id of the worksheet.</param>
+			/// <returns type="Excel.RangeAreas"></returns>
+		}
+		WorkbookRangeAreas.prototype.getRangeAreasOrNullObjectBySheet = function(key) {
+			/// <summary>
+			/// Returns the RangeAreas object based on worksheet name or id in the collection. If the worksheet does not exist, will return a null object. [Api set: ExcelApi 1.12]
+			/// </summary>
+			/// <param name="key" type="String">The name or id of the worksheet.</param>
+			/// <returns type="Excel.RangeAreas"></returns>
+		}
+
+		WorkbookRangeAreas.prototype.track = function() {
+			/// <summary>
+			/// Track the object for automatic adjustment based on surrounding changes in the document. This call is a shorthand for context.trackedObjects.add(thisObject). If you are using this object across ".sync" calls and outside the sequential execution of a ".run" batch, and get an "InvalidObjectPath" error when setting a property or invoking a method on the object, you needed to have added the object to the tracked object collection when the object was first created.
+			/// </summary>
+			/// <returns type="Excel.WorkbookRangeAreas"/>
+		}
+
+		WorkbookRangeAreas.prototype.untrack = function() {
+			/// <summary>
+			/// Release the memory associated with this object, if has previous been tracked. This call is shorthand for context.trackedObjects.remove(thisObject). Having many tracked objects slows down the host application, so please remember to free any objects you add, once you're done using them. You will need to call "context.sync()" before the memory release takes effect.
+			/// </summary>
+			/// <returns type="Excel.WorkbookRangeAreas"/>
+		}
+
+		return WorkbookRangeAreas;
+	})(OfficeExtension.ClientObject);
+	Excel.WorkbookRangeAreas = WorkbookRangeAreas;
+})(Excel || (Excel = {__proto__: null}));
+
+var Excel;
+(function (Excel) {
 	var Worksheet = (function(_super) {
 		__extends(Worksheet, _super);
 		function Worksheet() {
@@ -19013,6 +19609,7 @@ var Excel;
 			/// <field name="autoFilter" type="Excel.AutoFilter">Represents the AutoFilter object of the worksheet. [Api set: ExcelApi 1.9]</field>
 			/// <field name="charts" type="Excel.ChartCollection">Returns a collection of charts that are part of the worksheet. [Api set: ExcelApi 1.1]</field>
 			/// <field name="comments" type="Excel.CommentCollection">Returns a collection of all the Comments objects on the worksheet. [Api set: ExcelApi 1.10]</field>
+			/// <field name="customProperties" type="Excel.WorksheetCustomPropertyCollection">Gets a collection of worksheet-level custom properties. [Api set: ExcelApi 1.12]</field>
 			/// <field name="enableCalculation" type="Boolean">Determines if Excel should recalculate the worksheet when necessary.              True if Excel recalculates the worksheet when necessary. False if Excel doesn&apos;t recalculate the sheet. [Api set: ExcelApi 1.9]</field>
 			/// <field name="freezePanes" type="Excel.WorksheetFreezePanes">Gets an object that can be used to manipulate frozen panes on the worksheet. [Api set: ExcelApi 1.7]</field>
 			/// <field name="horizontalPageBreaks" type="Excel.PageBreakCollection">Gets the horizontal page break collection for the worksheet. This collection only contains manual page breaks. [Api set: ExcelApi 1.9]</field>
@@ -19035,7 +19632,7 @@ var Excel;
 			/// <field name="visibility" type="String">The Visibility of the worksheet. [Api set: ExcelApi 1.1 for reading visibility; 1.2 for setting it.]</field>
 			/// <field name="onActivated" type="OfficeExtension.EventHandlers">Occurs when the worksheet is activated. [Api set: ExcelApi 1.7]</field>
 			/// <field name="onCalculated" type="OfficeExtension.EventHandlers">Occurs when the worksheet is calculated. [Api set: ExcelApi 1.8]</field>
-			/// <field name="onChanged" type="OfficeExtension.EventHandlers">Occurs when data changed on a specific worksheet. [Api set: ExcelApi 1.7]</field>
+			/// <field name="onChanged" type="OfficeExtension.EventHandlers">Occurs when data changes in a specific worksheet. [Api set: ExcelApi 1.7]</field>
 			/// <field name="onColumnSorted" type="OfficeExtension.EventHandlers">Occurs when one or more columns have been sorted. This happens as the result of a left-to-right sort operation. [Api set: ExcelApi 1.10]</field>
 			/// <field name="onDeactivated" type="OfficeExtension.EventHandlers">Occurs when the worksheet is deactivated. [Api set: ExcelApi 1.7]</field>
 			/// <field name="onFormatChanged" type="OfficeExtension.EventHandlers">Occurs when format changed on a specific worksheet. [Api set: ExcelApi 1.9]</field>
@@ -19702,6 +20299,108 @@ var Excel;
 
 var Excel;
 (function (Excel) {
+	var WorksheetCustomProperty = (function(_super) {
+		__extends(WorksheetCustomProperty, _super);
+		function WorksheetCustomProperty() {
+			/// <summary> Represents a worksheet-level custom property. [Api set: ExcelApi 1.12] </summary>
+			/// <field name="context" type="Excel.RequestContext">The request context associated with this object.</field>
+			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
+			/// <field name="key" type="String">Gets the key of the custom property. Custom property keys are case-insensitive. The key is limited to 255 characters (larger values will cause an &quot;InvalidArgument&quot; error to be thrown.) [Api set: ExcelApi 1.12]</field>
+			/// <field name="value" type="String">Gets or sets the value of the custom property. [Api set: ExcelApi 1.12]</field>
+		}
+
+		WorksheetCustomProperty.prototype.load = function(option) {
+			/// <summary>
+			/// Queues up a command to load the specified properties of the object. You must call "context.sync()" before reading the properties.
+			/// </summary>
+			/// <param name="option" type="string | string[] | OfficeExtension.LoadOption"/>
+			/// <returns type="Excel.WorksheetCustomProperty"/>
+		}
+
+		WorksheetCustomProperty.prototype.set = function() {
+			/// <signature>
+			/// <summary>Sets multiple properties on the object at the same time, based on JSON input.</summary>
+			/// <param name="properties" type="Excel.Interfaces.WorksheetCustomPropertyUpdateData">Properties described by the Excel.Interfaces.WorksheetCustomPropertyUpdateData interface.</param>
+			/// <param name="options" type="string">Options of the form { throwOnReadOnly?: boolean }
+			/// <br />
+			/// * throwOnReadOnly: Throw an error if the passed-in property list includes read-only properties (default = true).
+			/// </param>
+			/// </signature>
+			/// <signature>
+			/// <summary>Sets multiple properties on the object at the same time, based on an existing loaded object.</summary>
+			/// <param name="properties" type="WorksheetCustomProperty">An existing WorksheetCustomProperty object, with properties that have already been loaded and synced.</param>
+			/// </signature>
+		}
+		WorksheetCustomProperty.prototype.delete = function() {
+			/// <summary>
+			/// Deletes the custom property. [Api set: ExcelApi 1.12]
+			/// </summary>
+			/// <returns ></returns>
+		}
+
+		return WorksheetCustomProperty;
+	})(OfficeExtension.ClientObject);
+	Excel.WorksheetCustomProperty = WorksheetCustomProperty;
+})(Excel || (Excel = {__proto__: null}));
+
+var Excel;
+(function (Excel) {
+	var WorksheetCustomPropertyCollection = (function(_super) {
+		__extends(WorksheetCustomPropertyCollection, _super);
+		function WorksheetCustomPropertyCollection() {
+			/// <summary> Contains the collection of worksheet-level custom property. [Api set: ExcelApi 1.12] </summary>
+			/// <field name="context" type="Excel.RequestContext">The request context associated with this object.</field>
+			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
+			/// <field name="items" type="Array" elementType="Excel.WorksheetCustomProperty">Gets the loaded child items in this collection.</field>
+		}
+
+		WorksheetCustomPropertyCollection.prototype.load = function(option) {
+			/// <summary>
+			/// Queues up a command to load the specified properties of the object. You must call "context.sync()" before reading the properties.
+			/// </summary>
+			/// <param name="option" type="string | string[] | OfficeExtension.LoadOption"/>
+			/// <returns type="Excel.WorksheetCustomPropertyCollection"/>
+		}
+		WorksheetCustomPropertyCollection.prototype.add = function(key, value) {
+			/// <summary>
+			/// Adds a new custom property that maps to the provided key. This overwrites existing custom properties with that key. [Api set: ExcelApi 1.12]
+			/// </summary>
+			/// <param name="key" type="String">The key that identifies the custom property object. It is case-insensitive.The key is limited to 255 characters (larger values will cause an &quot;InvalidArgument&quot; error to be thrown.)</param>
+			/// <param name="value" type="String">The value of this custom property.</param>
+			/// <returns type="Excel.WorksheetCustomProperty"></returns>
+		}
+		WorksheetCustomPropertyCollection.prototype.getCount = function() {
+			/// <summary>
+			/// Gets the number of custom properties on this worksheet. [Api set: ExcelApi 1.12]
+			/// </summary>
+			/// <returns type="OfficeExtension.ClientResult&lt;number&gt;"></returns>
+			var result = new OfficeExtension.ClientResult();
+			result.__proto__ = null;
+			result.value = 0;
+			return result;
+		}
+		WorksheetCustomPropertyCollection.prototype.getItem = function(key) {
+			/// <summary>
+			/// Gets a custom property object by its key, which is case-insensitive. Throws if the custom property does not exist. [Api set: ExcelApi 1.12]
+			/// </summary>
+			/// <param name="key" type="String">The key that identifies the custom property object. It is case-insensitive.</param>
+			/// <returns type="Excel.WorksheetCustomProperty"></returns>
+		}
+		WorksheetCustomPropertyCollection.prototype.getItemOrNullObject = function(key) {
+			/// <summary>
+			/// Gets a custom property object by its key, which is case-insensitive. Returns a null object if the custom property does not exist. [Api set: ExcelApi 1.12]
+			/// </summary>
+			/// <param name="key" type="String">The key that identifies the custom property object. It is case-insensitive.</param>
+			/// <returns type="Excel.WorksheetCustomProperty"></returns>
+		}
+
+		return WorksheetCustomPropertyCollection;
+	})(OfficeExtension.ClientObject);
+	Excel.WorksheetCustomPropertyCollection = WorksheetCustomPropertyCollection;
+})(Excel || (Excel = {__proto__: null}));
+
+var Excel;
+(function (Excel) {
 	var Interfaces;
 	(function (Interfaces) {
 		var WorksheetDeactivatedEventArgs = (function() {
@@ -19780,14 +20479,14 @@ var Excel;
 		}
 		WorksheetFreezePanes.prototype.freezeColumns = function(count) {
 			/// <summary>
-			/// Freeze the first column(s) of the worksheet in place. [Api set: ExcelApi 1.7]
+			/// Freeze the first column or columns of the worksheet in place. [Api set: ExcelApi 1.7]
 			/// </summary>
 			/// <param name="count" type="Number" optional="true">Optional number of columns to freeze, or zero to unfreeze all columns</param>
 			/// <returns ></returns>
 		}
 		WorksheetFreezePanes.prototype.freezeRows = function(count) {
 			/// <summary>
-			/// Freeze the top row(s) of the worksheet in place. [Api set: ExcelApi 1.7]
+			/// Freeze the top row or rows of the worksheet in place. [Api set: ExcelApi 1.7]
 			/// </summary>
 			/// <param name="count" type="Number" optional="true">Optional number of rows to freeze, or zero to unfreeze all rows</param>
 			/// <returns ></returns>
@@ -20098,9 +20797,9 @@ var Excel;
 				/// <field name="dataValidation" type="Excel.Interfaces.DataValidationUpdateData">Returns a data validation object. [Api set: ExcelApi 1.8]</field>
 				/// <field name="format" type="Excel.Interfaces.RangeFormatUpdateData">Returns a format object, encapsulating the range&apos;s font, fill, borders, alignment, and other properties. [Api set: ExcelApi 1.1]</field>
 				/// <field name="columnHidden" type="Boolean">Represents if all columns of the current range are hidden. [Api set: ExcelApi 1.2]</field>;
-				/// <field name="formulas" type="Array" elementType="Array">Represents the formula in A1-style notation. [Api set: ExcelApi 1.1]</field>;
-				/// <field name="formulasLocal" type="Array" elementType="Array">Represents the formula in A1-style notation, in the user&apos;s language and number-formatting locale.  For example, the English &quot;=SUM(A1, 1.5)&quot; formula would become &quot;=SUMME(A1; 1,5)&quot; in German. [Api set: ExcelApi 1.1]</field>;
-				/// <field name="formulasR1C1" type="Array" elementType="Array">Represents the formula in R1C1-style notation. [Api set: ExcelApi 1.2]</field>;
+				/// <field name="formulas" type="Array" elementType="Array">Represents the formula in A1-style notation. If a cell has no formula, its value is returned instead. [Api set: ExcelApi 1.1]</field>;
+				/// <field name="formulasLocal" type="Array" elementType="Array">Represents the formula in A1-style notation, in the user&apos;s language and number-formatting locale. For example, the English &quot;=SUM(A1, 1.5)&quot; formula would become &quot;=SUMME(A1; 1,5)&quot; in German. If a cell has no formula, its value is returned instead. [Api set: ExcelApi 1.1]</field>;
+				/// <field name="formulasR1C1" type="Array" elementType="Array">Represents the formula in R1C1-style notation. If a cell has no formula, its value is returned instead. [Api set: ExcelApi 1.2]</field>;
 				/// <field name="hyperlink" type="Excel.Interfaces.RangeHyperlink">Represents the hyperlink for the current range. [Api set: ExcelApi 1.7]</field>;
 				/// <field name="numberFormat" type="Array" elementType="Array">Represents Excel&apos;s number format code for the given range. [Api set: ExcelApi 1.1]</field>;
 				/// <field name="numberFormatLocal" type="Array" elementType="Array">Represents Excel&apos;s number format code for the given range, based on the language settings of the user.​               Excel does not perform any language or format coercion when getting or setting the `numberFormatLocal` property.               Any returned text uses the locally-formatted strings based on the language specified in the system settings. [Api set: ExcelApi 1.7]</field>;
@@ -20322,7 +21021,7 @@ var Excel;
 				/// <field name="pattern" type="String">The pattern of a range. See Excel.FillPattern for details. LinearGradient and RectangularGradient are not supported.              A null value indicates that the entire range doesn&apos;t have uniform pattern setting. [Api set: ExcelApi 1.9]</field>;
 				/// <field name="patternColor" type="String">The HTML color code representing the color of the range pattern, of the form #RRGGBB (e.g., &quot;FFA500&quot;) or as a named HTML color (e.g., &quot;orange&quot;). [Api set: ExcelApi 1.9]</field>;
 				/// <field name="patternTintAndShade" type="Number">Specifies a double that lightens or darkens a pattern color for Range Fill, the value is between -1 (darkest) and 1 (brightest), with 0 for the original color.              If the pattern tintAndShades are not uniform, null will be returned. [Api set: ExcelApi 1.9]</field>;
-				/// <field name="tintAndShade" type="Number">Specifies a double that lightens or darkens a color for Range Fill, the value is between -1 (darkest) and 1 (brightest), with 0 for the original color.              If the tintAndShades are not uniform, null will be returned. [Api set: ExcelApi 1.9]</field>;
+				/// <field name="tintAndShade" type="Number">Specifies a double that lightens or darkens a color for Range Fill. The value is between -1 (darkest) and 1 (brightest), with 0 for the original color.               If the tintAndShades are not uniform, null will be returned. [Api set: ExcelApi 1.9]</field>;
 			}
 			return RangeFillUpdateData;
 		})();
@@ -20376,7 +21075,7 @@ var Excel;
 				/// <field name="bold" type="Boolean">Represents the bold status of font. [Api set: ExcelApi 1.1]</field>;
 				/// <field name="color" type="String">HTML color code representation of the text color (e.g., #FF0000 represents Red). [Api set: ExcelApi 1.1]</field>;
 				/// <field name="italic" type="Boolean">Specifies the italic status of the font. [Api set: ExcelApi 1.1]</field>;
-				/// <field name="name" type="String">Font name (e.g., &quot;Calibri&quot;) [Api set: ExcelApi 1.1]</field>;
+				/// <field name="name" type="String">Font name (e.g., &quot;Calibri&quot;). The name&apos;s length should not be greater than 31 characters. [Api set: ExcelApi 1.1]</field>;
 				/// <field name="size" type="Number">Font size. [Api set: ExcelApi 1.1]</field>;
 				/// <field name="strikethrough" type="Boolean">Specifies the strikethrough status of font. A null value indicates that the entire range doesn&apos;t have uniform Strikethrough setting. [Api set: ExcelApi 1.9]</field>;
 				/// <field name="subscript" type="Boolean">Specifies the Subscript status of font.              Returns True if all the fonts of the range are Subscript.              Returns False if all the fonts of the range are Superscript or normal (neither Superscript, nor Subscript).              Returns Null otherwise. [Api set: ExcelApi 1.9]</field>;
@@ -20504,7 +21203,7 @@ var Excel;
 				/// <field name="markerForegroundColor" type="String">Specifies the markers foreground color of a chart series. [Api set: ExcelApi 1.7]</field>;
 				/// <field name="markerSize" type="Number">Specifies the marker size of a chart series. [Api set: ExcelApi 1.7]</field>;
 				/// <field name="markerStyle" type="String">Specifies the marker style of a chart series. See Excel.ChartMarkerStyle for details. [Api set: ExcelApi 1.7]</field>;
-				/// <field name="name" type="String">Specifies the name of a series in a chart. [Api set: ExcelApi 1.1]</field>;
+				/// <field name="name" type="String">Specifies the name of a series in a chart. The name&apos;s length should not be greater than 255 characters. [Api set: ExcelApi 1.1]</field>;
 				/// <field name="overlap" type="Number">Specifies how bars and columns are positioned. Can be a value between –100 and 100. Applies only to 2-D bar and 2-D column charts. [Api set: ExcelApi 1.8]</field>;
 				/// <field name="parentLabelStrategy" type="String">Specifies the series parent label strategy area for a treemap chart. [Api set: ExcelApi 1.9]</field>;
 				/// <field name="plotOrder" type="Number">Specifies the plot order of a chart series within the chart group. [Api set: ExcelApi 1.7]</field>;
@@ -20669,7 +21368,7 @@ var Excel;
 				/// <summary>An interface for updating data on the ChartAxisTitle object, for use in "chartAxisTitle.set({ ... })".</summary>
 				/// <field name="format" type="Excel.Interfaces.ChartAxisTitleFormatUpdateData">Specifies the formatting of chart axis title. [Api set: ExcelApi 1.1]</field>
 				/// <field name="text" type="String">Specifies the axis title. [Api set: ExcelApi 1.1]</field>;
-				/// <field name="textOrientation" type="Number">Specifies the angle to which the text is oriented for the chart axis title. The value should either be an integer from -90 to 90 or the integer 180 for vertically-oriented text. [Api set: ExcelApiOnline 1.1]</field>;
+				/// <field name="textOrientation" type="Number">Specifies the angle to which the text is oriented for the chart axis title. The value should either be an integer from -90 to 90 or the integer 180 for vertically-oriented text. [Api set: ExcelApi 1.12]</field>;
 				/// <field name="visible" type="Boolean">Specifies if the axis title is visibile. [Api set: ExcelApi 1.1]</field>;
 			}
 			return ChartAxisTitleUpdateData;
@@ -21212,6 +21911,7 @@ var Excel;
 		var PivotTableUpdateData = (function() {
 			function PivotTableUpdateData() {
 				/// <summary>An interface for updating data on the PivotTable object, for use in "pivotTable.set({ ... })".</summary>
+				/// <field name="allowMultipleFiltersPerField" type="Boolean">Specifies if the PivotTable allows the application of multiple PivotFilters on a given PivotField in the table. [Api set: ExcelApi 1.12]</field>;
 				/// <field name="enableDataValueEditing" type="Boolean">Specifies if the PivotTable allows values in the data body to be edited by the user. [Api set: ExcelApi 1.9]</field>;
 				/// <field name="name" type="String">Name of the PivotTable. [Api set: ExcelApi 1.3]</field>;
 				/// <field name="useCustomSortLists" type="Boolean">Specifies if the PivotTable uses custom lists when sorting. [Api set: ExcelApi 1.9]</field>;
@@ -21350,6 +22050,22 @@ var Excel;
 		})();
 		Interfaces.PivotItemUpdateData.__proto__ = null;
 		Interfaces.PivotItemUpdateData = PivotItemUpdateData;
+	})(Interfaces = Excel.Interfaces || (Excel.Interfaces = { __proto__: null}));
+})(Excel || (Excel = {__proto__: null}));
+
+var Excel;
+(function (Excel) {
+	var Interfaces;
+	(function (Interfaces) {
+		var WorksheetCustomPropertyUpdateData = (function() {
+			function WorksheetCustomPropertyUpdateData() {
+				/// <summary>An interface for updating data on the WorksheetCustomProperty object, for use in "worksheetCustomProperty.set({ ... })".</summary>
+				/// <field name="value" type="String">Gets or sets the value of the custom property. [Api set: ExcelApi 1.12]</field>;
+			}
+			return WorksheetCustomPropertyUpdateData;
+		})();
+		Interfaces.WorksheetCustomPropertyUpdateData.__proto__ = null;
+		Interfaces.WorksheetCustomPropertyUpdateData = WorksheetCustomPropertyUpdateData;
 	})(Interfaces = Excel.Interfaces || (Excel.Interfaces = { __proto__: null}));
 })(Excel || (Excel = {__proto__: null}));
 
@@ -21563,7 +22279,7 @@ var Excel;
 		var TopBottomConditionalFormatUpdateData = (function() {
 			function TopBottomConditionalFormatUpdateData() {
 				/// <summary>An interface for updating data on the TopBottomConditionalFormat object, for use in "topBottomConditionalFormat.set({ ... })".</summary>
-				/// <field name="format" type="Excel.Interfaces.ConditionalRangeFormatUpdateData">Returns a format object, encapsulating the conditional formats font, fill, borders, and other properties. [Api set: ExcelApi 1.6]</field>
+				/// <field name="format" type="Excel.Interfaces.ConditionalRangeFormatUpdateData">Returns a format object, encapsulating the conditional format&apos;s font, fill, borders, and other properties. [Api set: ExcelApi 1.6]</field>
 				/// <field name="rule" type="Excel.Interfaces.ConditionalTopBottomRule">The criteria of the Top/Bottom conditional format. [Api set: ExcelApi 1.6]</field>;
 			}
 			return TopBottomConditionalFormatUpdateData;
@@ -21597,7 +22313,7 @@ var Excel;
 		var TextConditionalFormatUpdateData = (function() {
 			function TextConditionalFormatUpdateData() {
 				/// <summary>An interface for updating data on the TextConditionalFormat object, for use in "textConditionalFormat.set({ ... })".</summary>
-				/// <field name="format" type="Excel.Interfaces.ConditionalRangeFormatUpdateData">Returns a format object, encapsulating the conditional formats font, fill, borders, and other properties. [Api set: ExcelApi 1.6]</field>
+				/// <field name="format" type="Excel.Interfaces.ConditionalRangeFormatUpdateData">Returns a format object, encapsulating the conditional format&apos;s font, fill, borders, and other properties. [Api set: ExcelApi 1.6]</field>
 				/// <field name="rule" type="Excel.Interfaces.ConditionalTextComparisonRule">The rule of the conditional format. [Api set: ExcelApi 1.6]</field>;
 			}
 			return TextConditionalFormatUpdateData;
@@ -24757,7 +25473,7 @@ var Word;
 
 var Word;
 (function (Word) {
-	/// <summary> [Api set: WordApi] </summary>
+	/// <summary> This enum sets where the cursor (insertion point) in the document is after a selection. [Api set: WordApi] </summary>
 	var SelectionMode = {
 		__proto__: null,
 		"select": "select",

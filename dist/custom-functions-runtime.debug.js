@@ -427,9 +427,6 @@ var ScriptLoading;
                         self.flushTelemetryBuffer();
                     };
                     var onLoadCallback = function OSF_OUtil_loadScript$onLoadCallback() {
-                        if (OSF._OfficeAppFactory.getHostInfo().hostType == "onenote" && (typeof OSF.AppTelemetry !== 'undefined') && (typeof OSF.AppTelemetry.enableTelemetry !== 'undefined')) {
-                            OSF.AppTelemetry.enableTelemetry = false;
-                        }
                         if (!OSF._OfficeAppFactory.getLoggingAllowed() && (typeof OSF.AppTelemetry !== 'undefined')) {
                             OSF.AppTelemetry.enableTelemetry = false;
                         }
@@ -1206,7 +1203,6 @@ var OTel;
                 hostJsVersion: info.hostJSVersion,
                 browserToken: info.clientId,
                 instanceId: info.appInstanceId,
-                name: info.name,
                 sessionId: info.sessionId
             };
             var fields = oteljs.Contracts.Office.System.SDX.getFields("SDX", contract);
@@ -1381,7 +1377,8 @@ var Office;
         OfficeStringJS: "office_strings.debug.js",
         O15InitHelper: "o15apptofilemappingtable.debug.js",
         SupportedLocales: OSF.SupportedLocales,
-        AssociatedLocales: OSF.AssociatedLocales
+        AssociatedLocales: OSF.AssociatedLocales,
+        ExperimentScriptSuffix: "experiment"
     };
     for (var key in previousConstantNames) {
         OSF.ConstantNames[key] = previousConstantNames[key];
@@ -1408,7 +1405,8 @@ OSF.InitializationHelper.prototype.prepareRightAfterWebExtensionInitialize = fun
 };
 OSF.HostInfoFlags = {
     SharedApp: 1,
-    CustomFunction: 2
+    CustomFunction: 2,
+    ProtectedDocDisable: 4
 };
 OSF._OfficeAppFactory = (function OSF__OfficeAppFactory() {
     var _setNamespace = function OSF_OUtil$_setNamespace(name, parent) {
@@ -1873,16 +1871,30 @@ OSF._OfficeAppFactory = (function OSF__OfficeAppFactory() {
             _loadScriptHelper.loadScript(basePath + OSF.ConstantNames.O15InitHelper, OSF.ConstantNames.O15MappingId, onAppCodeReady);
         }
         else {
-            var hostSpecificFileName = ([
-                _hostInfo.hostType,
-                _hostInfo.hostPlatform,
-                _hostInfo.hostSpecificFileVersion,
-                OSF.ConstantNames.HostFileScriptSuffix || null,
-            ]
-                .filter(function (part) { return part != null; })
-                .join("-"))
-                +
-                    ".debug.js";
+            var hostSpecificFileName;
+            if (typeof (g_isExpEnabled) !== 'undefined' && g_isExpEnabled) {
+                hostSpecificFileName = ([
+                    _hostInfo.hostType,
+                    _hostInfo.hostPlatform,
+                    OSF.ConstantNames.ExperimentScriptSuffix || null,
+                ]
+                    .filter(function (part) { return part != null; })
+                    .join("-"))
+                    +
+                        ".debug.js";
+            }
+            else {
+                hostSpecificFileName = ([
+                    _hostInfo.hostType,
+                    _hostInfo.hostPlatform,
+                    _hostInfo.hostSpecificFileVersion,
+                    OSF.ConstantNames.HostFileScriptSuffix || null,
+                ]
+                    .filter(function (part) { return part != null; })
+                    .join("-"))
+                    +
+                        ".debug.js";
+            }
             _loadScriptHelper.loadScript(basePath + hostSpecificFileName.toLowerCase(), OSF.ConstantNames.HostFileId, onAppCodeReady);
             if (typeof OSFPerformance !== "undefined") {
                 OSFPerformance.hostSpecificFileName = hostSpecificFileName;
@@ -6186,7 +6198,7 @@ var oteljs = function(modules) {
     })), __webpack_require__.d(__webpack_exports__, "c", (function() {
         return logError;
     }));
-    var LogLevel, Category, onNotificationEvent = new (__webpack_require__(9).a);
+    var LogLevel, Category, onNotificationEvent = new (__webpack_require__(10).a);
     function onNotification() {
         return onNotificationEvent;
     }
@@ -6365,12 +6377,30 @@ var oteljs = function(modules) {
     }(Contracts || (Contracts = {}));
 }, function(module, __webpack_exports__, __webpack_require__) {
     "use strict";
+    function cloneEvent(event) {
+        var localEvent = {
+            eventName: event.eventName,
+            eventFlags: event.eventFlags
+        };
+        return event.telemetryProperties && (localEvent.telemetryProperties = {
+            ariaTenantToken: event.telemetryProperties.ariaTenantToken,
+            nexusTenantToken: event.telemetryProperties.nexusTenantToken
+        }), event.eventContract && (localEvent.eventContract = {
+            name: event.eventContract.name,
+            dataFields: event.eventContract.dataFields.slice()
+        }), localEvent.dataFields = event.dataFields ? event.dataFields.slice() : [], localEvent;
+    }
+    __webpack_require__.d(__webpack_exports__, "a", (function() {
+        return cloneEvent;
+    }));
+}, function(module, __webpack_exports__, __webpack_require__) {
+    "use strict";
     __webpack_require__.d(__webpack_exports__, "b", (function() {
         return SuppressNexus;
     })), __webpack_require__.d(__webpack_exports__, "a", (function() {
         return SimpleTelemetryLogger_SimpleTelemetryLogger;
     }));
-    var TokenType, TenantTokenManager_TenantTokenManager, OTelNotifications = __webpack_require__(1);
+    var TokenType, TenantTokenManager_TenantTokenManager, TelemetryEvent = __webpack_require__(7), OTelNotifications = __webpack_require__(1);
     !function(TokenType) {
         TokenType[TokenType.Aria = 0] = "Aria", TokenType[TokenType.Nexus = 1] = "Nexus";
     }(TokenType || (TokenType = {})), function(TenantTokenManager) {
@@ -6457,7 +6487,7 @@ var oteljs = function(modules) {
             if (null != event.dataFields) for (var i = 0; i < event.dataFields.length; i++) validateDataField(event.dataFields[i]);
         }, TelemetryEventValidator.validateInt = validateInt;
     }(TelemetryEventValidator_TelemetryEventValidator || (TelemetryEventValidator_TelemetryEventValidator = {}));
-    var Event = __webpack_require__(9), DataFieldHelper = __webpack_require__(0), __assign = function() {
+    var Event = __webpack_require__(10), DataFieldHelper = __webpack_require__(0), __assign = function() {
         return (__assign = Object.assign || function(t) {
             for (var s, i = 1, n = arguments.length; i < n; i++) for (var p in s = arguments[i]) Object.prototype.hasOwnProperty.call(s, p) && (t[p] = s[p]);
             return t;
@@ -6467,7 +6497,7 @@ var oteljs = function(modules) {
             var _a, _b;
             this.onSendEvent = new Event.a, this.persistentDataFields = [], this.config = config || {}, 
             parent ? (this.onSendEvent = parent.onSendEvent, (_a = this.persistentDataFields).push.apply(_a, parent.persistentDataFields), 
-            this.config = __assign(__assign({}, parent.getConfig()), this.config)) : this.persistentDataFields.push(Object(DataFieldHelper.e)("OTelJS.Version", "3.1.50")), 
+            this.config = __assign(__assign({}, parent.getConfig()), this.config)) : this.persistentDataFields.push(Object(DataFieldHelper.e)("OTelJS.Version", "3.1.61")), 
             persistentDataFields && (_b = this.persistentDataFields).push.apply(_b, persistentDataFields);
         }
         return SimpleTelemetryLogger.prototype.sendTelemetryEvent = function(event) {
@@ -6497,17 +6527,7 @@ var oteljs = function(modules) {
         }, SimpleTelemetryLogger.prototype.setTenantTokens = function(tokenTree) {
             TenantTokenManager_TenantTokenManager.setTenantTokens(tokenTree);
         }, SimpleTelemetryLogger.prototype.cloneEvent = function(event) {
-            var localEvent = {
-                eventName: event.eventName,
-                eventFlags: event.eventFlags
-            };
-            return event.telemetryProperties && (localEvent.telemetryProperties = {
-                ariaTenantToken: event.telemetryProperties.ariaTenantToken,
-                nexusTenantToken: event.telemetryProperties.nexusTenantToken
-            }), event.eventContract && (localEvent.eventContract = {
-                name: event.eventContract.name,
-                dataFields: event.eventContract.dataFields.slice()
-            }), localEvent.dataFields = event.dataFields ? event.dataFields.slice() : [], localEvent;
+            return Object(TelemetryEvent.a)(event);
         }, SimpleTelemetryLogger.prototype.getConfig = function() {
             return this.config;
         }, SimpleTelemetryLogger;
@@ -6642,7 +6662,7 @@ var oteljs = function(modules) {
     }, getCurrentMicroseconds = function() {
         return 1e3 * Date.now();
     };
-    "object" == typeof window.performance && "now" in window.performance && (getCurrentMicroseconds = function() {
+    "object" == typeof window && "object" == typeof window.performance && "now" in window.performance && (getCurrentMicroseconds = function() {
         return 1e3 * Math.floor(window.performance.now());
     });
     var Activity_ActivityScope = function() {
@@ -6748,7 +6768,7 @@ var oteljs = function(modules) {
     __webpack_require__.d(__webpack_exports__, "Contracts", (function() {
         return _contracts_Contracts__WEBPACK_IMPORTED_MODULE_0__.a;
     }));
-    var _Activity__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(8);
+    var _Activity__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(9);
     __webpack_require__.d(__webpack_exports__, "ActivityScope", (function() {
         return _Activity__WEBPACK_IMPORTED_MODULE_1__.a;
     }));
@@ -6756,7 +6776,7 @@ var oteljs = function(modules) {
     __webpack_require__.d(__webpack_exports__, "addContractField", (function() {
         return _Contract__WEBPACK_IMPORTED_MODULE_2__.a;
     }));
-    var _CustomContract__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(11);
+    var _CustomContract__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(12);
     __webpack_require__.d(__webpack_exports__, "getFieldsForContract", (function() {
         return _CustomContract__WEBPACK_IMPORTED_MODULE_3__.a;
     }));
@@ -6764,8 +6784,8 @@ var oteljs = function(modules) {
     __webpack_require__.d(__webpack_exports__, "DataClassification", (function() {
         return _DataClassification__WEBPACK_IMPORTED_MODULE_4__.a;
     }));
-    var _DataField__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(12);
-    for (var __WEBPACK_IMPORT_KEY__ in _DataField__WEBPACK_IMPORTED_MODULE_5__) [ "Contracts", "ActivityScope", "addContractField", "getFieldsForContract", "DataClassification", "default" ].indexOf(__WEBPACK_IMPORT_KEY__) < 0 && function(key) {
+    var _DataField__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(13);
+    for (var __WEBPACK_IMPORT_KEY__ in _DataField__WEBPACK_IMPORTED_MODULE_5__) [ "default", "Contracts", "ActivityScope", "addContractField", "getFieldsForContract", "DataClassification" ].indexOf(__WEBPACK_IMPORT_KEY__) < 0 && function(key) {
         __webpack_require__.d(__webpack_exports__, key, (function() {
             return _DataField__WEBPACK_IMPORTED_MODULE_5__[key];
         }));
@@ -6786,7 +6806,7 @@ var oteljs = function(modules) {
     __webpack_require__.d(__webpack_exports__, "DataFieldType", (function() {
         return _DataFieldType__WEBPACK_IMPORTED_MODULE_7__.a;
     }));
-    var _EventFlagFiller__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(13);
+    var _EventFlagFiller__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(14);
     __webpack_require__.d(__webpack_exports__, "getEffectiveEventFlags", (function() {
         return _EventFlagFiller__WEBPACK_IMPORTED_MODULE_8__.a;
     }));
@@ -6802,8 +6822,8 @@ var oteljs = function(modules) {
     })), __webpack_require__.d(__webpack_exports__, "DiagnosticLevel", (function() {
         return _EventFlagsProperties__WEBPACK_IMPORTED_MODULE_9__.c;
     }));
-    var _OptionalEventFlags__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(14);
-    for (var __WEBPACK_IMPORT_KEY__ in _OptionalEventFlags__WEBPACK_IMPORTED_MODULE_10__) [ "Contracts", "ActivityScope", "addContractField", "getFieldsForContract", "DataClassification", "makeBooleanDataField", "makeInt64DataField", "makeDoubleDataField", "makeStringDataField", "makeGuidDataField", "DataFieldType", "getEffectiveEventFlags", "SamplingPolicy", "PersistencePriority", "CostPriority", "DataCategories", "DiagnosticLevel", "default" ].indexOf(__WEBPACK_IMPORT_KEY__) < 0 && function(key) {
+    var _OptionalEventFlags__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(15);
+    for (var __WEBPACK_IMPORT_KEY__ in _OptionalEventFlags__WEBPACK_IMPORTED_MODULE_10__) [ "default", "Contracts", "ActivityScope", "addContractField", "getFieldsForContract", "DataClassification", "makeBooleanDataField", "makeInt64DataField", "makeDoubleDataField", "makeStringDataField", "makeGuidDataField", "DataFieldType", "getEffectiveEventFlags", "SamplingPolicy", "PersistencePriority", "CostPriority", "DataCategories", "DiagnosticLevel" ].indexOf(__WEBPACK_IMPORT_KEY__) < 0 && function(key) {
         __webpack_require__.d(__webpack_exports__, key, (function() {
             return _OptionalEventFlags__WEBPACK_IMPORTED_MODULE_10__[key];
         }));
@@ -6820,30 +6840,28 @@ var oteljs = function(modules) {
     })), __webpack_require__.d(__webpack_exports__, "logError", (function() {
         return _OTelNotifications__WEBPACK_IMPORTED_MODULE_11__.c;
     }));
-    var _SimpleTelemetryLogger__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(7);
+    var _SimpleTelemetryLogger__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(8);
     __webpack_require__.d(__webpack_exports__, "SuppressNexus", (function() {
         return _SimpleTelemetryLogger__WEBPACK_IMPORTED_MODULE_12__.b;
     })), __webpack_require__.d(__webpack_exports__, "SimpleTelemetryLogger", (function() {
         return _SimpleTelemetryLogger__WEBPACK_IMPORTED_MODULE_12__.a;
     }));
-    var _TelemetryLogger__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(15);
+    var _TelemetryLogger__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(16);
     __webpack_require__.d(__webpack_exports__, "TelemetryLogger", (function() {
         return _TelemetryLogger__WEBPACK_IMPORTED_MODULE_13__.a;
     }));
-    var _TelemetryEvent__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(16);
-    for (var __WEBPACK_IMPORT_KEY__ in _TelemetryEvent__WEBPACK_IMPORTED_MODULE_14__) [ "Contracts", "ActivityScope", "addContractField", "getFieldsForContract", "DataClassification", "makeBooleanDataField", "makeInt64DataField", "makeDoubleDataField", "makeStringDataField", "makeGuidDataField", "DataFieldType", "getEffectiveEventFlags", "SamplingPolicy", "PersistencePriority", "CostPriority", "DataCategories", "DiagnosticLevel", "LogLevel", "Category", "onNotification", "logNotification", "logError", "SuppressNexus", "SimpleTelemetryLogger", "TelemetryLogger", "default" ].indexOf(__WEBPACK_IMPORT_KEY__) < 0 && function(key) {
-        __webpack_require__.d(__webpack_exports__, key, (function() {
-            return _TelemetryEvent__WEBPACK_IMPORTED_MODULE_14__[key];
-        }));
-    }(__WEBPACK_IMPORT_KEY__);
+    var _TelemetryEvent__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(7);
+    __webpack_require__.d(__webpack_exports__, "cloneEvent", (function() {
+        return _TelemetryEvent__WEBPACK_IMPORTED_MODULE_14__.a;
+    }));
     var _TelemetryProperties__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(17);
-    for (var __WEBPACK_IMPORT_KEY__ in _TelemetryProperties__WEBPACK_IMPORTED_MODULE_15__) [ "Contracts", "ActivityScope", "addContractField", "getFieldsForContract", "DataClassification", "makeBooleanDataField", "makeInt64DataField", "makeDoubleDataField", "makeStringDataField", "makeGuidDataField", "DataFieldType", "getEffectiveEventFlags", "SamplingPolicy", "PersistencePriority", "CostPriority", "DataCategories", "DiagnosticLevel", "LogLevel", "Category", "onNotification", "logNotification", "logError", "SuppressNexus", "SimpleTelemetryLogger", "TelemetryLogger", "default" ].indexOf(__WEBPACK_IMPORT_KEY__) < 0 && function(key) {
+    for (var __WEBPACK_IMPORT_KEY__ in _TelemetryProperties__WEBPACK_IMPORTED_MODULE_15__) [ "default", "Contracts", "ActivityScope", "addContractField", "getFieldsForContract", "DataClassification", "makeBooleanDataField", "makeInt64DataField", "makeDoubleDataField", "makeStringDataField", "makeGuidDataField", "DataFieldType", "getEffectiveEventFlags", "SamplingPolicy", "PersistencePriority", "CostPriority", "DataCategories", "DiagnosticLevel", "LogLevel", "Category", "onNotification", "logNotification", "logError", "SuppressNexus", "SimpleTelemetryLogger", "TelemetryLogger", "cloneEvent" ].indexOf(__WEBPACK_IMPORT_KEY__) < 0 && function(key) {
         __webpack_require__.d(__webpack_exports__, key, (function() {
             return _TelemetryProperties__WEBPACK_IMPORTED_MODULE_15__[key];
         }));
     }(__WEBPACK_IMPORT_KEY__);
     var _TelemetrySink__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(18);
-    for (var __WEBPACK_IMPORT_KEY__ in _TelemetrySink__WEBPACK_IMPORTED_MODULE_16__) [ "Contracts", "ActivityScope", "addContractField", "getFieldsForContract", "DataClassification", "makeBooleanDataField", "makeInt64DataField", "makeDoubleDataField", "makeStringDataField", "makeGuidDataField", "DataFieldType", "getEffectiveEventFlags", "SamplingPolicy", "PersistencePriority", "CostPriority", "DataCategories", "DiagnosticLevel", "LogLevel", "Category", "onNotification", "logNotification", "logError", "SuppressNexus", "SimpleTelemetryLogger", "TelemetryLogger", "default" ].indexOf(__WEBPACK_IMPORT_KEY__) < 0 && function(key) {
+    for (var __WEBPACK_IMPORT_KEY__ in _TelemetrySink__WEBPACK_IMPORTED_MODULE_16__) [ "default", "Contracts", "ActivityScope", "addContractField", "getFieldsForContract", "DataClassification", "makeBooleanDataField", "makeInt64DataField", "makeDoubleDataField", "makeStringDataField", "makeGuidDataField", "DataFieldType", "getEffectiveEventFlags", "SamplingPolicy", "PersistencePriority", "CostPriority", "DataCategories", "DiagnosticLevel", "LogLevel", "Category", "onNotification", "logNotification", "logError", "SuppressNexus", "SimpleTelemetryLogger", "TelemetryLogger", "cloneEvent" ].indexOf(__WEBPACK_IMPORT_KEY__) < 0 && function(key) {
         __webpack_require__.d(__webpack_exports__, key, (function() {
             return _TelemetrySink__WEBPACK_IMPORTED_MODULE_16__[key];
         }));
@@ -6893,7 +6911,7 @@ var oteljs = function(modules) {
     __webpack_require__.d(__webpack_exports__, "a", (function() {
         return TelemetryLogger;
     }));
-    var extendStatics, _SimpleTelemetryLogger__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(7), _Activity__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(8), _contracts_Contracts__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(6), __extends = (extendStatics = function(d, b) {
+    var extendStatics, _SimpleTelemetryLogger__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(8), _Activity__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(9), _contracts_Contracts__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(6), __extends = (extendStatics = function(d, b) {
         return (extendStatics = Object.setPrototypeOf || {
             __proto__: []
         } instanceof Array && function(d, b) {
@@ -7043,6 +7061,6 @@ var oteljs = function(modules) {
             });
         }, TelemetryLogger;
     }(_SimpleTelemetryLogger__WEBPACK_IMPORTED_MODULE_0__.a);
-}, function(module, exports) {}, function(module, exports) {}, function(module, exports) {}, function(module, exports, __webpack_require__) {
-    module.exports = __webpack_require__(10);
+}, function(module, exports) {}, function(module, exports) {}, function(module, exports, __webpack_require__) {
+    module.exports = __webpack_require__(11);
 } ]);

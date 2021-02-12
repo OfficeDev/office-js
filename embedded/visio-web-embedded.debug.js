@@ -17,9 +17,9 @@
 
 // Sources:
 // osfweb: none
-// runtime: 16.0\13018.10000
-// core: 16.0\13018.10000
-// host: visio 16.0.13018.34950
+// runtime: 16.0\13326.10000
+// core: 16.0\13326.10000
+// host: 16.0.13327.34950
 
 
 
@@ -636,6 +636,7 @@ var OfficeExtension;
                 xhr.onerror = function () {
                     reject(new _Internal.RuntimeError({
                         code: CoreErrorCodes.connectionFailure,
+                        httpStatusCode: xhr.status,
                         message: CoreUtility._getResourceString(CoreResourceStrings.connectionFailureWithStatus, xhr.statusText)
                     }));
                 };
@@ -647,11 +648,39 @@ var OfficeExtension;
                 xhr.send(CoreUtility._getRequestBodyText(request));
             });
         };
+        HttpUtility.fetchSendRequestFunc = function (request) {
+            var requestBodyText = CoreUtility._getRequestBodyText(request);
+            if (requestBodyText === '') {
+                requestBodyText = undefined;
+            }
+            return fetch(request.url, {
+                method: request.method,
+                headers: request.headers,
+                body: requestBodyText
+            })
+                .then(function (resp) {
+                return resp.text()
+                    .then(function (body) {
+                    var statusCode = resp.status;
+                    var headers = {};
+                    resp.headers.forEach(function (value, name) {
+                        headers[name] = value;
+                    });
+                    var ret = { statusCode: statusCode, headers: headers, body: body };
+                    return ret;
+                });
+            });
+        };
         HttpUtility.sendRequest = function (request) {
             HttpUtility.validateAndNormalizeRequest(request);
             var func = HttpUtility.s_customSendRequestFunc;
             if (!func) {
-                func = HttpUtility.xhrSendRequestFunc;
+                if (typeof (fetch) !== 'undefined') {
+                    func = HttpUtility.fetchSendRequestFunc;
+                }
+                else {
+                    func = HttpUtility.xhrSendRequestFunc;
+                }
             }
             return func(request);
         };
@@ -867,6 +896,24 @@ var OfficeExtension;
                     _this.traceMessages = error.traceMessages || [];
                     _this.innerError = error.innerError || null;
                     _this.debugInfo = _this._createDebugInfo(error.debugInfo || {});
+                    _this.httpStatusCode = error.httpStatusCode;
+                    _this.data = error.data;
+                }
+                if (CoreUtility.isNullOrUndefined(_this.httpStatusCode) || _this.httpStatusCode === 200) {
+                    var mapping = {};
+                    mapping[CoreErrorCodes.accessDenied] = 401;
+                    mapping[CoreErrorCodes.connectionFailure] = 500;
+                    mapping[CoreErrorCodes.generalException] = 500;
+                    mapping[CoreErrorCodes.invalidArgument] = 400;
+                    mapping[CoreErrorCodes.invalidObjectPath] = 400;
+                    mapping[CoreErrorCodes.invalidOrTimedOutSession] = 408;
+                    mapping[CoreErrorCodes.invalidRequestContext] = 400;
+                    mapping[CoreErrorCodes.timeout] = 408;
+                    mapping[CoreErrorCodes.valueNotLoaded] = 400;
+                    _this.httpStatusCode = mapping[_this.code];
+                }
+                if (CoreUtility.isNullOrUndefined(_this.httpStatusCode)) {
+                    _this.httpStatusCode = 500;
                 }
                 return _this;
             }
@@ -897,6 +944,7 @@ var OfficeExtension;
             RuntimeError._createInvalidArgError = function (error) {
                 return new _Internal.RuntimeError({
                     code: CoreErrorCodes.invalidArgument,
+                    httpStatusCode: 400,
                     message: CoreUtility.isNullOrEmptyString(error.argumentName)
                         ? CoreUtility._getResourceString(CoreResourceStrings.invalidArgumentGeneric)
                         : CoreUtility._getResourceString(CoreResourceStrings.invalidArgument, error.argumentName),
@@ -968,23 +1016,26 @@ var OfficeExtension;
             return messageSafearray;
         };
         RichApiMessageUtility.buildResponseOnSuccess = function (responseBody, responseHeaders) {
-            var response = { ErrorCode: '', ErrorMessage: '', Headers: null, Body: null };
+            var response = { HttpStatusCode: 200, ErrorCode: '', ErrorMessage: '', Headers: null, Body: null };
             response.Body = JSON.parse(responseBody);
             response.Headers = responseHeaders;
             return response;
         };
         RichApiMessageUtility.buildResponseOnError = function (errorCode, message) {
-            var response = { ErrorCode: '', ErrorMessage: '', Headers: null, Body: null };
+            var response = { HttpStatusCode: 500, ErrorCode: '', ErrorMessage: '', Headers: null, Body: null };
             response.ErrorCode = CoreErrorCodes.generalException;
             response.ErrorMessage = message;
             if (errorCode == RichApiMessageUtility.OfficeJsErrorCode_ooeNoCapability) {
                 response.ErrorCode = CoreErrorCodes.accessDenied;
+                response.HttpStatusCode = 401;
             }
             else if (errorCode == RichApiMessageUtility.OfficeJsErrorCode_ooeActivityLimitReached) {
                 response.ErrorCode = CoreErrorCodes.activityLimitReached;
+                response.HttpStatusCode = 429;
             }
             else if (errorCode == RichApiMessageUtility.OfficeJsErrorCode_ooeInvalidOrTimedOutSession) {
                 response.ErrorCode = CoreErrorCodes.invalidOrTimedOutSession;
+                response.HttpStatusCode = 408;
                 response.ErrorMessage = CoreUtility._getResourceString(CoreResourceStrings.invalidOrTimedOutSessionMessage);
             }
             return response;
@@ -1367,23 +1418,35 @@ var OfficeExtension;
                     CoreUtility.log('Error when parse ' + errorResponseBody);
                 }
             }
-            var errorMessage;
-            var errorCode;
-            if (!CoreUtility.isNullOrUndefined(errorObj) && typeof errorObj === 'object' && errorObj.error) {
-                errorCode = errorObj.error.code;
-                errorMessage = CoreUtility._getResourceString(CoreResourceStrings.connectionFailureWithDetails, [
-                    responseInfo.statusCode.toString(),
-                    errorObj.error.code,
-                    errorObj.error.message
-                ]);
+            var statusCode = responseInfo.statusCode.toString();
+            if (CoreUtility.isNullOrUndefined(errorObj) || typeof errorObj !== 'object' || !errorObj.error) {
+                return CoreUtility._createDefaultErrorResponse(statusCode);
             }
-            else {
-                errorMessage = CoreUtility._getResourceString(CoreResourceStrings.connectionFailureWithStatus, responseInfo.statusCode.toString());
+            var error = errorObj.error;
+            var innerError = error.innerError;
+            if (innerError && innerError.code) {
+                return CoreUtility._createErrorResponse(innerError.code, statusCode, innerError.message);
             }
-            if (CoreUtility.isNullOrEmptyString(errorCode)) {
-                errorCode = CoreErrorCodes.connectionFailure;
+            if (error.code) {
+                return CoreUtility._createErrorResponse(error.code, statusCode, error.message);
             }
-            return { errorCode: errorCode, errorMessage: errorMessage };
+            return CoreUtility._createDefaultErrorResponse(statusCode);
+        };
+        CoreUtility._createDefaultErrorResponse = function (statusCode) {
+            return {
+                errorCode: CoreErrorCodes.connectionFailure,
+                errorMessage: CoreUtility._getResourceString(CoreResourceStrings.connectionFailureWithStatus, statusCode)
+            };
+        };
+        CoreUtility._createErrorResponse = function (code, statusCode, message) {
+            return {
+                errorCode: code,
+                errorMessage: CoreUtility._getResourceString(CoreResourceStrings.connectionFailureWithDetails, [
+                    statusCode,
+                    code,
+                    message
+                ])
+            };
         };
         CoreUtility._copyHeaders = function (src, dest) {
             if (src && dest) {
@@ -1567,6 +1630,7 @@ var OfficeExtension;
                         if (!scalarPropUpdatable[index]) {
                             throw new _Internal.RuntimeError({
                                 code: CoreErrorCodes.invalidArgument,
+                                httpStatusCode: 400,
                                 message: CoreUtility._getResourceString(CommonResourceStrings.attemptingToSetReadOnlyProperty, propName),
                                 debugInfo: {
                                     errorLocation: propName
@@ -1582,6 +1646,7 @@ var OfficeExtension;
                     else {
                         throw new _Internal.RuntimeError({
                             code: CoreErrorCodes.invalidArgument,
+                            httpStatusCode: 400,
                             message: CoreUtility._getResourceString(CommonResourceStrings.propertyDoesNotExist, propName),
                             debugInfo: {
                                 errorLocation: propName
@@ -1612,6 +1677,7 @@ var OfficeExtension;
             catch (innerError) {
                 throw new _Internal.RuntimeError({
                     code: CoreErrorCodes.invalidArgument,
+                    httpStatusCode: 400,
                     message: CoreUtility._getResourceString(CoreResourceStrings.invalidArgument, 'properties'),
                     debugInfo: {
                         errorLocation: this._className + '.update'
@@ -2101,6 +2167,7 @@ var OfficeExtension;
             if (!objectPath.isValid) {
                 throw new _Internal.RuntimeError({
                     code: CoreErrorCodes.invalidObjectPath,
+                    httpStatusCode: 400,
                     message: CoreUtility._getResourceString(CoreResourceStrings.invalidObjectPath, CommonUtility.getObjectPathExpression(objectPath)),
                     debugInfo: {
                         errorLocation: CommonUtility.getObjectPathExpression(objectPath)
@@ -2320,6 +2387,7 @@ var OfficeExtension;
                 if (!this.m_isLoaded) {
                     throw new _Internal.RuntimeError({
                         code: CoreErrorCodes.valueNotLoaded,
+                        httpStatusCode: 400,
                         message: CoreUtility._getResourceString(CoreResourceStrings.valueNotLoaded),
                         debugInfo: {
                             errorLocation: 'clientResult.value'
@@ -2412,12 +2480,14 @@ var OfficeExtension;
             if (!CoreUtility.isNullOrEmptyString(response.ErrorCode)) {
                 return new _Internal.RuntimeError({
                     code: response.ErrorCode,
+                    httpStatusCode: response.HttpStatusCode,
                     message: response.ErrorMessage
                 });
             }
             if (response.Body && response.Body.Error) {
                 return new _Internal.RuntimeError({
                     code: response.Body.Error.Code,
+                    httpStatusCode: response.Body.Error.HttpStatusCode,
                     message: response.Body.Error.Message
                 });
             }
@@ -2488,6 +2558,7 @@ var OfficeExtension;
                 var response;
                 if (responseInfo.statusCode === 200) {
                     response = {
+                        HttpStatusCode: responseInfo.statusCode,
                         ErrorCode: null,
                         ErrorMessage: null,
                         Headers: responseInfo.headers,
@@ -2498,6 +2569,7 @@ var OfficeExtension;
                     CoreUtility.log('Error Response:' + responseInfo.body);
                     var error = CoreUtility._parseErrorResponse(responseInfo);
                     response = {
+                        HttpStatusCode: responseInfo.statusCode,
                         ErrorCode: error.errorCode,
                         ErrorMessage: error.errorMessage,
                         Headers: responseInfo.headers,
@@ -2543,6 +2615,7 @@ var OfficeExtension;
                 if (!objectPath.isValid) {
                     throw new _Internal.RuntimeError({
                         code: CoreErrorCodes.invalidObjectPath,
+                        httpStatusCode: 400,
                         message: CoreUtility._getResourceString(CoreResourceStrings.invalidObjectPath, CommonUtility.getObjectPathExpression(objectPath)),
                         debugInfo: {
                             errorLocation: CommonUtility.getObjectPathExpression(objectPath)
@@ -2560,6 +2633,7 @@ var OfficeExtension;
                         if (!objectPath.isValid) {
                             throw new _Internal.RuntimeError({
                                 code: CoreErrorCodes.invalidObjectPath,
+                                httpStatusCode: 400,
                                 message: CoreUtility._getResourceString(CoreResourceStrings.invalidObjectPath, CommonUtility.getObjectPathExpression(objectPath))
                             });
                         }
@@ -2653,6 +2727,7 @@ var OfficeExtension;
             if (context && obj && obj._context !== context) {
                 throw new _Internal.RuntimeError({
                     code: CoreErrorCodes.invalidRequestContext,
+                    httpStatusCode: 400,
                     message: CoreUtility._getResourceString(CoreResourceStrings.invalidRequestContext)
                 });
             }
@@ -2678,10 +2753,17 @@ var OfficeExtension;
                 ]);
                 throw new _Internal.RuntimeError({
                     code: CoreErrorCodes.apiNotFound,
+                    httpStatusCode: 404,
                     message: message,
                     debugInfo: { errorLocation: apiFullName }
                 });
             }
+        };
+        CommonUtility.calculateApiFlags = function (apiFlags, undoableApiSetName, undoableApiSetVersion) {
+            if (!CommonUtility.isSetSupported(undoableApiSetName, undoableApiSetVersion)) {
+                apiFlags = apiFlags & (~2);
+            }
+            return apiFlags;
         };
         CommonUtility._parseSelectExpand = function (select) {
             var args = [];
@@ -3520,6 +3602,7 @@ var OfficeExtension;
                         if (typeof input[prop] !== 'undefined' && throwOnReadOnly) {
                             throw new _Internal.RuntimeError({
                                 code: CoreErrorCodes.invalidArgument,
+                                httpStatusCode: 400,
                                 message: CoreUtility._getResourceString(ResourceStrings.cannotApplyPropertyThroughSetMethod, prop),
                                 debugInfo: {
                                     errorLocation: prop
@@ -3534,6 +3617,7 @@ var OfficeExtension;
                         if (!propertyDescriptor) {
                             throw new _Internal.RuntimeError({
                                 code: CoreErrorCodes.invalidArgument,
+                                httpStatusCode: 400,
                                 message: CoreUtility._getResourceString(CommonResourceStrings.propertyDoesNotExist, prop),
                                 debugInfo: {
                                     errorLocation: prop
@@ -3543,6 +3627,7 @@ var OfficeExtension;
                         if (throwOnReadOnly && !propertyDescriptor.set) {
                             throw new _Internal.RuntimeError({
                                 code: CoreErrorCodes.invalidArgument,
+                                httpStatusCode: 400,
                                 message: CoreUtility._getResourceString(CommonResourceStrings.attemptingToSetReadOnlyProperty, prop),
                                 debugInfo: {
                                     errorLocation: prop
@@ -3555,6 +3640,7 @@ var OfficeExtension;
             catch (innerError) {
                 throw new _Internal.RuntimeError({
                     code: CoreErrorCodes.invalidArgument,
+                    httpStatusCode: 400,
                     message: CoreUtility._getResourceString(CoreResourceStrings.invalidArgument, 'properties'),
                     debugInfo: {
                         errorLocation: this._className + '.set'
@@ -3590,6 +3676,7 @@ var OfficeExtension;
                 var response;
                 if (responseInfo.statusCode === 200) {
                     response = {
+                        HttpStatusCode: responseInfo.statusCode,
                         ErrorCode: null,
                         ErrorMessage: null,
                         Headers: responseInfo.headers,
@@ -3600,6 +3687,7 @@ var OfficeExtension;
                     CoreUtility.log('Error Response:' + responseInfo.body);
                     var error = CoreUtility._parseErrorResponse(responseInfo);
                     response = {
+                        HttpStatusCode: responseInfo.statusCode,
                         ErrorCode: error.errorCode,
                         ErrorMessage: error.errorMessage,
                         Headers: responseInfo.headers,
@@ -3899,6 +3987,7 @@ var OfficeExtension;
                         }
                         transformedError = new _Internal.RuntimeError({
                             code: ErrorCodes.cannotRegisterEvent,
+                            httpStatusCode: 400,
                             message: message,
                             traceMessages: req._responseTraceMessages
                         });
@@ -3947,6 +4036,7 @@ var OfficeExtension;
             if (!Utility.isNullOrEmptyString(response.ErrorCode)) {
                 return new _Internal.RuntimeError({
                     code: response.ErrorCode,
+                    httpStatusCode: response.HttpStatusCode,
                     message: response.ErrorMessage,
                     traceMessages: traceMessages
                 });
@@ -3962,6 +4052,7 @@ var OfficeExtension;
                 }
                 return new _Internal.RuntimeError({
                     code: response.Body.Error.Code,
+                    httpStatusCode: response.Body.Error.HttpStatusCode,
                     message: response.Body.Error.Message,
                     traceMessages: traceMessages,
                     debugInfo: debugInfo
@@ -4334,6 +4425,7 @@ var OfficeExtension;
                 if (!this.m_isLoaded) {
                     throw new _Internal.RuntimeError({
                         code: ErrorCodes.valueNotLoaded,
+                        httpStatusCode: 400,
                         message: CoreUtility._getResourceString(ResourceStrings.valueNotLoaded),
                         debugInfo: {
                             errorLocation: 'retrieveResult.$isNullObject'
@@ -4656,9 +4748,7 @@ var OfficeExtension;
                             return Office.context.document.settings.addHandlerAsync(Office.EventType.SettingsChanged, handler, callback);
                         });
                     case 5:
-                        return Utility.promisify(function (callback) {
-                            return OSF.DDA.RichApi.richApiMessageManager.addHandlerAsync('richApiMessage', handler, callback);
-                        });
+                        return OSF.DDA.RichApi.richApiMessageManager.register(handler);
                     case 13:
                         return Utility.promisify(function (callback) {
                             return Office.context.document.addHandlerAsync(Office.EventType.ObjectDeleted, handler, { id: targetId }, callback);
@@ -5612,15 +5702,18 @@ var OfficeExtension;
         Utility.throwError = function (resourceId, arg, errorLocation) {
             throw new _Internal.RuntimeError({
                 code: resourceId,
+                httpStatusCode: 400,
                 message: CoreUtility._getResourceString(resourceId, arg),
                 debugInfo: errorLocation ? { errorLocation: errorLocation } : undefined
             });
         };
-        Utility.createRuntimeError = function (code, message, location) {
+        Utility.createRuntimeError = function (code, message, location, httpStatusCode, data) {
             return new _Internal.RuntimeError({
                 code: code,
+                httpStatusCode: httpStatusCode,
                 message: message,
-                debugInfo: { errorLocation: location }
+                debugInfo: { errorLocation: location },
+                data: data
             });
         };
         Utility.throwIfNotLoaded = function (propertyName, fieldValue, entityName, isNull) {
@@ -5633,6 +5726,7 @@ var OfficeExtension;
         Utility.createPropertyNotLoadedException = function (entityName, propertyName) {
             return new _Internal.RuntimeError({
                 code: ErrorCodes.propertyNotLoaded,
+                httpStatusCode: 400,
                 message: CoreUtility._getResourceString(ResourceStrings.propertyNotLoaded, propertyName),
                 debugInfo: entityName ? { errorLocation: entityName + '.' + propertyName } : undefined
             });
@@ -5640,6 +5734,7 @@ var OfficeExtension;
         Utility.createCannotUpdateReadOnlyPropertyException = function (entityName, propertyName) {
             return new _Internal.RuntimeError({
                 code: ErrorCodes.cannotUpdateReadOnlyProperty,
+                httpStatusCode: 400,
                 message: CoreUtility._getResourceString(ResourceStrings.cannotUpdateReadOnlyProperty, propertyName),
                 debugInfo: entityName ? { errorLocation: entityName + '.' + propertyName } : undefined
             });
@@ -6116,18 +6211,28 @@ var OfficeExtension;
                 for (var i = 0; i < typeInfo.scalarProperties.length; i++) {
                     var elem = typeInfo.scalarProperties[i];
                     if (Array.isArray(elem)) {
-                        this.ensureArraySize(elem, 5);
+                        this.ensureArraySize(elem, 6);
                         typeInfo.scalarProperties[i] = {
                             name: this.getString(elem[0]),
                             behaviorFlags: elem[1],
                             apiSetInfoOrdinal: elem[2],
                             originalName: this.getString(elem[3]),
-                            setMethodApiFlags: elem[4]
+                            setMethodApiFlags: elem[4],
+                            undoableApiSetInfoOrdinal: elem[5]
                         };
                     }
                     this.buildScalarProperty(type, typeInfo, typeInfo.scalarProperties[i]);
                 }
             }
+        };
+        LibraryBuilder.prototype.calculateApiFlags = function (apiFlags, undoableApiSetInfoOrdinal) {
+            if (undoableApiSetInfoOrdinal > 0) {
+                var undoableApiSetInfo = this.m_apiSets[undoableApiSetInfoOrdinal - 1];
+                if (undoableApiSetInfo) {
+                    apiFlags = CommonUtility.calculateApiFlags(apiFlags, undoableApiSetInfo.name, undoableApiSetInfo.version);
+                }
+            }
+            return apiFlags;
         };
         LibraryBuilder.prototype.buildScalarProperty = function (type, typeInfo, propInfo) {
             this.ensureOriginalName(propInfo);
@@ -6152,7 +6257,8 @@ var OfficeExtension;
                         }
                     }
                     this[fieldName] = value;
-                    BatchApiHelper.invokeSetProperty(this, propInfo.originalName, value, propInfo.setMethodApiFlags);
+                    var apiFlags = thisBuilder.calculateApiFlags(propInfo.setMethodApiFlags, propInfo.undoableApiSetInfoOrdinal);
+                    BatchApiHelper.invokeSetProperty(this, propInfo.originalName, value, apiFlags);
                 };
             }
             Object.defineProperty(type.prototype, propInfo.name, descriptor);
@@ -6162,7 +6268,7 @@ var OfficeExtension;
                 for (var i = 0; i < typeInfo.navigationProperties.length; i++) {
                     var elem = typeInfo.navigationProperties[i];
                     if (Array.isArray(elem)) {
-                        this.ensureArraySize(elem, 7);
+                        this.ensureArraySize(elem, 8);
                         typeInfo.navigationProperties[i] = {
                             name: this.getString(elem[0]),
                             behaviorFlags: elem[2],
@@ -6170,7 +6276,8 @@ var OfficeExtension;
                             originalName: this.getString(elem[4]),
                             getMethodApiFlags: elem[5],
                             setMethodApiFlags: elem[6],
-                            propertyTypeFullName: this.getString(elem[1])
+                            propertyTypeFullName: this.getString(elem[1]),
+                            undoableApiSetInfoOrdinal: elem[7]
                         };
                     }
                     this.buildNavigationProperty(type, typeInfo, typeInfo.navigationProperties[i]);
@@ -6206,7 +6313,8 @@ var OfficeExtension;
                         }
                     }
                     this[fieldName] = value;
-                    BatchApiHelper.invokeSetProperty(this, propInfo.originalName, value, propInfo.setMethodApiFlags);
+                    var apiFlags = thisBuilder.calculateApiFlags(propInfo.setMethodApiFlags, propInfo.undoableApiSetInfoOrdinal);
+                    BatchApiHelper.invokeSetProperty(this, propInfo.originalName, value, apiFlags);
                 };
             }
             Object.defineProperty(type.prototype, propInfo.name, descriptor);
@@ -6216,14 +6324,15 @@ var OfficeExtension;
                 for (var i = 0; i < typeInfo.scalarMethods.length; i++) {
                     var elem = typeInfo.scalarMethods[i];
                     if (Array.isArray(elem)) {
-                        this.ensureArraySize(elem, 6);
+                        this.ensureArraySize(elem, 7);
                         typeInfo.scalarMethods[i] = {
                             name: this.getString(elem[0]),
                             behaviorFlags: elem[2],
                             apiSetInfoOrdinal: elem[3],
                             originalName: this.getString(elem[5]),
                             apiFlags: elem[4],
-                            parameterCount: elem[1]
+                            parameterCount: elem[1],
+                            undoableApiSetInfoOrdinal: elem[6]
                         };
                     }
                     this.buildScalarMethod(type, typeInfo, typeInfo.scalarMethods[i]);
@@ -6270,7 +6379,8 @@ var OfficeExtension;
                 if (methodInfo.behaviorFlags & 2) {
                     operationType = 1;
                 }
-                return BatchApiHelper.invokeMethod(this, methodInfo.originalName, operationType, args, methodInfo.apiFlags, resultProcessType);
+                var apiFlags = thisBuilder.calculateApiFlags(methodInfo.apiFlags, methodInfo.undoableApiSetInfoOrdinal);
+                return BatchApiHelper.invokeMethod(this, methodInfo.originalName, operationType, args, apiFlags, resultProcessType);
             };
         };
         LibraryBuilder.prototype.buildNavigationMethods = function (type, typeInfo) {
@@ -6278,7 +6388,7 @@ var OfficeExtension;
                 for (var i = 0; i < typeInfo.navigationMethods.length; i++) {
                     var elem = typeInfo.navigationMethods[i];
                     if (Array.isArray(elem)) {
-                        this.ensureArraySize(elem, 8);
+                        this.ensureArraySize(elem, 9);
                         typeInfo.navigationMethods[i] = {
                             name: this.getString(elem[0]),
                             behaviorFlags: elem[3],
@@ -6287,7 +6397,8 @@ var OfficeExtension;
                             apiFlags: elem[5],
                             parameterCount: elem[2],
                             returnTypeFullName: this.getString(elem[1]),
-                            returnObjectGetByIdMethodName: this.getString(elem[7])
+                            returnObjectGetByIdMethodName: this.getString(elem[7]),
+                            undoableApiSetInfoOrdinal: elem[8]
                         };
                     }
                     this.buildNavigationMethod(type, typeInfo, typeInfo.navigationMethods[i]);
@@ -6334,7 +6445,8 @@ var OfficeExtension;
                     if (methodInfo.behaviorFlags & 2) {
                         operationType = 1;
                     }
-                    return BatchApiHelper.createMethodObject(thisBuilder.getFunction(methodInfo.returnTypeFullName), this, methodInfo.originalName, operationType, args, (methodInfo.behaviorFlags & 4) !== 0, (methodInfo.behaviorFlags & 8) !== 0, methodInfo.returnObjectGetByIdMethodName, methodInfo.apiFlags);
+                    var apiFlags = thisBuilder.calculateApiFlags(methodInfo.apiFlags, methodInfo.undoableApiSetInfoOrdinal);
+                    return BatchApiHelper.createMethodObject(thisBuilder.getFunction(methodInfo.returnTypeFullName), this, methodInfo.originalName, operationType, args, (methodInfo.behaviorFlags & 4) !== 0, (methodInfo.behaviorFlags & 8) !== 0, methodInfo.returnObjectGetByIdMethodName, apiFlags);
                 }
             };
         };
@@ -7754,6 +7866,7 @@ var OfficeCore;
     var _adjustToDateTime = OfficeExtension.Utility.adjustToDateTime;
     var _processRetrieveResult = OfficeExtension.Utility.processRetrieveResult;
     var _setMockData = OfficeExtension.Utility.setMockData;
+    var _calculateApiFlags = OfficeExtension.CommonUtility.calculateApiFlags;
     var _typeSkill = "Skill";
     var Skill = (function (_super) {
         __extends(Skill, _super);
@@ -7931,14 +8044,15 @@ var OfficeFirstPartyAuth;
             if (OSF.WebAuth && OSF._OfficeAppFactory.getHostInfo().hostPlatform == "web") {
                 try {
                     if (!Office || !Office.context || !Office.context.webAuth) {
-                        reject({ code: ErrorCode.GetAuthContextAsyncMissing, message: (Strings && Strings.OfficeOM.L_ImplicitGetAuthContextMissing) ? Strings.OfficeOM.L_ImplicitGetAuthContextMissing : "" });
+                        reject({ code: ErrorCode.GetAuthContextAsyncMissing, message: (typeof (Strings) !== 'undefined' && Strings.OfficeOM.L_ImplicitGetAuthContextMissing) ? Strings.OfficeOM.L_ImplicitGetAuthContextMissing : "" });
                     }
                     Office.context.webAuth.getAuthContextAsync(function (result) {
                         if (result.status === "succeeded") {
                             retrievedAuthContext = true;
                             var authContext = result.value;
                             if (!authContext || authContext.isAnonymous) {
-                                return false;
+                                reject({ code: ErrorCode.CannotGetAuthContext, message: (typeof (Strings) !== 'undefined' && Strings.OfficeOM.L_ImplicitGetAuthContextMissing) ? Strings.OfficeOM.L_ImplicitGetAuthContextMissing : "" });
+                                return;
                             }
                             var isMsa = authContext.authorityType.toLowerCase() === 'msa';
                             OSF.WebAuth.config = {
@@ -7957,7 +8071,7 @@ var OfficeFirstPartyAuth;
                                     succeeded = true;
                                     resolve();
                                 }
-                                reject({ code: ErrorCode.PackageNotLoaded, message: (Strings && Strings.OfficeOM.L_ImplicitNotLoaded) ? Strings.OfficeOM.L_ImplicitNotLoaded : "" });
+                                reject({ code: ErrorCode.PackageNotLoaded, message: (typeof (Strings) !== 'undefined' && Strings.OfficeOM.L_ImplicitNotLoaded) ? Strings.OfficeOM.L_ImplicitNotLoaded : "" });
                             });
                             logLoadEvent(loadResult, succeeded);
                             var finalReplyUrl = (replyUrl) ? replyUrl : window.location.href.split("?")[0];
@@ -7997,43 +8111,57 @@ var OfficeFirstPartyAuth;
     }
     OfficeFirstPartyAuth.load = load;
     function getAccessToken(options, behaviorOption) {
-        if (OSF.WebAuth && OSF._OfficeAppFactory.getHostInfo().hostPlatform == "web") {
-            if (OSF.WebAuth.loaded) {
-                return new OfficeExtension.CoreUtility.Promise(function (resolve, reject) {
-                    if (behaviorOption && behaviorOption.forceRefresh) {
-                        OSF.WebAuth.clearCache();
+        return new OfficeExtension.CoreUtility.Promise(function (resolve, reject) {
+            if (OSF._OfficeAppFactory.getHostInfo().hostPlatform == "web") {
+                Office.context.webAuth.getAuthContextAsync(function (result) {
+                    var supportsAuthToken = false;
+                    if (result.status === "succeeded") {
+                        retrievedAuthContext = true;
+                        var authContext = result.value;
+                        if (authContext.supportsAuthToken) {
+                            supportsAuthToken = true;
+                        }
                     }
-                    var identityType = (OSF.WebAuth.config.idp.toLowerCase() == "msa")
-                        ? OfficeCore.IdentityType.microsoftAccount
-                        : OfficeCore.IdentityType.organizationAccount;
-                    if (OSF.WebAuth.config.appIds[0]) {
-                        OSF.WebAuth.getToken(options.resource, OSF.WebAuth.config.appIds[0], OSF._OfficeAppFactory.getHostInfo().osfControlAppCorrelationId, (behaviorOption && behaviorOption.popup) ? behaviorOption.popup : null).then(function (result) {
-                            logAcquireEvent(result, true, options.resource, (behaviorOption && behaviorOption.popup) ? behaviorOption.popup : null);
-                            resolve({ accessToken: result.Token, tokenIdenityType: identityType });
-                        })["catch"](function (result) {
-                            logAcquireEvent(result, false, options.resource, (behaviorOption && behaviorOption.popup) ? behaviorOption.popup : null, result.ErrorCode);
-                            reject({ code: result.ErrorCode, message: result.ErrorMessage });
+                    if (!supportsAuthToken) {
+                        if (OSF.WebAuth && OSF.WebAuth.loaded) {
+                            if (behaviorOption && behaviorOption.forceRefresh) {
+                                OSF.WebAuth.clearCache();
+                            }
+                            var identityType_1 = (OSF.WebAuth.config.idp.toLowerCase() == "msa")
+                                ? OfficeCore.IdentityType.microsoftAccount
+                                : OfficeCore.IdentityType.organizationAccount;
+                            if (OSF.WebAuth.config.appIds[0]) {
+                                OSF.WebAuth.getToken(options.resource, OSF.WebAuth.config.appIds[0], OSF._OfficeAppFactory.getHostInfo().osfControlAppCorrelationId, (behaviorOption && behaviorOption.popup) ? behaviorOption.popup : null).then(function (result) {
+                                    logAcquireEvent(result, true, options.resource, (behaviorOption && behaviorOption.popup) ? behaviorOption.popup : null);
+                                    resolve({ accessToken: result.Token, tokenIdenityType: identityType_1 });
+                                })["catch"](function (result) {
+                                    logAcquireEvent(result, false, options.resource, (behaviorOption && behaviorOption.popup) ? behaviorOption.popup : null, result.ErrorCode);
+                                    reject({ code: result.ErrorCode, message: result.ErrorMessage });
+                                });
+                            }
+                        }
+                        else {
+                            logUnexpectedAcquireEvent(OSF.WebAuth.loaded, OSF.WebAuth.loadAttempts);
+                        }
+                    }
+                    else {
+                        var context = new OfficeCore.RequestContext();
+                        var auth = OfficeCore.AuthenticationService.newObject(context);
+                        context._customData = "WacPartition";
+                        var result_1 = auth.getAccessToken(options, null);
+                        context.sync().then(function () {
+                            resolve(result_1.value);
                         });
                     }
                 });
             }
             else {
-                logUnexpectedAcquireEvent(OSF.WebAuth.loaded, OSF.WebAuth.loadAttempts);
-            }
-        }
-        var context = new OfficeCore.RequestContext();
-        var auth = OfficeCore.AuthenticationService.newObject(context);
-        context._customData = "WacPartition";
-        if (OSF._OfficeAppFactory.getHostInfo().hostPlatform == "web" && OSF._OfficeAppFactory.getHostInfo().hostType == "word") {
-            var result_1 = auth.getAccessToken(options, null);
-            return context.sync().then(function () { return result_1.value; });
-        }
-        else {
-            return new OfficeExtension.CoreUtility.Promise(function (resolve, reject) {
-                var handler = auth.onTokenReceived.add(function (arg) {
+                var context_1 = new OfficeCore.RequestContext();
+                var auth_1 = OfficeCore.AuthenticationService.newObject(context_1);
+                var handler_1 = auth_1.onTokenReceived.add(function (arg) {
                     if (!OfficeExtension.CoreUtility.isNullOrUndefined(arg)) {
-                        handler.remove();
-                        context.sync()["catch"](function () {
+                        handler_1.remove();
+                        context_1.sync()["catch"](function () {
                         });
                         if (arg.code == 0) {
                             resolve(arg.tokenValue);
@@ -8054,10 +8182,10 @@ var OfficeFirstPartyAuth;
                     }
                     return null;
                 });
-                context.sync()
+                context_1.sync()
                     .then(function () {
-                    var apiResult = auth.getAccessToken(options, auth._targetId);
-                    return context.sync()
+                    var apiResult = auth_1.getAccessToken(options, auth_1._targetId);
+                    return context_1.sync()
                         .then(function () {
                         if (OfficeExtension.CoreUtility.isNullOrUndefined(apiResult.value)) {
                             return null;
@@ -8070,8 +8198,8 @@ var OfficeFirstPartyAuth;
                 })["catch"](function (e) {
                     reject(e);
                 });
-            });
-        }
+            }
+        });
     }
     OfficeFirstPartyAuth.getAccessToken = getAccessToken;
     function getPrimaryIdentityInfo() {
@@ -8245,6 +8373,7 @@ var OfficeCore;
     var _adjustToDateTime = OfficeExtension.Utility.adjustToDateTime;
     var _processRetrieveResult = OfficeExtension.Utility.processRetrieveResult;
     var _setMockData = OfficeExtension.Utility.setMockData;
+    var _calculateApiFlags = OfficeExtension.CommonUtility.calculateApiFlags;
     var IdentityType;
     (function (IdentityType) {
         IdentityType["organizationAccount"] = "OrganizationAccount";
@@ -8524,6 +8653,7 @@ var OfficeCore;
         ServiceProvider["ariaBrowserPipeUrl"] = "AriaBrowserPipeUrl";
         ServiceProvider["ariaUploadUrl"] = "AriaUploadUrl";
         ServiceProvider["ariaVNextUploadUrl"] = "AriaVNextUploadUrl";
+        ServiceProvider["lokiAutoDiscoverUrl"] = "LokiAutoDiscoverUrl";
     })(ServiceProvider = OfficeCore.ServiceProvider || (OfficeCore.ServiceProvider = {}));
     var _typeServiceUrlProvider = "ServiceUrlProvider";
     var ServiceUrlProvider = (function (_super) {
@@ -8613,6 +8743,9 @@ var OfficeCore;
             enumerable: true,
             configurable: true
         });
+        NetworkUsage.prototype.isInDisconnectedMode = function () {
+            return _invokeMethod(this, "IsInDisconnectedMode", 1, [], 4, 0);
+        };
         NetworkUsage.prototype.isInOnlineMode = function () {
             return _invokeMethod(this, "IsInOnlineMode", 1, [], 4, 0);
         };
@@ -9580,6 +9713,9 @@ var OfficeCore;
         };
         PersonaActions.prototype.openLinkContactUx = function () {
             _invokeMethod(this, "OpenLinkContactUx", 0, [], 0, 0);
+        };
+        PersonaActions.prototype.openOutlookProperties = function () {
+            _invokeMethod(this, "OpenOutlookProperties", 0, [], 0, 0);
         };
         PersonaActions.prototype.pinPersonaToQuickContacts = function () {
             _invokeMethod(this, "PinPersonaToQuickContacts", 0, [], 0, 0);
@@ -12356,22 +12492,9 @@ var OfficeCore;
                         registerFunc: function () { return _this._RegisterStateChange(); },
                         unregisterFunc: function () { return _this._UnregisterStateChange(); },
                         getTargetIdFunc: function () { return _this.id; },
-                        eventArgsTransformFunc: function (args) {
-                            if (args) {
-                                var newArgs = {
-                                    feature: args.featureName,
-                                    isEnabled: args.isEnabled,
-                                    tier: args.tierName
-                                };
-                                if (args.tierName) {
-                                    newArgs.tier = args.tierName == 0 ? LicenseFeatureTier.unknown :
-                                        args.tierName == 1 ? LicenseFeatureTier.basic :
-                                            args.tierName == 2 ? LicenseFeatureTier.premium :
-                                                args.tierName;
-                                }
-                                return OfficeExtension.Utility._createPromiseFromResult(newArgs);
-                            }
-                            return OfficeExtension.Utility._createPromiseFromResult(null);
+                        eventArgsTransformFunc: function (value) {
+                            var event = _CC.LicenseFeature_StateChanged_EventArgsTransform(_this, value);
+                            return OfficeExtension.Utility._createPromiseFromResult(event);
                         }
                     });
                 }
@@ -12395,6 +12518,23 @@ var OfficeCore;
         return LicenseFeature;
     }(OfficeExtension.ClientObject));
     OfficeCore.LicenseFeature = LicenseFeature;
+    (function (_CC) {
+        function LicenseFeature_StateChanged_EventArgsTransform(thisObj, args) {
+            var newArgs = {
+                feature: args.featureName,
+                isEnabled: args.isEnabled,
+                tier: args.tierName
+            };
+            if (args.tierName) {
+                newArgs.tier = args.tierName == 0 ? LicenseFeatureTier.unknown :
+                    args.tierName == 1 ? LicenseFeatureTier.basic :
+                        args.tierName == 2 ? LicenseFeatureTier.premium :
+                            args.tierName;
+            }
+            return newArgs;
+        }
+        _CC.LicenseFeature_StateChanged_EventArgsTransform = LicenseFeature_StateChanged_EventArgsTransform;
+    })(_CC = OfficeCore._CC || (OfficeCore._CC = {}));
     var ErrorCodes;
     (function (ErrorCodes) {
         ErrorCodes["apiNotAvailable"] = "ApiNotAvailable";
@@ -12636,8 +12776,12 @@ var Office;
         function requestCreateControls(input) {
             var requestContext = _createRequestContext();
             var ribbon = requestContext.ribbon;
+            var delay = function (milliseconds) {
+                return new Promise(function (resolve, _) { return setTimeout(function () { return resolve(); }, milliseconds); });
+            };
             ribbon.executeRequestCreate(JSON.stringify(input));
-            return requestContext.sync();
+            return delay(250)
+                .then(function () { return requestContext.sync(); });
         }
         ribbon_1.requestCreateControls = requestCreateControls;
     })(ribbon = Office.ribbon || (Office.ribbon = {}));
@@ -12667,46 +12811,34 @@ var OfficeCore;
     var _adjustToDateTime = OfficeExtension.Utility.adjustToDateTime;
     var _processRetrieveResult = OfficeExtension.Utility.processRetrieveResult;
     var _setMockData = OfficeExtension.Utility.setMockData;
-    var _typeAddinInternalService = "AddinInternalService";
-    var AddinInternalService = (function (_super) {
-        __extends(AddinInternalService, _super);
-        function AddinInternalService() {
-            return _super !== null && _super.apply(this, arguments) || this;
-        }
-        Object.defineProperty(AddinInternalService.prototype, "_className", {
-            get: function () {
-                return "AddinInternalService";
-            },
-            enumerable: true,
-            configurable: true
-        });
-        AddinInternalService.prototype.notifyActionHandlerReady = function () {
-            _invokeMethod(this, "NotifyActionHandlerReady", 1, [], 4, 0);
-        };
-        AddinInternalService.prototype._handleResult = function (value) {
-            _super.prototype._handleResult.call(this, value);
-            if (_isNullOrUndefined(value))
-                return;
-            var obj = value;
-            _fixObjectPathIfNecessary(this, obj);
-        };
-        AddinInternalService.prototype._handleRetrieveResult = function (value, result) {
-            _super.prototype._handleRetrieveResult.call(this, value, result);
-            _processRetrieveResult(this, value, result);
-        };
-        AddinInternalService.newObject = function (context) {
-            return _createTopLevelServiceObject(OfficeCore.AddinInternalService, context, "Microsoft.InternalService.AddinInternalService", false, 4);
-        };
-        AddinInternalService.prototype.toJSON = function () {
-            return _toJson(this, {}, {});
-        };
-        return AddinInternalService;
-    }(OfficeExtension.ClientObject));
-    OfficeCore.AddinInternalService = AddinInternalService;
+    var _calculateApiFlags = OfficeExtension.CommonUtility.calculateApiFlags;
     var AddinInternalServiceErrorCodes;
     (function (AddinInternalServiceErrorCodes) {
         AddinInternalServiceErrorCodes["generalException"] = "GeneralException";
     })(AddinInternalServiceErrorCodes || (AddinInternalServiceErrorCodes = {}));
+    var _libraryMetadataInternalServiceApi = { "version": "1.0.0",
+        "name": "OfficeCore",
+        "defaultApiSetName": "OfficeSharedApi",
+        "hostName": "Office",
+        "apiSets": [],
+        "strings": ["AddinInternalService"],
+        "enumTypes": [],
+        "clientObjectTypes": [[1,
+                0,
+                0,
+                0,
+                [["notifyActionHandlerReady",
+                        0,
+                        2,
+                        0,
+                        4]],
+                0,
+                0,
+                0,
+                0,
+                "Microsoft.InternalService.AddinInternalService",
+                4]] };
+    var _builder = new OfficeExtension.LibraryBuilder({ metadata: _libraryMetadataInternalServiceApi, targetNamespaceObject: OfficeCore });
 })(OfficeCore || (OfficeCore = {}));
 var Office;
 (function (Office) {
@@ -12803,20 +12935,42 @@ var Office;
         function notifyActionHandlerReady() {
             var context = new OfficeExtension.ClientRequestContext();
             var addinInternalService = OfficeCore.AddinInternalService.newObject(context);
+            context._customData = 'WacPartition';
             addinInternalService.notifyActionHandlerReady();
             return context.sync();
         }
-        function initOnce() {
-            if (typeof (document) !== 'undefined' && document.addEventListener) {
-                document.addEventListener("DOMContentLoaded", function () {
-                    Office.onReadyInternal()
-                        .then(function () {
-                        return init();
-                    })
-                        .then(function () {
+        function handlerOnReadyInternal() {
+            try {
+                Microsoft.Office.WebExtension.onReadyInternal()
+                    .then(function () {
+                    return init();
+                })
+                    .then(function () {
+                    if (OSF._OfficeAppFactory.getHostInfo().hostPlatform === "web" &&
+                        OSF._OfficeAppFactory.getHostInfo().hostType !== "excel") {
+                        return;
+                    }
+                    else {
                         return notifyActionHandlerReady();
-                    });
+                    }
                 });
+            }
+            catch (ex) {
+            }
+        }
+        function initOnce() {
+            OfficeExtension.Utility.log('ActionProxy.initOnce');
+            if (typeof (document) !== 'undefined') {
+                if (document.readyState && document.readyState !== 'loading') {
+                    OfficeExtension.Utility.log('ActionProxy.initOnce: document.readyState is not loading state');
+                    handlerOnReadyInternal();
+                }
+                else if (document.addEventListener) {
+                    document.addEventListener("DOMContentLoaded", function () {
+                        OfficeExtension.Utility.log('ActionProxy.initOnce: DOMContentLoaded event triggered');
+                        handlerOnReadyInternal();
+                    });
+                }
             }
         }
         initOnce();
