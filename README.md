@@ -143,6 +143,10 @@ For example, to use a `1.1.2-beta-next.0` version, use the following references:
 
 <br />
 
+## Code of Conduct
+
+This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/). For more information, see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.
+
 ## More info
 
 For more information on Office Add-ins and the Office JavaScript APIs, see:
