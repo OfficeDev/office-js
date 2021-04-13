@@ -3,8 +3,9 @@ _u.ExtensibilityStrings = function()
 {
 };
 _u.ExtensibilityStrings.registerClass("_u.ExtensibilityStrings");
-_u.ExtensibilityStrings.l_APICallFailedDueToItemChange_Text = "선택한 항목이 변경되었습니다.";
+_u.ExtensibilityStrings.l_APICallFailedDueToItemChange_Text = "선택한 항목이 변경되었습니다."
 _u.ExtensibilityStrings.l_API_Not_Supported_By_ExtensionPoint_Error_Text = "API가 확장 지점에 대해 지원되지 않습니다.";
+_u.ExtensibilityStrings.l_API_Not_Supported_For_Shared_Folders_Error = "공유 폴더에는 API가 지원되지 않습니다.";
 _u.ExtensibilityStrings.l_ActionsDefinitionMultipleActionsError_Text = "현재 하나의 작업만 지원됩니다.";
 _u.ExtensibilityStrings.l_ActionsDefinitionWrongNotificationMessageError_Text = "이 알림 메시지 유형에 대해 작업을 정의할 수 없습니다.";
 _u.ExtensibilityStrings.l_AttachmentDeleteGeneralFailure_Text = "항목에서 첨부 파일을 삭제할 수 없습니다.";
@@ -16,6 +17,9 @@ _u.ExtensibilityStrings.l_AttachmentNameTooLong_Text = "하나 이상의 첨부 
 _u.ExtensibilityStrings.l_AttachmentNotSupported_Text = "지원되지 않는 첨부 파일 유형입니다.";
 _u.ExtensibilityStrings.l_AttachmentUploadGeneralFailure_Text = "항목에 첨부 파일을 추가할 수 없습니다.";
 _u.ExtensibilityStrings.l_AttachmentUrlTooLong_Text = "하나 이상의 첨부 파일 URL이 너무 깁니다.";
+_u.ExtensibilityStrings.l_Attachment_Download_Failed_Generic_Error = "첨부 파일을 다운로드하지 못했습니다.";
+_u.ExtensibilityStrings.l_Attachment_Resource_Not_Found = "첨부 파일을 찾을 수 없습니다.";
+_u.ExtensibilityStrings.l_Attachment_Resource_UnAuthorizedAccess = "첨부 파일에 대한 무단 액세스입니다.";
 _u.ExtensibilityStrings.l_CallSaveAsyncBeforeToken_Text = "항목을 저장할 때까지 토큰을 검색할 수 없습니다.";
 _u.ExtensibilityStrings.l_CannotAddAttachmentBeforeUpgrade_Text = "서버에서 전체 회신 또는 전달을 검색하는 중에는 첨부 파일을 추가할 수 없습니다.";
 _u.ExtensibilityStrings.l_CannotPersistPropertyInUnsavedDraftError_Text = "알림을 저장되지 않은 임시 항목으로 보관할 수 없습니다. 이 API를 호출하기 전에 항목을 저장하세요.";
@@ -37,7 +41,7 @@ _u.ExtensibilityStrings.l_InternalFormatError_Text = "내부 형식 오류가 �
 _u.ExtensibilityStrings.l_InternalProtocolError_Text = "내부 프로토콜 오류입니다. {0}";
 _u.ExtensibilityStrings.l_Internal_Server_Error_Text = "Exchange 서버에서 오류를 반환했습니다. 자세한 내용은 진단 개체를 참조하세요.";
 _u.ExtensibilityStrings.l_Internet_Not_Connected_Error_Text = "사용자가 더 이상 네트워크에 연결되어 있지 않습니다. 네트워크 연결을 확인하고 다시 시도하세요.";
-_u.ExtensibilityStrings.l_InvalidActionType_Text = "'actionType' 매개 변수의 값이 잘못되었습니다. 허용되는 값은 \"showTaskPane\"입니다."
+_u.ExtensibilityStrings.l_InvalidActionType_Text = "'actionType' 매개 변수의 값이 잘못되었습니다. 허용되는 값은 \"showTaskPane\"입니다.";
 _u.ExtensibilityStrings.l_InvalidAttachmentId_Text = "첨부 파일 ID가 잘못되었습니다.";
 _u.ExtensibilityStrings.l_InvalidAttachmentPath_Text = "첨부 파일 경로가 잘못되었습니다.";
 _u.ExtensibilityStrings.l_InvalidCommandIdError_Text = "'commandId' 매개 변수의 값이 잘못되었습니다.";
@@ -60,6 +64,7 @@ _u.ExtensibilityStrings.l_NumberOfNotificationsExceeded_Text = "알림 제한에
 _u.ExtensibilityStrings.l_NumberOfRecipientsExceeded_Text = "필드에 있는 받는 사람의 총 수는 {0}을(를) 초과할 수 없습니다.";
 _u.ExtensibilityStrings.l_OffsetNotfound_Text = "이 타임스탬프에 대한 오프셋을 찾을 수 없습니다.";
 _u.ExtensibilityStrings.l_Olk_Http_Error_Text = "요청이 실패했습니다. 진단 개체에서 HTTP 오류 코드를 참조하세요.";
+_u.ExtensibilityStrings.l_OnlineMeetingsUserDenied_Text = "사용자가 거부되었습니다.";
 _u.ExtensibilityStrings.l_ParameterValueTooLongError_Text = "'{0}' 매개 변수의 값이 너무 깁니다. 최대 문자 수는 '{1}'자입니다.";
 _u.ExtensibilityStrings.l_ParametersNotAsExpected_Text = "주어진 매개 변수가 예상된 형식과 일치하지 않습니다.";
 _u.ExtensibilityStrings.l_PersistedNotificationArrayReadError_Text = "보관된 알림이 검색되지 않아 API를 호출하지 못했습니다.";

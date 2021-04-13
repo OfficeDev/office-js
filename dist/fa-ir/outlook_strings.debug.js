@@ -5,6 +5,7 @@ _u.ExtensibilityStrings = function()
 _u.ExtensibilityStrings.registerClass("_u.ExtensibilityStrings");
 _u.ExtensibilityStrings.l_APICallFailedDueToItemChange_Text = "مورد انتخابی تغییر کرده است.";
 _u.ExtensibilityStrings.l_API_Not_Supported_By_ExtensionPoint_Error_Text = "API برای نقطه پسوند پشتیبانی نمی‌شود.";
+_u.ExtensibilityStrings.l_API_Not_Supported_For_Shared_Folders_Error = "API برای فایل‌های مشترک پشتیبانی نمی شود.";
 _u.ExtensibilityStrings.l_ActionsDefinitionMultipleActionsError_Text = "در حال حاضر تنها از یک اقدام پشتیبانی می‌شود.";
 _u.ExtensibilityStrings.l_ActionsDefinitionWrongNotificationMessageError_Text = "امکان شرح این نوع پیام اعلان وجود ندارد.";
 _u.ExtensibilityStrings.l_AttachmentDeleteGeneralFailure_Text = "پیوست را نمی‌توان از این مورد حذف کرد.";
@@ -16,6 +17,9 @@ _u.ExtensibilityStrings.l_AttachmentNameTooLong_Text = "یک یا چند مور�
 _u.ExtensibilityStrings.l_AttachmentNotSupported_Text = "نوع پیوست پشتیبانی نمی‌شود.";
 _u.ExtensibilityStrings.l_AttachmentUploadGeneralFailure_Text = "پیوست را نمی‌توان به این مورد اضافه کرد.";
 _u.ExtensibilityStrings.l_AttachmentUrlTooLong_Text = "یک یا چند مورد از URLهای پیوست بیش از حد طولانی هستند.";
+_u.ExtensibilityStrings.l_Attachment_Download_Failed_Generic_Error = "دانلود پیوست انجام نشد.";
+_u.ExtensibilityStrings.l_Attachment_Resource_Not_Found = "پیوست یافت نشد.";
+_u.ExtensibilityStrings.l_Attachment_Resource_UnAuthorizedAccess = "دسترسی غیرمجاز به پیوست.";
 _u.ExtensibilityStrings.l_CallSaveAsyncBeforeToken_Text = "تا زمانی که مورد ذخیره نشود، امکان بازیابی رمز وجود ندارد.";
 _u.ExtensibilityStrings.l_CannotAddAttachmentBeforeUpgrade_Text = "هنگامی که پاسخ کامل یا هدایت پیام در حال بازیابی از سرور است، نمی توان پیوستی را اضافه کرد.";
 _u.ExtensibilityStrings.l_CannotPersistPropertyInUnsavedDraftError_Text = "امکان ادامه اعلان‌ها در پیش‌نویس‌های ذخیره‌نشده وجود ندارد. پیش از فراخوانی این API، این مورد را ذخیره کنید.";
@@ -37,7 +41,7 @@ _u.ExtensibilityStrings.l_InternalFormatError_Text = "خطای قالب داخل
 _u.ExtensibilityStrings.l_InternalProtocolError_Text = "خطای پروتکل داخلی: '{0}'.";
 _u.ExtensibilityStrings.l_Internal_Server_Error_Text = "سرور Exchange خطایی را بازگرداند. لطفاً برای کسب اطلاعات بیشتر، به شیء تشخیص عیب مراجعه کنید.";
 _u.ExtensibilityStrings.l_Internet_Not_Connected_Error_Text = "این کاربر دیگر به شبکه متصل نیست. لطفاً اتصال شبکه خود را بررسی و دوباره امتحان کنید.";
-_u.ExtensibilityStrings.l_InvalidActionType_Text = "مقدار پارامتر 'actionType' نامعتبر است. این مقدار پذیرفته‌شده \"showTaskPane\" است."
+_u.ExtensibilityStrings.l_InvalidActionType_Text = "مقدار پارامتر 'actionType' نامعتبر است. این مقدار پذیرفته‌شده \"showTaskPane\" است.";
 _u.ExtensibilityStrings.l_InvalidAttachmentId_Text = "شناسه پیوست نامعتبر بود.";
 _u.ExtensibilityStrings.l_InvalidAttachmentPath_Text = "مسیر پیوست نامعتبر بود.";
 _u.ExtensibilityStrings.l_InvalidCommandIdError_Text = "مقدار پارامتر 'commandId' نامعتبر است.";
@@ -56,10 +60,11 @@ _u.ExtensibilityStrings.l_Missing_Extended_Permissions_For_API = "مجوز تم�
 _u.ExtensibilityStrings.l_NoValidRecipientsProvided_Text = "گیرنده معتبری ارائه نشده است.";
 _u.ExtensibilityStrings.l_NotificationKeyNotFound_Text = "هیچ اعلانی همراه با کلید ارائه‌شده وجود ندارد.";
 _u.ExtensibilityStrings.l_NullOrEmptyParameterError_Text = "پارامتر '{0}' الزامی است و نباید تهی یا خالی باشد.";
-_u.ExtensibilityStrings.l_NumberOfNotificationsExceeded_Text = "افزودن اعلان امکان‌پذیر نیست زیرا به حد مجاز اعلان رسیده است.";
+_u.ExtensibilityStrings.l_NumberOfNotificationsExceeded_Text = "افزودن اعلان امکان‌پذیر نیست زیرا به حد مجاز اعلان رسیده است."
 _u.ExtensibilityStrings.l_NumberOfRecipientsExceeded_Text = "تعداد کل گیرندگان در کارد نباید بیشتر از {0} باشد.";
 _u.ExtensibilityStrings.l_OffsetNotfound_Text = "افستی برای این مهر زمان یافت نشد.";
 _u.ExtensibilityStrings.l_Olk_Http_Error_Text = "این درخواست انجام نشد. لطفاً برای کد خطای HTTP به شیء تشخیص عیب مراجعه کنید.";
+_u.ExtensibilityStrings.l_OnlineMeetingsUserDenied_Text = "کاربر رد شد.";
 _u.ExtensibilityStrings.l_ParameterValueTooLongError_Text = "مقدار پارمتر '{0}' بسیار طولانی است. حداکثر مقدار نویسه‌ها '{1}' است.";
 _u.ExtensibilityStrings.l_ParametersNotAsExpected_Text = "پارامترهای تعیین شد با قالب مورد انتظار مطابقت ندارند.";
 _u.ExtensibilityStrings.l_PersistedNotificationArrayReadError_Text = "فراخوانی API از سوی شما انجام نشد زیرا امکان بازیابی اعلان‌های ادامه‌دار وجود ندارد.";

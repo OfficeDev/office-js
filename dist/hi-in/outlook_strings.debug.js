@@ -3,8 +3,9 @@ _u.ExtensibilityStrings = function()
 {
 };
 _u.ExtensibilityStrings.registerClass("_u.ExtensibilityStrings");
-_u.ExtensibilityStrings.l_APICallFailedDueToItemChange_Text = "चयनित आइटम बदला गया है.";
+_u.ExtensibilityStrings.l_APICallFailedDueToItemChange_Text = "चयनित आइटम बदला गया है."
 _u.ExtensibilityStrings.l_API_Not_Supported_By_ExtensionPoint_Error_Text = "API, एक्सटेंशन पॉइंट के लिए समर्थित नहीं है.";
+_u.ExtensibilityStrings.l_API_Not_Supported_For_Shared_Folders_Error = "साझा किए गए फ़ोल्डर के लिए API समर्थित नहीं है.";
 _u.ExtensibilityStrings.l_ActionsDefinitionMultipleActionsError_Text = "वर्तमान में केवल कोई एकल क्रिया समर्थित है.";
 _u.ExtensibilityStrings.l_ActionsDefinitionWrongNotificationMessageError_Text = "इस अधिसूचना संदेश प्रकार के लिए क्रियाएँ निर्धारित नहीं की जा सकतीं.";
 _u.ExtensibilityStrings.l_AttachmentDeleteGeneralFailure_Text = "अनुलग्नक को आइटम से हटाया नहीं जा सकता.";
@@ -16,6 +17,9 @@ _u.ExtensibilityStrings.l_AttachmentNameTooLong_Text = "एक या अधि�
 _u.ExtensibilityStrings.l_AttachmentNotSupported_Text = "अनुलग्नक प्रकार समर्थित नहीं है.";
 _u.ExtensibilityStrings.l_AttachmentUploadGeneralFailure_Text = "आइटम पर अनुलग्नक जोड़ा नहीं जा सकता.";
 _u.ExtensibilityStrings.l_AttachmentUrlTooLong_Text = "एक या अधिक अनुलग्नक URL बहुत बड़े हैं.";
+_u.ExtensibilityStrings.l_Attachment_Download_Failed_Generic_Error = "अनुलग्नक डाउनलोड करना विफल रहा.";
+_u.ExtensibilityStrings.l_Attachment_Resource_Not_Found = "अनुलग्नक नहीं मिला.";
+_u.ExtensibilityStrings.l_Attachment_Resource_UnAuthorizedAccess = "अनुलग्नक पर अनधिकृत पहुँच.";
 _u.ExtensibilityStrings.l_CallSaveAsyncBeforeToken_Text = "आइटम के सहेजे जाने तक टोकन पुनर्प्राप्त नहीं किया जा सकता.";
 _u.ExtensibilityStrings.l_CannotAddAttachmentBeforeUpgrade_Text = "पूर्ण उत्तर या अग्रेषित किए गए को सर्वर से पुनर्प्राप्त किए जाने के दौरान अनुलग्नक जोड़े नहीं जा सकते.";
 _u.ExtensibilityStrings.l_CannotPersistPropertyInUnsavedDraftError_Text = "अधिसूचनाओं को बिना सहेजे गए ड्राफ्ट्स में कायम नहीं रखा जा सकता. इस API को कॉल करने से पहले आइटम को सहेजें.";
@@ -37,7 +41,7 @@ _u.ExtensibilityStrings.l_InternalFormatError_Text = "आंतरिक स्�
 _u.ExtensibilityStrings.l_InternalProtocolError_Text = "आंतरिक प्रोटोकॉल त्रुटि: '{0}'.";
 _u.ExtensibilityStrings.l_Internal_Server_Error_Text = "Exchange सर्वर ने त्रुटि लौटाई. कृपया अधिक जानकारी के लिए नैदानिक ऑब्जेक्ट देखें.";
 _u.ExtensibilityStrings.l_Internet_Not_Connected_Error_Text = "उपयोगकर्ता अब नेटवर्क से कनेक्ट नहीं है. कृपया अपना नेटवर्क कनेक्शन जाँचें और पुनः प्रयास करें.";
-_u.ExtensibilityStrings.l_InvalidActionType_Text = "'actionType' पैरामीटर का मान अमान्य है. स्वीकृत मान \"showTaskPane\" है."
+_u.ExtensibilityStrings.l_InvalidActionType_Text = "'actionType' पैरामीटर का मान अमान्य है. स्वीकृत मान \"showTaskPane\" है.";
 _u.ExtensibilityStrings.l_InvalidAttachmentId_Text = "अनुलग्नक ID अमान्य था.";
 _u.ExtensibilityStrings.l_InvalidAttachmentPath_Text = "अनुलग्नक पथ अमान्य था.";
 _u.ExtensibilityStrings.l_InvalidCommandIdError_Text = "'commandId' पैरामीटर का मान अमान्य है.";
@@ -60,6 +64,7 @@ _u.ExtensibilityStrings.l_NumberOfNotificationsExceeded_Text = "अधिसू�
 _u.ExtensibilityStrings.l_NumberOfRecipientsExceeded_Text = "फ़ील्ड में प्राप्तकर्ताओं की कुल संख्या {0} को पार नहीं कर सकती.";
 _u.ExtensibilityStrings.l_OffsetNotfound_Text = "इस टाइम स्टाम्प के लिए ऑफ़सेट ढूँढ़ा नहीं जा सका.";
 _u.ExtensibilityStrings.l_Olk_Http_Error_Text = "अनुरोध विफल हुआ. कृपया HTTP त्रुटि कोड के लिए नैदानिक ऑब्जेक्ट देखें.";
+_u.ExtensibilityStrings.l_OnlineMeetingsUserDenied_Text = "उपयोगकर्ता ने अस्वीकृत किया.";
 _u.ExtensibilityStrings.l_ParameterValueTooLongError_Text = "'{0}' पैरामीटर का मान बहुत लंबा है. वर्णों की अधिकतम संख्या '{1}' है.";
 _u.ExtensibilityStrings.l_ParametersNotAsExpected_Text = "प्रदत्त पैरामीटर्स अपेक्षित स्वरूप से मेल नहीं खाते.";
 _u.ExtensibilityStrings.l_PersistedNotificationArrayReadError_Text = "आपके द्वारा की गई API कॉल विफल रही क्योंकि कायम की गई अधिसूचनाएँ पुनर्प्राप्त नहीं की जा सकीं.";

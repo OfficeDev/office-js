@@ -18,7 +18,7 @@ Strings.OfficeOM.L_BindingCreationError = "خطای ایجاد پیوند اجز
 Strings.OfficeOM.L_BindingNotExist = "پیوستگی معین شده وجود ندارد.";
 Strings.OfficeOM.L_BindingToMultipleSelection = "انتخاب های کنارهم پشتیبانی نمی شود.";
 Strings.OfficeOM.L_BrowserAPINotSupported = "این مرورگر از API درخواستی پشتیبانی نمی کند.";
-Strings.OfficeOM.L_CallbackNotAFunction = "بازگشت تماس باید از نوع کارکردی باشد، از نوع {0} بود."
+Strings.OfficeOM.L_CallbackNotAFunction = "بازگشت تماس باید از نوع کارکردی باشد، از نوع {0} بود.";
 Strings.OfficeOM.L_CannotApplyPropertyThroughSetMethod = "تغییر به ویژگی «{0}» را نمی‌توان از طریق یک روش «object.set» اعمال کرد.";
 Strings.OfficeOM.L_CannotNavigateTo = "این شیء در مکانی قرار دارد که راه یابی آن پشتیبانی نمیشود.";
 Strings.OfficeOM.L_CannotRegisterEvent = "در دست دارنده رویداد را نمی‌توان ثبت کرد.";
@@ -45,7 +45,7 @@ Strings.OfficeOM.L_CustomXmlExceedQuotaName = "به حد مجاز انتخاب �
 Strings.OfficeOM.L_CustomXmlNodeNotFound = "گره معین شده یافت نشد.";
 Strings.OfficeOM.L_CustomXmlOutOfDateMessage = "داده‌ها قدیمی است. جسم را دوباره بازیابی کنید.";
 Strings.OfficeOM.L_CustomXmlOutOfDateName = "داده‌ها به‌روز نیستند";
-Strings.OfficeOM.L_DataNotMatchBindingSize = "شیء داده تأمینی با اندازه مورد انتخابی فعلی مطابقت ندارد.";
+Strings.OfficeOM.L_DataNotMatchBindingSize = "شیء داده تأمینی با اندازه مورد انتخابی فعلی مطابقت ندارد."
 Strings.OfficeOM.L_DataNotMatchBindingType = "شیء داده معین شده با این نوع پیوستگی سازگار نیست.";
 Strings.OfficeOM.L_DataNotMatchCoercionType = "نوع شیء داده معین شده با مورد انتخابی فعلی سازگار نیست.";
 Strings.OfficeOM.L_DataNotMatchSelection = "شیء داده تأمینی با شکل و ابعاد مورد انتخابی فعلی مطابقت ندارد.";

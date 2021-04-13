@@ -409,7 +409,7 @@ var oteljs = function(modules) {
             var _a, _b;
             this.onSendEvent = new Event.a, this.persistentDataFields = [], this.config = config || {}, 
             parent ? (this.onSendEvent = parent.onSendEvent, (_a = this.persistentDataFields).push.apply(_a, parent.persistentDataFields), 
-            this.config = __assign(__assign({}, parent.getConfig()), this.config)) : this.persistentDataFields.push(Object(DataFieldHelper.e)("OTelJS.Version", "3.1.63")), 
+            this.config = __assign(__assign({}, parent.getConfig()), this.config)) : this.persistentDataFields.push(Object(DataFieldHelper.e)("OTelJS.Version", "3.1.70")), 
             persistentDataFields && (_b = this.persistentDataFields).push.apply(_b, persistentDataFields);
         }
         return SimpleTelemetryLogger.prototype.sendTelemetryEvent = function(event) {

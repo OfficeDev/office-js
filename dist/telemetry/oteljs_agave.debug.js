@@ -703,7 +703,7 @@ var oteljs_agave = function(modules) {
                 return _this._uploadNow(callback);
             }), 0));
         }, AWTQueueManager.prototype.pauseTransmission = function() {
-            this._paused = !0, this._httpManager.pause(), this.shouldDropEventsOnPause && (this._queueSize -= this._inboundQueues[Enums_1.AWTEventPriority.High][0].length + this._inboundQueues[Enums_1.AWTEventPriority.Normal][0].length + this._inboundQueues[Enums_1.AWTEventPriority.Low][0].length, 
+            this._paused = !0, this._httpManager.pause(), this._shouldDropEventsOnPause && (this._queueSize -= this._inboundQueues[Enums_1.AWTEventPriority.High][0].length + this._inboundQueues[Enums_1.AWTEventPriority.Normal][0].length + this._inboundQueues[Enums_1.AWTEventPriority.Low][0].length, 
             this._inboundQueues[Enums_1.AWTEventPriority.High][0] = [], this._inboundQueues[Enums_1.AWTEventPriority.Normal][0] = [], 
             this._inboundQueues[Enums_1.AWTEventPriority.Low][0] = [], this._httpManager.removeQueuedRequests());
         }, AWTQueueManager.prototype.resumeTransmission = function() {
@@ -1078,7 +1078,7 @@ var oteljs_agave = function(modules) {
     "use strict";
     Object.defineProperty(exports, "__esModule", {
         value: !0
-    }), exports.Version = "1.8.6", exports.FullVersionString = "AWT-Web-JS-" + exports.Version;
+    }), exports.Version = "1.8.7", exports.FullVersionString = "AWT-Web-JS-" + exports.Version;
 }, function(module, exports, __webpack_require__) {
     "use strict";
     Object.defineProperty(exports, "__esModule", {

@@ -3,8 +3,9 @@ _u.ExtensibilityStrings = function()
 {
 };
 _u.ExtensibilityStrings.registerClass("_u.ExtensibilityStrings");
-_u.ExtensibilityStrings.l_APICallFailedDueToItemChange_Text = "Izbrani element je bil spremenjen.";
+_u.ExtensibilityStrings.l_APICallFailedDueToItemChange_Text = "Izbrani element je bil spremenjen."
 _u.ExtensibilityStrings.l_API_Not_Supported_By_ExtensionPoint_Error_Text = "API ni podprt za razširitveno točko.";
+_u.ExtensibilityStrings.l_API_Not_Supported_For_Shared_Folders_Error = "Vmesnik API ni podprt za mape v skupni rabi.";
 _u.ExtensibilityStrings.l_ActionsDefinitionMultipleActionsError_Text = "Trenutno je podprto le eno dejanje.";
 _u.ExtensibilityStrings.l_ActionsDefinitionWrongNotificationMessageError_Text = "Dejanj ni mogoče določiti za to vrsto sporočila obvestila.";
 _u.ExtensibilityStrings.l_AttachmentDeleteGeneralFailure_Text = "Priloge ni mogoče izbrisati iz elementa.";
@@ -16,6 +17,9 @@ _u.ExtensibilityStrings.l_AttachmentNameTooLong_Text = "Eno ime ali več imen pr
 _u.ExtensibilityStrings.l_AttachmentNotSupported_Text = "Vrsta priloge ni podprta.";
 _u.ExtensibilityStrings.l_AttachmentUploadGeneralFailure_Text = "Elementu ni mogoče dodati priloge.";
 _u.ExtensibilityStrings.l_AttachmentUrlTooLong_Text = "En URL ali več URL-jev priloge je predolgih.";
+_u.ExtensibilityStrings.l_Attachment_Download_Failed_Generic_Error = "Prenos priloge ni uspel.";
+_u.ExtensibilityStrings.l_Attachment_Resource_Not_Found = "Priloge ni mogoče najti.";
+_u.ExtensibilityStrings.l_Attachment_Resource_UnAuthorizedAccess = "Nepooblaščen dostop do priloge.";
 _u.ExtensibilityStrings.l_CallSaveAsyncBeforeToken_Text = "Žetona ni mogoče dobiti, dokler element ni shranjen.";
 _u.ExtensibilityStrings.l_CannotAddAttachmentBeforeUpgrade_Text = "Prilog ni mogoče dodati, če sta iz strežnika dobljena poln odgovor ali posredovano sporočilo.";
 _u.ExtensibilityStrings.l_CannotPersistPropertyInUnsavedDraftError_Text = "Obvestila v neshranjenih osnutkih ne morejo biti nespremenljiva. Shranite element, preden pokličete ta API.";
@@ -37,7 +41,7 @@ _u.ExtensibilityStrings.l_InternalFormatError_Text = "Prišlo je do napake notra
 _u.ExtensibilityStrings.l_InternalProtocolError_Text = "Notranja napaka protokola: »{0}«.";
 _u.ExtensibilityStrings.l_Internal_Server_Error_Text = "Exchange server je vrnil napako. Več informacij poiščite v diagnostičnem predmetu.";
 _u.ExtensibilityStrings.l_Internet_Not_Connected_Error_Text = "Uporabnik ni več povezan z omrežjem. Preverite omrežno povezavo in poskusite znova.";
-_u.ExtensibilityStrings.l_InvalidActionType_Text = "Vrednost parametra »actionType« ni veljavna. Sprejeta vrednost je »showTaskPane«."
+_u.ExtensibilityStrings.l_InvalidActionType_Text = "Vrednost parametra »actionType« ni veljavna. Sprejeta vrednost je »showTaskPane«.";
 _u.ExtensibilityStrings.l_InvalidAttachmentId_Text = "ID priloge ni veljaven.";
 _u.ExtensibilityStrings.l_InvalidAttachmentPath_Text = "Pot priloge ni veljavna.";
 _u.ExtensibilityStrings.l_InvalidCommandIdError_Text = "Vrednost parametra »commandId« ni veljavna.";
@@ -60,6 +64,7 @@ _u.ExtensibilityStrings.l_NumberOfNotificationsExceeded_Text = "Obvestila ni mog
 _u.ExtensibilityStrings.l_NumberOfRecipientsExceeded_Text = "Skupno število prejemnikov v polju ne sme biti večje od {0}.";
 _u.ExtensibilityStrings.l_OffsetNotfound_Text = "Ni mogoče najti odmika za časovni žig.";
 _u.ExtensibilityStrings.l_Olk_Http_Error_Text = "Zahteva ni uspela. Poiščite kodo napake HTTP v diagnostičnem predmetu.";
+_u.ExtensibilityStrings.l_OnlineMeetingsUserDenied_Text = "Uporabnik je zavrnil.";
 _u.ExtensibilityStrings.l_ParameterValueTooLongError_Text = "Vrednost parametra »{0}« je predolga. Največje število znakov je: »{1}«.";
 _u.ExtensibilityStrings.l_ParametersNotAsExpected_Text = "Navedeni parametri se ne ujemajo s pričakovano obliko zapisa.";
 _u.ExtensibilityStrings.l_PersistedNotificationArrayReadError_Text = "Klic API, ki ste ga opravili, ni uspel, ker ni bilo mogoče dobiti nespremenljivih obvestil.";

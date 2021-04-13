@@ -231,7 +231,7 @@ var ScriptLoading;
             this.pendingCallbacks.push(pendingCallback);
         }
         return ScriptInfo;
-    })();
+    }());
     var ScriptTelemetry = (function () {
         function ScriptTelemetry(scriptId, startTime, msResponseTime) {
             this.scriptId = scriptId;
@@ -239,7 +239,7 @@ var ScriptLoading;
             this.msResponseTime = msResponseTime;
         }
         return ScriptTelemetry;
-    })();
+    }());
     var LoadScriptHelper = (function () {
         function LoadScriptHelper(constantNames) {
             if (constantNames === void 0) { constantNames = {
@@ -507,7 +507,7 @@ var ScriptLoading;
             }
         };
         return LoadScriptHelper;
-    })();
+    }());
     ScriptLoading.LoadScriptHelper = LoadScriptHelper;
 })(ScriptLoading || (ScriptLoading = {}));
 var OfficeExt;
@@ -582,7 +582,7 @@ var OfficeExt;
                 return null;
             };
             return Host;
-        })();
+        }());
         HostName.Host = Host;
     })(HostName = OfficeExt.HostName || (OfficeExt.HostName = {}));
 })(OfficeExt || (OfficeExt = {}));
@@ -1103,7 +1103,6 @@ var Office;
             PromiseImpl.Init = Init;
         })(PromiseImpl = _Internal.PromiseImpl || (_Internal.PromiseImpl = {}));
     })(_Internal = Office._Internal || (Office._Internal = {}));
-    var _Internal;
     (function (_Internal) {
         function isEdgeLessThan14() {
             var userAgent = window.navigator.userAgent;
@@ -1265,10 +1264,9 @@ var OTel;
         OTelLogger.promises = [];
         OTelLogger.Enabled = true;
         return OTelLogger;
-    })();
+    }());
     OTel.OTelLogger = OTelLogger;
 })(OTel || (OTel = {}));
-var OfficeExt;
 (function (OfficeExt) {
     var Association = (function () {
         function Association() {
@@ -1324,7 +1322,7 @@ var OfficeExt;
             configurable: true
         });
         return Association;
-    })();
+    }());
     OfficeExt.Association = Association;
 })(OfficeExt || (OfficeExt = {}));
 var CustomFunctionMappings = window.CustomFunctionMappings || {};
@@ -1343,7 +1341,6 @@ var CustomFunctions;
     CustomFunctions.associate = associate;
     ;
 })(CustomFunctions || (CustomFunctions = {}));
-var Office;
 (function (Office) {
     var actions;
     (function (actions) {
@@ -1360,7 +1357,7 @@ var g_isOfflineLibrary = g_isOfflineLibrary || false;
 (function () {
     var previousConstantNames = OSF.ConstantNames || {};
     OSF.ConstantNames = {
-        FileVersion: "0.0.0.0",
+        FileVersion: "16.0.13927.10000",
         OfficeJS: "office.js",
         OfficeDebugJS: "office.debug.js",
         DefaultLocale: "en-us",
@@ -1403,7 +1400,8 @@ OSF.HostInfoFlags = {
     SharedApp: 1,
     CustomFunction: 2,
     ProtectedDocDisable: 4,
-    ExperimentJsEnabled: 8
+    ExperimentJsEnabled: 8,
+    PublicAddin: 0x10
 };
 OSF._OfficeAppFactory = (function OSF__OfficeAppFactory() {
     var _setNamespace = function OSF_OUtil$_setNamespace(name, parent) {
@@ -1486,14 +1484,14 @@ OSF._OfficeAppFactory = (function OSF__OfficeAppFactory() {
     };
     Microsoft.Office.WebExtension.onReadyInternal = function Microsoft_Office_WebExtension_onReadyInternal(callback) {
         if (_isOfficeJsLoaded) {
-            var host = _officeOnReadyHostAndPlatformInfo.host, platform = _officeOnReadyHostAndPlatformInfo.platform, addin = _officeOnReadyHostAndPlatformInfo.addin;
+            var host_1 = _officeOnReadyHostAndPlatformInfo.host, platform_1 = _officeOnReadyHostAndPlatformInfo.platform, addin_1 = _officeOnReadyHostAndPlatformInfo.addin;
             if (callback) {
-                var result = callback({ host: host, platform: platform, addin: addin });
+                var result = callback({ host: host_1, platform: platform_1, addin: addin_1 });
                 if (result && result.then && typeof result.then === "function") {
-                    return result.then(function () { return Office.Promise.resolve({ host: host, platform: platform, addin: addin }); });
+                    return result.then(function () { return Office.Promise.resolve({ host: host_1, platform: platform_1, addin: addin_1 }); });
                 }
             }
-            return Office.Promise.resolve({ host: host, platform: platform, addin: addin });
+            return Office.Promise.resolve({ host: host_1, platform: platform_1, addin: addin_1 });
         }
         if (callback) {
             return new Office.Promise(function (resolve) {
@@ -2376,7 +2374,7 @@ var oteljs = function(modules) {
             var _a, _b;
             this.onSendEvent = new Event.a, this.persistentDataFields = [], this.config = config || {}, 
             parent ? (this.onSendEvent = parent.onSendEvent, (_a = this.persistentDataFields).push.apply(_a, parent.persistentDataFields), 
-            this.config = __assign(__assign({}, parent.getConfig()), this.config)) : this.persistentDataFields.push(Object(DataFieldHelper.e)("OTelJS.Version", "3.1.69")), 
+            this.config = __assign(__assign({}, parent.getConfig()), this.config)) : this.persistentDataFields.push(Object(DataFieldHelper.e)("OTelJS.Version", "3.1.70")), 
             persistentDataFields && (_b = this.persistentDataFields).push.apply(_b, persistentDataFields);
         }
         return SimpleTelemetryLogger.prototype.sendTelemetryEvent = function(event) {
