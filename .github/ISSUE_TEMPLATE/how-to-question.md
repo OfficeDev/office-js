@@ -17,3 +17,5 @@ We have several forums where you can ask the developer community questions about
 - [Office JavaScript API.](https://docs.microsoft.com/answers/topics/office-js-dev.html)
 - [SharePoint and OneDrive development.](https://docs.microsoft.com/answers/topics/sharepoint-dev.html)
 - [Deploying and publishing Office or SharePoint apps to AppSource.](https://docs.microsoft.com/answers/topics/microsoft-365-apps-publishing-dev.html)
+
+For additional information about JavaScript programming, see the [JavaScript at Microsoft](https://docs.microsoft.com/javascript/) community hub.
