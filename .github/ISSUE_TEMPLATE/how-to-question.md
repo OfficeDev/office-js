@@ -8,7 +8,7 @@ assignees: ''
 
 ---
 
-## Please post how-to questions about your code on Microsoft Q&A
+## Post how-to questions about your code on Microsoft Q&A
 
 We have several forums where you can ask the developer community questions about your code. Try one of the following forums:
 - [Technical questions about developing Office Add-ins for Word, Excel, PowerPoint, Outlook, Project, Visio, and OneNote](https://docs.microsoft.com/en-us/answers/topics/office-addins-dev.html)
