@@ -1,7 +1,7 @@
 ---
 name: Feature request
 about: To request a new feature in office.js or any other aspect of the Office developer
-  platform, post your request on the  Microsoft 365 Developer Platform Ideas Forum
+  platform, post your request on the Microsoft 365 Developer Platform Ideas Forum
 title: ''
 labels: ''
 assignees: ''
