@@ -12,7 +12,7 @@ assignees: ''
 
 We have several forums where you can ask the developer community questions about your code. Try one of the following forums to ask technical questions about:
 - [Developing Office Add-ins for Word, Excel, PowerPoint, Outlook, Project, Visio, and OneNote.](https://docs.microsoft.com/answers/topics/office-addins-dev.html)
-- [Access programming in Office.](https://docs.microsoft.com/nswers/topics/office-access-dev.html)
+- [Access programming in Office.](https://docs.microsoft.com/answers/topics/office-access-dev.html)
 - [Developing COM or VSTO Add-ins for Office.](https://docs.microsoft.com/answers/topics/office-vsto-com-dev.html)
 - [Office JavaScript API.](https://docs.microsoft.com/answers/topics/office-js-dev.html)
 - [SharePoint and OneDrive development.](https://docs.microsoft.com/answers/topics/sharepoint-dev.html)
