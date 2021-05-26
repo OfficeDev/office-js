@@ -1,14 +1,14 @@
 ---
 name: How-to question
 about: To ask questions about how to use office.js or the Office developer platform,
-  please post your question on [Microsoft Q&A](https://docs.microsoft.com/en-us/answers/topics/office-js-dev.html).
+  please post your question on Microsoft Q&A
 title: ''
 labels: ''
 assignees: ''
 
 ---
 
->>> Please post how-to questions about your code on Microsoft Q&A <<<
+## Please post how-to questions about your code on Microsoft Q&A
 
 We have several forums where you can ask the developer community questions about your code. Try one of the following forums:
 [Technical questions about developing Office Add-ins for Word, Excel, PowerPoint, Outlook, Project, Visio, and OneNote](https://docs.microsoft.com/en-us/answers/topics/office-addins-dev.html)
