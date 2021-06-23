@@ -36,7 +36,7 @@ console.log("Deployment Script: Start");
 const env: EnvironmentVariables = environment.getEnvironmentVariables();
 
 // Printing for debug purposes
-debug(env);
+// debug(env);
 
 if (!deploymentPrerequisitesPassed(env)) {
   process.exit(0);

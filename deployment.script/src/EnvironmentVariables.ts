@@ -16,18 +16,18 @@ export interface EnvironmentVariables {
   // unused
   //
 
-  TRAVIS_COMMIT: string;
-  TRAVIS_COMMIT_MESSAGE: string;
-  TRAVIS_BUILD_ID: string;
-  TRAVIS_BUILD_NUMBER: string;
+  // TRAVIS_COMMIT: string;
+  // TRAVIS_COMMIT_MESSAGE: string;
+  // TRAVIS_BUILD_ID: string;
+  // TRAVIS_BUILD_NUMBER: string;
 
-  /**
-   * GitHub token generated using https://github.com/settings/tokens,
-   *     bearing permissions for "repo:status", "repo_deployment", and "public_repo".
-   * This is a personal access token, so the commits always happen on behalf
-   *     of the person who created the token.
-   * The token is then entered as a hidden value in https://travis-ci.org/OfficeDev/office-js/settings */
-  GH_TOKEN: string;
+  // /**
+  //  * GitHub token generated using https://github.com/settings/tokens,
+  //  *     bearing permissions for "repo:status", "repo_deployment", and "public_repo".
+  //  * This is a personal access token, so the commits always happen on behalf
+  //  *     of the person who created the token.
+  //  * The token is then entered as a hidden value in https://travis-ci.org/OfficeDev/office-js/settings */
+  // GH_TOKEN: string;
 }
 
 function env(variable: string): string {
@@ -51,14 +51,14 @@ export function getEnvironmentVariables(): EnvironmentVariables {
     TRAVIS_BUILD_DIR: env("TRAVIS_BUILD_DIR"),
     NPM_TOKEN: env("NPM_TOKEN"),
 
-    //
-    // unused
-    //
-    TRAVIS_COMMIT: env("TRAVIS_COMMIT"),
-    TRAVIS_COMMIT_MESSAGE: env("TRAVIS_COMMIT_MESSAGE"),
-    TRAVIS_BUILD_ID: env("TRAVIS_BUILD_ID"),
-    TRAVIS_BUILD_NUMBER: env("TRAVIS_BUILD_NUMBER"),
-    GH_TOKEN: env("GH_TOKEN"),
+    // //
+    // // unused
+    // //
+    // TRAVIS_COMMIT: env("TRAVIS_COMMIT"),
+    // TRAVIS_COMMIT_MESSAGE: env("TRAVIS_COMMIT_MESSAGE"),
+    // TRAVIS_BUILD_ID: env("TRAVIS_BUILD_ID"),
+    // TRAVIS_BUILD_NUMBER: env("TRAVIS_BUILD_NUMBER"),
+    // GH_TOKEN: env("GH_TOKEN"),
   };
 
   return environment;

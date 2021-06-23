@@ -1,12 +1,11 @@
 # This workflow will run the deployment.script
 # GitHug Action Reference: https://help.github.com/actions/language-and-framework-guides/using-nodejs-with-github-actions
 
-name: Deployment Script CI
+name: NPM Package Publish Script
 
 on:
   push:
-    branches: [ custom-* ]
-    # eventually add beta, release
+    branches: [ custom-*, beta, release ]
 
 jobs:
   build:
@@ -29,7 +28,7 @@ jobs:
     - name: Deploy
       env:
         BRANCH_NAME: ${{ github.ref }}
-        # Override Previous Travis environment
+        # Override Previous Travis environment variables
         TRAVIS: true
         TRAVIS_BRANCH: ${{ github.ref }}
         TRAVIS_PULL_REQUEST: false
