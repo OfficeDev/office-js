@@ -15,25 +15,25 @@ jobs:
 
     steps:
     - name: Checkout
-        uses: actions/checkout@v2
+      uses: actions/checkout@v2
     - name: Use Node.js
-        uses: actions/setup-node@v2
-        with:
-          node-version: '14.x'
+      uses: actions/setup-node@v2
+      with:
+        node-version: '14.x'
     - name: Clean Install
-        run: npm ci
-        working-directory: deployment.script
+      run: npm ci
+      working-directory: deployment.script
     - name: Build
-        run: npm run build --if-present
-        working-directory: deployment.script
+      run: npm run build --if-present
+      working-directory: deployment.script
     - name: Deploy
-        env:
-          BRANCH_NAME: ${{ github.ref }}
-          # Override Previous Travis environment
-          TRAVIS: true
-          TRAVIS_BRANCH: ${{ github.ref }}
-          TRAVIS_PULL_REQUEST: false
-          TRAVIS_BUILD_DIR: ${{ github.workspace }}
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: npm run deploy --if-present
-        working-directory: deployment.script
+      env:
+        BRANCH_NAME: ${{ github.ref }}
+        # Override Previous Travis environment
+        TRAVIS: true
+        TRAVIS_BRANCH: ${{ github.ref }}
+        TRAVIS_PULL_REQUEST: false
+        TRAVIS_BUILD_DIR: ${{ github.workspace }}
+        NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+      run: npm run deploy --if-present
+      working-directory: deployment.script
