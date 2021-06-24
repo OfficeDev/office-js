@@ -85,7 +85,7 @@ If you're using the Office.js NPM package for the [firewall scenario](#target-sc
 
 - **Tip**: If you create a `references.ts` file at the root of the project, you can simply point the reference to `office.d.ts` there.
 
-If you do not need the firewall scenario, obtain the TypeScript definitions by using `@types/office-js` and reference the Office.js CDN at <https://appsforoffice.microsoft.com/lib/1/hosted/office.js>. You don't need to use the Office.js NPM package.
+If you don't need the firewall scenario, obtain the TypeScript definitions by using `@types/office-js` and reference the Office.js CDN at <https://appsforoffice.microsoft.com/lib/1/hosted/office.js>. You don't need to use the Office.js NPM package.
 
 ### Enabling IntelliSense in Visual Studio
 
