@@ -99,7 +99,7 @@ In addition to downloading the files locally, they may be used via an external s
 <script src="https://unpkg.com/@microsoft/office-js/dist/office.js"></script>
 ```
 
-The different versions of the NPM package are listed in the dropdown on the top right at <https://unpkg.com/@microsoft/office-js/>.
+The different versions of the NPM package are listed  on the top right in the dropdown list at <https://unpkg.com/@microsoft/office-js/>.
 
 To view the latest version numbers for each of the tags run the following command on the command-line:
 
