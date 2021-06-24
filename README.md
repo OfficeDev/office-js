@@ -83,7 +83,8 @@ TypeScript definitions for Office.js are available.
 
 If you're using the Office.js NPM package for the [firewall scenario](#target-scenarios) and want a d.ts file that precisely matches the JS contents, use the d.ts file that is located within the `/dist/office.d.ts` folder of the NPM package. Achieve this by using a [triple-slash reference](https://www.typescriptlang.org/docs/handbook/triple-slash-directives.html). 
 
-- **Tip**: If you create a `references.ts` file at the root of the project, you can simply point the reference to `office.d.ts` there.
+- > [!TIP]
+> If you create a `references.ts` file at the root of the project, simply point the reference to `office.d.ts` there.
 
 If you don't need the firewall scenario, obtain the TypeScript definitions by using `@types/office-js` and reference the Office.js CDN at <https://appsforoffice.microsoft.com/lib/1/hosted/office.js>. You don't need to use the Office.js NPM package.
 
