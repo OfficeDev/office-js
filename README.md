@@ -93,7 +93,7 @@ Visual Studio 2017+ can use these same TypeScript definitions, even for regular 
 
 ## Accessing the NPM files via a CDN
 
-In addition to downloading the files locally, they may be used via an external service like <https://unpkg.com>, which provides best-effort (no uptime guarantees) CDN hosting for npm packages.  This is especially useful for trying out custom builds. To do so, simply change the script reference to:
+In addition to downloading the files locally, they may be used via an external service like <https://unpkg.com>, which provides best-effort (no uptime guarantees) CDN hosting for npm packages. This is especially useful for trying out custom builds. To do so, simply change the script reference to:
 
 ```html
 <script src="https://unpkg.com/@microsoft/office-js/dist/office.js"></script>
