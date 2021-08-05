@@ -35,7 +35,7 @@ _u.ExtensibilityStrings.l_ElevatedPermissionNeeded_Text = "الإذن غير ا�
 _u.ExtensibilityStrings.l_EmailAddressTooLong_Text = "إن عنواناً واحد أو أكثر من عناوين البريد الإلكتروني التي قدمتها طويل(ة) جداً.";
 _u.ExtensibilityStrings.l_EwsRequestOversized_Text = "يتجاوز الطلب حد الحجم الذي يبلغ 1 ميغابايت. يرجى تعديل طلب EWS الخاص بك.";
 _u.ExtensibilityStrings.l_ExceededMaxNumberOfAttachments_Text = "تتعذر إضافة المرفقات لأن الرسالة تحتوي بالفعل على العدد الأقصى من المرفقات";
-_u.ExtensibilityStrings.l_HtmlSanitizationFailure_Text = "فشلت عملية التحقق من سلامة مستند HTML."
+_u.ExtensibilityStrings.l_HtmlSanitizationFailure_Text = "فشلت عملية التحقق من سلامة مستند HTML.";
 _u.ExtensibilityStrings.l_Insufficient_Item_Permissions_Text = "لا يمتلك المستخدم الأذونات المطلوبة لتنفيذ هذه العملية.";
 _u.ExtensibilityStrings.l_InternalFormatError_Text = "حدث خطأ في التنسيق الداخلي.";
 _u.ExtensibilityStrings.l_InternalProtocolError_Text = 'خطأ بروتوكول داخلي: "{0}".';
@@ -73,7 +73,7 @@ _u.ExtensibilityStrings.l_RecurrenceErrorMaxOccurrences_Text = "تتجاوز ا�
 _u.ExtensibilityStrings.l_RecurrenceErrorZeroOccurrences_Text = "لا يوجد أي تكرار للسلسة المتكررة في نطاق التاريخ المحدد.";
 _u.ExtensibilityStrings.l_RecurrenceInvalidTimeZone_Text = "المنطقة الزمنية المحددة غير مدعمة.";
 _u.ExtensibilityStrings.l_RecurrenceUnsupportedAlternateCalendar_Text = "تم إعداد نمط التكرار بواسطة المستخدم باستخدام تقويم بديل غير مدعم.";
-_u.ExtensibilityStrings.l_Recurrence_Error_Instance_SetAsync_Text = "لا يمكن تعيين نمط التكرار لحالة واحدة في سلسلة.";
+_u.ExtensibilityStrings.l_Recurrence_Error_Instance_SetAsync_Text = "لا يمكن تعيين نمط التكرار لحالة واحدة في سلسلة."
 _u.ExtensibilityStrings.l_Recurrence_Error_Properties_Invalid_Text = "نمط التكرار غير صالح. الرجاء التحقق من أن خصائص التكرار المحدد تحاذي نوع التكرار.";
 _u.ExtensibilityStrings.l_SaveError_Text = "حدث خطأ في الاتصال أثناء محاولة حفظ العنصر على الخادم.";
 _u.ExtensibilityStrings.l_SessionDataObjectMaxLengthExceeded_Text = "تجاوز العنصر 'sessionData' الحد الأقصى لطول أحرفه والبالغ '{0}'.";

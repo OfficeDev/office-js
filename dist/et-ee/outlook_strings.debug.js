@@ -4,7 +4,7 @@ _u.ExtensibilityStrings = function()
 };
 _u.ExtensibilityStrings.registerClass("_u.ExtensibilityStrings");
 _u.ExtensibilityStrings.l_APICallFailedDueToItemChange_Text = "Valitud üksust on muudetud.";
-_u.ExtensibilityStrings.l_API_Not_Supported_By_ExtensionPoint_Error_Text = "Laienduspunkt ei toeta seda API-t.";
+_u.ExtensibilityStrings.l_API_Not_Supported_By_ExtensionPoint_Error_Text = "Laienduspunkt ei toeta seda API-t."
 _u.ExtensibilityStrings.l_API_Not_Supported_For_Shared_Folders_Error = "API ei ole ühiskasutuses kaustade puhul toetatud.";
 _u.ExtensibilityStrings.l_ActionsDefinitionMultipleActionsError_Text = "Praegu toetatakse ainult ühte toimingut.";
 _u.ExtensibilityStrings.l_ActionsDefinitionWrongNotificationMessageError_Text = "Seda tüüpi teavitussõnumite jaoks ei saa toiminguid määratleda.";
@@ -28,7 +28,7 @@ _u.ExtensibilityStrings.l_DataWriteErrorName_Text = "Andmete kirjutamise tõrge"
 _u.ExtensibilityStrings.l_DeleteAttachmentDoesNotExist_Text = "Manust ei saa kustutada, kuna selle manuseindeksiga manust ei leitud.";
 _u.ExtensibilityStrings.l_DisplayNameTooLong_Text = "Vähemalt üks sisestatud kuvatav nimi on liiga pikk.";
 _u.ExtensibilityStrings.l_DisplayReplyFormHtmlBodyRequired_Text = '"htmlBody" on nõutav.';
-_u.ExtensibilityStrings.l_DuplicateNotificationKey_Text = "Selle võtmega teatis on juba olemas."
+_u.ExtensibilityStrings.l_DuplicateNotificationKey_Text = "Selle võtmega teatis on juba olemas.";
 _u.ExtensibilityStrings.l_Duplicate_Category_Error_Text = "Üks esitatud kategooriatest on juba põhikategooriate loendis.";
 _u.ExtensibilityStrings.l_ElevatedPermissionNeededForMethod_Text = "Meetodi {0} kutsumiseks on nõutavad administraatoriõigused.";
 _u.ExtensibilityStrings.l_ElevatedPermissionNeeded_Text = "Office'i JavaScripti API kaitstud liikmetele juurdepääsemiseks on nõutavad administraatoriõigused.";

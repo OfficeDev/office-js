@@ -3,7 +3,7 @@ _u.ExtensibilityStrings = function()
 {
 };
 _u.ExtensibilityStrings.registerClass("_u.ExtensibilityStrings");
-_u.ExtensibilityStrings.l_APICallFailedDueToItemChange_Text = "선택한 항목이 변경되었습니다."
+_u.ExtensibilityStrings.l_APICallFailedDueToItemChange_Text = "선택한 항목이 변경되었습니다.";
 _u.ExtensibilityStrings.l_API_Not_Supported_By_ExtensionPoint_Error_Text = "API가 확장 지점에 대해 지원되지 않습니다.";
 _u.ExtensibilityStrings.l_API_Not_Supported_For_Shared_Folders_Error = "공유 폴더에는 API가 지원되지 않습니다.";
 _u.ExtensibilityStrings.l_ActionsDefinitionMultipleActionsError_Text = "현재 하나의 작업만 지원됩니다.";
@@ -35,7 +35,7 @@ _u.ExtensibilityStrings.l_ElevatedPermissionNeeded_Text = "JavaScript API for Of
 _u.ExtensibilityStrings.l_EmailAddressTooLong_Text = "하나 이상의 제공된 전자 메일 주소가 너무 깁니다.";
 _u.ExtensibilityStrings.l_EwsRequestOversized_Text = "요청이 제한 크기 1MB를 초과합니다. EWS 요청을 수정하십시오.";
 _u.ExtensibilityStrings.l_ExceededMaxNumberOfAttachments_Text = "메시지에 이미 최대 개수의 첨부 파일이 있으므로 첨부 파일을 추가할 수 없습니다.";
-_u.ExtensibilityStrings.l_HtmlSanitizationFailure_Text = "HTML 삭제가 실패했습니다.";
+_u.ExtensibilityStrings.l_HtmlSanitizationFailure_Text = "HTML 삭제가 실패했습니다."
 _u.ExtensibilityStrings.l_Insufficient_Item_Permissions_Text = "사용자에게 이 작업을 수행하는 데 필요한 권한이 없습니다.";
 _u.ExtensibilityStrings.l_InternalFormatError_Text = "내부 형식 오류가 발생했습니다.";
 _u.ExtensibilityStrings.l_InternalProtocolError_Text = "내부 프로토콜 오류입니다. {0}";

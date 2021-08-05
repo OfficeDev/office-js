@@ -3,7 +3,7 @@ _u.ExtensibilityStrings = function()
 {
 };
 _u.ExtensibilityStrings.registerClass("_u.ExtensibilityStrings");
-_u.ExtensibilityStrings.l_APICallFailedDueToItemChange_Text = "የተመረጠው ንጥል ነገር ተለውጧል።";
+_u.ExtensibilityStrings.l_APICallFailedDueToItemChange_Text = "የተመረጠው ንጥል ነገር ተለውጧል።"
 _u.ExtensibilityStrings.l_API_Not_Supported_By_ExtensionPoint_Error_Text = "API ለተራዘመ ነጥብ አይደገፍም።";
 _u.ExtensibilityStrings.l_API_Not_Supported_For_Shared_Folders_Error = "API ለተጋሩ አቃፊዎች አይደገፍም።";
 _u.ExtensibilityStrings.l_ActionsDefinitionMultipleActionsError_Text = "አሁን የሚደገፈው አንድ ድርጊት ብቻ ነው።";
@@ -11,7 +11,7 @@ _u.ExtensibilityStrings.l_ActionsDefinitionWrongNotificationMessageError_Text = 
 _u.ExtensibilityStrings.l_AttachmentDeleteGeneralFailure_Text = "አባሪው ከንጥልነገሩ ላይ ሊሰረዝ አይችልም።";
 _u.ExtensibilityStrings.l_AttachmentDeletedBeforeUploadCompletes_Text = "ተጠቃሚው አባሪው ተጭኖ ሳይጠናቀቅ አስወግዶታል።";
 _u.ExtensibilityStrings.l_AttachmentErrorName_Text = "የአባሪ ስህተት";
-_u.ExtensibilityStrings.l_AttachmentExceededSize_Text = "አባሪው በጣም ትልቅ በመሆኑ ሊታከል አልቻለም።"
+_u.ExtensibilityStrings.l_AttachmentExceededSize_Text = "አባሪው በጣም ትልቅ በመሆኑ ሊታከል አልቻለም።";
 _u.ExtensibilityStrings.l_AttachmentItemIdTooLong_Text = "አንዱ ወይም ከዚያ በላይ የኢሜይል አድራሻዎች በጣም ረጅም ነው/ናቸው።";
 _u.ExtensibilityStrings.l_AttachmentNameTooLong_Text = "አንዱ ወይም ከዚያ በላይ የማሳያ ስም በጣም ረጅም ነው/ናቸው።";
 _u.ExtensibilityStrings.l_AttachmentNotSupported_Text = "የማጣመር ዓይነቱ የሚደገፍ አይደለም።";

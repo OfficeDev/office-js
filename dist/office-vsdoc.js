@@ -1,4 +1,4 @@
-/* Version: 16.0.13927.10000 */
+/* Version: 16.0.14307.10000 */
 /*
 	Copyright (c) Microsoft Corporation.  All rights reserved.
 */
@@ -3430,6 +3430,13 @@ var Excel;
 			/// <param name="criteria" type="Excel.Interfaces.FilterCriteria" optional="true">The filter criteria.</param>
 			/// <returns ></returns>
 		}
+		AutoFilter.prototype.clearColumnCriteria = function(columnIndex) {
+			/// <summary>
+			/// Clears the column filter criteria of the AutoFilter. [Api set: ExcelApiOnline 1.1]
+			/// </summary>
+			/// <param name="columnIndex" type="Number">The zero-based column index, which represents which column filter needs to be cleared.                If the index value is not supported(for example, if the value is a negative number, or if the value is greater than the number of available columns in the range),                then an `InvalidArgument` exception will be thrown.</param>
+			/// <returns ></returns>
+		}
 		AutoFilter.prototype.clearCriteria = function() {
 			/// <summary>
 			/// Clears the filter criteria of the AutoFilter. [Api set: ExcelApi 1.9]
@@ -3656,7 +3663,7 @@ var Excel;
 		var BindingDataChangedEventArgs = (function() {
 			function BindingDataChangedEventArgs() {
 				/// <summary> Provides information about the binding that raised the data changed event. [Api set: ExcelApi 1.2] </summary>
-				/// <field name="binding" type="Excel.Binding">Gets a temporary `Binding` object that contains the ID of the `Binding` object that raised the event. Use that ID with `BindingCollection.getItem(id)` to get the binding. [Api set: ExcelApi 1.2]</field>
+				/// <field name="binding" type="Excel.Binding">Gets a temporary `Binding` object that contains the ID of the `Binding` object that raised the event. Use that ID with `BindingCollection.getItem(id)` to get the binding. [Api set: ExcelApi 1.2]</field>
 			}
 			return BindingDataChangedEventArgs;
 		})();
@@ -3672,7 +3679,7 @@ var Excel;
 		var BindingSelectionChangedEventArgs = (function() {
 			function BindingSelectionChangedEventArgs() {
 				/// <summary> Provides information about the selection that raised the selection changed event.                             **Note**: If multiple, discontiguous cells are selected, `Binding.onSelectionChanged` only reports row and column information for one selection. Use `Worksheet.onSelectionChanged` for multiple selected ranges. [Api set: ExcelApi 1.2] </summary>
-				/// <field name="binding" type="Excel.Binding">Gets a temporary `Binding` object that contains the ID of the `Binding` object that raised the event. Use that ID with `BindingCollection.getItem(id)` to get the binding. [Api set: ExcelApi 1.2]</field>
+				/// <field name="binding" type="Excel.Binding">Gets a temporary `Binding` object that contains the ID of the `Binding` object that raised the event. Use that ID with `BindingCollection.getItem(id)` to get the binding. [Api set: ExcelApi 1.2]</field>
 				/// <field name="columnCount" type="Number">Gets the number of columns selected. [Api set: ExcelApi 1.2]</field>
 				/// <field name="rowCount" type="Number">Gets the number of rows selected. [Api set: ExcelApi 1.2]</field>
 				/// <field name="startColumn" type="Number">Gets the index of the first column of the selection (zero-based). [Api set: ExcelApi 1.2]</field>
@@ -4090,7 +4097,7 @@ var Excel;
 			/// <field name="pivotOptions" type="Excel.ChartPivotOptions">Encapsulates the options for a pivot chart. [Api set: ExcelApi 1.9]</field>
 			/// <field name="plotArea" type="Excel.ChartPlotArea">Represents the plot area for the chart. [Api set: ExcelApi 1.8]</field>
 			/// <field name="plotBy" type="String">Specifies the way columns or rows are used as data series on the chart. [Api set: ExcelApi 1.8]</field>
-			/// <field name="plotVisibleOnly" type="Boolean">True if only visible cells are plotted. False if both visible and hidden cells are plotted. [Api set: ExcelApi 1.8]</field>
+			/// <field name="plotVisibleOnly" type="Boolean">True if only visible cells are plotted. False if both visible and hidden cells are plotted. [Api set: ExcelApi 1.8]</field>
 			/// <field name="series" type="Excel.ChartSeriesCollection">Represents either a single series or collection of series in the chart. [Api set: ExcelApi 1.1]</field>
 			/// <field name="seriesNameLevel" type="Number">Specifies a chart series name level enumeration constant, referring to the level of the source series names. [Api set: ExcelApi 1.8]</field>
 			/// <field name="showAllFieldButtons" type="Boolean">Specifies whether to display all field buttons on a PivotChart. [Api set: ExcelApi 1.7]</field>
@@ -6226,7 +6233,7 @@ var Excel;
 			/// <field name="gradientStyle" type="String">Specifies the series gradient style of a region map chart. [Api set: ExcelApi 1.9]</field>
 			/// <field name="hasDataLabels" type="Boolean">Specifies if the series has data labels. [Api set: ExcelApi 1.7]</field>
 			/// <field name="invertColor" type="String">Specifies the fill color for negative data points in a series. [Api set: ExcelApi 1.9]</field>
-			/// <field name="invertIfNegative" type="Boolean">True if Excel inverts the pattern in the item when it corresponds to a negative number. [Api set: ExcelApi 1.8]</field>
+			/// <field name="invertIfNegative" type="Boolean">True if Excel inverts the pattern in the item when it corresponds to a negative number. [Api set: ExcelApi 1.8]</field>
 			/// <field name="mapOptions" type="Excel.ChartMapOptions">Encapsulates the options for a region map chart. [Api set: ExcelApi 1.9]</field>
 			/// <field name="markerBackgroundColor" type="String">Specifies the marker background color of a chart series. [Api set: ExcelApi 1.7]</field>
 			/// <field name="markerForegroundColor" type="String">Specifies the marker foreground color of a chart series. [Api set: ExcelApi 1.7]</field>
@@ -6245,7 +6252,7 @@ var Excel;
 			/// <field name="splitType" type="String">Specifies the way the two sections of either a pie-of-pie chart or a bar-of-pie chart are split. [Api set: ExcelApi 1.8]</field>
 			/// <field name="splitValue" type="Number">Specifies the threshold value that separates two sections of either a pie-of-pie chart or a bar-of-pie chart. [Api set: ExcelApi 1.9]</field>
 			/// <field name="trendlines" type="Excel.ChartTrendlineCollection">The collection of trendlines in the series. [Api set: ExcelApi 1.7]</field>
-			/// <field name="varyByCategories" type="Boolean">True if Excel assigns a different color or pattern to each data marker. The chart must contain only one series. [Api set: ExcelApi 1.8]</field>
+			/// <field name="varyByCategories" type="Boolean">True if Excel assigns a different color or pattern to each data marker. The chart must contain only one series. [Api set: ExcelApi 1.8]</field>
 			/// <field name="xErrorBars" type="Excel.ChartErrorBars">Represents the error bar object of a chart series. [Api set: ExcelApi 1.9]</field>
 			/// <field name="yErrorBars" type="Excel.ChartErrorBars">Represents the error bar object of a chart series. [Api set: ExcelApi 1.9]</field>
 		}
@@ -9385,6 +9392,10 @@ var Excel;
 		"linkedWorkbookWorkbookLinksChanged": "linkedWorkbookWorkbookLinksChanged",
 		"linkedWorkbookRefreshCompleted": "linkedWorkbookRefreshCompleted",
 		"worksheetProtectionChanged": "worksheetProtectionChanged",
+		"worksheetNameChanged": "worksheetNameChanged",
+		"worksheetVisibilityChanged": "worksheetVisibilityChanged",
+		"worksheetMoved": "worksheetMoved",
+		"lineageActivityUpdateAvailable": "lineageActivityUpdateAvailable",
 	}
 	Excel.EventType = EventType;
 })(Excel || (Excel = {__proto__: null}));
@@ -9761,6 +9772,23 @@ var Excel;
 		return FormatProtection;
 	})(OfficeExtension.ClientObject);
 	Excel.FormatProtection = FormatProtection;
+})(Excel || (Excel = {__proto__: null}));
+
+var Excel;
+(function (Excel) {
+	var Interfaces;
+	(function (Interfaces) {
+		var FormulaChangedEventDetail = (function() {
+			function FormulaChangedEventDetail() {
+				/// <summary> Provides information about a changed formula during a formula changed event. [Api set: ExcelApi 1.13] </summary>
+				/// <field name="cellAddress" type="String">The address of the cell that contains the changed formula. [Api set: ExcelApi 1.13]</field>
+				/// <field name="previousFormula" type="String">Represents the previous formula, before it was changed. [Api set: ExcelApi 1.13]</field>
+			}
+			return FormulaChangedEventDetail;
+		})();
+		Interfaces.FormulaChangedEventDetail.__proto__ = null;
+		Interfaces.FormulaChangedEventDetail = FormulaChangedEventDetail;
+	})(Interfaces = Excel.Interfaces || (Excel.Interfaces = { __proto__: null}));
 })(Excel || (Excel = {__proto__: null}));
 
 var Excel;
@@ -13351,6 +13379,24 @@ var Excel;
 
 var Excel;
 (function (Excel) {
+	var Interfaces;
+	(function (Interfaces) {
+		var InsertWorksheetOptions = (function() {
+			function InsertWorksheetOptions() {
+				/// <summary> The options that define which worksheets to insert and where in the workbook the new worksheets will be inserted. [Api set: ExcelApi 1.13] </summary>
+				/// <field name="positionType" type="String">The insert position, in the current workbook, of the new worksheets. See `Excel.WorksheetPositionType` for details. The default position is &quot;End&quot;. [Api set: ExcelApi 1.13]</field>
+				/// <field name="relativeTo" >The worksheet in the current workbook that is referenced for the `WorksheetPositionType` parameter. The default is `null`. If the `relativeTo` parameter is not set, worksheets will be inserted based on `positionType`, at the start or end of the current workbook. [Api set: ExcelApi 1.13]</field>
+				/// <field name="sheetNamesToInsert" type="Array" elementType="String">The names of individual worksheets to insert. By default, all the worksheets from the source workbook are inserted. [Api set: ExcelApi 1.13]</field>
+			}
+			return InsertWorksheetOptions;
+		})();
+		Interfaces.InsertWorksheetOptions.__proto__ = null;
+		Interfaces.InsertWorksheetOptions = InsertWorksheetOptions;
+	})(Interfaces = Excel.Interfaces || (Excel.Interfaces = { __proto__: null}));
+})(Excel || (Excel = {__proto__: null}));
+
+var Excel;
+(function (Excel) {
 	var IterativeCalculation = (function(_super) {
 		__extends(IterativeCalculation, _super);
 		function IterativeCalculation() {
@@ -13392,7 +13438,7 @@ var Excel;
 
 var Excel;
 (function (Excel) {
-	/// <summary> [Api set: ExcelApiOnline 1.1] </summary>
+	/// <summary> [Api set: ExcelApi 1.13] </summary>
 	var KeyboardDirection = {
 		__proto__: null,
 		"left": "left",
@@ -13834,7 +13880,7 @@ var Excel;
 			/// Gets a sheet view using its name. [Api set: ExcelApiOnline 1.1]
 			/// </summary>
 			/// <param name="key" type="String">The case-sensitive name of the sheet view. Use the empty string (&quot;&quot;) to get the temporary sheet view, if the temporary view exists.</param>
-			/// <returns type="Excel.NamedSheetView">The sheet view with the given name, or the temporary view if the empty string was provided. If there is no current temporary view and the empty string was provided, then an error is thrown.</returns>
+			/// <returns type="Excel.NamedSheetView">The sheet view with the given name, or the temporary view if an empty string was provided. If there is no current temporary view and an empty string was provided, then an `ItemNotFound` error is thrown.</returns>
 		}
 		NamedSheetViewCollection.prototype.getItemAt = function(index) {
 			/// <summary>
@@ -14341,14 +14387,14 @@ var Excel;
 			/// <summary>
 			/// Sorts the PivotField. If a DataPivotHierarchy is specified, then sort will be applied based on it, if not sort will be based on the PivotField itself. [Api set: ExcelApi 1.8]
 			/// </summary>
-			/// <param name="sortBy" >Specifies if the sorting is done in ascending or descending order.</param>
+			/// <param name="sortBy" >Specifies if the sorting is done in ascending or descending order.</param>
 			/// <returns ></returns>
 		}
 		PivotField.prototype.sortByValues = function(sortBy, valuesHierarchy, pivotItemScope) {
 			/// <summary>
 			/// Sorts the PivotField by specified values in a given scope. The scope defines which specific values will be used to sort when              there are multiple values from the same DataPivotHierarchy. [Api set: ExcelApi 1.9]
 			/// </summary>
-			/// <param name="sortBy" type="String">Specifies if the sorting is done in ascending or descending order.</param>
+			/// <param name="sortBy" type="String">Specifies if the sorting is done in ascending or descending order.</param>
 			/// <param name="valuesHierarchy" type="Excel.DataPivotHierarchy">Specifies the values hierarchy on the data axis to be used for sorting.</param>
 			/// <param name="pivotItemScope" type="Array"  optional="true">The items that should be used for the scope of the sorting. These will be the              items that make up the row or column that you want to sort on. If a string is used instead of a PivotItem,              the string represents the ID of the PivotItem. If there are no items other than data hierarchy on the axis              you want to sort on, this can be empty.</param>
 			/// <returns ></returns>
@@ -14664,11 +14710,16 @@ var Excel;
 			/// <summary> Represents the visual layout of the PivotTable. [Api set: ExcelApi 1.8] </summary>
 			/// <field name="context" type="Excel.RequestContext">The request context associated with this object.</field>
 			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
+			/// <field name="altTextDescription" type="String">The alt text description of the PivotTable.                            Alt text provides alternative, text-based representations of the information contained in the PivotTable.               This information is useful for people with vision or cognitive impairments who may not be able to see or understand the table.               A title can be read to a person with a disability and is used to determine whether they wish to hear the description of the content. [Api set: ExcelApi 1.13]</field>
+			/// <field name="altTextTitle" type="String">The alt text title of the PivotTable.                            Alt text provides alternative, text-based representations of the information contained in the PivotTable.               This information is useful for people with vision or cognitive impairments who may not be able to see or understand the table.               A title can be read to a person with a disability and is used to determine whether they wish to hear the description of the content. [Api set: ExcelApi 1.13]</field>
 			/// <field name="autoFormat" type="Boolean">Specifies if formatting will be automatically formatted when it’s refreshed or when fields are moved. [Api set: ExcelApi 1.9]</field>
+			/// <field name="emptyCellText" type="String">The text that is automatically filled into any empty cell in the PivotTable if `fillEmptyCells == true`.              Note that this value persists if `fillEmptyCells` is set to `false`, and that setting this value does not set that property to `true`.              By default, this is an empty string. [Api set: ExcelApi 1.13]</field>
 			/// <field name="enableFieldList" type="Boolean">Specifies if the field list can be shown in the UI. [Api set: ExcelApi 1.10]</field>
+			/// <field name="fillEmptyCells" type="Boolean">Specifies whether empty cells in the PivotTable should be populated with the `emptyCellText`. Default is `false`.              Note that the value of `emptyCellText` persists when this property is set to `false`. [Api set: ExcelApi 1.13]</field>
 			/// <field name="layoutType" type="String">This property indicates the PivotLayoutType of all fields on the PivotTable. If fields have different states, this will be null. [Api set: ExcelApi 1.8]</field>
 			/// <field name="preserveFormatting" type="Boolean">Specifies if formatting is preserved when the report is refreshed or recalculated by operations such as pivoting, sorting, or changing page field items. [Api set: ExcelApi 1.9]</field>
 			/// <field name="showColumnGrandTotals" type="Boolean">Specifies if the PivotTable report shows grand totals for columns. [Api set: ExcelApi 1.8]</field>
+			/// <field name="showFieldHeaders" type="Boolean">Specifies whether the PivotTable displays field headers (field captions and filter drop-downs). [Api set: ExcelApi 1.13]</field>
 			/// <field name="showRowGrandTotals" type="Boolean">Specifies if the PivotTable report shows grand totals for rows. [Api set: ExcelApi 1.8]</field>
 			/// <field name="subtotalLocation" type="String">This property indicates the `SubtotalLocationType` of all fields on the PivotTable. If fields have different states, this will be `null`. [Api set: ExcelApi 1.8]</field>
 		}
@@ -14694,6 +14745,13 @@ var Excel;
 			/// <summary>Sets multiple properties on the object at the same time, based on an existing loaded object.</summary>
 			/// <param name="properties" type="PivotLayout">An existing PivotLayout object, with properties that have already been loaded and synced.</param>
 			/// </signature>
+		}
+		PivotLayout.prototype.displayBlankLineAfterEachItem = function(display) {
+			/// <summary>
+			/// Sets whether or not to display a blank line after each item. This is set at the global level for the PivotTable and applied to individual PivotFields.              This function overwrites the setting for all fields in the PivotTable to the value of `display` parameter. [Api set: ExcelApi 1.13]
+			/// </summary>
+			/// <param name="display" type="Boolean">True turns on the blank-line display setting. False turns it off.</param>
+			/// <returns ></returns>
 		}
 		PivotLayout.prototype.getColumnLabelRange = function() {
 			/// <summary>
@@ -14739,6 +14797,13 @@ var Excel;
 			/// Returns the range where the PivotTable&apos;s row labels reside. [Api set: ExcelApi 1.8]
 			/// </summary>
 			/// <returns type="Excel.Range"></returns>
+		}
+		PivotLayout.prototype.repeatAllItemLabels = function(repeatLabels) {
+			/// <summary>
+			/// Sets the &quot;repeat all item labels&quot; setting across all fields in the PivotTable. [Api set: ExcelApi 1.13]
+			/// </summary>
+			/// <param name="repeatLabels" type="Boolean">True turns on the label-repetition display setting. False turns it off.</param>
+			/// <returns ></returns>
 		}
 		PivotLayout.prototype.setAutoSortOnCell = function(cell, sortBy) {
 			/// <summary>
@@ -14799,6 +14864,7 @@ var Excel;
 			/// <field name="id" type="String">ID of the PivotTable. [Api set: ExcelApi 1.5]</field>
 			/// <field name="layout" type="Excel.PivotLayout">The PivotLayout describing the layout and visual structure of the PivotTable. [Api set: ExcelApi 1.8]</field>
 			/// <field name="name" type="String">Name of the PivotTable. [Api set: ExcelApi 1.3]</field>
+			/// <field name="refreshOnOpen" type="Boolean">Specifies whether the PivotTable refreshes when the workbook opens. Corresponds to &quot;Refresh on load&quot; setting in the UI. [Api set: ExcelApi 1.13]</field>
 			/// <field name="rowHierarchies" type="Excel.RowColumnPivotHierarchyCollection">The Row Pivot Hierarchies of the PivotTable. [Api set: ExcelApi 1.8]</field>
 			/// <field name="useCustomSortLists" type="Boolean">Specifies if the PivotTable uses custom lists when sorting. [Api set: ExcelApi 1.9]</field>
 			/// <field name="worksheet" type="Excel.Worksheet">The worksheet containing the current PivotTable. [Api set: ExcelApi 1.3]</field>
@@ -15229,7 +15295,7 @@ var Excel;
 			/// <field name="addressLocal" type="String">Represents the range reference for the specified range in the language of the user. [Api set: ExcelApi 1.1]</field>
 			/// <field name="cellCount" type="Number">Specifies the number of cells in the range. This API will return -1 if the cell count exceeds 2^31-1 (2,147,483,647). [Api set: ExcelApi 1.1]</field>
 			/// <field name="columnCount" type="Number">Specifies the total number of columns in the range. [Api set: ExcelApi 1.1]</field>
-			/// <field name="columnHidden" type="Boolean">Represents if all columns of the current range are hidden. [Api set: ExcelApi 1.2]</field>
+			/// <field name="columnHidden" type="Boolean">Represents if all columns in the current range are hidden. Value is `true` when all columns in a range are hidden. Value is `false` when no columns in the range are hidden. Value is `null` when some columns in a range are hidden and other columns in the same range are not hidden. [Api set: ExcelApi 1.2]</field>
 			/// <field name="columnIndex" type="Number">Specifies the column number of the first cell in the range. Zero-indexed. [Api set: ExcelApi 1.1]</field>
 			/// <field name="conditionalFormats" type="Excel.ConditionalFormatCollection">The collection of `ConditionalFormats` that intersect the range. [Api set: ExcelApi 1.6]</field>
 			/// <field name="dataValidation" type="Excel.DataValidation">Returns a data validation object. [Api set: ExcelApi 1.8]</field>
@@ -15239,7 +15305,7 @@ var Excel;
 			/// <field name="formulasR1C1" type="Array" elementType="Array">Represents the formula in R1C1-style notation. If a cell has no formula, its value is returned instead. [Api set: ExcelApi 1.2]</field>
 			/// <field name="hasSpill" type="Boolean">Represents if all cells have a spill border.              Returns `true` if all cells have a spill border, or `false` if all cells do not have a spill border.              Returns `null` if there are cells both with and without spill borders within the range. [Api set: ExcelApi 1.12]</field>
 			/// <field name="height" type="Number">Returns the distance in points, for 100% zoom, from the top edge of the range to the bottom edge of the range. [Api set: ExcelApi 1.10]</field>
-			/// <field name="hidden" type="Boolean">Represents if all cells of the current range are hidden. [Api set: ExcelApi 1.2]</field>
+			/// <field name="hidden" type="Boolean">Represents if all cells in the current range are hidden. Value is `true` when all cells in a range are hidden. Value is `false` when no cells in the range are hidden. Value is `null` when some cells in a range are hidden and other cells in the same range are not hidden. [Api set: ExcelApi 1.2]</field>
 			/// <field name="hyperlink" type="Excel.Interfaces.RangeHyperlink">Represents the hyperlink for the current range. [Api set: ExcelApi 1.7]</field>
 			/// <field name="isEntireColumn" type="Boolean">Represents if the current range is an entire column. [Api set: ExcelApi 1.7]</field>
 			/// <field name="isEntireRow" type="Boolean">Represents if the current range is an entire row. [Api set: ExcelApi 1.7]</field>
@@ -15247,9 +15313,9 @@ var Excel;
 			/// <field name="linkedDataTypeState" type="Array" elementType="Array">Represents the data type state of each cell. [Api set: ExcelApi 1.9]</field>
 			/// <field name="numberFormat" type="Array" elementType="Array">Represents Excel&apos;s number format code for the given range. [Api set: ExcelApi 1.1]</field>
 			/// <field name="numberFormatCategories" type="Array" elementType="Array">Represents the category of number format of each cell. [Api set: ExcelApi 1.12]</field>
-			/// <field name="numberFormatLocal" type="Array" elementType="Array">Represents Excel&apos;s number format code for the given range, based on the language settings of the user.​               Excel does not perform any language or format coercion when getting or setting the `numberFormatLocal` property.               Any returned text uses the locally-formatted strings based on the language specified in the system settings. [Api set: ExcelApi 1.7]</field>
+			/// <field name="numberFormatLocal" type="Array" elementType="Array">Represents Excel&apos;s number format code for the given range, based on the language settings of the user.              Excel does not perform any language or format coercion when getting or setting the `numberFormatLocal` property.              Any returned text uses the locally-formatted strings based on the language specified in the system settings. [Api set: ExcelApi 1.7]</field>
 			/// <field name="rowCount" type="Number">Returns the total number of rows in the range. [Api set: ExcelApi 1.1]</field>
-			/// <field name="rowHidden" type="Boolean">Represents if all rows of the current range are hidden. [Api set: ExcelApi 1.2]</field>
+			/// <field name="rowHidden" type="Boolean">Represents if all rows in the current range are hidden. Value is `true` when all rows in a range are hidden. Value is `false` when no rows in the range are hidden. Value is `null` when some rows in a range are hidden and other rows in the same range are not hidden. [Api set: ExcelApi 1.2]</field>
 			/// <field name="rowIndex" type="Number">Returns the row number of the first cell in the range. Zero-indexed. [Api set: ExcelApi 1.1]</field>
 			/// <field name="savedAsArray" type="Boolean">Represents if all the cells would be saved as an array formula.              Returns `true` if all cells would be saved as an array formula, or `false` if all cells would not be saved as an array formula.              Returns `null` if some cells would be saved as an array formula and some would not be. [Api set: ExcelApi 1.12]</field>
 			/// <field name="sort" type="Excel.RangeSort">Represents the range sort of the current range. [Api set: ExcelApi 1.2]</field>
@@ -15424,6 +15490,12 @@ var Excel;
 			/// <param name="count" type="Number" optional="true">Optional. The number of columns to include in the resulting range. In general, use a positive number to create a range outside the current range. You can also use a negative number to create a range within the current range. The default value is 1.</param>
 			/// <returns type="Excel.Range"></returns>
 		}
+		Range.prototype.getDirectDependents = function() {
+			/// <summary>
+			/// Returns a `WorkbookRangeAreas` object that represents the range containing all the direct dependents of a cell in the same worksheet or in multiple worksheets. [Api set: ExcelApi 1.13]
+			/// </summary>
+			/// <returns type="Excel.WorkbookRangeAreas"></returns>
+		}
 		Range.prototype.getDirectPrecedents = function() {
 			/// <summary>
 			/// Returns a `WorkbookRangeAreas` object that represents the range containing all the direct precedents of a cell in the same worksheet or in multiple worksheets. [Api set: ExcelApi 1.12]
@@ -15444,7 +15516,7 @@ var Excel;
 		}
 		Range.prototype.getExtendedRange = function(direction, activeCell) {
 			/// <summary>
-			/// Returns a range object that includes the current range and up to the edge of the range, based on the provided direction. This matches the Ctrl+Shift+Arrow key behavior in the Excel on Windows UI. [Api set: ExcelApiOnline 1.1]
+			/// Returns a range object that includes the current range and up to the edge of the range, based on the provided direction. This matches the Ctrl+Shift+Arrow key behavior in the Excel on Windows UI. [Api set: ExcelApi 1.13]
 			/// </summary>
 			/// <param name="direction" type="String">The direction from the active cell.</param>
 			/// <param name="activeCell"  optional="true">The active cell in this range. By default, the active cell is the top-left cell of the range. An error is thrown if the active cell is not in this range.</param>
@@ -15452,7 +15524,7 @@ var Excel;
 		}
 		Range.prototype.getImage = function() {
 			/// <summary>
-			/// Renders the range as a base64-encoded png image.              **Important**: This API is currently unsupported in Excel for Mac. Visit {@link https://github.com/OfficeDev/office-js/issues/235 | OfficeDev/office-js Issue #235} for the current status. [Api set: ExcelApi 1.7]
+			/// Renders the range as a base64-encoded png image.              **Important**: This API is currently unsupported in Excel for Mac. Visit {@link https://github.com/OfficeDev/office-js/issues/235 | OfficeDev/office-js Issue #235} for the current status. [Api set: ExcelApi 1.7]
 			/// </summary>
 			/// <returns type="OfficeExtension.ClientResult&lt;string&gt;"></returns>
 			var result = new OfficeExtension.ClientResult();
@@ -15492,9 +15564,9 @@ var Excel;
 			/// </summary>
 			/// <returns type="Excel.Range"></returns>
 		}
-		Range.prototype.getMergedAreas = function() {
+		Range.prototype.getMergedAreasOrNullObject = function() {
 			/// <summary>
-			/// Returns a `RangeAreas` object that represents the merged areas in this range. Note that if the merged areas count in this range is more than 512, an `InvalidOperation` error will be thrown. [Api set: ExcelApiOnline 1.1]
+			/// Returns a RangeAreas object that represents the merged areas in this range. Note that if the merged areas count in this range is more than 512, the API will fail to return the result. If the RangeAreas does not exist, will return a null object. [Api set: ExcelApi 1.13]
 			/// </summary>
 			/// <returns type="Excel.RangeAreas"></returns>
 		}
@@ -15515,7 +15587,7 @@ var Excel;
 		}
 		Range.prototype.getRangeEdge = function(direction, activeCell) {
 			/// <summary>
-			/// Returns a range object that is the edge cell of the data region that corresponds to the provided direction. This matches the Ctrl+Arrow key behavior in the Excel on Windows UI. [Api set: ExcelApiOnline 1.1]
+			/// Returns a range object that is the edge cell of the data region that corresponds to the provided direction. This matches the Ctrl+Arrow key behavior in the Excel on Windows UI. [Api set: ExcelApi 1.13]
 			/// </summary>
 			/// <param name="direction" type="String">The direction from the active cell.</param>
 			/// <param name="activeCell"  optional="true">The active cell in this range. By default, the active cell is the top-left cell of the range. An error is thrown if the active cell is not in this range.</param>
@@ -16150,7 +16222,7 @@ var Excel;
 			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
 			/// <field name="color" type="String">HTML color code representing the color of the background, in the form #RRGGBB (e.g., &quot;FFA500&quot;), or as a named HTML color (e.g., &quot;orange&quot;) [Api set: ExcelApi 1.1]</field>
 			/// <field name="pattern" type="String">The pattern of a range. See `Excel.FillPattern` for details. LinearGradient and RectangularGradient are not supported.              A `null` value indicates that the entire range doesn&apos;t have a uniform pattern setting. [Api set: ExcelApi 1.9]</field>
-			/// <field name="patternColor" type="String">The HTML color code representing the color of the range pattern, in the form #RRGGBB (e.g., &quot;FFA500&quot;), or as a named HTML color (e.g., &quot;orange&quot;). [Api set: ExcelApi 1.9]</field>
+			/// <field name="patternColor" type="String">The HTML color code representing the color of the range pattern, in the form #RRGGBB (e.g., &quot;FFA500&quot;), or as a named HTML color (e.g., &quot;orange&quot;). [Api set: ExcelApi 1.9]</field>
 			/// <field name="patternTintAndShade" type="Number">Specifies a double that lightens or darkens a pattern color for the range fill. The value is between -1 (darkest) and 1 (brightest), with 0 for the original color.              A `null` value indicates that the range doesn&apos;t have uniform `patternTintAndShade` settings. [Api set: ExcelApi 1.9]</field>
 			/// <field name="tintAndShade" type="Number">Specifies a double that lightens or darkens a color for the range fill. The value is between -1 (darkest) and 1 (brightest), with 0 for the original color.               A `null` value indicates that the range doesn&apos;t have uniform `tintAndShade` settings. [Api set: ExcelApi 1.9]</field>
 		}
@@ -18417,7 +18489,7 @@ var Excel;
 		}
 		Table.prototype.resize = function(newRange) {
 			/// <summary>
-			/// Resize the table to the new range. The new range must overlap with the original table range and the headers (or the top of the table) must be in the same row. [Api set: ExcelApiOnline 1.1]
+			/// Resize the table to the new range. The new range must overlap with the original table range and the headers (or the top of the table) must be in the same row. [Api set: ExcelApi 1.13]
 			/// </summary>
 			/// <param name="newRange" >The range object or range address that will be used to determine the new size of the table.</param>
 			/// <returns ></returns>
@@ -18921,7 +18993,7 @@ var Excel;
 			function TableSelectionChangedEventArgs() {
 				/// <summary> Provides information about the table that raised the selection changed event. [Api set: ExcelApi 1.7] </summary>
 				/// <field name="address" type="String">Gets the range address that represents the selected area of the table on a specific worksheet. [Api set: ExcelApi 1.7]</field>
-				/// <field name="isInsideTable" type="Boolean">Specifies if the selection is inside a table. The address will be useless if `IsInsideTable` is `false`. [Api set: ExcelApi 1.7]</field>
+				/// <field name="isInsideTable" type="Boolean">Specifies if the selection is inside a table. `IsInsideTable` must be set to `true` for the address to be useful. [Api set: ExcelApi 1.7]</field>
 				/// <field name="tableId" type="String">Gets the ID of the table in which the selection changed. [Api set: ExcelApi 1.7]</field>
 				/// <field name="type" type="String">Gets the type of the event. See `Excel.EventType` for details. [Api set: ExcelApi 1.7]</field>
 				/// <field name="worksheetId" type="String">Gets the ID of the worksheet in which the selection changed. [Api set: ExcelApi 1.7]</field>
@@ -19161,7 +19233,7 @@ var Excel;
 			/// <field name="textRange" type="Excel.TextRange">Represents the text that is attached to a shape in the text frame, and properties and methods for manipulating the text. See `Excel.TextRange` for details. [Api set: ExcelApi 1.9]</field>
 			/// <field name="topMargin" type="Number">Represents the top margin, in points, of the text frame. [Api set: ExcelApi 1.9]</field>
 			/// <field name="verticalAlignment" type="String">Represents the vertical alignment of the text frame. See `Excel.ShapeTextVerticalAlignment` for details. [Api set: ExcelApi 1.9]</field>
-			/// <field name="verticalOverflow" type="String">Represents the vertical overflow behavior of the text frame. See Excel.ShapeTextVerticalOverflow` for details. [Api set: ExcelApi 1.9]</field>
+			/// <field name="verticalOverflow" type="String">Represents the vertical overflow behavior of the text frame. See `Excel.ShapeTextVerticalOverflow` for details. [Api set: ExcelApi 1.9]</field>
 		}
 
 		TextFrame.prototype.load = function(option) {
@@ -19512,6 +19584,7 @@ var Excel;
 			/// <field name="timelineStyles" type="Excel.TimelineStyleCollection">Represents a collection of TimelineStyles associated with the workbook. [Api set: ExcelApi 1.10]</field>
 			/// <field name="usePrecisionAsDisplayed" type="Boolean">True if calculations in this workbook will be done using only the precision of the numbers as they&apos;re displayed.              Data will permanently lose accuracy when switching this property from `false` to `true`. [Api set: ExcelApi 1.9]</field>
 			/// <field name="worksheets" type="Excel.WorksheetCollection">Represents a collection of worksheets associated with the workbook. [Api set: ExcelApi 1.1]</field>
+			/// <field name="onActivated" type="OfficeExtension.EventHandlers">Occurs when the the workbook is activated. Note: This event will not fire when the workbook is opened. [Api set: ExcelApi 1.13]</field>
 			/// <field name="onAutoSaveSettingChanged" type="OfficeExtension.EventHandlers">Occurs when the AutoSave setting is changed on the workbook. [Api set: ExcelApi 1.9]</field>
 			/// <field name="onSelectionChanged" type="OfficeExtension.EventHandlers">Occurs when the selection in the document is changed. [Api set: ExcelApi 1.2]</field>
 		}
@@ -19597,6 +19670,18 @@ var Excel;
 			/// </summary>
 			/// <returns type="Excel.RangeAreas"></returns>
 		}
+		Workbook.prototype.insertWorksheetsFromBase64 = function(base64File, options) {
+			/// <summary>
+			/// Inserts the specified worksheets from a source workbook into the current workbook.                             **Note**: This API is currently only supported for Office on Windows, Mac and Online. [Api set: ExcelApi 1.13]
+			/// </summary>
+			/// <param name="base64File" type="String">Required. The base64-encoded string representing the source workbook file.</param>
+			/// <param name="options" type="Excel.Interfaces.InsertWorksheetOptions" optional="true">Optional. The options that define which worksheets to insert and where in the workbook the new worksheets will be inserted. By default, all the worksheets from the source workbook are inserted at the end of the current workbook.</param>
+			/// <returns type="OfficeExtension.ClientResult&lt;string[]&gt;">An array of ids corresponding to each newly inserted worksheet.</returns>
+			var result = new OfficeExtension.ClientResult();
+			result.__proto__ = null;
+			result.value = [];
+			return result;
+		}
 		Workbook.prototype.save = function(saveBehavior) {
 			/// <summary>
 			/// Save current workbook. [Api set: ExcelApi 1.11]
@@ -19604,6 +19689,20 @@ var Excel;
 			/// <param name="saveBehavior" type="String" optional="true">Workbook save behavior.</param>
 			/// <returns ></returns>
 		}
+		Workbook.prototype.onActivated = {
+			__proto__: null,
+			add: function (handler) {
+				/// <param name="handler" type="function(eventArgs: Excel.Interfaces.WorkbookActivatedEventArgs)">Handler for the event. EventArgs: Provides information about the workbook that raised the activated event. </param>
+				/// <returns type="OfficeExtension.EventHandlerResult"></returns>
+				var eventInfo = new Excel.Interfaces.WorkbookActivatedEventArgs();
+				eventInfo.__proto__ = null;
+				handler(eventInfo);
+			},
+			remove: function (handler) {
+				/// <param name="handler" type="function(eventArgs: Excel.Interfaces.WorkbookActivatedEventArgs)">Handler for the event.</param>
+				return;
+			}
+		};
 		Workbook.prototype.onAutoSaveSettingChanged = {
 			__proto__: null,
 			add: function (handler) {
@@ -19636,6 +19735,22 @@ var Excel;
 		return Workbook;
 	})(OfficeExtension.ClientObject);
 	Excel.Workbook = Workbook;
+})(Excel || (Excel = {__proto__: null}));
+
+var Excel;
+(function (Excel) {
+	var Interfaces;
+	(function (Interfaces) {
+		var WorkbookActivatedEventArgs = (function() {
+			function WorkbookActivatedEventArgs() {
+				/// <summary> Provides information about the workbook that raised the activated event. [Api set: ExcelApi 1.13] </summary>
+				/// <field name="type" type="String">Gets the type of the event. See `Excel.EventType` for details. [Api set: ExcelApi 1.13]</field>
+			}
+			return WorkbookActivatedEventArgs;
+		})();
+		Interfaces.WorkbookActivatedEventArgs.__proto__ = null;
+		Interfaces.WorkbookActivatedEventArgs = WorkbookActivatedEventArgs;
+	})(Interfaces = Excel.Interfaces || (Excel.Interfaces = { __proto__: null}));
 })(Excel || (Excel = {__proto__: null}));
 
 var Excel;
@@ -19725,7 +19840,7 @@ var Excel;
 			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
 			/// <field name="addresses" type="Array" elementType="String">Returns an array of addresses in A1-style. Address values contain the worksheet name for each rectangular block of cells (e.g., &quot;Sheet1!A1:B4, Sheet1!D1:D4&quot;). Read-only. [Api set: ExcelApi 1.12]</field>
 			/// <field name="areas" type="Excel.RangeAreasCollection">Returns the `RangeAreasCollection` object. Each `RangeAreas` in the collection represent one or more rectangle ranges in one worksheet. [Api set: ExcelApi 1.12]</field>
-			/// <field name="ranges" type="Excel.RangeCollection">Returns ranges that comprise this object in a `RangeCollection` object. [Api set: ExcelApi 1.12]</field>
+			/// <field name="ranges" type="Excel.RangeCollection">Returns ranges that comprise this object in a `RangeCollection` object. [Api set: ExcelApi 1.12]</field>
 		}
 
 		WorkbookRangeAreas.prototype.load = function(option) {
@@ -19781,7 +19896,7 @@ var Excel;
 			/// <field name="charts" type="Excel.ChartCollection">Returns a collection of charts that are part of the worksheet. [Api set: ExcelApi 1.1]</field>
 			/// <field name="comments" type="Excel.CommentCollection">Returns a collection of all the Comments objects on the worksheet. [Api set: ExcelApi 1.10]</field>
 			/// <field name="customProperties" type="Excel.WorksheetCustomPropertyCollection">Gets a collection of worksheet-level custom properties. [Api set: ExcelApi 1.12]</field>
-			/// <field name="enableCalculation" type="Boolean">Determines if Excel should recalculate the worksheet when necessary.              True if Excel recalculates the worksheet when necessary. False if Excel doesn&apos;t recalculate the sheet. [Api set: ExcelApi 1.9]</field>
+			/// <field name="enableCalculation" type="Boolean">Determines if Excel should recalculate the worksheet when necessary.              True if Excel recalculates the worksheet when necessary. False if Excel doesn&apos;t recalculate the sheet. [Api set: ExcelApi 1.9]</field>
 			/// <field name="freezePanes" type="Excel.WorksheetFreezePanes">Gets an object that can be used to manipulate frozen panes on the worksheet. [Api set: ExcelApi 1.7]</field>
 			/// <field name="horizontalPageBreaks" type="Excel.PageBreakCollection">Gets the horizontal page break collection for the worksheet. This collection only contains manual page breaks. [Api set: ExcelApi 1.9]</field>
 			/// <field name="id" type="String">Returns a value that uniquely identifies the worksheet in a given workbook. The value of the identifier remains the same even when the worksheet is renamed or moved. [Api set: ExcelApi 1.1]</field>
@@ -19808,6 +19923,7 @@ var Excel;
 			/// <field name="onColumnSorted" type="OfficeExtension.EventHandlers">Occurs when one or more columns have been sorted. This happens as the result of a left to right sort operation. [Api set: ExcelApi 1.10]</field>
 			/// <field name="onDeactivated" type="OfficeExtension.EventHandlers">Occurs when the worksheet is deactivated. [Api set: ExcelApi 1.7]</field>
 			/// <field name="onFormatChanged" type="OfficeExtension.EventHandlers">Occurs when format changed on a specific worksheet. [Api set: ExcelApi 1.9]</field>
+			/// <field name="onFormulaChanged" type="OfficeExtension.EventHandlers">Occurs when one or more formulas are changed in this worksheet. This event is for when the formula itself changes, not the data value resulting from the formula&apos;s calculation. [Api set: ExcelApi 1.13]</field>
 			/// <field name="onRowHiddenChanged" type="OfficeExtension.EventHandlers">Occurs when the hidden state of one or more rows has changed on a specific worksheet. [Api set: ExcelApi 1.11]</field>
 			/// <field name="onRowSorted" type="OfficeExtension.EventHandlers">Occurs when one or more rows have been sorted. This happens as the result of a top-to-bottom sort operation. [Api set: ExcelApi 1.10]</field>
 			/// <field name="onSelectionChanged" type="OfficeExtension.EventHandlers">Occurs when the selection changes on a specific worksheet. [Api set: ExcelApi 1.7]</field>
@@ -20058,6 +20174,20 @@ var Excel;
 				return;
 			}
 		};
+		Worksheet.prototype.onFormulaChanged = {
+			__proto__: null,
+			add: function (handler) {
+				/// <param name="handler" type="function(eventArgs: Excel.Interfaces.WorksheetFormulaChangedEventArgs)">Handler for the event. EventArgs: Provides information about the worksheet and formulas that raised the formula changed event. </param>
+				/// <returns type="OfficeExtension.EventHandlerResult"></returns>
+				var eventInfo = new Excel.Interfaces.WorksheetFormulaChangedEventArgs();
+				eventInfo.__proto__ = null;
+				handler(eventInfo);
+			},
+			remove: function (handler) {
+				/// <param name="handler" type="function(eventArgs: Excel.Interfaces.WorksheetFormulaChangedEventArgs)">Handler for the event.</param>
+				return;
+			}
+		};
 		Worksheet.prototype.onRowHiddenChanged = {
 			__proto__: null,
 			add: function (handler) {
@@ -20210,6 +20340,7 @@ var Excel;
 			/// <field name="onDeactivated" type="OfficeExtension.EventHandlers">Occurs when any worksheet in the workbook is deactivated. [Api set: ExcelApi 1.7]</field>
 			/// <field name="onDeleted" type="OfficeExtension.EventHandlers">Occurs when a worksheet is deleted from the workbook. [Api set: ExcelApi 1.7]</field>
 			/// <field name="onFormatChanged" type="OfficeExtension.EventHandlers">Occurs when any worksheet in the workbook has a format changed. [Api set: ExcelApi 1.9]</field>
+			/// <field name="onFormulaChanged" type="OfficeExtension.EventHandlers">Occurs when one or more formulas are changed in any worksheet of this collection. This event is for when the formula itself changes, not the data value resulting from the formula&apos;s calculation. [Api set: ExcelApi 1.13]</field>
 			/// <field name="onRowHiddenChanged" type="OfficeExtension.EventHandlers">Occurs when the hidden state of one or more rows has changed on a specific worksheet. [Api set: ExcelApi 1.11]</field>
 			/// <field name="onRowSorted" type="OfficeExtension.EventHandlers">Occurs when one or more rows have been sorted. This happens as the result of a top-to-bottom sort operation. [Api set: ExcelApi 1.10]</field>
 			/// <field name="onSelectionChanged" type="OfficeExtension.EventHandlers">Occurs when the selection changes on any worksheet. [Api set: ExcelApi 1.9]</field>
@@ -20385,6 +20516,20 @@ var Excel;
 			},
 			remove: function (handler) {
 				/// <param name="handler" type="function(eventArgs: Excel.Interfaces.WorksheetFormatChangedEventArgs)">Handler for the event.</param>
+				return;
+			}
+		};
+		WorksheetCollection.prototype.onFormulaChanged = {
+			__proto__: null,
+			add: function (handler) {
+				/// <param name="handler" type="function(eventArgs: Excel.Interfaces.WorksheetFormulaChangedEventArgs)">Handler for the event. EventArgs: Provides information about the worksheet and formulas that raised the formula changed event. </param>
+				/// <returns type="OfficeExtension.EventHandlerResult"></returns>
+				var eventInfo = new Excel.Interfaces.WorksheetFormulaChangedEventArgs();
+				eventInfo.__proto__ = null;
+				handler(eventInfo);
+			},
+			remove: function (handler) {
+				/// <param name="handler" type="function(eventArgs: Excel.Interfaces.WorksheetFormulaChangedEventArgs)">Handler for the event.</param>
 				return;
 			}
 		};
@@ -20627,6 +20772,25 @@ var Excel;
 
 var Excel;
 (function (Excel) {
+	var Interfaces;
+	(function (Interfaces) {
+		var WorksheetFormulaChangedEventArgs = (function() {
+			function WorksheetFormulaChangedEventArgs() {
+				/// <summary> Provides information about the worksheet and formulas that raised the formula changed event. [Api set: ExcelApi 1.13] </summary>
+				/// <field name="formulaDetails" type="Array" elementType="Excel.Interfaces.FormulaChangedEventDetail">Gets an array of `FormulaChangedEventDetail` objects, which contain the details about the all of the changed formulas. [Api set: ExcelApi 1.13]</field>
+				/// <field name="source" type="String">The source of the event. It can be local or remote (through co-authoring). [Api set: ExcelApi 1.13]</field>
+				/// <field name="type" type="String">Gets the type of the event. See `Excel.EventType` for details. [Api set: ExcelApi 1.13]</field>
+				/// <field name="worksheetId" type="String">Gets the ID of the worksheet in which the formula changed. [Api set: ExcelApi 1.13]</field>
+			}
+			return WorksheetFormulaChangedEventArgs;
+		})();
+		Interfaces.WorksheetFormulaChangedEventArgs.__proto__ = null;
+		Interfaces.WorksheetFormulaChangedEventArgs = WorksheetFormulaChangedEventArgs;
+	})(Interfaces = Excel.Interfaces || (Excel.Interfaces = { __proto__: null}));
+})(Excel || (Excel = {__proto__: null}));
+
+var Excel;
+(function (Excel) {
 	var WorksheetFreezePanes = (function(_super) {
 		__extends(WorksheetFreezePanes, _super);
 		function WorksheetFreezePanes() {
@@ -20651,14 +20815,14 @@ var Excel;
 		}
 		WorksheetFreezePanes.prototype.freezeColumns = function(count) {
 			/// <summary>
-			/// Freeze the first column or columns of the worksheet in place. [Api set: ExcelApi 1.7]
+			/// Freeze the first column or columns of the worksheet in place. [Api set: ExcelApi 1.7]
 			/// </summary>
 			/// <param name="count" type="Number" optional="true">Optional number of columns to freeze, or zero to unfreeze all columns</param>
 			/// <returns ></returns>
 		}
 		WorksheetFreezePanes.prototype.freezeRows = function(count) {
 			/// <summary>
-			/// Freeze the top row or rows of the worksheet in place. [Api set: ExcelApi 1.7]
+			/// Freeze the top row or rows of the worksheet in place. [Api set: ExcelApi 1.7]
 			/// </summary>
 			/// <param name="count" type="Number" optional="true">Optional number of rows to freeze, or zero to unfreeze all rows</param>
 			/// <returns ></returns>
@@ -20943,7 +21107,7 @@ var Excel;
 			function WorksheetUpdateData() {
 				/// <summary>An interface for updating data on the Worksheet object, for use in "worksheet.set({ ... })".</summary>
 				/// <field name="pageLayout" type="Excel.Interfaces.PageLayoutUpdateData">Gets the `PageLayout` object of the worksheet. [Api set: ExcelApi 1.9]</field>
-				/// <field name="enableCalculation" type="Boolean">Determines if Excel should recalculate the worksheet when necessary.              True if Excel recalculates the worksheet when necessary. False if Excel doesn&apos;t recalculate the sheet. [Api set: ExcelApi 1.9]</field>;
+				/// <field name="enableCalculation" type="Boolean">Determines if Excel should recalculate the worksheet when necessary.              True if Excel recalculates the worksheet when necessary. False if Excel doesn&apos;t recalculate the sheet. [Api set: ExcelApi 1.9]</field>;
 				/// <field name="name" type="String">The display name of the worksheet. [Api set: ExcelApi 1.1]</field>;
 				/// <field name="position" type="Number">The zero-based position of the worksheet within the workbook. [Api set: ExcelApi 1.1]</field>;
 				/// <field name="showGridlines" type="Boolean">Specifies if gridlines are visible to the user. [Api set: ExcelApi 1.8]</field>;
@@ -20968,14 +21132,14 @@ var Excel;
 				/// <summary>An interface for updating data on the Range object, for use in "range.set({ ... })".</summary>
 				/// <field name="dataValidation" type="Excel.Interfaces.DataValidationUpdateData">Returns a data validation object. [Api set: ExcelApi 1.8]</field>
 				/// <field name="format" type="Excel.Interfaces.RangeFormatUpdateData">Returns a format object, encapsulating the range&apos;s font, fill, borders, alignment, and other properties. [Api set: ExcelApi 1.1]</field>
-				/// <field name="columnHidden" type="Boolean">Represents if all columns of the current range are hidden. [Api set: ExcelApi 1.2]</field>;
+				/// <field name="columnHidden" type="Boolean">Represents if all columns in the current range are hidden. Value is `true` when all columns in a range are hidden. Value is `false` when no columns in the range are hidden. Value is `null` when some columns in a range are hidden and other columns in the same range are not hidden. [Api set: ExcelApi 1.2]</field>;
 				/// <field name="formulas" type="Array" elementType="Array">Represents the formula in A1-style notation. If a cell has no formula, its value is returned instead. [Api set: ExcelApi 1.1]</field>;
 				/// <field name="formulasLocal" type="Array" elementType="Array">Represents the formula in A1-style notation, in the user&apos;s language and number-formatting locale. For example, the English &quot;=SUM(A1, 1.5)&quot; formula would become &quot;=SUMME(A1; 1,5)&quot; in German. If a cell has no formula, its value is returned instead. [Api set: ExcelApi 1.1]</field>;
 				/// <field name="formulasR1C1" type="Array" elementType="Array">Represents the formula in R1C1-style notation. If a cell has no formula, its value is returned instead. [Api set: ExcelApi 1.2]</field>;
 				/// <field name="hyperlink" type="Excel.Interfaces.RangeHyperlink">Represents the hyperlink for the current range. [Api set: ExcelApi 1.7]</field>;
 				/// <field name="numberFormat" type="Array" elementType="Array">Represents Excel&apos;s number format code for the given range. [Api set: ExcelApi 1.1]</field>;
-				/// <field name="numberFormatLocal" type="Array" elementType="Array">Represents Excel&apos;s number format code for the given range, based on the language settings of the user.​               Excel does not perform any language or format coercion when getting or setting the `numberFormatLocal` property.               Any returned text uses the locally-formatted strings based on the language specified in the system settings. [Api set: ExcelApi 1.7]</field>;
-				/// <field name="rowHidden" type="Boolean">Represents if all rows of the current range are hidden. [Api set: ExcelApi 1.2]</field>;
+				/// <field name="numberFormatLocal" type="Array" elementType="Array">Represents Excel&apos;s number format code for the given range, based on the language settings of the user.              Excel does not perform any language or format coercion when getting or setting the `numberFormatLocal` property.              Any returned text uses the locally-formatted strings based on the language specified in the system settings. [Api set: ExcelApi 1.7]</field>;
+				/// <field name="rowHidden" type="Boolean">Represents if all rows in the current range are hidden. Value is `true` when all rows in a range are hidden. Value is `false` when no rows in the range are hidden. Value is `null` when some rows in a range are hidden and other rows in the same range are not hidden. [Api set: ExcelApi 1.2]</field>;
 				/// <field name="style" type="String">Represents the style of the current range.              If the styles of the cells are inconsistent, `null` will be returned.              For custom styles, the style name will be returned. For built-in styles, a string representing a value in the `BuiltInStyle` enum will be returned. [Api set: ExcelApi 1.7]</field>;
 				/// <field name="values" type="Array" elementType="Array">Represents the raw values of the specified range. The data returned could be a string, number, or boolean. Cells that contain an error will return the error string.              If the returned value starts with a plus (&quot;+&quot;), minus (&quot;-&quot;), or equal sign (&quot;=&quot;), Excel interprets this value as a formula. [Api set: ExcelApi 1.1]</field>;
 			}
@@ -21191,7 +21355,7 @@ var Excel;
 				/// <summary>An interface for updating data on the RangeFill object, for use in "rangeFill.set({ ... })".</summary>
 				/// <field name="color" type="String">HTML color code representing the color of the background, in the form #RRGGBB (e.g., &quot;FFA500&quot;), or as a named HTML color (e.g., &quot;orange&quot;) [Api set: ExcelApi 1.1]</field>;
 				/// <field name="pattern" type="String">The pattern of a range. See `Excel.FillPattern` for details. LinearGradient and RectangularGradient are not supported.              A `null` value indicates that the entire range doesn&apos;t have a uniform pattern setting. [Api set: ExcelApi 1.9]</field>;
-				/// <field name="patternColor" type="String">The HTML color code representing the color of the range pattern, in the form #RRGGBB (e.g., &quot;FFA500&quot;), or as a named HTML color (e.g., &quot;orange&quot;). [Api set: ExcelApi 1.9]</field>;
+				/// <field name="patternColor" type="String">The HTML color code representing the color of the range pattern, in the form #RRGGBB (e.g., &quot;FFA500&quot;), or as a named HTML color (e.g., &quot;orange&quot;). [Api set: ExcelApi 1.9]</field>;
 				/// <field name="patternTintAndShade" type="Number">Specifies a double that lightens or darkens a pattern color for the range fill. The value is between -1 (darkest) and 1 (brightest), with 0 for the original color.              A `null` value indicates that the range doesn&apos;t have uniform `patternTintAndShade` settings. [Api set: ExcelApi 1.9]</field>;
 				/// <field name="tintAndShade" type="Number">Specifies a double that lightens or darkens a color for the range fill. The value is between -1 (darkest) and 1 (brightest), with 0 for the original color.               A `null` value indicates that the range doesn&apos;t have uniform `tintAndShade` settings. [Api set: ExcelApi 1.9]</field>;
 			}
@@ -21283,7 +21447,7 @@ var Excel;
 				/// <field name="left" type="Number">The distance, in points, from the left side of the chart to the worksheet origin. [Api set: ExcelApi 1.1]</field>;
 				/// <field name="name" type="String">Specifies the name of a chart object. [Api set: ExcelApi 1.1]</field>;
 				/// <field name="plotBy" type="String">Specifies the way columns or rows are used as data series on the chart. [Api set: ExcelApi 1.8]</field>;
-				/// <field name="plotVisibleOnly" type="Boolean">True if only visible cells are plotted. False if both visible and hidden cells are plotted. [Api set: ExcelApi 1.8]</field>;
+				/// <field name="plotVisibleOnly" type="Boolean">True if only visible cells are plotted. False if both visible and hidden cells are plotted. [Api set: ExcelApi 1.8]</field>;
 				/// <field name="seriesNameLevel" type="Number">Specifies a chart series name level enumeration constant, referring to the level of the source series names. [Api set: ExcelApi 1.8]</field>;
 				/// <field name="showAllFieldButtons" type="Boolean">Specifies whether to display all field buttons on a PivotChart. [Api set: ExcelApi 1.7]</field>;
 				/// <field name="showDataLabelsOverMaximum" type="Boolean">Specifies whether to show the data labels when the value is greater than the maximum value on the value axis.              If the value axis becomes smaller than the size of the data points, you can use this property to set whether to show the data labels.              This property applies to 2-D charts only. [Api set: ExcelApi 1.8]</field>;
@@ -21370,7 +21534,7 @@ var Excel;
 				/// <field name="gradientStyle" type="String">Specifies the series gradient style of a region map chart. [Api set: ExcelApi 1.9]</field>;
 				/// <field name="hasDataLabels" type="Boolean">Specifies if the series has data labels. [Api set: ExcelApi 1.7]</field>;
 				/// <field name="invertColor" type="String">Specifies the fill color for negative data points in a series. [Api set: ExcelApi 1.9]</field>;
-				/// <field name="invertIfNegative" type="Boolean">True if Excel inverts the pattern in the item when it corresponds to a negative number. [Api set: ExcelApi 1.8]</field>;
+				/// <field name="invertIfNegative" type="Boolean">True if Excel inverts the pattern in the item when it corresponds to a negative number. [Api set: ExcelApi 1.8]</field>;
 				/// <field name="markerBackgroundColor" type="String">Specifies the marker background color of a chart series. [Api set: ExcelApi 1.7]</field>;
 				/// <field name="markerForegroundColor" type="String">Specifies the marker foreground color of a chart series. [Api set: ExcelApi 1.7]</field>;
 				/// <field name="markerSize" type="Number">Specifies the marker size of a chart series. [Api set: ExcelApi 1.7]</field>;
@@ -21386,7 +21550,7 @@ var Excel;
 				/// <field name="smooth" type="Boolean">Specifies if the series is smooth. Only applicable to line and scatter charts. [Api set: ExcelApi 1.7]</field>;
 				/// <field name="splitType" type="String">Specifies the way the two sections of either a pie-of-pie chart or a bar-of-pie chart are split. [Api set: ExcelApi 1.8]</field>;
 				/// <field name="splitValue" type="Number">Specifies the threshold value that separates two sections of either a pie-of-pie chart or a bar-of-pie chart. [Api set: ExcelApi 1.9]</field>;
-				/// <field name="varyByCategories" type="Boolean">True if Excel assigns a different color or pattern to each data marker. The chart must contain only one series. [Api set: ExcelApi 1.8]</field>;
+				/// <field name="varyByCategories" type="Boolean">True if Excel assigns a different color or pattern to each data marker. The chart must contain only one series. [Api set: ExcelApi 1.8]</field>;
 			}
 			return ChartSeriesUpdateData;
 		})();
@@ -22086,6 +22250,7 @@ var Excel;
 				/// <field name="allowMultipleFiltersPerField" type="Boolean">Specifies if the PivotTable allows the application of multiple PivotFilters on a given PivotField in the table. [Api set: ExcelApi 1.12]</field>;
 				/// <field name="enableDataValueEditing" type="Boolean">Specifies if the PivotTable allows values in the data body to be edited by the user. [Api set: ExcelApi 1.9]</field>;
 				/// <field name="name" type="String">Name of the PivotTable. [Api set: ExcelApi 1.3]</field>;
+				/// <field name="refreshOnOpen" type="Boolean">Specifies whether the PivotTable refreshes when the workbook opens. Corresponds to &quot;Refresh on load&quot; setting in the UI. [Api set: ExcelApi 1.13]</field>;
 				/// <field name="useCustomSortLists" type="Boolean">Specifies if the PivotTable uses custom lists when sorting. [Api set: ExcelApi 1.9]</field>;
 			}
 			return PivotTableUpdateData;
@@ -22102,11 +22267,16 @@ var Excel;
 		var PivotLayoutUpdateData = (function() {
 			function PivotLayoutUpdateData() {
 				/// <summary>An interface for updating data on the PivotLayout object, for use in "pivotLayout.set({ ... })".</summary>
+				/// <field name="altTextDescription" type="String">The alt text description of the PivotTable.                            Alt text provides alternative, text-based representations of the information contained in the PivotTable.               This information is useful for people with vision or cognitive impairments who may not be able to see or understand the table.               A title can be read to a person with a disability and is used to determine whether they wish to hear the description of the content. [Api set: ExcelApi 1.13]</field>;
+				/// <field name="altTextTitle" type="String">The alt text title of the PivotTable.                            Alt text provides alternative, text-based representations of the information contained in the PivotTable.               This information is useful for people with vision or cognitive impairments who may not be able to see or understand the table.               A title can be read to a person with a disability and is used to determine whether they wish to hear the description of the content. [Api set: ExcelApi 1.13]</field>;
 				/// <field name="autoFormat" type="Boolean">Specifies if formatting will be automatically formatted when it’s refreshed or when fields are moved. [Api set: ExcelApi 1.9]</field>;
+				/// <field name="emptyCellText" type="String">The text that is automatically filled into any empty cell in the PivotTable if `fillEmptyCells == true`.              Note that this value persists if `fillEmptyCells` is set to `false`, and that setting this value does not set that property to `true`.              By default, this is an empty string. [Api set: ExcelApi 1.13]</field>;
 				/// <field name="enableFieldList" type="Boolean">Specifies if the field list can be shown in the UI. [Api set: ExcelApi 1.10]</field>;
+				/// <field name="fillEmptyCells" type="Boolean">Specifies whether empty cells in the PivotTable should be populated with the `emptyCellText`. Default is `false`.              Note that the value of `emptyCellText` persists when this property is set to `false`. [Api set: ExcelApi 1.13]</field>;
 				/// <field name="layoutType" type="String">This property indicates the PivotLayoutType of all fields on the PivotTable. If fields have different states, this will be null. [Api set: ExcelApi 1.8]</field>;
 				/// <field name="preserveFormatting" type="Boolean">Specifies if formatting is preserved when the report is refreshed or recalculated by operations such as pivoting, sorting, or changing page field items. [Api set: ExcelApi 1.9]</field>;
 				/// <field name="showColumnGrandTotals" type="Boolean">Specifies if the PivotTable report shows grand totals for columns. [Api set: ExcelApi 1.8]</field>;
+				/// <field name="showFieldHeaders" type="Boolean">Specifies whether the PivotTable displays field headers (field captions and filter drop-downs). [Api set: ExcelApi 1.13]</field>;
 				/// <field name="showRowGrandTotals" type="Boolean">Specifies if the PivotTable report shows grand totals for rows. [Api set: ExcelApi 1.8]</field>;
 				/// <field name="subtotalLocation" type="String">This property indicates the `SubtotalLocationType` of all fields on the PivotTable. If fields have different states, this will be `null`. [Api set: ExcelApi 1.8]</field>;
 			}
@@ -22920,7 +23090,7 @@ var Excel;
 				/// <field name="rightMargin" type="Number">Represents the right margin, in points, of the text frame. [Api set: ExcelApi 1.9]</field>;
 				/// <field name="topMargin" type="Number">Represents the top margin, in points, of the text frame. [Api set: ExcelApi 1.9]</field>;
 				/// <field name="verticalAlignment" type="String">Represents the vertical alignment of the text frame. See `Excel.ShapeTextVerticalAlignment` for details. [Api set: ExcelApi 1.9]</field>;
-				/// <field name="verticalOverflow" type="String">Represents the vertical overflow behavior of the text frame. See Excel.ShapeTextVerticalOverflow` for details. [Api set: ExcelApi 1.9]</field>;
+				/// <field name="verticalOverflow" type="String">Represents the vertical overflow behavior of the text frame. See `Excel.ShapeTextVerticalOverflow` for details. [Api set: ExcelApi 1.9]</field>;
 			}
 			return TextFrameUpdateData;
 		})();
@@ -23199,7 +23369,7 @@ var Word;
 		}
 		Body.prototype.getHtml = function() {
 			/// <summary>
-			/// Gets an HTML representation of the body object. When rendered in a web page or HTML viewer, the formatting will be a close, but not exact, match for of the formatting of the document. This method does not return the exact same HTML for the same document on different platforms (Windows, Mac, Word Online, etc.). If you need exact fidelity, or consistency across platforms, use `Body.getOoxml()` and convert the returned XML to HTML. [Api set: WordApi 1.1]
+			/// Gets an HTML representation of the body object. When rendered in a web page or HTML viewer, the formatting will be a close, but not exact, match for of the formatting of the document. This method does not return the exact same HTML for the same document on different platforms (Windows, Mac, Word on the web, etc.). If you need exact fidelity, or consistency across platforms, use `Body.getOoxml()` and convert the returned XML to HTML. [Api set: WordApi 1.1]
 			/// </summary>
 			/// <returns type="OfficeExtension.ClientResult&lt;string&gt;"></returns>
 			var result = new OfficeExtension.ClientResult();
@@ -23342,6 +23512,9 @@ var Word;
 		"header": "header",
 		"footer": "footer",
 		"tableCell": "tableCell",
+		"footnote": "footnote",
+		"endnote": "endnote",
+		"noteItem": "noteItem",
 	}
 	Word.BodyType = BodyType;
 })(Word || (Word = {__proto__: null}));
@@ -23450,7 +23623,7 @@ var Word;
 			/// <field name="parentTableCell" type="Word.TableCell">Gets the table cell that contains the content control. Throws an error if it is not contained in a table cell. Read-only. [Api set: WordApi 1.3]</field>
 			/// <field name="parentTableCellOrNullObject" type="Word.TableCell">Gets the table cell that contains the content control. Returns a null object if it is not contained in a table cell. Read-only. [Api set: WordApi 1.3]</field>
 			/// <field name="parentTableOrNullObject" type="Word.Table">Gets the table that contains the content control. Returns a null object if it is not contained in a table. Read-only. [Api set: WordApi 1.3]</field>
-			/// <field name="placeholderText" type="String">Gets or sets the placeholder text of the content control. Dimmed text will be displayed when the content control is empty. [Api set: WordApi 1.1]</field>
+			/// <field name="placeholderText" type="String">Gets or sets the placeholder text of the content control. Dimmed text will be displayed when the content control is empty.              **Note**: The set operation for this property is not supported in Word on the web. [Api set: WordApi 1.1]</field>
 			/// <field name="removeWhenEdited" type="Boolean">Gets or sets a value that indicates whether the content control is removed after it is edited. Mutually exclusive with cannotDelete. [Api set: WordApi 1.1]</field>
 			/// <field name="style" type="String">Gets or sets the style name for the content control. Use this property for custom styles and localized style names. To use the built-in styles that are portable between locales, see the &quot;styleBuiltIn&quot; property. [Api set: WordApi 1.1]</field>
 			/// <field name="styleBuiltIn" type="String">Gets or sets the built-in style name for the content control. Use this property for built-in styles that are portable between locales. To use custom styles or localized style names, see the &quot;style&quot; property. [Api set: WordApi 1.3]</field>
@@ -23499,7 +23672,7 @@ var Word;
 		}
 		ContentControl.prototype.getHtml = function() {
 			/// <summary>
-			/// Gets an HTML representation of the content control object. When rendered in a web page or HTML viewer, the formatting will be a close, but not exact, match for of the formatting of the document. This method does not return the exact same HTML for the same document on different platforms (Windows, Mac, Word Online, etc.). If you need exact fidelity, or consistency across platforms, use `ContentControl.getOoxml()` and convert the returned XML to HTML. [Api set: WordApi 1.1]
+			/// Gets an HTML representation of the content control object. When rendered in a web page or HTML viewer, the formatting will be a close, but not exact, match for of the formatting of the document. This method does not return the exact same HTML for the same document on different platforms (Windows, Mac, Word on the web, etc.). If you need exact fidelity, or consistency across platforms, use `ContentControl.getOoxml()` and convert the returned XML to HTML. [Api set: WordApi 1.1]
 			/// </summary>
 			/// <returns type="OfficeExtension.ClientResult&lt;string&gt;"></returns>
 			var result = new OfficeExtension.ClientResult();
@@ -23783,7 +23956,7 @@ var Word;
 			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
 			/// <field name="key" type="String">Gets the key of the custom property. Read only. [Api set: WordApi 1.3]</field>
 			/// <field name="type" type="String">Gets the value type of the custom property. Possible values are: String, Number, Date, Boolean. Read only. [Api set: WordApi 1.3]</field>
-			/// <field name="value" >Gets or sets the value of the custom property. Note that even though Word Online and the docx file format allow these properties to be arbitrarily long, the desktop version of Word will truncate string values to 255 16-bit chars (possibly creating invalid unicode by breaking up a surrogate pair). [Api set: WordApi 1.3]</field>
+			/// <field name="value" >Gets or sets the value of the custom property. Note that even though Word on the web and the docx file format allow these properties to be arbitrarily long, the desktop version of Word will truncate string values to 255 16-bit chars (possibly creating invalid unicode by breaking up a surrogate pair). [Api set: WordApi 1.3]</field>
 		}
 
 		CustomProperty.prototype.load = function(option) {
@@ -23918,7 +24091,7 @@ var Word;
 			/// <summary> The Document object is the top level object. A Document object contains one or more sections, content controls, and the body that contains the contents of the document. [Api set: WordApi 1.1] </summary>
 			/// <field name="context" type="Word.RequestContext">The request context associated with this object.</field>
 			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
-			/// <field name="body" type="Word.Body">Gets the body object of the document. The body is the text that excludes headers, footers, footnotes, textboxes, etc.. Read-only. [Api set: WordApi 1.1]</field>
+			/// <field name="body" type="Word.Body">Gets the body object of the main document. The body is the text that excludes headers, footers, footnotes, textboxes, etc.. Read-only. [Api set: WordApi 1.1]</field>
 			/// <field name="contentControls" type="Word.ContentControlCollection">Gets the collection of content control objects in the document. This includes content controls in the body of the document, headers, footers, textboxes, etc.. Read-only. [Api set: WordApi 1.1]</field>
 			/// <field name="properties" type="Word.DocumentProperties">Gets the properties of the document. Read-only. [Api set: WordApi 1.3]</field>
 			/// <field name="saved" type="Boolean">Indicates whether the changes in the document have been saved. A value of true indicates that the document hasn&apos;t changed since it was saved. Read-only. [Api set: WordApi 1.1]</field>
@@ -24816,6 +24989,17 @@ var Word;
 
 var Word;
 (function (Word) {
+	/// <summary> Note item type [Api set: WordApi] </summary>
+	var NoteItemType = {
+		__proto__: null,
+		"footnote": "footnote",
+		"endnote": "endnote",
+	}
+	Word.NoteItemType = NoteItemType;
+})(Word || (Word = {__proto__: null}));
+
+var Word;
+(function (Word) {
 	var Paragraph = (function(_super) {
 		__extends(Paragraph, _super);
 		function Paragraph() {
@@ -24904,7 +25088,7 @@ var Word;
 		}
 		Paragraph.prototype.getHtml = function() {
 			/// <summary>
-			/// Gets an HTML representation of the paragraph object. When rendered in a web page or HTML viewer, the formatting will be a close, but not exact, match for of the formatting of the document. This method does not return the exact same HTML for the same document on different platforms (Windows, Mac, Word Online, etc.). If you need exact fidelity, or consistency across platforms, use `Paragraph.getOoxml()` and convert the returned XML to HTML. [Api set: WordApi 1.1]
+			/// Gets an HTML representation of the paragraph object. When rendered in a web page or HTML viewer, the formatting will be a close, but not exact, match for of the formatting of the document. This method does not return the exact same HTML for the same document on different platforms (Windows, Mac, Word on the web, etc.). If you need exact fidelity, or consistency across platforms, use `Paragraph.getOoxml()` and convert the returned XML to HTML. [Api set: WordApi 1.1]
 			/// </summary>
 			/// <returns type="OfficeExtension.ClientResult&lt;string&gt;"></returns>
 			var result = new OfficeExtension.ClientResult();
@@ -25234,7 +25418,7 @@ var Word;
 		}
 		Range.prototype.getHtml = function() {
 			/// <summary>
-			/// Gets an HTML representation of the range object. When rendered in a web page or HTML viewer, the formatting will be a close, but not exact, match for of the formatting of the document. This method does not return the exact same HTML for the same document on different platforms (Windows, Mac, Word Online, etc.). If you need exact fidelity, or consistency across platforms, use `Range.getOoxml()` and convert the returned XML to HTML. [Api set: WordApi 1.1]
+			/// Gets an HTML representation of the range object. When rendered in a web page or HTML viewer, the formatting will be a close, but not exact, match for of the formatting of the document. This method does not return the exact same HTML for the same document on different platforms (Windows, Mac, Word on the web, etc.). If you need exact fidelity, or consistency across platforms, use `Range.getOoxml()` and convert the returned XML to HTML. [Api set: WordApi 1.1]
 			/// </summary>
 			/// <returns type="OfficeExtension.ClientResult&lt;string&gt;"></returns>
 			var result = new OfficeExtension.ClientResult();
@@ -26665,7 +26849,7 @@ var Word;
 				/// <field name="cannotDelete" type="Boolean">Gets or sets a value that indicates whether the user can delete the content control. Mutually exclusive with removeWhenEdited. [Api set: WordApi 1.1]</field>;
 				/// <field name="cannotEdit" type="Boolean">Gets or sets a value that indicates whether the user can edit the contents of the content control. [Api set: WordApi 1.1]</field>;
 				/// <field name="color" type="String">Gets or sets the color of the content control. Color is specified in &apos;#RRGGBB&apos; format or by using the color name. [Api set: WordApi 1.1]</field>;
-				/// <field name="placeholderText" type="String">Gets or sets the placeholder text of the content control. Dimmed text will be displayed when the content control is empty. [Api set: WordApi 1.1]</field>;
+				/// <field name="placeholderText" type="String">Gets or sets the placeholder text of the content control. Dimmed text will be displayed when the content control is empty.              **Note**: The set operation for this property is not supported in Word on the web. [Api set: WordApi 1.1]</field>;
 				/// <field name="removeWhenEdited" type="Boolean">Gets or sets a value that indicates whether the content control is removed after it is edited. Mutually exclusive with cannotDelete. [Api set: WordApi 1.1]</field>;
 				/// <field name="style" type="String">Gets or sets the style name for the content control. Use this property for custom styles and localized style names. To use the built-in styles that are portable between locales, see the &quot;styleBuiltIn&quot; property. [Api set: WordApi 1.1]</field>;
 				/// <field name="styleBuiltIn" type="String">Gets or sets the built-in style name for the content control. Use this property for built-in styles that are portable between locales. To use custom styles or localized style names, see the &quot;style&quot; property. [Api set: WordApi 1.3]</field>;
@@ -26686,7 +26870,7 @@ var Word;
 		var CustomPropertyUpdateData = (function() {
 			function CustomPropertyUpdateData() {
 				/// <summary>An interface for updating data on the CustomProperty object, for use in "customProperty.set({ ... })".</summary>
-				/// <field name="value" >Gets or sets the value of the custom property. Note that even though Word Online and the docx file format allow these properties to be arbitrarily long, the desktop version of Word will truncate string values to 255 16-bit chars (possibly creating invalid unicode by breaking up a surrogate pair). [Api set: WordApi 1.3]</field>;
+				/// <field name="value" >Gets or sets the value of the custom property. Note that even though Word on the web and the docx file format allow these properties to be arbitrarily long, the desktop version of Word will truncate string values to 255 16-bit chars (possibly creating invalid unicode by breaking up a surrogate pair). [Api set: WordApi 1.3]</field>;
 			}
 			return CustomPropertyUpdateData;
 		})();
@@ -26702,7 +26886,7 @@ var Word;
 		var DocumentUpdateData = (function() {
 			function DocumentUpdateData() {
 				/// <summary>An interface for updating data on the Document object, for use in "document.set({ ... })".</summary>
-				/// <field name="body" type="Word.Interfaces.BodyUpdateData">Gets the body object of the document. The body is the text that excludes headers, footers, footnotes, textboxes, etc.. [Api set: WordApi 1.1]</field>
+				/// <field name="body" type="Word.Interfaces.BodyUpdateData">Gets the body object of the main document. The body is the text that excludes headers, footers, footnotes, textboxes, etc.. [Api set: WordApi 1.1]</field>
 				/// <field name="properties" type="Word.Interfaces.DocumentPropertiesUpdateData">Gets the properties of the document. [Api set: WordApi 1.3]</field>
 				/// <field name="allowCloseOnUntitled" type="Boolean">Gets or sets a value that indicates that, when opening a new document, whether it is allowed to close this document even if this document is untitled. True to close, false otherwise. [Api set: WordApi]</field>;
 			}

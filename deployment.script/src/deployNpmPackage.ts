@@ -95,6 +95,6 @@ function updatePackageVersion(packageJsonPath: string, version: string) {
   standardFile.writeFileJson(packageJsonPath, packageData);
 }
 
-function generateCommand(...parts: Array<string|null>) {
+function generateCommand(...parts: Array<string | null>) {
   return parts.filter((part) => part != null).join(" ");
 }

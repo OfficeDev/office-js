@@ -1144,7 +1144,7 @@ var OTel;
         function OTelLogger() {
         }
         OTelLogger.loaded = function () {
-            return !(OTelLogger.logger === undefined);
+            return !(OTelLogger.logger === undefined || OTelLogger.sink === undefined);
         };
         OTelLogger.getOtelSinkCDNLocation = function () {
             return (OSF._OfficeAppFactory.getLoadScriptHelper().getOfficeJsBasePath() + CDN_PATH_OTELJS_AGAVE);
@@ -1208,23 +1208,49 @@ var OTel;
                 'App.Version': version,
                 'Session.Id': OTelLogger.ensureValue(info.correlationId, "00000000-0000-0000-0000-000000000000")
             };
-            var sink = oteljs_agave.AgaveSink.createInstance(context);
             var namespace = "Office.Extensibility.OfficeJs";
             var ariaTenantToken = 'db334b301e7b474db5e0f02f07c51a47-a1b5bc36-1bbe-482f-a64a-c2d9cb606706-7439';
             var nexusTenantToken = 1755;
-            var logger = new oteljs.TelemetryLogger(undefined, fields);
-            logger.addSink(sink);
+            var logger = new oteljs.SimpleTelemetryLogger(undefined, fields);
             logger.setTenantToken(namespace, ariaTenantToken, nexusTenantToken);
+            if (oteljs.AgaveSink) {
+                OTelLogger.sink = oteljs.AgaveSink.createInstance(context);
+            }
+            if (OTelLogger.sink === undefined) {
+                OTelLogger.attachLegacyAgaveSink(context);
+            }
+            else {
+                logger.addSink(OTelLogger.sink);
+            }
             return logger;
+        };
+        OTelLogger.attachLegacyAgaveSink = function (context) {
+            var afterLoadOtelSink = function () {
+                if (typeof oteljs_agave !== "undefined") {
+                    OTelLogger.sink = oteljs_agave.AgaveSink.createInstance(context);
+                }
+                if (OTelLogger.sink === undefined || OTelLogger.logger === undefined) {
+                    OTelLogger.Enabled = false;
+                    OTelLogger.promises = [];
+                    OTelLogger.logger = undefined;
+                    OTelLogger.sink = undefined;
+                    return;
+                }
+                OTelLogger.logger.addSink(OTelLogger.sink);
+                OTelLogger.promises.forEach(function (resolve) {
+                    resolve();
+                });
+            };
+            var timeoutAfterFiveSeconds = 5000;
+            OSF.OUtil.loadScript(OTelLogger.getOtelSinkCDNLocation(), afterLoadOtelSink, timeoutAfterFiveSeconds);
         };
         OTelLogger.initialize = function (info) {
             if (!OTelLogger.Enabled) {
                 OTelLogger.promises = [];
                 return;
             }
-            var timeoutAfterOneSecond = 1000;
             var afterOnReady = function () {
-                if ((typeof oteljs === "undefined") || (typeof oteljs_agave === "undefined")) {
+                if ((typeof oteljs === "undefined")) {
                     return;
                 }
                 if (!OTelLogger.loaded()) {
@@ -1236,15 +1262,21 @@ var OTel;
                     });
                 }
             };
-            var afterLoadOtelSink = function () {
-                Microsoft.Office.WebExtension.onReadyInternal().then(function () { return afterOnReady(); });
-            };
-            OSF.OUtil.loadScript(OTelLogger.getOtelSinkCDNLocation(), afterLoadOtelSink, timeoutAfterOneSecond);
+            Microsoft.Office.WebExtension.onReadyInternal().then(function () { return afterOnReady(); });
         };
         OTelLogger.sendTelemetryEvent = function (telemetryEvent) {
             OTelLogger.onTelemetryLoaded(function () {
                 try {
                     OTelLogger.logger.sendTelemetryEvent(telemetryEvent);
+                }
+                catch (e) {
+                }
+            });
+        };
+        OTelLogger.sendCustomerContent = function (customerContentEvent) {
+            OTelLogger.onTelemetryLoaded(function () {
+                try {
+                    OTelLogger.logger.sendCustomerContent(customerContentEvent);
                 }
                 catch (e) {
                 }
@@ -1357,7 +1389,7 @@ var g_isOfflineLibrary = g_isOfflineLibrary || false;
 (function () {
     var previousConstantNames = OSF.ConstantNames || {};
     OSF.ConstantNames = {
-        FileVersion: "16.0.13927.10000",
+        FileVersion: "16.0.14307.10001",
         OfficeJS: "office.js",
         OfficeDebugJS: "office.debug.js",
         DefaultLocale: "en-us",
@@ -1482,6 +1514,7 @@ OSF._OfficeAppFactory = (function OSF__OfficeAppFactory() {
     Microsoft.Office.WebExtension.sendTelemetryEvent = function Microsoft_Office_WebExtension_sendTelemetryEvent(telemetryEvent) {
         OTel.OTelLogger.sendTelemetryEvent(telemetryEvent);
     };
+    Microsoft.Office.WebExtension.telemetrySink = OTel.OTelLogger;
     Microsoft.Office.WebExtension.onReadyInternal = function Microsoft_Office_WebExtension_onReadyInternal(callback) {
         if (_isOfficeJsLoaded) {
             var host_1 = _officeOnReadyHostAndPlatformInfo.host, platform_1 = _officeOnReadyHostAndPlatformInfo.platform, addin_1 = _officeOnReadyHostAndPlatformInfo.addin;
@@ -1915,8 +1948,14 @@ OSF._OfficeAppFactory = (function OSF__OfficeAppFactory() {
             var msAjaxCDNPath = (window.location.protocol.toLowerCase() === 'https:' ? 'https:' : 'http:') + '//ajax.aspnetcdn.com/ajax/3.5/MicrosoftAjax.js';
             _loadScriptHelper.loadScriptParallel(msAjaxCDNPath, OSF.ConstantNames.MicrosoftAjaxId);
         }
+        var originalWindowConfirm = window.confirm;
         window.confirm = function OSF__OfficeAppFactory_initialize$confirm(message) {
-            throw new Error('Function window.confirm is not supported.');
+            if (_hostInfo.hostPlatform == "web" && _hostInfo.isDialog) {
+                return originalWindowConfirm(message);
+            }
+            else {
+                throw new Error('Function window.confirm is not supported.');
+            }
         };
         window.alert = function OSF__OfficeAppFactory_initialize$alert(message) {
             throw new Error('Function window.alert is not supported.');
@@ -2373,9 +2412,8 @@ var oteljs = function(modules) {
         function SimpleTelemetryLogger(parent, persistentDataFields, config) {
             var _a, _b;
             this.onSendEvent = new Event.a, this.persistentDataFields = [], this.config = config || {}, 
-            parent ? (this.onSendEvent = parent.onSendEvent, (_a = this.persistentDataFields).push.apply(_a, parent.persistentDataFields), 
-            this.config = __assign(__assign({}, parent.getConfig()), this.config)) : this.persistentDataFields.push(Object(DataFieldHelper.e)("OTelJS.Version", "3.1.70")), 
-            persistentDataFields && (_b = this.persistentDataFields).push.apply(_b, persistentDataFields);
+            parent && (this.onSendEvent = parent.onSendEvent, (_a = this.persistentDataFields).push.apply(_a, parent.persistentDataFields), 
+            this.config = __assign(__assign({}, parent.getConfig()), this.config)), persistentDataFields && (_b = this.persistentDataFields).push.apply(_b, persistentDataFields);
         }
         return SimpleTelemetryLogger.prototype.sendTelemetryEvent = function(event) {
             var localEvent;
@@ -2393,7 +2431,8 @@ var oteljs = function(modules) {
         }, SimpleTelemetryLogger.prototype.processTelemetryEvent = function(event) {
             var _a;
             event.telemetryProperties || (event.telemetryProperties = TenantTokenManager_TenantTokenManager.getTenantTokens(event.eventName)), 
-            event.dataFields && this.persistentDataFields && (_a = event.dataFields).unshift.apply(_a, this.persistentDataFields), 
+            event.dataFields && (event.dataFields.unshift(Object(DataFieldHelper.e)("OTelJS.Version", "3.1.74")), 
+            this.persistentDataFields && (_a = event.dataFields).unshift.apply(_a, this.persistentDataFields)), 
             this.config.disableValidation || TelemetryEventValidator_TelemetryEventValidator.validateTelemetryEvent(event);
         }, SimpleTelemetryLogger.prototype.addSink = function(sink) {
             this.onSendEvent.addListener((function(event) {

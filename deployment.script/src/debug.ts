@@ -11,6 +11,7 @@ export function debug(env: EnvironmentVariables) {
     "TRAVIS",
     "TRAVIS_BRANCH",
     "TRAVIS_PULL_REQUEST",
+    "TRAVIS_BUILD_DIR",
   ];
 
   const fields = fieldsToPrint.map((item) => `"${item}": "${env[item]}"`).join(",\n");

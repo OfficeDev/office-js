@@ -3,7 +3,7 @@ _u.ExtensibilityStrings = function()
 {
 };
 _u.ExtensibilityStrings.registerClass("_u.ExtensibilityStrings");
-_u.ExtensibilityStrings.l_APICallFailedDueToItemChange_Text = "Izbrani element je bil spremenjen."
+_u.ExtensibilityStrings.l_APICallFailedDueToItemChange_Text = "Izbrani element je bil spremenjen.";
 _u.ExtensibilityStrings.l_API_Not_Supported_By_ExtensionPoint_Error_Text = "API ni podprt za razširitveno točko.";
 _u.ExtensibilityStrings.l_API_Not_Supported_For_Shared_Folders_Error = "Vmesnik API ni podprt za mape v skupni rabi.";
 _u.ExtensibilityStrings.l_ActionsDefinitionMultipleActionsError_Text = "Trenutno je podprto le eno dejanje.";
@@ -17,7 +17,7 @@ _u.ExtensibilityStrings.l_AttachmentNameTooLong_Text = "Eno ime ali več imen pr
 _u.ExtensibilityStrings.l_AttachmentNotSupported_Text = "Vrsta priloge ni podprta.";
 _u.ExtensibilityStrings.l_AttachmentUploadGeneralFailure_Text = "Elementu ni mogoče dodati priloge.";
 _u.ExtensibilityStrings.l_AttachmentUrlTooLong_Text = "En URL ali več URL-jev priloge je predolgih.";
-_u.ExtensibilityStrings.l_Attachment_Download_Failed_Generic_Error = "Prenos priloge ni uspel.";
+_u.ExtensibilityStrings.l_Attachment_Download_Failed_Generic_Error = "Prenos priloge ni uspel."
 _u.ExtensibilityStrings.l_Attachment_Resource_Not_Found = "Priloge ni mogoče najti.";
 _u.ExtensibilityStrings.l_Attachment_Resource_UnAuthorizedAccess = "Nepooblaščen dostop do priloge.";
 _u.ExtensibilityStrings.l_CallSaveAsyncBeforeToken_Text = "Žetona ni mogoče dobiti, dokler element ni shranjen.";

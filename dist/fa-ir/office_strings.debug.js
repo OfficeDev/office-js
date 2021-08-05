@@ -15,7 +15,7 @@ Strings.OfficeOM.L_AppNotExistInitializeNotCalled = "برنامه {0} موجود
 Strings.OfficeOM.L_AttemptingToSetReadOnlyProperty = "تلاش برای تنظیم ویژگی فقط خواندنی «{0}».";
 Strings.OfficeOM.L_BadSelectorString = "رشته وارد شده به انتخابگر به درستی قالب بندی نشده است یا پشتیبانی نمی شود.";
 Strings.OfficeOM.L_BindingCreationError = "خطای ایجاد پیوند اجزا";
-Strings.OfficeOM.L_BindingNotExist = "پیوستگی معین شده وجود ندارد.";
+Strings.OfficeOM.L_BindingNotExist = "پیوستگی معین شده وجود ندارد."
 Strings.OfficeOM.L_BindingToMultipleSelection = "انتخاب های کنارهم پشتیبانی نمی شود.";
 Strings.OfficeOM.L_BrowserAPINotSupported = "این مرورگر از API درخواستی پشتیبانی نمی کند.";
 Strings.OfficeOM.L_CallbackNotAFunction = "بازگشت تماس باید از نوع کارکردی باشد، از نوع {0} بود.";
@@ -31,6 +31,7 @@ Strings.OfficeOM.L_CoercionTypeNotSupported = "نوع تبدیل داده معی
 Strings.OfficeOM.L_ColIndexOutOfRange = "مقدار فهرست ستون خارج از محدوده مجاز است. از مقداری (0 یا بیشتر) استفاده کنید که کمتر از تعداد ستون ها باشد.";
 Strings.OfficeOM.L_ConfirmCancelMessage = "با عرض پوزش، نمی‌توانیم ادامه دهیم.";
 Strings.OfficeOM.L_ConfirmDialog = "آیا به دامنه {0} که این جلسه Office در آن میزبانی می‌شود اعتماد دارید؟";
+Strings.OfficeOM.L_ConfirmDialogApiTrustsParent = "شما در آستانه ارسال و دریافت اطلاعات بالقوه حساسی از طرف {0} هستید. فقط در صورتی که به این وب سایت که اطلاعات حساس {1} را دریافت می‌کند، اعتماد دارید «تأیید» را کلیک کنید.";
 Strings.OfficeOM.L_ConfirmRefreshMessage = "برای ادامه، افزونه را حذف و دوباره آن را اضافه کنید، یا صفحه را تازه‌سازی کنید.";
 Strings.OfficeOM.L_ConnectionFailureWithDetails = "درخواست با کد وضعیت {0}، کد خطای {1} و پیام خطای زیر انجام نشد: {2}";
 Strings.OfficeOM.L_ConnectionFailureWithStatus = "درخواست با کد وضعیت {0} انجام نشد.";
@@ -45,7 +46,7 @@ Strings.OfficeOM.L_CustomXmlExceedQuotaName = "به حد مجاز انتخاب �
 Strings.OfficeOM.L_CustomXmlNodeNotFound = "گره معین شده یافت نشد.";
 Strings.OfficeOM.L_CustomXmlOutOfDateMessage = "داده‌ها قدیمی است. جسم را دوباره بازیابی کنید.";
 Strings.OfficeOM.L_CustomXmlOutOfDateName = "داده‌ها به‌روز نیستند";
-Strings.OfficeOM.L_DataNotMatchBindingSize = "شیء داده تأمینی با اندازه مورد انتخابی فعلی مطابقت ندارد."
+Strings.OfficeOM.L_DataNotMatchBindingSize = "شیء داده تأمینی با اندازه مورد انتخابی فعلی مطابقت ندارد.";
 Strings.OfficeOM.L_DataNotMatchBindingType = "شیء داده معین شده با این نوع پیوستگی سازگار نیست.";
 Strings.OfficeOM.L_DataNotMatchCoercionType = "نوع شیء داده معین شده با مورد انتخابی فعلی سازگار نیست.";
 Strings.OfficeOM.L_DataNotMatchSelection = "شیء داده تأمینی با شکل و ابعاد مورد انتخابی فعلی مطابقت ندارد.";

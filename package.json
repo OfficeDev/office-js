@@ -7,7 +7,7 @@
         "Office JavaScript API",
         "Office"
     ],
-    "homepage": "https://dev.office.com/docs/add-ins/overview/office-add-ins",
+    "homepage": "https://docs.microsoft.com/office/dev/add-ins/",
     "bugs": {
         "url": "https://stackoverflow.com/questions/tagged/office-js"
     },
@@ -22,10 +22,6 @@
         "embedded"
     ],
     "scripts": {
-    },
-    "repository": {
-        "type": "git",
-        "url": "https://github.com/OfficeDev/office-js.git"
     },
     "engines": {
         "node": ">=6.9.4"

@@ -3,7 +3,7 @@ _u.ExtensibilityStrings = function()
 {
 };
 _u.ExtensibilityStrings.registerClass("_u.ExtensibilityStrings");
-_u.ExtensibilityStrings.l_APICallFailedDueToItemChange_Text = "चयनित आइटम बदला गया है."
+_u.ExtensibilityStrings.l_APICallFailedDueToItemChange_Text = "चयनित आइटम बदला गया है.";
 _u.ExtensibilityStrings.l_API_Not_Supported_By_ExtensionPoint_Error_Text = "API, एक्सटेंशन पॉइंट के लिए समर्थित नहीं है.";
 _u.ExtensibilityStrings.l_API_Not_Supported_For_Shared_Folders_Error = "साझा किए गए फ़ोल्डर के लिए API समर्थित नहीं है.";
 _u.ExtensibilityStrings.l_ActionsDefinitionMultipleActionsError_Text = "वर्तमान में केवल कोई एकल क्रिया समर्थित है.";
@@ -63,7 +63,7 @@ _u.ExtensibilityStrings.l_NullOrEmptyParameterError_Text = "पैरामी�
 _u.ExtensibilityStrings.l_NumberOfNotificationsExceeded_Text = "अधिसूचना जोड़ी नहीं जा सकी क्योंकि अधिसूचना सीमा पूरी हो गई है.";
 _u.ExtensibilityStrings.l_NumberOfRecipientsExceeded_Text = "फ़ील्ड में प्राप्तकर्ताओं की कुल संख्या {0} को पार नहीं कर सकती.";
 _u.ExtensibilityStrings.l_OffsetNotfound_Text = "इस टाइम स्टाम्प के लिए ऑफ़सेट ढूँढ़ा नहीं जा सका.";
-_u.ExtensibilityStrings.l_Olk_Http_Error_Text = "अनुरोध विफल हुआ. कृपया HTTP त्रुटि कोड के लिए नैदानिक ऑब्जेक्ट देखें.";
+_u.ExtensibilityStrings.l_Olk_Http_Error_Text = "अनुरोध विफल हुआ. कृपया HTTP त्रुटि कोड के लिए नैदानिक ऑब्जेक्ट देखें."
 _u.ExtensibilityStrings.l_OnlineMeetingsUserDenied_Text = "उपयोगकर्ता ने अस्वीकृत किया.";
 _u.ExtensibilityStrings.l_ParameterValueTooLongError_Text = "'{0}' पैरामीटर का मान बहुत लंबा है. वर्णों की अधिकतम संख्या '{1}' है.";
 _u.ExtensibilityStrings.l_ParametersNotAsExpected_Text = "प्रदत्त पैरामीटर्स अपेक्षित स्वरूप से मेल नहीं खाते.";

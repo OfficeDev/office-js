@@ -15,7 +15,7 @@ Strings.OfficeOM.L_AppNotExistInitializeNotCalled = "ایپلی کیشن {0} م�
 Strings.OfficeOM.L_AttemptingToSetReadOnlyProperty = "فقط مطالعہ خاصیت '{0}' سیٹ کرنے کی کوشش کی جا رہی ہے۔";
 Strings.OfficeOM.L_BadSelectorString = "انتخاب میں پاس کردہ اسٹرنگ نامناسب وضع شدہ یا غیر معاون ہے۔";
 Strings.OfficeOM.L_BindingCreationError = "بائنڈنگ تخلیقی نقص";
-Strings.OfficeOM.L_BindingNotExist = "اختصاصی بائنڈنگ موجود نہیں۔";
+Strings.OfficeOM.L_BindingNotExist = "اختصاصی بائنڈنگ موجود نہیں۔"
 Strings.OfficeOM.L_BindingToMultipleSelection = "نونکونٹگواس انتخابات کی معاونت نہیں کی جاتی۔";
 Strings.OfficeOM.L_BrowserAPINotSupported = "یہ براؤزر درخواست کردہ API کی معاونت نہیں کرتا۔";
 Strings.OfficeOM.L_CallbackNotAFunction = "واپس کال فعل کی قسم ہونی چاہئے، جو {0} کی قسم تھی۔";
@@ -31,6 +31,7 @@ Strings.OfficeOM.L_CoercionTypeNotSupported = "اختصاصی جبر کی قسم
 Strings.OfficeOM.L_ColIndexOutOfRange = "قدر کا اشاریہ کالم اجازت یافتہ حد اطلاق سے باہر ہے۔ (0 یا اعلی) قدر جو کالموں کی تعداد کے مقابلہ میں کم ہو اسے استعمال کریں۔";
 Strings.OfficeOM.L_ConfirmCancelMessage = "معافی چاہتے ہیں، ہم جاری نہیں رکھ سکتے۔";
 Strings.OfficeOM.L_ConfirmDialog = "کیا آپ اس عمل داری {0} پر بھروسا کرتے ہیں جہاں یہ Office سیشن میزبان ہے؟";
+Strings.OfficeOM.L_ConfirmDialogApiTrustsParent = "آپ ممکنہ طور پر {0} کی جانب سے حساس معلومات بھیجنے اور وصول کرنے جا رہے ہیں۔ جب آپ کو بھروسہ ہو کہ مندرجہ ذیل ویب سائٹ وہ حساس معلومات وصول کرے، صرف تب اوکے پر کلک کریں: {1}۔";
 Strings.OfficeOM.L_ConfirmRefreshMessage = "جاری رکھنے کے لئے، ایڈ کو ہٹائیں اور اسے دوبارہ شامل کریں، یا صفحہ کو تازہ دم کریں۔";
 Strings.OfficeOM.L_ConnectionFailureWithDetails = "{0} کے حالت کوڈ کے ساتھ درخواست ناکام ہوگئی، نقص کوڈ {1} اور مندرجہ زیل نقص پیغام: {2}";
 Strings.OfficeOM.L_ConnectionFailureWithStatus = "{0} کے حالت کوڈ کے ساتھ درخواست ناکام ہوگئی۔";
@@ -191,7 +192,7 @@ Strings.OfficeOM.L_TooManyOptionalObjects = "پیرامیٹر فہرست میں 
 Strings.OfficeOM.L_UnknownBindingType = "بائنڈنگ قسم معاون نہیں ہے۔";
 Strings.OfficeOM.L_UnsupportedDataObject = "فراہم کردہ کوائف آبجیکٹ کی قسم غیر معاون ہے۔";
 Strings.OfficeOM.L_UnsupportedEnumeration = "غیر تائید شدہ اعداد و شمار";
-Strings.OfficeOM.L_UnsupportedEnumerationMessage = "اعداد و شمار میں موجودہ میزبان ایپلیکیشن تائیدشدہ نہیں ہے۔"
+Strings.OfficeOM.L_UnsupportedEnumerationMessage = "اعداد و شمار میں موجودہ میزبان ایپلیکیشن تائیدشدہ نہیں ہے۔";
 Strings.OfficeOM.L_UnsupportedUserIdentity = "صارف شناخت معاونت شدہ نہیں ہے۔";
 Strings.OfficeOM.L_UnsupportedUserIdentityMessage = "صارف کی شناخت قسم معاونت شدہ نہیں ہے۔";
 Strings.OfficeOM.L_UserAborted = "صارف نے رضامندی درخواست کو روک دیا۔";

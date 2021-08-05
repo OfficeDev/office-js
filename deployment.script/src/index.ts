@@ -1,5 +1,4 @@
 import * as environment from "./EnvironmentVariables";
-import * as standardFile from "./standardFile";
 
 import { EnvironmentVariables } from "./EnvironmentVariables";
 import { debug, banner } from "./debug";
@@ -34,7 +33,7 @@ custom:
     tag: custom
 */
 console.log("Deployment Script: Start");
-const env: environment.EnvironmentVariables = environment.getEnvironmentVariables();
+const env: EnvironmentVariables = environment.getEnvironmentVariables();
 
 // Printing for debug purposes
 // debug(env);

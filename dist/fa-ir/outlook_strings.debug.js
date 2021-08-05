@@ -10,7 +10,7 @@ _u.ExtensibilityStrings.l_ActionsDefinitionMultipleActionsError_Text = "در ح�
 _u.ExtensibilityStrings.l_ActionsDefinitionWrongNotificationMessageError_Text = "امکان شرح این نوع پیام اعلان وجود ندارد.";
 _u.ExtensibilityStrings.l_AttachmentDeleteGeneralFailure_Text = "پیوست را نمی‌توان از این مورد حذف کرد.";
 _u.ExtensibilityStrings.l_AttachmentDeletedBeforeUploadCompletes_Text = "کاربر قبل از تکمیل شدن بارگذاری پیوست، آن را حذف کرد.";
-_u.ExtensibilityStrings.l_AttachmentErrorName_Text = "خطای پیوست";
+_u.ExtensibilityStrings.l_AttachmentErrorName_Text = "خطای پیوست"
 _u.ExtensibilityStrings.l_AttachmentExceededSize_Text = "پیوست را نمی‌توان اضافه کرد زیرا بیش از اندازه بزرگ است.";
 _u.ExtensibilityStrings.l_AttachmentItemIdTooLong_Text = "یک یا چند مورد از شناسه‌های پیوست بیش از حد طولانی هستند.";
 _u.ExtensibilityStrings.l_AttachmentNameTooLong_Text = "یک یا چند مورد از نام‌های پیوست بیش از حد طولانی هستند.";
@@ -60,7 +60,7 @@ _u.ExtensibilityStrings.l_Missing_Extended_Permissions_For_API = "مجوز تم�
 _u.ExtensibilityStrings.l_NoValidRecipientsProvided_Text = "گیرنده معتبری ارائه نشده است.";
 _u.ExtensibilityStrings.l_NotificationKeyNotFound_Text = "هیچ اعلانی همراه با کلید ارائه‌شده وجود ندارد.";
 _u.ExtensibilityStrings.l_NullOrEmptyParameterError_Text = "پارامتر '{0}' الزامی است و نباید تهی یا خالی باشد.";
-_u.ExtensibilityStrings.l_NumberOfNotificationsExceeded_Text = "افزودن اعلان امکان‌پذیر نیست زیرا به حد مجاز اعلان رسیده است."
+_u.ExtensibilityStrings.l_NumberOfNotificationsExceeded_Text = "افزودن اعلان امکان‌پذیر نیست زیرا به حد مجاز اعلان رسیده است.";
 _u.ExtensibilityStrings.l_NumberOfRecipientsExceeded_Text = "تعداد کل گیرندگان در کارد نباید بیشتر از {0} باشد.";
 _u.ExtensibilityStrings.l_OffsetNotfound_Text = "افستی برای این مهر زمان یافت نشد.";
 _u.ExtensibilityStrings.l_Olk_Http_Error_Text = "این درخواست انجام نشد. لطفاً برای کد خطای HTTP به شیء تشخیص عیب مراجعه کنید.";
