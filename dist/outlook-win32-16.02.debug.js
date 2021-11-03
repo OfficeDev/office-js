@@ -1,6 +1,6 @@
 /* Outlook Win32 specific API library */
-/* osfweb version: 16.0.14307.10001 */
-/* office-js-api version: 20210704.L */
+/* osfweb version: 16.0.14506.10000 */
+/* office-js-api version: 20210901.L */
 /*
 	Copyright (c) Microsoft Corporation.  All rights reserved.
 */
@@ -19,7 +19,7 @@ if (typeof OSFPerformance !== "undefined") {
 }
 
 /* Outlook rich client specific API library */
-/* Version: 16.0.14307.10001 */
+/* Version: 16.0.14506.10000 */
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
         extendStatics = Object.setPrototypeOf ||
@@ -166,11 +166,11 @@ OSF.FlightNames = {
     FirstPartyAnonymousProxyReadyCheckTimeout: 6,
     AddinRibbonIdAllowUnknown: 9,
     ManifestParserDevConsoleLog: 15,
-    AddInsInSupportedIrmDocsIsEnabled: 17,
     AddinActionDefinitionHybridMode: 18,
     UseActionIdForUILessCommand: 20,
     RequirementSetRibbonApiOnePointTwo: 21,
     SetFocusToTaskpaneIsEnabled: 22,
+    ShortcutInfoArrayInUserPreferenceData: 23,
     OSFTestFlight1000: OSF.TestFlightStart,
     OSFTestFlight1001: OSF.TestFlightStart + 1,
     OSFTestFlight1002: OSF.TestFlightStart + 2,
@@ -181,6 +181,12 @@ OSF.FlightNames = {
     OSFTestFlight1007: OSF.TestFlightStart + 7,
     OSFTestFlight1008: OSF.TestFlightStart + 8,
     OSFTestFlight1009: OSF.TestFlightEnd
+};
+OSF.FlightTreatmentNames = {
+    AllowStorageAccessByUserActivationOnIFrame: "Microsoft.Office.SharedOnline.AllowStorageAccessByUserActivationOnIFrame",
+    IsPrivateAddin: "Microsoft.Office.SharedOnline.IsPrivateAddin",
+    LogAllAddinsAsPublic: "Microsoft.Office.SharedOnline.LogAllAddinsAsPublic",
+    AddinCommandRibbonCacheFixEnabled: "Microsoft.Office.SharedOnline.AddinCommandRibbonCacheFixEnabled"
 };
 OSF.Flights = [];
 OSF.Settings = {};
@@ -365,7 +371,15 @@ OSF.OUtil = (function () {
                             currentCallback();
                         }
                     };
-                    var onLoadError = function OSF_OUtil_loadScript$onLoadError() {
+                    var onLoadTimeOut = function OSF_OUtil_loadScript$onLoadTimeOut() {
+                        if (window.navigator.userAgent.indexOf("Trident") > 0) {
+                            onLoadError(null);
+                        }
+                        else {
+                            onLoadError(new Event("Script load timed out"));
+                        }
+                    };
+                    var onLoadError = function OSF_OUtil_loadScript$onLoadError(errorEvent) {
                         delete _loadedScripts[url];
                         if (_loadedScriptEntry.timer != null) {
                             clearTimeout(_loadedScriptEntry.timer);
@@ -390,7 +404,7 @@ OSF.OUtil = (function () {
                     }
                     script.onerror = onLoadError;
                     timeoutInMs = timeoutInMs || _defaultScriptLoadingTimeout;
-                    _loadedScriptEntry.timer = setTimeout(onLoadError, timeoutInMs);
+                    _loadedScriptEntry.timer = setTimeout(onLoadTimeOut, timeoutInMs);
                     script.setAttribute("crossOrigin", "anonymous");
                     script.src = url;
                     doc.getElementsByTagName("head")[0].appendChild(script);
@@ -4343,6 +4357,17 @@ OSF.DDA.DispIdHost.getClientDelegateMethods = function (actionId) {
         }
         Win32RichClientHostController.prototype.messageParent = function (params) {
             if (OSF.OUtil.externalNativeFunctionExists(typeof window.external.MessageParent2)) {
+                if (params) {
+                    var messageToParent = params[Microsoft.Office.WebExtension.Parameters.MessageToParent];
+                    if (typeof messageToParent === "boolean") {
+                        if (messageToParent === true) {
+                            params[Microsoft.Office.WebExtension.Parameters.MessageToParent] = "true";
+                        }
+                        else if (messageToParent === false) {
+                            params[Microsoft.Office.WebExtension.Parameters.MessageToParent] = "";
+                        }
+                    }
+                }
                 if (typeof OsfOMToken != 'undefined' && OsfOMToken) {
                     window.external.MessageParent2(JSON.stringify(params), OsfOMToken);
                 }
@@ -6521,7 +6546,7 @@ var OSFAppTelemetry;
         }
         appInfo.message = context.get_hostCustomMessage();
         appInfo.officeJSVersion = OSF.ConstantNames.FileVersion;
-        appInfo.hostJSVersion = "16.0.14307.10001";
+        appInfo.hostJSVersion = "16.0.14506.10000";
         if (context._wacHostEnvironment) {
             appInfo.wacHostEnvironment = context._wacHostEnvironment;
         }
@@ -6826,17 +6851,7 @@ var OSFAppTelemetry;
                 }
             }
             else if (hostPlatform == "mac") {
-                if (major < 16 || major == 16 && build < 21062700) {
-                    excepted = true;
-                }
-            }
-            else if (hostPlatform == "ios") {
-                if (minor < 2122) {
-                    excepted = true;
-                }
-            }
-            else if (hostPlatform == "android") {
-                if (minor < 2120) {
+                if (major < 16 || (major == 16 && (minor < 52 || minor == 52 && build < 808))) {
                     excepted = true;
                 }
             }
@@ -6883,10 +6898,14 @@ var OSFPerfUtil;
                     oteljs.makeDoubleDataField("officeExecuteEnd", OSFPerformance.officeExecuteEnd),
                     oteljs.makeDoubleDataField("hostInitializationStart", OSFPerformance.hostInitializationStart),
                     oteljs.makeDoubleDataField("hostInitializationEnd", OSFPerformance.hostInitializationEnd),
+                    oteljs.makeDoubleDataField("totalJSHeapSize", OSFPerformance.totalJSHeapSize),
+                    oteljs.makeDoubleDataField("usedJSHeapSize", OSFPerformance.usedJSHeapSize),
+                    oteljs.makeDoubleDataField("jsHeapSizeLimit", OSFPerformance.jsHeapSizeLimit),
                     oteljs.makeDoubleDataField("getAppContextStart", OSFPerformance.getAppContextStart),
                     oteljs.makeDoubleDataField("getAppContextEnd", OSFPerformance.getAppContextEnd),
                     oteljs.makeDoubleDataField("createOMEnd", OSFPerformance.createOMEnd),
-                    oteljs.makeDoubleDataField("officeOnReady", OSFPerformance.officeOnReady)
+                    oteljs.makeDoubleDataField("officeOnReady", OSFPerformance.officeOnReady),
+                    oteljs.makeBooleanDataField("isSharedRuntime", (OSF._OfficeAppFactory.getHostInfo().flags & OSF.HostInfoFlags.SharedApp) !== 0)
                 ]);
                 Microsoft.Office.WebExtension.sendTelemetryEvent({
                     eventName: "Office.Extensibility.OfficeJs.JSPerformanceTelemetryV06",
@@ -8279,6 +8298,11 @@ var createDeserializedDataWithDictionary = function createDeserializedDataWithDi
       var diagnosticsData = JSON.parse(responseData[2]);
       deserializedData.diagnostics = diagnosticsData["Diagnostics"];
     }
+
+    if (responseData.length >= 5) {
+      deserializedData.errorMessage = responseData[3];
+      deserializedData.errorName = responseData[4];
+    }
   } else {
     deserializedData.error = false;
   }
@@ -8347,7 +8371,7 @@ function standardInvokeHostMethod(dispid, userContext, callback, data, format, c
     }
   });
 }
-function createAsyncResult(value, errorCode, detailedErrorCode, userContext, errorMessage) {
+function createAsyncResult(value, errorCode, detailedErrorCode, userContext, errorMessage, errorName) {
   var initArgs = {};
   var errorArgs;
   initArgs[standardInvokeHostMethod_OSF.DDA.AsyncResultEnum.Properties.Value] = value;
@@ -8357,7 +8381,7 @@ function createAsyncResult(value, errorCode, detailedErrorCode, userContext, err
     errorArgs = {};
     var errorProperties = void 0;
     errorProperties = getErrorArgs(detailedErrorCode);
-    errorArgs[standardInvokeHostMethod_OSF.DDA.AsyncResultEnum.ErrorProperties.Name] = errorProperties.name;
+    errorArgs[standardInvokeHostMethod_OSF.DDA.AsyncResultEnum.ErrorProperties.Name] = !errorName ? errorProperties.name : errorName;
     errorArgs[standardInvokeHostMethod_OSF.DDA.AsyncResultEnum.ErrorProperties.Message] = !errorMessage ? errorProperties.message : errorMessage;
     errorArgs[standardInvokeHostMethod_OSF.DDA.AsyncResultEnum.ErrorProperties.Code] = detailedErrorCode;
   }
@@ -9578,7 +9602,9 @@ var handleTokenResponse_OSF = __webpack_require__(0);
 function handleTokenResponse(response, context, resultCode) {
   var asyncResult = undefined;
 
-  if (!!resultCode && resultCode !== InvokeResultCode.noError) {
+  if (getAppName() === handleTokenResponse_OSF.AppName.Outlook && response.error !== undefined && response.errorCode !== undefined && !!response.error && response.errorCode === 9030) {
+    asyncResult = createAsyncResult(undefined, handleTokenResponse_OSF.DDA.AsyncResultEnum.ErrorCode.Failed, response.errorCode, context, response.errorMessage, response.errorName);
+  } else if (!!resultCode && resultCode !== InvokeResultCode.noError) {
     asyncResult = createAsyncResult(undefined, handleTokenResponse_OSF.DDA.AsyncResultEnum.ErrorCode.Failed, 9017, context, getString("l_InternalProtocolError_Text").replace("{0}", resultCode));
 
     if (!!asyncResult) {
@@ -9587,12 +9613,10 @@ function handleTokenResponse(response, context, resultCode) {
       };
     }
   } else {
-    if (getAppName() === handleTokenResponse_OSF.AppName.Outlook && response.error !== undefined && response.errorCode !== undefined && !!response.error && response.errorCode === 9030) {
-      asyncResult = createAsyncResult(undefined, handleTokenResponse_OSF.DDA.AsyncResultEnum.ErrorCode.Failed, response.errorCode, context, response.errorMessage);
-    } else if (!!response.wasSuccessful) {
+    if (!!response.wasSuccessful) {
       asyncResult = createAsyncResult(response.token, handleTokenResponse_OSF.DDA.AsyncResultEnum.ErrorCode.Success, 0, context);
     } else {
-      asyncResult = createAsyncResult(undefined, handleTokenResponse_OSF.DDA.AsyncResultEnum.ErrorCode.Failed, response.errorCode, context, response.errorMessage);
+      asyncResult = createAsyncResult(undefined, handleTokenResponse_OSF.DDA.AsyncResultEnum.ErrorCode.Failed, response.errorCode, context, response.errorMessage, response.errorName);
     }
 
     if (response.diagnostics) {

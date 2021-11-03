@@ -4,7 +4,7 @@ _u.ExtensibilityStrings = function()
 };
 _u.ExtensibilityStrings.registerClass("_u.ExtensibilityStrings");
 _u.ExtensibilityStrings.l_APICallFailedDueToItemChange_Text = "選択したアイテムは変更されました。";
-_u.ExtensibilityStrings.l_API_Not_Supported_By_ExtensionPoint_Error_Text = "API が拡張点でサポートされていません。";
+_u.ExtensibilityStrings.l_API_Not_Supported_By_ExtensionPoint_Error_Text = "API が拡張点でサポートされていません。"
 _u.ExtensibilityStrings.l_API_Not_Supported_For_Shared_Folders_Error = "API は共有フォルダーではサポートされていません。";
 _u.ExtensibilityStrings.l_ActionsDefinitionMultipleActionsError_Text = "現在、単一の処理のみがサポートされています。";
 _u.ExtensibilityStrings.l_ActionsDefinitionWrongNotificationMessageError_Text = "この通知メッセージの種類に対して処理を定義することはできません。";
@@ -56,7 +56,7 @@ _u.ExtensibilityStrings.l_ItemNotFound_Text = "アイテムが存在しないか
 _u.ExtensibilityStrings.l_Item_Not_Saved_Error_Text = "アイテムが保存されるまで id を取得できません。";
 _u.ExtensibilityStrings.l_KeyNotFound_Text = "指定されたキーが見つかりませんでした。";
 _u.ExtensibilityStrings.l_MessageInDifferentStoreError_Text = "メッセージが別のストアに保存されているため、EWS ID を取得できません。";
-_u.ExtensibilityStrings.l_Missing_Extended_Permissions_For_API = "API 呼び出しの拡張アクセス許可がありません。"
+_u.ExtensibilityStrings.l_Missing_Extended_Permissions_For_API = "API 呼び出しの拡張アクセス許可がありません。";
 _u.ExtensibilityStrings.l_NoValidRecipientsProvided_Text = "有効な受信者が指定されていません。";
 _u.ExtensibilityStrings.l_NotificationKeyNotFound_Text = "指定したキーを持つ通知はありません。";
 _u.ExtensibilityStrings.l_NullOrEmptyParameterError_Text = "パラメーター '{0}' は必須で、null または空にすることはできません。";

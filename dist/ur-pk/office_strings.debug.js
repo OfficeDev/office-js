@@ -15,7 +15,7 @@ Strings.OfficeOM.L_AppNotExistInitializeNotCalled = "ایپلی کیشن {0} م�
 Strings.OfficeOM.L_AttemptingToSetReadOnlyProperty = "فقط مطالعہ خاصیت '{0}' سیٹ کرنے کی کوشش کی جا رہی ہے۔";
 Strings.OfficeOM.L_BadSelectorString = "انتخاب میں پاس کردہ اسٹرنگ نامناسب وضع شدہ یا غیر معاون ہے۔";
 Strings.OfficeOM.L_BindingCreationError = "بائنڈنگ تخلیقی نقص";
-Strings.OfficeOM.L_BindingNotExist = "اختصاصی بائنڈنگ موجود نہیں۔"
+Strings.OfficeOM.L_BindingNotExist = "اختصاصی بائنڈنگ موجود نہیں۔";
 Strings.OfficeOM.L_BindingToMultipleSelection = "نونکونٹگواس انتخابات کی معاونت نہیں کی جاتی۔";
 Strings.OfficeOM.L_BrowserAPINotSupported = "یہ براؤزر درخواست کردہ API کی معاونت نہیں کرتا۔";
 Strings.OfficeOM.L_CallbackNotAFunction = "واپس کال فعل کی قسم ہونی چاہئے، جو {0} کی قسم تھی۔";
@@ -118,7 +118,7 @@ Strings.OfficeOM.L_InvalidSSOAddinMessage = "اس در اضافے کے لئے ش
 Strings.OfficeOM.L_InvalidSelectionForBindingType = "حالیہ انتخاب اور مخصوص بائنڈنگ کی قسم کے ساتھ ایک ارتباط نہیں بنایا جا سکتا۔";
 Strings.OfficeOM.L_InvalidSetColumns = "اختصاصی کالم درست نہیں ہیں۔";
 Strings.OfficeOM.L_InvalidSetRows = "اختصاصی کالم درست نہیں ہیں۔";
-Strings.OfficeOM.L_InvalidSetStartRowColumn = "اختصاصی startRow یا startColumn اقدار درست نہیں ہیں۔";
+Strings.OfficeOM.L_InvalidSetStartRowColumn = "اختصاصی startRow یا startColumn اقدار درست نہیں ہیں۔"
 Strings.OfficeOM.L_InvalidTableOptionValue = "ایک یا زائد tableOptions پیرامیٹرز کے اقدار جن کی اجازت نہیں ہے۔ قدروں کو دہرا چیک کریں اور دوبارہ کوشش کریں۔";
 Strings.OfficeOM.L_InvalidValue = "غلط قدر";
 Strings.OfficeOM.L_MemoryLimit = "میموری حد سے تجاوز کرگیا ہے";
@@ -154,10 +154,10 @@ Strings.OfficeOM.L_PropertyDoesNotExist = "خاصیت '{0}' آبجیکٹ پر م
 Strings.OfficeOM.L_PropertyNotLoaded = "خاصیت '{0}' دستیاب نہیں ہے۔ خاصیت کی قدر کا مطالعہ کرنے سے قبل، مشتمل آبجیکٹ پر لوڈ طریقے کو کال کریں اور درخواست کے وابستہ سیاق پر \"context.sync()\" کو کال کریں۔";
 Strings.OfficeOM.L_ReadSettingsError = "سیٹنگیں نقص کا مطالعہ";
 Strings.OfficeOM.L_RedundantCallbackSpecification = "واپس کال کو اختیاری آبجیکٹ اور بحث فہرست میں مخصوص نہیں کیا جاسکتا۔";
-Strings.OfficeOM.L_RequestPayloadSizeLimitExceededMessage = 'درخواست کے پے لوڈ کا سائز حد سے تجاوز کر گیا ہے۔ براہ کرم میں دستاویزات ملاحظہ کريں: "https://docs.microsoft.com/office/dev/add-ins/concepts/resource-limits-and-performance-optimization#excel-add-ins"۔';
+Strings.OfficeOM.L_RequestPayloadSizeLimitExceededMessage = 'درخواست کے پے لوڈ کا سائز حد سے تجاوز کر گیا ہے۔ براہ کرم دستاویزات ملاحظہ کريں: "https://docs.microsoft.com/office/dev/add-ins/concepts/resource-limits-and-performance-optimization#excel-add-ins"۔';
 Strings.OfficeOM.L_RequestTimeout = "کال نفاذ کرنے میں بہت دیر کر دی ہے۔";
 Strings.OfficeOM.L_RequestTokenUnavailable = "اس API کو فریکوئنسی آہستہ کرنے کے لیے تھروٹلاد کیا گیا ہے۔";
-Strings.OfficeOM.L_ResponsePayloadSizeLimitExceededMessage = 'جواب کے پے لوڈ کا سائز حد سے تجاوز کر گیا ہے۔ براہ کرم میں دستاویزات ملاحظہ کريں: "https://docs.microsoft.com/office/dev/add-ins/concepts/resource-limits-and-performance-optimization#excel-add-ins"۔';
+Strings.OfficeOM.L_ResponsePayloadSizeLimitExceededMessage = 'جواب کے پے لوڈ کا سائز حد سے تجاوز کر گیا ہے۔ براہ کرم دستاویزات ملاحظہ کريں: "https://docs.microsoft.com/office/dev/add-ins/concepts/resource-limits-and-performance-optimization#excel-add-ins"۔';
 Strings.OfficeOM.L_RowIndexOutOfRange = "قدر کا اشاریہ کالم اجازت یافتہ حد اطلاق سے باہر ہے۔ (0 یا اعلی) قدر جو صفوں کی تعداد کے مقابلہ میں کم ہو اسے استعمال کریں۔";
 Strings.OfficeOM.L_RunMustReturnPromise = '".run" طریقے پر دیے گئے بیچ فعل نے کوئی وعدہ نہیں لوٹایا ہے۔ فعل کو لازمی وعدہ لوٹانا چاہئے، تاکہ خود کار طور پر سراغ یافتہ کوئی بھی اشیاء بیچ کی تکمیل پر جاری کئے جاسکتے ہیں۔ عام طور پر، آپ "context.sync()" سے جواب لوٹا کر ایک وعدہ لوٹاتے ہیں۔';
 Strings.OfficeOM.L_SSOClientError = "Office کی طرف سے توثیق کاری کی درخواست میں نقص واقع ہوگیا ہے۔";

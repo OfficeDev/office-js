@@ -3,7 +3,7 @@ _u.ExtensibilityStrings = function()
 {
 };
 _u.ExtensibilityStrings.registerClass("_u.ExtensibilityStrings");
-_u.ExtensibilityStrings.l_APICallFailedDueToItemChange_Text = "Vybratá položka sa zmenila.";
+_u.ExtensibilityStrings.l_APICallFailedDueToItemChange_Text = "Vybratá položka sa zmenila."
 _u.ExtensibilityStrings.l_API_Not_Supported_By_ExtensionPoint_Error_Text = "Rozhranie API nie je podporované pre bod rozšírenia.";
 _u.ExtensibilityStrings.l_API_Not_Supported_For_Shared_Folders_Error = "Rozhranie API nie je podporované pre zdieľané priečinky.";
 _u.ExtensibilityStrings.l_ActionsDefinitionMultipleActionsError_Text = "Momentálne sa podporuje len jedna akcia.";
@@ -51,7 +51,7 @@ _u.ExtensibilityStrings.l_InvalidEventDates_Text = "Dátum ukončenia sa vyskytu
 _u.ExtensibilityStrings.l_InvalidParameterValueError_Text = "Hodnota parametra {0} je neplatná.";
 _u.ExtensibilityStrings.l_InvalidSelection_Text = "Výber je neplatný.";
 _u.ExtensibilityStrings.l_InvalidTime_Text = "Nezadali ste platný čas.";
-_u.ExtensibilityStrings.l_Invalid_Category_Error_Text = "Boli zadané neplatné kategórie."
+_u.ExtensibilityStrings.l_Invalid_Category_Error_Text = "Boli zadané neplatné kategórie.";
 _u.ExtensibilityStrings.l_ItemNotFound_Text = "Položka neexistuje alebo nebola vytvorená.";
 _u.ExtensibilityStrings.l_Item_Not_Saved_Error_Text = "ID sa nedá načítať, kým sa položka neuloží.";
 _u.ExtensibilityStrings.l_KeyNotFound_Text = "Zadaný kľúč sa nenašiel.";

@@ -3,7 +3,7 @@ Strings.OfficeOM = function()
 {
 };
 Strings.OfficeOM.registerClass("Strings.OfficeOM");
-Strings.OfficeOM.L_APICallFailed = "Gọi API Không thành công";
+Strings.OfficeOM.L_APICallFailed = "Gọi API Không thành công"
 Strings.OfficeOM.L_APINotSupported = "API Không được Hỗ trợ";
 Strings.OfficeOM.L_ActivityLimitReached = "Đã đạt giới hạn hoạt động.";
 Strings.OfficeOM.L_AddBindingFromPromptDefaultText = "Vui lòng chọn.";
@@ -99,7 +99,7 @@ Strings.OfficeOM.L_InvalidFormat = "Lỗi Định dạng Không hợp lệ";
 Strings.OfficeOM.L_InvalidFormatValue = "Một hoặc nhiều tham số định dạng có chứa giá trị không được phép. Hãy kiểm tra kép các giá trị rồi thử lại.";
 Strings.OfficeOM.L_InvalidGetColumns = "Các cột đã xác định không hợp lệ.";
 Strings.OfficeOM.L_InvalidGetRowColumnCounts = "Giá trị rowCount hoặc columnCount đã xác định không hợp lệ.";
-Strings.OfficeOM.L_InvalidGetRows = "Các hàng đã xác định không hợp lệ."
+Strings.OfficeOM.L_InvalidGetRows = "Các hàng đã xác định không hợp lệ.";
 Strings.OfficeOM.L_InvalidGetStartRowColumn = "Giá trị startRow hoặc startColumn đã xác định không hợp lệ.";
 Strings.OfficeOM.L_InvalidGrant = "Thiếu cấp phép trước.";
 Strings.OfficeOM.L_InvalidGrantMessage = "Ứng dụng này bị cấp thiếu quyền.";

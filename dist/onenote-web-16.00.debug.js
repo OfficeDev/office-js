@@ -16,10 +16,10 @@
 
 
 // Sources:
-// osfweb: 16.0\14307.10000
-// runtime: 16.0\14307.10000
-// core: 16.0\14307.10000
-// host: 16.0\14307.10000
+// osfweb: 16.0\14520.10000
+// runtime: 16.0\14520.10000
+// core: 16.0\14520.10000
+// host: 16.0\14520.10000
 
 
 
@@ -154,6 +154,9 @@ var OSF = OSF || {};
             }
             return keyList;
         };
+        SafeStorage.prototype.isLocalStorageAvailable = function () {
+            return (this._internalStorage != null);
+        };
         return SafeStorage;
     }());
     OfficeExt.SafeStorage = SafeStorage;
@@ -166,16 +169,15 @@ OSF.TestFlightStart = 1000;
 OSF.TestFlightEnd = 1009;
 OSF.FlightNames = {
     UseOriginNotUrl: 0,
-    CheckReceiverOrigin: 1,
     AddinEnforceHttps: 2,
     FirstPartyAnonymousProxyReadyCheckTimeout: 6,
     AddinRibbonIdAllowUnknown: 9,
     ManifestParserDevConsoleLog: 15,
-    AddInsInSupportedIrmDocsIsEnabled: 17,
     AddinActionDefinitionHybridMode: 18,
     UseActionIdForUILessCommand: 20,
     RequirementSetRibbonApiOnePointTwo: 21,
     SetFocusToTaskpaneIsEnabled: 22,
+    ShortcutInfoArrayInUserPreferenceData: 23,
     OSFTestFlight1000: OSF.TestFlightStart,
     OSFTestFlight1001: OSF.TestFlightStart + 1,
     OSFTestFlight1002: OSF.TestFlightStart + 2,
@@ -186,6 +188,13 @@ OSF.FlightNames = {
     OSFTestFlight1007: OSF.TestFlightStart + 7,
     OSFTestFlight1008: OSF.TestFlightStart + 8,
     OSFTestFlight1009: OSF.TestFlightEnd
+};
+OSF.FlightTreatmentNames = {
+    AllowStorageAccessByUserActivationOnIFrame: "Microsoft.Office.SharedOnline.AllowStorageAccessByUserActivationOnIFrame",
+    IsPrivateAddin: "Microsoft.Office.SharedOnline.IsPrivateAddin",
+    LogAllAddinsAsPublic: "Microsoft.Office.SharedOnline.LogAllAddinsAsPublic",
+    AddinCommandRibbonCacheFixEnabled: "Microsoft.Office.SharedOnline.AddinCommandRibbonCacheFixEnabled",
+    OSFSolutionRefactor: "Microsoft.Office.SharedOnline.OSFSolutionRefactor"
 };
 OSF.Flights = [];
 OSF.Settings = {};
@@ -370,7 +379,15 @@ OSF.OUtil = (function () {
                             currentCallback();
                         }
                     };
-                    var onLoadError = function OSF_OUtil_loadScript$onLoadError() {
+                    var onLoadTimeOut = function OSF_OUtil_loadScript$onLoadTimeOut() {
+                        if (window.navigator.userAgent.indexOf("Trident") > 0) {
+                            onLoadError(null);
+                        }
+                        else {
+                            onLoadError(new Event("Script load timed out"));
+                        }
+                    };
+                    var onLoadError = function OSF_OUtil_loadScript$onLoadError(errorEvent) {
                         delete _loadedScripts[url];
                         if (_loadedScriptEntry.timer != null) {
                             clearTimeout(_loadedScriptEntry.timer);
@@ -395,7 +412,7 @@ OSF.OUtil = (function () {
                     }
                     script.onerror = onLoadError;
                     timeoutInMs = timeoutInMs || _defaultScriptLoadingTimeout;
-                    _loadedScriptEntry.timer = setTimeout(onLoadError, timeoutInMs);
+                    _loadedScriptEntry.timer = setTimeout(onLoadTimeOut, timeoutInMs);
                     script.setAttribute("crossOrigin", "anonymous");
                     script.src = url;
                     doc.getElementsByTagName("head")[0].appendChild(script);
@@ -5266,6 +5283,9 @@ Microsoft.Office.Common.XdmCommunicationManager = (function () {
                 throw e;
             delete _serviceEndPoints[serviceEndPointId];
         },
+        urlCompare: function Microsoft_Office_Common_XdmCommunicationManager$_urlCompare(url_parser1, url_parser2) {
+            return _urlCompare(url_parser1, url_parser2);
+        },
         checkUrlWithAppDomains: function Microsoft_Office_Common_XdmCommunicationManager$_checkUrlWithAppDomains(appDomains, origin) {
             return _checkOriginWithAppDomains(appDomains, origin);
         },
@@ -5385,7 +5405,38 @@ Microsoft.Office.Common.ResponseSender = function Microsoft_Office_Common_Respon
     this._responseType = responseType;
     var me = this;
     this._send = function (result) {
+        var validateTargetMatchesRequester = function (targetOrigin, requesterUrl) {
+            var parsedTargetOrigin = OSF.OUtil.parseUrl(targetOrigin);
+            var parsedRequesterUrl = OSF.OUtil.parseUrl(requesterUrl);
+            if (!parsedTargetOrigin || !parsedTargetOrigin.hostname || !parsedRequesterUrl || !parsedRequesterUrl.hostname) {
+                var errorMessage = "Failed to execute 'postMessage' on 'DOMWindow': The target origin provided or the recipient window's origin are undefined.";
+                console.log(errorMessage);
+                ;
+                return false;
+            }
+            else if (!Microsoft.Office.Common.XdmCommunicationManager.urlCompare(parsedTargetOrigin, parsedRequesterUrl)) {
+                var targetOriginToConsoleLog = parsedTargetOrigin ? (parsedTargetOrigin.protocol + "//" + parsedTargetOrigin.hostname + (parsedTargetOrigin.port ? (":" + parsedTargetOrigin.port) : "")) : 'undefined';
+                var requesterUrlToConsoleLog = parsedRequesterUrl ? (parsedRequesterUrl.protocol + "//" + parsedRequesterUrl.hostname + (parsedRequesterUrl.port ? (":" + parsedRequesterUrl.port) : "")) : 'undefined';
+                var errorMessage = "Failed to execute 'postMessage' on 'DOMWindow': The target origin provided ('" + targetOriginToConsoleLog + "') does not match the recipient window's origin ('" + requesterUrlToConsoleLog + "').";
+                console.log(errorMessage);
+                ;
+                return false;
+            }
+            return true;
+        };
         try {
+            if (me._actionName === "dialogMessageReceived" && result.targetOrigin !== "*") {
+                if (result.targetOrigin) {
+                    if (!validateTargetMatchesRequester(result.targetOrigin, me._requesterUrl)) {
+                        return;
+                    }
+                }
+            }
+            else if (me._actionName === "dialogParentMessageReceived" && result.targetOrigin && result.targetOrigin !== "*") {
+                if (!validateTargetMatchesRequester(result.targetOrigin, me._requesterUrl)) {
+                    return;
+                }
+            }
             var response = new Microsoft.Office.Common.Response(me._actionName, me._conversationId, me._correlationId, me._invokeResultCode, me._responseType, result);
             var envelopedResult = Microsoft.Office.Common.MessagePackager.envelope(response, serializerVersion);
             me._requesterWindow.postMessage(envelopedResult, me._requesterUrl);
@@ -6086,23 +6137,39 @@ OSF.InitializationHelper.prototype.addOrRemoveEventListenersForWindow = function
             me._webAppState.clientEndPoint.invoke("ContextActivationManager_notifyHost", null, [me._webAppState.id, actionId]);
         }
         else if (e.keyCode == 9) {
-            e.preventDefault();
+            var isPowerPointModernSlideShow = me._appContext._appSettings &&
+                (me._appContext._appSettings['PowerPointModernSlideShowEnabled'] || false) &&
+                me._appContext._appName == OSF.AppName.PowerpointWebApp &&
+                me._appContext._clientMode == OSF.ClientMode.ReadOnly &&
+                me._appContext._osfControlType == OSF.OsfControlType.DocumentLevel;
+            if (!isPowerPointModernSlideShow) {
+                e.preventDefault();
+            }
             var allTabbableElements = document.querySelectorAll(me._tabbableElements);
             var focused = OSF.OUtil.focusToNextTabbable(allTabbableElements, e.target || e.srcElement, e.shiftKey);
-            if (!focused) {
+            if (focused) {
+                if (isPowerPointModernSlideShow) {
+                    e.preventDefault();
+                }
+            }
+            else {
                 if (me._hostInfo.isDialog) {
                     OSF.OUtil.focusToFirstTabbable(allTabbableElements, e.shiftKey);
                 }
                 else {
                     if (e.shiftKey) {
-                        me._webAppState.clientEndPoint.invoke("ContextActivationManager_notifyHost", null, [me._webAppState.id, OSF.AgaveHostAction.TabExitShift]);
+                        if (!isPowerPointModernSlideShow) {
+                            me._webAppState.clientEndPoint.invoke("ContextActivationManager_notifyHost", null, [me._webAppState.id, OSF.AgaveHostAction.TabExitShift]);
+                        }
                     }
                     else {
                         if (OSF.OUtil.checkFlight(OSF.FlightNames.SetFocusToTaskpaneIsEnabled) && e.target && e.target.tagName.toUpperCase() === "BODY") {
                             OSF.OUtil.focusToFirstTabbable(allTabbableElements, e.shiftKey);
                         }
                         else {
-                            me._webAppState.clientEndPoint.invoke("ContextActivationManager_notifyHost", null, [me._webAppState.id, OSF.AgaveHostAction.TabExit]);
+                            if (!isPowerPointModernSlideShow) {
+                                me._webAppState.clientEndPoint.invoke("ContextActivationManager_notifyHost", null, [me._webAppState.id, OSF.AgaveHostAction.TabExit]);
+                            }
                         }
                     }
                 }
@@ -7096,7 +7163,7 @@ var OSFAppTelemetry;
         }
         appInfo.message = context.get_hostCustomMessage();
         appInfo.officeJSVersion = OSF.ConstantNames.FileVersion;
-        appInfo.hostJSVersion = "16.0.14307.10000";
+        appInfo.hostJSVersion = "16.0.14520.10000";
         if (context._wacHostEnvironment) {
             appInfo.wacHostEnvironment = context._wacHostEnvironment;
         }
@@ -7401,17 +7468,7 @@ var OSFAppTelemetry;
                 }
             }
             else if (hostPlatform == "mac") {
-                if (major < 16 || major == 16 && build < 21062700) {
-                    excepted = true;
-                }
-            }
-            else if (hostPlatform == "ios") {
-                if (minor < 2122) {
-                    excepted = true;
-                }
-            }
-            else if (hostPlatform == "android") {
-                if (minor < 2120) {
+                if (major < 16 || (major == 16 && (minor < 52 || minor == 52 && build < 808))) {
                     excepted = true;
                 }
             }
@@ -7458,10 +7515,14 @@ var OSFPerfUtil;
                     oteljs.makeDoubleDataField("officeExecuteEnd", OSFPerformance.officeExecuteEnd),
                     oteljs.makeDoubleDataField("hostInitializationStart", OSFPerformance.hostInitializationStart),
                     oteljs.makeDoubleDataField("hostInitializationEnd", OSFPerformance.hostInitializationEnd),
+                    oteljs.makeDoubleDataField("totalJSHeapSize", OSFPerformance.totalJSHeapSize),
+                    oteljs.makeDoubleDataField("usedJSHeapSize", OSFPerformance.usedJSHeapSize),
+                    oteljs.makeDoubleDataField("jsHeapSizeLimit", OSFPerformance.jsHeapSizeLimit),
                     oteljs.makeDoubleDataField("getAppContextStart", OSFPerformance.getAppContextStart),
                     oteljs.makeDoubleDataField("getAppContextEnd", OSFPerformance.getAppContextEnd),
                     oteljs.makeDoubleDataField("createOMEnd", OSFPerformance.createOMEnd),
-                    oteljs.makeDoubleDataField("officeOnReady", OSFPerformance.officeOnReady)
+                    oteljs.makeDoubleDataField("officeOnReady", OSFPerformance.officeOnReady),
+                    oteljs.makeBooleanDataField("isSharedRuntime", (OSF._OfficeAppFactory.getHostInfo().flags & OSF.HostInfoFlags.SharedApp) !== 0)
                 ]);
                 Microsoft.Office.WebExtension.sendTelemetryEvent({
                     eventName: "Office.Extensibility.OfficeJs.JSPerformanceTelemetryV06",
@@ -7514,7 +7575,16 @@ var OSFWebAuth;
         var IMPLICIT_SHIP = 'webauth/webauth.implicit.js';
         var Implicit_Cdn_Path = OSF._OfficeAppFactory.getLoadScriptHelper().getOfficeJsBasePath() + ((OSFWebAuth.config && OSFWebAuth.config.debugging) ? IMPLICIT_DEBUG : IMPLICIT_SHIP);
         return new OfficeExtension.Promise(function (resolve, reject) {
-            OSF.OUtil.loadScript(Implicit_Cdn_Path, function () {
+            OSF.OUtil.loadScript(Implicit_Cdn_Path, function (successOrEvent) {
+                if (typeof successOrEvent === 'boolean' && !successOrEvent) {
+                    reject(successOrEvent);
+                }
+                if (typeof successOrEvent !== 'boolean' && successOrEvent) {
+                    reject(successOrEvent);
+                }
+                if (!Implicit) {
+                    reject(new Error("Missing Implicit namespace, Implicit is not loaded."));
+                }
                 if (OSFWebAuth.config) {
                     resolve(Implicit.Load(OSFWebAuth.config, OSF._OfficeAppFactory.getHostInfo().osfControlAppCorrelationId));
                 }
@@ -7537,7 +7607,16 @@ var OSFWebAuth;
             ? OSF._OfficeAppFactory.getLoadScriptHelper().getOfficeJsBasePath() + BROWSERAUTH_PATH + OSFWebAuth.config.authVersion + "/" + BrowserAuth_Js
             : OSF._OfficeAppFactory.getLoadScriptHelper().getOfficeJsBasePath() + BROWSERAUTH_PATH + BrowserAuth_Js;
         return new OfficeExtension.Promise(function (resolve, reject) {
-            OSF.OUtil.loadScript(BrowserAuth_Cdn_Path, function () {
+            OSF.OUtil.loadScript(BrowserAuth_Cdn_Path, function (successOrEvent) {
+                if (typeof successOrEvent === 'boolean' && !successOrEvent) {
+                    reject(successOrEvent);
+                }
+                if (typeof successOrEvent !== 'boolean' && successOrEvent) {
+                    reject(successOrEvent);
+                }
+                if (!BrowserAuth) {
+                    reject(new Error("Missing BrowserAuth namespace, BrowserAuth is not loaded."));
+                }
                 if (OSFWebAuth.config) {
                     BrowserAuth.Load(OSFWebAuth.config, OSF._OfficeAppFactory.getHostInfo().osfControlAppCorrelationId).then(function (result) { resolve(result); }, function (result) { reject(result); });
                 }
@@ -9994,12 +10073,14 @@ OSF.OUtil.setNamespace("Dialog", OSF.DDA.Marshaling);
 OSF.DDA.Marshaling.Dialog.DialogMessageReceivedEventKeys = {
     MessageType: "messageType",
     MessageContent: "messageContent",
-    MessageOrigin: "messageOrigin"
+    MessageOrigin: "messageOrigin",
+    TargetOrigin: "targetOrigin"
 };
 OSF.DDA.Marshaling.Dialog.DialogParentMessageReceivedEventKeys = {
     MessageType: "messageType",
     MessageContent: "messageContent",
-    MessageOrigin: "messageOrigin"
+    MessageOrigin: "messageOrigin",
+    TargetOrigin: "targetOrigin"
 };
 OSF.DDA.Marshaling.MessageParentKeys = {
     MessageToParent: "messageToParent",
@@ -10010,7 +10091,7 @@ OSF.DDA.Marshaling.DialogNotificationShownEventType = {
 };
 OSF.DDA.Marshaling.SendMessageKeys = {
     MessageContent: "messageContent",
-    MessageOrigin: "messageOrigin"
+    TargetOrigin: "targetOrigin"
 };
 (function (OfficeExt) {
     var WacCommonUICssManager;
@@ -10659,15 +10740,30 @@ OSF.DDA.Marshaling.SendMessageKeys = {
             }
             function showDialog(dialogInfo) {
                 var hostInfoObj = OSF._OfficeAppFactory.getInitializationHelper()._hostInfo;
-                var hostInfoVals = [
-                    hostInfoObj.hostType,
-                    hostInfoObj.hostPlatform,
-                    hostInfoObj.hostSpecificFileVersion,
-                    hostInfoObj.hostLocale,
-                    hostInfoObj.osfControlAppCorrelationId,
-                    "isDialog",
-                    hostInfoObj.disableLogging ? "disableLogging" : ""
-                ];
+                var hostInfoVals;
+                if (OSF.OUtil.checkFlight(OSF.FlightTreatmentNames.IsPrivateAddin)) {
+                    hostInfoVals = [
+                        hostInfoObj.hostType,
+                        hostInfoObj.hostPlatform,
+                        hostInfoObj.hostSpecificFileVersion,
+                        hostInfoObj.hostLocale,
+                        hostInfoObj.osfControlAppCorrelationId,
+                        "isDialog",
+                        hostInfoObj.disableLogging ? "disableLogging" : "",
+                        (hostInfoObj.flags & OSF.HostInfoFlags.PublicAddin)
+                    ];
+                }
+                else {
+                    hostInfoVals = [
+                        hostInfoObj.hostType,
+                        hostInfoObj.hostPlatform,
+                        hostInfoObj.hostSpecificFileVersion,
+                        hostInfoObj.hostLocale,
+                        hostInfoObj.osfControlAppCorrelationId,
+                        "isDialog",
+                        hostInfoObj.disableLogging ? "disableLogging" : "",
+                    ];
+                }
                 var hostInfo = hostInfoVals.join("$");
                 var appContext = OSF._OfficeAppFactory.getInitializationHelper()._appContext;
                 appContext._taskpaneUrl = window.location.origin;
@@ -11011,15 +11107,6 @@ OSF.DDA.WAC.Delegate.messageParent = function OSF_DDA_WAC_Delegate$MessageParent
         OfficeExt.AddinNativeAction.Dialog.messageParent(args);
     }
     else {
-        var currentUrl = window.location.origin;
-        if (!currentUrl) {
-            currentUrl = window.location.protocol + "//"
-                + window.location.hostname
-                + (window.location.port ? ':' + window.location.port : '');
-        }
-        if (!hasTargetOrigin) {
-            args.hostCallArgs["targetOrigin"] = currentUrl;
-        }
         OSF.DDA.WAC.Delegate.executeAsync(args);
     }
 };
@@ -12673,7 +12760,7 @@ var OfficeExtension;
         CoreErrorCodes.invalidRequestContext = 'InvalidRequestContext';
         CoreErrorCodes.valueNotLoaded = 'ValueNotLoaded';
         CoreErrorCodes.requestPayloadSizeLimitExceeded = 'RequestPayloadSizeLimitExceeded';
-        CoreErrorCodes.responsePayloadSizeLimitExcceded = 'ResponsePayloadSizeLimitExcceded';
+        CoreErrorCodes.responsePayloadSizeLimitExceeded = 'ResponsePayloadSizeLimitExceeded';
         CoreErrorCodes.writeNotSupportedWhenModalDialogOpen = 'WriteNotSupportedWhenModalDialogOpen';
         return CoreErrorCodes;
     }());
@@ -12748,7 +12835,7 @@ var OfficeExtension;
                 response.HttpStatusCode = 400;
             }
             else if (errorCode == RichApiMessageUtility.OfficeJsErrorCode_ooeResponsePayloadSizeLimitExceeded) {
-                response.ErrorCode = CoreErrorCodes.responsePayloadSizeLimitExcceded;
+                response.ErrorCode = CoreErrorCodes.responsePayloadSizeLimitExceeded;
                 response.HttpStatusCode = 400;
             }
             else if (errorCode == RichApiMessageUtility.OfficeJsErrorCode_ooeWriteNotSupportedWhenModalDialogOpen) {
@@ -12790,6 +12877,9 @@ var OfficeExtension;
             var solutionId = '';
             var instanceId = '';
             var marketplaceType = '';
+            var solutionVersion = '';
+            var storeLocation = '';
+            var compliantSolutionId = '';
             return [
                 customData,
                 method,
@@ -12800,7 +12890,10 @@ var OfficeExtension;
                 requestFlags,
                 solutionId,
                 instanceId,
-                marketplaceType
+                marketplaceType,
+                solutionVersion,
+                storeLocation,
+                compliantSolutionId
             ];
         };
         RichApiMessageUtility.getResponseBody = function (result) {
@@ -17685,6 +17778,11 @@ var OfficeExtension;
                 }
             });
         };
+        Utility.ensureTypeInitialized = function (type) {
+            var context = new ClientRequestContext();
+            var objectPath = ObjectPathFactory.createNewObjectObjectPath(context, "Temp", false, 0);
+            new type(context, objectPath);
+        };
         Utility.fieldName_m__items = 'm__items';
         Utility.fieldName_isCollection = '_isCollection';
         Utility._synchronousCleanup = false;
@@ -19888,7 +19986,7 @@ var OfficeFirstPartyAuth;
                                 logLoadEvent(loadError, false);
                                 reject({
                                     code: "PackageNotLoaded",
-                                    message: (typeof (Strings) !== 'undefined' && Strings.OfficeOM.L_ImplicitNotLoaded) ? Strings.OfficeOM.L_ImplicitNotLoaded : ""
+                                    message: loadError ? loadError : (typeof (Strings) !== 'undefined' && Strings.OfficeOM.L_ImplicitNotLoaded) ? Strings.OfficeOM.L_ImplicitNotLoaded : ""
                                 });
                             });
                             var finalReplyUrl = (replyUrl) ? replyUrl : window.location.href.split("?")[0];
@@ -24094,7 +24192,7 @@ var OfficeCore;
             return _invokeMethod(this, "GetAppRuntimeStartState", 1, [], 4, 0);
         };
         AppRuntimePersistenceService.prototype.setAppRuntimeStartState = function (appRuntimeState) {
-            _invokeMethod(this, "SetAppRuntimeStartState", 0, [appRuntimeState], 0, 0);
+            _invokeMethod(this, "SetAppRuntimeStartState", 0, [appRuntimeState], _calculateApiFlags(2, "SharedRuntimeInternal", "1.2"), 0);
         };
         AppRuntimePersistenceService.prototype._handleResult = function (value) {
             _super.prototype._handleResult.call(this, value);
@@ -24133,7 +24231,7 @@ var OfficeCore;
             return _invokeMethod(this, "GetAppRuntimeState", 1, [], 4, 0);
         };
         AppRuntimeService.prototype.setAppRuntimeState = function (appRuntimeState) {
-            _invokeMethod(this, "SetAppRuntimeState", 0, [appRuntimeState], 0, 0);
+            _invokeMethod(this, "SetAppRuntimeState", 0, [appRuntimeState], _calculateApiFlags(2, "SharedRuntimeInternal", "1.2"), 0);
         };
         AppRuntimeService.prototype._handleResult = function (value) {
             _super.prototype._handleResult.call(this, value);
@@ -25179,7 +25277,18 @@ var OneNote;
         });
         Object.defineProperty(Application.prototype, "_navigationPropertyNames", {
             get: function () {
-                return ["notebooks", "noteTagManager"];
+                return ["notebooks", "noteTagManager", "mathAssistantManager"];
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(Application.prototype, "mathAssistantManager", {
+            get: function () {
+                _throwIfApiNotSupported("Application.mathAssistantManager", _defaultApiSetName, "1.9", _hostName);
+                if (!this._M) {
+                    this._M = _createPropertyObject(OneNote.MathAssistantManager, this, "MathAssistantManager", false, 4);
+                }
+                return this._M;
             },
             enumerable: true,
             configurable: true
@@ -25213,13 +25322,14 @@ var OneNote;
             enumerable: true,
             configurable: true
         });
-        Application.prototype.buildUpTextToTypeSet = function () {
-            _throwIfApiNotSupported("Application.buildUpTextToTypeSet", _defaultApiSetName, "1.9", _hostName);
-            _invokeMethod(this, "BuildUpTextToTypeSet", 1, [], 4, 0);
+        Application.prototype.set = function (properties, options) {
+            this._recursivelySet(properties, options, [], ["mathAssistantManager"], [
+                "notebooks",
+                "noteTagManager"
+            ]);
         };
-        Application.prototype.getActiveMathMLs = function () {
-            _throwIfApiNotSupported("Application.getActiveMathMLs", _defaultApiSetName, "1.9", _hostName);
-            return _invokeMethod(this, "GetActiveMathMLs", 1, [], 4, 0);
+        Application.prototype.update = function (properties) {
+            this._recursivelyUpdate(properties);
         };
         Application.prototype.getActiveNotebook = function () {
             return _createMethodObject(OneNote.Notebook, this, "GetActiveNotebook", 1, [], false, false, null, 4);
@@ -25392,7 +25502,7 @@ var OneNote;
             if (!_isUndefined(obj["_platform"])) {
                 this.__p = obj["_platform"];
             }
-            _handleNavigationPropertyResults(this, obj, ["noteTagManager", "NoteTagManager", "notebooks", "Notebooks"]);
+            _handleNavigationPropertyResults(this, obj, ["mathAssistantManager", "MathAssistantManager", "noteTagManager", "NoteTagManager", "notebooks", "Notebooks"]);
         };
         Application.prototype.load = function (options) {
             return _load(this, options);
@@ -25406,6 +25516,7 @@ var OneNote;
         };
         Application.prototype.toJSON = function () {
             return _toJson(this, {}, {
+                "mathAssistantManager": this._M,
                 "notebooks": this._N,
                 "noteTagManager": this._No
             });
@@ -31982,6 +32093,246 @@ var OneNote;
         return NoteTagManager;
     }(OfficeExtension.ClientObject));
     OneNote.NoteTagManager = NoteTagManager;
+    var _typeMathAssistantManager = "MathAssistantManager";
+    var MathAssistantManager = (function (_super) {
+        __extends(MathAssistantManager, _super);
+        function MathAssistantManager() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        Object.defineProperty(MathAssistantManager.prototype, "_className", {
+            get: function () {
+                return "MathAssistantManager";
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(MathAssistantManager.prototype, "_scalarPropertyNames", {
+            get: function () {
+                return ["selectAndCorrectMode"];
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(MathAssistantManager.prototype, "_scalarPropertyOriginalNames", {
+            get: function () {
+                return ["SelectAndCorrectMode"];
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(MathAssistantManager.prototype, "_scalarPropertyUpdateable", {
+            get: function () {
+                return [true];
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(MathAssistantManager.prototype, "selectAndCorrectMode", {
+            get: function () {
+                _throwIfNotLoaded("selectAndCorrectMode", this._S, _typeMathAssistantManager, this._isNull);
+                return this._S;
+            },
+            set: function (value) {
+                this._S = value;
+                _invokeSetProperty(this, "SelectAndCorrectMode", value, 0);
+            },
+            enumerable: true,
+            configurable: true
+        });
+        MathAssistantManager.prototype.set = function (properties, options) {
+            this._recursivelySet(properties, options, ["selectAndCorrectMode"], [], []);
+        };
+        MathAssistantManager.prototype.update = function (properties) {
+            this._recursivelyUpdate(properties);
+        };
+        MathAssistantManager.prototype.convertInkStrokesToTypesetMath = function (mathml) {
+            _invokeMethod(this, "ConvertInkStrokesToTypesetMath", 1, [mathml], 4, 0);
+        };
+        MathAssistantManager.prototype.getActiveInkStrokes = function () {
+            return _createMethodObject(OneNote.InkStrokeCollection, this, "GetActiveInkStrokes", 1, [], true, false, null, 4);
+        };
+        MathAssistantManager.prototype.getActiveMathMLs = function () {
+            return _invokeMethod(this, "GetActiveMathMLs", 1, [], 4, 0);
+        };
+        MathAssistantManager.prototype.getAlternateInkStrokes = function () {
+            return _createMethodObject(OneNote.InkStrokeCollection, this, "GetAlternateInkStrokes", 1, [], true, false, null, 4);
+        };
+        MathAssistantManager.prototype.initialize = function () {
+            _invokeMethod(this, "Initialize", 1, [], 4, 0);
+        };
+        MathAssistantManager.prototype.onClosing = function () {
+            _invokeMethod(this, "OnClosing", 1, [], 4, 0);
+        };
+        MathAssistantManager.prototype.registerAlterationSelectedEvent = function () {
+            _invokeMethod(this, "RegisterAlterationSelectedEvent", 0, [], 0, 0);
+        };
+        MathAssistantManager.prototype.registerInkSelectedForCorrectionEvent = function () {
+            _invokeMethod(this, "RegisterInkSelectedForCorrectionEvent", 0, [], 0, 0);
+        };
+        MathAssistantManager.prototype.registerResetEvent = function () {
+            _invokeMethod(this, "RegisterResetEvent", 0, [], 0, 0);
+        };
+        MathAssistantManager.prototype.registerRestrictionsCalculatedEvent = function () {
+            _invokeMethod(this, "RegisterRestrictionsCalculatedEvent", 0, [], 0, 0);
+        };
+        MathAssistantManager.prototype.showAlternatesMenu = function (strokeIdsJson, alternatesJson) {
+            _invokeMethod(this, "ShowAlternatesMenu", 1, [strokeIdsJson, alternatesJson], 4, 0);
+        };
+        MathAssistantManager.prototype.unregisterAlterationSelectedEvent = function () {
+            _invokeMethod(this, "UnregisterAlterationSelectedEvent", 0, [], 0, 0);
+        };
+        MathAssistantManager.prototype.unregisterInkSelectedForCorrectionEvent = function () {
+            _invokeMethod(this, "UnregisterInkSelectedForCorrectionEvent", 0, [], 0, 0);
+        };
+        MathAssistantManager.prototype.unregisterResetEvent = function () {
+            _invokeMethod(this, "UnregisterResetEvent", 0, [], 0, 0);
+        };
+        MathAssistantManager.prototype.unregisterRestrictionsCalculatedEvent = function () {
+            _invokeMethod(this, "UnregisterRestrictionsCalculatedEvent", 0, [], 0, 0);
+        };
+        MathAssistantManager.prototype._KeepReference = function () {
+            _invokeMethod(this, "_KeepReference", 1, [], 4, 0);
+        };
+        MathAssistantManager.prototype._handleResult = function (value) {
+            _super.prototype._handleResult.call(this, value);
+            if (_isNullOrUndefined(value))
+                return;
+            var obj = value;
+            _fixObjectPathIfNecessary(this, obj);
+            if (!_isUndefined(obj["SelectAndCorrectMode"])) {
+                this._S = obj["SelectAndCorrectMode"];
+            }
+        };
+        MathAssistantManager.prototype.load = function (options) {
+            return _load(this, options);
+        };
+        MathAssistantManager.prototype.retrieve = function (option) {
+            return _retrieve(this, option);
+        };
+        MathAssistantManager.prototype._handleRetrieveResult = function (value, result) {
+            _super.prototype._handleRetrieveResult.call(this, value, result);
+            _processRetrieveResult(this, value, result);
+        };
+        Object.defineProperty(MathAssistantManager.prototype, "onAlterationSelected", {
+            get: function () {
+                var _this = this;
+                if (!this.m_alterationSelected) {
+                    this.m_alterationSelected = new OfficeExtension.GenericEventHandlers(this.context, this, "AlterationSelected", {
+                        eventType: 14,
+                        registerFunc: function () { _this.registerAlterationSelectedEvent(); },
+                        unregisterFunc: function () { _this.unregisterAlterationSelectedEvent(); },
+                        getTargetIdFunc: function () { return ""; },
+                        eventArgsTransformFunc: function (value) {
+                            var event = {
+                                type: EventType.alterationSelected,
+                                mathML: value.mathML,
+                                firstLevelIndex: value.firstLevelIndex,
+                                secondLevelIndex: value.secondLevelIndex,
+                                strokeIds: value.strokeIds
+                            };
+                            return OfficeExtension.Utility._createPromiseFromResult(event);
+                        }
+                    });
+                }
+                return this.m_alterationSelected;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(MathAssistantManager.prototype, "onInkSelectedForCorrection", {
+            get: function () {
+                var _this = this;
+                if (!this.m_inkSelectedForCorrection) {
+                    this.m_inkSelectedForCorrection = new OfficeExtension.GenericEventHandlers(this.context, this, "InkSelectedForCorrection", {
+                        eventType: 15,
+                        registerFunc: function () { _this.registerInkSelectedForCorrectionEvent(); },
+                        unregisterFunc: function () { _this.unregisterInkSelectedForCorrectionEvent(); },
+                        getTargetIdFunc: function () { return ""; },
+                        eventArgsTransformFunc: function (value) {
+                            var event = {
+                                type: EventType.inkSelectedForCorrection,
+                                isInSnCMode: value.isInSnCMode
+                            };
+                            return OfficeExtension.Utility._createPromiseFromResult(event);
+                        }
+                    });
+                }
+                return this.m_inkSelectedForCorrection;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(MathAssistantManager.prototype, "onReset", {
+            get: function () {
+                var _this = this;
+                if (!this.m_reset) {
+                    this.m_reset = new OfficeExtension.GenericEventHandlers(this.context, this, "Reset", {
+                        eventType: 17,
+                        registerFunc: function () { _this.registerResetEvent(); },
+                        unregisterFunc: function () { _this.unregisterResetEvent(); },
+                        getTargetIdFunc: function () { return ""; },
+                        eventArgsTransformFunc: function (value) {
+                            var event = {
+                                type: EventType.reset
+                            };
+                            return OfficeExtension.Utility._createPromiseFromResult(event);
+                        }
+                    });
+                }
+                return this.m_reset;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(MathAssistantManager.prototype, "onRestrictionsCalculated", {
+            get: function () {
+                var _this = this;
+                if (!this.m_restrictionsCalculated) {
+                    this.m_restrictionsCalculated = new OfficeExtension.GenericEventHandlers(this.context, this, "RestrictionsCalculated", {
+                        eventType: 16,
+                        registerFunc: function () { _this.registerRestrictionsCalculatedEvent(); },
+                        unregisterFunc: function () { _this.unregisterRestrictionsCalculatedEvent(); },
+                        getTargetIdFunc: function () { return ""; },
+                        eventArgsTransformFunc: function (value) {
+                            var event = {
+                                type: EventType.restrictionsCalculated,
+                                isSolvingEnabled: value.isSolvingEnabled,
+                                isStepByStepEnabled: value.isStepByStepEnabled,
+                                isGraphingEnabled: value.isGraphingEnabled,
+                                isKeyGraphFeaturesEnabled: value.isKeyGraphFeaturesEnabled
+                            };
+                            return OfficeExtension.Utility._createPromiseFromResult(event);
+                        }
+                    });
+                }
+                return this.m_restrictionsCalculated;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        MathAssistantManager.prototype.track = function () {
+            this.context.trackedObjects.add(this);
+            return this;
+        };
+        MathAssistantManager.prototype.untrack = function () {
+            this.context.trackedObjects.remove(this);
+            return this;
+        };
+        MathAssistantManager.prototype.toJSON = function () {
+            return _toJson(this, {
+                "selectAndCorrectMode": this._S
+            }, {});
+        };
+        MathAssistantManager.prototype.setMockData = function (data) {
+            _setMockData(this, data);
+        };
+        MathAssistantManager.prototype.ensureUnchanged = function (data) {
+            _invokeEnsureUnchanged(this, data);
+            return;
+        };
+        return MathAssistantManager;
+    }(OfficeExtension.ClientObject));
+    OneNote.MathAssistantManager = MathAssistantManager;
     var EntityType;
     (function (EntityType) {
         EntityType["notebook"] = "Notebook";
@@ -32217,6 +32568,13 @@ var OneNote;
         TagModificationResult["invalidGUID"] = "InvalidGUID";
         TagModificationResult["invalidLabel"] = "InvalidLabel";
     })(TagModificationResult = OneNote.TagModificationResult || (OneNote.TagModificationResult = {}));
+    var EventType;
+    (function (EventType) {
+        EventType["alterationSelected"] = "AlterationSelected";
+        EventType["inkSelectedForCorrection"] = "InkSelectedForCorrection";
+        EventType["restrictionsCalculated"] = "RestrictionsCalculated";
+        EventType["reset"] = "Reset";
+    })(EventType = OneNote.EventType || (OneNote.EventType = {}));
     var ErrorCodes;
     (function (ErrorCodes) {
         ErrorCodes["accessDenied"] = "AccessDenied";

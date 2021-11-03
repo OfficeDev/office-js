@@ -1,4 +1,4 @@
-/* Version: 16.0.14307.10000 */
+/* Version: 16.0.14621.10000 */
 /*
 	Copyright (c) Microsoft Corporation.  All rights reserved.
 */
@@ -3432,14 +3432,14 @@ var Excel;
 		}
 		AutoFilter.prototype.clearColumnCriteria = function(columnIndex) {
 			/// <summary>
-			/// Clears the column filter criteria of the AutoFilter. [Api set: ExcelApiOnline 1.1]
+			/// Clears the column filter criteria of the AutoFilter. [Api set: ExcelApi 1.14]
 			/// </summary>
 			/// <param name="columnIndex" type="Number">The zero-based column index, which represents which column filter needs to be cleared.                If the index value is not supported(for example, if the value is a negative number, or if the value is greater than the number of available columns in the range),                then an `InvalidArgument` exception will be thrown.</param>
 			/// <returns ></returns>
 		}
 		AutoFilter.prototype.clearCriteria = function() {
 			/// <summary>
-			/// Clears the filter criteria of the AutoFilter. [Api set: ExcelApi 1.9]
+			/// Clears the filter criteria and sort state of the AutoFilter. [Api set: ExcelApi 1.9]
 			/// </summary>
 			/// <returns ></returns>
 		}
@@ -4077,6 +4077,23 @@ var Excel;
 
 var Excel;
 (function (Excel) {
+	var Interfaces;
+	(function (Interfaces) {
+		var ChangeDirectionState = (function() {
+			function ChangeDirectionState() {
+				/// <summary> Represents the direction that existing or remaining cells in a worksheet will shift when cells are inserted into or deleted from a worksheet. [Api set: ExcelApi 1.14] </summary>
+				/// <field name="deleteShiftDirection" type="String">Represents the direction (such as up or to the left) that the remaining cells will shift when a cell or cells are deleted.              Note：`insertShiftDirection` and `deleteShiftDirection` are exclusive and both enums can&apos;t have a value at the same time. If one has a value, then the other will return `undefined`. [Api set: ExcelApi 1.14]</field>
+				/// <field name="insertShiftDirection" type="String">Represents the direction (such as down or to the right) that the existing cells will shift when a new cell or cells are inserted.              Note：`insertShiftDirection` and `deleteShiftDirection` are exclusive and both enums can&apos;t have a value at the same time. If one has a value, then the other will return `undefined`. [Api set: ExcelApi 1.14]</field>
+			}
+			return ChangeDirectionState;
+		})();
+		Interfaces.ChangeDirectionState.__proto__ = null;
+		Interfaces.ChangeDirectionState = ChangeDirectionState;
+	})(Interfaces = Excel.Interfaces || (Excel.Interfaces = { __proto__: null}));
+})(Excel || (Excel = {__proto__: null}));
+
+var Excel;
+(function (Excel) {
 	var Chart = (function(_super) {
 		__extends(Chart, _super);
 		function Chart() {
@@ -4145,13 +4162,25 @@ var Excel;
 			/// </summary>
 			/// <returns ></returns>
 		}
+		Chart.prototype.getDataTable = function() {
+			/// <summary>
+			/// Gets the data table on the chart. If the chart doesn&apos;t allow a data table, it will throw an exception. [Api set: ExcelApi 1.14]
+			/// </summary>
+			/// <returns type="Excel.ChartDataTable"></returns>
+		}
+		Chart.prototype.getDataTableOrNullObject = function() {
+			/// <summary>
+			/// Gets the data table on the chart. If the chart doesn&apos;t allow a data table, then this function returns an object with its `isNullObject` property set to `true`.               For further information, see {@link https://docs.microsoft.com/office/dev/add-ins/develop/application-specific-api-model#ornullobject-methods-and-properties | *OrNullObject methods and properties}. [Api set: ExcelApi 1.14]
+			/// </summary>
+			/// <returns type="Excel.ChartDataTable"></returns>
+		}
 		Chart.prototype.getImage = function(width, height, fittingMode) {
 			/// <summary>
 			/// Renders the chart as a base64-encoded image by scaling the chart to fit the specified dimensions.              The aspect ratio is preserved as part of the resizing. [Api set: ExcelApi 1.2]
 			/// </summary>
 			/// <param name="height" type="Number" optional="true">Optional. The desired height of the resulting image.</param>
 			/// <param name="width" type="Number" optional="true">Optional. The desired width of the resulting image.</param>
-			/// <param name="fittingMode" type="String" optional="true">Optional. The method used to scale the chart to the specified to the specified dimensions (if both height and width are set).</param>
+			/// <param name="fittingMode" type="String" optional="true">Optional. The method used to scale the chart to the specified dimensions (if both height and width are set).</param>
 			/// <returns type="OfficeExtension.ClientResult&lt;string&gt;"></returns>
 			var result = new OfficeExtension.ClientResult();
 			result.__proto__ = null;
@@ -5166,6 +5195,91 @@ var Excel;
 		return ChartDataLabels;
 	})(OfficeExtension.ClientObject);
 	Excel.ChartDataLabels = ChartDataLabels;
+})(Excel || (Excel = {__proto__: null}));
+
+var Excel;
+(function (Excel) {
+	var ChartDataTable = (function(_super) {
+		__extends(ChartDataTable, _super);
+		function ChartDataTable() {
+			/// <summary> Represents the data table object of a chart. [Api set: ExcelApi 1.14] </summary>
+			/// <field name="context" type="Excel.RequestContext">The request context associated with this object.</field>
+			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
+			/// <field name="format" type="Excel.ChartDataTableFormat">Represents the format of a chart data table, which includes fill, font, and border format. [Api set: ExcelApi 1.14]</field>
+			/// <field name="showHorizontalBorder" type="Boolean">Specifies whether to display the horizontal border of the data table. [Api set: ExcelApi 1.14]</field>
+			/// <field name="showLegendKey" type="Boolean">Specifies whether to show the legend key of the data table. [Api set: ExcelApi 1.14]</field>
+			/// <field name="showOutlineBorder" type="Boolean">Specifies whether to display the outline border of the data table. [Api set: ExcelApi 1.14]</field>
+			/// <field name="showVerticalBorder" type="Boolean">Specifies whether to display the vertical border of the data table. [Api set: ExcelApi 1.14]</field>
+			/// <field name="visible" type="Boolean">Specifies whether to show the data table of the chart. [Api set: ExcelApi 1.14]</field>
+		}
+
+		ChartDataTable.prototype.load = function(option) {
+			/// <summary>
+			/// Queues up a command to load the specified properties of the object. You must call "context.sync()" before reading the properties.
+			/// </summary>
+			/// <param name="option" type="string | string[] | OfficeExtension.LoadOption"/>
+			/// <returns type="Excel.ChartDataTable"/>
+		}
+
+		ChartDataTable.prototype.set = function() {
+			/// <signature>
+			/// <summary>Sets multiple properties on the object at the same time, based on JSON input.</summary>
+			/// <param name="properties" type="Excel.Interfaces.ChartDataTableUpdateData">Properties described by the Excel.Interfaces.ChartDataTableUpdateData interface.</param>
+			/// <param name="options" type="string">Options of the form { throwOnReadOnly?: boolean }
+			/// <br />
+			/// * throwOnReadOnly: Throw an error if the passed-in property list includes read-only properties (default = true).
+			/// </param>
+			/// </signature>
+			/// <signature>
+			/// <summary>Sets multiple properties on the object at the same time, based on an existing loaded object.</summary>
+			/// <param name="properties" type="ChartDataTable">An existing ChartDataTable object, with properties that have already been loaded and synced.</param>
+			/// </signature>
+		}
+
+		return ChartDataTable;
+	})(OfficeExtension.ClientObject);
+	Excel.ChartDataTable = ChartDataTable;
+})(Excel || (Excel = {__proto__: null}));
+
+var Excel;
+(function (Excel) {
+	var ChartDataTableFormat = (function(_super) {
+		__extends(ChartDataTableFormat, _super);
+		function ChartDataTableFormat() {
+			/// <summary> Represents the format of a chart data table. [Api set: ExcelApi 1.14] </summary>
+			/// <field name="context" type="Excel.RequestContext">The request context associated with this object.</field>
+			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
+			/// <field name="border" type="Excel.ChartBorder">Represents the border format of chart data table, which includes color, line style, and weight. [Api set: ExcelApi 1.14]</field>
+			/// <field name="fill" type="Excel.ChartFill">Represents the fill format of an object, which includes background formatting information. [Api set: ExcelApi 1.14]</field>
+			/// <field name="font" type="Excel.ChartFont">Represents the font attributes (such as font name, font size, and color) for the current object. [Api set: ExcelApi 1.14]</field>
+		}
+
+		ChartDataTableFormat.prototype.load = function(option) {
+			/// <summary>
+			/// Queues up a command to load the specified properties of the object. You must call "context.sync()" before reading the properties.
+			/// </summary>
+			/// <param name="option" type="string | string[] | OfficeExtension.LoadOption"/>
+			/// <returns type="Excel.ChartDataTableFormat"/>
+		}
+
+		ChartDataTableFormat.prototype.set = function() {
+			/// <signature>
+			/// <summary>Sets multiple properties on the object at the same time, based on JSON input.</summary>
+			/// <param name="properties" type="Excel.Interfaces.ChartDataTableFormatUpdateData">Properties described by the Excel.Interfaces.ChartDataTableFormatUpdateData interface.</param>
+			/// <param name="options" type="string">Options of the form { throwOnReadOnly?: boolean }
+			/// <br />
+			/// * throwOnReadOnly: Throw an error if the passed-in property list includes read-only properties (default = true).
+			/// </param>
+			/// </signature>
+			/// <signature>
+			/// <summary>Sets multiple properties on the object at the same time, based on an existing loaded object.</summary>
+			/// <param name="properties" type="ChartDataTableFormat">An existing ChartDataTableFormat object, with properties that have already been loaded and synced.</param>
+			/// </signature>
+		}
+
+		return ChartDataTableFormat;
+	})(OfficeExtension.ClientObject);
+	Excel.ChartDataTableFormat = ChartDataTableFormat;
 })(Excel || (Excel = {__proto__: null}));
 
 var Excel;
@@ -6966,7 +7080,7 @@ var Excel;
 
 var Excel;
 (function (Excel) {
-	/// <summary> [Api set: ExcelApi 1.1 for All/Formats/Contents, 1.7 for Hyperlinks & HyperlinksAndFormats.] </summary>
+	/// <summary> [Api set: ExcelApi 1.1 for All, Formats, and Contents. 1.7 for Hyperlinks and RemoveHyperlinks.] </summary>
 	var ClearApplyTo = {
 		__proto__: null,
 		"all": "all",
@@ -7218,6 +7332,13 @@ var Excel;
 			/// <param name="replyId" type="String">The identifier of comment reply.</param>
 			/// <returns type="Excel.Comment"></returns>
 		}
+		CommentCollection.prototype.getItemOrNullObject = function(commentId) {
+			/// <summary>
+			/// Gets a comment from the collection based on its ID.              If the comment object does not exist, then this function will return an object with its `isNullObject` property set to `true`.               For further information, see {@link https://docs.microsoft.com/office/dev/add-ins/develop/application-specific-api-model#ornullobject-methods-and-properties  | *OrNullObject methods and properties}. [Api set: ExcelApi 1.14]
+			/// </summary>
+			/// <param name="commentId" type="String">The identifier for the comment.</param>
+			/// <returns type="Excel.Comment"></returns>
+		}
 		CommentCollection.prototype.onAdded = {
 			__proto__: null,
 			add: function (handler) {
@@ -7440,6 +7561,13 @@ var Excel;
 			/// Gets a comment reply based on its position in the collection. [Api set: ExcelApi 1.10]
 			/// </summary>
 			/// <param name="index" type="Number">The index value of the comment reply to be retrieved. The collection uses zero-based indexing.</param>
+			/// <returns type="Excel.CommentReply"></returns>
+		}
+		CommentReplyCollection.prototype.getItemOrNullObject = function(commentReplyId) {
+			/// <summary>
+			/// Returns a comment reply identified by its ID.              If the comment reply object does not exist, then this function will return an object with its `isNullObject` property set to `true`.               For further information, see {@link https://docs.microsoft.com/office/dev/add-ins/develop/application-specific-api-model#ornullobject-methods-and-properties  | *OrNullObject methods and properties}. [Api set: ExcelApi 1.14]
+			/// </summary>
+			/// <param name="commentReplyId" type="String">The identifier for the comment reply</param>
 			/// <returns type="Excel.CommentReply"></returns>
 		}
 
@@ -7796,6 +7924,13 @@ var Excel;
 			/// Returns a conditional format at the given index. [Api set: ExcelApi 1.6]
 			/// </summary>
 			/// <param name="index" type="Number">Index of the conditional formats to be retrieved.</param>
+			/// <returns type="Excel.ConditionalFormat"></returns>
+		}
+		ConditionalFormatCollection.prototype.getItemOrNullObject = function(id) {
+			/// <summary>
+			/// Returns a conditional format identified by its ID.              If the conditional format object does not exist, then this function will return an object with its `isNullObject` property set to `true`.               For further information, see {@link https://docs.microsoft.com/office/dev/add-ins/develop/application-specific-api-model#ornullobject-methods-and-properties  | *OrNullObject methods and properties}. [Api set: ExcelApi 1.14]
+			/// </summary>
+			/// <param name="id" type="String">The ID of the conditional format</param>
 			/// <returns type="Excel.ConditionalFormat"></returns>
 		}
 
@@ -9343,6 +9478,17 @@ var Excel;
 		"remote": "remote",
 	}
 	Excel.EventSource = EventSource;
+})(Excel || (Excel = {__proto__: null}));
+
+var Excel;
+(function (Excel) {
+	/// <summary> [Api set: ExcelApi 1.14] </summary>
+	var EventTriggerSource = {
+		__proto__: null,
+		"unknown": "unknown",
+		"thisLocalAddin": "thisLocalAddin",
+	}
+	Excel.EventTriggerSource = EventTriggerSource;
 })(Excel || (Excel = {__proto__: null}));
 
 var Excel;
@@ -13114,6 +13260,13 @@ var Excel;
 			/// <param name="index" type="Number">The zero-based index value of the object to be retrieved.</param>
 			/// <returns type="Excel.Shape"></returns>
 		}
+		GroupShapeCollection.prototype.getItemOrNullObject = function(key) {
+			/// <summary>
+			/// Gets a shape using its name or ID.              If the shape object does not exist, then this function will return an object with its `isNullObject` property set to `true`.               For further information, see {@link https://docs.microsoft.com/office/dev/add-ins/develop/application-specific-api-model#ornullobject-methods-and-properties  | *OrNullObject methods and properties}. [Api set: ExcelApi 1.14]
+			/// </summary>
+			/// <param name="key" type="String">The Name or ID of the shape to be retrieved.</param>
+			/// <returns type="Excel.Shape"></returns>
+		}
 
 		return GroupShapeCollection;
 	})(OfficeExtension.ClientObject);
@@ -13565,6 +13718,108 @@ var Excel;
 
 var Excel;
 (function (Excel) {
+	var LinkedWorkbook = (function(_super) {
+		__extends(LinkedWorkbook, _super);
+		function LinkedWorkbook() {
+			/// <summary> Contains information about a linked workbook.              If a workbook has links pointing to data in another workbook, the second workbook is linked to the first workbook.              In this scenario, the second workbook is called the &quot;linked workbook&quot;. [Api set: ExcelApiOnline 1.1] </summary>
+			/// <field name="context" type="Excel.RequestContext">The request context associated with this object.</field>
+			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
+			/// <field name="id" type="String">The original URL pointing to the linked workbook. It is unique across all linked workbooks in the collection. [Api set: ExcelApiOnline 1.1]</field>
+		}
+
+		LinkedWorkbook.prototype.load = function(option) {
+			/// <summary>
+			/// Queues up a command to load the specified properties of the object. You must call "context.sync()" before reading the properties.
+			/// </summary>
+			/// <param name="option" type="string | string[] | OfficeExtension.LoadOption"/>
+			/// <returns type="Excel.LinkedWorkbook"/>
+		}
+		LinkedWorkbook.prototype.breakLinks = function() {
+			/// <summary>
+			/// Makes a request to break the links pointing to the linked workbook.              Links in formulas are replaced with the latest fetched data.              The current `LinkedWorkbook` object is invalidated and removed from `LinkedWorkbookCollection`. [Api set: ExcelApiOnline 1.1]
+			/// </summary>
+			/// <returns ></returns>
+		}
+		LinkedWorkbook.prototype.refresh = function() {
+			/// <summary>
+			/// Makes a request to refresh the data retrieved from the linked workbook. [Api set: ExcelApiOnline 1.1]
+			/// </summary>
+			/// <returns ></returns>
+		}
+
+		return LinkedWorkbook;
+	})(OfficeExtension.ClientObject);
+	Excel.LinkedWorkbook = LinkedWorkbook;
+})(Excel || (Excel = {__proto__: null}));
+
+var Excel;
+(function (Excel) {
+	var LinkedWorkbookCollection = (function(_super) {
+		__extends(LinkedWorkbookCollection, _super);
+		function LinkedWorkbookCollection() {
+			/// <summary> Represents a collection of linked workbook objects. [Api set: ExcelApiOnline 1.1] </summary>
+			/// <field name="context" type="Excel.RequestContext">The request context associated with this object.</field>
+			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
+			/// <field name="workbookLinksRefreshMode" type="String">Represents the update mode of the workbook links. The mode is same for all of the workbook links present in the workbook. [Api set: ExcelApiOnline 1.1]</field>
+			/// <field name="items" type="Array" elementType="Excel.LinkedWorkbook">Gets the loaded child items in this collection.</field>
+		}
+
+		LinkedWorkbookCollection.prototype.load = function(option) {
+			/// <summary>
+			/// Queues up a command to load the specified properties of the object. You must call "context.sync()" before reading the properties.
+			/// </summary>
+			/// <param name="option" type="string | string[] | OfficeExtension.LoadOption"/>
+			/// <returns type="Excel.LinkedWorkbookCollection"/>
+		}
+
+		LinkedWorkbookCollection.prototype.set = function() {
+			/// <signature>
+			/// <summary>Sets multiple properties on the object at the same time, based on JSON input.</summary>
+			/// <param name="properties" type="Excel.Interfaces.LinkedWorkbookCollectionUpdateData">Properties described by the Excel.Interfaces.LinkedWorkbookCollectionUpdateData interface.</param>
+			/// <param name="options" type="string">Options of the form { throwOnReadOnly?: boolean }
+			/// <br />
+			/// * throwOnReadOnly: Throw an error if the passed-in property list includes read-only properties (default = true).
+			/// </param>
+			/// </signature>
+			/// <signature>
+			/// <summary>Sets multiple properties on the object at the same time, based on an existing loaded object.</summary>
+			/// <param name="properties" type="LinkedWorkbookCollection">An existing LinkedWorkbookCollection object, with properties that have already been loaded and synced.</param>
+			/// </signature>
+		}
+		LinkedWorkbookCollection.prototype.breakAllLinks = function() {
+			/// <summary>
+			/// Breaks all the links to the linked workbooks. Once the links are broken, any formulas referencing workbook links are removed entirely and replaced with the most recently retrieved values. [Api set: ExcelApiOnline 1.1]
+			/// </summary>
+			/// <returns ></returns>
+		}
+		LinkedWorkbookCollection.prototype.getItem = function(key) {
+			/// <summary>
+			/// Gets information about a linked workbook by its URL. [Api set: ExcelApiOnline 1.1]
+			/// </summary>
+			/// <param name="key" type="String">The URL of the linked workbook.</param>
+			/// <returns type="Excel.LinkedWorkbook">The linked workbook with the given URL.</returns>
+		}
+		LinkedWorkbookCollection.prototype.getItemOrNullObject = function(key) {
+			/// <summary>
+			/// Gets information about a linked workbook by its URL. If the workbook does not exist, then this function will return an object with its `isNullObject` property set to `true`.              For further information, see {@link https://docs.microsoft.com/office/dev/add-ins/develop/application-specific-api-model#ornullobject-methods-and-properties  | *OrNullObject methods and properties}. [Api set: ExcelApiOnline 1.1]
+			/// </summary>
+			/// <param name="key" type="String">The URL of the linked workbook.</param>
+			/// <returns type="Excel.LinkedWorkbook">The linked workbook with given URL.</returns>
+		}
+		LinkedWorkbookCollection.prototype.refreshAll = function() {
+			/// <summary>
+			/// Makes a request to refresh all the workbook links. [Api set: ExcelApiOnline 1.1]
+			/// </summary>
+			/// <returns ></returns>
+		}
+
+		return LinkedWorkbookCollection;
+	})(OfficeExtension.ClientObject);
+	Excel.LinkedWorkbookCollection = LinkedWorkbookCollection;
+})(Excel || (Excel = {__proto__: null}));
+
+var Excel;
+(function (Excel) {
 	var Interfaces;
 	(function (Interfaces) {
 		var ListDataValidation = (function() {
@@ -13578,6 +13833,19 @@ var Excel;
 		Interfaces.ListDataValidation.__proto__ = null;
 		Interfaces.ListDataValidation = ListDataValidation;
 	})(Interfaces = Excel.Interfaces || (Excel.Interfaces = { __proto__: null}));
+})(Excel || (Excel = {__proto__: null}));
+
+var Excel;
+(function (Excel) {
+	/// <summary> An enum that specifies the query load to destination. [Api set: ExcelApi 1.14] </summary>
+	var LoadToType = {
+		__proto__: null,
+		"connectionOnly": "connectionOnly",
+		"table": "table",
+		"pivotTable": "pivotTable",
+		"pivotChart": "pivotChart",
+	}
+	Excel.LoadToType = LoadToType;
 })(Excel || (Excel = {__proto__: null}));
 
 var Excel;
@@ -15285,10 +15553,95 @@ var Excel;
 
 var Excel;
 (function (Excel) {
+	var Query = (function(_super) {
+		__extends(Query, _super);
+		function Query() {
+			/// <summary> Represents a PowerQuery query. [Api set: ExcelApi 1.14] </summary>
+			/// <field name="context" type="Excel.RequestContext">The request context associated with this object.</field>
+			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
+			/// <field name="error" type="String">Gets the query error message from when the query was last refreshed. [Api set: ExcelApi 1.14]</field>
+			/// <field name="loadedTo" type="String">Gets the query loaded to object type. [Api set: ExcelApi 1.14]</field>
+			/// <field name="loadedToDataModel" type="Boolean">Specifies if the query loaded to the data model. [Api set: ExcelApi 1.14]</field>
+			/// <field name="name" type="String">Gets the name of the query.              Query names cannot contain periods or quotation marks. [Api set: ExcelApi 1.14]</field>
+			/// <field name="refreshDate" type="Date">Gets the date and time when the query was last refreshed. [Api set: ExcelApi 1.14]</field>
+			/// <field name="rowsLoadedCount" type="Number">Gets the number of rows that were loaded when the query was last refreshed.              If last refresh has errors the value will be -1. [Api set: ExcelApi 1.14]</field>
+		}
+
+		Query.prototype.load = function(option) {
+			/// <summary>
+			/// Queues up a command to load the specified properties of the object. You must call "context.sync()" before reading the properties.
+			/// </summary>
+			/// <param name="option" type="string | string[] | OfficeExtension.LoadOption"/>
+			/// <returns type="Excel.Query"/>
+		}
+
+		return Query;
+	})(OfficeExtension.ClientObject);
+	Excel.Query = Query;
+})(Excel || (Excel = {__proto__: null}));
+
+var Excel;
+(function (Excel) {
+	var QueryCollection = (function(_super) {
+		__extends(QueryCollection, _super);
+		function QueryCollection() {
+			/// <summary> Represents the collection of queries in the workbook. [Api set: ExcelApi 1.14] </summary>
+			/// <field name="context" type="Excel.RequestContext">The request context associated with this object.</field>
+			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
+			/// <field name="items" type="Array" elementType="Excel.Query">Gets the loaded child items in this collection.</field>
+		}
+
+		QueryCollection.prototype.load = function(option) {
+			/// <summary>
+			/// Queues up a command to load the specified properties of the object. You must call "context.sync()" before reading the properties.
+			/// </summary>
+			/// <param name="option" type="string | string[] | OfficeExtension.LoadOption"/>
+			/// <returns type="Excel.QueryCollection"/>
+		}
+		QueryCollection.prototype.getCount = function() {
+			/// <summary>
+			/// Gets the number of queries in the workbook. [Api set: ExcelApi 1.14]
+			/// </summary>
+			/// <returns type="OfficeExtension.ClientResult&lt;number&gt;"></returns>
+			var result = new OfficeExtension.ClientResult();
+			result.__proto__ = null;
+			result.value = 0;
+			return result;
+		}
+		QueryCollection.prototype.getItem = function(key) {
+			/// <summary>
+			/// Gets a query from the collection based on its name. [Api set: ExcelApi 1.14]
+			/// </summary>
+			/// <param name="key" type="String">The name of the query case-insensitive.</param>
+			/// <returns type="Excel.Query">The query with the given name. If there is no query by that name, then an error is thrown.</returns>
+		}
+
+		return QueryCollection;
+	})(OfficeExtension.ClientObject);
+	Excel.QueryCollection = QueryCollection;
+})(Excel || (Excel = {__proto__: null}));
+
+var Excel;
+(function (Excel) {
+	/// <summary> An enum that specifies the query load error message. [Api set: ExcelApi 1.14] </summary>
+	var QueryError = {
+		__proto__: null,
+		"unknown": "unknown",
+		"none": "none",
+		"failedLoadToWorksheet": "failedLoadToWorksheet",
+		"failedLoadToDataModel": "failedLoadToDataModel",
+		"failedDownload": "failedDownload",
+		"failedToCompleteDownload": "failedToCompleteDownload",
+	}
+	Excel.QueryError = QueryError;
+})(Excel || (Excel = {__proto__: null}));
+
+var Excel;
+(function (Excel) {
 	var Range = (function(_super) {
 		__extends(Range, _super);
 		function Range() {
-			/// <summary> Range represents a set of one or more contiguous cells such as a cell, a row, a column, block of cells, etc.               To learn more about how ranges are used throughout the API, read {@link https://docs.microsoft.com/office/dev/add-ins/excel/excel-add-ins-ranges | Work with ranges using the Excel JavaScript API}               and {@link https://docs.microsoft.com/office/dev/add-ins/excel/excel-add-ins-ranges-advanced | Work with ranges using the Excel JavaScript API (advanced)}. [Api set: ExcelApi 1.1] </summary>
+			/// <summary> Range represents a set of one or more contiguous cells such as a cell, a row, a column, or a block of cells.              To learn more about how ranges are used throughout the API, start with {@link https://docs.microsoft.com/office/dev/add-ins/excel/excel-add-ins-core-concepts#ranges | Ranges in the Excel JavaScript API}. [Api set: ExcelApi 1.1] </summary>
 			/// <field name="context" type="Excel.RequestContext">The request context associated with this object.</field>
 			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
 			/// <field name="address" type="String">Specifies the range reference in A1-style. Address value contains the sheet reference (e.g., &quot;Sheet1!A1:B4&quot;). [Api set: ExcelApi 1.1]</field>
@@ -15584,6 +15937,12 @@ var Excel;
 			/// </summary>
 			/// <param name="fullyContained" type="Boolean" optional="true">If `true`, returns only PivotTables that are fully contained within the range bounds. The default value is `false`.</param>
 			/// <returns type="Excel.PivotTableScopedCollection"></returns>
+		}
+		Range.prototype.getPrecedents = function() {
+			/// <summary>
+			/// Returns a `WorkbookRangeAreas` object that represents the range containing all the precedents of a cell in the same worksheet or in multiple worksheets. [Api set: ExcelApi 1.14]
+			/// </summary>
+			/// <returns type="Excel.WorkbookRangeAreas"></returns>
 		}
 		Range.prototype.getRangeEdge = function(direction, activeCell) {
 			/// <summary>
@@ -17276,6 +17635,13 @@ var Excel;
 			/// <param name="index" type="Number">The zero-based index of the shape to be retrieved.</param>
 			/// <returns type="Excel.Shape"></returns>
 		}
+		ShapeCollection.prototype.getItemOrNullObject = function(key) {
+			/// <summary>
+			/// Gets a shape using its name or ID.              If the shape object does not exist, then this function will return an object with its `isNullObject` property set to `true`.               For further information, see {@link https://docs.microsoft.com/office/dev/add-ins/develop/application-specific-api-model#ornullobject-methods-and-properties  | *OrNullObject methods and properties}. [Api set: ExcelApi 1.14]
+			/// </summary>
+			/// <param name="key" type="String">Name or ID of the shape to retrieved.</param>
+			/// <returns type="Excel.Shape"></returns>
+		}
 
 		return ShapeCollection;
 	})(OfficeExtension.ClientObject);
@@ -17501,7 +17867,7 @@ var Excel;
 			/// <field name="context" type="Excel.RequestContext">The request context associated with this object.</field>
 			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
 			/// <field name="color" type="String">Represents the line color in HTML color format, in the form #RRGGBB (e.g., &quot;FFA500&quot;) or as a named HTML color (e.g., &quot;orange&quot;). [Api set: ExcelApi 1.9]</field>
-			/// <field name="dashStyle" type="String">Represents the line style of the shape. Returns `null` when the line is not visible or there are inconsistent dash styles. See `Excel.ShapeLineStyle` for details. [Api set: ExcelApi 1.9]</field>
+			/// <field name="dashStyle" type="String">Represents the line style of the shape. Returns `null` when the line is not visible or there are inconsistent dash styles. See `Excel.ShapeLineDashStyle` for details. [Api set: ExcelApi 1.9]</field>
 			/// <field name="style" type="String">Represents the line style of the shape. Returns `null` when the line is not visible or there are inconsistent styles. See `Excel.ShapeLineStyle` for details. [Api set: ExcelApi 1.9]</field>
 			/// <field name="transparency" type="Number">Represents the degree of transparency of the specified line as a value from 0.0 (opaque) through 1.0 (clear). Returns `null` when the shape has inconsistent transparencies. [Api set: ExcelApi 1.9]</field>
 			/// <field name="visible" type="Boolean">Specifies if the line formatting of a shape element is visible. Returns `null` when the shape has inconsistent visibilities. [Api set: ExcelApi 1.9]</field>
@@ -18344,6 +18710,13 @@ var Excel;
 			/// <param name="index" type="Number">Index value of the style object to be retrieved. Zero-indexed.</param>
 			/// <returns type="Excel.Style"></returns>
 		}
+		StyleCollection.prototype.getItemOrNullObject = function(name) {
+			/// <summary>
+			/// Gets a style by name.              If the style object does not exist, then this function will return an object with its `isNullObject` property set to `true`.               For further information, see {@link https://docs.microsoft.com/office/dev/add-ins/develop/application-specific-api-model#ornullobject-methods-and-properties  | *OrNullObject methods and properties}. [Api set: ExcelApi 1.14]
+			/// </summary>
+			/// <param name="name" type="String">Name of the style to be retrieved.</param>
+			/// <returns type="Excel.Style"></returns>
+		}
 
 		return StyleCollection;
 	})(OfficeExtension.ClientObject);
@@ -18907,13 +19280,28 @@ var Excel;
 			/// <param name="option" type="string | string[] | OfficeExtension.LoadOption"/>
 			/// <returns type="Excel.TableRowCollection"/>
 		}
-		TableRowCollection.prototype.add = function(index, values) {
+		TableRowCollection.prototype.add = function(index, values, alwaysInsert) {
 			/// <summary>
 			/// Adds one or more rows to the table. The return object will be the top of the newly added row(s).                             Note that unlike ranges or columns, which will adjust if new rows or columns are added before them,               a `TableRow` object represents the physical location of the table row, but not the data.               That is, if the data is sorted or if new rows are added, a table row will continue               to point at the index for which it was created. [Api set: ExcelApi 1.1 for adding a single row; 1.4 allows adding of multiple rows.]
 			/// </summary>
 			/// <param name="index" type="Number" optional="true">Optional. Specifies the relative position of the new row. If null or -1, the addition happens at the end. Any rows below the inserted row are shifted downwards. Zero-indexed.</param>
 			/// <param name="values"  optional="true">Optional. A 2D array of unformatted values of the table row.</param>
 			/// <returns type="Excel.TableRow"></returns>
+		}
+		TableRowCollection.prototype.deleteRows = function(rows) {
+			/// <summary>
+			/// Delete multiple rows from a table.               These rows don&apos;t need to be sequential. This method will throw the `InvalidArgument` error if a chosen row has already been deleted or doesn&apos;t exist.              This method will throw the `InsertDeleteConflict` error if the table on which the method is called has a filter applied. [Api set: ExcelApiOnline 1.1]
+			/// </summary>
+			/// <param name="rows" type="Array" >An array of row index numbers or row objects to delete from the table.</param>
+			/// <returns ></returns>
+		}
+		TableRowCollection.prototype.deleteRowsAt = function(index, count) {
+			/// <summary>
+			/// Delete a specified number of rows from a table, starting at a given index.              This method will throw the `InsertDeleteConflict` error if the table on which the method is called has a filter applied. [Api set: ExcelApiOnline 1.1]
+			/// </summary>
+			/// <param name="index" type="Number">The index value of the row to be deleted. Note: Row indexes update each time that a preceding row in the table is deleted, after each delete operation. Ensure that the index of the row that you want to delete hasn&apos;t changed between the time that you determined the value and the time that you run the operation.</param>
+			/// <param name="count" type="Number" optional="true">Number of rows to delete. By default, a single row will be deleted.</param>
+			/// <returns ></returns>
 		}
 		TableRowCollection.prototype.getCount = function() {
 			/// <summary>
@@ -18975,6 +19363,13 @@ var Excel;
 		TableScopedCollection.prototype.getItem = function(key) {
 			/// <summary>
 			/// Gets a table by name or ID. [Api set: ExcelApi 1.9]
+			/// </summary>
+			/// <param name="key" type="String">Name or ID of the table to be retrieved.</param>
+			/// <returns type="Excel.Table"></returns>
+		}
+		TableScopedCollection.prototype.getItemOrNullObject = function(key) {
+			/// <summary>
+			/// Gets a table by name or ID.              If the table object does not exist, then this function will return an object with its `isNullObject` property set to `true`.               For further information, see {@link https://docs.microsoft.com/office/dev/add-ins/develop/application-specific-api-model#ornullobject-methods-and-properties  | *OrNullObject methods and properties}. [Api set: ExcelApi 1.14]
 			/// </summary>
 			/// <param name="key" type="String">Name or ID of the table to be retrieved.</param>
 			/// <returns type="Excel.Table"></returns>
@@ -19567,6 +19962,7 @@ var Excel;
 			/// <field name="dataConnections" type="Excel.DataConnectionCollection">Represents all data connections in the workbook. [Api set: ExcelApi 1.7]</field>
 			/// <field name="functions" type="Excel.Functions">Represents a collection of worksheet functions that can be used for computation. [Api set: ExcelApi 1.2]</field>
 			/// <field name="isDirty" type="Boolean">Specifies if changes have been made since the workbook was last saved.              You can set this property to `true` if you want to close a modified workbook without either saving it or being prompted to save it. [Api set: ExcelApi 1.9]</field>
+			/// <field name="linkedWorkbooks" type="Excel.LinkedWorkbookCollection">Returns a collection of linked workbooks. In formulas, the workbook links can be used to reference data (cell values and names) outside of the current workbook. [Api set: ExcelApiOnline 1.1]</field>
 			/// <field name="name" type="String">Gets the workbook name. [Api set: ExcelApi 1.7]</field>
 			/// <field name="names" type="Excel.NamedItemCollection">Represents a collection of workbook-scoped named items (named ranges and constants). [Api set: ExcelApi 1.1]</field>
 			/// <field name="pivotTableStyles" type="Excel.PivotTableStyleCollection">Represents a collection of PivotTableStyles associated with the workbook. [Api set: ExcelApi 1.10]</field>
@@ -19574,6 +19970,7 @@ var Excel;
 			/// <field name="previouslySaved" type="Boolean">Specifies if the workbook has ever been saved locally or online. [Api set: ExcelApi 1.9]</field>
 			/// <field name="properties" type="Excel.DocumentProperties">Gets the workbook properties. [Api set: ExcelApi 1.7]</field>
 			/// <field name="protection" type="Excel.WorkbookProtection">Returns the protection object for a workbook. [Api set: ExcelApi 1.7]</field>
+			/// <field name="queries" type="Excel.QueryCollection">Returns a collection of Power Query queries that are part of the workbook. [Api set: ExcelApi 1.14]</field>
 			/// <field name="readOnly" type="Boolean">Returns `true` if the workbook is open in read-only mode. [Api set: ExcelApi 1.8]</field>
 			/// <field name="settings" type="Excel.SettingCollection">Represents a collection of settings associated with the workbook. [Api set: ExcelApi 1.4]</field>
 			/// <field name="slicerStyles" type="Excel.SlicerStyleCollection">Represents a collection of SlicerStyles associated with the workbook. [Api set: ExcelApi 1.10]</field>
@@ -19672,11 +20069,11 @@ var Excel;
 		}
 		Workbook.prototype.insertWorksheetsFromBase64 = function(base64File, options) {
 			/// <summary>
-			/// Inserts the specified worksheets from a source workbook into the current workbook.                             **Note**: This API is currently only supported for Office on Windows, Mac and Online. [Api set: ExcelApi 1.13]
+			/// Inserts the specified worksheets from a source workbook into the current workbook.                             **Note**: This API is currently only supported for Office on Windows, Mac, and the web. [Api set: ExcelApi 1.13]
 			/// </summary>
 			/// <param name="base64File" type="String">Required. The base64-encoded string representing the source workbook file.</param>
 			/// <param name="options" type="Excel.Interfaces.InsertWorksheetOptions" optional="true">Optional. The options that define which worksheets to insert and where in the workbook the new worksheets will be inserted. By default, all the worksheets from the source workbook are inserted at the end of the current workbook.</param>
-			/// <returns type="OfficeExtension.ClientResult&lt;string[]&gt;">An array of ids corresponding to each newly inserted worksheet.</returns>
+			/// <returns type="OfficeExtension.ClientResult&lt;string[]&gt;">An array of IDs corresponding to each newly inserted worksheet.</returns>
 			var result = new OfficeExtension.ClientResult();
 			result.__proto__ = null;
 			result.value = [];
@@ -19790,6 +20187,17 @@ var Excel;
 		return WorkbookCreated;
 	})(OfficeExtension.ClientObject);
 	Excel.WorkbookCreated = WorkbookCreated;
+})(Excel || (Excel = {__proto__: null}));
+
+var Excel;
+(function (Excel) {
+	/// <summary> Represents the refresh mode of the workbook links. [Api set: ExcelApiOnline 1.1] </summary>
+	var WorkbookLinksRefreshMode = {
+		__proto__: null,
+		"manual": "manual",
+		"automatic": "automatic",
+	}
+	Excel.WorkbookLinksRefreshMode = WorkbookLinksRefreshMode;
 })(Excel || (Excel = {__proto__: null}));
 
 var Excel;
@@ -19914,6 +20322,7 @@ var Excel;
 			/// <field name="standardHeight" type="Number">Returns the standard (default) height of all the rows in the worksheet, in points. [Api set: ExcelApi 1.7]</field>
 			/// <field name="standardWidth" type="Number">Specifies the standard (default) width of all the columns in the worksheet.              One unit of column width is equal to the width of one character in the Normal style. For proportional fonts, the width of the character 0 (zero) is used. [Api set: ExcelApi 1.7]</field>
 			/// <field name="tabColor" type="String">The tab color of the worksheet.              When retrieving the tab color, if the worksheet is invisible, the value will be `null`. If the worksheet is visible but the tab color is set to auto, an empty string will be returned. Otherwise, the property will be set to a color, in the form #RRGGBB (e.g., &quot;FFA500&quot;).              When setting the color, use an empty-string to set an &quot;auto&quot; color, or a real color otherwise. [Api set: ExcelApi 1.7]</field>
+			/// <field name="tabId" type="Number">Returns a value representing this worksheet that can be read by Open Office XML. This is integer value, which is different from `worksheet.id` (GUID), `worksheet.name` (eg: &quot;Sheet1&quot;). [Api set: ExcelApi 1.14]</field>
 			/// <field name="tables" type="Excel.TableCollection">Collection of tables that are part of the worksheet. [Api set: ExcelApi 1.1]</field>
 			/// <field name="verticalPageBreaks" type="Excel.PageBreakCollection">Gets the vertical page break collection for the worksheet. This collection only contains manual page breaks. [Api set: ExcelApi 1.9]</field>
 			/// <field name="visibility" type="String">The visibility of the worksheet. [Api set: ExcelApi 1.1 for reading visibility; 1.2 for setting it.]</field>
@@ -19924,10 +20333,13 @@ var Excel;
 			/// <field name="onDeactivated" type="OfficeExtension.EventHandlers">Occurs when the worksheet is deactivated. [Api set: ExcelApi 1.7]</field>
 			/// <field name="onFormatChanged" type="OfficeExtension.EventHandlers">Occurs when format changed on a specific worksheet. [Api set: ExcelApi 1.9]</field>
 			/// <field name="onFormulaChanged" type="OfficeExtension.EventHandlers">Occurs when one or more formulas are changed in this worksheet. This event is for when the formula itself changes, not the data value resulting from the formula&apos;s calculation. [Api set: ExcelApi 1.13]</field>
+			/// <field name="onNameChanged" type="OfficeExtension.EventHandlers">Occurs when the worksheet name is changed. [Api set: ExcelApiOnline 1.1]</field>
+			/// <field name="onProtectionChanged" type="OfficeExtension.EventHandlers">Occurs when the worksheet protection state is changed. [Api set: ExcelApi 1.14]</field>
 			/// <field name="onRowHiddenChanged" type="OfficeExtension.EventHandlers">Occurs when the hidden state of one or more rows has changed on a specific worksheet. [Api set: ExcelApi 1.11]</field>
 			/// <field name="onRowSorted" type="OfficeExtension.EventHandlers">Occurs when one or more rows have been sorted. This happens as the result of a top-to-bottom sort operation. [Api set: ExcelApi 1.10]</field>
 			/// <field name="onSelectionChanged" type="OfficeExtension.EventHandlers">Occurs when the selection changes on a specific worksheet. [Api set: ExcelApi 1.7]</field>
 			/// <field name="onSingleClicked" type="OfficeExtension.EventHandlers">Occurs when a left-clicked/tapped action happens in the worksheet. This event will not be fired when clicking in the following cases:                            - The user drags the mouse for multi-selection.                            - The user selects a cell in the mode when cell arguments are selected for formula references. [Api set: ExcelApi 1.10]</field>
+			/// <field name="onVisibilityChanged" type="OfficeExtension.EventHandlers">Occurs when the worksheet visibility is changed. [Api set: ExcelApiOnline 1.1]</field>
 		}
 
 		Worksheet.prototype.load = function(option) {
@@ -20188,6 +20600,34 @@ var Excel;
 				return;
 			}
 		};
+		Worksheet.prototype.onNameChanged = {
+			__proto__: null,
+			add: function (handler) {
+				/// <param name="handler" type="function(eventArgs: Excel.Interfaces.WorksheetNameChangedEventArgs)">Handler for the event. EventArgs: Provides information about the worksheet whose name has changed. </param>
+				/// <returns type="OfficeExtension.EventHandlerResult"></returns>
+				var eventInfo = new Excel.Interfaces.WorksheetNameChangedEventArgs();
+				eventInfo.__proto__ = null;
+				handler(eventInfo);
+			},
+			remove: function (handler) {
+				/// <param name="handler" type="function(eventArgs: Excel.Interfaces.WorksheetNameChangedEventArgs)">Handler for the event.</param>
+				return;
+			}
+		};
+		Worksheet.prototype.onProtectionChanged = {
+			__proto__: null,
+			add: function (handler) {
+				/// <param name="handler" type="function(eventArgs: Excel.Interfaces.WorksheetProtectionChangedEventArgs)">Handler for the event. EventArgs: Provides information about the worksheet that raised the protection status changed event, which fires when the protection status is updated in a worksheet. </param>
+				/// <returns type="OfficeExtension.EventHandlerResult"></returns>
+				var eventInfo = new Excel.Interfaces.WorksheetProtectionChangedEventArgs();
+				eventInfo.__proto__ = null;
+				handler(eventInfo);
+			},
+			remove: function (handler) {
+				/// <param name="handler" type="function(eventArgs: Excel.Interfaces.WorksheetProtectionChangedEventArgs)">Handler for the event.</param>
+				return;
+			}
+		};
 		Worksheet.prototype.onRowHiddenChanged = {
 			__proto__: null,
 			add: function (handler) {
@@ -20241,6 +20681,20 @@ var Excel;
 			},
 			remove: function (handler) {
 				/// <param name="handler" type="function(eventArgs: Excel.Interfaces.WorksheetSingleClickedEventArgs)">Handler for the event.</param>
+				return;
+			}
+		};
+		Worksheet.prototype.onVisibilityChanged = {
+			__proto__: null,
+			add: function (handler) {
+				/// <param name="handler" type="function(eventArgs: Excel.Interfaces.WorksheetVisibilityChangedEventArgs)">Handler for the event. EventArgs: Provides information about the worksheet whose visibility has changed. </param>
+				/// <returns type="OfficeExtension.EventHandlerResult"></returns>
+				var eventInfo = new Excel.Interfaces.WorksheetVisibilityChangedEventArgs();
+				eventInfo.__proto__ = null;
+				handler(eventInfo);
+			},
+			remove: function (handler) {
+				/// <param name="handler" type="function(eventArgs: Excel.Interfaces.WorksheetVisibilityChangedEventArgs)">Handler for the event.</param>
 				return;
 			}
 		};
@@ -20316,6 +20770,8 @@ var Excel;
 				/// <field name="source" type="String">Gets the source of the event. See `Excel.EventSource` for details. [Api set: ExcelApi 1.7]</field>
 				/// <field name="type" type="String">Gets the type of the event. See `Excel.EventType` for details. [Api set: ExcelApi 1.7]</field>
 				/// <field name="worksheetId" type="String">Gets the ID of the worksheet in which the data changed. [Api set: ExcelApi 1.7]</field>
+				/// <field name="changeDirectionState" type="Excel.Interfaces.ChangeDirectionState">Represents a change to the direction that the cells in a worksheet will shift when a cell or cells are deleted or inserted. This includes the following two scenarios.              1. The direction (such as down or to the right) that existing cells will shift when a new cell or cells are inserted into a worksheet.              2. The direction (such as up or to the left) that the remaining cells will shift when a cell or cells are deleted from a worksheet. [Api set: ExcelApi 1.14]</field>
+				/// <field name="triggerSource" type="String">Represents the trigger source of the event. For example, identifies whether this local add-in triggers the event. [Api set: ExcelApi 1.14]</field>
 			}
 			return WorksheetChangedEventArgs;
 		})();
@@ -20341,10 +20797,14 @@ var Excel;
 			/// <field name="onDeleted" type="OfficeExtension.EventHandlers">Occurs when a worksheet is deleted from the workbook. [Api set: ExcelApi 1.7]</field>
 			/// <field name="onFormatChanged" type="OfficeExtension.EventHandlers">Occurs when any worksheet in the workbook has a format changed. [Api set: ExcelApi 1.9]</field>
 			/// <field name="onFormulaChanged" type="OfficeExtension.EventHandlers">Occurs when one or more formulas are changed in any worksheet of this collection. This event is for when the formula itself changes, not the data value resulting from the formula&apos;s calculation. [Api set: ExcelApi 1.13]</field>
+			/// <field name="onMoved" type="OfficeExtension.EventHandlers">Occurs when a worksheet is moved by a user within a workbook. [Api set: ExcelApiOnline 1.1]</field>
+			/// <field name="onNameChanged" type="OfficeExtension.EventHandlers">Occurs when the worksheet name is changed in the worksheet collection. [Api set: ExcelApiOnline 1.1]</field>
+			/// <field name="onProtectionChanged" type="OfficeExtension.EventHandlers">Occurs when the worksheet protection state is changed. [Api set: ExcelApi 1.14]</field>
 			/// <field name="onRowHiddenChanged" type="OfficeExtension.EventHandlers">Occurs when the hidden state of one or more rows has changed on a specific worksheet. [Api set: ExcelApi 1.11]</field>
 			/// <field name="onRowSorted" type="OfficeExtension.EventHandlers">Occurs when one or more rows have been sorted. This happens as the result of a top-to-bottom sort operation. [Api set: ExcelApi 1.10]</field>
 			/// <field name="onSelectionChanged" type="OfficeExtension.EventHandlers">Occurs when the selection changes on any worksheet. [Api set: ExcelApi 1.9]</field>
 			/// <field name="onSingleClicked" type="OfficeExtension.EventHandlers">Occurs when left-clicked/tapped operation happens in the worksheet collection. This event will not be fired when clicking in the following cases:              - The user drags the mouse for multi-selection.              - The user selects a cell in the mode when cell arguments are selected for formula references. [Api set: ExcelApi 1.10]</field>
+			/// <field name="onVisibilityChanged" type="OfficeExtension.EventHandlers">Occurs when the worksheet visibility is changed in the worksheet collection. [Api set: ExcelApiOnline 1.1]</field>
 			/// <field name="items" type="Array" elementType="Excel.Worksheet">Gets the loaded child items in this collection.</field>
 		}
 
@@ -20533,6 +20993,48 @@ var Excel;
 				return;
 			}
 		};
+		WorksheetCollection.prototype.onMoved = {
+			__proto__: null,
+			add: function (handler) {
+				/// <param name="handler" type="function(eventArgs: Excel.Interfaces.WorksheetMovedEventArgs)">Handler for the event. EventArgs: Notifies when a worksheet is moved within a workbook.                            If a worksheet is moved from one position within the workbook to another              via the Excel UI, then this API will trigger an event. Note that if               the position of a worksheet changes as a result of moving a different worksheet,              then this event won&apos;t trigger for both position changes. This event only triggers              for the primary worksheet move, and not any worksheet position changes that occur              as a result of that primary move. </param>
+				/// <returns type="OfficeExtension.EventHandlerResult"></returns>
+				var eventInfo = new Excel.Interfaces.WorksheetMovedEventArgs();
+				eventInfo.__proto__ = null;
+				handler(eventInfo);
+			},
+			remove: function (handler) {
+				/// <param name="handler" type="function(eventArgs: Excel.Interfaces.WorksheetMovedEventArgs)">Handler for the event.</param>
+				return;
+			}
+		};
+		WorksheetCollection.prototype.onNameChanged = {
+			__proto__: null,
+			add: function (handler) {
+				/// <param name="handler" type="function(eventArgs: Excel.Interfaces.WorksheetNameChangedEventArgs)">Handler for the event. EventArgs: Provides information about the worksheet whose name has changed. </param>
+				/// <returns type="OfficeExtension.EventHandlerResult"></returns>
+				var eventInfo = new Excel.Interfaces.WorksheetNameChangedEventArgs();
+				eventInfo.__proto__ = null;
+				handler(eventInfo);
+			},
+			remove: function (handler) {
+				/// <param name="handler" type="function(eventArgs: Excel.Interfaces.WorksheetNameChangedEventArgs)">Handler for the event.</param>
+				return;
+			}
+		};
+		WorksheetCollection.prototype.onProtectionChanged = {
+			__proto__: null,
+			add: function (handler) {
+				/// <param name="handler" type="function(eventArgs: Excel.Interfaces.WorksheetProtectionChangedEventArgs)">Handler for the event. EventArgs: Provides information about the worksheet that raised the protection status changed event, which fires when the protection status is updated in a worksheet. </param>
+				/// <returns type="OfficeExtension.EventHandlerResult"></returns>
+				var eventInfo = new Excel.Interfaces.WorksheetProtectionChangedEventArgs();
+				eventInfo.__proto__ = null;
+				handler(eventInfo);
+			},
+			remove: function (handler) {
+				/// <param name="handler" type="function(eventArgs: Excel.Interfaces.WorksheetProtectionChangedEventArgs)">Handler for the event.</param>
+				return;
+			}
+		};
 		WorksheetCollection.prototype.onRowHiddenChanged = {
 			__proto__: null,
 			add: function (handler) {
@@ -20586,6 +21088,20 @@ var Excel;
 			},
 			remove: function (handler) {
 				/// <param name="handler" type="function(eventArgs: Excel.Interfaces.WorksheetSingleClickedEventArgs)">Handler for the event.</param>
+				return;
+			}
+		};
+		WorksheetCollection.prototype.onVisibilityChanged = {
+			__proto__: null,
+			add: function (handler) {
+				/// <param name="handler" type="function(eventArgs: Excel.Interfaces.WorksheetVisibilityChangedEventArgs)">Handler for the event. EventArgs: Provides information about the worksheet whose visibility has changed. </param>
+				/// <returns type="OfficeExtension.EventHandlerResult"></returns>
+				var eventInfo = new Excel.Interfaces.WorksheetVisibilityChangedEventArgs();
+				eventInfo.__proto__ = null;
+				handler(eventInfo);
+			},
+			remove: function (handler) {
+				/// <param name="handler" type="function(eventArgs: Excel.Interfaces.WorksheetVisibilityChangedEventArgs)">Handler for the event.</param>
 				return;
 			}
 		};
@@ -20853,6 +21369,46 @@ var Excel;
 
 var Excel;
 (function (Excel) {
+	var Interfaces;
+	(function (Interfaces) {
+		var WorksheetMovedEventArgs = (function() {
+			function WorksheetMovedEventArgs() {
+				/// <summary> Notifies when a worksheet is moved within a workbook.                            If a worksheet is moved from one position within the workbook to another              via the Excel UI, then this API will trigger an event. Note that if               the position of a worksheet changes as a result of moving a different worksheet,              then this event won&apos;t trigger for both position changes. This event only triggers              for the primary worksheet move, and not any worksheet position changes that occur              as a result of that primary move. [Api set: ExcelApiOnline 1.1] </summary>
+				/// <field name="positionAfter" type="Number">Gets the new position of the worksheet, after the move. [Api set: ExcelApiOnline 1.1]</field>
+				/// <field name="positionBefore" type="Number">Gets the previous position of the worksheet, prior to the move. [Api set: ExcelApiOnline 1.1]</field>
+				/// <field name="source" type="String">The source of the event. It can be local or remote (through co-authoring). [Api set: ExcelApiOnline 1.1]</field>
+				/// <field name="type" type="String">Gets the type of the event. [Api set: ExcelApiOnline 1.1]</field>
+				/// <field name="worksheetId" type="String">Gets the ID of the worksheet that was moved. [Api set: ExcelApiOnline 1.1]</field>
+			}
+			return WorksheetMovedEventArgs;
+		})();
+		Interfaces.WorksheetMovedEventArgs.__proto__ = null;
+		Interfaces.WorksheetMovedEventArgs = WorksheetMovedEventArgs;
+	})(Interfaces = Excel.Interfaces || (Excel.Interfaces = { __proto__: null}));
+})(Excel || (Excel = {__proto__: null}));
+
+var Excel;
+(function (Excel) {
+	var Interfaces;
+	(function (Interfaces) {
+		var WorksheetNameChangedEventArgs = (function() {
+			function WorksheetNameChangedEventArgs() {
+				/// <summary> Provides information about the worksheet whose name has changed. [Api set: ExcelApiOnline 1.1] </summary>
+				/// <field name="nameAfter" type="String">Gets the new name of the worksheet, after the name change. [Api set: ExcelApiOnline 1.1]</field>
+				/// <field name="nameBefore" type="String">Gets the previous name of the worksheet, before the name changed. [Api set: ExcelApiOnline 1.1]</field>
+				/// <field name="source" type="String">The source of the event. It can be local or remote (through co-authoring). [Api set: ExcelApiOnline 1.1]</field>
+				/// <field name="type" type="String">Gets the type of the event. [Api set: ExcelApiOnline 1.1]</field>
+				/// <field name="worksheetId" type="String">Gets the ID of the worksheet with the new name. [Api set: ExcelApiOnline 1.1]</field>
+			}
+			return WorksheetNameChangedEventArgs;
+		})();
+		Interfaces.WorksheetNameChangedEventArgs.__proto__ = null;
+		Interfaces.WorksheetNameChangedEventArgs = WorksheetNameChangedEventArgs;
+	})(Interfaces = Excel.Interfaces || (Excel.Interfaces = { __proto__: null}));
+})(Excel || (Excel = {__proto__: null}));
+
+var Excel;
+(function (Excel) {
 	/// <summary> [Api set: ExcelApi 1.7] </summary>
 	var WorksheetPositionType = {
 		__proto__: null,
@@ -20903,6 +21459,25 @@ var Excel;
 		return WorksheetProtection;
 	})(OfficeExtension.ClientObject);
 	Excel.WorksheetProtection = WorksheetProtection;
+})(Excel || (Excel = {__proto__: null}));
+
+var Excel;
+(function (Excel) {
+	var Interfaces;
+	(function (Interfaces) {
+		var WorksheetProtectionChangedEventArgs = (function() {
+			function WorksheetProtectionChangedEventArgs() {
+				/// <summary> Provides information about the worksheet that raised the protection status changed event, which fires when the protection status is updated in a worksheet. [Api set: ExcelApi 1.14] </summary>
+				/// <field name="isProtected" type="Boolean">Gets the current protection status of the worksheet. [Api set: ExcelApi 1.14]</field>
+				/// <field name="source" type="String">The source of the event. It can be local or remote (through co-authoring). [Api set: ExcelApi 1.14]</field>
+				/// <field name="type" type="String">Gets the type of the event. See `Excel.EventType` for details. [Api set: ExcelApi 1.14]</field>
+				/// <field name="worksheetId" type="String">Gets the ID of the worksheet in which the protection status is changed. [Api set: ExcelApi 1.14]</field>
+			}
+			return WorksheetProtectionChangedEventArgs;
+		})();
+		Interfaces.WorksheetProtectionChangedEventArgs.__proto__ = null;
+		Interfaces.WorksheetProtectionChangedEventArgs = WorksheetProtectionChangedEventArgs;
+	})(Interfaces = Excel.Interfaces || (Excel.Interfaces = { __proto__: null}));
 })(Excel || (Excel = {__proto__: null}));
 
 var Excel;
@@ -21025,6 +21600,42 @@ var Excel;
 		})();
 		Interfaces.WorksheetSingleClickedEventArgs.__proto__ = null;
 		Interfaces.WorksheetSingleClickedEventArgs = WorksheetSingleClickedEventArgs;
+	})(Interfaces = Excel.Interfaces || (Excel.Interfaces = { __proto__: null}));
+})(Excel || (Excel = {__proto__: null}));
+
+var Excel;
+(function (Excel) {
+	var Interfaces;
+	(function (Interfaces) {
+		var WorksheetVisibilityChangedEventArgs = (function() {
+			function WorksheetVisibilityChangedEventArgs() {
+				/// <summary> Provides information about the worksheet whose visibility has changed. [Api set: ExcelApiOnline 1.1] </summary>
+				/// <field name="source" type="String">The source of the event. It can be local or remote (through co-authoring). [Api set: ExcelApiOnline 1.1]</field>
+				/// <field name="type" type="String">Gets the type of the event. [Api set: ExcelApiOnline 1.1]</field>
+				/// <field name="visibilityAfter" type="String">Gets the new visibility setting of the worksheet, after the visibility change.n [Api set: ExcelApiOnline 1.1]</field>
+				/// <field name="visibilityBefore" type="String">Gets the previous visibility setting of the worksheet, before the visibility change. [Api set: ExcelApiOnline 1.1]</field>
+				/// <field name="worksheetId" type="String">Gets the ID of the worksheet whose visibility has changed. [Api set: ExcelApiOnline 1.1]</field>
+			}
+			return WorksheetVisibilityChangedEventArgs;
+		})();
+		Interfaces.WorksheetVisibilityChangedEventArgs.__proto__ = null;
+		Interfaces.WorksheetVisibilityChangedEventArgs = WorksheetVisibilityChangedEventArgs;
+	})(Interfaces = Excel.Interfaces || (Excel.Interfaces = { __proto__: null}));
+})(Excel || (Excel = {__proto__: null}));
+
+var Excel;
+(function (Excel) {
+	var Interfaces;
+	(function (Interfaces) {
+		var LinkedWorkbookCollectionUpdateData = (function() {
+			function LinkedWorkbookCollectionUpdateData() {
+				/// <summary>An interface for updating data on the LinkedWorkbookCollection object, for use in "linkedWorkbookCollection.set({ ... })".</summary>
+				/// <field name="workbookLinksRefreshMode" type="String">Represents the update mode of the workbook links. The mode is same for all of the workbook links present in the workbook. [Api set: ExcelApiOnline 1.1]</field>;
+			}
+			return LinkedWorkbookCollectionUpdateData;
+		})();
+		Interfaces.LinkedWorkbookCollectionUpdateData.__proto__ = null;
+		Interfaces.LinkedWorkbookCollectionUpdateData = LinkedWorkbookCollectionUpdateData;
 	})(Interfaces = Excel.Interfaces || (Excel.Interfaces = { __proto__: null}));
 })(Excel || (Excel = {__proto__: null}));
 
@@ -21809,6 +22420,44 @@ var Excel;
 		})();
 		Interfaces.ChartDataLabelFormatUpdateData.__proto__ = null;
 		Interfaces.ChartDataLabelFormatUpdateData = ChartDataLabelFormatUpdateData;
+	})(Interfaces = Excel.Interfaces || (Excel.Interfaces = { __proto__: null}));
+})(Excel || (Excel = {__proto__: null}));
+
+var Excel;
+(function (Excel) {
+	var Interfaces;
+	(function (Interfaces) {
+		var ChartDataTableUpdateData = (function() {
+			function ChartDataTableUpdateData() {
+				/// <summary>An interface for updating data on the ChartDataTable object, for use in "chartDataTable.set({ ... })".</summary>
+				/// <field name="format" type="Excel.Interfaces.ChartDataTableFormatUpdateData">Represents the format of a chart data table, which includes fill, font, and border format. [Api set: ExcelApi 1.14]</field>
+				/// <field name="showHorizontalBorder" type="Boolean">Specifies whether to display the horizontal border of the data table. [Api set: ExcelApi 1.14]</field>;
+				/// <field name="showLegendKey" type="Boolean">Specifies whether to show the legend key of the data table. [Api set: ExcelApi 1.14]</field>;
+				/// <field name="showOutlineBorder" type="Boolean">Specifies whether to display the outline border of the data table. [Api set: ExcelApi 1.14]</field>;
+				/// <field name="showVerticalBorder" type="Boolean">Specifies whether to display the vertical border of the data table. [Api set: ExcelApi 1.14]</field>;
+				/// <field name="visible" type="Boolean">Specifies whether to show the data table of the chart. [Api set: ExcelApi 1.14]</field>;
+			}
+			return ChartDataTableUpdateData;
+		})();
+		Interfaces.ChartDataTableUpdateData.__proto__ = null;
+		Interfaces.ChartDataTableUpdateData = ChartDataTableUpdateData;
+	})(Interfaces = Excel.Interfaces || (Excel.Interfaces = { __proto__: null}));
+})(Excel || (Excel = {__proto__: null}));
+
+var Excel;
+(function (Excel) {
+	var Interfaces;
+	(function (Interfaces) {
+		var ChartDataTableFormatUpdateData = (function() {
+			function ChartDataTableFormatUpdateData() {
+				/// <summary>An interface for updating data on the ChartDataTableFormat object, for use in "chartDataTableFormat.set({ ... })".</summary>
+				/// <field name="border" type="Excel.Interfaces.ChartBorderUpdateData">Represents the border format of chart data table, which includes color, line style, and weight. [Api set: ExcelApi 1.14]</field>
+				/// <field name="font" type="Excel.Interfaces.ChartFontUpdateData">Represents the font attributes (such as font name, font size, and color) for the current object. [Api set: ExcelApi 1.14]</field>
+			}
+			return ChartDataTableFormatUpdateData;
+		})();
+		Interfaces.ChartDataTableFormatUpdateData.__proto__ = null;
+		Interfaces.ChartDataTableFormatUpdateData = ChartDataTableFormatUpdateData;
 	})(Interfaces = Excel.Interfaces || (Excel.Interfaces = { __proto__: null}));
 })(Excel || (Excel = {__proto__: null}));
 
@@ -23060,7 +23709,7 @@ var Excel;
 			function ShapeLineFormatUpdateData() {
 				/// <summary>An interface for updating data on the ShapeLineFormat object, for use in "shapeLineFormat.set({ ... })".</summary>
 				/// <field name="color" type="String">Represents the line color in HTML color format, in the form #RRGGBB (e.g., &quot;FFA500&quot;) or as a named HTML color (e.g., &quot;orange&quot;). [Api set: ExcelApi 1.9]</field>;
-				/// <field name="dashStyle" type="String">Represents the line style of the shape. Returns `null` when the line is not visible or there are inconsistent dash styles. See `Excel.ShapeLineStyle` for details. [Api set: ExcelApi 1.9]</field>;
+				/// <field name="dashStyle" type="String">Represents the line style of the shape. Returns `null` when the line is not visible or there are inconsistent dash styles. See `Excel.ShapeLineDashStyle` for details. [Api set: ExcelApi 1.9]</field>;
 				/// <field name="style" type="String">Represents the line style of the shape. Returns `null` when the line is not visible or there are inconsistent styles. See `Excel.ShapeLineStyle` for details. [Api set: ExcelApi 1.9]</field>;
 				/// <field name="transparency" type="Number">Represents the degree of transparency of the specified line as a value from 0.0 (opaque) through 1.0 (clear). Returns `null` when the shape has inconsistent transparencies. [Api set: ExcelApi 1.9]</field>;
 				/// <field name="visible" type="Boolean">Specifies if the line formatting of a shape element is visible. Returns `null` when the shape has inconsistent visibilities. [Api set: ExcelApi 1.9]</field>;
@@ -23600,6 +24249,29 @@ var Word;
 
 var Word;
 (function (Word) {
+	/// <summary> ChangeTracking mode. [Api set: WordApi] </summary>
+	var ChangeTrackingMode = {
+		__proto__: null,
+		"off": "off",
+		"trackAll": "trackAll",
+		"trackMineOnly": "trackMineOnly",
+	}
+	Word.ChangeTrackingMode = ChangeTrackingMode;
+})(Word || (Word = {__proto__: null}));
+
+var Word;
+(function (Word) {
+	/// <summary> Specify the current version or the original version of the document. [Api set: WordApi] </summary>
+	var ChangeTrackingVersion = {
+		__proto__: null,
+		"original": "original",
+		"current": "current",
+	}
+	Word.ChangeTrackingVersion = ChangeTrackingVersion;
+})(Word || (Word = {__proto__: null}));
+
+var Word;
+(function (Word) {
 	var ContentControl = (function(_super) {
 		__extends(ContentControl, _super);
 		function ContentControl() {
@@ -24091,8 +24763,8 @@ var Word;
 			/// <summary> The Document object is the top level object. A Document object contains one or more sections, content controls, and the body that contains the contents of the document. [Api set: WordApi 1.1] </summary>
 			/// <field name="context" type="Word.RequestContext">The request context associated with this object.</field>
 			/// <field name="isNull" type="Boolean">Returns a boolean value for whether the corresponding object is null. You must call "context.sync()" before reading the isNull property.</field>
-			/// <field name="body" type="Word.Body">Gets the body object of the main document. The body is the text that excludes headers, footers, footnotes, textboxes, etc.. Read-only. [Api set: WordApi 1.1]</field>
-			/// <field name="contentControls" type="Word.ContentControlCollection">Gets the collection of content control objects in the document. This includes content controls in the body of the document, headers, footers, textboxes, etc.. Read-only. [Api set: WordApi 1.1]</field>
+			/// <field name="body" type="Word.Body">Gets the body object of the main document. The body is the text that excludes headers, footers, footnotes, textboxes, etc. Read-only. [Api set: WordApi 1.1]</field>
+			/// <field name="contentControls" type="Word.ContentControlCollection">Gets the collection of content control objects in the document. This includes content controls in the body of the document, headers, footers, textboxes, etc. Read-only. [Api set: WordApi 1.1]</field>
 			/// <field name="properties" type="Word.DocumentProperties">Gets the properties of the document. Read-only. [Api set: WordApi 1.3]</field>
 			/// <field name="saved" type="Boolean">Indicates whether the changes in the document have been saved. A value of true indicates that the document hasn&apos;t changed since it was saved. Read-only. [Api set: WordApi 1.1]</field>
 			/// <field name="sections" type="Word.SectionCollection">Gets the collection of section objects in the document. Read-only. [Api set: WordApi 1.1]</field>
@@ -26886,7 +27558,7 @@ var Word;
 		var DocumentUpdateData = (function() {
 			function DocumentUpdateData() {
 				/// <summary>An interface for updating data on the Document object, for use in "document.set({ ... })".</summary>
-				/// <field name="body" type="Word.Interfaces.BodyUpdateData">Gets the body object of the main document. The body is the text that excludes headers, footers, footnotes, textboxes, etc.. [Api set: WordApi 1.1]</field>
+				/// <field name="body" type="Word.Interfaces.BodyUpdateData">Gets the body object of the main document. The body is the text that excludes headers, footers, footnotes, textboxes, etc. [Api set: WordApi 1.1]</field>
 				/// <field name="properties" type="Word.Interfaces.DocumentPropertiesUpdateData">Gets the properties of the document. [Api set: WordApi 1.3]</field>
 				/// <field name="allowCloseOnUntitled" type="Boolean">Gets or sets a value that indicates that, when opening a new document, whether it is allowed to close this document even if this document is untitled. True to close, false otherwise. [Api set: WordApi]</field>;
 			}

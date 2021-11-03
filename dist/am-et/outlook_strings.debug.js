@@ -3,7 +3,7 @@ _u.ExtensibilityStrings = function()
 {
 };
 _u.ExtensibilityStrings.registerClass("_u.ExtensibilityStrings");
-_u.ExtensibilityStrings.l_APICallFailedDueToItemChange_Text = "የተመረጠው ንጥል ነገር ተለውጧል።"
+_u.ExtensibilityStrings.l_APICallFailedDueToItemChange_Text = "የተመረጠው ንጥል ነገር ተለውጧል።";
 _u.ExtensibilityStrings.l_API_Not_Supported_By_ExtensionPoint_Error_Text = "API ለተራዘመ ነጥብ አይደገፍም።";
 _u.ExtensibilityStrings.l_API_Not_Supported_For_Shared_Folders_Error = "API ለተጋሩ አቃፊዎች አይደገፍም።";
 _u.ExtensibilityStrings.l_ActionsDefinitionMultipleActionsError_Text = "አሁን የሚደገፈው አንድ ድርጊት ብቻ ነው።";
@@ -72,7 +72,7 @@ _u.ExtensibilityStrings.l_PersistedNotificationArraySaveError_Text = "እርስ�
 _u.ExtensibilityStrings.l_RecurrenceErrorMaxOccurrences_Text = "ተደጋግሞ የሚከሰት ተከታታይ ከፍተኛውን የ 999 ክስተቶች ገደብ አልፏል።";
 _u.ExtensibilityStrings.l_RecurrenceErrorZeroOccurrences_Text = "ተደጋግሞ የሚከሰት ተከታታይ በተጠቀሰው የጊዜ ክልል ውስጥ ምንም ክስተቶች የሉትም።";
 _u.ExtensibilityStrings.l_RecurrenceInvalidTimeZone_Text = "የተወሰነው የሰዓት ክልል አይደገፍም።";
-_u.ExtensibilityStrings.l_RecurrenceUnsupportedAlternateCalendar_Text = "የድግግሞሽ ጥለቱ የተዋቀረው ያልተደገፈ አማራጭ ቀን መቁጠሪያ በሚጠቀም ተጠቃሚ ነበር።";
+_u.ExtensibilityStrings.l_RecurrenceUnsupportedAlternateCalendar_Text = "የድግግሞሽ ጥለቱ የተዋቀረው ያልተደገፈ አማራጭ ቀን መቁጠሪያ በሚጠቀም ተጠቃሚ ነበር።"
 _u.ExtensibilityStrings.l_Recurrence_Error_Instance_SetAsync_Text = "የተደጋጋሚነት ጥለት በተከታታይ ውስጥ ለአንድ ክስተት መዘጋጀት አይችልም።";
 _u.ExtensibilityStrings.l_Recurrence_Error_Properties_Invalid_Text = "የተደጋጋሚነት ጥለት ልክ አይደለም። እባክዎ የተጠቀሱት የተደጋጋሚነት ባህሪዎች ከተደጋጋሚነት አይነቱ ጋር ይሰምራሉ።";
 _u.ExtensibilityStrings.l_SaveError_Text = "በአገልጋዩ ላይ ለማስቀመጥ በመሞከር ላይ የግንኙነት ስህተት ተከስቷል።";

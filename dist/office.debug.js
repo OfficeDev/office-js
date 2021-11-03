@@ -1389,7 +1389,7 @@ var g_isOfflineLibrary = g_isOfflineLibrary || false;
 (function () {
     var previousConstantNames = OSF.ConstantNames || {};
     OSF.ConstantNames = {
-        FileVersion: "16.0.14307.10001",
+        FileVersion: "16.0.14621.10000",
         OfficeJS: "office.js",
         OfficeDebugJS: "office.debug.js",
         DefaultLocale: "en-us",
@@ -1938,7 +1938,7 @@ OSF._OfficeAppFactory = (function OSF__OfficeAppFactory() {
             }
             _loadScriptHelper.loadScript(basePath + hostSpecificFileName.toLowerCase(), OSF.ConstantNames.HostFileId, onAppCodeReady);
             if (typeof OSFPerformance !== "undefined") {
-                OSFPerformance.hostSpecificFileName = hostSpecificFileName;
+                OSFPerformance.hostSpecificFileName = hostSpecificFileName.toLowerCase();
             }
         }
         if (_hostInfo.hostLocale) {
@@ -1948,14 +1948,8 @@ OSF._OfficeAppFactory = (function OSF__OfficeAppFactory() {
             var msAjaxCDNPath = (window.location.protocol.toLowerCase() === 'https:' ? 'https:' : 'http:') + '//ajax.aspnetcdn.com/ajax/3.5/MicrosoftAjax.js';
             _loadScriptHelper.loadScriptParallel(msAjaxCDNPath, OSF.ConstantNames.MicrosoftAjaxId);
         }
-        var originalWindowConfirm = window.confirm;
         window.confirm = function OSF__OfficeAppFactory_initialize$confirm(message) {
-            if (_hostInfo.hostPlatform == "web" && _hostInfo.isDialog) {
-                return originalWindowConfirm(message);
-            }
-            else {
-                throw new Error('Function window.confirm is not supported.');
-            }
+            throw new Error('Function window.confirm is not supported.');
         };
         window.alert = function OSF__OfficeAppFactory_initialize$alert(message) {
             throw new Error('Function window.alert is not supported.');

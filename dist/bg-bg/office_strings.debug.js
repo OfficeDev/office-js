@@ -3,7 +3,7 @@ Strings.OfficeOM = function()
 {
 };
 Strings.OfficeOM.registerClass("Strings.OfficeOM");
-Strings.OfficeOM.L_APICallFailed = "Неуспешно извикване на API"
+Strings.OfficeOM.L_APICallFailed = "Неуспешно извикване на API";
 Strings.OfficeOM.L_APINotSupported = "API не се поддържа";
 Strings.OfficeOM.L_ActivityLimitReached = "Достигнато е ограничението за активност.";
 Strings.OfficeOM.L_AddBindingFromPromptDefaultText = "Направете избор.";
@@ -112,7 +112,7 @@ Strings.OfficeOM.L_InvalidOrTimedOutSessionMessage = "Вашата сесия н
 Strings.OfficeOM.L_InvalidParameters = "Функцията {0} има невалиден параметри.";
 Strings.OfficeOM.L_InvalidReadForBlankRow = "Указаният ред е празен.";
 Strings.OfficeOM.L_InvalidRequestContext = "Не може да се използва обектът в контекста на различни заявки.";
-Strings.OfficeOM.L_InvalidResourceUrl = "Предоставен е невалиден URL адрес на ресурс на приложение.";
+Strings.OfficeOM.L_InvalidResourceUrl = "Предоставен е невалиден URL адрес на ресурс на приложение."
 Strings.OfficeOM.L_InvalidResourceUrlMessage = "Невалиден URL адрес на ресурс е зададен в манифеста.";
 Strings.OfficeOM.L_InvalidSSOAddinMessage = "API за самоличност не се поддържа за тази добавка.";
 Strings.OfficeOM.L_InvalidSelectionForBindingType = "Не може да се създаде обвързване с текущата селекция и указания тип обвързване.";
@@ -154,10 +154,10 @@ Strings.OfficeOM.L_PropertyDoesNotExist = 'Свойството "{0}" не съ�
 Strings.OfficeOM.L_PropertyNotLoaded = 'Свойството "{0}" не е налично. Преди да прочетете стойността на свойството, извикайте метода за зареждане с обекта, който го съдържа, и извикайте "context.sync()" в контекста на свързаната заявка.';
 Strings.OfficeOM.L_ReadSettingsError = "Грешка в настройките за четене";
 Strings.OfficeOM.L_RedundantCallbackSpecification = "Обратното повикване не може да се задава и в списък с аргументи, и в незадължителен обект.";
-Strings.OfficeOM.L_RequestPayloadSizeLimitExceededMessage = 'Размерът на полезния обем на заявката е превишил ограничението. Консултирайте се с документацията: "https://docs.microsoft.com/office/dev/add-ins/concepts/resource-limits-and-performance-optimization#excel-add-ins".';
+Strings.OfficeOM.L_RequestPayloadSizeLimitExceededMessage = "Размерът на полезния обем на заявката е превишил ограничението. Консултирайте се с документацията: „https://docs.microsoft.com/office/dev/add-ins/concepts/resource-limits-and-performance-optimization#excel-add-ins“.";
 Strings.OfficeOM.L_RequestTimeout = "Повикването отне твърде много време, за да се изпълни.";
 Strings.OfficeOM.L_RequestTokenUnavailable = "Този API е ограничен, за да се забави честотата на повикване.";
-Strings.OfficeOM.L_ResponsePayloadSizeLimitExceededMessage = 'Размерът на полезния обем на отговора е превишил ограничението. Консултирайте се с документацията: "https://docs.microsoft.com/office/dev/add-ins/concepts/resource-limits-and-performance-optimization#excel-add-ins".';
+Strings.OfficeOM.L_ResponsePayloadSizeLimitExceededMessage = "Размерът на полезния обем на отговора е превишил ограничението. Консултирайте се с документацията: „https://docs.microsoft.com/office/dev/add-ins/concepts/resource-limits-and-performance-optimization#excel-add-ins“.";
 Strings.OfficeOM.L_RowIndexOutOfRange = "Стойността на индекса на реда е извън допустимия диапазон. Използвайте стойност (0 или по-висока), която е по-малка от броя на редовете.";
 Strings.OfficeOM.L_RunMustReturnPromise = 'Функцията за партида, подадена на метода ".run", не върна обещание. Функцията трябва да върне едно обещание, така че всички автоматично проследявани обекти да могат да бъдат освободени при завършване на операцията с партидата. Обикновено връщате обещание чрез връщане на отговора от "context.sync()".';
 Strings.OfficeOM.L_SSOClientError = "Възникна грешка в искането за удостоверяване от Office.";

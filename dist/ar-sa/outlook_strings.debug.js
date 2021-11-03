@@ -48,7 +48,7 @@ _u.ExtensibilityStrings.l_InvalidCommandIdError_Text = "قيمة المعلمة 
 _u.ExtensibilityStrings.l_InvalidDate_Text = "لا يتم حل الإدخال إلى تاريخ صالح.";
 _u.ExtensibilityStrings.l_InvalidEndTime_Text = "لا يمكن أن يكون وقت النهاية قبل وقت البدء.";
 _u.ExtensibilityStrings.l_InvalidEventDates_Text = "يقع تاريخ الانتهاء قبل تاريخ البدء.";
-_u.ExtensibilityStrings.l_InvalidParameterValueError_Text = "قيمة المعلمة '{0}' غير صالحة.";
+_u.ExtensibilityStrings.l_InvalidParameterValueError_Text = "قيمة المعلمة '{0}' غير صالحة."
 _u.ExtensibilityStrings.l_InvalidSelection_Text = "التحديد غير صالح.";
 _u.ExtensibilityStrings.l_InvalidTime_Text = "لا يتم حل الإدخال إلى تاريخ صالح.";
 _u.ExtensibilityStrings.l_Invalid_Category_Error_Text = "تم تقديم فئات غير صالحة.";
@@ -73,7 +73,7 @@ _u.ExtensibilityStrings.l_RecurrenceErrorMaxOccurrences_Text = "تتجاوز ا�
 _u.ExtensibilityStrings.l_RecurrenceErrorZeroOccurrences_Text = "لا يوجد أي تكرار للسلسة المتكررة في نطاق التاريخ المحدد.";
 _u.ExtensibilityStrings.l_RecurrenceInvalidTimeZone_Text = "المنطقة الزمنية المحددة غير مدعمة.";
 _u.ExtensibilityStrings.l_RecurrenceUnsupportedAlternateCalendar_Text = "تم إعداد نمط التكرار بواسطة المستخدم باستخدام تقويم بديل غير مدعم.";
-_u.ExtensibilityStrings.l_Recurrence_Error_Instance_SetAsync_Text = "لا يمكن تعيين نمط التكرار لحالة واحدة في سلسلة."
+_u.ExtensibilityStrings.l_Recurrence_Error_Instance_SetAsync_Text = "لا يمكن تعيين نمط التكرار لحالة واحدة في سلسلة.";
 _u.ExtensibilityStrings.l_Recurrence_Error_Properties_Invalid_Text = "نمط التكرار غير صالح. الرجاء التحقق من أن خصائص التكرار المحدد تحاذي نوع التكرار.";
 _u.ExtensibilityStrings.l_SaveError_Text = "حدث خطأ في الاتصال أثناء محاولة حفظ العنصر على الخادم.";
 _u.ExtensibilityStrings.l_SessionDataObjectMaxLengthExceeded_Text = "تجاوز العنصر 'sessionData' الحد الأقصى لطول أحرفه والبالغ '{0}'.";

@@ -144,6 +144,9 @@ var OSF = OSF || {};
             }
             return keyList;
         };
+        SafeStorage.prototype.isLocalStorageAvailable = function () {
+            return (this._internalStorage != null);
+        };
         return SafeStorage;
     }());
     OfficeExt.SafeStorage = SafeStorage;
@@ -156,16 +159,15 @@ OSF.TestFlightStart = 1000;
 OSF.TestFlightEnd = 1009;
 OSF.FlightNames = {
     UseOriginNotUrl: 0,
-    CheckReceiverOrigin: 1,
     AddinEnforceHttps: 2,
     FirstPartyAnonymousProxyReadyCheckTimeout: 6,
     AddinRibbonIdAllowUnknown: 9,
     ManifestParserDevConsoleLog: 15,
-    AddInsInSupportedIrmDocsIsEnabled: 17,
     AddinActionDefinitionHybridMode: 18,
     UseActionIdForUILessCommand: 20,
     RequirementSetRibbonApiOnePointTwo: 21,
     SetFocusToTaskpaneIsEnabled: 22,
+    ShortcutInfoArrayInUserPreferenceData: 23,
     OSFTestFlight1000: OSF.TestFlightStart,
     OSFTestFlight1001: OSF.TestFlightStart + 1,
     OSFTestFlight1002: OSF.TestFlightStart + 2,
@@ -176,6 +178,15 @@ OSF.FlightNames = {
     OSFTestFlight1007: OSF.TestFlightStart + 7,
     OSFTestFlight1008: OSF.TestFlightStart + 8,
     OSFTestFlight1009: OSF.TestFlightEnd
+};
+OSF.FlightTreatmentNames = {
+    AllowStorageAccessByUserActivationOnIFrameCheck: "Microsoft.Office.SharedOnline.AllowStorageAccessByUserActivationOnIFrameCheck",
+    IsPrivateAddin: "Microsoft.Office.SharedOnline.IsPrivateAddin",
+    LogAllAddinsAsPublic: "Microsoft.Office.SharedOnline.LogAllAddinsAsPublic",
+    WopiPreinstalledAddInsEnabled: "Microsoft.Office.SharedOnline.WopiPreinstalledAddInsEnabled",
+    AddinCommandRibbonCacheFixEnabled: "Microsoft.Office.SharedOnline.AddinCommandRibbonCacheFixEnabled",
+    OSFSolutionRefactor: "Microsoft.Office.SharedOnline.OSFSolutionRefactor",
+    CheckProxyIsReadyRetry: "Microsoft.Office.SharedOnline.OEP.CheckProxyIsReadyRetry"
 };
 OSF.Flights = [];
 OSF.Settings = {};
@@ -360,7 +371,15 @@ OSF.OUtil = (function () {
                             currentCallback();
                         }
                     };
-                    var onLoadError = function OSF_OUtil_loadScript$onLoadError() {
+                    var onLoadTimeOut = function OSF_OUtil_loadScript$onLoadTimeOut() {
+                        if (window.navigator.userAgent.indexOf("Trident") > 0) {
+                            onLoadError(null);
+                        }
+                        else {
+                            onLoadError(new Event("Script load timed out"));
+                        }
+                    };
+                    var onLoadError = function OSF_OUtil_loadScript$onLoadError(errorEvent) {
                         delete _loadedScripts[url];
                         if (_loadedScriptEntry.timer != null) {
                             clearTimeout(_loadedScriptEntry.timer);
@@ -385,7 +404,7 @@ OSF.OUtil = (function () {
                     }
                     script.onerror = onLoadError;
                     timeoutInMs = timeoutInMs || _defaultScriptLoadingTimeout;
-                    _loadedScriptEntry.timer = setTimeout(onLoadError, timeoutInMs);
+                    _loadedScriptEntry.timer = setTimeout(onLoadTimeOut, timeoutInMs);
                     script.setAttribute("crossOrigin", "anonymous");
                     script.src = url;
                     doc.getElementsByTagName("head")[0].appendChild(script);
@@ -5254,6 +5273,9 @@ Microsoft.Office.Common.XdmCommunicationManager = (function () {
                 throw e;
             delete _serviceEndPoints[serviceEndPointId];
         },
+        urlCompare: function Microsoft_Office_Common_XdmCommunicationManager$_urlCompare(url_parser1, url_parser2) {
+            return _urlCompare(url_parser1, url_parser2);
+        },
         checkUrlWithAppDomains: function Microsoft_Office_Common_XdmCommunicationManager$_checkUrlWithAppDomains(appDomains, origin) {
             return _checkOriginWithAppDomains(appDomains, origin);
         },
@@ -5373,7 +5395,38 @@ Microsoft.Office.Common.ResponseSender = function Microsoft_Office_Common_Respon
     this._responseType = responseType;
     var me = this;
     this._send = function (result) {
+        var validateTargetMatchesRequester = function (targetOrigin, requesterUrl) {
+            var parsedTargetOrigin = OSF.OUtil.parseUrl(targetOrigin);
+            var parsedRequesterUrl = OSF.OUtil.parseUrl(requesterUrl);
+            if (!parsedTargetOrigin || !parsedTargetOrigin.hostname || !parsedRequesterUrl || !parsedRequesterUrl.hostname) {
+                var errorMessage = "Failed to execute 'postMessage' on 'DOMWindow': The target origin provided or the recipient window's origin are undefined.";
+                console.log(errorMessage);
+                ;
+                return false;
+            }
+            else if (!Microsoft.Office.Common.XdmCommunicationManager.urlCompare(parsedTargetOrigin, parsedRequesterUrl)) {
+                var targetOriginToConsoleLog = parsedTargetOrigin ? (parsedTargetOrigin.protocol + "//" + parsedTargetOrigin.hostname + (parsedTargetOrigin.port ? (":" + parsedTargetOrigin.port) : "")) : 'undefined';
+                var requesterUrlToConsoleLog = parsedRequesterUrl ? (parsedRequesterUrl.protocol + "//" + parsedRequesterUrl.hostname + (parsedRequesterUrl.port ? (":" + parsedRequesterUrl.port) : "")) : 'undefined';
+                var errorMessage = "Failed to execute 'postMessage' on 'DOMWindow': The target origin provided ('" + targetOriginToConsoleLog + "') does not match the recipient window's origin ('" + requesterUrlToConsoleLog + "').";
+                console.log(errorMessage);
+                ;
+                return false;
+            }
+            return true;
+        };
         try {
+            if (me._actionName === "dialogMessageReceived" && result.targetOrigin !== "*") {
+                if (result.targetOrigin) {
+                    if (!validateTargetMatchesRequester(result.targetOrigin, me._requesterUrl)) {
+                        return;
+                    }
+                }
+            }
+            else if (me._actionName === "dialogParentMessageReceived" && result.targetOrigin && result.targetOrigin !== "*") {
+                if (!validateTargetMatchesRequester(result.targetOrigin, me._requesterUrl)) {
+                    return;
+                }
+            }
             var response = new Microsoft.Office.Common.Response(me._actionName, me._conversationId, me._correlationId, me._invokeResultCode, me._responseType, result);
             var envelopedResult = Microsoft.Office.Common.MessagePackager.envelope(response, serializerVersion);
             me._requesterWindow.postMessage(envelopedResult, me._requesterUrl);
@@ -5540,7 +5593,6 @@ OSF.DDA.WAC.getDelegateMethods = function OSF_DDA_WAC_getDelegateMethods() {
     delegateMethods[OSF.DDA.DispIdHost.Delegates.RegisterEventAsync] = OSF.DDA.WAC.Delegate.registerEventAsync;
     delegateMethods[OSF.DDA.DispIdHost.Delegates.UnregisterEventAsync] = OSF.DDA.WAC.Delegate.unregisterEventAsync;
     delegateMethods[OSF.DDA.DispIdHost.Delegates.OpenDialog] = OSF.DDA.WAC.Delegate.openDialog;
-    delegateMethods[OSF.DDA.DispIdHost.Delegates.ValidateTaskpaneDomain] = OSF.DDA.WAC.Delegate.validateTaskpaneDomain;
     delegateMethods[OSF.DDA.DispIdHost.Delegates.MessageParent] = OSF.DDA.WAC.Delegate.messageParent;
     delegateMethods[OSF.DDA.DispIdHost.Delegates.SendMessage] = OSF.DDA.WAC.Delegate.sendMessage;
     delegateMethods[OSF.DDA.DispIdHost.Delegates.CloseDialog] = OSF.DDA.WAC.Delegate.closeDialog;
@@ -6074,23 +6126,39 @@ OSF.InitializationHelper.prototype.addOrRemoveEventListenersForWindow = function
             me._webAppState.clientEndPoint.invoke("ContextActivationManager_notifyHost", null, [me._webAppState.id, actionId]);
         }
         else if (e.keyCode == 9) {
-            e.preventDefault();
+            var isPowerPointModernSlideShow = me._appContext._appSettings &&
+                (me._appContext._appSettings['PowerPointModernSlideShowEnabled'] || false) &&
+                me._appContext._appName == OSF.AppName.PowerpointWebApp &&
+                me._appContext._clientMode == OSF.ClientMode.ReadOnly &&
+                me._appContext._osfControlType == OSF.OsfControlType.DocumentLevel;
+            if (!isPowerPointModernSlideShow) {
+                e.preventDefault();
+            }
             var allTabbableElements = document.querySelectorAll(me._tabbableElements);
             var focused = OSF.OUtil.focusToNextTabbable(allTabbableElements, e.target || e.srcElement, e.shiftKey);
-            if (!focused) {
+            if (focused) {
+                if (isPowerPointModernSlideShow) {
+                    e.preventDefault();
+                }
+            }
+            else {
                 if (me._hostInfo.isDialog) {
                     OSF.OUtil.focusToFirstTabbable(allTabbableElements, e.shiftKey);
                 }
                 else {
                     if (e.shiftKey) {
-                        me._webAppState.clientEndPoint.invoke("ContextActivationManager_notifyHost", null, [me._webAppState.id, OSF.AgaveHostAction.TabExitShift]);
+                        if (!isPowerPointModernSlideShow) {
+                            me._webAppState.clientEndPoint.invoke("ContextActivationManager_notifyHost", null, [me._webAppState.id, OSF.AgaveHostAction.TabExitShift]);
+                        }
                     }
                     else {
                         if (OSF.OUtil.checkFlight(OSF.FlightNames.SetFocusToTaskpaneIsEnabled) && e.target && e.target.tagName.toUpperCase() === "BODY") {
                             OSF.OUtil.focusToFirstTabbable(allTabbableElements, e.shiftKey);
                         }
                         else {
-                            me._webAppState.clientEndPoint.invoke("ContextActivationManager_notifyHost", null, [me._webAppState.id, OSF.AgaveHostAction.TabExit]);
+                            if (!isPowerPointModernSlideShow) {
+                                me._webAppState.clientEndPoint.invoke("ContextActivationManager_notifyHost", null, [me._webAppState.id, OSF.AgaveHostAction.TabExit]);
+                            }
                         }
                     }
                 }
@@ -7389,17 +7457,7 @@ var OSFAppTelemetry;
                 }
             }
             else if (hostPlatform == "mac") {
-                if (major < 16 || major == 16 && build < 21062700) {
-                    excepted = true;
-                }
-            }
-            else if (hostPlatform == "ios") {
-                if (minor < 2122) {
-                    excepted = true;
-                }
-            }
-            else if (hostPlatform == "android") {
-                if (minor < 2120) {
+                if (major < 16 || (major == 16 && (minor < 52 || minor == 52 && build < 808))) {
                     excepted = true;
                 }
             }
@@ -8194,12 +8252,14 @@ OSF.OUtil.setNamespace("Dialog", OSF.DDA.Marshaling);
 OSF.DDA.Marshaling.Dialog.DialogMessageReceivedEventKeys = {
     MessageType: "messageType",
     MessageContent: "messageContent",
-    MessageOrigin: "messageOrigin"
+    MessageOrigin: "messageOrigin",
+    TargetOrigin: "targetOrigin"
 };
 OSF.DDA.Marshaling.Dialog.DialogParentMessageReceivedEventKeys = {
     MessageType: "messageType",
     MessageContent: "messageContent",
-    MessageOrigin: "messageOrigin"
+    MessageOrigin: "messageOrigin",
+    TargetOrigin: "targetOrigin"
 };
 OSF.DDA.Marshaling.MessageParentKeys = {
     MessageToParent: "messageToParent",
@@ -8210,7 +8270,7 @@ OSF.DDA.Marshaling.DialogNotificationShownEventType = {
 };
 OSF.DDA.Marshaling.SendMessageKeys = {
     MessageContent: "messageContent",
-    MessageOrigin: "messageOrigin"
+    TargetOrigin: "targetOrigin"
 };
 (function (OfficeExt) {
     var WacCommonUICssManager;
@@ -8509,6 +8569,15 @@ OSF.DDA.Marshaling.SendMessageKeys = {
             function messageParent(params) {
                 var message = params.hostCallArgs[Microsoft.Office.WebExtension.Parameters.MessageToParent];
                 var targetOrigin = params.hostCallArgs[Microsoft.Office.WebExtension.Parameters.TargetOrigin] || null;
+                if (!targetOrigin) {
+                    var currentOrigin = window.location.origin;
+                    if (!currentOrigin) {
+                        currentOrigin = window.location.protocol + "//"
+                            + window.location.hostname
+                            + (window.location.port ? ':' + window.location.port : '');
+                    }
+                    targetOrigin = currentOrigin;
+                }
                 if (shouldUseLocalStorageToPassMessage) {
                     try {
                         var messageKey = OSF._OfficeAppFactory.getInitializationHelper()._webAppState.id + messageParentKey;
@@ -8521,7 +8590,7 @@ OSF.DDA.Marshaling.SendMessageKeys = {
                     }
                 }
                 else {
-                    postDialogMessage(window.opener, { message: message, targetOrigin: targetOrigin });
+                    window.opener.postMessage(message, targetOrigin);
                 }
             }
             Dialog.messageParent = messageParent;
@@ -8530,44 +8599,25 @@ OSF.DDA.Marshaling.SendMessageKeys = {
                     var message = params.hostCallArgs;
                     var targetOrigin = message[Microsoft.Office.WebExtension.Parameters.TargetOrigin] || null;
                     delete message[Microsoft.Office.WebExtension.Parameters.TargetOrigin];
+                    if (!targetOrigin) {
+                        var currentOrigin = window.location.origin;
+                        if (!currentOrigin) {
+                            currentOrigin = window.location.protocol + "//"
+                                + window.location.hostname
+                                + (window.location.port ? ':' + window.location.port : '');
+                        }
+                        targetOrigin = currentOrigin;
+                    }
                     if (typeof message != "string") {
                         message = JSON.stringify(message);
                     }
-                    postDialogMessage(windowInstance, { message: message, targetOrigin: targetOrigin });
+                    windowInstance.postMessage(message, targetOrigin);
                 }
             }
             Dialog.sendMessage = sendMessage;
-            function postDialogMessage(targetWindow, args) {
-                var message = args.message;
-                var targetOrigin = args.targetOrigin;
-                if (targetOrigin) {
-                    targetWindow.postMessage(message, targetOrigin);
-                }
-                else {
-                    var appDomains = OSF._OfficeAppFactory.getInitializationHelper()._appContext._appDomains;
-                    var currentOrigin = window.location.origin;
-                    if (!currentOrigin) {
-                        currentOrigin = window.location.protocol + "//"
-                            + window.location.hostname
-                            + (window.location.port ? ':' + window.location.port : '');
-                    }
-                    if (appDomains) {
-                        for (var i = 0; i < appDomains.length && appDomains[i].indexOf("://") !== -1; i++) {
-                            targetWindow.postMessage(message, appDomains[i]);
-                        }
-                    }
-                    if (!Microsoft.Office.Common.XdmCommunicationManager.checkUrlWithAppDomains(appDomains, currentOrigin)) {
-                        targetWindow.postMessage(message, currentOrigin);
-                    }
-                }
-            }
-            Dialog.postDialogMessage = postDialogMessage;
             function registerMessageReceivedEvent() {
                 function receiveCloseDialogMessage(event) {
-                    var origin = event.origin;
-                    if (event.source == window.opener &&
-                        (window.office_disable_receive_dialog_message_prompt === true ||
-                            OfficeExt.AddinNativeAction.Dialog.validateTaskpaneDomain(origin, true))) {
+                    if (event.source == window.opener) {
                         if (typeof event.data === "string" && event.data.indexOf(closeDialogKey) > -1) {
                             window.close();
                         }
@@ -8653,136 +8703,6 @@ OSF.DDA.Marshaling.SendMessageKeys = {
                 okButton.focus();
             }
             Dialog.showCrossZoneNotification = showCrossZoneNotification;
-            function getWithExpiry(storage, key) {
-                var itemStr = storage.getItem(key);
-                if (!itemStr) {
-                    return 'undefined';
-                }
-                var item = JSON.parse(itemStr);
-                if (!item.expiry || !item.value) {
-                    return 'undefined';
-                }
-                var now = new Date();
-                var isExpired = now.getTime() > item.expiry;
-                if (isExpired) {
-                    storage.removeItem(key);
-                    return 'undefined';
-                }
-                return item.value;
-            }
-            Dialog.getWithExpiry = getWithExpiry;
-            function setWithExpiry(storage, key, value) {
-                var ttlInMs = 86400000;
-                var now = new Date();
-                var item = {
-                    value: value,
-                    expiry: now.getTime() + ttlInMs
-                };
-                storage.setItem(key, JSON.stringify(item));
-            }
-            Dialog.setWithExpiry = setWithExpiry;
-            function getLocalStorage() {
-                if (OfficeExt.SafeStorage) {
-                    return new OfficeExt.SafeStorage(window.localStorage);
-                }
-                else {
-                    return window.localStorage;
-                }
-            }
-            Dialog.getLocalStorage = getLocalStorage;
-            function getSessionStorage() {
-                if (OfficeExt.SafeStorage) {
-                    return new OfficeExt.SafeStorage(window.sessionStorage);
-                }
-                else {
-                    return window.sessionStorage;
-                }
-            }
-            Dialog.getSessionStorage = getSessionStorage;
-            function getUrlProtocolHostnamePort(parsedUrl) {
-                var port = parsedUrl.port ? (':' + parsedUrl.port) : '';
-                return parsedUrl.protocol + "//" + parsedUrl.hostname + port;
-            }
-            Dialog.getUrlProtocolHostnamePort = getUrlProtocolHostnamePort;
-            function validateTaskpaneDomain(taskpaneUrl, allowSubDomains) {
-                function urlCompare(url_parser1, url_parser2) {
-                    return ((url_parser1.hostname == url_parser2.hostname) &&
-                        (url_parser1.protocol == url_parser2.protocol) &&
-                        hasSamePort(url_parser1, url_parser2));
-                }
-                function hasSamePort(url_parser1, url_parser2) {
-                    var httpPort = "80";
-                    var httpsPort = "443";
-                    return ((url_parser1.port == url_parser2.port) ||
-                        (url_parser1.port == "" && url_parser1.protocol == "http:" && url_parser2.port == httpPort) ||
-                        (url_parser1.port == "" && url_parser1.protocol == "https:" && url_parser2.port == httpsPort) ||
-                        (url_parser2.port == "" && url_parser2.protocol == "http:" && url_parser1.port == httpPort) ||
-                        (url_parser2.port == "" && url_parser2.protocol == "https:" && url_parser1.port == httpsPort));
-                }
-                try {
-                    if (!taskpaneUrl) {
-                        return false;
-                    }
-                    if (!allowSubDomains) {
-                        allowSubDomains = true;
-                    }
-                    var dialogUrl = window.location.origin;
-                    if (!dialogUrl) {
-                        dialogUrl = window.location.protocol + "//"
-                            + window.location.hostname
-                            + (window.location.port ? ':' + window.location.port : '');
-                    }
-                    var parsedDialogUrl = OSF.OUtil.parseUrl(dialogUrl, true);
-                    var parsedTaskpaneUrl = OSF.OUtil.parseUrl(taskpaneUrl, true);
-                    if (!parsedDialogUrl.protocol || !parsedDialogUrl.hostname ||
-                        !parsedTaskpaneUrl.protocol || !parsedTaskpaneUrl.hostname || parsedTaskpaneUrl.port === undefined) {
-                        return false;
-                    }
-                    var isSameDomain = urlCompare(parsedDialogUrl, parsedTaskpaneUrl);
-                    var isSubdomain = false;
-                    if (allowSubDomains) {
-                        isSubdomain = Microsoft.Office.Common.XdmCommunicationManager.isTargetSubdomainOfSourceLocation(taskpaneUrl, dialogUrl);
-                    }
-                    if (isSameDomain || isSubdomain) {
-                        return true;
-                    }
-                    var localStorage = this.getLocalStorage();
-                    var sessionStorage = this.getSessionStorage();
-                    var taskpaneUrlPrefix = parsedTaskpaneUrl.protocol + "//" + parsedTaskpaneUrl.hostname + (parsedTaskpaneUrl.port ? (":" + parsedTaskpaneUrl.port) : "");
-                    var storageKeyUrl = '_trusts_' + taskpaneUrlPrefix;
-                    var urlTrustValueInLocalStorage = this.getWithExpiry(localStorage, storageKeyUrl);
-                    var urlTrustValueInSessionStorage = this.getWithExpiry(sessionStorage, storageKeyUrl);
-                    if (urlTrustValueInLocalStorage === 'true') {
-                        return true;
-                    }
-                    else if (urlTrustValueInSessionStorage === 'false') {
-                        return false;
-                    }
-                    var shortTaskpaneUrl = this.getUrlProtocolHostnamePort(parsedTaskpaneUrl);
-                    var shortDialogUrl = this.getUrlProtocolHostnamePort(parsedDialogUrl);
-                    var promptText = 'You are about to send and receive potentially sensitive information from "' + shortDialogUrl + '". Only click OK if you trust the following website recieving the sensitive information: "' + shortTaskpaneUrl + '".';
-                    if (Strings.OfficeOM["L_ConfirmDialogApiTrustsParent"]) {
-                        promptText = Strings.OfficeOM["L_ConfirmDialogApiTrustsParent"].replace('{0}', shortDialogUrl).replace('{1}', shortTaskpaneUrl);
-                    }
-                    if (window.confirm(promptText)) {
-                        this.setWithExpiry(localStorage, storageKeyUrl, 'true');
-                        this.setWithExpiry(sessionStorage, storageKeyUrl, 'true');
-                        return true;
-                    }
-                    else {
-                        this.setWithExpiry(localStorage, storageKeyUrl, 'false');
-                        this.setWithExpiry(sessionStorage, storageKeyUrl, 'false');
-                        return false;
-                    }
-                }
-                catch (e) {
-                    if (OSF.AppTelemetry) {
-                        OSF.AppTelemetry.logAppException("Error happened during validateTaskpaneDomain method:" + e);
-                    }
-                    return false;
-                }
-            }
-            Dialog.validateTaskpaneDomain = validateTaskpaneDomain;
             function validateDialogDomain(dialogUrl, taskpaneUrl, allowSubdomains) {
                 if (allowSubdomains === void 0) { allowSubdomains = true; }
                 if (!dialogUrl || !taskpaneUrl) {
@@ -8811,6 +8731,14 @@ OSF.DDA.Marshaling.SendMessageKeys = {
                     try {
                         var dialogOrigin = event.origin;
                         var taskpaneUrl = OSF._OfficeAppFactory.getInitializationHelper()._appContext._addInSourceUrl;
+                        if (!taskpaneUrl) {
+                            taskpaneUrl = window.location.origin;
+                            if (!taskpaneUrl) {
+                                taskpaneUrl = window.location.protocol + "//"
+                                    + window.location.hostname
+                                    + (window.location.port ? ':' + window.location.port : '');
+                            }
+                        }
                         var isTrustedDomain = validateDialogDomain(dialogOrigin, taskpaneUrl, true);
                         if (!isTrustedDomain) {
                             throw new Error("Received a message from a dialog with an untrusted domain.");
@@ -8850,22 +8778,45 @@ OSF.DDA.Marshaling.SendMessageKeys = {
                 var url = dialogInfo[OSF.ShowWindowDialogParameterKeys.Url];
                 var fInDomain = Microsoft.Office.Common.XdmCommunicationManager.checkUrlWithAppDomains(appDomains, url);
                 if (!fInDomain) {
-                    return OSF._OfficeAppFactory.getInitializationHelper()._appContext._addInSourceUrl
-                        && Microsoft.Office.Common.XdmCommunicationManager.isTargetSubdomainOfSourceLocation(OSF._OfficeAppFactory.getInitializationHelper()._appContext._addInSourceUrl, url);
+                    var taskpaneUrl = OSF._OfficeAppFactory.getInitializationHelper()._appContext._addInSourceUrl;
+                    if (!taskpaneUrl) {
+                        taskpaneUrl = window.location.origin;
+                        if (!taskpaneUrl) {
+                            taskpaneUrl = window.location.protocol + "//"
+                                + window.location.hostname
+                                + (window.location.port ? ':' + window.location.port : '');
+                        }
+                    }
+                    return taskpaneUrl && Microsoft.Office.Common.XdmCommunicationManager.isTargetSubdomainOfSourceLocation(taskpaneUrl, url);
                 }
                 return fInDomain;
             }
             function showDialog(dialogInfo) {
                 var hostInfoObj = OSF._OfficeAppFactory.getInitializationHelper()._hostInfo;
-                var hostInfoVals = [
-                    hostInfoObj.hostType,
-                    hostInfoObj.hostPlatform,
-                    hostInfoObj.hostSpecificFileVersion,
-                    hostInfoObj.hostLocale,
-                    hostInfoObj.osfControlAppCorrelationId,
-                    "isDialog",
-                    hostInfoObj.disableLogging ? "disableLogging" : ""
-                ];
+                var hostInfoVals;
+                if (OSF.OUtil.checkFlight(OSF.FlightTreatmentNames.IsPrivateAddin)) {
+                    hostInfoVals = [
+                        hostInfoObj.hostType,
+                        hostInfoObj.hostPlatform,
+                        hostInfoObj.hostSpecificFileVersion,
+                        hostInfoObj.hostLocale,
+                        hostInfoObj.osfControlAppCorrelationId,
+                        "isDialog",
+                        hostInfoObj.disableLogging ? "disableLogging" : "",
+                        (hostInfoObj.flags & OSF.HostInfoFlags.PublicAddin)
+                    ];
+                }
+                else {
+                    hostInfoVals = [
+                        hostInfoObj.hostType,
+                        hostInfoObj.hostPlatform,
+                        hostInfoObj.hostSpecificFileVersion,
+                        hostInfoObj.hostLocale,
+                        hostInfoObj.osfControlAppCorrelationId,
+                        "isDialog",
+                        hostInfoObj.disableLogging ? "disableLogging" : "",
+                    ];
+                }
                 var hostInfo = hostInfoVals.join("$");
                 var appContext = OSF._OfficeAppFactory.getInitializationHelper()._appContext;
                 appContext._taskpaneUrl = window.location.origin;
@@ -9174,50 +9125,11 @@ OSF.DDA.WAC.Delegate.openDialog = function OSF_DDA_WAC_Delegate$OpenDialog(args)
         OSF.DDA.WAC.Delegate.registerEventAsync(args);
     }
 };
-OSF.DDA.WAC.Delegate.validateTaskpaneDomain = function OSF_DDA_WAC_Delegate$ValidateTaskpaneDomain(taskpaneUrl, allowSubDomains) {
-    return OfficeExt.AddinNativeAction.Dialog.validateTaskpaneDomain(taskpaneUrl, allowSubDomains);
-};
 OSF.DDA.WAC.Delegate.messageParent = function OSF_DDA_WAC_Delegate$MessageParent(args) {
-    var targetOrigin = args.hostCallArgs["targetOrigin"];
-    var hasTargetOrigin = !!targetOrigin;
-    var allowSubDomains = true;
-    if (hasTargetOrigin && targetOrigin != "*") {
-        var localStorage = OfficeExt.AddinNativeAction.Dialog.getLocalStorage();
-        var sessionStorage = OfficeExt.AddinNativeAction.Dialog.getSessionStorage();
-        var storageKey = '_trusts_';
-        var parsedTargetOriginUrl = OSF.OUtil.parseUrl(targetOrigin, true);
-        var targetOriginUrlPrefix = parsedTargetOriginUrl.protocol + "//" + parsedTargetOriginUrl.hostname + (parsedTargetOriginUrl.port ? (":" + parsedTargetOriginUrl.port) : "");
-        storageKey = storageKey + targetOriginUrlPrefix;
-        OfficeExt.AddinNativeAction.Dialog.setWithExpiry(localStorage, storageKey, 'true');
-        OfficeExt.AddinNativeAction.Dialog.setWithExpiry(sessionStorage, storageKey, 'true');
-    }
     if (window.opener != null) {
-        if (!hasTargetOrigin) {
-            var taskpaneUrl = OSF._OfficeAppFactory.getInitializationHelper()._appContext._taskpaneUrl;
-            if (!taskpaneUrl) {
-                taskpaneUrl = window.location.origin;
-            }
-            else if (!OfficeExt.AddinNativeAction.Dialog.validateTaskpaneDomain(taskpaneUrl, allowSubDomains)) {
-                var errorMessage = "messageParent called but the taskpane domain is untrusted: " + taskpaneUrl;
-                if (OSF.AppTelemetry) {
-                    OSF.AppTelemetry.logAppException(errorMessage);
-                }
-                throw new Error(errorMessage);
-            }
-            args.hostCallArgs["targetOrigin"] = taskpaneUrl;
-        }
         OfficeExt.AddinNativeAction.Dialog.messageParent(args);
     }
     else {
-        var currentUrl = window.location.origin;
-        if (!currentUrl) {
-            currentUrl = window.location.protocol + "//"
-                + window.location.hostname
-                + (window.location.port ? ':' + window.location.port : '');
-        }
-        if (!hasTargetOrigin) {
-            args.hostCallArgs["targetOrigin"] = currentUrl;
-        }
         OSF.DDA.WAC.Delegate.executeAsync(args);
     }
 };
@@ -9482,7 +9394,7 @@ OSF.InitializationHelper.prototype.prepareApiSurface = function OSF_Initializati
                 displayInIframe: options.displayInIFrame || !1
             };
             function messageHandler(args) {
-                options.onMessage && options.onMessage(args.message, dialog);
+                options.onMessage && options.onMessage(args.message, dialog, args.origin);
             }
             function eventHandler(args) {
                 12006 === args.error ? options.onClose && options.onClose() : options.onRuntimeError && options.onRuntimeError(new OfficeExtension.Error(lookupErrorCodeAndMessage(args.error)), dialog);

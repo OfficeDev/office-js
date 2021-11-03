@@ -4,7 +4,7 @@ _u.ExtensibilityStrings = function()
 };
 _u.ExtensibilityStrings.registerClass("_u.ExtensibilityStrings");
 _u.ExtensibilityStrings.l_APICallFailedDueToItemChange_Text = "Valitud üksust on muudetud.";
-_u.ExtensibilityStrings.l_API_Not_Supported_By_ExtensionPoint_Error_Text = "Laienduspunkt ei toeta seda API-t."
+_u.ExtensibilityStrings.l_API_Not_Supported_By_ExtensionPoint_Error_Text = "Laienduspunkt ei toeta seda API-t.";
 _u.ExtensibilityStrings.l_API_Not_Supported_For_Shared_Folders_Error = "API ei ole ühiskasutuses kaustade puhul toetatud.";
 _u.ExtensibilityStrings.l_ActionsDefinitionMultipleActionsError_Text = "Praegu toetatakse ainult ühte toimingut.";
 _u.ExtensibilityStrings.l_ActionsDefinitionWrongNotificationMessageError_Text = "Seda tüüpi teavitussõnumite jaoks ei saa toiminguid määratleda.";
@@ -19,7 +19,7 @@ _u.ExtensibilityStrings.l_AttachmentUploadGeneralFailure_Text = "Manust ei saa �
 _u.ExtensibilityStrings.l_AttachmentUrlTooLong_Text = "Mõni manuse URL on liiga pikk.";
 _u.ExtensibilityStrings.l_Attachment_Download_Failed_Generic_Error = "Manuse allalaadimine nurjus.";
 _u.ExtensibilityStrings.l_Attachment_Resource_Not_Found = "Manust ei leitud.";
-_u.ExtensibilityStrings.l_Attachment_Resource_UnAuthorizedAccess = "Volitamata juurdepääs manusele.";
+_u.ExtensibilityStrings.l_Attachment_Resource_UnAuthorizedAccess = "Volitamata juurdepääs manusele."
 _u.ExtensibilityStrings.l_CallSaveAsyncBeforeToken_Text = "Tõendit ei saa enne üksuse salvestamist tuua.";
 _u.ExtensibilityStrings.l_CannotAddAttachmentBeforeUpgrade_Text = "Manuseid ei saa lisada serverist täielike vastussõnumite või edasisaadetavate sõnumite toomise ajal.";
 _u.ExtensibilityStrings.l_CannotPersistPropertyInUnsavedDraftError_Text = "Salvestamata mustandites ei saa teatisi püsivaks määrata. Salvestage üksus enne selle API kutsumist.";

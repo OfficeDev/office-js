@@ -6,7 +6,7 @@ _u.ExtensibilityStrings.registerClass("_u.ExtensibilityStrings");
 _u.ExtensibilityStrings.l_APICallFailedDueToItemChange_Text = "ఎంచుకోబడిన అంశం మార్చబడింది.";
 _u.ExtensibilityStrings.l_API_Not_Supported_By_ExtensionPoint_Error_Text = "ఎక్స్‌టెన్షన్ పాయింట్‌లో APIకు మద్దతు లేదు.";
 _u.ExtensibilityStrings.l_API_Not_Supported_For_Shared_Folders_Error = "భాగస్వామ్య ఫోల్డర్‌లకు API మద్దతు లేదు.";
-_u.ExtensibilityStrings.l_ActionsDefinitionMultipleActionsError_Text = "ప్రస్తుతం ఒక చర్యకు మాత్రమే మద్దతు ఉంది."
+_u.ExtensibilityStrings.l_ActionsDefinitionMultipleActionsError_Text = "ప్రస్తుతం ఒక చర్యకు మాత్రమే మద్దతు ఉంది.";
 _u.ExtensibilityStrings.l_ActionsDefinitionWrongNotificationMessageError_Text = "ఈ నోటిఫికేషన్ సందేశ రకం యొక్క చర్యను నిర్వచించడం సాధ్యం కాదు.";
 _u.ExtensibilityStrings.l_AttachmentDeleteGeneralFailure_Text = "అంశం నుండి జోడింపుని తొలగించలేము.";
 _u.ExtensibilityStrings.l_AttachmentDeletedBeforeUploadCompletes_Text = "అప్‌లోడ్ పూర్తికాక ముందే వినియోగదారు జోడింపును తొలగించారు.";
@@ -24,7 +24,7 @@ _u.ExtensibilityStrings.l_CallSaveAsyncBeforeToken_Text = "అంశాన్న
 _u.ExtensibilityStrings.l_CannotAddAttachmentBeforeUpgrade_Text = "పూర్తి ప్రత్యుత్తరం లేదా ఫార్వార్డ్‌ని సర్వర్ నుండి పునరుద్ధరిస్తున్నప్పుడు జోడింపులను జోడించలేము.";
 _u.ExtensibilityStrings.l_CannotPersistPropertyInUnsavedDraftError_Text = "సేవ్ చేయని చిత్తుప్రతుల నుండి నోటిఫికేషన్‌లను పొందడం సాధ్యం కాదు. మీరు ఈ APIని కాల్ చేయడం కంటే ముందు అంశాన్ని సేవ్ చేయండి.";
 _u.ExtensibilityStrings.l_CursorPositionChanged_Text = "డేటాను చొప్పిస్తున్నప్పుడు వినియోగదారు కర్సర్ యొక్క స్థానాన్ని మార్చారు.";
-_u.ExtensibilityStrings.l_DataWriteErrorName_Text = "డేటా వ్రాయడంలో దోషం";
+_u.ExtensibilityStrings.l_DataWriteErrorName_Text = "డేటా వ్రాయడంలో దోషం"
 _u.ExtensibilityStrings.l_DeleteAttachmentDoesNotExist_Text = "జోడింపు సూచికతో జోడింపు గుర్తించబడలేదు కాబట్టి జోడింపుని తొలగించలేము.";
 _u.ExtensibilityStrings.l_DisplayNameTooLong_Text = "పేర్కొన్న ఒకటి లేదా అంతకంటే ఎక్కువ ప్రదర్శన పేర్లు చాలా పొడవుగా ఉన్నాయి.";
 _u.ExtensibilityStrings.l_DisplayReplyFormHtmlBodyRequired_Text = "'htmlBody' అవసరం.";
