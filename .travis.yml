@@ -1,0 +1,19 @@
+language: node_js
+
+git:
+  depth: 4
+
+node_js:
+- 10.10.0
+
+before_install:
+- cd deployment.script
+
+install:
+- npm install
+
+before_script:
+- npm run build
+
+script:
+- npm run deploy
