@@ -4,7 +4,7 @@ _u.ExtensibilityStrings = function()
 };
 _u.ExtensibilityStrings.registerClass("_u.ExtensibilityStrings");
 _u.ExtensibilityStrings.l_APICallFailedDueToItemChange_Text = "選択したアイテムは変更されました。";
-_u.ExtensibilityStrings.l_API_Not_Supported_By_ExtensionPoint_Error_Text = "API が拡張点でサポートされていません。"
+_u.ExtensibilityStrings.l_API_Not_Supported_By_ExtensionPoint_Error_Text = "API が拡張点でサポートされていません。";
 _u.ExtensibilityStrings.l_API_Not_Supported_For_Shared_Folders_Error = "API は共有フォルダーではサポートされていません。";
 _u.ExtensibilityStrings.l_ActionsDefinitionMultipleActionsError_Text = "現在、単一の処理のみがサポートされています。";
 _u.ExtensibilityStrings.l_ActionsDefinitionWrongNotificationMessageError_Text = "この通知メッセージの種類に対して処理を定義することはできません。";
@@ -71,7 +71,7 @@ _u.ExtensibilityStrings.l_PersistedNotificationArrayReadError_Text = "永続化�
 _u.ExtensibilityStrings.l_PersistedNotificationArraySaveError_Text = "通知を永続化できなかったため、実行された API 呼び出しは失敗しました。";
 _u.ExtensibilityStrings.l_RecurrenceErrorMaxOccurrences_Text = "定期的なイベントの回数が、上限の 999 回を超えています。";
 _u.ExtensibilityStrings.l_RecurrenceErrorZeroOccurrences_Text = "定期的なイベントが、指定された日付の期間内に 1 回も行われません。";
-_u.ExtensibilityStrings.l_RecurrenceInvalidTimeZone_Text = "指定したタイム ゾーンはサポートされていません。";
+_u.ExtensibilityStrings.l_RecurrenceInvalidTimeZone_Text = "指定したタイム ゾーンはサポートされていません。"
 _u.ExtensibilityStrings.l_RecurrenceUnsupportedAlternateCalendar_Text = "サポートされていない他の暦を使用した定期的なパターンが、ユーザーによって設定されました。";
 _u.ExtensibilityStrings.l_Recurrence_Error_Instance_SetAsync_Text = "定期的なアイテムの中の 1 回に対して定期的なパターンを設定することはできません。";
 _u.ExtensibilityStrings.l_Recurrence_Error_Properties_Invalid_Text = "定期的なパターンが無効です。パターンの種類に合致したパターンのプロパティが指定されていることを確認してください。";

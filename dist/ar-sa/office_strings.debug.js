@@ -30,7 +30,7 @@ Strings.OfficeOM.L_CoercionTypeNotMatchBinding = "نوع الاندماج الم
 Strings.OfficeOM.L_CoercionTypeNotSupported = "نوع الاندماج المحدد غير معتمد.";
 Strings.OfficeOM.L_ColIndexOutOfRange = "إن قيمة فهرس العمود خارج النطاق المسموح به. استخدم قيمة (0 أو أعلى) تكون أصغر من عدد الأعمدة.";
 Strings.OfficeOM.L_ConfirmCancelMessage = "عذراً، يتعذر علينا المتابعة.";
-Strings.OfficeOM.L_ConfirmDialog = "هل تثق بمجال {0} الذي يستضيف جلسة عمل Office؟";
+Strings.OfficeOM.L_ConfirmDialog = 'تعمل {0} المجال ك Microsoft Office ويمكنها تشغيل وظائف Office الإضافية التي يمكنها الوصول إلى بياناتك الشخصية. إذا كنت تثق في المجال الذي سيتم تشغيله ك Office والوصول إلى بياناتك، انقر فوق "موافق" للمتابعة.';
 Strings.OfficeOM.L_ConfirmDialogApiTrustsParent = 'أنت علي وشك إرسال المعلومات الحساسة المحتملة وتلقيها من {0}. انقر فوق "موافق" فقط إذا كنت تثق في موقع الويب التالي الذي يتلقى المعلومات الحساسة: {1}.';
 Strings.OfficeOM.L_ConfirmRefreshMessage = "للمتابعة، قم بإزالة الوظيفة الإضافية وإضافتها مرة أخرى أو تحديث الصفحة.";
 Strings.OfficeOM.L_ConnectionFailureWithDetails = "فشل الطلب برمز الحالة {0} ورمز الخطأ {1} وظهرت رسالة الخطأ التالية: {2}";
@@ -45,7 +45,7 @@ Strings.OfficeOM.L_CustomXmlExceedQuotaMessage = "تحدد XPath التحديد 
 Strings.OfficeOM.L_CustomXmlExceedQuotaName = "تم الوصول إلى الحد الأقصى للتحديد";
 Strings.OfficeOM.L_CustomXmlNodeNotFound = "لم يتم العثور على العقدة المحددة.";
 Strings.OfficeOM.L_CustomXmlOutOfDateMessage = "البيانات غير محدثة. قم باسترداد العنصر مرة أخرى.";
-Strings.OfficeOM.L_CustomXmlOutOfDateName = "البيانات ليست حديثة"
+Strings.OfficeOM.L_CustomXmlOutOfDateName = "البيانات ليست حديثة";
 Strings.OfficeOM.L_DataNotMatchBindingSize = "لا يتطابق عنصر البيانات الذي تم توفيره مع حجم التحديد الحالي.";
 Strings.OfficeOM.L_DataNotMatchBindingType = "عنصر البيانات المحدد غير متوافق مع نوع الربط.";
 Strings.OfficeOM.L_DataNotMatchCoercionType = "نوع عنصر البيانات المحدد غير متوافق مع التحديد الحالي.";
@@ -59,8 +59,10 @@ Strings.OfficeOM.L_DialogAlreadyOpened = "فشلت العملية لأن هذه 
 Strings.OfficeOM.L_DialogInvalidScheme = "نظام عنوان URL غير مدعوم. استخدم HTTPS بدلاً من ذلك.";
 Strings.OfficeOM.L_DialogNavigateError = "خطأ في التنقل في مربع الحوار";
 Strings.OfficeOM.L_DialogOK = "موافق";
+Strings.OfficeOM.L_DialogParentIsMinimized = "فشلت العملية بسبب تصغير النافذة الأصل.";
 Strings.OfficeOM.L_DialogRequireHTTPS = "بروتوكول HTTP غير مدعوم. استخدم HTTPS بدلاً من ذلك";
 Strings.OfficeOM.L_DisplayDialogError = "عرض خطأ مربع الحوار";
+Strings.OfficeOM.L_DocumentIsInactive = "فشلت العملية لأن المستند الذي يحتوي على هذه الوظيفة الإضافية غير نشط.";
 Strings.OfficeOM.L_DocumentReadOnly = "العملية المطلوبة غير مسموح بها في وضع المستند الحالي.";
 Strings.OfficeOM.L_ElementMissing = "تعذر علينا تنسيق خلية الجدول لأن بعض قيم المعلمات مفقودة. تحقق من المعلمات مرة أخرى ثم أعد المحاولة.";
 Strings.OfficeOM.L_EventHandlerAdditionFailed = "فشل في إضافة معالج الحدث.";
@@ -123,82 +125,4 @@ Strings.OfficeOM.L_InvalidTableOptionValue = "تحتوي معلمة واحدة �
 Strings.OfficeOM.L_InvalidValue = "قيمة غير صالحة";
 Strings.OfficeOM.L_MemoryLimit = "تجاوز حد الذاكرة";
 Strings.OfficeOM.L_MissingParameter = "معلمة مفقودة";
-Strings.OfficeOM.L_MissingRequiredArguments = "فقدان بعض الوسيطات المطلوبة";
-Strings.OfficeOM.L_MultipleNamedItemFound = "تم العثور على عدة عناصر بالاسم نفسه.";
-Strings.OfficeOM.L_NamedItemNotFound = "العنصر المسمى غير موجود.";
-Strings.OfficeOM.L_NavOutOfBound = "فشلت العملية لأن الفهرس خارج النطاق.";
-Strings.OfficeOM.L_NetworkProblem = "مشكلة في الشبكة";
-Strings.OfficeOM.L_NetworkProblemRetrieveFile = "حالت مشكلة في الشبكة دون استرداد الملف.";
-Strings.OfficeOM.L_NewWindowCrossZone = "إعدادات الأمان في المستعرض تحول دون إنشاء مربع حوار. حاول استخدام مستعرض مختلف، أو {0} وبذلك يكونا '{1}' والمجال المعروض في شريط العنوان في نفس منطقة الأمان.";
-Strings.OfficeOM.L_NewWindowCrossZoneConfigureBrowserLink = "تكوين المستعرض";
-Strings.OfficeOM.L_NewWindowCrossZoneErrorString = "منعتنا قيود المستعرض من إنشاء مربع الحوار. مجال مربع الحوار ومجال مضيف الوظيفة الإضافية ليسا في نفس منطقة الأمان.";
-Strings.OfficeOM.L_NoCapability = "لا تملك الأذونات الكافية لهذا الإجراء.";
-Strings.OfficeOM.L_NoHttpsWAC = "لا تستخدم جلسة عمل Office هذه اتصالاً أمناً. نوصي باتخاذ احتياطات إضافية.";
-Strings.OfficeOM.L_NonUniformPartialGetNotSupported = 'لا يمكن استخدام معلمات الإحداثيات مع "جدول" بنوع الاندماج عندما يحتوي الجدول على خلايا مدمجة.';
-Strings.OfficeOM.L_NonUniformPartialSetNotSupported = 'لا يمكن استخدام معلمات الإحداثيات مع "جدول" بنوع الاندماج عندما يحتوي الجدول على خلايا مدمجة.';
-Strings.OfficeOM.L_NotImplemented = "لم يتم تنفيذ الدالة {0}.";
-Strings.OfficeOM.L_NotSupported = "الدالة {0} غير معتمدة.";
-Strings.OfficeOM.L_NotSupportedBindingType = "نوع الربط المحدد {0} غير معتمد.";
-Strings.OfficeOM.L_NotSupportedEventType = "نوع الحدث المحدد {0} غير معتمد.";
-Strings.OfficeOM.L_NotTrustedWAC = "تم تعطيل هذه الوظيفة الاضافيه للمساعدة في الحفاظ علي أمانك. لمتابعه استخدام الوظيفة الاضافيه ، تحقق من ان هذا العنصر تمت استضافته في مجال موثوق به أو قم بفتحه في تطبيق Office لسطح المكتب.";
-Strings.OfficeOM.L_OperationCancelledError = "تم إلغاء العملية";
-Strings.OfficeOM.L_OperationCancelledErrorMessage = "تم إلغاء العملية بواسطة المستخدم.";
-Strings.OfficeOM.L_OperationNotSupported = "العملية غير معتمدة.";
-Strings.OfficeOM.L_OperationNotSupportedOnMatrixData = "يجب أن يكون المحتوى المحدد بتنسيق الجدول. قم بتنسيق البيانات كجدول وحاول مرة أخرى.";
-Strings.OfficeOM.L_OperationNotSupportedOnThisBindingType = "العملية غير معتمدة على هذا النوع من الربط.";
-Strings.OfficeOM.L_OsfControlTypeNotSupported = "نوع OsfControl غير معتمد.";
-Strings.OfficeOM.L_OutOfRange = "خارج النطاق";
-Strings.OfficeOM.L_OverwriteWorksheetData = "فشلت عملية التعيين لأن عنصر البيانات الذي تم توفيره سيكتب فوق البيانات أو سينقلها.";
-Strings.OfficeOM.L_PermissionDenied = "تم رفض الإذن";
-Strings.OfficeOM.L_PropertyDoesNotExist = 'لا توجد الخاصية "{0}" في العنصر.';
-Strings.OfficeOM.L_PropertyNotLoaded = "الخاصية '{0}' غير متاحة. قبل قراءة قيمة الخاصية، قم باستدعاء أسلوب التحميل على العنصر المضمن وقم باستدعاء \"context.sync()‎\" في سياق الطلب المقترن.";
-Strings.OfficeOM.L_ReadSettingsError = "خطأ في إعدادات القراءة";
-Strings.OfficeOM.L_RedundantCallbackSpecification = "لا يمكن تعيين رد الاستدعاء في كل من قائمة الوسائط وفي العنصر الاختياري.";
-Strings.OfficeOM.L_RequestPayloadSizeLimitExceededMessage = 'تجاوز حجم حمولة الطلب الحد المسموح به. الرجاء الرجوع إلى الوثائق: "https://docs.microsoft.com/office/dev/add-ins/concepts/resource-limits-and-performance-optimization#excel-add-ins".';
-Strings.OfficeOM.L_RequestTimeout = "استغرقت المكالمة وقتاً طويلاً وبالتالي يتعذر تنفيذها.";
-Strings.OfficeOM.L_RequestTokenUnavailable = "تم إحباط API هذه لإبطاء تكرار المكالمة.";
-Strings.OfficeOM.L_ResponsePayloadSizeLimitExceededMessage = 'تجاوز حجم حمولة الاستجابة الحد المسموح به. الرجاء الرجوع إلى الوثائق: "https://docs.microsoft.com/office/dev/add-ins/concepts/resource-limits-and-performance-optimization#excel-add-ins".';
-Strings.OfficeOM.L_RowIndexOutOfRange = "إن قيمة فهرس الصف خارج النطاق المسموح به. استخدم قيمة (0 أو أعلى) تكون أصغر من عدد الصفوف.";
-Strings.OfficeOM.L_RunMustReturnPromise = 'لم ترجع الوظيفة الدفعية التي تم تمريرها إلى أسلوب ".run" أي تعهد. يجب أن تُرجع الوظيفة أي تعهد، بحيث يمكن إصدار أي عناصر يتم تعقبها تلقائياً عند اكتمال العملية الدفعية. عادةً، يمكن إرجاع التعهد بإرجاع الاستجابة من"context.sync()".';
-Strings.OfficeOM.L_SSOClientError = "حدث خطأ في طلب المصادقة من Office.";
-Strings.OfficeOM.L_SSOClientErrorMessage = "حدث خطأ غير متوقع في العميل.";
-Strings.OfficeOM.L_SSOConnectionLostError = "تم فقد الاتصال أثناء عملية تسجيل الدخول.";
-Strings.OfficeOM.L_SSOConnectionLostErrorMessage = "تم فقد الاتصال أثناء عملية تسجيل الدخول، وربما لم يتم تسجيل دخول المستخدم. وهذا على الأغلب بسبب إعدادات تكوين مستعرض المستخدم، مثل مناطق الأمان.";
-Strings.OfficeOM.L_SSOServerError = "حدث خطأ في موفر المصادقة.";
-Strings.OfficeOM.L_SSOServerErrorMessage = "حدث خطأ غير متوقع في الخادم.";
-Strings.OfficeOM.L_SSOUnsupportedPlatform = "واجهة برمجة التطبيقات (API) غير مدعمة في هذا النظام الأساسي.";
-Strings.OfficeOM.L_SSOUserConsentNotSupportedByCurrentAddinCategory = "لا تدعم هذه الوظيفة الإضافية موافقة المستخدم.";
-Strings.OfficeOM.L_SSOUserConsentNotSupportedByCurrentAddinCategoryMessage = "فشلت العملية لأن هذه الوظيفة الإضافية لا تدعم موافقة المستخدم في هذه الفئة";
-Strings.OfficeOM.L_SaveSettingsError = "خطأ في إعدادات الحفظ";
-Strings.OfficeOM.L_SelectionCannotBound = "يتعذر الربط بالتحديد الحالي.";
-Strings.OfficeOM.L_SelectionNotSupportCoercionType = "التحديد الحالي غير متوافق مع نوع الاندماج المحدد.";
-Strings.OfficeOM.L_SetDataIsTooLarge = "عنصر البيانات المحدد طويل جداً.";
-Strings.OfficeOM.L_SetDataParametersConflict = "تعارض المعلمات المحددة.";
-Strings.OfficeOM.L_SettingNameNotExist = "اسم الإعداد المحدد غير موجود.";
-Strings.OfficeOM.L_SettingsAreStale = "تعذر حفظ الإعدادات نظراً لأنها غير حديثة.";
-Strings.OfficeOM.L_SettingsCannotSave = "تعذر حفظ الإعدادات.";
-Strings.OfficeOM.L_SettingsStaleError = "خطأ في الإعدادات القديمة";
-Strings.OfficeOM.L_ShowWindowDialogNotification = "يريد {0} عرض نافذة جديدة.";
-Strings.OfficeOM.L_ShowWindowDialogNotificationAllow = "سماح";
-Strings.OfficeOM.L_ShowWindowDialogNotificationIgnore = "تجاهل";
-Strings.OfficeOM.L_ShuttingDown = "فشلت العملية لأن البيانات غير حديثة على الخادم.";
-Strings.OfficeOM.L_SliceSizeNotSupported = "حجم الشريحة المحدد غير معتمد.";
-Strings.OfficeOM.L_SpecifiedIdNotExist = "إن المعرف المحدد غير موجود.";
-Strings.OfficeOM.L_Timeout = "انقضت مهلة العملية.";
-Strings.OfficeOM.L_TooManyArguments = "العديد من الوسيطات";
-Strings.OfficeOM.L_TooManyIncompleteRequests = "انتظر حتى اكتمال المكالمة السابقة.";
-Strings.OfficeOM.L_TooManyOptionalFunction = "دالات اختيارية متعددة في قائمة المعلمات";
-Strings.OfficeOM.L_TooManyOptionalObjects = "عناصر اختيارية متعددة في قائمة المعلمات";
-Strings.OfficeOM.L_UnknownBindingType = "نوع الربط غير معتمد.";
-Strings.OfficeOM.L_UnsupportedDataObject = "نوع عنصر البيانات الذي تم توفيره غير معتمد.";
-Strings.OfficeOM.L_UnsupportedEnumeration = "قائمة تعداد غير معتمدة";
-Strings.OfficeOM.L_UnsupportedEnumerationMessage = "قائمة التعداد غير معتمدة في تطبيق المضيف الحالي.";
-Strings.OfficeOM.L_UnsupportedUserIdentity = "نوع هوية المستخدم غير مدعم.";
-Strings.OfficeOM.L_UnsupportedUserIdentityMessage = "نوع هوية المستخدم غير مدعم.";
-Strings.OfficeOM.L_UserAborted = "أوقف المستخدم طلب الموافقة قبل اكتماله.";
-Strings.OfficeOM.L_UserAbortedMessage = "لم يوافق المستخدم على أذونات الوظيفة الإضافية.";
-Strings.OfficeOM.L_UserClickIgnore = "اختار المستخدم تجاهل مربع الحوار.";
-Strings.OfficeOM.L_UserNotSignedIn = "لم يسجل أي مستخدم دخوله إلى Office.";
-Strings.OfficeOM.L_ValueNotLoaded = 'لم يتم تحميل قيمة عنصر النتيجة بعد. قم باستدعاء "context.sync()" في سياق الطلب المقترن قبل قراءة خاصية القيمة.';
-Strings.OfficeOM.L_WorkbookHiddenMessage = "فشل طلب JavaScript API لأنه تم إخفاء المصنف. الرجاء قم بإظهار المصنف، ثم أعد المحاولة.";
-Strings.OfficeOM.L_WriteNotSupportedWhenModalDialogOpen = "عملية الكتابة غير مدعمة لـ Office عند فتح مربع حوار مشروط.";
+Strings.OfficeOM.L_MissingRequiredArguments = "فقدان بعض الوسيطات المطلو�

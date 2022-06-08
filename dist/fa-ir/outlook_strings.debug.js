@@ -26,7 +26,7 @@ _u.ExtensibilityStrings.l_CannotPersistPropertyInUnsavedDraftError_Text = "ام�
 _u.ExtensibilityStrings.l_CursorPositionChanged_Text = "هنگامی که داده در حال وارد شدن بود، کاربر موقعیت مکان نما را تغییر داد.";
 _u.ExtensibilityStrings.l_DataWriteErrorName_Text = "خطای نوشتن داده";
 _u.ExtensibilityStrings.l_DeleteAttachmentDoesNotExist_Text = "پیوست را نمی‌توان حذف کرد زیرا پیوست در فهرست پیوست یافت نمی شود.";
-_u.ExtensibilityStrings.l_DisplayNameTooLong_Text = "یک یا چند نام نمایشی ارائه شده بیش از حد طولانی است."
+_u.ExtensibilityStrings.l_DisplayNameTooLong_Text = "یک یا چند نام نمایشی ارائه شده بیش از حد طولانی است.";
 _u.ExtensibilityStrings.l_DisplayReplyFormHtmlBodyRequired_Text = "'htmlBody' مورد نیاز است.";
 _u.ExtensibilityStrings.l_DuplicateNotificationKey_Text = "اعلان با کلید ارائه‌شده از قبل وجود دارد.";
 _u.ExtensibilityStrings.l_Duplicate_Category_Error_Text = "یکی از رده‌های ارائه‌شده در حال حاضر در فهرست مقوله اصلی است.";
@@ -70,7 +70,7 @@ _u.ExtensibilityStrings.l_ParametersNotAsExpected_Text = "پارامترهای �
 _u.ExtensibilityStrings.l_PersistedNotificationArrayReadError_Text = "فراخوانی API از سوی شما انجام نشد زیرا امکان بازیابی اعلان‌های ادامه‌دار وجود ندارد.";
 _u.ExtensibilityStrings.l_PersistedNotificationArraySaveError_Text = "فراخوانی API از سوی شما انجام نشد زیرا امکان ادامه اعلان‌ها وجود ندارد.";
 _u.ExtensibilityStrings.l_RecurrenceErrorMaxOccurrences_Text = "سری بازگشتی از حداکثر مجاز 999 رخداد فراتر رفته است.";
-_u.ExtensibilityStrings.l_RecurrenceErrorZeroOccurrences_Text = "سری بازگشتی هیچ رخدادی در محدوده تاریخی مشخص‌شده ندارد.";
+_u.ExtensibilityStrings.l_RecurrenceErrorZeroOccurrences_Text = "سری بازگشتی هیچ رخدادی در محدوده تاریخی مشخص‌شده ندارد."
 _u.ExtensibilityStrings.l_RecurrenceInvalidTimeZone_Text = "منطقه زمانی مشخص‌شده پشتیبانی نمی‌شود.";
 _u.ExtensibilityStrings.l_RecurrenceUnsupportedAlternateCalendar_Text = "الگوی تکرار توسط کاربر و با استفاده از تقویم جایگزینی که پشتیبانی نمی‌شود تنظیم شد.";
 _u.ExtensibilityStrings.l_Recurrence_Error_Instance_SetAsync_Text = "امکان تنظیم الگوی تکرار برای رویدادی خاص در یک مجموعه وجود ندارد.";

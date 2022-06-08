@@ -5,7 +5,7 @@ _u.ExtensibilityStrings = function()
 _u.ExtensibilityStrings.registerClass("_u.ExtensibilityStrings");
 _u.ExtensibilityStrings.l_APICallFailedDueToItemChange_Text = "منتخب شدہ شے کو تبدیل کردیا گیا۔";
 _u.ExtensibilityStrings.l_API_Not_Supported_By_ExtensionPoint_Error_Text = "توسیع کے نقطہ کے لئے API کی معاونت نہیں۔";
-_u.ExtensibilityStrings.l_API_Not_Supported_For_Shared_Folders_Error = "حصہ دارانہ فولڈرز کے لیے API تعاون یافتہ نہیں ہے۔";
+_u.ExtensibilityStrings.l_API_Not_Supported_For_Shared_Folders_Error = "حصہ دارانہ فولڈرز کے لیے API تعاون یافتہ نہیں ہے۔"
 _u.ExtensibilityStrings.l_ActionsDefinitionMultipleActionsError_Text = "فی الحال ایک واحد عمل معاونت شدہ ہے۔";
 _u.ExtensibilityStrings.l_ActionsDefinitionWrongNotificationMessageError_Text = "اس اطلاع پیغام قسم کے لئے اعمال واضح نہیں ہو سکتے۔";
 _u.ExtensibilityStrings.l_AttachmentDeleteGeneralFailure_Text = "منسلکہ اس آئٹم سے شامل نہیں کیا جاسکتا۔";
@@ -50,7 +50,7 @@ _u.ExtensibilityStrings.l_InvalidEndTime_Text = "اختتام وقت ابتدا�
 _u.ExtensibilityStrings.l_InvalidEventDates_Text = "اختتام تاریخ آغاز تاریخ سے قبل آتی ہے۔";
 _u.ExtensibilityStrings.l_InvalidParameterValueError_Text = "'{0}' پيراميٹر کی قدر بے جواز ہے۔";
 _u.ExtensibilityStrings.l_InvalidSelection_Text = "انتخاب بے جواز ہے۔";
-_u.ExtensibilityStrings.l_InvalidTime_Text = "ان پٹ ایک جائز وقت کو حل نہیں کرتا۔"
+_u.ExtensibilityStrings.l_InvalidTime_Text = "ان پٹ ایک جائز وقت کو حل نہیں کرتا۔";
 _u.ExtensibilityStrings.l_Invalid_Category_Error_Text = "بےجواز زمرے فراہم کیے گئے تھے۔";
 _u.ExtensibilityStrings.l_ItemNotFound_Text = "آئٹم موجود نہیں ہے یا تخلیق نہیں کیا گیا ہے۔";
 _u.ExtensibilityStrings.l_Item_Not_Saved_Error_Text = "شے کے محفوظ ہو جانے تک id بازگیر نہیں ہو سکتی۔";

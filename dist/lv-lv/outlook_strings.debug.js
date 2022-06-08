@@ -6,7 +6,7 @@ _u.ExtensibilityStrings.registerClass("_u.ExtensibilityStrings");
 _u.ExtensibilityStrings.l_APICallFailedDueToItemChange_Text = "Atlasītais vienums ir mainīts.";
 _u.ExtensibilityStrings.l_API_Not_Supported_By_ExtensionPoint_Error_Text = "API netiek atbalstīts paplašinājuma punktam.";
 _u.ExtensibilityStrings.l_API_Not_Supported_For_Shared_Folders_Error = "API netiek atbalstīts koplietotajās mapēs.";
-_u.ExtensibilityStrings.l_ActionsDefinitionMultipleActionsError_Text = "Šobrīd tiek atbalstīta tikai viena darbība.";
+_u.ExtensibilityStrings.l_ActionsDefinitionMultipleActionsError_Text = "Šobrīd tiek atbalstīta tikai viena darbība."
 _u.ExtensibilityStrings.l_ActionsDefinitionWrongNotificationMessageError_Text = "Šim paziņojuma ziņojuma tipam darbības nevar definēt.";
 _u.ExtensibilityStrings.l_AttachmentDeleteGeneralFailure_Text = "Pielikumu no šī vienuma nevar izdzēst.";
 _u.ExtensibilityStrings.l_AttachmentDeletedBeforeUploadCompletes_Text = "Lietotājs noņēma pielikumu, pirms tika pabeigta augšupielāde.";
@@ -36,7 +36,7 @@ _u.ExtensibilityStrings.l_EmailAddressTooLong_Text = "Vismaz viena norādītā e
 _u.ExtensibilityStrings.l_EwsRequestOversized_Text = "Pieprasījums pārsniedz 1 MB lieluma ierobežojumu. Lūdzu, modificējiet savu EWS pieprasījumu.";
 _u.ExtensibilityStrings.l_ExceededMaxNumberOfAttachments_Text = "Pielikumus nevar pievienot, jo ziņojumam jau ir maksimālais pielikumu skaits";
 _u.ExtensibilityStrings.l_HtmlSanitizationFailure_Text = "HTML tīrīšana neizdevās.";
-_u.ExtensibilityStrings.l_Insufficient_Item_Permissions_Text = "Lietotājam nav atļauju, kas ir nepieciešamas, lai veiktu šo darbību."
+_u.ExtensibilityStrings.l_Insufficient_Item_Permissions_Text = "Lietotājam nav atļauju, kas ir nepieciešamas, lai veiktu šo darbību.";
 _u.ExtensibilityStrings.l_InternalFormatError_Text = "Radās iekšēja formāta kļūda.";
 _u.ExtensibilityStrings.l_InternalProtocolError_Text = "Iekšēja protokola kļūda: '{0}'.";
 _u.ExtensibilityStrings.l_Internal_Server_Error_Text = "Exchange serveris atgrieza kļūdu. Lai iegūtu vairāk informācijas, lūdzu, skatiet diagnostika objektu.";

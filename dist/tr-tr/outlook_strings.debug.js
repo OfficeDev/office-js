@@ -3,7 +3,7 @@ _u.ExtensibilityStrings = function()
 {
 };
 _u.ExtensibilityStrings.registerClass("_u.ExtensibilityStrings");
-_u.ExtensibilityStrings.l_APICallFailedDueToItemChange_Text = "Seçili öğe değiştirilmiş.";
+_u.ExtensibilityStrings.l_APICallFailedDueToItemChange_Text = "Seçili öğe değiştirilmiş."
 _u.ExtensibilityStrings.l_API_Not_Supported_By_ExtensionPoint_Error_Text = "API, genişletme noktası için desteklenmiyor.";
 _u.ExtensibilityStrings.l_API_Not_Supported_For_Shared_Folders_Error = "Paylaşılan klasörler için API desteklenmiyor.";
 _u.ExtensibilityStrings.l_ActionsDefinitionMultipleActionsError_Text = "Şu anda yalnızca tek eylem destekleniyor.";
@@ -55,7 +55,7 @@ _u.ExtensibilityStrings.l_Invalid_Category_Error_Text = "Geçersiz kategoriler g
 _u.ExtensibilityStrings.l_ItemNotFound_Text = "Öğe yok veya oluşturulmamış.";
 _u.ExtensibilityStrings.l_Item_Not_Saved_Error_Text = "Öğe kaydedilene kadar kimlik alınamaz.";
 _u.ExtensibilityStrings.l_KeyNotFound_Text = "Belirtilen anahtar bulunamadı.";
-_u.ExtensibilityStrings.l_MessageInDifferentStoreError_Text = "İleti farklı bir depoya kaydedildiğinden EWS kimliği alınamıyor."
+_u.ExtensibilityStrings.l_MessageInDifferentStoreError_Text = "İleti farklı bir depoya kaydedildiğinden EWS kimliği alınamıyor.";
 _u.ExtensibilityStrings.l_Missing_Extended_Permissions_For_API = "API çağrısı için Genişletilmiş İzin bulunmuyor.";
 _u.ExtensibilityStrings.l_NoValidRecipientsProvided_Text = "Geçerli alıcı bilgisi sağlanmadı.";
 _u.ExtensibilityStrings.l_NotificationKeyNotFound_Text = "Sağlanan anahtara sahip bildirim yok.";

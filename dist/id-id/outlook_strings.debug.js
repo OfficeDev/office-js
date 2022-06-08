@@ -4,7 +4,7 @@ _u.ExtensibilityStrings = function()
 };
 _u.ExtensibilityStrings.registerClass("_u.ExtensibilityStrings");
 _u.ExtensibilityStrings.l_APICallFailedDueToItemChange_Text = "Item yang dipilih telah diubah.";
-_u.ExtensibilityStrings.l_API_Not_Supported_By_ExtensionPoint_Error_Text = "API tidak didukung untuk titik ekstensi.";
+_u.ExtensibilityStrings.l_API_Not_Supported_By_ExtensionPoint_Error_Text = "API tidak didukung untuk titik ekstensi."
 _u.ExtensibilityStrings.l_API_Not_Supported_For_Shared_Folders_Error = "API tidak didukung untuk folder bersama.";
 _u.ExtensibilityStrings.l_ActionsDefinitionMultipleActionsError_Text = "Hanya satu tindakan yang didukung saat ini.";
 _u.ExtensibilityStrings.l_ActionsDefinitionWrongNotificationMessageError_Text = "Tindakan tidak dapat didefinisikan untuk tipe pesan pemberitahuan ini.";
@@ -59,10 +59,10 @@ _u.ExtensibilityStrings.l_MessageInDifferentStoreError_Text = "ID EWS tidak dapa
 _u.ExtensibilityStrings.l_Missing_Extended_Permissions_For_API = "Izin yang Diperluas tidak ditemukan untuk panggilan API.";
 _u.ExtensibilityStrings.l_NoValidRecipientsProvided_Text = "Tidak tersedia penerima valid.";
 _u.ExtensibilityStrings.l_NotificationKeyNotFound_Text = "Tidak ada pemberitahuan dengan tombol yang disediakan.";
-_u.ExtensibilityStrings.l_NullOrEmptyParameterError_Text = "Parameter '{0}' bersifat wajib dan tidak boleh null atau kosong."
+_u.ExtensibilityStrings.l_NullOrEmptyParameterError_Text = "Parameter '{0}' bersifat wajib dan tidak boleh null atau kosong.";
 _u.ExtensibilityStrings.l_NumberOfNotificationsExceeded_Text = "Pemberitahuan tidak dapat ditambahkan karena telah mencapai batas pemberitahuan.";
 _u.ExtensibilityStrings.l_NumberOfRecipientsExceeded_Text = "Jumlah total penerima di bidang tidak dapat melampaui {0}.";
-_u.ExtensibilityStrings.l_OffsetNotfound_Text = "Offset untuk time stamp ini tidak ditemukan.";
+_u.ExtensibilityStrings.l_OffsetNotfound_Text = "Offset untuk stempel waktu ini tidak ditemukan.";
 _u.ExtensibilityStrings.l_Olk_Http_Error_Text = "Permintaan gagal. Silakan lihat kode kesalahan HTTP pada objek diagnostik.";
 _u.ExtensibilityStrings.l_OnlineMeetingsUserDenied_Text = "Pengguna menolak.";
 _u.ExtensibilityStrings.l_ParameterValueTooLongError_Text = "Nilai parameter '{0}' terlalu panjang. Jumlah maksimum karakter adalah '{1}'.";

@@ -6,7 +6,7 @@ _u.ExtensibilityStrings.registerClass("_u.ExtensibilityStrings");
 _u.ExtensibilityStrings.l_APICallFailedDueToItemChange_Text = "Mục được chọn đã bị thay đổi.";
 _u.ExtensibilityStrings.l_API_Not_Supported_By_ExtensionPoint_Error_Text = "API không được hỗ trợ cho điểm mở rộng.";
 _u.ExtensibilityStrings.l_API_Not_Supported_For_Shared_Folders_Error = "API không được hỗ trợ cho các thư mục chia sẻ.";
-_u.ExtensibilityStrings.l_ActionsDefinitionMultipleActionsError_Text = "Hiện chỉ hỗ trợ duy nhất một hành động đơn.";
+_u.ExtensibilityStrings.l_ActionsDefinitionMultipleActionsError_Text = "Hiện chỉ hỗ trợ duy nhất một hành động đơn."
 _u.ExtensibilityStrings.l_ActionsDefinitionWrongNotificationMessageError_Text = "Không thể xác định hành động cho loại thư thông báo này.";
 _u.ExtensibilityStrings.l_AttachmentDeleteGeneralFailure_Text = "Không thể xóa phần đính kèm ra khỏi mục.";
 _u.ExtensibilityStrings.l_AttachmentDeletedBeforeUploadCompletes_Text = "Người dùng đã loại bỏ phần đính kèm trước khi tải lên hoàn tất.";
@@ -43,7 +43,7 @@ _u.ExtensibilityStrings.l_Internal_Server_Error_Text = "Máy chủ Exchange đã
 _u.ExtensibilityStrings.l_Internet_Not_Connected_Error_Text = "Người dùng không còn kết nối với mạng. Vui lòng kiểm tra kết nối mạng của bạn, rồi thử lại.";
 _u.ExtensibilityStrings.l_InvalidActionType_Text = "Giá trị của tham số 'actionType' là không hợp lệ. Giá trị được chấp nhận là \"showTaskPane\".";
 _u.ExtensibilityStrings.l_InvalidAttachmentId_Text = "ID phần đính kèm không hợp lệ.";
-_u.ExtensibilityStrings.l_InvalidAttachmentPath_Text = "Đường dẫn phần đính kèm không hợp lệ."
+_u.ExtensibilityStrings.l_InvalidAttachmentPath_Text = "Đường dẫn phần đính kèm không hợp lệ.";
 _u.ExtensibilityStrings.l_InvalidCommandIdError_Text = "Giá trị của tham số 'commandId' là không hợp lệ.";
 _u.ExtensibilityStrings.l_InvalidDate_Text = "Đầu vào không giải quyết vào một ngày hợp lệ.";
 _u.ExtensibilityStrings.l_InvalidEndTime_Text = "Thời gian kết thúc không thể trước khi thời gian bắt đầu.";

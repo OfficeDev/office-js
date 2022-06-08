@@ -5,7 +5,7 @@ _u.ExtensibilityStrings = function()
 _u.ExtensibilityStrings.registerClass("_u.ExtensibilityStrings");
 _u.ExtensibilityStrings.l_APICallFailedDueToItemChange_Text = "নির্বাচিত আইটেমটিকে পরিবর্তন করা হয়েছে৷";
 _u.ExtensibilityStrings.l_API_Not_Supported_By_ExtensionPoint_Error_Text = "এক্সটেনশন পয়েন্টের জন্য API সমর্থিত নয়৷";
-_u.ExtensibilityStrings.l_API_Not_Supported_For_Shared_Folders_Error = "শেয়ারকৃত ফোল্ডারগুলির জন্য API সমর্থিত নয় ।";
+_u.ExtensibilityStrings.l_API_Not_Supported_For_Shared_Folders_Error = "শেয়ারকৃত ফোল্ডারগুলির জন্য API সমর্থিত নয় ।"
 _u.ExtensibilityStrings.l_ActionsDefinitionMultipleActionsError_Text = "বর্তমানে কেবলমাত্র একটি একক কার্য সমর্থিত৷";
 _u.ExtensibilityStrings.l_ActionsDefinitionWrongNotificationMessageError_Text = "এই বিজ্ঞপ্তি বার্তার প্রকারের জন্য কার্যগুলোকে নির্ধারণ করা যাবে না৷";
 _u.ExtensibilityStrings.l_AttachmentDeleteGeneralFailure_Text = "আইটেমটি থেকে সংযুক্তিটি মুছতে পারা যায় না।";
@@ -13,7 +13,7 @@ _u.ExtensibilityStrings.l_AttachmentDeletedBeforeUploadCompletes_Text = "আপ�
 _u.ExtensibilityStrings.l_AttachmentErrorName_Text = "সংযুক্তি ত্রুটি";
 _u.ExtensibilityStrings.l_AttachmentExceededSize_Text = "সংযুক্তিটি অত্যন্ত বড় হওয়ার কারণে যোগ করতে পারা যায় না।";
 _u.ExtensibilityStrings.l_AttachmentItemIdTooLong_Text = "এক বা একাধিক সংযুক্তির ID খুবই বড়৷";
-_u.ExtensibilityStrings.l_AttachmentNameTooLong_Text = "এক বা একাধিক সংযুক্তির নাম খুবই বড়৷"
+_u.ExtensibilityStrings.l_AttachmentNameTooLong_Text = "এক বা একাধিক সংযুক্তির নাম খুবই বড়৷";
 _u.ExtensibilityStrings.l_AttachmentNotSupported_Text = "সংযুক্তিটির প্রকার সমর্থিত নয়।";
 _u.ExtensibilityStrings.l_AttachmentUploadGeneralFailure_Text = "সংযুক্তিটি আইটেমে যোগ করতে পারা যায় না।";
 _u.ExtensibilityStrings.l_AttachmentUrlTooLong_Text = "এক বা একাধিক সংযুক্তির URL খুবই বড়৷";

@@ -3,7 +3,7 @@ _u.ExtensibilityStrings = function()
 {
 };
 _u.ExtensibilityStrings.registerClass("_u.ExtensibilityStrings");
-_u.ExtensibilityStrings.l_APICallFailedDueToItemChange_Text = "Vybratá položka sa zmenila."
+_u.ExtensibilityStrings.l_APICallFailedDueToItemChange_Text = "Vybratá položka sa zmenila.";
 _u.ExtensibilityStrings.l_API_Not_Supported_By_ExtensionPoint_Error_Text = "Rozhranie API nie je podporované pre bod rozšírenia.";
 _u.ExtensibilityStrings.l_API_Not_Supported_For_Shared_Folders_Error = "Rozhranie API nie je podporované pre zdieľané priečinky.";
 _u.ExtensibilityStrings.l_ActionsDefinitionMultipleActionsError_Text = "Momentálne sa podporuje len jedna akcia.";
@@ -62,7 +62,7 @@ _u.ExtensibilityStrings.l_NotificationKeyNotFound_Text = "Neexistujú žiadne oz
 _u.ExtensibilityStrings.l_NullOrEmptyParameterError_Text = "Parameter {0} je povinný a nemôže byť prázdny ani mať hodnotu Null.";
 _u.ExtensibilityStrings.l_NumberOfNotificationsExceeded_Text = "Oznámenie sa nepodarilo pridať, pretože bol dosiahnutý limit oznámení.";
 _u.ExtensibilityStrings.l_NumberOfRecipientsExceeded_Text = "Celkový počet príjemcov v poli nemôže presiahnuť {0}.";
-_u.ExtensibilityStrings.l_OffsetNotfound_Text = "Posun tejto časovej známky sa nepodarilo nájsť.";
+_u.ExtensibilityStrings.l_OffsetNotfound_Text = "Posun tejto časovej známky sa nepodarilo nájsť."
 _u.ExtensibilityStrings.l_Olk_Http_Error_Text = "Požiadavka zlyhala. Skontrolujte objekt diagnostiky pre chybový kód HTTP.";
 _u.ExtensibilityStrings.l_OnlineMeetingsUserDenied_Text = "Používateľ zamietol.";
 _u.ExtensibilityStrings.l_ParameterValueTooLongError_Text = "Hodnota parametra {0} je príliš dlhá. Maximálny počet znakov je {1}.";

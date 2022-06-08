@@ -30,7 +30,7 @@ Strings.OfficeOM.L_CoercionTypeNotMatchBinding = "اختصاصی جبر کی ق�
 Strings.OfficeOM.L_CoercionTypeNotSupported = "اختصاصی جبر کی قسم معاون نہیں ہے۔";
 Strings.OfficeOM.L_ColIndexOutOfRange = "قدر کا اشاریہ کالم اجازت یافتہ حد اطلاق سے باہر ہے۔ (0 یا اعلی) قدر جو کالموں کی تعداد کے مقابلہ میں کم ہو اسے استعمال کریں۔";
 Strings.OfficeOM.L_ConfirmCancelMessage = "معافی چاہتے ہیں، ہم جاری نہیں رکھ سکتے۔";
-Strings.OfficeOM.L_ConfirmDialog = "کیا آپ اس عمل داری {0} پر بھروسا کرتے ہیں جہاں یہ Office سیشن میزبان ہے؟";
+Strings.OfficeOM.L_ConfirmDialog = "ڈومین {0} بطور Microsoft Office کام کر رہا ہے اور Office کے ایسے در اضافہ جات چلا سکتا ہے جو آپ کے ذاتی ڈیٹا تک رسائی پا سکتے ہوں۔ اگر آپ کو اس ڈومین پر اعتماد ہے کہ وہ بطور Office چلے اور آپ کے ڈیٹا تک رسائی پائے، تو آگے جاری رکھنے کے لئے ‘ٹھیک ہے’ پر کلک کریں۔";
 Strings.OfficeOM.L_ConfirmDialogApiTrustsParent = "آپ ممکنہ طور پر {0} کی جانب سے حساس معلومات بھیجنے اور وصول کرنے جا رہے ہیں۔ جب آپ کو بھروسہ ہو کہ مندرجہ ذیل ویب سائٹ وہ حساس معلومات وصول کرے، صرف تب اوکے پر کلک کریں: {1}۔";
 Strings.OfficeOM.L_ConfirmRefreshMessage = "جاری رکھنے کے لئے، ایڈ کو ہٹائیں اور اسے دوبارہ شامل کریں، یا صفحہ کو تازہ دم کریں۔";
 Strings.OfficeOM.L_ConnectionFailureWithDetails = "{0} کے حالت کوڈ کے ساتھ درخواست ناکام ہوگئی، نقص کوڈ {1} اور مندرجہ زیل نقص پیغام: {2}";
@@ -45,7 +45,7 @@ Strings.OfficeOM.L_CustomXmlExceedQuotaMessage = "XPath انتخاب کو 1024 �
 Strings.OfficeOM.L_CustomXmlExceedQuotaName = "انتخاب کی حد پوری ہوچکی ہے";
 Strings.OfficeOM.L_CustomXmlNodeNotFound = "مخصوص گھنڈی نہیں ملی۔";
 Strings.OfficeOM.L_CustomXmlOutOfDateMessage = "تاریخ بہت پرانی ہے۔ شے کو دوبارہ بازگیر کریں۔";
-Strings.OfficeOM.L_CustomXmlOutOfDateName = "کوائف حالیہ نہیں";
+Strings.OfficeOM.L_CustomXmlOutOfDateName = "کوائف حالیہ نہیں"
 Strings.OfficeOM.L_DataNotMatchBindingSize = "فراہم کردہ کوائف آبجیکٹ حالیہ انتخاب کے سائز کے مشابہ نہیں ہے۔";
 Strings.OfficeOM.L_DataNotMatchBindingType = "اختصاصی کوائف آبجیکٹ بائنڈنگ قسم کے ساتھ ہم آہنگ نہیں ہے۔";
 Strings.OfficeOM.L_DataNotMatchCoercionType = "اختصاصی کوائف آبجیکٹ کی قسم حالیہ انتخاب کے ساتھ ہم آہنگ نہیں ہے۔";
@@ -59,8 +59,10 @@ Strings.OfficeOM.L_DialogAlreadyOpened = "عمل ناکام ہوگیا ہے کی
 Strings.OfficeOM.L_DialogInvalidScheme = "URL سکیم معاونت کردہ نہیں ہے۔ اس کے بجائے HTTPS استعمال کریں۔";
 Strings.OfficeOM.L_DialogNavigateError = "مکالمہ نیویگیشن نقص";
 Strings.OfficeOM.L_DialogOK = "ٹھیک ہے";
+Strings.OfficeOM.L_DialogParentIsMinimized = "آپریشن اس لئے ناکام رہا کيونکہ پیرینٹ ونڈو سکیڑی ہوئی ہے۔";
 Strings.OfficeOM.L_DialogRequireHTTPS = "HTTP پروٹوکول معاونت کردہ نہیں ہے۔ اس کے بجائے HTTPS استعمال کریں";
 Strings.OfficeOM.L_DisplayDialogError = "مکالمہ نقص دکھائیں";
+Strings.OfficeOM.L_DocumentIsInactive = "آپریشن اس لئے ناکام رہا کیونکہ اس در اضافہ کی حامل دستاویز غیر فعال ہے۔";
 Strings.OfficeOM.L_DocumentReadOnly = "درخواست کردہ آپریشن کو حالیہ دستاویز موڈ پر اجازت نہیں ہے۔";
 Strings.OfficeOM.L_ElementMissing = "کچھ پیرا میٹر قدروں کے غائب ہونے کی وجہ سے ہم جدول سیل وضع نہیں کر سکتے۔ پیرامیٹر کو دہرا چیک کریں اور پھر کوشش کریں۔";
 Strings.OfficeOM.L_EventHandlerAdditionFailed = "وقوعہ ہینڈلر کا اضافہ کرنے میں ناکام رہا۔";
@@ -115,90 +117,4 @@ Strings.OfficeOM.L_InvalidRequestContext = "آبجیکٹ کو مختلف درخ�
 Strings.OfficeOM.L_InvalidResourceUrl = "ناجائز ایپلیکیشن ماخذ Url فراہم کیا گیا۔";
 Strings.OfficeOM.L_InvalidResourceUrlMessage = "ظاہر میں ناجائز ماخذ Url کو مخصوص کیا گیا ہے۔";
 Strings.OfficeOM.L_InvalidSSOAddinMessage = "اس در اضافے کے لئے شناخت API معاونت شدہ نہیں ہے۔";
-Strings.OfficeOM.L_InvalidSelectionForBindingType = "حالیہ انتخاب اور مخصوص بائنڈنگ کی قسم کے ساتھ ایک ارتباط نہیں بنایا جا سکتا۔";
-Strings.OfficeOM.L_InvalidSetColumns = "اختصاصی کالم درست نہیں ہیں۔";
-Strings.OfficeOM.L_InvalidSetRows = "اختصاصی کالم درست نہیں ہیں۔";
-Strings.OfficeOM.L_InvalidSetStartRowColumn = "اختصاصی startRow یا startColumn اقدار درست نہیں ہیں۔"
-Strings.OfficeOM.L_InvalidTableOptionValue = "ایک یا زائد tableOptions پیرامیٹرز کے اقدار جن کی اجازت نہیں ہے۔ قدروں کو دہرا چیک کریں اور دوبارہ کوشش کریں۔";
-Strings.OfficeOM.L_InvalidValue = "غلط قدر";
-Strings.OfficeOM.L_MemoryLimit = "میموری حد سے تجاوز کرگیا ہے";
-Strings.OfficeOM.L_MissingParameter = "غائب پیرامیٹر";
-Strings.OfficeOM.L_MissingRequiredArguments = "کچھ مطلوبہ دلائل غائب";
-Strings.OfficeOM.L_MultipleNamedItemFound = "اسی نام کے ساتھ متعدد آبجیکٹ نہیں ملے۔";
-Strings.OfficeOM.L_NamedItemNotFound = "نام دیا گیا شے موجود نہیں۔";
-Strings.OfficeOM.L_NavOutOfBound = "آپریشن ناکام ہوگیا کیوں کہ اشاریہ حد اطلاق کے باہر ہے۔";
-Strings.OfficeOM.L_NetworkProblem = "نیٹ ورک مسئلہ";
-Strings.OfficeOM.L_NetworkProblemRetrieveFile = "ایک نیٹ ورک مسئلے نے فائل کی باز گیری روک رکھا ہے۔";
-Strings.OfficeOM.L_NewWindowCrossZone = "آپ کے براؤزر میں موجود سلامتی سیٹنگوں نے ہمیں مکالمہ خانہ بنانے سے روک دیا ہے۔ ایک مختلف براؤزر آزمائیں یا {0} تو وہ '{1}' اور آپ کے پتہ بار میں دکھائے گئے ڈومین ایک جیسے سلامتی منطقہ میں ہوں گے۔";
-Strings.OfficeOM.L_NewWindowCrossZoneConfigureBrowserLink = "اپنا براؤزر تشکیل دیں";
-Strings.OfficeOM.L_NewWindowCrossZoneErrorString = "براؤزر کی پابندیوں نے ہمیں مکالمہ خانہ بنانے سے روک دیا۔ مکالمہ خانے کے ڈومین اور در اضافہ میزبان کا ڈومین ایک جیسے سلامتی منطقہ میں نہیں ہیں۔";
-Strings.OfficeOM.L_NoCapability = "آپ کو اس عمل کے لیے کافی اجازت نہیں۔";
-Strings.OfficeOM.L_NoHttpsWAC = "Office کا یہ سیشن محفوظ کنکشن کا استعمال نہیں کررہا ہے۔ ہمارا مشورہ ہے کہ آپ اضافی احتیاط برتیں۔";
-Strings.OfficeOM.L_NonUniformPartialGetNotSupported = "محدود پیرامیٹر جبر قسم کی جدول کے ساتھ استعمال نہیں کیا جاسکتا جب تک کہ جدول ضم سیلوں کا حامل نہ ہوجائے۔";
-Strings.OfficeOM.L_NonUniformPartialSetNotSupported = "محدود پیرامیٹر جبر قسم کی جدول کے ساتھ استعمال نہیں کیا جاسکتا جب تک کہ جدول ضم سیلوں کا حامل نہ ہوجائے۔";
-Strings.OfficeOM.L_NotImplemented = "فعل {0} نافذ نہیں کیا گیا ہے۔";
-Strings.OfficeOM.L_NotSupported = "فعل {0} معاون نہیں ہے۔";
-Strings.OfficeOM.L_NotSupportedBindingType = "اختصاصی بائنڈنگ کی {0} قسم معاون نہیں ہے۔";
-Strings.OfficeOM.L_NotSupportedEventType = "اختصاصی وقوعہ کی {0} قسم معاون نہیں ہے۔";
-Strings.OfficeOM.L_NotTrustedWAC = "آپ کو محفوظ رکھنے میں مدد کرنے کے لئے اس ایڈ کو غیر فعال کردیا گیا ہے۔ ایڈ کا استعمال جاری رکھنے کے لیے، توثیق کریں کہ اس آئٹم کو کسی قابل اعتماد ڈومین میں میزبان کیا گیا ہے یا اسے آفس ڈیسک ٹاپ ایپ میں کھولیں۔";
-Strings.OfficeOM.L_OperationCancelledError = "عملیہ منسوخ ہو گیا";
-Strings.OfficeOM.L_OperationCancelledErrorMessage = "صارف کی جانب سے عملیہ منسوخ ہو گیا ہے۔";
-Strings.OfficeOM.L_OperationNotSupported = "يہ آپریشن معاون نہیں ہے۔";
-Strings.OfficeOM.L_OperationNotSupportedOnMatrixData = "منتخب مشمول کا جدول وضع میں ہونے کی ضرورت ہے۔ بطور ایک جدول کوائف وضع کریں اور دوبارہ کوشش کریں۔";
-Strings.OfficeOM.L_OperationNotSupportedOnThisBindingType = "اس بائنڈنگ کی قسم پر آپریشن کی معاونت نہیں ہے۔";
-Strings.OfficeOM.L_OsfControlTypeNotSupported = "OsfControl قسم معاون نہیں ہے۔";
-Strings.OfficeOM.L_OutOfRange = "حد اطلاق سے باہر";
-Strings.OfficeOM.L_OverwriteWorksheetData = "سیٹ آپریشن ناکام ہوگیا کیونکہ فراہم کردہ کوائف آبجیکٹ اووررائٹ یا منتقل کوائف کریگا۔";
-Strings.OfficeOM.L_PermissionDenied = "اجازت نہیں ملی";
-Strings.OfficeOM.L_PropertyDoesNotExist = "خاصیت '{0}' آبجیکٹ پر موجود نہیں ہے۔";
-Strings.OfficeOM.L_PropertyNotLoaded = "خاصیت '{0}' دستیاب نہیں ہے۔ خاصیت کی قدر کا مطالعہ کرنے سے قبل، مشتمل آبجیکٹ پر لوڈ طریقے کو کال کریں اور درخواست کے وابستہ سیاق پر \"context.sync()\" کو کال کریں۔";
-Strings.OfficeOM.L_ReadSettingsError = "سیٹنگیں نقص کا مطالعہ";
-Strings.OfficeOM.L_RedundantCallbackSpecification = "واپس کال کو اختیاری آبجیکٹ اور بحث فہرست میں مخصوص نہیں کیا جاسکتا۔";
-Strings.OfficeOM.L_RequestPayloadSizeLimitExceededMessage = 'درخواست کے پے لوڈ کا سائز حد سے تجاوز کر گیا ہے۔ براہ کرم دستاویزات ملاحظہ کريں: "https://docs.microsoft.com/office/dev/add-ins/concepts/resource-limits-and-performance-optimization#excel-add-ins"۔';
-Strings.OfficeOM.L_RequestTimeout = "کال نفاذ کرنے میں بہت دیر کر دی ہے۔";
-Strings.OfficeOM.L_RequestTokenUnavailable = "اس API کو فریکوئنسی آہستہ کرنے کے لیے تھروٹلاد کیا گیا ہے۔";
-Strings.OfficeOM.L_ResponsePayloadSizeLimitExceededMessage = 'جواب کے پے لوڈ کا سائز حد سے تجاوز کر گیا ہے۔ براہ کرم دستاویزات ملاحظہ کريں: "https://docs.microsoft.com/office/dev/add-ins/concepts/resource-limits-and-performance-optimization#excel-add-ins"۔';
-Strings.OfficeOM.L_RowIndexOutOfRange = "قدر کا اشاریہ کالم اجازت یافتہ حد اطلاق سے باہر ہے۔ (0 یا اعلی) قدر جو صفوں کی تعداد کے مقابلہ میں کم ہو اسے استعمال کریں۔";
-Strings.OfficeOM.L_RunMustReturnPromise = '".run" طریقے پر دیے گئے بیچ فعل نے کوئی وعدہ نہیں لوٹایا ہے۔ فعل کو لازمی وعدہ لوٹانا چاہئے، تاکہ خود کار طور پر سراغ یافتہ کوئی بھی اشیاء بیچ کی تکمیل پر جاری کئے جاسکتے ہیں۔ عام طور پر، آپ "context.sync()" سے جواب لوٹا کر ایک وعدہ لوٹاتے ہیں۔';
-Strings.OfficeOM.L_SSOClientError = "Office کی طرف سے توثیق کاری کی درخواست میں نقص واقع ہوگیا ہے۔";
-Strings.OfficeOM.L_SSOClientErrorMessage = "کلائنٹ میں ایک غیر متوقع نقص واقع ہوا ہے۔";
-Strings.OfficeOM.L_SSOConnectionLostError = "سائن ان عمل کے دوران ایک کنکشن منقطع ہو گیا تھا۔";
-Strings.OfficeOM.L_SSOConnectionLostErrorMessage = "سائن ان عمل کے دوران ایک کنکشن منقطع ہو گیا تھا، اور ممکن ہے کہ صارف سائن ان نہیں ہو سکا۔ اس بات کا امکان ہے کہ یہ صارف کے براؤزر کی تشکیل کاری سیٹنگوں کی وجہ سے ہوا تھا، جیسے کہ سلامتی منطقے۔";
-Strings.OfficeOM.L_SSOServerError = "تصدیق فراہم کنندہ میں نقص واقع ہوگیا ہے۔";
-Strings.OfficeOM.L_SSOServerErrorMessage = "سرور پر ایک غیر متوقع نقص واقع ہوا ہے۔";
-Strings.OfficeOM.L_SSOUnsupportedPlatform = "اس پلیٹ فارم میں API معاونت شدہ نہیں ہے۔";
-Strings.OfficeOM.L_SSOUserConsentNotSupportedByCurrentAddinCategory = "یہ ایڈ ان صارف مشمول کی معاونت نہیں کرتا۔";
-Strings.OfficeOM.L_SSOUserConsentNotSupportedByCurrentAddinCategoryMessage = "عملیہ ناکام ہو گیا کیونکہ اس ذمرے میں یہ ایڈ ان صارف مشمول کی معاونت نہیں کرتا";
-Strings.OfficeOM.L_SaveSettingsError = "سیٹنگز کی نقص محفوظ کریں";
-Strings.OfficeOM.L_SelectionCannotBound = "حالیہ انتخاب میں بائنڈ ہوسکتا۔";
-Strings.OfficeOM.L_SelectionNotSupportCoercionType = "حالیہ انتخاب اختصاصی جبر کی قسم کے ساتھ ہم آہنگ نہیں ہے۔";
-Strings.OfficeOM.L_SetDataIsTooLarge = "اختصاصی کوائف آبجیکٹ بہت بڑی ہے۔";
-Strings.OfficeOM.L_SetDataParametersConflict = "اختصاصی پیرامیٹر سے تعارض ہے۔";
-Strings.OfficeOM.L_SettingNameNotExist = "مخصوص سٹنگوں کا نام موجود نہیں ہے۔";
-Strings.OfficeOM.L_SettingsAreStale = "سیٹنگیں محفوظ نہیں ہو سکی کیونکہ وہ فی الحال نہیں ہے۔";
-Strings.OfficeOM.L_SettingsCannotSave = "سیٹنگیں محفوظ نہیں کی جا سکتی۔";
-Strings.OfficeOM.L_SettingsStaleError = "سیٹنگیں اسٹل کا نقص";
-Strings.OfficeOM.L_ShowWindowDialogNotification = "‎{0} ایک نیا دریچہ ظاہر کرنا چاہتا ہے۔";
-Strings.OfficeOM.L_ShowWindowDialogNotificationAllow = "اجازت ديں";
-Strings.OfficeOM.L_ShowWindowDialogNotificationIgnore = "نظر انداز کریں";
-Strings.OfficeOM.L_ShuttingDown = "آپریشن ناکام ہو گیا کیونکہ کوائف فی الحال پیش کار پر نہیں ہے۔";
-Strings.OfficeOM.L_SliceSizeNotSupported = "مخصوص سلک سائز معاون نہیں ہے۔";
-Strings.OfficeOM.L_SpecifiedIdNotExist = "مخصوص ID موجود نہیں۔";
-Strings.OfficeOM.L_Timeout = "عملیہ کا وقت ختم ہو چکا ہے۔";
-Strings.OfficeOM.L_TooManyArguments = "بہت سے دلائل";
-Strings.OfficeOM.L_TooManyIncompleteRequests = "پچھلا کال مکمل ہونے تک انتظار کریں۔";
-Strings.OfficeOM.L_TooManyOptionalFunction = "پیرامیٹر فہرست میں متعدد اختیاری افعال";
-Strings.OfficeOM.L_TooManyOptionalObjects = "پیرامیٹر فہرست میں متعدد اختیاری آبجیکٹس";
-Strings.OfficeOM.L_UnknownBindingType = "بائنڈنگ قسم معاون نہیں ہے۔";
-Strings.OfficeOM.L_UnsupportedDataObject = "فراہم کردہ کوائف آبجیکٹ کی قسم غیر معاون ہے۔";
-Strings.OfficeOM.L_UnsupportedEnumeration = "غیر تائید شدہ اعداد و شمار";
-Strings.OfficeOM.L_UnsupportedEnumerationMessage = "اعداد و شمار میں موجودہ میزبان ایپلیکیشن تائیدشدہ نہیں ہے۔";
-Strings.OfficeOM.L_UnsupportedUserIdentity = "صارف شناخت معاونت شدہ نہیں ہے۔";
-Strings.OfficeOM.L_UnsupportedUserIdentityMessage = "صارف کی شناخت قسم معاونت شدہ نہیں ہے۔";
-Strings.OfficeOM.L_UserAborted = "صارف نے رضامندی درخواست کو روک دیا۔";
-Strings.OfficeOM.L_UserAbortedMessage = "صارف نے در اضافے کی اجازتوں کی رضامندی نہیں دی۔";
-Strings.OfficeOM.L_UserClickIgnore = "صارف نے مکالمہ خانہ کو نظر انداز کرنے کا انتخاب کیا ہے۔";
-Strings.OfficeOM.L_UserNotSignedIn = "Office میں کوئی صارف دستخط شدہ نہیں۔";
-Strings.OfficeOM.L_ValueNotLoaded = 'نتیجہ آبجیکٹ کی قدر ابھی تک لوڈ نہیں کی گئی ہے۔ خاصیت کی قدر پڑھنے سے پہلے وابستہ متن پر "context.sync()" کو کال کریں۔';
-Strings.OfficeOM.L_WorkbookHiddenMessage = "کتاب کار پوشیدہ ہونے کی وجہ سے JavaScript API کی درخواست ناکام ہو گئی ہے۔ برائے مہربانی کتاب کار کو عیاں کریں اور دوبارہ کوشش کریں۔";
-Strings.OfficeOM.L_WriteNotSupportedWhenModalDialogOpen = "جب موڈل ڈائیلاگ کھلا ہوا ہو تو Office کے لئے تحریری کارروائی کی سہولت معاونت شدہ نہیں ہوتی ہے۔";
+Strings.OfficeOM.L

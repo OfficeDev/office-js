@@ -3,7 +3,7 @@ _u.ExtensibilityStrings = function()
 {
 };
 _u.ExtensibilityStrings.registerClass("_u.ExtensibilityStrings");
-_u.ExtensibilityStrings.l_APICallFailedDueToItemChange_Text = "El elemento seleccionado se modificó.";
+_u.ExtensibilityStrings.l_APICallFailedDueToItemChange_Text = "El elemento seleccionado se modificó."
 _u.ExtensibilityStrings.l_API_Not_Supported_By_ExtensionPoint_Error_Text = "La API no es compatible con el punto de extensión.";
 _u.ExtensibilityStrings.l_API_Not_Supported_For_Shared_Folders_Error = "La API no es compatible con las carpetas compartidas.";
 _u.ExtensibilityStrings.l_ActionsDefinitionMultipleActionsError_Text = "Actualmente solo se admite una acción.";
@@ -69,7 +69,7 @@ _u.ExtensibilityStrings.l_ParameterValueTooLongError_Text = 'El valor del parám
 _u.ExtensibilityStrings.l_ParametersNotAsExpected_Text = "Los parámetros especificados no coinciden con el formato esperado.";
 _u.ExtensibilityStrings.l_PersistedNotificationArrayReadError_Text = "No se pudo realizar la llamada API debido a que las notificaciones guardadas no se pudieron recuperar.";
 _u.ExtensibilityStrings.l_PersistedNotificationArraySaveError_Text = "No se pudo realizar la llamada API debido a que las notificaciones no se pudieron guardar.";
-_u.ExtensibilityStrings.l_RecurrenceErrorMaxOccurrences_Text = "La serie periódica supera el límite máximo de repeticiones (999)."
+_u.ExtensibilityStrings.l_RecurrenceErrorMaxOccurrences_Text = "La serie periódica supera el límite máximo de repeticiones (999).";
 _u.ExtensibilityStrings.l_RecurrenceErrorZeroOccurrences_Text = "La serie periódica no tiene ninguna repetición en el rango de fechas especificado.";
 _u.ExtensibilityStrings.l_RecurrenceInvalidTimeZone_Text = "No se admite la zona horaria especificada.";
 _u.ExtensibilityStrings.l_RecurrenceUnsupportedAlternateCalendar_Text = "El usuario estableció el patrón de periodicidad con un calendario alternativo que no es compatible.";
