@@ -101,28 +101,6 @@ If you don't need the [firewall scenario](#target-scenarios), don't use the Offi
 
 Visual Studio 2017+ can use these same TypeScript definitions, even for regular JavaScript. For JavaScript IntelliSense in earlier versions of Visual Studio, an `office-vsdoc.js` is available alongside the `office.js` file. As long as you have a `Scripts/_references.js` file in your VS project, and as long as you substitute the existing triple-slash reference (`/// <reference path="https://.../office.js" />`) with the new location (the `-vsdoc` part gets substituted automatically, so use it just as you would in a `<script src="">` reference), you should have the corresponding JavaScript IntelliSense.
 
-## Access NPM files via a CDN
-
-In addition to downloading the files locally, they may be used via an external service like <https://unpkg.com>, which provides best-effort (no uptime guarantees) CDN hosting for npm packages. This is especially useful for trying out custom builds. To do so, simply change the script reference to:
-
-```html
-<script src="https://unpkg.com/@microsoft/office-js/dist/office.js"></script>
-```
-
-The different versions of the NPM package are listed  on the top right in the dropdown list at <https://unpkg.com/@microsoft/office-js/>.
-
-To view the latest version numbers for each of the tags run the following command on the command-line:
-
-> npm view @microsoft/office-js dist-tags --json
-
-A specific version number, can be used with <https://unpkg.com> by appending `@<version-#>` right after `office-js`; e.g., `.../office-js@1.1.2-custom.0/dist/...`
-
-```html
-<script src="https://unpkg.com/@microsoft/office-js@1.1.2-custom.0/dist/office.js"></script>
-```
-
-<br />
-
 ## NPM Package Versions
 
 Office.js versioning is described in detail in <https://docs.microsoft.com/office/dev/add-ins/develop/referencing-the-javascript-api-for-office-library-from-its-cdn>. Importantly, there is a  difference between what is in the JS files, versus what are the capabilities of a particular computer (i.e., older or slower-to-update versions of office).
@@ -133,20 +111,6 @@ The NPM package and the repo branches assume the following structure.
 | ------------------    |-------------- |-------------|
 | `release`             | `latest`      | Identical to a previous release on <https://appsforoffice.microsoft.com/lib/1/hosted/office.js> <br/><br/> The latest released publicly-available APIs.   |
 | `beta`                | `beta`        | Identical to a previous release on <https://appsforoffice.microsoft.com/lib/beta/hosted/office.js> <br/><br/>  Forthcoming APIs, not necessarily ready for public consumption that may change. Possibly available on [Insider Fast (and maybe Insider Slow) builds](https://products.office.com/office-insider). |
-| `custom`              | `custom`      | A custom release deployed for a specific need. Successive versions of this tag are not cumulative updates (e.e. `1.1.2-custom.1` may contain beta JavaScript, and `1.1.2-custom.2` may only contain the publicly-available release APIs with some tweaks) |
-
-## Use a specific version with [Script Lab](https://aka.ms/script-lab)
-
-To use a version of the NPM package with [Script Lab](https://aka.ms/script-lab), substitute the CDN reference and the `@types/office-js` reference with the NPM package name and version.  [Note: Script Lab uses <https://unpkg.com> for resolving the package names, so it's very similar guidance as above].
-
-For example, to use a `1.1.2-custom.0` version, use the following references:
-
-```text
-@microsoft/office-js@1.1.2-custom.0/dist/office.js
-@microsoft/office-js@1.1.2-custom.0/dist/office.d.ts
-```
-
-![Use the NPM package with Script Lab](https://github.com/OfficeDev/office-js/blob/release/.github/images/script-lab-substitute-refs.png)
 
 ## Code of Conduct
 
