@@ -81,6 +81,8 @@ _u.ExtensibilityStrings.l_RecurrenceInvalidTimeZone_Text='The specified time zon
 _u.ExtensibilityStrings.l_RecurrenceUnsupportedAlternateCalendar_Text='The recurrence pattern was set by the user using an alternate calendar that is not supported.';
 _u.ExtensibilityStrings.l_Recurrence_Error_Instance_SetAsync_Text='A recurrence pattern can\'t be set for a single occurrence in a series.';
 _u.ExtensibilityStrings.l_Recurrence_Error_Properties_Invalid_Text='The recurrence pattern isn\'t valid. Please check that the specified recurrence properties align with the recurrence type.';
+_u.ExtensibilityStrings.l_RoamingSettingsExceededSize_Text='Invalid parameter size. Roaming settings can\'t exceed the 32 KB size limit.';
 _u.ExtensibilityStrings.l_SaveError_Text='Connection error occurred while trying to save the item on the server.';
 _u.ExtensibilityStrings.l_SessionDataObjectMaxLengthExceeded_Text='The \'sessionData\' object surpassed its maximum length of \'{0}\' characters.';
 _u.ExtensibilityStrings.l_TokenAccessDeniedWithoutItemContext_Text='A REST token is only available with ReadWriteMailbox permission when there is no item context.';
+

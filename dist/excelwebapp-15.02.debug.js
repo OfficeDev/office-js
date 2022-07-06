@@ -508,4 +508,12 @@ OSF.DDA.ExcelWebAppDocument=function Microsoft_Office_WebExtension_ExcelWebAppDo
 	OSF.DDA.ExcelWebAppDocument.uber.constructor.call(this,
 		officeAppContext,
 		bf,
-		setting
+		settings
+	);
+	if (this.mode==OSF.ClientMode.ReadOnly) {
+		this.url=document.URL;
+	}
+	OSF.OUtil.finalizeProperties(this);
+};
+OSF.OUtil.extend(OSF.DDA.ExcelWebAppDocument, OSF.DDA.JsomDocument);
+
