@@ -1989,11 +1989,6 @@ OSF._OfficeAppFactory = (function OSF__OfficeAppFactory() {
         window.prompt = function OSF__OfficeAppFactory_initialize$prompt(message, defaultvalue) {
             throw new Error('Function window.prompt is not supported.');
         };
-        var isOutlookAndroid = _hostInfo.hostType == "outlook" && _hostInfo.hostPlatform == "android";
-        if (!isOutlookAndroid) {
-            window.history.replaceState = null;
-            window.history.pushState = null;
-        }
     };
     initialize();
     if (window.addEventListener) {
