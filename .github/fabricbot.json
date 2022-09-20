@@ -41,8 +41,7 @@
           "issues",
           "project_card"
         ]
-      },
-      "id": "xxRxza85i"
+      }
     },
     {
       "taskType": "scheduled",
@@ -193,8 +192,7 @@
             }
           }
         ]
-      },
-      "id": "KNnnTNCNn"
+      }
     },
     {
       "taskType": "scheduled",
@@ -343,8 +341,7 @@
             "parameters": {}
           }
         ]
-      },
-      "id": "jxIbXX2epF"
+      }
     },
     {
       "taskType": "trigger",
@@ -388,8 +385,7 @@
           "issues",
           "project_card"
         ]
-      },
-      "id": "y09KU2kSDI"
+      }
     },
     {
       "taskType": "trigger",
@@ -421,8 +417,7 @@
         "eventNames": [
           "issue_comment"
         ]
-      },
-      "id": "KilIIfeYxq"
+      }
     },
     {
       "taskType": "trigger",
@@ -474,8 +469,163 @@
         "eventNames": [
           "issue_comment"
         ]
+      }
+    },
+    {
+      "taskType": "trigger",
+      "capabilityId": "IssueResponder",
+      "subCapability": "IssuesOnlyResponder",
+      "version": "1.0",
+      "config": {
+        "conditions": {
+          "operator": "and",
+          "operands": [
+            {
+              "name": "isAction",
+              "parameters": {
+                "action": "opened"
+              }
+            },
+            {
+              "operator": "not",
+              "operands": [
+                {
+                  "name": "isAssignedToSomeone",
+                  "parameters": {}
+                }
+              ]
+            },
+            {
+              "operator": "or",
+              "operands": [
+                {
+                  "name": "bodyContains",
+                  "parameters": {
+                    "bodyPattern": "Host [Excel, Word, PowerPoint, etc.]: Word"
+                  }
+                },
+                {
+                  "name": "bodyContains",
+                  "parameters": {
+                    "bodyPattern": "Word.run"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        "eventType": "issue",
+        "eventNames": [
+          "issues",
+          "project_card"
+        ],
+        "actions": [
+          {
+            "name": "addLabel",
+            "parameters": {
+              "label": "Area: Word"
+            }
+          },
+          {
+            "name": "assignToUser",
+            "parameters": {
+              "user": "JinghuiMS"
+            }
+          },
+          {
+            "name": "addLabel",
+            "parameters": {
+              "label": "Needs: attention :wave:"
+            }
+          },
+          {
+            "name": "addReply",
+            "parameters": {
+              "comment": "Thank you for letting us know about this issue. We will take a look shortly. Thanks."
+            }
+          }
+        ],
+        "taskName": "Add label for Word API related issues and assign it to OCE driver."
       },
-      "id": "8Yc2yp4lk0"
+      "disabled": false
+    },
+    {
+      "taskType": "trigger",
+      "capabilityId": "IssueResponder",
+      "subCapability": "IssuesOnlyResponder",
+      "version": "1.0",
+      "config": {
+        "conditions": {
+          "operator": "and",
+          "operands": [
+            {
+              "name": "isAction",
+              "parameters": {
+                "action": "opened"
+              }
+            },
+            {
+              "operator": "not",
+              "operands": [
+                {
+                  "name": "isAssignedToSomeone",
+                  "parameters": {}
+                }
+              ]
+            },
+            {
+              "operator": "or",
+              "operands": [
+                {
+                  "name": "bodyContains",
+                  "parameters": {
+                    "bodyPattern": "Host [Excel, Word, PowerPoint, etc.]: Excel"
+                  }
+                },
+                {
+                  "name": "bodyContains",
+                  "parameters": {
+                    "bodyPattern": "Excel.run"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        "eventType": "issue",
+        "eventNames": [
+          "issues",
+          "project_card"
+        ],
+        "taskName": "Add label for Excel API related issues and assign it to OCE driver.",
+        "actions": [
+          {
+            "name": "addLabel",
+            "parameters": {
+              "label": "Area: Excel"
+            }
+          },
+          {
+            "name": "assignToUser",
+            "parameters": {
+              "groupId": "",
+              "user": "JinghuiMS"
+            }
+          },
+          {
+            "name": "addLabel",
+            "parameters": {
+              "label": "Needs: attention :wave:"
+            }
+          },
+          {
+            "name": "addReply",
+            "parameters": {
+              "comment": "Thank you for letting us know about this issue. We will take a look shortly. Thanks."
+            }
+          }
+        ]
+      }
     }
   ],
   "userGroups": []
