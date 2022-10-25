@@ -7,7 +7,7 @@
         "Office JavaScript API",
         "Office"
     ],
-    "homepage": "https://docs.microsoft.com/office/dev/add-ins/",
+    "homepage": "https://learn.microsoft.com/office/dev/add-ins/",
     "bugs": {
         "url": "https://stackoverflow.com/questions/tagged/office-js"
     },
