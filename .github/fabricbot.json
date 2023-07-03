@@ -578,7 +578,7 @@
           {
             "name": "assignToUser",
             "parameters": {
-              "user": "JinghuiMS"
+              "user": "ZYUN-MSFT"
             }
           },
           {
@@ -658,7 +658,7 @@
             "name": "assignToUser",
             "parameters": {
               "groupId": "",
-              "user": "JinghuiMS"
+              "user": "ZYUN-MSFT"
             }
           },
           {
