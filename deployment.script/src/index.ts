@@ -24,11 +24,11 @@ release:
     version: x.y.z
     tag: release
 
-beta:
+beta: (disabled)
     version: x.y.(z+1)-beta.q
     tag: beta
 
-custom:
+custom: (disabled)
     version: x.y.(z+1)-custom.p
     tag: custom
 */
@@ -44,6 +44,13 @@ if (!deploymentPrerequisitesPassed(env)) {
 
 // Base actions on the branch name
 const release_type: ReleaseType = getReleaseTypeFromBranchName(env.TRAVIS_BRANCH);
+
+// Disable custom package deployment
+if (release_type !== ReleaseType.release) {
+  console.log(`Deployment Script: Only release packages may be deployed to NPM.`);
+  process.exit(1);
+}
+
 const tag = getNpmPackageTag(release_type);
 
 const packageDirectory = env.TRAVIS_BUILD_DIR;
