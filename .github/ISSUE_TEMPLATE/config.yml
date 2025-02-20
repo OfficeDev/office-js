@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Feature request
+    url: https://techcommunity.microsoft.com/category/microsoft365/ideas/microsoft365developerplatform
+    about: To request a new feature in Office.js or the Office developer platform, please post your idea to the Microsoft 365 Developer Platform Tech Community.
