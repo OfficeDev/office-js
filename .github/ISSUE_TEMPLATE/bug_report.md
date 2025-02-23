@@ -12,8 +12,19 @@ assignees: ''
 
 ## Your Environment
 <!--- Include as many relevant details about the environment so we can triage your issue -->
-* Platform [PC desktop, Mac, iOS, Office on the web]: ______
-* Host [Excel, Word, PowerPoint, etc.]: ______
+* Platform:
+  - [ ] Windows
+  - [ ] Mac
+  - [ ] iOS
+  - [ ] Android
+  - [ ] Office on the web
+* Host
+  - [ ] Word
+  - [ ] Excel
+  - [ ] PowerPoint
+  - [ ] Outlook
+  - [ ] New Outlook on Windows
+  - [ ] Legacy Outlook on Mac
 * Office version number: ______
 * Operating System: ______
 * Browser (if using Office on the web): ______
