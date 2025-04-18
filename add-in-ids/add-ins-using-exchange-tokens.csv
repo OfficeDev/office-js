@@ -4,7 +4,6 @@ wa200005724,,LPOEAllCapPC
 wa200005792,,LPMEMOS
 wa200006012,,LPOEACap
 wa103004101,7BF2AEA5-FCA0-4EBC-B337-5B54109F9172,harmon.ie for Outlook
-wa104005406,62916641-fc48-44ae-a2a3-163811f1c945,Message Header Analyzer
 wa104055208,c61bb978-adb2-4344-abe9-d599aa75704f,EmailTranslator V1.1
 wa104058309,8e82cba1-1843-4152-81fd-58c96182e682,Insightly
 wa104080714,0ef22d5e-971b-419d-a528-e0e7f6da6b97,Share A Contact
@@ -13,45 +12,34 @@ wa104123757,243b95d4-e55b-4bd8-91ff-e7241af96ff1,RedCritter
 wa104137034,cc511b05-1637-4d8f-9126-43bbd87f1b65,Email to Task
 wa104140504,ed1c35eb-86d6-4126-bf0d-15ab31c74710,Nimble
 wa104201648,cb85b80c-f585-40ff-8bfc-12ff4d0e34a9,Rate My Pres !
-wa104218067,0021b273-bca0-4a1f-38c2-0df61de7d9e3,Docusign eSignature
 wa104220578,ca70f62e-154a-4fac-870f-3b6ee3f38473,CVR Lookup
 wa104311018,0746c938-d464-4a79-a70a-bbbbad3f554d,Travel Time
 wa104323055,ba2a19d8-55b5-4ce6-bc6d-7057eb681098,Secure Messaging
 wa104354490,ae78b7a3-4fda-4392-bbee-749469fae51b,Kanban for Outlook
-wa104362643,7f0ca1ec-4d48-493a-b784-dae18d79718b,LikeForOutlook
 wa104368661,5294ad32-3624-4f31-a1a7-5014661376a1,JobAdder
 wa104379126,b5bdd852-6ae9-495a-9fcb-de052649502a,Bullhorn
 wa104379326,206b37de-e132-491d-80a5-3981b57ff1b2,Crelate
-wa104379334,47232a61-61ee-4318-80f8-82568651aa9f,Salesforce
-wa104379335,4c655dc5-759f-4bcb-a100-c8fa41e9a4df,Salesforce Sandbox
 wa104379361,64351514-c3d9-4a72-8ee3-9851ab8ab483,Idea collaboration for Wazoku
 wa104379385,5d57fea6-20f9-4f7c-b486-b808b9e6f854,Cegid Expert Link
 wa104379434,7bb9f300-575c-4fb9-a6a6-c2342441256a,Smartsheet for Outlook
-wa104379468,3ba8b5e3-49f3-6a74-8a30-9de9b623ba0d,Zoho CRM for email
 wa104379506,5cd22f9a-ec9f-4834-b567-063b75716745,Email Reactor
 wa104379511,a37a22bd-c937-438d-83ec-f4ddd88dd65d,Appogee Leave
-wa104379517,858a57b9-7178-4a3d-bc1a-52220cdc58af,Revenue Grid for Salesforce CRM
-wa104379519,b89fecd2-892c-4071-abb3-536832c0c662,Custom Signatures
 wa104379524,e9542a2e-b945-4d40-8b55-bbc3c9eca5a0,Egress Switch - Secure Email
 wa104379526,2843d6e1-69b2-4a98-8653-cc3cdadd1b2c,PROBUSINESS
 wa104379543,3206fb59-02b9-4a4a-98c0-37fd20db356d,Kofax View+
-wa104379547,df0a4e4b-4666-43ee-90a8-879a1d9935ed,Smartway2
 wa104379570,7ec028c7-a040-46fb-a914-9267da7585fb,Dynamics CRM
 wa104379617,C427FF10-F2AA-43DB-A07C-3BC19296E937,Evernote
 wa104379636,69cea0ba-9cf1-4062-a211-c72a66bf9c58,iGlobe CRM
 wa104379679,d4db76a8-7ad1-41aa-835a-f2dfe4c08c84,å…±æœ‰ã‚¢ãƒ‰ãƒ¬ã‚¹å¸³ 
-wa104379681,bebc5fd4-014d-40a7-bce7-bb5713e07a17,Tasks in a Box
 wa104379733,2ce5b8cf-5403-4cc6-9113-6d79feae0b7f,BombBomb
 wa104379799,47969d00-20b9-4900-b2ba-97bc989397fc,Legal Tracker
 wa104379818,24295235-339e-4151-8b2f-4353bcd0b10e,Tilkee
-wa104379838,e685dedf-712f-49ab-8808-97c29a5eb3f9,AgilePoint NX Task
 wa104379844,dc1e7ce8-df00-4568-adf3-3ba3261cff3e,PhishPro Tracker
 wa104379875,f66ae2a6-1065-4820-8af9-dd70a911ec88,Attach From Dropbox
 wa104379892,55f1e6bd-856f-4117-b979-59695aff0684,Bing Nearby
 wa104379908,d00a5c51-0a0a-25b2-e13f-0d70a4181602,join.me meetings for Office 365
 wa104379909,66f9bda0-7132-4ae4-989c-e5f6b2d0090c,GIPHY
 wa104379932,14d90e42-0070-4b04-bfcb-ead0f4525ccd,Implicit FrontEnd
-wa104379967,9a897989-5695-4e81-8150-dc178e3c364d,Template Phrases
 wa104379970,485940ae-4ff5-4d31-88b0-d6bb0a9830d3,Syncplicity
 wa104379982,f5f4ff00-fcf5-4c3e-aca6-2fe408b48fe2,Emma
 wa104380003,90e36c1e-ff40-4382-954a-2b1daf4fd544,V-CUBE Meeting Outlook Add-in
@@ -69,7 +57,6 @@ wa104380191,720841b9-6460-4363-a96d-c6baa8130ad0,MediaValet Library for Outlook
 wa104380196,58cbc313-0a3f-47e5-bdb6-a4ff6e411233,Mosspaper
 wa104380212,7164e750-dc86-49c0-b548-1bac57abdc7c,Sage Customer Info
 wa104380232,502a5942-52ea-4293-83b3-0ec4f2d6b4b8,smartQ Workflow Management
-wa104380259,a3862f6f-027a-4d9c-ac55-1a3b35ec51a4,Yesware
 wa104380285,9364122f-4c7e-4d4b-a368-369a24ef3e36,ConferenceCall.co.uk templates for Office 365
 wa104380294,fef191b6-63c6-4589-80d5-ae073dfc4434,AC Calendar Add-in
 wa104380332,6a192b54-6b8e-46de-960a-2ebfe8f1e60c,SMART Template
@@ -80,13 +67,10 @@ wa104380388,9230b645-1919-43a0-a568-1f2300fe06b0,SmartConnector to Clobbi.CRM
 wa104380389,872e40a0-4e55-4136-9a87-a4291a11c2a4,Brainshark
 wa104380391,24B69EDF-25CD-4A58-8067-3E39390D0D6A,Send Anywhere
 wa104380431,355dea57-5777-4e6a-b733-7caf9f9f5907,Beyond Encryption - Secure Email
-wa104380444,1de090bc-dab8-45da-ab61-2b5e52b80767,Decisions Meeting Secretary
 wa104380447,F329B581-6B6B-43B3-A3E5-43505CEA4966,Email Recovery
 wa104380459,cf9ae390-3fa8-4556-bbc2-5a4d521fd691,Enadoc 365
-wa104380464,1ebe5572-7bdc-40a2-b261-676887527401,iPlanner Pro
 wa104380470,72c98b5f-487f-4af6-849c-0ef2e56f69ba,FreeBusy
 wa104380490,dedf4528-4a6e-443b-8763-4ec32c340240,Concur Expense
-wa104380494,cd65cfae-6426-46ae-b778-a36ae2f4f1e5,Attachments
 wa104380520,7f5070ab-968e-4d0a-a8d1-5061d83fc31c,TimeTracker
 wa104380522,ef0619f8-e255-4f94-975a-2272a60f432f,WittyParrot
 wa104380539,bb085d95-2a65-4b6e-8d26-66d91ec2d0f1,RMail Outlook
@@ -94,12 +78,10 @@ wa104380546,75f0fede-5db5-41de-a580-3a58ee3c2c44,Revelation Bridge
 wa104380613,8d77590c-f556-41ed-b52f-b755d4a5ba12,Recognize
 wa104380615,ded5f813-bbe8-4906-bdf7-b64abaa87880,Signeasy
 wa104380627,131A8B55-BD40-4FEC-B2E6-D68BF5929976,Translator
-wa104380673,22f63757-1323-4f17-a8a0-9cce35573f06,Fyle
 wa104380681,149ed85a-cdab-11e5-ab30-625662870761,Folloze
 wa104380689,286aae8d-e135-4c1b-9aef-b5cf2a2335f4,Office2SharePoint
 wa104380691,971e76ef-d73e-567f-adae-5a76b39052cb,Yoxel
 wa104380692,B84AA869-F254-4F7C-8B81-78472BF2AA52,TextMiner
-wa104380723,e5019060-ce5d-4a6d-be57-513ab494d6f5,OnePlaceMail
 wa104380725,e9449119-1472-414e-803a-0f11e8be3cdd,FedEx Tracking
 wa104380751,576f6187-6df5-4783-8a1d-e3a943e4498f,Pobuca - Contact Management
 wa104380775,106dca5b-ec57-4389-a2c3-5887028201ae,MeisterTask
@@ -108,39 +90,30 @@ wa104380835,3ba8b5e3-49f3-6a74-8a30-9de9b853ba0a,Zoho Campaigns tool for marketi
 wa104380841,ad05ed51-a042-4529-bbd5-cb248d4ab957,Perfony
 wa104380853,6fbfc670-7fb8-4e06-aee0-3041adb82369,ForceManager CRM
 wa104380891,8a27f94f-e792-4420-b88b-28febcf4dda5,Rocket Matter Email 365
-wa104380896,ea4bad8e-1ef9-4e27-89bb-01a731396180,Robin - Room Scheduling and Desk Booking
 wa104380906,45cf1d9f-1f03-4ffe-a583-d66f6eeed02b,Dovico Timesheet
 wa104380913,a5b6fe77-bd24-495a-91aa-dd59680fa6f6,ShareFile
 wa104380943,b7cf3295-3645-4fc5-9c19-a963c71d1fe2,Workfront
-wa104381003,af39e89e-ca88-42f2-9b48-cf2b1c89ea9d,Cirrus Insight
 wa104381023,d756dc97-d553-40c7-a347-5babf8f70b82,Attach to Merus
 wa104381043,49411697-aace-44e5-9da9-5a6132f6ab9c,SignIt Email
 wa104381047,c1ea5b17-7206-4d15-9968-7a4666f7f4ca,Clearbit Connect
-wa104381052,286f8133-4ca2-5885-940c-54992a732931,Outreach
 wa104381056,4aaa7609-64d0-4f0b-9deb-f1db83aab61c,ImpactTracker
 wa104381058,da6bc93b-afc5-46b1-9c40-6cb106fe1211,Fond - Recognize your Colleagues
 wa104381067,3ba8b5e3-49f3-6a74-3a40-9de9b853ba0a,Invoice and Time Tracking - Zoho Invoice
 wa104381081,4b08ebf0-6eff-444f-b8a6-4f8d295d8ca4,Save to Fluxx
-wa104381095,7164e150-dc86-49ff-b549-1bac57abdc7c,Jira for Outlook
 wa104381110,deed004f-661d-55cd-b625-e853c5c508b1,Smart Attachr - File Search Assistant
 wa104381111,c0a5c193-48f4-464b-bdc0-ea5ae36099ed,Fuze
-wa104381120,c88e4e2a-8a30-404f-8f20-3d066dd425c1,Wrike
 wa104381124,9521de85-046f-4f02-a63b-0180e520ca9d,Email Stickers by MojiLaLa
 wa104381133,f6319415-ea4d-4785-996d-5f47c3e5ddbc,ClearSlide
 wa104381143,8f01b46c-3cc8-49f5-81c2-fde95bc06ea8,myTask2do
 wa104381153,3eabf969-5868-41bf-a5fd-bb827dca95d7,simPRO
-wa104381160,480F036A-A345-4307-9741-A2B89CC27CCC,Blackbaud for Outlook
 wa104381161,9586446f-109a-42bf-90d5-61dfa35d122f,Staffbase Email
 wa104381167,080b0be7-e7c1-4725-b099-a5c969adfb74,Ant Text Email Templates
-wa104381169,e90ced19-bd88-46f2-af8d-6039c7cf35cd,Salesloft Connect
 wa104381175,5f5dbbb4-deab-462c-ac63-6e394c120a5a,Mailsphere DNS Check
 wa104381176,df6e3554-bd7d-4e1a-8d0e-06488ac658a7,Teamleader
 wa104381180,6046742c-3aee-485e-a4ac-92ab7199db2e,Report Message
 wa104381213,8f2ff399-c699-49cb-bc35-12682789f6a5,Nutshell
-wa104381216,3ba9e8ee-1f5a-407e-bc52-204162698b71,ExtendSync
 wa104381249,2b40eb6f-ae70-490e-ba92-ff7ae1029bee,Barracuda Essentials
 wa104381251,bf4192d1-b91f-48e9-8f45-7be9211f0856,BitaBIZ
-wa104381257,CA0E68F1-FD94-4BD2-A38F-D48190F42F15,HubSpot Sales
 wa104381263,6006e01d-3317-4284-95a6-2b870cd40e70,Betterworks for Email
 wa104381280,8c64aeea-2380-48f1-b1e1-1bf5dfe6202b,PipelineDeals for Outlook
 wa104381281,e9fb052c-e578-4ad3-805c-d60c892772ab,FranConnect Sky
@@ -148,7 +121,6 @@ wa104381286,b709c032-b1e0-4c74-9ac2-e90b82afac36,Mailsphere Sender Trust
 wa104381293,294f9ffc-ba9e-4a35-afd6-c80bef7188ae,Beenote
 wa104381296,64d1ae57-b7cb-4c92-af6b-8197ad7b2fc0,Bravo for Outlook
 wa104381306,e761a603-e8f8-44b5-84f2-f640cc816a49,Clio Outlook Add-in
-wa104381310,67528170-c45a-405c-9584-f5bc450c4d33,Trustifi
 wa104381346,49535d8a-fbe5-4935-8579-82099f9c14cc,Dropbox
 wa104381358,547e3bb9-34f1-4674-adc5-2edd4f8f71bf,SalesDirector.ai
 wa104381367,e2bba33b-13dc-40a5-84e1-fe239f30cf47,8x8 Work for Office 365
@@ -165,16 +137,12 @@ wa104381414,42740291-03a8-432f-8305-de8bb98f762b,Simplicate
 wa104381437,4c5c86d6-daef-4c0f-b7b2-cf496abc5461,iWRITER 365
 wa104381442,3e5032d8-9aac-436f-8ec7-0b77f4d300ff,Ezekia
 wa104381444,b0bba006-2d7e-4ebd-a8be-d6364d31fdfe,Retruster
-wa104381446,fa0c4d52-36f6-4b55-a872-7c263cc0e467,Calendly
 wa104381476,084fa5bc-7b66-49f6-9a1a-7157557cc32f,ConnectWise Control for Outlook Add-in
 wa104381480,65279354-7cc7-4269-8ac2-84491f8ffad7,RecruitBPM
-wa104381481,C5AC486C-B180-44A2-BBCA-01AC5DE66930,Synergy
-wa104381518,fc188889-7206-4d15-9968-7a4966f7f4cc,ServiceDesk Plus for Email
 wa104381521,56638367-6abe-4606-8f20-c491b4237d8f,Levitate
 wa104381524,95394dae-9d6c-4830-afa8-bf32225b8945,INES
 wa104381538,5b14d1b5-937b-4dc2-8df8-4d86af1d6b61,Method:CRM
 wa104381539,caae11e7-0342-0709-bd95-f990efb0901c,e2grow
-wa104381557,CCFBFF3D-A114-4353-ABCB-C9490BDDE498,Highspot
 wa104381610,2150edbd-459f-4ce9-9267-cf1ecf71fa52,Attack Simulator Report Phishing
 wa104381636,0b4671c9-1ac4-460d-aaf0-b2dfd3c80fe4,Bucketlist
 wa104381638,B83D8018-A292-40D2-A052-1AD46BF903AD,Jira plugin for Outlook
@@ -183,10 +151,8 @@ wa104381676,ac70e923-b463-45d5-a021-4a35e4b1e7a8,snapADDY Assistant
 wa104381686,3d1408f6-afb3-4baf-aacd-55cd867bb0fa,Actionable Messages Debugger
 wa104381693,502a5942-52ea-4293-83b3-0ec4f2d6b4b9,5pm - Project Management and Team Collaboration tool
 wa104381708,533878e4-6c58-4010-bc99-b6b013a40ba2,Commusoft
-wa104381712,a7ca6c74-33fb-43a4-a3e4-781078f0eff5,Zoom
 wa104381725,01d0977f-7752-4241-8d44-07e8c93535e9,WiseTime
 wa104381726,050087F1-16B5-437B-87E5-EC673AAC2DB3,Avaya Meeting Scheduler
-wa104381735,d76f016f-52c7-41b5-835b-900361d7040c,Priority Matrix
 wa104381746,13c9e1d3-165f-4c67-a145-e6c6b1cfc465,CEIPAL Corp.
 wa104381747,ac1a4a5b-3504-40e0-a08d-1f3e03b1f89b,Quantum Workplace
 wa104381753,34400a39-55ca-4aed-a6ab-dd4c40f34d26,Claritysoft for Outlook
@@ -203,7 +169,6 @@ wa104381840,75faf608-4762-4247-af36-372badd31063,Secured Signing
 wa104381842,405916b0-0d1c-44aa-a890-da1407f793a4,I.D. Connect by Instinctive Drives
 wa104381846,1c4f0221-6482-4665-84e0-42fc71cb9a38,Vast Conference
 wa104381849,0026eab0-afba-43fe-a3fa-c479b6feeccb,I'm out
-wa104381851,6df220fc-e48e-4469-8db1-6912ce109886,Google Meet
 wa104381853,002a0f82-0870-4bfb-9104-89393c086fcb,Signature Manager
 wa104381858,b030c35d-47c9-47cd-8323-449f486eabfb,FYI for Outlook
 wa104381864,ab16b091-17c7-4c0c-a179-338a160b4d5f,Pipeliner CRM
@@ -215,7 +180,6 @@ wa104381891,007e9df9-9649-4650-a260-58d7ceda751a,INSIGHT for Outlook
 wa104381896,140d36a9-9324-45ca-a039-16e30e9030b8,Achievers for Outlook
 wa104381914,935f4777-fe79-411d-9aa5-b9ebb4bb92ef,appear.in
 wa104381915,710860f5-cb7b-4e0d-9f61-967f2acca236,Team Do
-wa104381922,39403046-5079-4d8b-a7d0-d540c95a3a5b,GoToMeeting
 wa104381929,fdb70a37-5802-47ae-a019-91957f106057,Amicus Online for Outlook
 wa104381930,7b5d9404-d6ea-4ab0-8dc9-9c291a9b69d2,ShareSimple
 wa104381932,4478b552-c6ed-43da-9142-ffbe4a5153d2,CMap for Outlook
@@ -223,18 +187,13 @@ wa104381937,a8e14732-37cf-4a46-b69f-2539f4059948,UniPhi
 wa104381946,80a4e00a-3be4-4646-959b-f9d42e5c22d2,Spekit
 wa104381950,d5cfdab6-9866-49b3-8f2a-7c8fa1da63f2,Content Quality Optimizer
 wa104381968,16149E96-8406-473C-AC4E-F7B419559EC5,Egress Protect
-wa104381970,67528170-c45a-405c-9584-f5bc450c4d33,TrustiMail
-wa104381976,7214a7e3-4615-4824-b696-df0b2e13f130,Condeco
 wa104381980,65d810d6-591a-4e2e-80b0-85894008e614,Happay
 wa104381982,7fd782bc-394a-4dce-82f1-fd1d0a68e1c1,Mobile Locker for Outlook
 wa104381991,5efbb21d-9785-46ff-9e24-41fd2e2dda4d,Upsales
 wa104381998,7082e6cd-6943-48dd-9ec3-a7b1454cd369,Vtiger for Outlook
 wa104381999,deb6717c-1d17-4dc5-8719-7e1928ce2076,CatchApp Meeting Scheduler
 wa104382022,2a571c94-88df-4371-bfb7-dc384f3390aa,tiny+
-wa104382026,c1f0f062-29a7-4adf-bae8-a04aef9498ca,ClickUp
 wa104382031,5af9483a-3d6f-40da-9910-d2cfebf234ec,Easy Projects
-wa104382035,7a91e319-a65d-4ceb-909b-12203561dbf5,Cisco Webex Scheduler
-wa104382036,be22bad2-7fc4-48bb-af5b-c6071bf8165e,ContactMonkey
 wa104382049,7570f8c1-2538-456f-9ae9-d5aff7f40e93,Mail Assure Cloud Email Security
 wa104382052,c58c7299-f2ca-4534-a858-c7b5d949a4b0,yoyomeeting
 wa104382053,04e22875-5423-45f3-af0e-c3879a21c0a3,Dialpad Meetings
@@ -243,14 +202,10 @@ wa104382065,007e17a8-8617-4cfa-b032-a56407c276c1,Ftrans for Outlook
 wa104382074,238c2b28-e05f-4eef-b397-f36a715cd08d,UnsubCentral
 wa104382076,79c012f2-bde1-4116-b46f-52fdc77ccafe,Textio
 wa104382077,de174894-578d-4359-83e2-ca1af33cdc19,Tracker de correo time manager 314
-wa104382088,0909755f-cd01-453d-aafa-0a5a3a357755,Slack for Outlook
 wa104382095,7c1dc130-5a1a-4e9a-ad8d-ec9c6866e29e,BookMe
 wa200000003,6200bc28-e216-4ba1-ab6f-9bc34a9591c4,Hippo Video
 wa200000010,48754a72-4650-4f6a-a433-e1e478edadb4,4Degrees
 wa200000012,bad805bf-65dd-4faf-8e8d-da0271673916,Note Publisher
-wa200000015,270c1312-7c65-467e-be34-48495d823173,Box
-wa200000016,d1a9cde3-038f-4b0a-a96c-94d38df21fc7,JobDiva
-wa200000023,e1170821-7a2a-4f4f-aaa8-7444c2681b9c,MailMerge365
 wa200000026,ebb83a92-ea7e-439d-8794-20f9dbd77433,iCIMS Video Studio
 wa200000035,51acf238-56b2-4ba5-b269-eb4d4672d753,Amazon Chime
 wa200000036,61dddbbf-9c5c-4f66-81f8-2fc084586655,Firefish for Outlook
@@ -268,7 +223,6 @@ wa200000090,3d0b651b-0fac-4f63-b3c7-644660256369,XQ Secure Outlook
 wa200000098,ed9b8540-f655-4f8d-8346-87416578bbd5,SigningHub
 wa200000105,484BB4AC-7E0D-11E7-BB31-BE2E44B06B34,Repfabric Sync+
 wa200000106,2776a6bb-5c14-4dbb-9cc1-db328be821e0,cloudplan fÃ¼r Outlook
-wa200000114,b51e3efb-9c17-4a01-af72-09187d818a57,Polls
 wa200000152,87ce3175-2f68-44af-a765-d659e7bf9112,Enablix
 wa200000154,3f666eb6-37f3-4e6c-b7e0-861d1da13f10,AccountKit
 wa200000163,52977dbf-5d65-4830-af8a-fdfc545c34a1,Project Insight for Outlook
@@ -353,7 +307,6 @@ wa200000930,EEDA285F-805F-49AC-A7F3-9610E7F493EB,Shared Email Templates
 wa200000935,770034b9-7f24-4d27-9c90-86ccf0733f7c,ProWorkflow
 wa200000954,9e85593e-4efb-11e9-8647-d663bd873d93,mxHero
 wa200000965,5b2529ce-4f7a-4a42-9f30-33fd515d751f,Keyhouse365
-wa200001031,bb9c2cb5-8a1e-480b-830e-566a127ea00c,Mailbutler
 wa200001055,665fb91c-77b4-4207-9680-2323a7cfbafc,Sugar Connect
 wa200001057,80eeb3cc-d988-4f9a-800c-b65e7d559ac2,WEBCON BPS Cloud
 wa200001073,698a6e7b-8ac8-4b6e-abff-952f25a7ac98,ShowAlias
@@ -365,12 +318,10 @@ wa200001219,6656bdf9-a418-4bad-81d2-d4b9c5a2e428,EZLynx
 wa200001231,6656bdf9-a418-4bad-81d2-d4b9c5a2e428,EZLynx
 wa200001310,eb10df7c-4e7a-401b-84e6-2cb7daeae969,Template Reply
 wa200001331,ad7019e7-1dbc-4545-9dbe-aa1ed167d946,Guru
-wa200001392,cbff328f-767c-4e96-8056-a05b1cb35d24,Actionstep 
 wa200001408,5fbb0ec3-3c74-4d4f-a6ea-a4b80fb7e1f7,Thrive TRM
 wa200001419,fc668889-7206-4d15-9968-7a4966f7f459,Adecon
 wa200001432,9DA3075A-F1BB-41A6-BE75-2FC326FA31F6,Federated Directory
 wa200001452,33e85d92-380a-456c-8b57-9d7943dfb15d,Veloxy
-wa200001471,a14de463-9802-4c72-afdb-ddda6a8ae9a2,RingCentral Scheduler
 wa200001473,86fa0fb3-5eaa-4ae7-9040-77a7cdc5207b,Paperflite for Outlook
 wa200001477,10000000-0000-0000-0000-000000007357,Word Rhyme for Outlook
 wa200001485,ab8a3747-6208-4937-8261-be221db48a66,Zoho Recruit for Email
@@ -381,7 +332,6 @@ wa200001539,038b75f5-14a4-40c2-8588-b5c31a5e0ee2,Axpoint SmartOffice
 wa200001570,05c2e1c9-3e1d-406e-9a91-e9ac64854144,WriQ
 wa200001581,dce29891-b629-4e73-9bd1-e141e24c832c,Tresorit
 wa200001588,0ec8daaa-014b-4426-acdf-f06edeb15053,Meeting Place Finder
-wa200001597,7f002d57-7a7a-4afb-8d93-ec4ba1e6ce4d,SuperOffice for Outlook
 wa200001603,49d3b812-abda-45b9-b478-9bc464ce5b9c,Script Lab for Outlook
 wa200001623,8cb6fe5c-fdfa-41fa-a4e6-ba19ac1d4b1a,Oliv
 wa200001624,fc188889-7206-4d15-9138-2a2956f7f4cb,Wordeep Proofreading
@@ -389,7 +339,6 @@ wa200001644,cfa4f45a-29d9-4b17-a8ad-e241d64f57a8,Sapling
 wa200001654,814f2245-31eb-4d48-a119-7e45d32625c5,BigChange
 wa200001659,a1d9cd08-fe7f-467b-b01d-21386f95620c,NVivo - Integration
 wa200001666,51b4e8d6-461f-48a8-a9d8-c222f7ff486f,Chameleon-i
-wa200001676,68a9347c-c9c4-46fa-ab19-395399706e07,GoTo for Outlook
 wa200001688,77EFD993-C0FB-4929-ABDF-24269152C8DC,Translator
 wa200001703,7164e750-dc86-49c0-b548-1bac57abdc7c,Canto
 wa200001731,4089c73b-5605-4a93-bb06-d2d61e2f37a7,Room Finder
@@ -401,7 +350,6 @@ wa200001786,2acd2b3f-e3a3-49ae-a558-d2929f1b8a5c,Phishing Report
 wa200001791,f3474f70-df7d-49c8-ad97-ecc2fe702dc2,TikiPicker
 wa200001793,eec188b7-156f-4cab-bc62-6c1bb349905e,Send &amp; Sign
 wa200001795,40efcf3f-bd65-4f4a-9928-5f6254e35b57,Gong
-wa200001796,391a85c1-8bd9-4b0f-adc0-9f26e8aa328f,MacroView Mail
 wa200001800,ec00686b-ce06-4b7e-a437-dbcbfa8e2a96,Procurios
 wa200001805,3a3d1a75-2f50-482e-9e48-8e121fdea670,Team Tools
 wa200001835,169530b5-abee-4f01-974d-cc9ee97fd509,maverick
@@ -449,14 +397,10 @@ wa200002258,431780eb-6280-473c-bca6-3b43236f5432,anaba pour Outlook
 wa200002269,39d78cc6-6677-11e9-a923-1681be663d3e,SmartWe
 wa200002279,c5397e67-2843-42be-9d8a-680553896e4f,DocMoto
 wa200002282,946adafa-804f-4d11-8002-a4070ed5dc83,iCRM for Outlook
-wa200002285,214df843-a034-4f18-9fb8-4700027fb2c7,Salesforce Connector
-wa200002312,44f04495-290f-41b5-b4fb-264e88398c55,LinkPoint Connect
 wa200002317,343b83ac-1639-4cc8-b62a-460241e8be50,SureDrop
 wa200002322,068C2CBD-CAF9-495F-BA67-073B32BD3DDD,Instant Booker
-wa200002326,fc188889-7206-4d15-9968-7d4966f7f4cb,Zoho Sign
 wa200002331,0c7c5157-91ca-4c16-bec3-2afa5747dc5b,689Cloud SecureMail
 wa200002350,B39A1DAC-987A-417E-A7BD-FF37BBA12C74,MeetingZen 
-wa200002353,99d884f9-a001-468d-80be-5d12052d753c,Dynamics 365 Connector
 wa200002355,a4ae8d97-d4d3-4c29-96a3-0f1cfc621270,AHAU 260
 wa200002356,f574e961-2b61-4959-8ed5-25fcae18f336,Clari Groove
 wa200002361,77670503-fe42-4656-a697-79d1698dec37,SugarCRM Connector
@@ -467,7 +411,6 @@ wa200002413,cdceaecc-1189-4b09-b748-8025df6a35b0,EWR for SwiftKanban
 wa200002414,a1a142f6-a1ec-4e58-981b-2e4e00e3120e,Sustainably Run Meetings
 wa200002423,52a1846b-bebb-440b-9db3-90ef967ccdee,Orphy
 wa200002425,2e6685ed-feef-4e73-887f-5d9d4214b414,Optimiser
-wa200002434,bc0d42c6-5695-48b9-8789-1e7de9fdc5f2,AFAS Software
 wa200002435,f8cc6692-71d3-4a3b-b7e7-2bd54f3fa44c,FLOWFACT
 wa200002436,2004dca8-b7f5-40ff-ab33-ce3dc3f3317a,Easy Teams
 wa200002441,f113e64e-09e7-4ffc-9ad7-4d66c0e5b924,CargoBooking
@@ -483,22 +426,18 @@ wa200002489,c05c38b5-215e-4cf3-bae3-324b697b9b3b,ImagineShare
 wa200002507,77EFD993-C0FB-4929-ABDF-24269152C8DC,Translator
 wa200002509,3947c80f-df95-40e8-ba5d-c5b4800dad7d,Nobilex
 wa200002536,59f7191c-06c6-40fc-b779-36f057a5b5e8,Klyck.io
-wa200002553,2f97adb4-0ae1-4f0d-8858-b728238e730d,SolidNexus
 wa200002558,a90d8103-ded7-4c27-be3d-384f30ae4821,Covideo
 wa200002561,15c2e1c9-3e1d-406e-9a91-e9ac64854143,Phonero SMS Office
 wa200002563,c0aba794-357f-4c14-a9e4-be51b2a0236e,CI HUB
-wa200002570,c84000c2-b389-4929-a20c-88b2aecbf021,RecognitionNow DM
 wa200002593,e48fd8da-ca5a-4e2f-8df0-6e23f30fec3d,TrustiMail for Outlook
 wa200002596,bdd25e2a-ac1b-4345-8f8b-aa6ee8285919,ESL's monday.com for Outlook
 wa200002616,0b4286de-969e-4639-a35c-7cd3cbd7916c,Docubird for Outlook
-wa200002627,4a1d0d97-cc26-4fb1-8e12-e022b360f5d9,Vantagepoint
 wa200002634,bb1302a9-ccb9-4daf-915e-359bf5220565,Yadera
 wa200002636,74ddf371-6d94-4e1e-8839-3e330d4514f7,MiTeam Meetings
 wa200002637,6f3da974-71d4-4e6d-bde6-a5804b0c675a,Scribe
 wa200002646,a67b08bf-a867-4fe6-ac3a-7f66776412cb,Writer
 wa200002666,1629efa9-7180-4e99-8f63-aca53a71adbe,xiQ Profile
 wa200002668,edce9984-03f9-4b67-9806-dfad8edc4138,e-Share Secure Email
-wa200002686,d6072c51-72e9-4bbb-a34b-0dcaad6bf00c,Todoist
 wa200002693,d132b846-7218-4f10-901d-328611098748,Juniper Square
 wa200002695,39118598-0d92-4d97-bb79-826493bf8836,Connect+
 wa200002699,8c1c2c5f-90ea-471c-ae9c-df4b4c6a931f,LawBillity
@@ -527,7 +466,6 @@ wa200002897,df7e1b1c-af1a-4eb8-b29d-02cd497882c4,Backdrop Add-In
 wa200002899,0c844d4f-5eec-4330-a142-f8a8255c9110,Mothernode CRM
 wa200002901,1bacdba3-7a3b-410b-8753-5cc0b8125f81,Inova
 wa200002903,02e0c8a4-23ac-41a5-abb8-ac6e9c047fa6,Dataforma
-wa200002918,ba2ee9e9-ae28-4bab-8188-6f278cca92e0,Insert HTML by Designmodo
 wa200002924,8c1fba59-3cd3-4a3c-84d3-1ebf98941a7e,Crewdle
 wa200002930,9f6113ad-7140-45fc-8715-101919d434f4,Reserve
 wa200002939,05c2e1c9-3e1d-406e-9a91-e9ac64854143,QuoteToMe
@@ -539,12 +477,10 @@ wa200002954,cb28f5d8-dbd0-4169-9075-4bc8315beefc,Letsmeet
 wa200002971,05c2e1c9-3e1d-406e-9a91-e9ac64854143,FollowupCrm Add-in
 wa200002979,4d2a14c1-f3a5-42ac-8127-d958d752bdc8,FreshBooks
 wa200002989,06aa36a1-a15a-4c78-acc2-12307a7a7a60,TimeSheet Reporter OUA Light
-wa200002991,657e833a-c931-4ad9-a378-c781ec631057,Letsignit Add-in
 wa200002998,d8e9fad1-76c6-4a4f-8171-14daec343e30,Redbooth for Outlook
 wa200003003,a4f8fdf0-10de-4275-87c0-7b528cb193b2,acta solutions mustang
 wa200003015,1cd8d72f-a949-4649-9891-51fc8297dc49,Lexzur Connect for Outlook
 wa200003016,85ed5329-9928-408b-aa4f-3822a160e3a7,SEPPmail Encrypt
-wa200003022,40695BFC-E831-4980-BC79-D786569E9F34,CodeTwo Signatures
 wa200003030,d4acca7c-f413-41f3-a870-897b1c02f858,LibrettaÂ® for Outlook 365
 wa200003031,bf8ff9f5-ae83-4b94-901e-b1204c39f574,Anomali Copilot
 wa200003032,1a27fe6e-0fd8-4f52-b0e6-94bff4a88fb3,AI-Powered Reply Generator
@@ -580,10 +516,8 @@ wa200003147,80d99f64-36a8-554e-876f-8b494063d2e2,Online Meeting
 wa200003158,05c2e1c9-3e1d-406e-9a91-e9ac64854143,Word Search Add-in
 wa200003163,efdb2b2e-eefa-4a2f-94c5-3dadcb5b599b,Multi Approval Process for Outlook
 wa200003168,f5700210-9a82-4493-86d9-3d43ea29d0fb,Comeen Workplace
-wa200003174,4db6b7a8-71c4-4fb6-8634-78ebaa3891b1,ARchitect Interactions
 wa200003180,65819494-c43e-442f-81b5-6ec98921b86f,Service Request
 wa200003181,c52cad7e-042c-4e59-a7f0-5b3980a09c67,ARI
-wa200003187,ea2ce177-3492-4e55-a347-1491f4f7db81,Phished
 wa200003190,4b55ab82-9fe2-4e1b-94e8-69a7afbd34ef,BlueCamroo
 wa200003195,6a01635e-4e78-4b00-913e-438643fa1b8c,DocuSoft Add-in
 wa200003197,2cb328a0-e383-4762-9383-aa0c275bb943,okKoala
@@ -608,7 +542,6 @@ wa200003353,02e11a96-3d5c-4fd2-92ba-cb56c477b959,SEAD Free
 wa200003358,f010a531-fd4c-44bd-9eba-72901dc55a40,Taghash for Outlook
 wa200003370,adbf7093-b28b-4b4d-948f-14b9d5328ca9,Org@Work
 wa200003377,3b31b622-f263-4d33-88f0-7cd22a365adf,ClickMeeting
-wa200003389,d1761161-5dab-44be-87f1-6c4be78120b6,Best CRM for Outlook
 wa200003421,a99b6822-3494-47bb-f6c4-d1a167f02aa3,Acuity Essentials for Outlook
 wa200003439,fac32193-cdf8-42fd-962d-73fdd525c719,EVA Check-in
 wa200003447,3bb8d042-3f0c-4e63-86ec-448610c5f7ed,Knowa for Outlook
@@ -631,7 +564,6 @@ wa200003531,ca535ae4-0827-4223-aad4-ab3a4d2f735a,Xakia
 wa200003542,8bdc9604-eca0-4e7f-8500-8398a2fa2e5f,teamsTALK
 wa200003551,8912d033-243b-43ba-bb09-f803c570ee6b,DataQuality
 wa200003557,0c9f8c12-65de-423e-be74-e6490cd449fe,Profit.co for Outlook
-wa200003566,174190e8-2cd4-4ce5-8d94-9ba94e5b47a4,Clio's Outlook Add-in
 wa200003569,6a63e9c7-d328-41b2-a0f6-e76a9da12b49,Socialboards
 wa200003576,203b60c7-24d1-4f64-9eb7-8aa71596c37e,Strategy-AI for Outlook
 wa200003583,c74e3fdd-0cb5-49ab-aaa8-58a61ff2dfa8,Nelis for Outlook
@@ -661,7 +593,6 @@ wa200003845,65c56022-6aa3-491e-bbe3-553476346284,Avaya SpacesÂ® Meeting Schedu
 wa200003852,92bc2ffd-cf4b-428a-8150-f2a1e577e823,SmartOffice
 wa200003854,2631e6e1-bd70-4b19-95d0-dd135d960353,LeadSquared for Outlook
 wa200003860,542b1955-9cdd-4f02-b80e-1b3fb6aaf663,MadeMarket Add-in
-wa200003893,1c202150-1c90-44fb-98ed-ef9643fdc2fe,Seismic
 wa200003922,c0a470c1-c1f1-4911-9cc7-fc2ee690d10d,LawVu
 wa200003923,8afa1b2e-4f16-4bfe-9b9a-72791058c6d2,Nitro Sign for Outlook
 wa200003957,b311ebf5-3d0c-4dd7-bc3f-41a6adc9e4ff,Teamwork
@@ -678,7 +609,6 @@ wa200004032,C341AD31-BF7A-4C1D-99F1-D2E5896BEB0A,Newoldstamp Email Signatures fo
 wa200004035,8ec8899d-d5d5-4570-8268-5e01498aed18,Text2Task
 wa200004049,ea4d11e4-4bae-4727-b8e7-0c0957913062,Mecenas.iT
 wa200004050,da8741a1-2164-4872-af58-907e38e049bb,too-doo for Outlook
-wa200004057,9703fc0f-1c25-490f-9c6b-3c06f367a813,Scribe
 wa200004058,802F404A-2D18-411B-9F11-44CFD8639D93,Dasseti
 wa200004060,5ae9c27c-5020-44e0-8e9a-c9d003d6e1b0,MSBDocs eSign for Outlook
 wa200004075,910d4cd5-eda2-464b-895e-a4e3c4705d1d,Cloudya Meet and Share
@@ -688,7 +618,6 @@ wa200004085,18EEA885-12B9-4055-BB92-3A95BB7A9511,Boost My Mail
 wa200004087,1f59be1d-b536-4ac5-814a-d69a5e48935b,Repasat
 wa200004088,832ed943-aa77-4d7e-aecc-e4dc9e25ace7,projectfacts
 wa200004090,8f926022-0784-421b-b4c5-da83019aba86,SNAP.HD Meetings
-wa200004102,2246bf88-d37a-481d-bffd-5d0311b401b6,Appspace Places
 wa200004110,b0146b96-5f5a-4508-9cab-507ec358ab99,Learning Experience for Outlook
 wa200004117,ce473886-18be-442b-a65c-b4d7c935d1d2,OXO signature V2 
 wa200004158,cef2d04b-ebe7-4eef-b68c-e979882a837a,ClauseBuddy
@@ -698,13 +627,11 @@ wa200004176,e44fdc86-7266-4a5f-92f6-afec3c91702b,SharePortals
 wa200004177,03dde774-2969-46d2-b427-6988a3747883,Egnyte for Outlook
 wa200004180,91ee4ee3-a18e-4baa-8d5b-31e32a7ea480,LexShare
 wa200004186,cd280bc4-9ce3-4c1d-93ca-b9e8b3af4ce3,Mailissa
-wa200004194,f1664065-f080-4963-b1ee-fdeeb2deb6bd,SIGNandGO
 wa200004207,b5b30eea-c98c-4c94-9dd4-31d020e98466,MTS Link
 wa200004208,5b5b8dc8-dd1b-4b2f-84d4-fbba8fe7adbd,Archie for Outlook
 wa200004219,3d7dab89-8dcd-4917-a89c-34785844caee,Kukkuniiaat
 wa200004279,55253ca9-e782-4bad-b828-5ed96aaae706,Mashoom for Outlook
 wa200004282,3a8effa3-e7ca-4663-a830-9ae3d3a191a0,Portex
-wa200004292,70740af2-d4c7-4f35-8757-ca6066de6c12,DealRoom
 wa200004293,39b4fcd3-3f20-4332-a218-5861e6335229,Acall
 wa200004305,96E1F7A3-B653-4BC2-895F-D5FAB6AE13EB,OfficeSpace for Outlook
 wa200004351,721e8b10-e412-4b5d-99f0-57f9b60ed51a,SuperSync Email for NetSuite
@@ -723,7 +650,6 @@ wa200004452,9438af68-443a-49ac-9f68-848de6d18ab1,Matrx
 wa200004482,ba39d595-6803-4610-b6ea-607d45be023b,CloudLex for Outlook
 wa200004486,AA0640A1-4057-469E-9379-EA29C54EF8F4,Dasseti (Demo)
 wa200004496,67C91310-D756-4E69-A46A-8CA75E3D6A3B,Meetingflow
-wa200004512,efc30400-2ac5-48b7-8c9b-c0fd5f266be2,Exclaimer
 wa200004516,c7c3b43e-d32c-413e-9a84-fe3945548d70,Encyro
 wa200004526,5460653e-9beb-4e0d-9e1b-aefc510cf6cb,Spaceti
 wa200004528,c5fe29c8-55ef-4d57-a466-a6e16007e50b,Attendee Contact
@@ -742,7 +668,6 @@ wa200004613,e58d550f-13ff-fa9d-2fb8-bcff80688df1,Priority Matrix HIPAA
 wa200004616,9e45a20b-5535-4399-b7d3-f1eae122f30a,Diary Detox
 wa200004626,f1da79ce-4558-4e73-a2c0-4656a8fe2174,ezMark
 wa200004637,30c77c14-28b0-42b4-99c6-929f992dfd41,OrchestratorBot
-wa200004647,2e6d9276-9b57-4f1a-841b-4e4ae399b8eb,Sine
 wa200004652,c0d0f88d-f7dc-455d-89ee-2b759135e44f,Moxo
 wa200004656,24d0343d-3f42-47e5-9530-32e601acdab7,Edda
 wa200004663,41ecf199-58ae-4095-ab59-0c5df9e89d7f,vidREACH Video Share
@@ -750,7 +675,6 @@ wa200004665,f6ff3952-cb91-4134-9ac8-110c4d33ad16,InTouch
 wa200004668,e894ac5c-581c-4708-ba69-cc81f36f8391,ZeroTime
 wa200004671,530f2364-6fc2-4a1f-9198-8162dc649427,Snapcom Meeting for Outlook
 wa200004673,0a37c2ac-91f0-40e9-8e87-fb577a0849e6,Thread for Email
-wa200004686,ac0d2830-ad92-4e1a-86d7-60fdbb51e380,Report Phishing
 wa200004691,70b13522-a63f-4200-9cc3-e7d6b2dc59a7,Flexopus for Outlook
 wa200004695,5e4862bd-a560-49f8-b250-de5c609fb1ff,DocPortal
 wa200004712,fb86ddbf-8562-4deb-bd19-ffe0d9efad6c,Perfectview CRM Online
@@ -777,10 +701,8 @@ wa200004924,a8d54630-1e1f-463c-8e13-82eb03a1ee17,Calendly
 wa200004929,fd86eb70-7536-44fb-b837-803561857baa,Backstop for Outlook
 wa200004937,69176ECC-A49E-4B78-8338-3CEC56BA6D99,Image Chooser
 wa200004954,ef6541ff-b37b-45a1-a008-13a9661a5eac,KnowledgeNet.ai
-wa200004956,581d28b3-0ecf-4e63-89ba-c5c3d12030cd,Awardco
 wa200004960,babbf439-d0b5-42b7-b6cb-1e4de34f994a,CultureNext
 wa200004967,abed54c5-fa37-412f-b77c-c798efe72be2,SendConfirm for Outlook M365
-wa200004973,bcb0ae42-ff5f-4f1d-88ca-f93c0f959f97,Send to Trello
 wa200004974,b63b084b-3e71-41aa-a0f3-6578785edae2,ndMail
 wa200004975,5b65abe0-e1cd-44e3-8eec-b51cdea4e44e,TrueConf for Outlook
 wa200004978,a1a6e520-2b26-4c31-bea5-e21b5e8d16ea,Plan arrival/departure
@@ -794,7 +716,6 @@ wa200005035,93ba175e-9fc0-481b-be18-4b369042da86,QReserve
 wa200005039,f1c91473-65da-d3a7-99e8-9a824c284cfa,Priority Matrix Government
 wa200005049,5f3dc08e-14ff-4d7c-930e-86e5b823f7d8,Bastion - Report Phishing ðŸŽ£
 wa200005051,63312176-17ce-43c3-8d71-1406593e73e5,MTrans for Outlook
-wa200005053,b3b8da19-4284-446d-9faa-1690df70be4c,DealCloud for Outlook 
 wa200005062,eef2d7b4-240f-4218-a443-1bb8884bdf26,ISOPlanner Task
 wa200005094,5bcd70b8-8518-498e-a6dc-54ef4b0f6f06,Evolio for Outlook
 wa200005112,56f8f9d6-3bfb-4884-bd39-7194359ee3b4,Email Blaster
@@ -808,11 +729,9 @@ wa200005161,cfd1ec99-98a6-4966-a672-11b4403aa99e,BizVibe - Turn Contacts into In
 wa200005164,cf05277f-5cb2-4300-ad3f-269f7411dc1f,TeamSystem Legal
 wa200005165,b350e788-73db-474d-b0e6-0eff1cea6a36,RePhraser
 wa200005166,05c2e1c9-3e1d-406e-9a91-e9ac64854146,Phish Inspector
-wa200005168,8ae4fcda-026f-400c-9ea3-f8f3fcb51078,MailMaestro - ChatGPT for Outlook
 wa200005213,f5be8023-c697-4521-a6d5-bba33bb94cc5,ByondFiles
 wa200005224,f2ef5121-9f40-4bcd-870e-822adfbec87b,doclinc for Outlook
 wa200005225,48b83e1f-de12-4178-bfd2-1f5cf9f7e83e,ClientManager for Outlook
-wa200005237,d5e8242a-0f61-4ae3-9351-30e41d37ceb1,Signature 365
 wa200005257,262225db-49e6-45ed-992f-c434ca5fc1ae,WriteNow AI
 wa200005261,3222526d-6f63-4793-bf50-075bfcc0e0c2,VComply for Outlook
 wa200005262,49c5c2ce-7cc9-4af7-8837-5d27bbc8a06f,LexisÂ® Create DMS
@@ -863,7 +782,6 @@ wa200005605,6c2e1d66-2dcd-4303-8196-0d3d235af573,ToMate
 wa200005606,adfb64c3-fdef-42dd-81a6-84445a68f547,CoroMail
 wa200005613,f14bed38-1cd6-4cb9-81e9-3f4b94774f49,Roam
 wa200005629,6c5ed5fb-1ae7-489e-b1b8-705d9bdfd97a,Raiser AI Assistant
-wa200005635,f6b54eba-e5c1-437e-8c64-40c0b1b213b3,ChatGPT Connector
 wa200005636,9e9f154b-e66e-46d1-b5da-2b2d25f5c010,Mailinblack
 wa200005637,89662296-e962-486a-b682-6c98754ff3fe,Truss
 wa200005652,98ef1f1b-560d-4784-b2ba-42f220a93e8d,NextAgency
@@ -890,7 +808,6 @@ wa200005805,981699a4-58f0-4706-b992-aafc798d4eb5,MarvellUp
 wa200005820,fabe8f65-7356-4bfa-8449-e606e42ca76e,Morningmate
 wa200005821,FC6D29AE-C588-422E-AD9D-7D70C7581890,contentACCESS
 wa200005831,79ed8524-1c03-40cd-bfb3-d7071b1c36d9,Foxit eSign
-wa200005837,9E0BD3BC-386E-45D0-97B3-ECA8D7F703BB,Xink
 wa200005840,0b9eefd1-e32c-4a61-af23-84184191d3ba,Inpart Deal
 wa200005864,8049c76d-a506-4c42-9b45-ba7329191a09,Malcore Office Shield
 wa200005878,85370f25-7dee-42b1-b138-f0a4c086db00,Email Tracker by Leadinfo
