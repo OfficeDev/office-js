@@ -5,4 +5,4 @@ contact_links:
     about: To request a new feature in Office.js or the Office developer platform, please post your idea to the Microsoft 365 Developer Platform Tech Community.
   - name: General discussions
     url: https://github.com/OfficeDev/office-js/discussions
-    about: For general discussions about Office.js, please use the GitHub Discussions forum.
+    about: For general questions and other discussions about Office.js, please use the GitHub Discussions forum.
