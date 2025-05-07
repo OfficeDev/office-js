@@ -49,7 +49,7 @@ For next steps, see [Determine if centrally deployed add-ins are using legacy to
 
 Users can also deploy add-ins from the Microsoft store, or sideload add-ins. Run the following command in PowerShell to get a list of all add-ins deployed by users in your tenant. The command loops through all user mailboxes so it may take some time to complete.
 
-- `Get-EXOMailbox -ResultSize Unlimited | ForEach-Object {Get-App -Mailbox $_.identity | Select-Object -Property DisplayName, Enabled, AppVersion, AppId, MarketplaceAssetID} | Sort-Object -Property DisplayName | Get-Unique -AsString | Export-Csv add-in-list-export.csv -NoTypeInformation -Append`
+- `Get-EXOMailbox -ResultSize Unlimited | ForEach-Object {Get-App -Mailbox $_.identity | Select-Object -Property MailboxOwnerId, DisplayName, Enabled, AppVersion, AppId, MarketplaceAssetID} | Sort-Object -Property DisplayName | Get-Unique -AsString | Export-Csv add-in-list-export.csv -NoTypeInformation -Append`
 
 The command exports an `add-in-list-export.csv` file with a list of all add-ins found for all users. For more information about this command including how to build reports around add-ins in your organization, see [Report Office Store Web Add-ins (apps) usage in your organization](https://www.howto-outlook.com/howto/report-office-store-app-usage.htm)
 
