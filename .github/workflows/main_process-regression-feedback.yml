@@ -1,0 +1,29 @@
+name: Process Regression Feedback
+
+on:
+  issue_comment:
+    types: [edited]
+
+jobs:
+  process_feedback:
+    runs-on: ubuntu-latest
+    if: contains(github.event.comment.body, '## Regression Analysis Needs Your Input') && contains(github.event.comment.body, '<!-- comment_id:')
+    permissions:
+      issues: write
+      contents: read
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          
+      - run: pip install --quiet requests
+      
+      - env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          COMMENT_ID: ${{ github.event.comment.id }}
+          COMMENT_BODY: ${{ github.event.comment.body }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+        run: python issue-scripts/process_regression_feedback.py
