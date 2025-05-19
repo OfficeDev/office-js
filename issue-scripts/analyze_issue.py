@@ -341,6 +341,7 @@ def analyze_single_issue(issue_data, repo_owner, repo_name, github_token, chat_m
         analysis_result = analyze_issue_for_regression(issue_content, issue_number, chat_model)
         final_decision = analysis_result["decision"]
         final_reason = analysis_result["reason"]
+        final_conclude = analysis_result["initial_analysis"].get('reason', 'N/A')
         
         # Common headers for GitHub API calls
         headers = {
@@ -360,7 +361,7 @@ def analyze_single_issue(issue_data, repo_owner, repo_name, github_token, chat_m
                 # Add a comment explaining the label
                 comment_url = f"https://api.github.com/repos/{repo_owner}/{repo_name}/issues/{issue_number}/comments"
                 source = "issue content and comments" if include_comments else "issue content"
-                comment_data = {"body": f"This issue was automatically labeled as a regression based on dual-LLM analysis of the {source}.\n\nReason: {final_reason}"}
+                comment_data = {"body": f"This issue was automatically labeled as a regression based on dual-LLM analysis of the {source}.\n\nReason: {final_conclude}"}
                 requests.post(comment_url, headers=headers, json=comment_data)
                 return True
             else:
@@ -394,8 +395,6 @@ A regression bug is when **functionality that previously worked properly no long
 > After selecting the option, your choice will be automatically processed.
 
 ---
-*Technical details:*
-{final_reason}
 """
             
             comment_data = {"body": comment_body}
