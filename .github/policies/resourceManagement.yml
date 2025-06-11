@@ -120,7 +120,7 @@ configuration:
           label: 'Area: Word'
       - assignTo:
           users:
-          - guoms1
+          - penglongzhaochina
       - addLabel:
           label: 'Needs: attention :wave:'
       - addReply:
@@ -143,7 +143,7 @@ configuration:
           label: 'Area: Excel'
       - assignTo:
           users:
-          - guoms1
+          - penglongzhaochina
       - addLabel:
           label: 'Needs: attention :wave:'
       - addReply:
