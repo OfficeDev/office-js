@@ -120,7 +120,7 @@ configuration:
           label: 'Area: Word'
       - assignTo:
           users:
-          - penglongzhaochina
+          - AmandaHan123
       - addLabel:
           label: 'Needs: attention :wave:'
       - addReply:
