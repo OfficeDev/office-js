@@ -143,7 +143,7 @@ configuration:
           label: 'Area: Excel'
       - assignTo:
           users:
-          - penglongzhaochina
+          - RuizhiSunMS
       - addLabel:
           label: 'Needs: attention :wave:'
       - addReply:
