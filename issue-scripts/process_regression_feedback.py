@@ -2,6 +2,8 @@ import os
 import re
 import requests
 
+from incident_notification import send_incident_notification
+
 def process_regression_feedback():
     """Process user feedback on regression analysis."""
     # Get environment variables
@@ -9,6 +11,7 @@ def process_regression_feedback():
     comment_id = os.environ["COMMENT_ID"]
     comment_body = os.environ["COMMENT_BODY"]
     issue_number = os.environ["ISSUE_NUMBER"]
+    issue_user = os.environ.get("ISSUE_USER")
     
     print(f"Processing feedback for issue #{issue_number}")
     
@@ -49,6 +52,13 @@ def process_regression_feedback():
     
     if label_response.status_code == 200:
         print(f"Successfully added 'regression' label to issue #{issue_number}")
+        send_incident_notification(
+            issue_title=None,
+            issue_url=f"https://github.com/{repo_owner}/{repo_name}/issues/{issue_number}",
+            regression_reason="Regression confirmed via manual feedback",
+            user_login=issue_user,
+            detection_source="manual feedback confirmation",
+        )
     else:
         print(f"Failed to add label. Status code: {label_response.status_code}")
     
