@@ -7,6 +7,8 @@ from langchain_core.messages import SystemMessage, HumanMessage
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import JsonOutputParser
 
+from incident_notification import send_incident_notification
+
 class AzureChatOpenAIError(Exception):
     """Exception raised for errors in Azure OpenAI chat operations."""
     pass
@@ -363,6 +365,14 @@ def analyze_single_issue(issue_data, repo_owner, repo_name, github_token, chat_m
                 source = "issue content and comments" if include_comments else "issue content"
                 comment_data = {"body": f"This issue was automatically labeled as a regression based on dual-LLM analysis of the {source}.\n\nReason: {final_conclude}"}
                 requests.post(comment_url, headers=headers, json=comment_data)
+                # Notify Logic App to create an incident
+                send_incident_notification(
+                    issue_title=issue_title,
+                    issue_url=issue_data.get("html_url"),
+                    regression_reason=final_reason or "Regression confirmed automatically",
+                    user_login=issue_data.get("user", {}).get("login") if isinstance(issue_data.get("user"), dict) else None,
+                    detection_source="automated regression detection",
+                )
                 return True
             else:
                 print(f"Failed to add label. Status code: {response.status_code}")
