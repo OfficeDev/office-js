@@ -12,6 +12,7 @@ def process_regression_feedback():
     comment_body = os.environ["COMMENT_BODY"]
     issue_number = os.environ["ISSUE_NUMBER"]
     issue_user = os.environ.get("ISSUE_USER")
+    issue_title_env = os.environ.get("ISSUE_TITLE")
     
     print(f"Processing feedback for issue #{issue_number}")
     
@@ -52,8 +53,19 @@ def process_regression_feedback():
     
     if label_response.status_code == 200:
         print(f"Successfully added 'regression' label to issue #{issue_number}")
+        issue_title = issue_title_env
+        if not issue_title:
+            issue_details_url = f"https://api.github.com/repos/{repo_owner}/{repo_name}/issues/{issue_number}"
+            issue_details_response = requests.get(issue_details_url, headers=headers)
+            if issue_details_response.status_code == 200:
+                issue_title = issue_details_response.json().get("title")
+            else:
+                print(
+                    "Warning: unable to retrieve issue title for notification "
+                    f"(status {issue_details_response.status_code})"
+                )
         send_incident_notification(
-            issue_title=None,
+            issue_title=issue_title,
             issue_url=f"https://github.com/{repo_owner}/{repo_name}/issues/{issue_number}",
             regression_reason="Regression confirmed via manual feedback",
             user_login=issue_user,
