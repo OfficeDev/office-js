@@ -26,4 +26,5 @@ jobs:
           COMMENT_ID: ${{ github.event.comment.id }}
           COMMENT_BODY: ${{ github.event.comment.body }}
           ISSUE_NUMBER: ${{ github.event.issue.number }}
+          ISSUE_USER: ${{ github.event.issue.user.login }}
         run: python issue-scripts/process_regression_feedback.py
