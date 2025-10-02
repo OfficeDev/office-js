@@ -1,6 +1,6 @@
 # Office JavaScript APIs for Office Add-ins
 
-Use Office.js amd the Office Add-ins platform to build solutions that extend Office applications and interact with content in Office documents and in Outlook mail messages and calendar items. With Office Add-ins, you can use familiar web technologies such as HTML, CSS, and JavaScript to build solutions that can run in Office on the web, Windows, Mac, and mobile. You'll find walkthroughs, samples, and more information in the official [Office Add-ins documentation](https://learn.microsoft.com/office/dev/add-ins/).
+Use Office.js and the Office Add-ins platform to build solutions that extend Office applications and interact with content in Office documents and in Outlook mail messages and calendar items. With Office Add-ins, you can use familiar web technologies such as HTML, CSS, and JavaScript to build solutions that can run in Office on the web, Windows, Mac, and mobile. You'll find walkthroughs, samples, and more information in the official [Office Add-ins documentation](https://learn.microsoft.com/office/dev/add-ins/).
 
 ## This repository
 
