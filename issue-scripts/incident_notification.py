@@ -3,10 +3,6 @@ from typing import Optional
 
 import requests
 
-
-LOGIC_APP_URL = "https://prod-07.northcentralus.logic.azure.com:443/workflows/fce230d344e3424193fa488f37a5f1cf/triggers/When_a_HTTP_request_is_received/paths/invoke?api-version=2016-10-01&sp=%2Ftriggers%2FWhen_a_HTTP_request_is_received%2Frun&sv=1.0&sig=FWEPdesnuPXBarpDl_bbT6jTQLPMT2zkH8eS96ZekZw"
-
-
 def send_incident_notification(
     *,
     issue_title: Optional[str],
@@ -17,7 +13,13 @@ def send_incident_notification(
 ) -> bool:
     """Trigger the regression incident Logic App webhook with required fields."""
 
-    logic_app_url = LOGIC_APP_URL
+    logic_app_url = os.environ.get("REGRESSION_ICM_LOGIC_APP_URL")
+    if not logic_app_url:
+        print(
+            "Skipping regression incident notification: LOGIC_APP_URL environment "
+            "variable is not set."
+        )
+        return False
     timeout = float(os.environ.get("INCIDENT_NOTIFICATION_TIMEOUT", 10))
     payload = {
         "issue_title": issue_title,
