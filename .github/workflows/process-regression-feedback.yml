@@ -28,5 +28,5 @@ jobs:
           ISSUE_NUMBER: ${{ github.event.issue.number }}
           ISSUE_USER: ${{ github.event.issue.user.login }}
           ISSUE_TITLE: ${{ github.event.issue.title }}
-          REGRESSION_ICM_LOGIC_APP_URL: ${{ secrets.REGRESSION_ICMLOGIC_APP_URL }}
+          REGRESSION_ICM_LOGIC_APP_URL: ${{ secrets.REGRESSION_ICM_LOGIC_APP_URL }}
         run: python issue-scripts/process_regression_feedback.py
