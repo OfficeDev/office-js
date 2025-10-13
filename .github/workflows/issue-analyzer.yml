@@ -47,5 +47,6 @@ jobs:
           ISSUE_NUMBER: ${{ github.event_name == 'issue_comment' && github.event.issue.number || github.event.issue.number || '' }}
           REPO_OWNER: ${{ github.repository_owner }}
           REPO_NAME: ${{ github.repository }}
+          REGRESSION_ICM_LOGIC_APP_URL: ${{ secrets.REGRESSION_ICM_LOGIC_APP_URL }}
         run: |
           python issue-scripts/analyze_issue.py
