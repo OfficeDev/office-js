@@ -1,10 +1,10 @@
 # Office JavaScript APIs for Office Add-ins
 
-Use Office.js amd the Office Add-ins platform to build solutions that extend Office applications and interact with content in Office documents and in Outlook mail messages and calendar items. With Office Add-ins, you can use familiar web technologies such as HTML, CSS, and JavaScript to build solutions that can run in Office on the web, Windows, Mac, and mobile. You'll find walkthroughs, samples, and more information in the official [Office Add-ins documentation](https://learn.microsoft.com/office/dev/add-ins/).
+Use Office.js and the Office Add-ins platform to build solutions that extend Office applications and interact with content in Office documents and in Outlook mail messages and calendar items. With Office Add-ins, you can use familiar web technologies such as HTML, CSS, and JavaScript to build solutions that can run in Office on the web, Windows, Mac, and mobile. You'll find walkthroughs, samples, and more information in the official [Office Add-ins documentation](https://learn.microsoft.com/office/dev/add-ins/).
 
 ## This repository
 
-This GitHub repository is primarily used to report issues found in the Office JavaScript APIs. The NPM package associated with this repo is no longer officially supported. Your add-in should get the JavaScript library from the Office content delivery network (CDN), as described in the section [Reference Office.js from the CDN](#reference-officejs-from-the-cdn). This ensures that essential product updates are served quickly to the Office Add-ins. Given that the latest Office.js release is backward-compatible with prior releases, it's safe to update to the most recent release of the library when one is available. If you need to access the library in a secure cloud environment, download the necessary files from the CDN and bundle them with your add-in.
+This GitHub repository is primarily used to report issues found in the Office JavaScript APIs. The npm package associated with this repository is no longer officially supported. Your add-in should get the JavaScript library from the Office content delivery network (CDN), as described in the section [Reference Office.js from the CDN](#reference-officejs-from-the-cdn). This ensures that essential product updates are served quickly to Office Add-ins.
 
 ## Report issues
 
@@ -43,14 +43,14 @@ TypeScript definitions for Office.js are available on DefinitelyTyped.
   > npm install @types/office-js --save-dev
 - latest **PREVIEW** version of Office.js:
   - DefinitelyTyped: <https://github.com/DefinitelyTyped/DefinitelyTyped/blob/master/types/office-js-preview/index.d.ts>
-  - @types: `@types/office-js-preview`.
+  - @types: `@types/office-js-preview`
   > npm install @types/office-js-preview --save-dev
 
 ## Code of Conduct
 
-This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/). For more information, see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.
+This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/). For more information, see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any questions or comments.
 
-## More info
+## More information
 
 For more information on Office Add-ins and the Office JavaScript APIs, see:
 
