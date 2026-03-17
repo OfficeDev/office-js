@@ -138,6 +138,74 @@ def is_outlook_exclusive_issue(issue_title, issue_body, chat_model):
         # Fall back to false in case of errors
         return False
 
+def detect_platform_behavioral_difference(issue_title, issue_body, chat_model):
+    """
+    Use LLM to determine if an issue describes a behavioral difference between
+    Office on the web (Excel Online, Word Online, etc.) and Office desktop.
+
+    Args:
+        issue_title: The title of the issue
+        issue_body: The body/description of the issue
+        chat_model: LangChain model for analysis
+
+    Returns:
+        dict: Analysis result with keys:
+            - 'is_platform_difference': bool – True if the issue is a web/desktop behavioral difference
+            - 'confidence': float between 0 and 1
+            - 'web_only': bool – True if the problem only manifests on the web platform
+            - 'reason': str – explanation of the decision
+    """
+    issue_content = f"Issue Title: {issue_title}\n\nIssue Description: {issue_body}"
+
+    platform_prompt = ChatPromptTemplate.from_messages([
+        ("system", """You are an expert at analyzing software issues for Microsoft Office Add-ins.
+        Your task is to determine if an issue describes a **behavioral difference** between
+        Office on the web (e.g. Excel Online, Word Online) and Office desktop (Windows or Mac).
+
+        A 'platform behavioral difference' is a problem where:
+        1. The behavior or output differs between the web version and the desktop version of the same Office application.
+        2. The issue reporter explicitly mentions observing different results on web vs. desktop.
+        3. It is NOT a feature that is simply unavailable on one platform; it must be the same feature
+           behaving differently.
+
+        Provide a JSON response with your analysis."""),
+        ("human", """Analyze the following issue and determine if it describes a behavioral difference
+        between Office on the web and Office desktop.
+
+        Response must be JSON with:
+        - 'is_platform_difference': boolean – true if a web/desktop behavioral difference is described
+        - 'confidence': number between 0 and 1
+        - 'web_only': boolean – true if the undesirable behavior occurs only on the web platform
+        - 'reason': string explaining your decision
+
+        Issue content:
+        {issue}""")
+    ])
+
+    try:
+        parser = JsonOutputParser()
+        result = platform_prompt.pipe(chat_model).pipe(parser).invoke({"issue": issue_content})
+
+        print(f"Platform behavioral difference analysis result:")
+        print(json.dumps(result, ensure_ascii=False, indent=2))
+
+        return {
+            "is_platform_difference": bool(result.get("is_platform_difference", False)),
+            "confidence": float(result.get("confidence", 0)),
+            "web_only": bool(result.get("web_only", False)),
+            "reason": result.get("reason", ""),
+        }
+
+    except Exception as e:
+        print(f"Error in platform behavioral difference detection: {str(e)}")
+        return {
+            "is_platform_difference": False,
+            "confidence": 0,
+            "web_only": False,
+            "reason": f"Error during analysis: {str(e)}",
+        }
+
+
 def get_issue_comments(repo_owner, repo_name, issue_number, github_token):
     """Get all comments for a specific issue."""
     comments_url = f"https://api.github.com/repos/{repo_owner}/{repo_name}/issues/{issue_number}/comments"
@@ -325,6 +393,60 @@ def analyze_single_issue(issue_data, repo_owner, repo_name, github_token, chat_m
         
     print(f"\nProcessing issue #{issue_number}: {issue_title}")
     print(f"Body length: {len(issue_body)} characters")
+
+    # Common headers for GitHub API calls
+    headers = {
+        "Authorization": f"token {github_token}",
+        "Accept": "application/vnd.github.v3+json"
+    }
+
+    # Check if the issue describes a web/desktop behavioral difference and label accordingly
+    platform_result = detect_platform_behavioral_difference(issue_title, issue_body, chat_model)
+    if platform_result["is_platform_difference"] and platform_result["confidence"] > 0.7:
+        print(f"Issue #{issue_number} describes a platform behavioral difference (web vs desktop). Labeling.")
+        label_url = f"https://api.github.com/repos/{repo_owner}/{repo_name}/issues/{issue_number}/labels"
+        labels_to_add = ["platform: web"]
+        label_response = requests.post(label_url, headers=headers, json={"labels": labels_to_add})
+        if label_response.status_code == 200:
+            print(f"Successfully added 'platform: web' label to issue #{issue_number}")
+        else:
+            print(f"Failed to add platform label. Status code: {label_response.status_code}")
+
+        if platform_result["web_only"]:
+            comment_url = f"https://api.github.com/repos/{repo_owner}/{repo_name}/issues/{issue_number}/comments"
+            platform_comment = (
+                "Our automated analysis detected that this issue describes a behavioral difference "
+                "between **Office on the web** and **Office desktop**.\n\n"
+                "This has been labeled as `platform: web` to help our team prioritize and route it correctly.\n\n"
+                "**Workaround for automated testing (e.g. Playwright):**\n"
+                "When reading cell values in Excel Online immediately after triggering a formula recalculation, "
+                "the cell may transiently display `0` between the `#BUSY` state and the final calculated value. "
+                "To avoid flaky tests, poll the cell value in a retry loop and wait until the value is neither "
+                "`#BUSY` nor `0` (or whatever the default empty-cell value is) before asserting the expected result. "
+                "Alternatively, listen for the `onCalculated` event on the `Worksheet` or `Workbook` object "
+                "and read the cell value only after that event fires.\n\n"
+                "Example snippet:\n"
+                "```javascript\n"
+                "await Excel.run(async (context) => {\n"
+                "  const sheet = context.workbook.worksheets.getActiveWorksheet();\n"
+                "  sheet.onCalculated.add(async () => {\n"
+                "    await Excel.run(async (ctx) => {\n"
+                "      const cell = ctx.workbook.worksheets.getActiveWorksheet().getRange(\"A1\");\n"
+                "      cell.load(\"values\");\n"
+                "      await ctx.sync();\n"
+                "      console.log(\"Calculated value:\", cell.values[0][0]);\n"
+                "    });\n"
+                "  });\n"
+                "  await context.sync();\n"
+                "});\n"
+                "```\n\n"
+                "The Office team will investigate the root cause of the transient `0` value on the web platform."
+            )
+            comment_response = requests.post(comment_url, headers=headers, json={"body": platform_comment})
+            if comment_response.status_code == 201:
+                print(f"Successfully added platform guidance comment to issue #{issue_number}")
+            else:
+                print(f"Failed to add platform comment. Status code: {comment_response.status_code}")
     
     # Prepare issue content for analysis
     issue_content = f"Issue Title: {issue_title}\n\nIssue Description: {issue_body}"
@@ -344,12 +466,6 @@ def analyze_single_issue(issue_data, repo_owner, repo_name, github_token, chat_m
         final_decision = analysis_result["decision"]
         final_reason = analysis_result["reason"]
         final_conclude = analysis_result["initial_analysis"].get('reason', 'N/A')
-        
-        # Common headers for GitHub API calls
-        headers = {
-            "Authorization": f"token {github_token}",
-            "Accept": "application/vnd.github.v3+json"
-        }
         
         # Take action based on final decision
         if final_decision == "confirmed_regression":
@@ -436,6 +552,15 @@ def analyze_issues():
             "regression", 
             "d73a4a",  #Red color for regression
             "Functionality that previously worked no longer works"
+        )
+
+        ensure_label_exists(
+            repo_owner,
+            repo_name,
+            github_token,
+            "platform: web",
+            "0075ca",  # Blue color for platform-specific issues
+            "Issue behavior is specific to Office on the web"
         )
         
         # Check for specific issue number
