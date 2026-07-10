@@ -1,0 +1,59 @@
+# Define a workflow to run the issue sentinel
+name: Run issue sentinel
+
+on:
+  issues:
+    types: [opened, edited, closed]
+
+jobs:
+  Issue:
+    permissions:
+      issues: write
+    runs-on: ubuntu-latest
+    steps:
+      - name: Run Issue Sentinel
+        uses: Azure/issue-sentinel@v1
+        with:
+          # Define a function to analyze an issue
+          analyze_issue: |
+            import os
+            import requests
+            import json
+            import traceback
+
+            def analyze_issue(issue):
+                try:
+                    # Get the issue title and description
+                    title = issue['title']
+                    description = issue['description']
+
+                    # Check if the issue is related to silent breaking changes or unverifiable remote code
+                    if 'silent breaking change' in title.lower() or 'unverifiable remote code' in description.lower():
+                        return True
+                    else:
+                        return False
+                except Exception as e:
+                    print(f"Error analyzing issue: {e}")
+                    return None
+
+          # Define a function to process regression feedback
+          process_regression_feedback: |
+            import os
+            import requests
+            import json
+            import traceback
+
+            def process_regression_feedback(feedback):
+                try:
+                    # Get the feedback title and description
+                    title = feedback['title']
+                    description = feedback['description']
+
+                    # Check if the feedback is related to silent breaking changes or unverifiable remote code
+                    if 'silent breaking change' in title.lower() or 'unverifiable remote code' in description.lower():
+                        return True
+                    else:
+                        return False
+                except Exception as e:
+                    print(f"Error processing feedback: {e}")
+                    return None
