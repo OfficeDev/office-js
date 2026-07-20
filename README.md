@@ -8,6 +8,9 @@ This GitHub repository is primarily used to report issues found in the Office Ja
 
 ## Report issues
 
+See also [CONTRIBUTING.md](CONTRIBUTING.md) for where to file bugs, how-to questions, documentation feedback, and feature requests.
+
+
 If you believe you've found an issue (bug) with the Office JavaScript APIs, please visit the [issues tab](https://github.com/OfficeDev/office-js/issues) of this repo. If your issue is already reported, consider adding additional context or reproduction steps. Otherwise, select **New issue**, choose **Bug report**, and provide as much detail as possible. A member of our team will respond within 1-2 business days.
 
 > [!NOTE]
@@ -19,7 +22,9 @@ Requests for new platform features should be raised at the [Microsoft 365 Develo
 
 ### Other questions
 
-Questions about developing add-ins and how to use the APIs should be raised on [Stack Overflow](https://stackoverflow.com/questions/tagged/office-js) with the "office-js" tag or on [Microsoft Q&A](https://learn.microsoft.com/answers/tags/321/office-development) with the "Office Development" tag. These locations are monitored by a community of experts, which includes members of our product team. They'll review questions and provide assistance as they're able.
+Questions about developing add-ins and how to use the APIs should be raised on [Stack Overflow](https://stackoverflow.com/questions/tagged/office-js) with the "office-js" tag or on [Microsoft Q&A (Office JavaScript API)](https://learn.microsoft.com/answers/topics/office-js-dev.html). These locations are monitored by a community of experts, which includes members of our product team. They'll review questions and provide assistance as they're able.
+
+Documentation feedback (typos, missing samples, or Learn article issues) should be submitted with the feedback controls on the relevant [Office Add-ins documentation](https://learn.microsoft.com/office/dev/add-ins/) page, not as API bugs in this repository.
 
 ## Reference Office.js from the CDN
 
