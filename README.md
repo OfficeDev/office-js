@@ -28,7 +28,7 @@ The Office CDN is the official supported source for Office Add-ins. Reference th
 ```html
 <head>
     ...
-    <script src="https://appsforoffice.microsoft.com/lib/1/hosted/office.js" type="text/javascript"></script>
+    <script src="https://officeapis.public.onecdn.static.microsoft/1/office.js" type="text/javascript"></script>
 </head>
 ```
 
